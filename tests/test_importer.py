@@ -170,5 +170,29 @@ class TemplateTests(unittest.TestCase):
                                     {'ARMY__05.DAT': importer.decode_templates(self.fixture())}, ['ARMY__05.DAT'])
 
 
+class PreviewTests(unittest.TestCase):
+    def test_rejected_rle_is_reported_then_exact_dimensions_selected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            table = {'templates': [{'name': 'Candidate', 'width': 2, 'height': 2, 'sprite_base_candidate': 0}]}
+            data = spr([b'\x84\x01', b'\x84\x01\x02\x03\x04'])
+            palette = bytes([0, 0, 0, 10, 20, 30]) + bytes(762)
+            importer.write_template_previews({'ARMY__01.DAT': table}, lambda _: data, palette, Path(directory))
+            preview = table['templates'][0]['preview']
+            self.assertEqual(preview['status'], 'candidate')
+            self.assertEqual(preview['frame'], 1)
+            self.assertIn('literal', preview['rejections'][0]['reason'])
+            with Image.open(Path(directory) / 'template_previews.png') as image:
+                self.assertEqual(image.getpixel((0, 0)), (10, 20, 30, 255))
+
+    def test_mismatched_frames_remain_unresolved(self):
+        with tempfile.TemporaryDirectory() as directory:
+            table = {'templates': [{'name': 'Unknown', 'width': 3, 'height': 3, 'sprite_base_candidate': 0}]}
+            importer.write_template_previews({'ARMY__01.DAT': table}, lambda _: spr([b'\x04']), bytes(768), Path(directory))
+            preview = table['templates'][0]['preview']
+            self.assertEqual(preview['status'], 'unresolved')
+            self.assertIsNone(preview['frame'])
+            self.assertIn('dimensions', preview['rejections'][0]['reason'])
+
+
 if __name__ == '__main__':
     unittest.main()

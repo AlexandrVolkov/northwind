@@ -86,3 +86,27 @@ public sealed class ObjectRecord
     public uint RawY { get; set; }
     public string RawRecordHex { get; set; } = "";
 }
+
+public sealed class TemplatesData
+{
+    public Dictionary<string, TemplateTable> Armies { get; set; } = [];
+}
+public sealed class TemplateTable
+{
+    public TemplateEntry[] Templates { get; set; } = [];
+}
+public sealed class TemplateEntry
+{
+    public int TemplateIndex { get; set; }
+    public string Name { get; set; } = "";
+    public TemplatePreview Preview { get; set; } = new();
+}
+public sealed class TemplatePreview
+{
+    public string Status { get; set; } = "unresolved";
+    public int? Frame { get; set; }
+    public int AtlasX { get; set; }
+    public int AtlasY { get; set; }
+    public int Width { get; set; }
+    public int Height { get; set; }
+}

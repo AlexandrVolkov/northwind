@@ -217,6 +217,54 @@ def link_templates(records: list[dict], tables: dict, army_files: list[str]) -> 
                        'template_offset': template['file_offset']})
 
 
+def write_template_previews(tables: dict, read, palette: bytes, destination: Path) -> None:
+    """Representative candidates only: strict RLE and exact DAT dimensions.
+
+    Search at most 16 frames in each template's sprite range. Rejections remain
+    visible; this does not prove the original animation state or anchor.
+    """
+    total = sum(len(table['templates']) for table in tables.values())
+    atlas = Image.new('RGBA', (8 * 256, max(1, (total + 7) // 8) * 256))
+    slot = 0
+    for filename, table in tables.items():
+        data = read(filename.replace('.DAT', '.SPR'))
+        if len(data) < 2:
+            raise ValueError('Truncated SPR')
+        count = int.from_bytes(data[:2], 'little')
+        base = 2 + count * 3
+        if base > len(data):
+            raise ValueError('Truncated SPR offsets')
+        offsets = [int.from_bytes(data[2 + i * 3:5 + i * 3], 'little') for i in range(count)] + [len(data) - base]
+        if not count or offsets[0] != 0 or any(a > b or b > len(data) - base for a, b in zip(offsets, offsets[1:])):
+            raise ValueError('Invalid SPR offsets')
+        templates = table['templates']
+        for template in templates:
+            start = template['sprite_base_candidate']
+            next_bases = [t['sprite_base_candidate'] for t in templates if t['sprite_base_candidate'] > start]
+            end = min([count, start + 16] + next_bases)
+            preview = {'status': 'unresolved', 'rejections': [], 'frame': None,
+                       'atlas_x': slot % 8 * 256, 'atlas_y': slot // 8 * 256,
+                       'width': template['width'], 'height': template['height']}
+            slot += 1
+            template['preview'] = preview
+            for index in range(start, end):
+                record = data[base + offsets[index]:base + offsets[index + 1]]
+                try:
+                    pixels = decode_spr(b'\x01\x00\x00\x00\x00' + record)[0]
+                except ValueError as error:
+                    preview['rejections'].append({'frame': index, 'reason': str(error)})
+                    continue
+                if len(pixels) != template['width'] * template['height'] or not template['width'] or not template['height']:
+                    preview['rejections'].append({'frame': index, 'reason': 'DAT dimensions mismatch'})
+                    continue
+                image = Image.new('RGBA', (template['width'], template['height']))
+                image.putdata([tuple(palette[v * 3:v * 3 + 3]) + (255,) if v >= 0 else (0, 0, 0, 0) for v in pixels])
+                atlas.paste(image, (preview['atlas_x'], preview['atlas_y']))
+                preview.update({'status': 'candidate', 'frame': index})
+                break
+    atlas.save(destination / 'template_previews.png')
+
+
 def audit_directory(source: Path) -> dict:
     """Validate every discovered SCN/MAP/SEG chain, including empty OBE files."""
     files = {p.name.upper(): p for p in source.iterdir() if p.is_file()}
@@ -368,13 +416,14 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         'unit_frames': {'source': 'ARMY__01.SPR', 'first': 5, 'count': 32, 'width': 62, 'height': 62},
     }
     (destination / 'map.json').write_text(json.dumps(result, separators=(',', ':')), encoding='utf-8')
+    write_template_previews(tables, read, palette, destination)
     (destination / 'templates.json').write_text(json.dumps({'format_version': 1, 'armies': tables}, ensure_ascii=False, indent=2), encoding='utf-8')
     scenario_path = destination / 'scenario.json'
     if scenario is not None:
         scenario_path.write_text(json.dumps(scenario, ensure_ascii=False, indent=2), encoding='utf-8')
     elif scenario_path.exists():
         scenario_path.unlink()  # Never leave a previous map's scenario in the output.
-    manifest = {'importer_version': 4, 'files': used, 'decoded_sprite_records': len(frames),
+    manifest = {'importer_version': 5, 'files': used, 'decoded_sprite_records': len(frames),
                 'notes': 'Graphics decoded; gameplay and terrain blocking are experimental.'}
     (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
     return manifest
