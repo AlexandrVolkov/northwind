@@ -18,7 +18,8 @@ public partial class TestRunner : Node
             switch (mode)
             {
                 case "scene": await SceneChecks(); break;
-                case "simulation": SimulationChecks(); break;
+                case "simulation": SimulationChecks(); OriginalBuildingChecks(); break;
+                case "original-buildings": OriginalBuildingChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
                 default: throw new ArgumentException($"Unknown test mode: {mode}");
             }
