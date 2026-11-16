@@ -1,0 +1,112 @@
+using Godot;
+using Northwind;
+
+public partial class TestRunner : Node
+{
+    private int _checks;
+    private void Check(bool condition, string message)
+    {
+        _checks++;
+        if (!condition) throw new InvalidOperationException(message);
+    }
+    public override async void _Ready()
+    {
+        try
+        {
+            string mode = OS.GetCmdlineUserArgs().FirstOrDefault() ?? "simulation";
+            switch (mode)
+            {
+                case "scene": await SceneChecks(); break;
+                case "simulation": SimulationChecks(); break;
+                case "missing-assets": MissingAssetsChecks(); break;
+                default: throw new ArgumentException($"Unknown test mode: {mode}");
+            }
+            GD.Print($"C# {mode}: PASS ({_checks} checks)"); GetTree().Quit();
+        }
+        catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); }
+    }
+    private void SimulationChecks()
+    {
+        var rules = GameData.Read<GameRules>("res://data/prototype_rules.json");
+        rules.SpawnCenter = [3, 3];
+        rules.Units = [new Spawn { Id = 1, Team = 0, Offset = [0, 0] }, new Spawn { Id = 2, Team = 1, Offset = [2, 0] }];
+        var map = new MapData { Width = 7, Height = 7, Cells = new uint[49], Terrain = ["ground", "water", "forest"] };
+        map.Cells[2 * 7 + 3] = 1; map.Cells[4 * 7 + 3] = 2;
+        using var model = new Simulation(); model.Setup(map, rules);
+        Check(model.Units.Count == 2, "Two units spawn"); var unit = model.GetUnit(1)!;
+        Check(model.MoveUnit(1, new(3, 2)).Count == 0, "Water blocks movement");
+        Check(model.MoveUnit(1, new(5, 3)).Count == 0, "Occupied target blocked");
+        Check(model.MoveUnit(1, new(7, 3)).Count == 0, "Outside target blocked");
+        Check(!model.Attack(1, 2), "Attack at range rejected");
+        Check(unit.Moves == 6 && unit.Cell == new Vector2I(3, 3), "Rejected actions leave state unchanged");
+        Check(model.RouteCost(model.PathFor(unit, new(3, 4))) == 2, "Forest movement cost");
+        Check(model.MoveUnit(1, new(4, 3)).Count == 2 && unit.Moves == 5, "Movement and budget");
+        Check(model.Attack(1, 2), "Adjacent attack");
+        Check(model.GetUnit(2)!.Hp == 7 && unit.Hp == 9, "Damage and retaliation");
+        Check(!model.Attack(1, 2) && unit.Moves == 0, "No double attack");
+        Check(model.MoveUnit(1, new(4, 4)).Count == 0, "Exhausted unit cannot move");
+        model.EndTurn();
+        Check(model.Turn == 2 && unit.Moves == 6 && !unit.Attacked, "Friendly turn resets");
+        Check(unit.Hp == 6, "Enemy retaliates on its turn");
+        model.GetUnit(2)!.Hp = 0;
+        Check(model.UnitAt(new(5, 3)) == null, "Dead unit does not occupy cell");
+        Check(model.Outcome() != "", "Victory detected");
+        model.EndTurn(); Check(model.Turn == 2, "Finished battle cannot advance");
+        model.Setup(map, rules);
+        for (int y = 0; y < 7; y++) model.Grid.SetPointSolid(new(4, y), true);
+        Check(model.PathFor(model.GetUnit(1), new(6, 6)).Count == 0, "Unreachable path");
+        model.GetUnit(2)!.Team = 0; Check(!model.Attack(1, 2), "Friendly fire rejected");
+        // Lethal attacks must not trigger retaliation.
+        model.Setup(map, rules); model.GetUnit(1)!.Cell = new(4, 3); model.GetUnit(2)!.Hp = 3;
+        model.Attack(1, 2); Check(model.GetUnit(1)!.Hp == 10 && model.GetUnit(2) == null, "No retaliation after death");
+        // Enemy movement must remain within budget and not overlap friendly units.
+        model.Setup(map, rules); model.EndTurn();
+        Check(model.Units.Select(u => u.Cell).Distinct().Count() == 2, "AI does not overlap units");
+        Check(model.Grid.GetPointWeightScale(new(3, 4)) == 2, "Weighted pathfinding retained");
+    }
+    private void MissingAssetsChecks()
+    {
+        Check(!Godot.FileAccess.FileExists("res://assets/imported/map.json"), "Fixture must not contain imported assets");
+        var scene = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        AddChild(scene);
+        Check(!scene.ReadyToPlay && scene.EndButton.Disabled, "Fresh checkout shows import instructions instead of starting a battle");
+        RemoveChild(scene); scene.Free();
+    }
+    private async Task Click(Main scene, Vector2I cell, MouseButton button)
+    {
+        var point = scene.GetViewport().GetCanvasTransform() * Main.CenterOf(cell);
+        Input.WarpMouse(point); await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        var e = new InputEventMouseButton { Position = point, ButtonIndex = button, Pressed = true };
+        Input.ParseInputEvent(e); await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        Input.ParseInputEvent(new InputEventMouseButton { Position = point, ButtonIndex = button, Pressed = false });
+        await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+    }
+    private async Task SceneChecks()
+    {
+        GetTree().Root.Size = new Vector2I(1280, 800);
+        var scene = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        Check(scene.ReadyToPlay, "Imported assets load"); Check(scene.Model.Units.Count == 4, "Four units spawn");
+        var unit = scene.Model.GetUnit(2)!; await Click(scene, unit.Cell, MouseButton.Left);
+        Check(scene.Selected == 2, "Mouse selection");
+        var target = new[] { Vector2I.Right, Vector2I.Down, Vector2I.Left, Vector2I.Up }.Select(d => unit.Cell + d)
+            .First(c => { var p = scene.Model.PathFor(unit, c); return p.Count > 1 && scene.Model.RouteCost(p) <= unit.Moves; });
+        await Click(scene, target, MouseButton.Right); Check(unit.Cell == target, "Right-click movement");
+        for (int i = 0; i < 10; i++) scene._Process(1);
+        Check(scene.Animations.Count == 0, "Animation completes");
+        Check(scene.Positions[2].DistanceTo(Main.CenterOf(target)) < .1f, "Sprite arrives");
+        scene.EndButton.EmitSignal(Button.SignalName.Pressed); Check(scene.Model.Turn == 2, "End-turn button");
+        for (int i = 0; i < 100; i++) scene._Process(1);
+        scene._UnhandledInput(new InputEventKey { PhysicalKeycode = Key.R, Pressed = true });
+        Check(scene.Model.Turn == 1 && scene.Animations.Count == 0, "Reset key");
+        scene.OpenScenario(); Check(scene.ScenarioDialog!.Visible && scene.ScenarioText!.Text.Length > 0, "Scenario inspector"); scene.ScenarioDialog.Hide();
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        if (DisplayServer.GetName() != "headless")
+        {
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            DirAccess.MakeDirRecursiveAbsolute("res://build");
+            Check(GetTree().Root.GetTexture().GetImage().SavePng("res://build/dotnet-smoke.png") == Error.Ok, "Rendered screenshot");
+        }
+        scene.QueueFree(); await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+    }
+}

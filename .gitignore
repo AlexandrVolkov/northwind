@@ -7,3 +7,9 @@ __pycache__/
 *.cab
 *.CAB
 build/
+
+# .NET build and IDE state
+bin/
+obj/
+.vs/
+.idea/
