@@ -106,6 +106,20 @@ def decode_spr(data: bytes) -> list[list[int]]:
     return frames
 
 
+def decode_spr_frame(data, frame):
+    if len(data) < 2:
+        raise ValueError('Truncated SPR')
+    count = int.from_bytes(data[:2], 'little')
+    base = 2 + count * 3
+    if not 0 <= frame < count or base > len(data):
+        raise ValueError('Invalid SPR frame or table')
+    offsets = [int.from_bytes(data[2+i*3:5+i*3], 'little') for i in range(count)] + [len(data)-base]
+    if offsets[0] != 0 or any(a > b or b > len(data)-base for a, b in zip(offsets, offsets[1:])):
+        raise ValueError('Invalid SPR offsets')
+    record = data[base+offsets[frame]:base+offsets[frame+1]]
+    return decode_spr(b'\x01\x00\x00\x00\x00' + record)[0]
+
+
 def dos_filename(raw: bytes) -> str:
     """SCN names use space-padded DOS 8.3 stems, unlike host filenames."""
     name = raw.split(b'\0')[0].decode('ascii')
@@ -423,7 +437,9 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         scenario_path.write_text(json.dumps(scenario, ensure_ascii=False, indent=2), encoding='utf-8')
     elif scenario_path.exists():
         scenario_path.unlink()  # Never leave a previous map's scenario in the output.
-    manifest = {'importer_version': 5, 'files': used, 'decoded_sprite_records': len(frames),
+    from reference_frames import render_observations
+    render_observations(source, destination, map_number, decode_spr_frame)
+    manifest = {'importer_version': 6, 'files': used, 'decoded_sprite_records': len(frames),
                 'notes': 'Graphics decoded; gameplay and terrain blocking are experimental.'}
     (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
     return manifest

@@ -21,6 +21,7 @@ public partial class Main : Node2D
     public List<(string File, ObjectRecord Record)> OriginalObjects { get; } = [];
     private int _objectFocus;
     public TemplateGallery? Gallery { get; private set; }
+    public ObservationView? Observation { get; private set; }
 
     private double _clock;
     private CanvasLayer _ui = null!;
@@ -114,6 +115,7 @@ public partial class Main : Node2D
     public override void _UnhandledInput(InputEvent e)
     {
         if (!ReadyToPlay) return;
+        if (e is InputEventKey { Pressed: true, Echo: false, PhysicalKeycode: Key.B }) { OpenObservation(); return; }
         if (e is InputEventKey { Pressed: true, Echo: false, PhysicalKeycode: Key.P }) { OpenGallery(); return; }
         if (e is InputEventKey { Pressed: true, Echo: false, PhysicalKeycode: Key.O }) { ToggleOriginalView(); return; }
         if (OriginalView && e is InputEventKey { Pressed: true, Echo: false } viewerKey)
@@ -259,6 +261,8 @@ public partial class Main : Node2D
         LabelFor(column, "ЛКМ — выбрать / атаковать\nПКМ — идти / атаковать\nWASD, стрелки, СКМ — камера\nКолесо — масштаб · F — к отряду\nG — сетка · R — начать заново", 12, "aebfb1");
         var gallery = new Button { Text = "ШАБЛОНЫ / КАДРЫ    [P]", FocusMode = Control.FocusModeEnum.None };
         gallery.Pressed += OpenGallery; column.AddChild(gallery);
+        var observed = new Button { Text = "ЭТАЛОНЫ НАБЛЮДЕНИЙ    [B]", FocusMode = Control.FocusModeEnum.None };
+        observed.Pressed += OpenObservation; column.AddChild(observed);
         var original = new Button { Text = "ИСХОДНЫЕ ОБЪЕКТЫ    [O]", FocusMode = Control.FocusModeEnum.None };
         original.Pressed += ToggleOriginalView; column.AddChild(original);
         column.AddChild(new Control { SizeFlagsVertical = Control.SizeFlags.ExpandFill }); _log = LabelFor(column, "", 12, "cfbd94");
@@ -325,6 +329,11 @@ public partial class Main : Node2D
         var r = OriginalObjects[_objectFocus % OriginalObjects.Count].Record;
         Camera.Position = new Vector2(r.RawX - PanelWidth / (2 * Camera.Zoom.X), r.RawY);
         ClampCamera(); RefreshUi();
+    }
+    public void OpenObservation()
+    {
+        if (Observation == null) { Observation = new ObservationView(); _ui.AddChild(Observation); }
+        Observation.PopupCentered(new Vector2I(700, 680));
     }
     public void OpenGallery()
     {

@@ -1,0 +1,49 @@
+{
+  "status": "unique",
+  "screen_top_left_candidates": [
+    [
+      464,
+      393
+    ]
+  ],
+  "opaque_pixels": 10697,
+  "limitations": "Explicit frame/palette match only; does not identify memory state or generalize object anchors.",
+  "comparison_scope": "declared_exclusions",
+  "excluded_regions": [
+    [
+      16,
+      0,
+      10,
+      40
+    ]
+  ],
+  "original_opaque_pixels": 10800,
+  "excluded_opaque_pixels": 103,
+  "frame": 884,
+  "spr": "ARMY__02.SPR",
+  "table": "COLOR_02.TAB",
+  "screenshot_sha256": "a78912753861199905186f19f9d20ee94d157f7030bc9a3334945a31f039a65b",
+  "camera": [
+    416,
+    480
+  ],
+  "viewport": [
+    336,
+    216,
+    448,
+    448
+  ],
+  "sprite_world_top_left": [
+    544,
+    657
+  ],
+  "selected_panel_name": "Замок",
+  "selected_panel_sha256": "9cf72896ad9c439fe508553a95e8a659dc2c670a9171ccc19b31444aa7bd1085",
+  "source_sha256": {
+    "MAP_1.MAP": "7fac22dfb8c3f01c350ec04f4584e788874bbb4ee1f79657f79fe404a53e30fc",
+    "MAPSEG01.SEG": "6a01e68eb2ef52f57f80bcd2180526d46105fa28975d854bb816f33926d2404d",
+    "COLOR1.PAL": "022e87d1ccd4961b08d54e073da6bff5cf28a9aa9577dc78422b211407c33a32",
+    "ARMY__02.SPR": "a684ad0474ad9272ab08b0997753305f9a1297103ba83e054e736542dc00302f",
+    "COLOR_02.TAB": "0731b729e708e56fed8a04ede8c05b56d52960d813bd458bf6b47dcb5be15cde"
+  }
+}

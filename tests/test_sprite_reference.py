@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from PIL import Image
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
-from match_sprite_reference import frame_pixels, match_frame
+from match_sprite_reference import frame_pixels, match_frame, apply_exclusions
 from measure_reference_motion import color_probe
 
 
@@ -41,6 +41,21 @@ class SpriteReferenceTests(unittest.TestCase):
             with self.assertRaises(ValueError): frame_pixels(bad,index)
         image,palette=self.fixture()
         with self.assertRaises(ValueError): match_frame(image,[-1]*4,[2,2],palette,bytes(range(256)),[0,0,10,10],[0,0,10,10])
+
+    def test_partial_match_requires_explicit_exclusion(self):
+        image, palette = self.fixture()
+        pixels = [1, 2, -1, 3]
+        image.putpixel((4, 5), (1, 1, 1))
+        args = ([2, 2], palette, bytes(range(256)), [0, 0, 10, 10], [0, 0, 10, 10])
+        self.assertEqual(match_frame(image, pixels, *args)['status'], 'no_match')
+        partial = apply_exclusions(pixels, [2, 2], [[1, 1, 1, 1]])
+        result = match_frame(image, partial, *args)
+        self.assertEqual(result['screen_top_left_candidates'], [[3, 4]])
+        self.assertEqual(result['opaque_pixels'], 2)
+        self.assertEqual(pixels, [1, 2, -1, 3])
+        for region in [[-1, 0, 1, 1], [0, 0, 0, 1], [1, 1, 2, 1]]:
+            with self.assertRaises(ValueError):
+                apply_exclusions(pixels, [2, 2], [region])
 
 
 class MotionProbeTests(unittest.TestCase):
