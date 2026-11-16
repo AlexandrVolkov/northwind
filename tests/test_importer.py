@@ -133,5 +133,42 @@ class ObjectTests(unittest.TestCase):
                 importer.decode_objects(data)
 
 
+class TemplateTests(unittest.TestCase):
+    def fixture(self):
+        record = bytearray(171)
+        struct.pack_into('<H', record, 0, 171)
+        struct.pack_into('<I', record, 9, 171 - 9)
+        record[3:5] = bytes([62, 62])
+        return bytes(record) + 'Лучник'.encode('cp866') + b'\xff'
+
+    def test_relative_name_pointer_and_preserved_bytes(self):
+        data = self.fixture()
+        result = importer.decode_templates(data)
+        template = result['templates'][0]
+        self.assertEqual(template['name'], 'Лучник')
+        self.assertEqual(template['name_offset'], 171)
+        self.assertEqual(bytes.fromhex(template['raw_record_hex']) + bytes.fromhex(result['raw_tail_hex']), data)
+
+    def test_bad_pointers_boundaries_and_terminators(self):
+        for data in [bytes(170), bytes(171), self.fixture()[:-1]]:
+            with self.assertRaises(ValueError):
+                importer.decode_templates(data)
+        data = bytearray(self.fixture())
+        struct.pack_into('<I', data, 9, 99999)
+        with self.assertRaises(ValueError):
+            importer.decode_templates(data)
+
+    def test_army_slot_maps_through_scenario_not_filename_number(self):
+        record = {'raw_code': 4, 'raw_record_hex': bytes(34).hex()}
+        importer.link_templates([record], {'ARMY__05.DAT': importer.decode_templates(self.fixture())},
+                                ['ARMY__00.DAT', 'ARMY__01.DAT', 'ARMY__02.DAT', 'ARMY__03.DAT', 'ARMY__05.DAT'])
+        self.assertEqual(record['template_file'], 'ARMY__05.DAT')
+        self.assertEqual(record['template_name'], 'Лучник')
+        raw = bytearray(34); raw[14] = 9
+        with self.assertRaises(ValueError):
+            importer.link_templates([{'raw_code': 0, 'raw_record_hex': raw.hex()}],
+                                    {'ARMY__05.DAT': importer.decode_templates(self.fixture())}, ['ARMY__05.DAT'])
+
+
 if __name__ == '__main__':
     unittest.main()

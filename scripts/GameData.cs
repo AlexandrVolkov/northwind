@@ -76,6 +76,10 @@ public sealed class ObjectRecord
     public int RecordIndex { get; set; }
     public int FileOffset { get; set; }
     public int RecordBytes { get; set; }
+    public string TemplateName { get; set; } = "";
+    public string TemplateFile { get; set; } = "";
+    public int TemplateIndex { get; set; }
+    public int TemplateOffset { get; set; }
     public int RawCode { get; set; }
     public int RawByte3 { get; set; }
     public uint RawX { get; set; }

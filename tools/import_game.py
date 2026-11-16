@@ -130,6 +130,8 @@ def decode_scenario(data: bytes) -> dict:
     if len(data) < 20:
         raise ValueError('Truncated SCN header')
     count = data[0]
+    if data[1] > 5:
+        raise ValueError('Unsupported SCN army mapping length')
     if len(data) != 20 + count * 114:
         raise ValueError('Unexpected SCN record count or size')
     slots = []
@@ -145,6 +147,7 @@ def decode_scenario(data: bytes) -> dict:
         })
     return {'format_version': 1, 'slot_count': count,
             'map_file': dos_filename(data[2:15]),
+            'army_files': [f'ARMY__{value:02d}.DAT' for value in data[15:15 + data[1]]],
             'raw_header_hex': data[:20].hex(), 'slots': slots,
             'limitations': ['SCN boundaries, filenames, text and OBE common headers are decoded.',
                             'Slot order is not a proven team, nation or player identifier.',
@@ -173,6 +176,47 @@ def decode_objects(data: bytes) -> list[dict]:
     return records
 
 
+def decode_templates(data: bytes) -> dict:
+    """Observed DAT version: 171-byte entries before first animation table."""
+    if len(data) < 171:
+        raise ValueError('Truncated DAT table')
+    boundary = int.from_bytes(data[:2], 'little')
+    if boundary == 0 or boundary % 171 or boundary > len(data):
+        raise ValueError('Invalid DAT table boundary')
+    templates = []
+    for offset in range(0, boundary, 171):
+        record = data[offset:offset + 171]
+        name_offset = offset + 9 + u32(record, 9)
+        if not boundary <= name_offset < len(data):
+            raise ValueError('DAT name pointer outside string section')
+        end = data.find(b'\xff', name_offset)
+        if end < 0:
+            raise ValueError('Unterminated DAT name')
+        templates.append({'template_index': len(templates), 'file_offset': offset,
+                          'name_offset': name_offset, 'name': data[name_offset:end].decode('cp866'),
+                          'width': record[3], 'height': record[4],
+                          'sprite_base_candidate': int.from_bytes(record[7:9], 'little'),
+                          'raw_record_hex': record.hex()})
+    return {'templates': templates, 'raw_tail_hex': data[boundary:].hex()}
+
+
+def link_templates(records: list[dict], tables: dict, army_files: list[str]) -> None:
+    for record in records:
+        raw = bytes.fromhex(record['raw_record_hex'])
+        record['template_index'] = raw[14]
+        if record['raw_code'] >= len(army_files):
+            raise ValueError('OBE army slot outside scenario mapping')
+        filename = army_files[record['raw_code']]
+        if filename not in tables:
+            raise ValueError(f'Missing DAT table: {filename}')
+        templates = tables[filename]['templates']
+        if raw[14] >= len(templates):
+            raise ValueError(f'OBE template index outside {filename}')
+        template = templates[raw[14]]
+        record.update({'template_file': filename, 'template_name': template['name'],
+                       'template_offset': template['file_offset']})
+
+
 def audit_directory(source: Path) -> dict:
     """Validate every discovered SCN/MAP/SEG chain, including empty OBE files."""
     files = {p.name.upper(): p for p in source.iterdir() if p.is_file()}
@@ -180,6 +224,7 @@ def audit_directory(source: Path) -> dict:
         if name not in files:
             raise ValueError(f'Missing referenced file: {name}')
         return files[name].read_bytes()
+    tables = {name: decode_templates(read_reference(name)) for name in sorted(files) if name.startswith('ARMY__') and name.endswith('.DAT')}
     scenarios = []
     for name in sorted(files):
         if not name.startswith('SCENA_') or not name.endswith('.SCN'):
@@ -206,8 +251,11 @@ def audit_directory(source: Path) -> dict:
         objects = []
         for slot in scenario['slots']:
             payload = read_reference(slot['object_file'])
+            records = decode_objects(payload)
+            if scenario['army_files']:
+                link_templates(records, tables, scenario['army_files'])
             objects.append({'slot_index': slot['slot_index'], 'file': slot['object_file'],
-                            'bytes': len(payload), 'record_count': len(decode_objects(payload)), 'sha256': hashlib.sha256(payload).hexdigest()})
+                            'bytes': len(payload), 'record_count': len(records), 'sha256': hashlib.sha256(payload).hexdigest()})
         scenarios.append({'file': name, 'sha256': hashlib.sha256(content).hexdigest(),
                           'map_file': scenario['map_file'], 'width': width, 'height': height,
                           'segment_file': segment_name, 'tile_count': count,
@@ -218,7 +266,7 @@ def audit_directory(source: Path) -> dict:
         content = files[name].read_bytes()
         inventory.append({'file': name, 'bytes': len(content),
                           'sha256': hashlib.sha256(content).hexdigest()})
-    return {'format_version': 1, 'files': inventory, 'scenarios': scenarios,
+    return {'format_version': 1, 'files': inventory, 'scenarios': scenarios, 'template_count': sum(len(t['templates']) for t in tables.values()),
             'limitations': ['Structural consistency is not gameplay validation.',
                            'OBE record counts describe the serialized chain, not proven live game entities.']}
 
@@ -233,6 +281,7 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         data = path.read_bytes()
         used[name.upper()] = {'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
         return data
+    tables = {name: decode_templates(read(name)) for name in sorted(files) if name.startswith('ARMY__') and name.endswith('.DAT')}
     scenario_name = f'SCENA_{map_number:02d}.SCN'
     scenario = decode_scenario(read(scenario_name)) if scenario_name in files else None
     if scenario is not None:
@@ -242,6 +291,7 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         for slot in scenario['slots']:
             payload = read(slot['object_file'])
             slot['objects'] = decode_objects(payload)
+            link_templates(slot['objects'], tables, scenario['army_files'])
             slot['object_bytes'] = len(payload)
             slot['object_sha256'] = hashlib.sha256(payload).hexdigest()
     map_bytes = read(f'MAP_{map_number}.MAP')
@@ -318,12 +368,13 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         'unit_frames': {'source': 'ARMY__01.SPR', 'first': 5, 'count': 32, 'width': 62, 'height': 62},
     }
     (destination / 'map.json').write_text(json.dumps(result, separators=(',', ':')), encoding='utf-8')
+    (destination / 'templates.json').write_text(json.dumps({'format_version': 1, 'armies': tables}, ensure_ascii=False, indent=2), encoding='utf-8')
     scenario_path = destination / 'scenario.json'
     if scenario is not None:
         scenario_path.write_text(json.dumps(scenario, ensure_ascii=False, indent=2), encoding='utf-8')
     elif scenario_path.exists():
         scenario_path.unlink()  # Never leave a previous map's scenario in the output.
-    manifest = {'importer_version': 3, 'files': used, 'decoded_sprite_records': len(frames),
+    manifest = {'importer_version': 4, 'files': used, 'decoded_sprite_records': len(frames),
                 'notes': 'Graphics decoded; gameplay and terrain blocking are experimental.'}
     (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
     return manifest

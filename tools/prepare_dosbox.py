@@ -44,6 +44,7 @@ def prepare(game: Path, iso: Path, output: Path, drive: str = 'D') -> dict:
         raise ValueError('Copied executable differs from original')
     config = f'''[sdl]
 fullscreen=false
+autolock=false
 output=surface
 [dosbox]
 machine=svga_s3
