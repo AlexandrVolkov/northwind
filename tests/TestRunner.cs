@@ -119,6 +119,16 @@ public partial class TestRunner : Node
             GetTree().Root.GetTexture().GetImage().SavePng("res://build/objects-view.png");
         }
         scene.ToggleOriginalView(); Check(!scene.OriginalView, "Can return to demo");
+        scene.OpenGallery();
+        Check(scene.Gallery!.Visible && scene.Gallery.AtlasLoaded, "Template gallery opens with a loaded atlas");
+        Check(scene.Gallery.EntryCount == 123 && scene.Gallery.CandidateCount > 0 && scene.Gallery.CandidateCount < scene.Gallery.EntryCount, "Gallery reports decoded and unresolved templates");
+        if (DisplayServer.GetName() != "headless")
+        {
+            for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            GetTree().Root.GetTexture().GetImage().SavePng("res://build/template-gallery.png");
+        }
+        scene.Gallery.Hide();
         scene.OpenScenario(); Check(scene.ScenarioDialog!.Visible && scene.ScenarioText!.Text.Length > 0, "Scenario inspector"); scene.ScenarioDialog.Hide();
         for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         if (DisplayServer.GetName() != "headless")
