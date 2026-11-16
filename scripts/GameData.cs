@@ -100,6 +100,19 @@ public sealed class TemplateEntry
     public int TemplateIndex { get; set; }
     public string Name { get; set; } = "";
     public TemplatePreview Preview { get; set; } = new();
+    public TemplateCommand[] Commands { get; set; } = [];
+    public int RuntimeRecordBytes { get; set; }
+    public byte InitialCondition { get; set; }
+    public ushort InitialFrame { get; set; }
+}
+public sealed class TemplateCommand
+{
+    public int Slot { get; set; }
+    public bool Present { get; set; }
+    public string Label { get; set; } = "";
+    public int IconFrame { get; set; }
+    public int Mode { get; set; }
+    public int? HotkeyScanCode { get; set; }
 }
 public sealed class TemplatePreview
 {

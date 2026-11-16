@@ -138,6 +138,9 @@ class TemplateTests(unittest.TestCase):
         record = bytearray(171)
         struct.pack_into('<I', record, 7, 171 - 7)
         struct.pack_into('<I', record, 0x3b, 0x7f)
+        record[0] = 49
+        record[0x45] = 127
+        struct.pack_into('<H', record, 0x48, 71)
         record[1:3] = bytes([62, 62])
         return struct.pack('<H', 171) + bytes(record) + 'Лучник'.encode('cp866') + b'\xff'
 
@@ -149,6 +152,7 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(template['name_offset'], 173)
         self.assertEqual(template['file_offset'], 2)
         self.assertEqual(template['wrk_entry_offset'], 0x7f)
+        self.assertEqual((template['runtime_record_bytes'], template['initial_condition'], template['initial_frame']), (49, 127, 71))
         self.assertEqual(bytes.fromhex(result['raw_header_hex']) + bytes.fromhex(template['raw_record_hex']) + bytes.fromhex(result['raw_tail_hex']), data)
 
     def test_header_is_not_part_of_first_record_and_records_do_not_overlap(self):
@@ -168,6 +172,31 @@ class TemplateTests(unittest.TestCase):
         struct.pack_into('<I', data, 9, 99999)
         with self.assertRaises(ValueError):
             importer.decode_templates(data)
+
+    def test_command_slot_relative_pointer_hotkey_and_style_escapes(self):
+        data = bytearray(self.fixture())
+        pointer = len(data)
+        text = b'\x7e\xff' + 'Р'.encode('cp866') + b'\x7e\0' + 'емонт'.encode('cp866')
+        data.extend(struct.pack('<H', 0x23) + text + b'\xff')
+        row = 2 + 0xb + 8
+        struct.pack_into('<HI2B', data, row, 873, pointer-row-2, 0, 7)
+        command = importer.decode_templates(data)['templates'][0]['commands'][1]
+        self.assertEqual((command['label'], command['hotkey_scan_code'], command['slot']), ('Ремонт', 0x23, 1))
+        self.assertEqual(command['raw_group'], 7)
+        self.assertEqual(command['tooltip_offset'], pointer)
+        struct.pack_into('<H', data, pointer, 0xff)
+        self.assertEqual(importer.decode_templates(data)['templates'][0]['commands'][1]['label'], 'Ремонт')
+        struct.pack_into('<I', data, row+2, 0xffffffff)
+        with self.assertRaises(ValueError): importer.decode_templates(data)
+
+    def test_truncated_command_text_and_style_are_rejected(self):
+        data = bytearray(self.fixture()); pointer = len(data)
+        row = 2 + 0xb
+        struct.pack_into('<HI2B', data, row, 1, pointer-row-2, 0, 0)
+        data.extend(b'\x23\0test')
+        with self.assertRaises(ValueError): importer.decode_templates(data)
+        data.extend(b'\x7e\xff')
+        with self.assertRaises(ValueError): importer.decode_templates(data)
 
     def test_army_slot_maps_through_scenario_not_filename_number(self):
         record = {'raw_code': 4, 'raw_record_hex': bytes(34).hex()}
