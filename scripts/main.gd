@@ -27,6 +27,8 @@ var end_button: Button
 var minimap: TextureRect
 var dragging := false
 var minimap_marker: Control
+var scenario_dialog: AcceptDialog
+var scenario_text: RichTextLabel
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -160,6 +162,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.pressed and not event.echo:
 		match event.physical_keycode:
 			KEY_SPACE: finish_turn()
+			KEY_I: open_scenario()
 			KEY_G: show_grid = not show_grid
 			KEY_F: focus_selected()
 			KEY_R: restart()
@@ -280,6 +283,11 @@ func build_ui() -> void:
 	end_button.focus_mode = Control.FOCUS_NONE
 	end_button.pressed.connect(finish_turn)
 	column.add_child(end_button)
+	var scenario_button := Button.new()
+	scenario_button.text = "ДАННЫЕ СЦЕНАРИЯ    [I]"
+	scenario_button.focus_mode = Control.FOCUS_NONE
+	scenario_button.pressed.connect(open_scenario)
+	column.add_child(scenario_button)
 	add_label(column, "ЛКМ — выбрать / атаковать\nПКМ — идти / атаковать\nWASD, стрелки, СКМ — камера\nКолесо — масштаб · F — к отряду\nG — сетка · R — начать заново", 12, Color("aebfb1"))
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -330,3 +338,34 @@ func refresh_ui() -> void:
 	if route.size() > 1:
 		cell_label.text += "\nСтоимость маршрута: %d ОД" % model.route_cost(route)
 	log_label.text = "\n".join(model.events.slice(-4))
+
+func open_scenario() -> void:
+	if scenario_dialog == null:
+		scenario_dialog = AcceptDialog.new()
+		scenario_dialog.title = "Исходные данные сценария"
+		scenario_dialog.min_size = Vector2i(740, 520)
+		scenario_dialog.ok_button_text = "Закрыть"
+		ui.add_child(scenario_dialog)
+		scenario_text = RichTextLabel.new()
+		scenario_text.custom_minimum_size = Vector2(700, 450)
+		scenario_text.bbcode_enabled = false
+		scenario_text.selection_enabled = true
+		scenario_dialog.add_child(scenario_text)
+	var path := "res://assets/imported/scenario.json"
+	if not FileAccess.file_exists(path):
+		scenario_text.text = "Данные сценария ещё не импортированы.\nПовторите импорт обновлённым tools/import_game.py."
+	else:
+		var scenario: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+		if not scenario is Dictionary or not scenario.has("slots"):
+			scenario_text.text = "Неверный scenario.json. Повторите импорт."
+		else:
+			var lines: Array[String] = ["Карта: %s · записей: %d" % [str(scenario.map_file), int(scenario.slot_count)],
+				"Имена и ссылки прочитаны из SCN. Порядок записей не определяет команду.",
+				"Размер OBE — число байтов, не число объектов. Расстановка в бою пока демонстрационная.", ""]
+			for slot in scenario.slots:
+				var leader := str(slot.leader_name) if not str(slot.leader_name).is_empty() else "(имя не задано)"
+				lines.append("Запись %d · %s" % [int(slot.slot_index) + 1, leader])
+				lines.append("Поселение: %s" % str(slot.settlement_name))
+				lines.append("%s · %d байт · смещение SCN: %d\n" % [str(slot.object_file), int(slot.object_bytes), int(slot.file_offset)])
+			scenario_text.text = "\n".join(lines)
+	scenario_dialog.popup_centered(Vector2i(760, 540))
