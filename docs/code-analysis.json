@@ -1,0 +1,1668 @@
+{
+  "format_version": 1,
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
+    "ARMY__00.WRK": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33",
+    "ARMY__01.DAT": "a8c5aa398ff63219eefcd58e56f89653b1135cd1443fed9d7cedd2cb03c61d6e",
+    "ARMY__01.WRK": "d2554037e3a135ce7c06530cf2ee85e89ae240aa31a00c7c72a9b3cb251c46de",
+    "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475",
+    "ARMY__02.WRK": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
+    "ARMY__03.DAT": "d6110b1bbdd2365dfd50df089f48a96b9ee2220ce2a6a4b66d5f1881c3437b1a",
+    "ARMY__03.WRK": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
+    "ARMY__04.DAT": "ca28d553d813348c3b93f2ff4b8ca8d5b64609cd9700f613c2473789610155c7",
+    "ARMY__04.WRK": "c419f791822084e83013a8988d792948cadb4f5f3b5606149b000300c9ee2316",
+    "ARMY__05.DAT": "2ec96a210a3cca53c1c50cb5fbd52686e40e8878098010a9905891471660d013",
+    "ARMY__05.WRK": "75e339a4869a7466714661f036fb3b933acab4ba73aaf2898dfd60691a13fafb"
+  },
+  "inner_mz_offset": 217764,
+  "le_offset": 228412,
+  "objects": [
+    {
+      "index": 1,
+      "size": 146882,
+      "preferred_base": 65536,
+      "flags": 8261,
+      "is_32_bit": true,
+      "pages": [
+        {
+          "object_offset": 0,
+          "file_offset": 282276,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 4096,
+          "file_offset": 286372,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 8192,
+          "file_offset": 290468,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 12288,
+          "file_offset": 294564,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 16384,
+          "file_offset": 298660,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 20480,
+          "file_offset": 302756,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 24576,
+          "file_offset": 306852,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 28672,
+          "file_offset": 310948,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 32768,
+          "file_offset": 315044,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 36864,
+          "file_offset": 319140,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 40960,
+          "file_offset": 323236,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 45056,
+          "file_offset": 327332,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 49152,
+          "file_offset": 331428,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 53248,
+          "file_offset": 335524,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 57344,
+          "file_offset": 339620,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 61440,
+          "file_offset": 343716,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 65536,
+          "file_offset": 347812,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 69632,
+          "file_offset": 351908,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 73728,
+          "file_offset": 356004,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 77824,
+          "file_offset": 360100,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 81920,
+          "file_offset": 364196,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 86016,
+          "file_offset": 368292,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 90112,
+          "file_offset": 372388,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 94208,
+          "file_offset": 376484,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 98304,
+          "file_offset": 380580,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 102400,
+          "file_offset": 384676,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 106496,
+          "file_offset": 388772,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 110592,
+          "file_offset": 392868,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 114688,
+          "file_offset": 396964,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 118784,
+          "file_offset": 401060,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 122880,
+          "file_offset": 405156,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 126976,
+          "file_offset": 409252,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 131072,
+          "file_offset": 413348,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 135168,
+          "file_offset": 417444,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 139264,
+          "file_offset": 421540,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 143360,
+          "file_offset": 425636,
+          "bytes": 3522
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "size": 15872,
+      "preferred_base": 262144,
+      "flags": 8259,
+      "is_32_bit": true,
+      "pages": [
+        {
+          "object_offset": 0,
+          "file_offset": 429732,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 4096,
+          "file_offset": 433828,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 8192,
+          "file_offset": 437924,
+          "bytes": 4096
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "size": 61833,
+      "preferred_base": 327680,
+      "flags": 8259,
+      "is_32_bit": true,
+      "pages": [
+        {
+          "object_offset": 0,
+          "file_offset": 442020,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 4096,
+          "file_offset": 446116,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 8192,
+          "file_offset": 450212,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 12288,
+          "file_offset": 454308,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 16384,
+          "file_offset": 458404,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 20480,
+          "file_offset": 462500,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 24576,
+          "file_offset": 466596,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 28672,
+          "file_offset": 470692,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 32768,
+          "file_offset": 474788,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 36864,
+          "file_offset": 478884,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 40960,
+          "file_offset": 482980,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 45056,
+          "file_offset": 487076,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 49152,
+          "file_offset": 491172,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 53248,
+          "file_offset": 495268,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 57344,
+          "file_offset": 499364,
+          "bytes": 4096
+        },
+        {
+          "object_offset": 61440,
+          "file_offset": 503460,
+          "bytes": 329
+        }
+      ]
+    }
+  ],
+  "code_evidence": {
+    "dat_header_and_stride": {
+      "code_offset": 13715,
+      "length": 21
+    },
+    "wrk_base": {
+      "code_offset": 13753,
+      "length": 9
+    },
+    "wrk_dispatch": {
+      "code_offset": 17210,
+      "length": 18
+    }
+  },
+  "fs_assignments": [
+    {
+      "code_offset": 10409,
+      "fs_slot": 29,
+      "target_offset": 33241
+    },
+    {
+      "code_offset": 10419,
+      "fs_slot": 21,
+      "target_offset": 39116
+    },
+    {
+      "code_offset": 10429,
+      "fs_slot": 17,
+      "target_offset": 38854
+    },
+    {
+      "code_offset": 10439,
+      "fs_slot": 161,
+      "target_offset": 38955
+    },
+    {
+      "code_offset": 10449,
+      "fs_slot": 25,
+      "target_offset": 38695
+    },
+    {
+      "code_offset": 10459,
+      "fs_slot": 33,
+      "target_offset": 39814
+    },
+    {
+      "code_offset": 10469,
+      "fs_slot": 41,
+      "target_offset": 39279
+    },
+    {
+      "code_offset": 10479,
+      "fs_slot": 37,
+      "target_offset": 39451
+    },
+    {
+      "code_offset": 10489,
+      "fs_slot": 49,
+      "target_offset": 42006
+    },
+    {
+      "code_offset": 10499,
+      "fs_slot": 53,
+      "target_offset": 42110
+    },
+    {
+      "code_offset": 10509,
+      "fs_slot": 57,
+      "target_offset": 42424
+    },
+    {
+      "code_offset": 10519,
+      "fs_slot": 61,
+      "target_offset": 51213
+    },
+    {
+      "code_offset": 10529,
+      "fs_slot": 65,
+      "target_offset": 51340
+    },
+    {
+      "code_offset": 10539,
+      "fs_slot": 69,
+      "target_offset": 42840
+    },
+    {
+      "code_offset": 10549,
+      "fs_slot": 73,
+      "target_offset": 43129
+    },
+    {
+      "code_offset": 10559,
+      "fs_slot": 77,
+      "target_offset": 44602
+    },
+    {
+      "code_offset": 10569,
+      "fs_slot": 81,
+      "target_offset": 45019
+    },
+    {
+      "code_offset": 10579,
+      "fs_slot": 85,
+      "target_offset": 48011
+    },
+    {
+      "code_offset": 10589,
+      "fs_slot": 89,
+      "target_offset": 46071
+    },
+    {
+      "code_offset": 10599,
+      "fs_slot": 93,
+      "target_offset": 45972
+    },
+    {
+      "code_offset": 10609,
+      "fs_slot": 97,
+      "target_offset": 46006
+    },
+    {
+      "code_offset": 10619,
+      "fs_slot": 101,
+      "target_offset": 46207
+    },
+    {
+      "code_offset": 10629,
+      "fs_slot": 105,
+      "target_offset": 48399
+    },
+    {
+      "code_offset": 10639,
+      "fs_slot": 109,
+      "target_offset": 26743
+    },
+    {
+      "code_offset": 10649,
+      "fs_slot": 113,
+      "target_offset": 26813
+    },
+    {
+      "code_offset": 10659,
+      "fs_slot": 117,
+      "target_offset": 50233
+    },
+    {
+      "code_offset": 10669,
+      "fs_slot": 121,
+      "target_offset": 50381
+    },
+    {
+      "code_offset": 10679,
+      "fs_slot": 125,
+      "target_offset": 51020
+    },
+    {
+      "code_offset": 10689,
+      "fs_slot": 129,
+      "target_offset": 52427
+    },
+    {
+      "code_offset": 10699,
+      "fs_slot": 133,
+      "target_offset": 53461
+    },
+    {
+      "code_offset": 10709,
+      "fs_slot": 137,
+      "target_offset": 48686
+    },
+    {
+      "code_offset": 10719,
+      "fs_slot": 141,
+      "target_offset": 51785
+    },
+    {
+      "code_offset": 10729,
+      "fs_slot": 145,
+      "target_offset": 54705
+    },
+    {
+      "code_offset": 10739,
+      "fs_slot": 149,
+      "target_offset": 54813
+    },
+    {
+      "code_offset": 10749,
+      "fs_slot": 12,
+      "target_offset": 7310
+    },
+    {
+      "code_offset": 10759,
+      "fs_slot": 153,
+      "target_offset": 48751
+    },
+    {
+      "code_offset": 10769,
+      "fs_slot": 157,
+      "target_offset": 51836
+    },
+    {
+      "code_offset": 10779,
+      "fs_slot": 165,
+      "target_offset": 55014
+    },
+    {
+      "code_offset": 10789,
+      "fs_slot": 169,
+      "target_offset": 55104
+    },
+    {
+      "code_offset": 10799,
+      "fs_slot": 173,
+      "target_offset": 55162
+    },
+    {
+      "code_offset": 10809,
+      "fs_slot": 177,
+      "target_offset": 53111
+    },
+    {
+      "code_offset": 10819,
+      "fs_slot": 181,
+      "target_offset": 48149
+    },
+    {
+      "code_offset": 10829,
+      "fs_slot": 185,
+      "target_offset": 53164
+    },
+    {
+      "code_offset": 10839,
+      "fs_slot": 189,
+      "target_offset": 52087
+    },
+    {
+      "code_offset": 10849,
+      "fs_slot": 193,
+      "target_offset": 54921
+    },
+    {
+      "code_offset": 10859,
+      "fs_slot": 197,
+      "target_offset": 56465
+    },
+    {
+      "code_offset": 10869,
+      "fs_slot": 201,
+      "target_offset": 49398
+    },
+    {
+      "code_offset": 10879,
+      "fs_slot": 205,
+      "target_offset": 48797
+    },
+    {
+      "code_offset": 10889,
+      "fs_slot": 209,
+      "target_offset": 48807
+    },
+    {
+      "code_offset": 10899,
+      "fs_slot": 213,
+      "target_offset": 56844
+    },
+    {
+      "code_offset": 10909,
+      "fs_slot": 217,
+      "target_offset": 48855
+    },
+    {
+      "code_offset": 10919,
+      "fs_slot": 221,
+      "target_offset": 37097
+    },
+    {
+      "code_offset": 10929,
+      "fs_slot": 225,
+      "target_offset": 33319
+    },
+    {
+      "code_offset": 10939,
+      "fs_slot": 229,
+      "target_offset": 33392
+    },
+    {
+      "code_offset": 10949,
+      "fs_slot": 233,
+      "target_offset": 33395
+    },
+    {
+      "code_offset": 10959,
+      "fs_slot": 237,
+      "target_offset": 33475
+    },
+    {
+      "code_offset": 10969,
+      "fs_slot": 241,
+      "target_offset": 33695
+    },
+    {
+      "code_offset": 10979,
+      "fs_slot": 245,
+      "target_offset": 33854
+    },
+    {
+      "code_offset": 10989,
+      "fs_slot": 249,
+      "target_offset": 33962
+    },
+    {
+      "code_offset": 10999,
+      "fs_slot": 253,
+      "target_offset": 34393
+    },
+    {
+      "code_offset": 11009,
+      "fs_slot": 257,
+      "target_offset": 34687
+    },
+    {
+      "code_offset": 11019,
+      "fs_slot": 261,
+      "target_offset": 34701
+    },
+    {
+      "code_offset": 11029,
+      "fs_slot": 265,
+      "target_offset": 40513
+    },
+    {
+      "code_offset": 11039,
+      "fs_slot": 269,
+      "target_offset": 40533
+    },
+    {
+      "code_offset": 11049,
+      "fs_slot": 273,
+      "target_offset": 48827
+    },
+    {
+      "code_offset": 11059,
+      "fs_slot": 277,
+      "target_offset": 35095
+    },
+    {
+      "code_offset": 11069,
+      "fs_slot": 281,
+      "target_offset": 49097
+    },
+    {
+      "code_offset": 11079,
+      "fs_slot": 285,
+      "target_offset": 34486
+    },
+    {
+      "code_offset": 11089,
+      "fs_slot": 289,
+      "target_offset": 52347
+    },
+    {
+      "code_offset": 11099,
+      "fs_slot": 293,
+      "target_offset": 48870
+    },
+    {
+      "code_offset": 11109,
+      "fs_slot": 297,
+      "target_offset": 42052
+    },
+    {
+      "code_offset": 11119,
+      "fs_slot": 301,
+      "target_offset": 52420
+    },
+    {
+      "code_offset": 11129,
+      "fs_slot": 305,
+      "target_offset": 72003
+    },
+    {
+      "code_offset": 11139,
+      "fs_slot": 309,
+      "target_offset": 6505
+    },
+    {
+      "code_offset": 11149,
+      "fs_slot": 313,
+      "target_offset": 48981
+    },
+    {
+      "code_offset": 11159,
+      "fs_slot": 318,
+      "target_offset": 35313
+    },
+    {
+      "code_offset": 11169,
+      "fs_slot": 323,
+      "target_offset": 60984
+    },
+    {
+      "code_offset": 11179,
+      "fs_slot": 327,
+      "target_offset": 74968
+    },
+    {
+      "code_offset": 11189,
+      "fs_slot": 331,
+      "target_offset": 73182
+    },
+    {
+      "code_offset": 11199,
+      "fs_slot": 335,
+      "target_offset": 72672
+    },
+    {
+      "code_offset": 11209,
+      "fs_slot": 339,
+      "target_offset": 61074
+    },
+    {
+      "code_offset": 11219,
+      "fs_slot": 343,
+      "target_offset": 53969
+    },
+    {
+      "code_offset": 11229,
+      "fs_slot": 347,
+      "target_offset": 38536
+    },
+    {
+      "code_offset": 11239,
+      "fs_slot": 351,
+      "target_offset": 76513
+    },
+    {
+      "code_offset": 11249,
+      "fs_slot": 355,
+      "target_offset": 72730
+    },
+    {
+      "code_offset": 11259,
+      "fs_slot": 359,
+      "target_offset": 72765
+    },
+    {
+      "code_offset": 11269,
+      "fs_slot": 363,
+      "target_offset": 36964
+    },
+    {
+      "code_offset": 11279,
+      "fs_slot": 367,
+      "target_offset": 72819
+    },
+    {
+      "code_offset": 11289,
+      "fs_slot": 371,
+      "target_offset": 76707
+    },
+    {
+      "code_offset": 11299,
+      "fs_slot": 375,
+      "target_offset": 76585
+    },
+    {
+      "code_offset": 11309,
+      "fs_slot": 379,
+      "target_offset": 55445
+    },
+    {
+      "code_offset": 11319,
+      "fs_slot": 387,
+      "target_offset": 34843
+    },
+    {
+      "code_offset": 11329,
+      "fs_slot": 391,
+      "target_offset": 68306
+    },
+    {
+      "code_offset": 11339,
+      "fs_slot": 395,
+      "target_offset": 72905
+    },
+    {
+      "code_offset": 11349,
+      "fs_slot": 399,
+      "target_offset": 66540
+    },
+    {
+      "code_offset": 11359,
+      "fs_slot": 403,
+      "target_offset": 53690
+    },
+    {
+      "code_offset": 11369,
+      "fs_slot": 407,
+      "target_offset": 75144
+    },
+    {
+      "code_offset": 11379,
+      "fs_slot": 411,
+      "target_offset": 17381
+    },
+    {
+      "code_offset": 11389,
+      "fs_slot": 415,
+      "target_offset": 45849
+    },
+    {
+      "code_offset": 11399,
+      "fs_slot": 419,
+      "target_offset": 73006
+    },
+    {
+      "code_offset": 11409,
+      "fs_slot": 427,
+      "target_offset": 33753
+    },
+    {
+      "code_offset": 11419,
+      "fs_slot": 423,
+      "target_offset": 33599
+    },
+    {
+      "code_offset": 11429,
+      "fs_slot": 431,
+      "target_offset": 35412
+    },
+    {
+      "code_offset": 11439,
+      "fs_slot": 435,
+      "target_offset": 42670
+    },
+    {
+      "code_offset": 11449,
+      "fs_slot": 439,
+      "target_offset": 125656
+    },
+    {
+      "code_offset": 11459,
+      "fs_slot": 443,
+      "target_offset": 48903
+    },
+    {
+      "code_offset": 11469,
+      "fs_slot": 447,
+      "target_offset": 73012
+    }
+  ],
+  "armies": [
+    {
+      "dat": "ARMY__00.DAT",
+      "wrk": "ARMY__00.WRK",
+      "template_count": 30,
+      "callbacks": [
+        {
+          "template_index": 0,
+          "name": "Лагерь",
+          "dat_record_offset": 2,
+          "wrk_offset": 0
+        },
+        {
+          "template_index": 1,
+          "name": "Выключатель",
+          "dat_record_offset": 173,
+          "wrk_offset": 82
+        },
+        {
+          "template_index": 2,
+          "name": "Посох Руфина",
+          "dat_record_offset": 344,
+          "wrk_offset": 134
+        },
+        {
+          "template_index": 3,
+          "name": "Посох Ониса",
+          "dat_record_offset": 515,
+          "wrk_offset": 241
+        },
+        {
+          "template_index": 4,
+          "name": "Посох Мирона",
+          "dat_record_offset": 686,
+          "wrk_offset": 251
+        },
+        {
+          "template_index": 5,
+          "name": "Посох Кочета",
+          "dat_record_offset": 857,
+          "wrk_offset": 261
+        },
+        {
+          "template_index": 6,
+          "name": "Посох Ирвила",
+          "dat_record_offset": 1028,
+          "wrk_offset": 271
+        },
+        {
+          "template_index": 7,
+          "name": "Посох Магуса",
+          "dat_record_offset": 1199,
+          "wrk_offset": 288
+        },
+        {
+          "template_index": 8,
+          "name": "Посох Кевина",
+          "dat_record_offset": 1370,
+          "wrk_offset": 305
+        },
+        {
+          "template_index": 9,
+          "name": "Посох Гарикa",
+          "dat_record_offset": 1541,
+          "wrk_offset": 322
+        },
+        {
+          "template_index": 10,
+          "name": "Посох Эфила",
+          "dat_record_offset": 1712,
+          "wrk_offset": 339
+        },
+        {
+          "template_index": 11,
+          "name": "Синий камень",
+          "dat_record_offset": 1883,
+          "wrk_offset": 356
+        },
+        {
+          "template_index": 12,
+          "name": "Сиреневый",
+          "dat_record_offset": 2054,
+          "wrk_offset": 498
+        },
+        {
+          "template_index": 13,
+          "name": "Розовый",
+          "dat_record_offset": 2225,
+          "wrk_offset": 515
+        },
+        {
+          "template_index": 14,
+          "name": "Хруст.шар",
+          "dat_record_offset": 2396,
+          "wrk_offset": 532
+        },
+        {
+          "template_index": 15,
+          "name": "Болезнь",
+          "dat_record_offset": 2567,
+          "wrk_offset": 667
+        },
+        {
+          "template_index": 16,
+          "name": "Рукопись 001",
+          "dat_record_offset": 2738,
+          "wrk_offset": 785
+        },
+        {
+          "template_index": 17,
+          "name": "Рукопись 010",
+          "dat_record_offset": 2909,
+          "wrk_offset": 785
+        },
+        {
+          "template_index": 18,
+          "name": "Рукопись 011",
+          "dat_record_offset": 3080,
+          "wrk_offset": 785
+        },
+        {
+          "template_index": 19,
+          "name": "Рукопись 100",
+          "dat_record_offset": 3251,
+          "wrk_offset": 785
+        },
+        {
+          "template_index": 20,
+          "name": "Рукопись 101",
+          "dat_record_offset": 3422,
+          "wrk_offset": 785
+        },
+        {
+          "template_index": 21,
+          "name": "Рукопись 110",
+          "dat_record_offset": 3593,
+          "wrk_offset": 785
+        },
+        {
+          "template_index": 22,
+          "name": "Рукопись 111",
+          "dat_record_offset": 3764,
+          "wrk_offset": 785
+        },
+        {
+          "template_index": 23,
+          "name": "Выключатель2",
+          "dat_record_offset": 3935,
+          "wrk_offset": 881
+        },
+        {
+          "template_index": 24,
+          "name": "Выход",
+          "dat_record_offset": 4106,
+          "wrk_offset": 937
+        },
+        {
+          "template_index": 25,
+          "name": "Красная молния",
+          "dat_record_offset": 4277,
+          "wrk_offset": 1008
+        },
+        {
+          "template_index": 26,
+          "name": "Зеленая молния",
+          "dat_record_offset": 4448,
+          "wrk_offset": 1130
+        },
+        {
+          "template_index": 27,
+          "name": "Голубая молния",
+          "dat_record_offset": 4619,
+          "wrk_offset": 1143
+        },
+        {
+          "template_index": 28,
+          "name": "Шар прозрения",
+          "dat_record_offset": 4790,
+          "wrk_offset": 1160
+        },
+        {
+          "template_index": 29,
+          "name": "Кувш. фантома",
+          "dat_record_offset": 4961,
+          "wrk_offset": 1177
+        }
+      ],
+      "unique_entry_count": 24
+    },
+    {
+      "dat": "ARMY__01.DAT",
+      "wrk": "ARMY__01.WRK",
+      "template_count": 22,
+      "callbacks": [
+        {
+          "template_index": 0,
+          "name": "Мечник",
+          "dat_record_offset": 2,
+          "wrk_offset": 0
+        },
+        {
+          "template_index": 1,
+          "name": "Лучник",
+          "dat_record_offset": 173,
+          "wrk_offset": 127
+        },
+        {
+          "template_index": 2,
+          "name": "Замок",
+          "dat_record_offset": 344,
+          "wrk_offset": 254
+        },
+        {
+          "template_index": 3,
+          "name": "Казарма",
+          "dat_record_offset": 515,
+          "wrk_offset": 589
+        },
+        {
+          "template_index": 4,
+          "name": "Ферма",
+          "dat_record_offset": 686,
+          "wrk_offset": 852
+        },
+        {
+          "template_index": 5,
+          "name": "Мавр",
+          "dat_record_offset": 857,
+          "wrk_offset": 0
+        },
+        {
+          "template_index": 6,
+          "name": "Завод",
+          "dat_record_offset": 1028,
+          "wrk_offset": 1005
+        },
+        {
+          "template_index": 7,
+          "name": "Всадник",
+          "dat_record_offset": 1199,
+          "wrk_offset": 1264
+        },
+        {
+          "template_index": 8,
+          "name": "Забор",
+          "dat_record_offset": 1370,
+          "wrk_offset": 1385
+        },
+        {
+          "template_index": 9,
+          "name": "Мост",
+          "dat_record_offset": 1541,
+          "wrk_offset": 1566
+        },
+        {
+          "template_index": 10,
+          "name": "Башня",
+          "dat_record_offset": 1712,
+          "wrk_offset": 1748
+        },
+        {
+          "template_index": 11,
+          "name": "Ворота",
+          "dat_record_offset": 1883,
+          "wrk_offset": 1952
+        },
+        {
+          "template_index": 12,
+          "name": "Поджигатель",
+          "dat_record_offset": 2054,
+          "wrk_offset": 127
+        },
+        {
+          "template_index": 13,
+          "name": "Лесопилка",
+          "dat_record_offset": 2225,
+          "wrk_offset": 2198
+        },
+        {
+          "template_index": 14,
+          "name": "Конюшня",
+          "dat_record_offset": 2396,
+          "wrk_offset": 2438
+        },
+        {
+          "template_index": 15,
+          "name": "Рабочий",
+          "dat_record_offset": 2567,
+          "wrk_offset": 2679
+        },
+        {
+          "template_index": 16,
+          "name": "Рабочий",
+          "dat_record_offset": 2738,
+          "wrk_offset": 2895
+        },
+        {
+          "template_index": 17,
+          "name": "Рабочий",
+          "dat_record_offset": 2909,
+          "wrk_offset": 3100
+        },
+        {
+          "template_index": 18,
+          "name": "Шатер",
+          "dat_record_offset": 3080,
+          "wrk_offset": 3299
+        },
+        {
+          "template_index": 19,
+          "name": "Заговоренный",
+          "dat_record_offset": 3251,
+          "wrk_offset": 3567
+        },
+        {
+          "template_index": 20,
+          "name": "Закованный воин",
+          "dat_record_offset": 3422,
+          "wrk_offset": 3940
+        },
+        {
+          "template_index": 21,
+          "name": "Тюрьма",
+          "dat_record_offset": 3593,
+          "wrk_offset": 4049
+        }
+      ],
+      "unique_entry_count": 20
+    },
+    {
+      "dat": "ARMY__02.DAT",
+      "wrk": "ARMY__02.WRK",
+      "template_count": 28,
+      "callbacks": [
+        {
+          "template_index": 0,
+          "name": "Ополченец",
+          "dat_record_offset": 2,
+          "wrk_offset": 0
+        },
+        {
+          "template_index": 1,
+          "name": "Лучник",
+          "dat_record_offset": 173,
+          "wrk_offset": 127
+        },
+        {
+          "template_index": 2,
+          "name": "Замок",
+          "dat_record_offset": 344,
+          "wrk_offset": 254
+        },
+        {
+          "template_index": 3,
+          "name": "Казарма",
+          "dat_record_offset": 515,
+          "wrk_offset": 611
+        },
+        {
+          "template_index": 4,
+          "name": "Лесопилка",
+          "dat_record_offset": 686,
+          "wrk_offset": 852
+        },
+        {
+          "template_index": 5,
+          "name": "Забор",
+          "dat_record_offset": 857,
+          "wrk_offset": 1108
+        },
+        {
+          "template_index": 6,
+          "name": "Шахта",
+          "dat_record_offset": 1028,
+          "wrk_offset": 1316
+        },
+        {
+          "template_index": 7,
+          "name": "Мост",
+          "dat_record_offset": 1199,
+          "wrk_offset": 1697
+        },
+        {
+          "template_index": 8,
+          "name": "Рабочий",
+          "dat_record_offset": 1370,
+          "wrk_offset": 2541
+        },
+        {
+          "template_index": 9,
+          "name": "Ферма",
+          "dat_record_offset": 1541,
+          "wrk_offset": 1878
+        },
+        {
+          "template_index": 10,
+          "name": "Рабочий",
+          "dat_record_offset": 1712,
+          "wrk_offset": 2037
+        },
+        {
+          "template_index": 11,
+          "name": "Рабочий",
+          "dat_record_offset": 1883,
+          "wrk_offset": 2302
+        },
+        {
+          "template_index": 12,
+          "name": "Лаборатория",
+          "dat_record_offset": 2054,
+          "wrk_offset": 2766
+        },
+        {
+          "template_index": 13,
+          "name": "Башня",
+          "dat_record_offset": 2225,
+          "wrk_offset": 3257
+        },
+        {
+          "template_index": 14,
+          "name": "Ворота",
+          "dat_record_offset": 2396,
+          "wrk_offset": 3461
+        },
+        {
+          "template_index": 15,
+          "name": "Завод",
+          "dat_record_offset": 2567,
+          "wrk_offset": 3707
+        },
+        {
+          "template_index": 16,
+          "name": "Катапульта",
+          "dat_record_offset": 2738,
+          "wrk_offset": 3974
+        },
+        {
+          "template_index": 17,
+          "name": "Поджигатель",
+          "dat_record_offset": 2909,
+          "wrk_offset": 127
+        },
+        {
+          "template_index": 18,
+          "name": "Рыцарь",
+          "dat_record_offset": 3080,
+          "wrk_offset": 0
+        },
+        {
+          "template_index": 19,
+          "name": "Яма-Ловушка",
+          "dat_record_offset": 3251,
+          "wrk_offset": 4216
+        },
+        {
+          "template_index": 20,
+          "name": "Предводитель",
+          "dat_record_offset": 3422,
+          "wrk_offset": 4337
+        },
+        {
+          "template_index": 21,
+          "name": "Всадник",
+          "dat_record_offset": 3593,
+          "wrk_offset": 4532
+        },
+        {
+          "template_index": 22,
+          "name": "Конюшня",
+          "dat_record_offset": 3764,
+          "wrk_offset": 4653
+        },
+        {
+          "template_index": 23,
+          "name": "Мельница",
+          "dat_record_offset": 3935,
+          "wrk_offset": 4894
+        },
+        {
+          "template_index": 24,
+          "name": "Церковь",
+          "dat_record_offset": 4106,
+          "wrk_offset": 4986
+        },
+        {
+          "template_index": 25,
+          "name": "Забор",
+          "dat_record_offset": 4277,
+          "wrk_offset": 5078
+        },
+        {
+          "template_index": 26,
+          "name": "Балиста",
+          "dat_record_offset": 4448,
+          "wrk_offset": 5218
+        },
+        {
+          "template_index": 27,
+          "name": "Непобедимый",
+          "dat_record_offset": 4619,
+          "wrk_offset": 5454
+        }
+      ],
+      "unique_entry_count": 26
+    },
+    {
+      "dat": "ARMY__03.DAT",
+      "wrk": "ARMY__03.WRK",
+      "template_count": 37,
+      "callbacks": [
+        {
+          "template_index": 0,
+          "name": "Маг",
+          "dat_record_offset": 2,
+          "wrk_offset": 0
+        },
+        {
+          "template_index": 1,
+          "name": "Кувшин",
+          "dat_record_offset": 173,
+          "wrk_offset": 228
+        },
+        {
+          "template_index": 2,
+          "name": "Камнепад",
+          "dat_record_offset": 344,
+          "wrk_offset": 393
+        },
+        {
+          "template_index": 3,
+          "name": "Фантом",
+          "dat_record_offset": 515,
+          "wrk_offset": 530
+        },
+        {
+          "template_index": 4,
+          "name": "Каменное лицо",
+          "dat_record_offset": 686,
+          "wrk_offset": 697
+        },
+        {
+          "template_index": 5,
+          "name": "Каменная стена",
+          "dat_record_offset": 857,
+          "wrk_offset": 1016
+        },
+        {
+          "template_index": 6,
+          "name": "Голова рыцаря",
+          "dat_record_offset": 1028,
+          "wrk_offset": 1314
+        },
+        {
+          "template_index": 7,
+          "name": "Живая елка",
+          "dat_record_offset": 1199,
+          "wrk_offset": 1572
+        },
+        {
+          "template_index": 8,
+          "name": "Ворон",
+          "dat_record_offset": 1370,
+          "wrk_offset": 1722
+        },
+        {
+          "template_index": 9,
+          "name": "Сундук+сирен.",
+          "dat_record_offset": 1541,
+          "wrk_offset": 1818
+        },
+        {
+          "template_index": 10,
+          "name": "Cундук+розов.",
+          "dat_record_offset": 1712,
+          "wrk_offset": 1998
+        },
+        {
+          "template_index": 11,
+          "name": "Сундук+шар",
+          "dat_record_offset": 1883,
+          "wrk_offset": 2015
+        },
+        {
+          "template_index": 12,
+          "name": "Яма-Ловушка",
+          "dat_record_offset": 2054,
+          "wrk_offset": 2032
+        },
+        {
+          "template_index": 13,
+          "name": "Руфин",
+          "dat_record_offset": 2225,
+          "wrk_offset": 2284
+        },
+        {
+          "template_index": 14,
+          "name": "Онис",
+          "dat_record_offset": 2396,
+          "wrk_offset": 3519
+        },
+        {
+          "template_index": 15,
+          "name": "Ирвил",
+          "dat_record_offset": 2567,
+          "wrk_offset": 4759
+        },
+        {
+          "template_index": 16,
+          "name": "Мирон",
+          "dat_record_offset": 2738,
+          "wrk_offset": 5832
+        },
+        {
+          "template_index": 17,
+          "name": "Магус",
+          "dat_record_offset": 2909,
+          "wrk_offset": 6766
+        },
+        {
+          "template_index": 18,
+          "name": "Кевин",
+          "dat_record_offset": 3080,
+          "wrk_offset": 7538
+        },
+        {
+          "template_index": 19,
+          "name": "Гарик",
+          "dat_record_offset": 3251,
+          "wrk_offset": 7993
+        },
+        {
+          "template_index": 20,
+          "name": "Эфил",
+          "dat_record_offset": 3422,
+          "wrk_offset": 8465
+        },
+        {
+          "template_index": 21,
+          "name": "Кочет",
+          "dat_record_offset": 3593,
+          "wrk_offset": 9369
+        },
+        {
+          "template_index": 22,
+          "name": "Фарих",
+          "dat_record_offset": 3764,
+          "wrk_offset": 0
+        },
+        {
+          "template_index": 23,
+          "name": "Закир",
+          "dat_record_offset": 3935,
+          "wrk_offset": 0
+        },
+        {
+          "template_index": 24,
+          "name": "Рукопись 1",
+          "dat_record_offset": 4106,
+          "wrk_offset": 10000
+        },
+        {
+          "template_index": 25,
+          "name": "Рукопись 2",
+          "dat_record_offset": 4277,
+          "wrk_offset": 10112
+        },
+        {
+          "template_index": 26,
+          "name": "Рукопись 3",
+          "dat_record_offset": 4448,
+          "wrk_offset": 10125
+        },
+        {
+          "template_index": 27,
+          "name": "Дракон",
+          "dat_record_offset": 4619,
+          "wrk_offset": 10138
+        },
+        {
+          "template_index": 28,
+          "name": "Генератор",
+          "dat_record_offset": 4790,
+          "wrk_offset": 10737
+        },
+        {
+          "template_index": 29,
+          "name": "Сундук+птицы",
+          "dat_record_offset": 4961,
+          "wrk_offset": 10859
+        },
+        {
+          "template_index": 30,
+          "name": "Кувшин+золото",
+          "dat_record_offset": 5132,
+          "wrk_offset": 11107
+        },
+        {
+          "template_index": 31,
+          "name": "Яма много.",
+          "dat_record_offset": 5303,
+          "wrk_offset": 11124
+        },
+        {
+          "template_index": 32,
+          "name": "Фантом",
+          "dat_record_offset": 5474,
+          "wrk_offset": 11175
+        },
+        {
+          "template_index": 33,
+          "name": "Кувшин+фантом",
+          "dat_record_offset": 5645,
+          "wrk_offset": 11373
+        },
+        {
+          "template_index": 34,
+          "name": "Говорящее",
+          "dat_record_offset": 5816,
+          "wrk_offset": 11528
+        },
+        {
+          "template_index": 35,
+          "name": "Говорящ. лицо",
+          "dat_record_offset": 5987,
+          "wrk_offset": 11602
+        },
+        {
+          "template_index": 36,
+          "name": "Камнепад",
+          "dat_record_offset": 6158,
+          "wrk_offset": 11801
+        }
+      ],
+      "unique_entry_count": 35
+    },
+    {
+      "dat": "ARMY__04.DAT",
+      "wrk": "ARMY__04.WRK",
+      "template_count": 1,
+      "callbacks": [
+        {
+          "template_index": 0,
+          "name": "Вулкан",
+          "dat_record_offset": 2,
+          "wrk_offset": 0
+        }
+      ],
+      "unique_entry_count": 1
+    },
+    {
+      "dat": "ARMY__05.DAT",
+      "wrk": "ARMY__05.WRK",
+      "template_count": 5,
+      "callbacks": [
+        {
+          "template_index": 0,
+          "name": "Птица",
+          "dat_record_offset": 2,
+          "wrk_offset": 0
+        },
+        {
+          "template_index": 1,
+          "name": "Генерат. птиц",
+          "dat_record_offset": 173,
+          "wrk_offset": 112
+        },
+        {
+          "template_index": 2,
+          "name": "Волк",
+          "dat_record_offset": 344,
+          "wrk_offset": 234
+        },
+        {
+          "template_index": 3,
+          "name": "Медведь",
+          "dat_record_offset": 515,
+          "wrk_offset": 424
+        },
+        {
+          "template_index": 4,
+          "name": "Волк",
+          "dat_record_offset": 686,
+          "wrk_offset": 674
+        }
+      ],
+      "unique_entry_count": 5
+    }
+  ],
+  "limitations": [
+    "No relocations applied; addresses are object-relative, not runtime linear addresses.",
+    "No complete control-flow or function recovery; WRK embeds data between instructions.",
+    "FS target types and meanings require individual use-site analysis."
+  ]
+}

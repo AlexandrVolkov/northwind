@@ -136,21 +136,32 @@ class ObjectTests(unittest.TestCase):
 class TemplateTests(unittest.TestCase):
     def fixture(self):
         record = bytearray(171)
-        struct.pack_into('<H', record, 0, 171)
-        struct.pack_into('<I', record, 9, 171 - 9)
-        record[3:5] = bytes([62, 62])
-        return bytes(record) + 'Лучник'.encode('cp866') + b'\xff'
+        struct.pack_into('<I', record, 7, 171 - 7)
+        struct.pack_into('<I', record, 0x3b, 0x7f)
+        record[1:3] = bytes([62, 62])
+        return struct.pack('<H', 171) + bytes(record) + 'Лучник'.encode('cp866') + b'\xff'
 
     def test_relative_name_pointer_and_preserved_bytes(self):
         data = self.fixture()
         result = importer.decode_templates(data)
         template = result['templates'][0]
         self.assertEqual(template['name'], 'Лучник')
-        self.assertEqual(template['name_offset'], 171)
-        self.assertEqual(bytes.fromhex(template['raw_record_hex']) + bytes.fromhex(result['raw_tail_hex']), data)
+        self.assertEqual(template['name_offset'], 173)
+        self.assertEqual(template['file_offset'], 2)
+        self.assertEqual(template['wrk_entry_offset'], 0x7f)
+        self.assertEqual(bytes.fromhex(result['raw_header_hex']) + bytes.fromhex(template['raw_record_hex']) + bytes.fromhex(result['raw_tail_hex']), data)
+
+    def test_header_is_not_part_of_first_record_and_records_do_not_overlap(self):
+        first = bytearray(self.fixture()[2:173]); second = bytearray(first)
+        first[-2:] = b'\xa5\x5a'; second[:1] = b'\x33'; second[-2:] = b'\x12\x34'
+        struct.pack_into('<I', first, 7, 342 - 7)
+        data = struct.pack('<H', 342) + first + second + b'X\xff'
+        result = importer.decode_templates(data)
+        self.assertEqual([t['file_offset'] for t in result['templates']], [2, 173])
+        self.assertEqual([bytes.fromhex(t['raw_record_hex']) for t in result['templates']], [first, second])
 
     def test_bad_pointers_boundaries_and_terminators(self):
-        for data in [bytes(170), bytes(171), self.fixture()[:-1]]:
+        for data in [bytes(170), bytes(171), self.fixture()[:-1], struct.pack('<H', 171) + bytes(170)]:
             with self.assertRaises(ValueError):
                 importer.decode_templates(data)
         data = bytearray(self.fixture())
