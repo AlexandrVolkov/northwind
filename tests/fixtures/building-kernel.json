@@ -1,0 +1,173 @@
+{
+  "format_version": 1,
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475",
+    "ARMY__02.WRK": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b"
+  },
+  "maintenance_code_range": [
+    51213,
+    51340
+  ],
+  "damage_code_range": [
+    48644,
+    48686
+  ],
+  "output_layout": {
+    "maintenance": "condition:u8,counter:u8,work_flags:u8,object_flags:u16le,balances:3*u32le,continue_action:u8,signal:u8",
+    "damage": "condition:u8,counter:u8,work_flags:u8,object_flags:u16le"
+  },
+  "maintenance": {
+    "parameters": [
+      {
+        "template_index": 2,
+        "limit": 127,
+        "interval": 4,
+        "costs": [
+          0,
+          2,
+          2
+        ]
+      },
+      {
+        "template_index": 3,
+        "limit": 80,
+        "interval": 4,
+        "costs": [
+          0,
+          2,
+          2
+        ]
+      },
+      {
+        "template_index": 4,
+        "limit": 70,
+        "interval": 4,
+        "costs": [
+          0,
+          1,
+          1
+        ]
+      },
+      {
+        "template_index": null,
+        "limit": 0,
+        "interval": 0,
+        "costs": [
+          4294967295,
+          0,
+          1
+        ]
+      }
+    ],
+    "conditions": [
+      0,
+      1,
+      79,
+      80,
+      126,
+      127,
+      128,
+      255
+    ],
+    "counters": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      254,
+      255
+    ],
+    "work_flags": [
+      0,
+      1,
+      2,
+      36
+    ],
+    "object_flags": [
+      0,
+      2,
+      26,
+      4610
+    ],
+    "state_bit40": [
+      false,
+      true
+    ],
+    "balances": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        2
+      ],
+      [
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        2,
+        1
+      ],
+      [
+        4294967295,
+        4294967295,
+        4294967295
+      ]
+    ],
+    "case_count": 35840,
+    "sha256": "7dd6fc6fde66e678b421e9abd58008891c485a5ba1eed2c9490e54054c5e5be6"
+  },
+  "damage": {
+    "condition_range": [
+      0,
+      255
+    ],
+    "strengths": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      79,
+      127,
+      128,
+      254,
+      255
+    ],
+    "protections": [
+      0,
+      4,
+      127,
+      255
+    ],
+    "object_flags": [
+      0,
+      31,
+      224,
+      43981
+    ],
+    "reactions": [
+      0,
+      1,
+      128,
+      255
+    ],
+    "case_count": 163840,
+    "sha256": "158d1f5bf0af3a5f2abb9576123d1e30710c1c7042668acf5d822e36d06f3048"
+  },
+  "restrictions": [
+    "Unicorn 2.1.4, original 32-bit instructions; no callbacks skipped.",
+    "Only the shared maintenance routine and per-target damage tail are executed.",
+    "Maintenance uses owner 7 and checks a neighbor balance is unchanged.",
+    "Intervals count invocations; no mapping to real time is established.",
+    "Three balance slots remain unnamed; effect/target selection and full WRK update are outside scope."
+  ]
+}
