@@ -13,6 +13,7 @@ public partial class TestRunner : Node
     {
         try
         {
+            GD.Print($"Runtime: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
             string mode = OS.GetCmdlineUserArgs().FirstOrDefault() ?? "simulation";
             switch (mode)
             {
