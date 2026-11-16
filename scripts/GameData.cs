@@ -110,3 +110,17 @@ public sealed class TemplatePreview
     public int Width { get; set; }
     public int Height { get; set; }
 }
+
+public sealed class ObservationsData
+{
+    public string Status { get; set; } = "unavailable";
+    public string Reason { get; set; } = "";
+    public ObservationSample[] Samples { get; set; } = [];
+}
+public sealed class ObservationSample
+{
+    public string Title { get; set; } = "";
+    public string Image { get; set; } = "";
+    public string Note { get; set; } = "";
+    public int[] ViewportSize { get; set; } = [];
+}

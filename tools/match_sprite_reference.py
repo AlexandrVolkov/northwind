@@ -5,21 +5,8 @@ import hashlib
 import json
 from pathlib import Path
 from PIL import Image
-from import_game import decode_spr
-
-
-def frame_pixels(data, frame):
-    if len(data) < 2:
-        raise ValueError('Truncated SPR')
-    count = int.from_bytes(data[:2], 'little')
-    base = 2 + count * 3
-    if not 0 <= frame < count or base > len(data):
-        raise ValueError('Invalid SPR frame or table')
-    offsets = [int.from_bytes(data[2+i*3:5+i*3], 'little') for i in range(count)] + [len(data)-base]
-    if offsets[0] != 0 or any(a > b or b > len(data)-base for a, b in zip(offsets, offsets[1:])):
-        raise ValueError('Invalid SPR offsets')
-    record = data[base+offsets[frame]:base+offsets[frame+1]]
-    return decode_spr(b'\x01\x00\x00\x00\x00' + record)[0]
+from import_game import decode_spr_frame as frame_pixels
+from reference_frames import exclude_pixels as apply_exclusions
 
 
 def match_frame(screenshot, pixels, size, palette, table, viewport, search):
@@ -80,14 +67,20 @@ def main():
     parser.add_argument('--size', type=int, nargs=2, required=True)
     parser.add_argument('--viewport', type=int, nargs=4, required=True)
     parser.add_argument('--search', type=int, nargs=4, required=True)
+    parser.add_argument('--exclude', type=int, nargs=4, action='append', default=[], help='Explicit frame-space exclusion rectangle; result is a partial comparison')
     args = parser.parse_args()
     files = {p.name.upper(): p for p in args.game.iterdir() if p.is_file()}
     spr = files[args.spr.upper()].read_bytes()
     table = files[args.table.upper()].read_bytes()
     palette = files['COLOR1.PAL'].read_bytes()
+    original = frame_pixels(spr, args.frame)
+    pixels = apply_exclusions(original, args.size, args.exclude)
     with Image.open(args.screenshot) as image:
-        result = match_frame(image, frame_pixels(spr, args.frame), args.size, palette, table, args.viewport, args.search)
-    result.update({'frame': args.frame, 'spr': args.spr, 'table': args.table,
+        result = match_frame(image, pixels, args.size, palette, table, args.viewport, args.search)
+    result.update({'comparison_scope': 'declared_exclusions' if args.exclude else 'full_opaque_mask',
+                   'excluded_regions': args.exclude, 'original_opaque_pixels': sum(c >= 0 for c in original),
+                   'excluded_opaque_pixels': sum(c >= 0 for c in original) - sum(c >= 0 for c in pixels),
+                   'frame': args.frame, 'spr': args.spr, 'table': args.table,
                    'screenshot_sha256': hashlib.sha256(args.screenshot.read_bytes()).hexdigest()})
     print(json.dumps(result, indent=2))
 

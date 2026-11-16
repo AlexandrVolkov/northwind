@@ -119,6 +119,16 @@ public partial class TestRunner : Node
             GetTree().Root.GetTexture().GetImage().SavePng("res://build/objects-view.png");
         }
         scene.ToggleOriginalView(); Check(!scene.OriginalView, "Can return to demo");
+        scene.OpenObservation();
+        Check(scene.Observation!.Visible && scene.Observation.ImageLoaded && scene.Observation.SampleCount == 2, "Verified observations load");
+        scene.Observation.ShowSample(1); Check(scene.Observation.ImageLoaded, "Castle body observation loads");
+        if (DisplayServer.GetName() != "headless")
+        {
+            for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            GetTree().Root.GetTexture().GetImage().SavePng("res://build/castle-observation.png");
+        }
+        scene.Observation.Hide();
         scene.OpenGallery();
         Check(scene.Gallery!.Visible && scene.Gallery.AtlasLoaded, "Template gallery opens with a loaded atlas");
         Check(scene.Gallery.EntryCount == 123 && scene.Gallery.CandidateCount > 0 && scene.Gallery.CandidateCount < scene.Gallery.EntryCount, "Gallery reports decoded and unresolved templates");
