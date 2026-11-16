@@ -59,6 +59,7 @@ public sealed class ScenarioSlot
     public string LeaderName { get; set; } = "";
     public string SettlementName { get; set; } = "";
     public string ObjectFile { get; set; } = "";
+    public ObjectRecord[] Objects { get; set; } = [];
     public int ObjectBytes { get; set; }
 }
 public static class GameData
@@ -67,4 +68,17 @@ public static class GameData
     public static T Read<T>(string path) where T : class =>
         JsonSerializer.Deserialize<T>(Godot.FileAccess.GetFileAsString(path), Options)
         ?? throw new InvalidDataException($"Invalid JSON: {path}");
+}
+
+/// <summary>Lossless record facts. RawX/RawY are coordinate candidates only.</summary>
+public sealed class ObjectRecord
+{
+    public int RecordIndex { get; set; }
+    public int FileOffset { get; set; }
+    public int RecordBytes { get; set; }
+    public int RawCode { get; set; }
+    public int RawByte3 { get; set; }
+    public uint RawX { get; set; }
+    public uint RawY { get; set; }
+    public string RawRecordHex { get; set; } = "";
 }

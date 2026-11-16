@@ -146,9 +146,31 @@ def decode_scenario(data: bytes) -> dict:
     return {'format_version': 1, 'slot_count': count,
             'map_file': dos_filename(data[2:15]),
             'raw_header_hex': data[:20].hex(), 'slots': slots,
-            'limitations': ['Only record boundaries, filenames and text fields are decoded.',
+            'limitations': ['SCN boundaries, filenames, text and OBE common headers are decoded.',
                             'Slot order is not a proven team, nation or player identifier.',
-                            'Object records, positions and game rules are not decoded.']}
+                            'OBE common headers are decoded; coordinates and byte codes have unconfirmed semantics.']}
+
+
+def decode_objects(data: bytes) -> list[dict]:
+    """OBE chain: observed 34-byte common prefix, u32 length at +16.
+
+    Coordinates and byte codes are candidates, not recovered game semantics.
+    """
+    records = []
+    offset = 0
+    while offset < len(data):
+        if len(data) - offset < 34:
+            raise ValueError(f'Truncated OBE prefix at {offset}')
+        size = u32(data, offset + 16)
+        if size < 34 or offset + size > len(data):
+            raise ValueError(f'Invalid OBE record length {size} at {offset}')
+        raw = data[offset:offset + size]
+        records.append({'record_index': len(records), 'file_offset': offset,
+                        'record_bytes': size, 'raw_code': raw[0], 'raw_byte_3': raw[3],
+                        'raw_x': u32(raw, 4), 'raw_y': u32(raw, 8),
+                        'raw_record_hex': raw.hex()})
+        offset += size
+    return records
 
 
 def audit_directory(source: Path) -> dict:
@@ -185,7 +207,7 @@ def audit_directory(source: Path) -> dict:
         for slot in scenario['slots']:
             payload = read_reference(slot['object_file'])
             objects.append({'slot_index': slot['slot_index'], 'file': slot['object_file'],
-                            'bytes': len(payload), 'sha256': hashlib.sha256(payload).hexdigest()})
+                            'bytes': len(payload), 'record_count': len(decode_objects(payload)), 'sha256': hashlib.sha256(payload).hexdigest()})
         scenarios.append({'file': name, 'sha256': hashlib.sha256(content).hexdigest(),
                           'map_file': scenario['map_file'], 'width': width, 'height': height,
                           'segment_file': segment_name, 'tile_count': count,
@@ -198,7 +220,7 @@ def audit_directory(source: Path) -> dict:
                           'sha256': hashlib.sha256(content).hexdigest()})
     return {'format_version': 1, 'files': inventory, 'scenarios': scenarios,
             'limitations': ['Structural consistency is not gameplay validation.',
-                           'OBE byte counts are not object counts.']}
+                           'OBE record counts describe the serialized chain, not proven live game entities.']}
 
 
 def import_directory(source: Path, destination: Path, map_number: int = 1) -> dict:
@@ -219,6 +241,7 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
             raise ValueError(f'Scenario references {scenario["map_file"]}, expected {expected_map}')
         for slot in scenario['slots']:
             payload = read(slot['object_file'])
+            slot['objects'] = decode_objects(payload)
             slot['object_bytes'] = len(payload)
             slot['object_sha256'] = hashlib.sha256(payload).hexdigest()
     map_bytes = read(f'MAP_{map_number}.MAP')
@@ -300,7 +323,7 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         scenario_path.write_text(json.dumps(scenario, ensure_ascii=False, indent=2), encoding='utf-8')
     elif scenario_path.exists():
         scenario_path.unlink()  # Never leave a previous map's scenario in the output.
-    manifest = {'importer_version': 2, 'files': used, 'decoded_sprite_records': len(frames),
+    manifest = {'importer_version': 3, 'files': used, 'decoded_sprite_records': len(frames),
                 'notes': 'Graphics decoded; gameplay and terrain blocking are experimental.'}
     (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
     return manifest
