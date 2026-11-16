@@ -14,7 +14,7 @@
 git clone https://github.com/AlexandrVolkov/northwind.git
 cd northwind
 # Если прототип ещё не объединён в main:
-git switch codex/godot-first-playable
+git switch codex/northwind-godot-prototype
 python -m pip install -r tools/requirements.txt
 ```
 
