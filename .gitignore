@@ -1,0 +1,9 @@
+.godot/
+assets/imported/
+__pycache__/
+*.pyc
+*.ISO
+*.iso
+*.cab
+*.CAB
+build/

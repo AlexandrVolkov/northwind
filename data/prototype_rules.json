@@ -1,0 +1,12 @@
+{
+  "status": "experimental_not_recovered_from_original",
+  "unit": {"name": "Дружинник", "max_hp": 10, "movement": 6, "damage": 3, "retaliation": 1},
+  "movement": {"forest_cost": 2, "ground_cost": 1},
+  "spawn_center": [65, 60],
+  "units": [
+    {"id": 1, "team": 0, "offset": [-3, 0]},
+    {"id": 2, "team": 0, "offset": [-3, 2]},
+    {"id": 3, "team": 1, "offset": [2, 0]},
+    {"id": 4, "team": 1, "offset": [3, 2]}
+  ]
+}
