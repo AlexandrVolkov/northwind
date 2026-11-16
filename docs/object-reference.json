@@ -1,0 +1,228 @@
+{
+  "status": "unique",
+  "screen_top_left_candidates": [
+    [
+      321,
+      393
+    ]
+  ],
+  "opaque_pixels": 280,
+  "limitations": "Explicit frame/palette match only; does not identify memory state or generalize object anchors.",
+  "frame": 71,
+  "spr": "ARMY__02.SPR",
+  "table": "COLOR_02.TAB",
+  "screenshot_sha256": "36f10b85466e9b1541e5d69acea0108a1e19a995a56722bc0760392df0416c49",
+  "format_version": 1,
+  "viewport": [
+    336,
+    216,
+    448,
+    448
+  ],
+  "camera": [
+    320,
+    768
+  ],
+  "matched_sprite_world_top_left": [
+    305,
+    945
+  ],
+  "proposed_obe_link": {
+    "file": "MAP_1_01.OBE",
+    "file_offset": 203,
+    "raw_xy": [
+      304,
+      912
+    ],
+    "derived_offset": [
+      1,
+      33
+    ],
+    "status": "candidate_link_not_general_anchor"
+  },
+  "source_sha256": {
+    "ARMY__02.SPR": "a684ad0474ad9272ab08b0997753305f9a1297103ba83e054e736542dc00302f",
+    "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475",
+    "COLOR1.PAL": "022e87d1ccd4961b08d54e073da6bff5cf28a9aa9577dc78422b211407c33a32",
+    "COLOR_02.TAB": "0731b729e708e56fed8a04ede8c05b56d52960d813bd458bf6b47dcb5be15cde",
+    "MAP_1_01.OBE": "95d17fd664985108a03f5e88e1d36330ee74288b0424aeae33b10f08e705b930"
+  },
+  "motion": {
+    "input": "right click",
+    "screen_target": [
+      480,
+      424
+    ],
+    "world_target": [
+      464,
+      976
+    ],
+    "roi": [
+      336,
+      400,
+      204,
+      40
+    ],
+    "frames": [
+      {
+        "file": "after-0.png",
+        "seconds_after_input_return": 0.005327857998054242,
+        "pixel_count": 18,
+        "centroid": [
+          355.0,
+          422.1111111111111
+        ],
+        "bounds": [
+          349,
+          414,
+          358,
+          427
+        ]
+      },
+      {
+        "file": "after-1.png",
+        "seconds_after_input_return": 0.25999846199920285,
+        "pixel_count": 23,
+        "centroid": [
+          357.7826086956522,
+          415.1304347826087
+        ],
+        "bounds": [
+          352,
+          413,
+          361,
+          418
+        ]
+      },
+      {
+        "file": "after-2.png",
+        "seconds_after_input_return": 0.5084983589986223,
+        "pixel_count": 28,
+        "centroid": [
+          368.10714285714283,
+          416.67857142857144
+        ],
+        "bounds": [
+          362,
+          412,
+          372,
+          423
+        ]
+      },
+      {
+        "file": "after-3.png",
+        "seconds_after_input_return": 1.0062547210000048,
+        "pixel_count": 32,
+        "centroid": [
+          385.78125,
+          416.09375
+        ],
+        "bounds": [
+          380,
+          412,
+          390,
+          423
+        ]
+      },
+      {
+        "file": "after-4.png",
+        "seconds_after_input_return": 2.0115453239995986,
+        "pixel_count": 25,
+        "centroid": [
+          421.96,
+          415.44
+        ],
+        "bounds": [
+          417,
+          413,
+          425,
+          419
+        ]
+      },
+      {
+        "file": "after-5.png",
+        "seconds_after_input_return": 3.0052591929998016,
+        "pixel_count": 26,
+        "centroid": [
+          457.11538461538464,
+          415.0769230769231
+        ],
+        "bounds": [
+          451,
+          412,
+          461,
+          423
+        ]
+      }
+    ],
+    "limitations": "Color centroid is a diagnostic proxy, not the object anchor. Requires a declared unobstructed ROI; cannot establish game speed or general movement rules.",
+    "capture_hashes": [
+      {
+        "file": "before.png",
+        "sha256": "e4f7af18e7237f53d29a3faf03e89566527cc571c02e6d2f1e16daf338a5fa79",
+        "camera": [
+          320,
+          768
+        ]
+      },
+      {
+        "file": "after-0.png",
+        "sha256": "a113440f732a5920b5caa42ec0f812b1aaa891481ee7081742e11776ff05da8c",
+        "camera": [
+          320,
+          768
+        ]
+      },
+      {
+        "file": "after-1.png",
+        "sha256": "69832a3360d7c4a6f991d6ee884fd64a9b428f90bdf7b5f13a5aac1227afb118",
+        "camera": [
+          320,
+          768
+        ]
+      },
+      {
+        "file": "after-2.png",
+        "sha256": "0e5c705fee0458365f70358581c68989356b000fd130b1a2b6a963cae481d722",
+        "camera": [
+          320,
+          768
+        ]
+      },
+      {
+        "file": "after-3.png",
+        "sha256": "b5bafa584ab5a20579b4de520f3e1f9a259cc02feae38ccc399357c61a542221",
+        "camera": [
+          320,
+          768
+        ]
+      },
+      {
+        "file": "after-4.png",
+        "sha256": "61e8e7375cd7532305d138e59f221f8759af62c3457551c312973c99dfb8979e",
+        "camera": [
+          320,
+          768
+        ]
+      },
+      {
+        "file": "after-5.png",
+        "sha256": "cbd3f33c473da1dc9fbc787eae3b5914bdbf4aace43b71ff740c239cfb88b38f",
+        "camera": [
+          320,
+          768
+        ]
+      },
+      {
+        "file": "settled.png",
+        "sha256": "d0e39dbe16775d94b4a2bfbc7ab2a08b02c6bbb06fa43f8de190531b35904133",
+        "camera": [
+          320,
+          768
+        ]
+      }
+    ]
+  },
+  "selected_panel_screenshot_sha256": "a5a2942f27e6ee12e081b015b4f6a40b16090c5ebef2e224682cd30f7c23e503",
+  "selected_panel_name": "Ополченец"
+}
