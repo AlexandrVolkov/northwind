@@ -106,6 +106,101 @@ def decode_spr(data: bytes) -> list[list[int]]:
     return frames
 
 
+def dos_filename(raw: bytes) -> str:
+    """SCN names use space-padded DOS 8.3 stems, unlike host filenames."""
+    name = raw.split(b'\0')[0].decode('ascii')
+    if any(c in name for c in '/\\:') or name in ('', '.', '..'):
+        raise ValueError('Unsafe scenario reference')
+    if '.' in name:
+        stem, extension = name.rsplit('.', 1)
+        name = stem.rstrip(' ') + '.' + extension.rstrip(' ')
+    return name.upper()
+
+
+def scenario_text(raw: bytes) -> str:
+    # Unlike README (CP1251), SCN names are DOS CP866, padded with FF.
+    return raw.rstrip(b'\xff\0 ').decode('cp866')
+
+
+def decode_scenario(data: bytes) -> dict:
+    """Observed SCN layout: 20-byte header + count * 114-byte slot records.
+
+    Export unknown bytes without assigning economy/diplomacy/army semantics.
+    """
+    if len(data) < 20:
+        raise ValueError('Truncated SCN header')
+    count = data[0]
+    if len(data) != 20 + count * 114:
+        raise ValueError('Unexpected SCN record count or size')
+    slots = []
+    for index in range(count):
+        offset = 20 + index * 114
+        record = data[offset:offset + 114]
+        slots.append({
+            'slot_index': index, 'file_offset': offset,
+            'object_file': dos_filename(record[2:15]),
+            'leader_name': scenario_text(record[37:57]),
+            'settlement_name': scenario_text(record[94:114]),
+            'raw_record_hex': record.hex(),
+        })
+    return {'format_version': 1, 'slot_count': count,
+            'map_file': dos_filename(data[2:15]),
+            'raw_header_hex': data[:20].hex(), 'slots': slots,
+            'limitations': ['Only record boundaries, filenames and text fields are decoded.',
+                            'Slot order is not a proven team, nation or player identifier.',
+                            'Object records, positions and game rules are not decoded.']}
+
+
+def audit_directory(source: Path) -> dict:
+    """Validate every discovered SCN/MAP/SEG chain, including empty OBE files."""
+    files = {p.name.upper(): p for p in source.iterdir() if p.is_file()}
+    def read_reference(name: str) -> bytes:
+        if name not in files:
+            raise ValueError(f'Missing referenced file: {name}')
+        return files[name].read_bytes()
+    scenarios = []
+    for name in sorted(files):
+        if not name.startswith('SCENA_') or not name.endswith('.SCN'):
+            continue
+        content = files[name].read_bytes()
+        scenario = decode_scenario(content)
+        map_bytes = read_reference(scenario['map_file'])
+        if len(map_bytes) < 25 or map_bytes[:4] != b'MAP2':
+            raise ValueError(f'Invalid MAP2 for {name}')
+        width, height = struct.unpack_from('<II', map_bytes, 17)
+        if not 0 < width <= 1024 or not 0 < height <= 1024 or len(map_bytes) != 25 + width * height * 4:
+            raise ValueError(f'Invalid map length for {name}')
+        segment_name = dos_filename(map_bytes[4:17])
+        segment = read_reference(segment_name)
+        if len(segment) < 21 or segment[:4] != b'SEG2':
+            raise ValueError(f'Invalid SEG2 for {name}')
+        count = u32(segment, 4)
+        end = 21 + count * (9 + 1024)
+        if not count or end > len(segment):
+            raise ValueError(f'Truncated SEG2 for {name}')
+        cells = struct.unpack_from(f'<{width * height}I', map_bytes, 25)
+        if any((cell & 65535) >= count for cell in cells):
+            raise ValueError(f'Invalid tile reference for {name}')
+        objects = []
+        for slot in scenario['slots']:
+            payload = read_reference(slot['object_file'])
+            objects.append({'slot_index': slot['slot_index'], 'file': slot['object_file'],
+                            'bytes': len(payload), 'sha256': hashlib.sha256(payload).hexdigest()})
+        scenarios.append({'file': name, 'sha256': hashlib.sha256(content).hexdigest(),
+                          'map_file': scenario['map_file'], 'width': width, 'height': height,
+                          'segment_file': segment_name, 'tile_count': count,
+                          'segment_unknown_tail_bytes': len(segment) - end,
+                          'slot_count': scenario['slot_count'], 'objects': objects})
+    inventory = []
+    for name in sorted(files):
+        content = files[name].read_bytes()
+        inventory.append({'file': name, 'bytes': len(content),
+                          'sha256': hashlib.sha256(content).hexdigest()})
+    return {'format_version': 1, 'files': inventory, 'scenarios': scenarios,
+            'limitations': ['Structural consistency is not gameplay validation.',
+                           'OBE byte counts are not object counts.']}
+
+
 def import_directory(source: Path, destination: Path, map_number: int = 1) -> dict:
     files = {p.name.upper(): p for p in source.iterdir() if p.is_file()}
     used = {}
@@ -116,6 +211,16 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         data = path.read_bytes()
         used[name.upper()] = {'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
         return data
+    scenario_name = f'SCENA_{map_number:02d}.SCN'
+    scenario = decode_scenario(read(scenario_name)) if scenario_name in files else None
+    if scenario is not None:
+        expected_map = f'MAP_{map_number}.MAP'
+        if scenario['map_file'] != expected_map:
+            raise ValueError(f'Scenario references {scenario["map_file"]}, expected {expected_map}')
+        for slot in scenario['slots']:
+            payload = read(slot['object_file'])
+            slot['object_bytes'] = len(payload)
+            slot['object_sha256'] = hashlib.sha256(payload).hexdigest()
     map_bytes = read(f'MAP_{map_number}.MAP')
     if map_bytes[:4] != b'MAP2' or len(map_bytes) < 25:
         raise ValueError('Expected MAP2')
@@ -190,7 +295,12 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         'unit_frames': {'source': 'ARMY__01.SPR', 'first': 5, 'count': 32, 'width': 62, 'height': 62},
     }
     (destination / 'map.json').write_text(json.dumps(result, separators=(',', ':')), encoding='utf-8')
-    manifest = {'importer_version': 1, 'files': used, 'decoded_sprite_records': len(frames),
+    scenario_path = destination / 'scenario.json'
+    if scenario is not None:
+        scenario_path.write_text(json.dumps(scenario, ensure_ascii=False, indent=2), encoding='utf-8')
+    elif scenario_path.exists():
+        scenario_path.unlink()  # Never leave a previous map's scenario in the output.
+    manifest = {'importer_version': 2, 'files': used, 'decoded_sprite_records': len(frames),
                 'notes': 'Graphics decoded; gameplay and terrain blocking are experimental.'}
     (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
     return manifest
@@ -201,10 +311,20 @@ def main() -> None:
     parser.add_argument('source', type=Path, help='Extracted game folder or Horde.ISO')
     parser.add_argument('--output', type=Path, default=ROOT / 'assets' / 'imported')
     parser.add_argument('--map', type=int, default=1, dest='map_number')
+    parser.add_argument('--audit', action='store_true', help='Validate all SCN/MAP/SEG/OBE links; write catalog.json without textures')
     parser.add_argument('--unshield', default='unshield', help='InstallShield extractor (only for ISO input)')
     args = parser.parse_args()
+    def process(source: Path) -> dict:
+        if args.audit:
+            report = audit_directory(source)
+            if not report['scenarios']:
+                raise ValueError('No SCENA_*.SCN files found')
+            args.output.mkdir(parents=True, exist_ok=True)
+            (args.output / 'catalog.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+            return report
+        return import_directory(source, args.output, args.map_number)
     if args.source.is_dir():
-        manifest = import_directory(args.source, args.output, args.map_number)
+        manifest = process(args.source)
     else:
         unshield = shutil.which(args.unshield)
         if unshield is None:
@@ -220,7 +340,10 @@ def main() -> None:
             executables = list((scratch / 'game').rglob('NORWIND.EXE'))
             if len(executables) != 1:
                 raise ValueError('Expected one NORWIND.EXE after extraction')
-            manifest = import_directory(executables[0].parent, args.output, args.map_number)
+            manifest = process(executables[0].parent)
+    if args.audit:
+        print(f'Validated {len(manifest["scenarios"])} scenarios; catalog: {args.output.resolve() / "catalog.json"}')
+        return
     print(f'Imported map {args.map_number} into {args.output.resolve()}')
     print(f'Decoded {manifest["decoded_sprite_records"]} sprite records; wrote terrain, unit frames and manifest.')
 

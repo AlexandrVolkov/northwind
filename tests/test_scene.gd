@@ -61,6 +61,10 @@ func run() -> void:
 	reset.pressed = true
 	scene._unhandled_input(reset)
 	check(scene.model.turn == 1 and scene.animations.is_empty(), "R resets battle and animations")
+	scene.open_scenario()
+	check(scene.scenario_dialog.visible, "Scenario dialog opens")
+	check(not scene.scenario_text.text.is_empty(), "Scenario dialog contains source information")
+	scene.scenario_dialog.hide()
 	for i in 5: await process_frame
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw

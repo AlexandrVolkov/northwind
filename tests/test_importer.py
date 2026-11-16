@@ -58,5 +58,57 @@ class ImportTests(unittest.TestCase):
                 self.assertEqual(image.getpixel((32, 0)), (16, 32, 128))
 
 
+class ScenarioTests(unittest.TestCase):
+    def fixture(self, count=1):
+        header = bytearray(20)
+        header[0] = count
+        header[2:15] = b'map_1   .map\0'
+        records = []
+        for _ in range(count):
+            record = bytearray(114)
+            record[2:15] = b'map_1_01.obe\0'
+            record[37:57] = 'Олег'.encode('cp866').ljust(20, b'\xff')
+            record[94:114] = 'пос. Олега'.encode('cp866').ljust(20, b'\xff')
+            records.append(record)
+        return bytes(header) + b''.join(records)
+
+    def test_scenario_names_references_and_lossless_records(self):
+        data = self.fixture(2)
+        result = importer.decode_scenario(data)
+        self.assertEqual(result['slot_count'], 2)
+        self.assertEqual(result['map_file'], 'MAP_1.MAP')
+        self.assertEqual(result['slots'][0]['leader_name'], 'Олег')
+        self.assertEqual(result['slots'][0]['settlement_name'], 'пос. Олега')
+        self.assertEqual(result['slots'][0]['object_file'], 'MAP_1_01.OBE')
+        self.assertEqual(result['slots'][1]['file_offset'], 134)
+        rebuilt = bytes.fromhex(result['raw_header_hex']) + b''.join(bytes.fromhex(s['raw_record_hex']) for s in result['slots'])
+        self.assertEqual(rebuilt, data)
+
+    def test_rejects_inconsistent_record_count(self):
+        with self.assertRaisesRegex(ValueError, 'count or size'):
+            importer.decode_scenario(self.fixture()[:-1])
+        with self.assertRaisesRegex(ValueError, 'header'):
+            importer.decode_scenario(b'')
+
+    def test_rejects_unsafe_reference(self):
+        data = bytearray(self.fixture())
+        data[2:15] = b'../evil .map\0'
+        with self.assertRaisesRegex(ValueError, 'Unsafe'):
+            importer.decode_scenario(data)
+
+    def test_audit_accepts_empty_obe_and_checks_missing_links(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'SCENA_01.SCN').write_bytes(self.fixture())
+            (root / 'MAP_1.MAP').write_bytes(b'MAP2MAPSEG01.SEG\0' + struct.pack('<III', 1, 1, 0))
+            (root / 'MAPSEG01.SEG').write_bytes(b'SEG2' + struct.pack('<I', 1) + bytes(13 + 9 + 1024))
+            (root / 'MAP_1_01.OBE').write_bytes(b'')
+            report = importer.audit_directory(root)
+            self.assertEqual(report['scenarios'][0]['objects'][0]['bytes'], 0)
+            (root / 'MAP_1_01.OBE').unlink()
+            with self.assertRaisesRegex(ValueError, 'Missing referenced file: MAP_1_01.OBE'):
+                importer.audit_directory(root)
+
+
 if __name__ == '__main__':
     unittest.main()
