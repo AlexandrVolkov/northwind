@@ -18,8 +18,8 @@ public partial class TestRunner : Node
             switch (mode)
             {
                 case "scene": await SceneChecks(); break;
-                case "simulation": SimulationChecks(); OriginalBuildingChecks(); break;
-                case "original-buildings": OriginalBuildingChecks(); break;
+                case "simulation": SimulationChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); break;
+                case "original-buildings": OriginalBuildingChecks(); OriginalLifecycleChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
                 default: throw new ArgumentException($"Unknown test mode: {mode}");
             }
@@ -103,6 +103,16 @@ public partial class TestRunner : Node
         Check(scene.Model.Turn == 1 && scene.Animations.Count == 0, "Reset key");
         Check(scene.OriginalObjects.Count > 0, "Original OBE records imported");
         Check(scene.OriginalObjects.All(o => o.Record.TemplateName.Length > 0 && o.Record.TemplateFile.EndsWith(".DAT")), "OBE objects link to named DAT templates");
+        var castle = GameData.Read<TemplatesData>("res://assets/imported/templates.json").Armies["ARMY__02.DAT"].Templates[2];
+        Check(castle is { RuntimeRecordBytes: 49, InitialCondition: 127, InitialFrame: 876 }, "Original creation parameters import from DAT");
+        Check(castle.Commands.Length == 6 && castle.Commands[1] is { Present: true, Slot: 1, Label: "Ремонт", Mode: 0, HotkeyScanCode: 0x23 },
+            "Original repair command imports with its slot, mode and scan code");
+        Check(OriginalBuildingLifecycle.QueueDirectCommand(0, castle.Commands[1]) == 0x48,
+            "Imported repair command queues the original action state");
+        bool rejectedMenuMode = false;
+        try { OriginalBuildingLifecycle.QueueDirectCommand(0, castle.Commands[3]); }
+        catch (ArgumentException) { rejectedMenuMode = true; }
+        Check(rejectedMenuMode, "A placement/menu command cannot silently become a direct order");
         var before = scene.Model.Units.Select(u => (u.Id, u.Cell, u.Hp, u.Moves)).ToArray();
         scene.ToggleOriginalView();
         Check(scene.OriginalView && scene.EndButton.Disabled, "Original view disables battle");

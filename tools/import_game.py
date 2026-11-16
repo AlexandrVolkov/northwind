@@ -190,6 +190,45 @@ def decode_objects(data: bytes) -> list[dict]:
     return records
 
 
+def decode_dat_label(raw: bytes) -> str:
+    """EXE 0x7028 skips the two-byte '~' + style escape."""
+    text = bytearray()
+    offset = 0
+    while offset < len(raw):
+        if raw[offset] == 0x7e:
+            if offset + 1 >= len(raw):
+                raise ValueError('Truncated DAT text style escape')
+            offset += 2
+        else:
+            text.append(raw[offset])
+            offset += 1
+    return text.decode('cp866')
+
+
+def decode_template_commands(data: bytes, record_offset: int, boundary: int) -> list[dict]:
+    commands = []
+    for slot in range(6):
+        offset = record_offset + 0xb + slot * 8
+        raw = data[offset:offset+8]
+        relative = u32(raw, 2)
+        command = {'slot': slot, 'file_offset': offset, 'icon_frame': int.from_bytes(raw[:2], 'little'),
+                   'mode': raw[6], 'raw_group': raw[7], 'raw_record_hex': raw.hex(),
+                   'present': bool(relative), 'label': '', 'hotkey_scan_code': None}
+        if relative:
+            pointer = offset + 2 + relative
+            if not boundary <= pointer < len(data)-2:
+                raise ValueError('DAT command pointer outside tail')
+            end = pointer + 2  # FF may itself be the hotkey's low byte or a style byte.
+            while end < len(data) and data[end] != 0xff:
+                end += 2 if data[end] == 0x7e else 1
+            if end >= len(data):
+                raise ValueError('Unterminated DAT command text')
+            command.update({'tooltip_offset': pointer, 'hotkey_scan_code': int.from_bytes(data[pointer:pointer+2], 'little'),
+                            'label': decode_dat_label(data[pointer+2:end]), 'raw_tooltip_hex': data[pointer:end+1].hex()})
+        commands.append(command)
+    return commands
+
+
 def decode_templates(data: bytes) -> dict:
     """EXE 0x3593: u16 table byte count, then count/171 actual records."""
     if len(data) < 2:
@@ -212,6 +251,10 @@ def decode_templates(data: bytes) -> dict:
                           'width': record[1], 'height': record[2],
                           'sprite_base_candidate': int.from_bytes(record[5:7], 'little'),
                           'wrk_entry_offset': u32(record, 0x3b),
+                          'runtime_record_bytes': record[0],
+                          'initial_condition': record[0x45],
+                          'initial_frame': int.from_bytes(record[0x48:0x4a], 'little'),
+                          'commands': decode_template_commands(data, offset, boundary),
                           'raw_record_hex': record.hex()})
     return {'raw_header_hex': data[:2].hex(), 'table_bytes': table_bytes,
             'templates': templates, 'raw_tail_hex': data[boundary:].hex()}
@@ -434,7 +477,7 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
     }
     (destination / 'map.json').write_text(json.dumps(result, separators=(',', ':')), encoding='utf-8')
     write_template_previews(tables, read, palette, destination)
-    (destination / 'templates.json').write_text(json.dumps({'format_version': 2, 'armies': tables}, ensure_ascii=False, indent=2), encoding='utf-8')
+    (destination / 'templates.json').write_text(json.dumps({'format_version': 3, 'armies': tables}, ensure_ascii=False, indent=2), encoding='utf-8')
     scenario_path = destination / 'scenario.json'
     if scenario is not None:
         scenario_path.write_text(json.dumps(scenario, ensure_ascii=False, indent=2), encoding='utf-8')
@@ -442,7 +485,7 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         scenario_path.unlink()  # Never leave a previous map's scenario in the output.
     from reference_frames import render_observations
     render_observations(source, destination, map_number, decode_spr_frame)
-    manifest = {'importer_version': 7, 'files': used, 'decoded_sprite_records': len(frames),
+    manifest = {'importer_version': 8, 'files': used, 'decoded_sprite_records': len(frames),
                 'notes': 'Graphics decoded; gameplay and terrain blocking are experimental.'}
     (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
     return manifest

@@ -1,0 +1,138 @@
+{
+  "format_version": 1,
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475",
+    "ARMY__02.WRK": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b"
+  },
+  "queue": {
+    "state_range": [
+      0,
+      255
+    ],
+    "slots": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "case_count": 1536,
+    "sha256": "98600a164ec802b35bbbf5951710a6b96be3022214ac3e09cea02786014b7e43"
+  },
+  "complete": {
+    "state_range": [
+      0,
+      255
+    ],
+    "work_flags": [
+      0,
+      1,
+      2,
+      36,
+      255
+    ],
+    "auxiliary": [
+      0,
+      128,
+      255
+    ],
+    "case_count": 3840,
+    "sha256": "04e4a459b39980277a5c973da3fb27a0b5abc49b880ea2576f8437d6e56d0c6c"
+  },
+  "create": {
+    "army_slots": [
+      0,
+      2,
+      4
+    ],
+    "owners": [
+      0,
+      3,
+      7
+    ],
+    "layers": [
+      0,
+      1,
+      3
+    ],
+    "coordinates": [
+      [
+        0,
+        0
+      ],
+      [
+        608,
+        720
+      ],
+      [
+        4294967295,
+        2147483648
+      ]
+    ],
+    "frames": [
+      876,
+      65535
+    ],
+    "conditions": [
+      0,
+      127,
+      255
+    ],
+    "construction": [
+      false,
+      true
+    ],
+    "case_count": 972,
+    "sha256": "6a464c34efaa5ca420fd4efb48dbff0144f4f90ba19afecc889deab44b93ceca"
+  },
+  "ranges": {
+    "queue": [
+      [
+        25031,
+        25044
+      ],
+      [
+        25149,
+        25168
+      ]
+    ],
+    "complete": [
+      [
+        51401,
+        51424
+      ]
+    ],
+    "create": [
+      [
+        42840,
+        43129
+      ]
+    ],
+    "wrk_callback": [
+      [
+        254,
+        294
+      ]
+    ],
+    "construction": [
+      [
+        45418,
+        45430
+      ]
+    ]
+  },
+  "output_layout": {
+    "queue": "state:u8",
+    "complete": "state:u8,auxiliary:u8,work_flags:u8",
+    "create": "49 raw object bytes"
+  },
+  "restrictions": [
+    "Unicorn 2.1.4; no callbacks skipped, including the actual castle WRK initialization.",
+    "Fresh allocation into an empty owner chain only; existing gaps and allocation failure excluded.",
+    "Single-object direct-mode command application, not group-selection or full UI validation.",
+    "Construction marks fields only; upfront cost and occupancy update excluded.",
+    "Factory checked only for the 49-byte castle shape and template index 2."
+  ]
+}
