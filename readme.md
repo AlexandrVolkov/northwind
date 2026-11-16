@@ -13,8 +13,7 @@
 ```bash
 git clone https://github.com/AlexandrVolkov/northwind.git
 cd northwind
-# Если прототип ещё не объединён в main:
-git switch codex/godot-4-7-2
+git switch main
 python -m pip install -r tools/requirements.txt
 ```
 
@@ -100,4 +99,8 @@ python tools/import_game.py "/путь/к/Horde.ISO" --audit
 python tools/import_game.py "/путь/к/игре" --audit
 ```
 
-Отчёт: `assets/imported/catalog.json`. В предоставленном образе проверены все 12 сценариев. Размер OBE в отчёте — число байтов, не число объектов. Для checkout этого этапа: `git switch codex/godot-4-7-2`.
+Отчёт: `assets/imported/catalog.json`. В предоставленном образе проверены все 12 сценариев. Размер OBE в отчёте — число байтов, не число объектов.
+
+## Запуск оригинала для сравнения
+
+Блокер CD-ROM устранён: пустой файл `CD` из установщика нужно настроить буквой привода, на котором подключён ISO. [Диагноз и инструкция](docs/original-launch.md). `tools/prepare_dosbox.py` создаёт отдельную рабочую копию с конфигурацией DOSBox и манифестом хэшей, не меняя EXE и исходную установку. Подтверждены вступление и главное меню; эталон движения/боя ещё предстоит записать.
