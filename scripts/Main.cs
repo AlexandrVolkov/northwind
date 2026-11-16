@@ -295,7 +295,7 @@ public partial class Main : Node2D
             if (OriginalObjects.Count > 0)
             {
                 var (file, r) = OriginalObjects[_objectFocus % OriginalObjects.Count];
-                _log.Text = $"{file} · запись {r.RecordIndex}\nСмещение {r.FileOffset} · {r.RecordBytes} байт\nКод {r.RawCode}, байт 3: {r.RawByte3}\nx={r.RawX}, y={r.RawY}";
+                _log.Text = $"{file} · запись {r.RecordIndex}\n{r.TemplateName} ({r.TemplateFile}:{r.TemplateIndex})\nСмещение {r.FileOffset} · {r.RecordBytes} байт\nКод {r.RawCode}, байт 3: {r.RawByte3}\nx={r.RawX}, y={r.RawY}";
             }
             else _log.Text = "Повторите импорт обновлённым конвертером.";
             return;

@@ -101,6 +101,7 @@ public partial class TestRunner : Node
         scene._UnhandledInput(new InputEventKey { PhysicalKeycode = Key.R, Pressed = true });
         Check(scene.Model.Turn == 1 && scene.Animations.Count == 0, "Reset key");
         Check(scene.OriginalObjects.Count > 0, "Original OBE records imported");
+        Check(scene.OriginalObjects.All(o => o.Record.TemplateName.Length > 0 && o.Record.TemplateFile.EndsWith(".DAT")), "OBE objects link to named DAT templates");
         var before = scene.Model.Units.Select(u => (u.Id, u.Cell, u.Hp, u.Moves)).ToArray();
         scene.ToggleOriginalView();
         Check(scene.OriginalView && scene.EndButton.Disabled, "Original view disables battle");
