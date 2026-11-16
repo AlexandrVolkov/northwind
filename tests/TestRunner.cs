@@ -100,6 +100,24 @@ public partial class TestRunner : Node
         for (int i = 0; i < 100; i++) scene._Process(1);
         scene._UnhandledInput(new InputEventKey { PhysicalKeycode = Key.R, Pressed = true });
         Check(scene.Model.Turn == 1 && scene.Animations.Count == 0, "Reset key");
+        Check(scene.OriginalObjects.Count > 0, "Original OBE records imported");
+        var before = scene.Model.Units.Select(u => (u.Id, u.Cell, u.Hp, u.Moves)).ToArray();
+        scene.ToggleOriginalView();
+        Check(scene.OriginalView && scene.EndButton.Disabled, "Original view disables battle");
+        scene.FinishTurn();
+        scene._UnhandledInput(new InputEventMouseButton { ButtonIndex = MouseButton.Right, Pressed = true, Position = new Vector2(600, 400) });
+        Check(scene.Model.Turn == 1 && before.SequenceEqual(scene.Model.Units.Select(u => (u.Id, u.Cell, u.Hp, u.Moves))), "Viewing original records cannot mutate demo simulation");
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        var panel = scene.GetChildren().OfType<CanvasLayer>().Single().GetChildren().OfType<PanelContainer>().Single();
+        Check(panel.GetCombinedMinimumSize().Y <= GetTree().Root.Size.Y, "OBE panel fits the viewport");
+        if (DisplayServer.GetName() != "headless")
+        {
+            for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            DirAccess.MakeDirRecursiveAbsolute("res://build");
+            GetTree().Root.GetTexture().GetImage().SavePng("res://build/objects-view.png");
+        }
+        scene.ToggleOriginalView(); Check(!scene.OriginalView, "Can return to demo");
         scene.OpenScenario(); Check(scene.ScenarioDialog!.Visible && scene.ScenarioText!.Text.Length > 0, "Scenario inspector"); scene.ScenarioDialog.Hide();
         for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         if (DisplayServer.GetName() != "headless")

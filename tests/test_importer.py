@@ -110,5 +110,28 @@ class ScenarioTests(unittest.TestCase):
                 importer.audit_directory(root)
 
 
+class ObjectTests(unittest.TestCase):
+    def record(self, size, x=608, y=720):
+        data = bytearray(size)
+        data[0] = 2
+        struct.pack_into('<II', data, 4, x, y)
+        struct.pack_into('<I', data, 16, size)
+        return bytes(data)
+
+    def test_variable_records_and_exact_roundtrip(self):
+        data = self.record(49) + self.record(91, 100, 0)
+        records = importer.decode_objects(data)
+        self.assertEqual([r['file_offset'] for r in records], [0, 49])
+        self.assertEqual(records[1]['raw_x'], 100)
+        self.assertEqual(records[0]['raw_y'], 720)
+        self.assertEqual(b''.join(bytes.fromhex(r['raw_record_hex']) for r in records), data)
+        self.assertEqual(importer.decode_objects(b''), [])
+
+    def test_rejects_zero_length_short_prefix_and_overrun(self):
+        for data in [bytes(34), bytes(33), self.record(49)[:-1]]:
+            with self.assertRaises(ValueError):
+                importer.decode_objects(data)
+
+
 if __name__ == '__main__':
     unittest.main()
