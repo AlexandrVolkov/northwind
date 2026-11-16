@@ -1,0 +1,139 @@
+{
+  "format_version": 1,
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475",
+    "ARMY__02.WRK": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b"
+  },
+  "code_range": [
+    51424,
+    51709
+  ],
+  "template": {
+    "file": "ARMY__02.DAT",
+    "index": 2,
+    "file_offset": 344
+  },
+  "case_count": 4352,
+  "mismatch_count": 0,
+  "examples": [
+    {
+      "condition_before": 127,
+      "previous_condition": 127,
+      "frame_before": 884,
+      "frame_after": 884,
+      "condition_after": 127
+    },
+    {
+      "condition_before": 113,
+      "previous_condition": 127,
+      "frame_before": 884,
+      "frame_after": 885,
+      "condition_after": 113
+    },
+    {
+      "condition_before": 99,
+      "previous_condition": 127,
+      "frame_before": 884,
+      "frame_after": 886,
+      "condition_after": 99
+    },
+    {
+      "condition_before": 85,
+      "previous_condition": 127,
+      "frame_before": 884,
+      "frame_after": 887,
+      "condition_after": 85
+    },
+    {
+      "condition_before": 71,
+      "previous_condition": 127,
+      "frame_before": 884,
+      "frame_after": 888,
+      "condition_after": 71
+    },
+    {
+      "condition_before": 56,
+      "previous_condition": 127,
+      "frame_before": 884,
+      "frame_after": 889,
+      "condition_after": 56
+    },
+    {
+      "condition_before": 42,
+      "previous_condition": 127,
+      "frame_before": 884,
+      "frame_after": 890,
+      "condition_after": 42
+    },
+    {
+      "condition_before": 28,
+      "previous_condition": 127,
+      "frame_before": 884,
+      "frame_after": 891,
+      "condition_after": 28
+    },
+    {
+      "condition_before": 14,
+      "previous_condition": 127,
+      "frame_before": 884,
+      "frame_after": 892,
+      "condition_after": 255
+    },
+    {
+      "condition_before": 0,
+      "previous_condition": 127,
+      "frame_before": 884,
+      "frame_after": 892,
+      "condition_after": 255
+    },
+    {
+      "condition_before": 14,
+      "previous_condition": 0,
+      "frame_before": 888,
+      "frame_after": 876,
+      "condition_after": 14
+    },
+    {
+      "condition_before": 28,
+      "previous_condition": 0,
+      "frame_before": 888,
+      "frame_after": 877,
+      "condition_after": 28
+    },
+    {
+      "condition_before": 56,
+      "previous_condition": 0,
+      "frame_before": 888,
+      "frame_after": 879,
+      "condition_after": 56
+    },
+    {
+      "condition_before": 85,
+      "previous_condition": 0,
+      "frame_before": 888,
+      "frame_after": 881,
+      "condition_after": 85
+    },
+    {
+      "condition_before": 113,
+      "previous_condition": 0,
+      "frame_before": 888,
+      "frame_after": 883,
+      "condition_after": 113
+    },
+    {
+      "condition_before": 127,
+      "previous_condition": 0,
+      "frame_before": 888,
+      "frame_after": 884,
+      "condition_after": 127
+    }
+  ],
+  "restrictions": [
+    "Original instructions executed in Unicorn 2.1.4, 32-bit x86.",
+    "Object state +0x14=0, flags +0x0f=0, odd tick; condition 0..127, previous 0 or 127.",
+    "Only frame +1 and condition +0x19 compared; effect creation at 0x9727 skipped.",
+    "Does not verify complete repair/construction, damage, timing, effects, or death processing."
+  ]
+}

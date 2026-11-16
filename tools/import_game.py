@@ -191,16 +191,17 @@ def decode_objects(data: bytes) -> list[dict]:
 
 
 def decode_templates(data: bytes) -> dict:
-    """Observed DAT version: 171-byte entries before first animation table."""
-    if len(data) < 171:
+    """EXE 0x3593: u16 table byte count, then count/171 actual records."""
+    if len(data) < 2:
         raise ValueError('Truncated DAT table')
-    boundary = int.from_bytes(data[:2], 'little')
-    if boundary == 0 or boundary % 171 or boundary > len(data):
+    table_bytes = int.from_bytes(data[:2], 'little')
+    boundary = 2 + table_bytes
+    if table_bytes == 0 or table_bytes % 171 or boundary > len(data):
         raise ValueError('Invalid DAT table boundary')
     templates = []
-    for offset in range(0, boundary, 171):
+    for offset in range(2, boundary, 171):
         record = data[offset:offset + 171]
-        name_offset = offset + 9 + u32(record, 9)
+        name_offset = offset + 7 + u32(record, 7)
         if not boundary <= name_offset < len(data):
             raise ValueError('DAT name pointer outside string section')
         end = data.find(b'\xff', name_offset)
@@ -208,10 +209,12 @@ def decode_templates(data: bytes) -> dict:
             raise ValueError('Unterminated DAT name')
         templates.append({'template_index': len(templates), 'file_offset': offset,
                           'name_offset': name_offset, 'name': data[name_offset:end].decode('cp866'),
-                          'width': record[3], 'height': record[4],
-                          'sprite_base_candidate': int.from_bytes(record[7:9], 'little'),
+                          'width': record[1], 'height': record[2],
+                          'sprite_base_candidate': int.from_bytes(record[5:7], 'little'),
+                          'wrk_entry_offset': u32(record, 0x3b),
                           'raw_record_hex': record.hex()})
-    return {'templates': templates, 'raw_tail_hex': data[boundary:].hex()}
+    return {'raw_header_hex': data[:2].hex(), 'table_bytes': table_bytes,
+            'templates': templates, 'raw_tail_hex': data[boundary:].hex()}
 
 
 def link_templates(records: list[dict], tables: dict, army_files: list[str]) -> None:
@@ -431,7 +434,7 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
     }
     (destination / 'map.json').write_text(json.dumps(result, separators=(',', ':')), encoding='utf-8')
     write_template_previews(tables, read, palette, destination)
-    (destination / 'templates.json').write_text(json.dumps({'format_version': 1, 'armies': tables}, ensure_ascii=False, indent=2), encoding='utf-8')
+    (destination / 'templates.json').write_text(json.dumps({'format_version': 2, 'armies': tables}, ensure_ascii=False, indent=2), encoding='utf-8')
     scenario_path = destination / 'scenario.json'
     if scenario is not None:
         scenario_path.write_text(json.dumps(scenario, ensure_ascii=False, indent=2), encoding='utf-8')
@@ -439,7 +442,7 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         scenario_path.unlink()  # Never leave a previous map's scenario in the output.
     from reference_frames import render_observations
     render_observations(source, destination, map_number, decode_spr_frame)
-    manifest = {'importer_version': 6, 'files': used, 'decoded_sprite_records': len(frames),
+    manifest = {'importer_version': 7, 'files': used, 'decoded_sprite_records': len(frames),
                 'notes': 'Graphics decoded; gameplay and terrain blocking are experimental.'}
     (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
     return manifest
