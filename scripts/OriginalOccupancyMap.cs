@@ -33,6 +33,9 @@ public sealed class OriginalOccupancyMap
         return (plane * Width * Height + (int)top * Width + (int)left, footprintWidth, footprintHeight);
     }
 
+    internal void ValidateFootprint(byte footprintWidth, byte footprintHeight, byte rawLayer, uint x, uint y)
+        => Locate(footprintWidth, footprintHeight, rawLayer, x, y);
+
     // EXE 43E5 -> 6885 -> 43B0 -> 4409. Zero clears; other references are overwritten.
     public void WriteFootprint(byte footprintWidth, byte footprintHeight, byte rawLayer, uint x, uint y, uint value)
     {

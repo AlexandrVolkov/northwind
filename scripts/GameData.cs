@@ -110,6 +110,7 @@ public sealed class TemplateTable
 }
 public sealed class TemplateEntry
 {
+    public string RawRecordHex { get; set; } = "";
     public int TemplateIndex { get; set; }
     public string Name { get; set; } = "";
     public TemplatePreview Preview { get; set; } = new();
