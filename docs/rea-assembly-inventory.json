@@ -1,0 +1,110 @@
+{
+  "format_version": 1,
+  "tool": {
+    "rea_version": "6.9.0"
+  },
+  "modules": [
+    {
+      "module": "ARMY__00.WRK",
+      "sha256": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33",
+      "provider": {
+        "id": "ghidra",
+        "name": "Ghidra",
+        "version": "12.1.4"
+      },
+      "inventory_evidence_id": "ev_bfd202aaf4e585c84035ac62b0e2e374fbab222e211f1d8b7f8b5324db09ccd5",
+      "exported_functions": 24,
+      "instruction_rows": 416,
+      "errors": 0,
+      "seed_sha256": "2eb8c21d6da9487109d42121ead21b42016fb6a80f3ae5db412aeb7ad69230d6"
+    },
+    {
+      "module": "ARMY__01.WRK",
+      "sha256": "d2554037e3a135ce7c06530cf2ee85e89ae240aa31a00c7c72a9b3cb251c46de",
+      "provider": {
+        "id": "ghidra",
+        "name": "Ghidra",
+        "version": "12.1.4"
+      },
+      "inventory_evidence_id": "ev_c7c1e9bd034dd5a1f0ffd023263d00d058d1bbfdcb55ebb12a294f4b7a0f022d",
+      "exported_functions": 22,
+      "instruction_rows": 999,
+      "errors": 0,
+      "seed_sha256": "18d2a90a3a452fe4175d4e947e01408a487f8cddc59bc7df518fac05d026373d"
+    },
+    {
+      "module": "ARMY__02.WRK",
+      "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
+      "provider": {
+        "id": "ghidra",
+        "name": "Ghidra",
+        "version": "12.1.4"
+      },
+      "inventory_evidence_id": "ev_a0fa5f008adc873c974fb84d921fc0053ed32ecb8e2cfec1a579be354348818f",
+      "exported_functions": 33,
+      "instruction_rows": 1425,
+      "errors": 0,
+      "seed_sha256": "c01f1cca66c2d0426fc454de8a7ef38abd52879c85c4c4aacde7e7c6768c3c94"
+    },
+    {
+      "module": "ARMY__03.WRK",
+      "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
+      "provider": {
+        "id": "ghidra",
+        "name": "Ghidra",
+        "version": "12.1.4"
+      },
+      "inventory_evidence_id": "ev_0c678a348bce72a9e69f71deddda389d0c90c0bd5fbce0b8df30fa566274aaad",
+      "exported_functions": 41,
+      "instruction_rows": 3447,
+      "errors": 0,
+      "seed_sha256": "f80cd56be5cbdca3a9c0de2d3b2877d007f10a6f96780aae48d9278454535510"
+    },
+    {
+      "module": "ARMY__04.WRK",
+      "sha256": "c419f791822084e83013a8988d792948cadb4f5f3b5606149b000300c9ee2316",
+      "provider": {
+        "id": "ghidra",
+        "name": "Ghidra",
+        "version": "12.1.4"
+      },
+      "inventory_evidence_id": "ev_2869f277f30a56ba0e43034221bb7964d86a5f9462a4e017d07b8b284abb2302",
+      "exported_functions": 1,
+      "instruction_rows": 53,
+      "errors": 0,
+      "seed_sha256": "cc04d224752d3e011943134248dcfce4212b53c5b38ed65f68ed39ff012279b2"
+    },
+    {
+      "module": "ARMY__05.WRK",
+      "sha256": "75e339a4869a7466714661f036fb3b933acab4ba73aaf2898dfd60691a13fafb",
+      "provider": {
+        "id": "ghidra",
+        "name": "Ghidra",
+        "version": "12.1.4"
+      },
+      "inventory_evidence_id": "ev_5c5ee4082a3e21c82253606a30e839dc3569dca0099a96a32f53866a253c4d71",
+      "exported_functions": 5,
+      "instruction_rows": 218,
+      "errors": 0,
+      "seed_sha256": "d01605721ac46c11e665f3168afe32ddf6d09ccd1e334c9f120953ba8a0406ae"
+    },
+    {
+      "module": "LE:1",
+      "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
+      "provider": {
+        "id": "ghidra",
+        "name": "Ghidra",
+        "version": "12.1.4"
+      },
+      "inventory_evidence_id": "ev_e0620fec08473f61ce0f55d52761351d224b63d1c30aaa76cb6f2258730ba53f",
+      "exported_functions": 751,
+      "instruction_rows": 30613,
+      "errors": 0,
+      "seed_sha256": "769d5b52ff78b1d6ac10b57f3c4b41831023d2e84f41a207a155d1a7adb151f1"
+    }
+  ],
+  "limitations": [
+    "REA/Ghidra raw x86/32 modules, object-relative addresses; no complete LE relocation or DS/FS runtime model.",
+    "Seeded names/boundaries are candidate analysis metadata; procedure counts and instruction counts do not establish complete function discovery."
+  ]
+}

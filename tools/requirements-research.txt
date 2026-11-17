@@ -1,3 +1,6 @@
 # Optional: executes bounded original x86 instruction blocks for comparison.
 # Ordinary asset import and Godot do not need this dependency.
 unicorn==2.1.4
+
+# Optional assembly inventory; not needed for Godot or asset import.
+capstone==5.0.7

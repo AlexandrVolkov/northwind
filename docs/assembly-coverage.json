@@ -1,0 +1,1092 @@
+{
+  "format_version": 1,
+  "annotation_sha256": "20065f39b7ea98266bc313611519ecc3338d31a37c4425ca2a553b3de47a1925",
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
+    "ARMY__00.WRK": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33",
+    "ARMY__01.DAT": "a8c5aa398ff63219eefcd58e56f89653b1135cd1443fed9d7cedd2cb03c61d6e",
+    "ARMY__01.WRK": "d2554037e3a135ce7c06530cf2ee85e89ae240aa31a00c7c72a9b3cb251c46de",
+    "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475",
+    "ARMY__02.WRK": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
+    "ARMY__03.DAT": "d6110b1bbdd2365dfd50df089f48a96b9ee2220ce2a6a4b66d5f1881c3437b1a",
+    "ARMY__03.WRK": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
+    "ARMY__04.DAT": "ca28d553d813348c3b93f2ff4b8ca8d5b64609cd9700f613c2473789610155c7",
+    "ARMY__04.WRK": "c419f791822084e83013a8988d792948cadb4f5f3b5606149b000300c9ee2316",
+    "ARMY__05.DAT": "2ec96a210a3cca53c1c50cb5fbd52686e40e8878098010a9905891471660d013",
+    "ARMY__05.WRK": "75e339a4869a7466714661f036fb3b933acab4ba73aaf2898dfd60691a13fafb"
+  },
+  "decoder": {
+    "name": "capstone",
+    "version": "5.0.7",
+    "mode": "x86/32"
+  },
+  "address_model": "Unrelocated object-relative LE modules and WRK modules; no flat runtime DS/FS model",
+  "modules": [
+    {
+      "module": "LE:1",
+      "source": "NORWIND.EXE",
+      "size": 146882,
+      "executable": true,
+      "source_backed_bytes": 146882,
+      "zero_fill_bytes": 0,
+      "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
+      "byte_status": {
+        "partial": 4289,
+        "ported": 3162,
+        "unreviewed": 139431
+      },
+      "linear_rows": 45008,
+      "flow_candidate_instructions": 30465,
+      "flow_candidate_bytes": 100194,
+      "edges": 6293,
+      "unresolved_indirect_edges": 44,
+      "decode_issues": 1,
+      "inline_table_bytes": 0,
+      "regions": [
+        {
+          "start": 0,
+          "end": 13715,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 13715,
+          "end": 13736,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "dat-loader-evidence"
+          ]
+        },
+        {
+          "start": 13736,
+          "end": 13753,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 13753,
+          "end": 13762,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "wrk-base-loader-evidence"
+          ]
+        },
+        {
+          "start": 13762,
+          "end": 17210,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 17210,
+          "end": 17228,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "wrk-callback-dispatch"
+          ]
+        },
+        {
+          "start": 17228,
+          "end": 17328,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 17328,
+          "end": 17381,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "occupancy-write-caller"
+          ]
+        },
+        {
+          "start": 17381,
+          "end": 17417,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "occupancy-write-wrapper"
+          ]
+        },
+        {
+          "start": 17417,
+          "end": 17523,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "occupancy-write-inner"
+          ]
+        },
+        {
+          "start": 17523,
+          "end": 29029,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 29029,
+          "end": 29056,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "motion-turn-prefix"
+          ]
+        },
+        {
+          "start": 29056,
+          "end": 29173,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "motion-accumulator"
+          ]
+        },
+        {
+          "start": 29173,
+          "end": 29276,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "motion-advance"
+          ]
+        },
+        {
+          "start": 29276,
+          "end": 29685,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 29685,
+          "end": 29847,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "route-prepare"
+          ]
+        },
+        {
+          "start": 29847,
+          "end": 31168,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "route-search-state-machine"
+          ]
+        },
+        {
+          "start": 31168,
+          "end": 31235,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "route-heading"
+          ]
+        },
+        {
+          "start": 31235,
+          "end": 31843,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 31843,
+          "end": 32564,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "movement-admission"
+          ]
+        },
+        {
+          "start": 32564,
+          "end": 32679,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "route-search-advance"
+          ]
+        },
+        {
+          "start": 32679,
+          "end": 32812,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "route-consumer-contact"
+          ]
+        },
+        {
+          "start": 32812,
+          "end": 32925,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "route-allocation-packing"
+          ]
+        },
+        {
+          "start": 32925,
+          "end": 33056,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "route-contact-action"
+          ]
+        },
+        {
+          "start": 33056,
+          "end": 33086,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "route-release"
+          ]
+        },
+        {
+          "start": 33086,
+          "end": 33319,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 33319,
+          "end": 33359,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "worker-action-dispatch"
+          ]
+        },
+        {
+          "start": 33359,
+          "end": 34114,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 34114,
+          "end": 34132,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "forestry-prepare"
+          ]
+        },
+        {
+          "start": 34132,
+          "end": 34181,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 34181,
+          "end": 34252,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "forestry-work"
+          ]
+        },
+        {
+          "start": 34252,
+          "end": 34261,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 34261,
+          "end": 34274,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "forestry-modifier"
+          ]
+        },
+        {
+          "start": 34274,
+          "end": 36272,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 36272,
+          "end": 36366,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "worker-entry-point"
+          ]
+        },
+        {
+          "start": 36366,
+          "end": 36720,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 36720,
+          "end": 36911,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "worker-approach"
+          ]
+        },
+        {
+          "start": 36911,
+          "end": 37097,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 37097,
+          "end": 37156,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "worker-common-update"
+          ]
+        },
+        {
+          "start": 37156,
+          "end": 37392,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 37392,
+          "end": 37628,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "worker-animation-dispatch"
+          ]
+        },
+        {
+          "start": 37628,
+          "end": 37716,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 37716,
+          "end": 37759,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "worker-turn-timer"
+          ]
+        },
+        {
+          "start": 37759,
+          "end": 37805,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 37805,
+          "end": 37929,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "worker-strike-init"
+          ]
+        },
+        {
+          "start": 37929,
+          "end": 37980,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "worker-strike-progress"
+          ]
+        },
+        {
+          "start": 37980,
+          "end": 38040,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "worker-strike-effect-args"
+          ]
+        },
+        {
+          "start": 38040,
+          "end": 38483,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 38483,
+          "end": 38536,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "motion-turn"
+          ]
+        },
+        {
+          "start": 38536,
+          "end": 38605,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "motion-heading"
+          ]
+        },
+        {
+          "start": 38605,
+          "end": 39116,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 39116,
+          "end": 39279,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "object-detach"
+          ]
+        },
+        {
+          "start": 39279,
+          "end": 39693,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 39693,
+          "end": 39814,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "motion-transfer"
+          ]
+        },
+        {
+          "start": 39814,
+          "end": 39929,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "worker-footprint-gap"
+          ]
+        },
+        {
+          "start": 39929,
+          "end": 42840,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 42840,
+          "end": 43120,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "castle-create-outer"
+          ]
+        },
+        {
+          "start": 43120,
+          "end": 44383,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 44383,
+          "end": 44602,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "construction-place"
+          ]
+        },
+        {
+          "start": 44602,
+          "end": 45187,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 45187,
+          "end": 45289,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "construction-upfront"
+          ]
+        },
+        {
+          "start": 45289,
+          "end": 45418,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 45418,
+          "end": 45430,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "construction-mark"
+          ]
+        },
+        {
+          "start": 45430,
+          "end": 48644,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 48644,
+          "end": 48686,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "target-damage-tail"
+          ]
+        },
+        {
+          "start": 48686,
+          "end": 50015,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 50015,
+          "end": 50233,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "forestry-find"
+          ]
+        },
+        {
+          "start": 50233,
+          "end": 50381,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "worker-receiver-find"
+          ]
+        },
+        {
+          "start": 50381,
+          "end": 50647,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "worker-waiting-lookup"
+          ]
+        },
+        {
+          "start": 50647,
+          "end": 51213,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 51213,
+          "end": 51340,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "building-maintenance"
+          ]
+        },
+        {
+          "start": 51340,
+          "end": 51401,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "building-dispatch"
+          ]
+        },
+        {
+          "start": 51401,
+          "end": 51424,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "queued-action-complete"
+          ]
+        },
+        {
+          "start": 51424,
+          "end": 52594,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 52594,
+          "end": 53505,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "forestry-patch"
+          ]
+        },
+        {
+          "start": 53505,
+          "end": 53548,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "forestry-tile"
+          ]
+        },
+        {
+          "start": 53548,
+          "end": 53969,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 53969,
+          "end": 54115,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "occupancy-conditional"
+          ]
+        },
+        {
+          "start": 54115,
+          "end": 74707,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 74707,
+          "end": 74756,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "worker-grant-timber"
+          ]
+        },
+        {
+          "start": 74756,
+          "end": 146882,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        }
+      ]
+    },
+    {
+      "module": "LE:2",
+      "source": "NORWIND.EXE",
+      "size": 15872,
+      "executable": false,
+      "source_backed_bytes": 12288,
+      "zero_fill_bytes": 3584,
+      "sha256": "b069cc2141a745d7a00bf66b3cc2bbc7b2ab46356fd271847045985714521d3e",
+      "byte_status": {
+        "unreviewed": 15872
+      },
+      "linear_rows": 7821,
+      "flow_candidate_instructions": 0,
+      "flow_candidate_bytes": 0,
+      "edges": 0,
+      "unresolved_indirect_edges": 0,
+      "decode_issues": 0,
+      "inline_table_bytes": 0,
+      "regions": [
+        {
+          "start": 0,
+          "end": 15872,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        }
+      ]
+    },
+    {
+      "module": "LE:3",
+      "source": "NORWIND.EXE",
+      "size": 61833,
+      "executable": false,
+      "source_backed_bytes": 61769,
+      "zero_fill_bytes": 64,
+      "sha256": "4132774a01f6e36ffae04af2eecbf50e08f64981ec6de1a04d9dcec99ba3398d",
+      "byte_status": {
+        "unreviewed": 61833
+      },
+      "linear_rows": 29343,
+      "flow_candidate_instructions": 0,
+      "flow_candidate_bytes": 0,
+      "edges": 0,
+      "unresolved_indirect_edges": 0,
+      "decode_issues": 0,
+      "inline_table_bytes": 0,
+      "regions": [
+        {
+          "start": 0,
+          "end": 61833,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        }
+      ]
+    },
+    {
+      "module": "ARMY__00.WRK",
+      "source": "ARMY__00.WRK",
+      "size": 5403,
+      "executable": true,
+      "source_backed_bytes": 5403,
+      "zero_fill_bytes": 0,
+      "sha256": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33",
+      "byte_status": {
+        "unreviewed": 5403
+      },
+      "linear_rows": 1709,
+      "flow_candidate_instructions": 416,
+      "flow_candidate_bytes": 1267,
+      "edges": 124,
+      "unresolved_indirect_edges": 0,
+      "decode_issues": 0,
+      "inline_table_bytes": 0,
+      "regions": [
+        {
+          "start": 0,
+          "end": 5403,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        }
+      ]
+    },
+    {
+      "module": "ARMY__01.WRK",
+      "source": "ARMY__01.WRK",
+      "size": 4951,
+      "executable": true,
+      "source_backed_bytes": 4951,
+      "zero_fill_bytes": 0,
+      "sha256": "d2554037e3a135ce7c06530cf2ee85e89ae240aa31a00c7c72a9b3cb251c46de",
+      "byte_status": {
+        "unreviewed": 4951
+      },
+      "linear_rows": 1625,
+      "flow_candidate_instructions": 1129,
+      "flow_candidate_bytes": 3501,
+      "edges": 415,
+      "unresolved_indirect_edges": 7,
+      "decode_issues": 7,
+      "inline_table_bytes": 240,
+      "regions": [
+        {
+          "start": 0,
+          "end": 4951,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        }
+      ]
+    },
+    {
+      "module": "ARMY__02.WRK",
+      "source": "ARMY__02.WRK",
+      "size": 6930,
+      "executable": true,
+      "source_backed_bytes": 6930,
+      "zero_fill_bytes": 0,
+      "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
+      "byte_status": {
+        "partial": 291,
+        "ported": 128,
+        "unreviewed": 6511
+      },
+      "linear_rows": 2285,
+      "flow_candidate_instructions": 1445,
+      "flow_candidate_bytes": 4419,
+      "edges": 542,
+      "unresolved_indirect_edges": 7,
+      "decode_issues": 6,
+      "inline_table_bytes": 336,
+      "regions": [
+        {
+          "start": 0,
+          "end": 867,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 867,
+          "end": 899,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "lumbermill-visitor-validator"
+          ]
+        },
+        {
+          "start": 899,
+          "end": 996,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 996,
+          "end": 1042,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "lumbermill-process"
+          ]
+        },
+        {
+          "start": 1042,
+          "end": 1052,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1052,
+          "end": 1102,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "lumbermill-receive"
+          ]
+        },
+        {
+          "start": 1102,
+          "end": 1316,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1316,
+          "end": 1346,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "mine-event-dispatch"
+          ]
+        },
+        {
+          "start": 1346,
+          "end": 1878,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1878,
+          "end": 1923,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "farm-event-and-counter"
+          ]
+        },
+        {
+          "start": 1923,
+          "end": 1949,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1949,
+          "end": 1981,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "farm-counter-decrement"
+          ]
+        },
+        {
+          "start": 1981,
+          "end": 2129,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 2129,
+          "end": 2281,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "worker-wrk-grant"
+          ]
+        },
+        {
+          "start": 2281,
+          "end": 2482,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 2482,
+          "end": 2514,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "worker-wrk-return"
+          ]
+        },
+        {
+          "start": 2514,
+          "end": 6930,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        }
+      ]
+    },
+    {
+      "module": "ARMY__03.WRK",
+      "source": "ARMY__03.WRK",
+      "size": 13412,
+      "executable": true,
+      "source_backed_bytes": 13412,
+      "zero_fill_bytes": 0,
+      "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
+      "byte_status": {
+        "unreviewed": 13412
+      },
+      "linear_rows": 4067,
+      "flow_candidate_instructions": 3445,
+      "flow_candidate_bytes": 11460,
+      "edges": 1165,
+      "unresolved_indirect_edges": 1,
+      "decode_issues": 0,
+      "inline_table_bytes": 0,
+      "regions": [
+        {
+          "start": 0,
+          "end": 13412,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        }
+      ]
+    },
+    {
+      "module": "ARMY__04.WRK",
+      "source": "ARMY__04.WRK",
+      "size": 411,
+      "executable": true,
+      "source_backed_bytes": 411,
+      "zero_fill_bytes": 0,
+      "sha256": "c419f791822084e83013a8988d792948cadb4f5f3b5606149b000300c9ee2316",
+      "byte_status": {
+        "unreviewed": 411
+      },
+      "linear_rows": 131,
+      "flow_candidate_instructions": 53,
+      "flow_candidate_bytes": 160,
+      "edges": 13,
+      "unresolved_indirect_edges": 0,
+      "decode_issues": 0,
+      "inline_table_bytes": 0,
+      "regions": [
+        {
+          "start": 0,
+          "end": 411,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        }
+      ]
+    },
+    {
+      "module": "ARMY__05.WRK",
+      "source": "ARMY__05.WRK",
+      "size": 882,
+      "executable": true,
+      "source_backed_bytes": 882,
+      "zero_fill_bytes": 0,
+      "sha256": "75e339a4869a7466714661f036fb3b933acab4ba73aaf2898dfd60691a13fafb",
+      "byte_status": {
+        "unreviewed": 882
+      },
+      "linear_rows": 270,
+      "flow_candidate_instructions": 181,
+      "flow_candidate_bytes": 525,
+      "edges": 48,
+      "unresolved_indirect_edges": 2,
+      "decode_issues": 0,
+      "inline_table_bytes": 0,
+      "regions": [
+        {
+          "start": 0,
+          "end": 882,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        }
+      ]
+    }
+  ],
+  "exe_unmapped_file_ranges": [
+    {
+      "start": 0,
+      "end": 282276,
+      "status": "unreviewed",
+      "classification": "container_or_loader_unknown"
+    },
+    {
+      "start": 429158,
+      "end": 429732,
+      "status": "unreviewed",
+      "classification": "container_or_loader_unknown"
+    }
+  ],
+  "limitations": [
+    "Linear and recursive disassembly are candidates, not reviewed code or recovered author source.",
+    "Indirect transfers, inline data, instruction overlaps and external/segmented addresses remain unresolved where reported.",
+    "Progress is annotation coverage only; conditional port limitations remain attached to each annotation.",
+    "DOS/container bytes outside LE pages are accounted for but have not been analyzed as 16-bit code.",
+    "LE non-executable modules contain data; their linear x86 interpretation is diagnostic only."
+  ]
+}
