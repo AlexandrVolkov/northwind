@@ -18,6 +18,7 @@ public partial class TestRunner : Node
             switch (mode)
             {
                 case "scene": await SceneChecks(); break;
+                case "skirmish": await SkirmishChecks(); break;
                 case "simulation": SimulationChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); OriginalSpatialChecks(); OriginalMotionPreparationChecks(); break;
                 case "original-buildings": OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); break;
                 case "imported-occupancy": ImportedOccupancyChecks(); break;
