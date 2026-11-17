@@ -142,6 +142,9 @@ class TemplateTests(unittest.TestCase):
         record[0x45] = 127
         struct.pack_into('<H', record, 0x48, 71)
         record[1:3] = bytes([62, 62])
+        record[3:5] = bytes([4, 3])
+        record[0x58:0x60] = bytes([10, 0, 0, 10, 10, 0, 10, 0])
+        struct.pack_into('<4I', record, 0x7c, 50, 80, 150, 2)
         return struct.pack('<H', 171) + bytes(record) + 'Лучник'.encode('cp866') + b'\xff'
 
     def test_relative_name_pointer_and_preserved_bytes(self):
@@ -153,6 +156,8 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(template['file_offset'], 2)
         self.assertEqual(template['wrk_entry_offset'], 0x7f)
         self.assertEqual((template['runtime_record_bytes'], template['initial_condition'], template['initial_frame']), (49, 127, 71))
+        self.assertEqual(template['construction'], {'footprint_width': 4, 'footprint_height': 3,
+                         'terrain_mask': [10, 0, 0, 10, 10, 0, 10, 0], 'upfront_costs': [50, 80, 150, 2]})
         self.assertEqual(bytes.fromhex(result['raw_header_hex']) + bytes.fromhex(template['raw_record_hex']) + bytes.fromhex(result['raw_tail_hex']), data)
 
     def test_header_is_not_part_of_first_record_and_records_do_not_overlap(self):
