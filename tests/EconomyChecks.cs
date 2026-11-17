@@ -64,16 +64,22 @@ public partial class TestRunner
             Check(worker.Frame == swingFrame + 6 && worker.Record[0x2f] == 0 && battle.Effects.Count == 1 && worker.Record[0x31] == 0,
                 "Native impact frame resets the gate and emits one effect before cargo is granted");
             for (int i = 0; i < 900 && worker.Record[0x31] != 3; i++) battle.Advance(.1);
-            Check(worker.Record[0x31] == 3 && worker.Source.TemplateIndex == 11 && battle.Harvestable(tree) && worker.Record[0x34] == 0x20 && worker.Record[0x16] == 5,
+            Check(worker.Record[0x31] == 3 && worker.Source.TemplateIndex == 11 && worker.Record[0x0f] == 0x13 && worker.Record[0x20] == 255 && battle.Harvestable(tree) && worker.Record[0x34] == 0x20 && worker.Record[0x16] == 5,
                 "Worker uses native work counters, retains the grove after one load and switches to loaded template");
             uint before = battle.Wood; battle.Advance(5);
             Check(battle.Wood == before && worker.Record[0x31] == 3 && battle.ProducedWood == 0,
                 "Chopping and waiting without a sawmill do not credit the stock");
+            battle.Stop([worker.Id]);
+            Check(worker.GatherTree == null && worker.Record[0x31] == 3, "Stop retains a loaded worker for a manual delivery order");
             var cell = EconomyMillCell(battle, tree);
             var mill = battle.BuildMill(cell) ?? throw new InvalidOperationException("Could not build sawmill");
             Check(mill.ConstructionRemaining > 0 && battle.Wood == before - battle.Rules.Economy.MillPrice &&
                 battle.ProbeMill(cell).Status == ConstructionPlacementStatus.Occupied,
                 "Construction debits wood and immediately reserves the source footprint");
+            Check(battle.DeliverTimber([worker.Id], mill.Id), "A loaded worker accepts an explicit receiver order without a gathering task");
+            var entry = battle.MillEntry(cell);
+            Check(mill.Position.X % 32 == 0 && mill.Position.Y % 32 == 0 && entry.Valid && entry.X == (uint)mill.Position.X - 80 && entry.Y == (uint)mill.Position.Y + 16,
+                "Even-sized sawmill uses the source anchor and the narrow worker's DAT entrance");
             before = battle.Wood;
             Check(battle.BuildMill(cell) == null && battle.BuildMill(new(-1, -1)) == null && battle.Wood == before,
                 "Occupied and outside placements do not spend tutorial resources");
@@ -81,6 +87,17 @@ public partial class TestRunner
             Check(mill.ConstructionRemaining == remaining && battle.TrainWorker() == null && battle.BuildMill(cell) == null && battle.GatherTimber([worker.Id], tree) == 0,
                 "Pause freezes construction and all economy orders");
             battle.Paused = false;
+            for (int i = 0; i < 3600 && worker.Record[0x30] != 0xf3; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check(worker.Record[0x30] == 0xf3 && worker.Position == new Vector2(entry.X, entry.Y) &&
+                (worker.Record[0x17] & 64) != 0 && (mill.Record[0x17] & 64) != 0 && mill.Record[0x24] == 0,
+                "Worker reaches the exact entrance and requests the native two-object handoff");
+            uint handoffStock = battle.Wood; battle.Paused = true; var waiting = worker.Record.ToArray(); var waitingMill = mill.Record.ToArray(); battle.Advance(10);
+            Check(worker.Record.SequenceEqual(waiting) && mill.Record.SequenceEqual(waitingMill), "Pause freezes a pending two-object handoff");
+            battle.Paused = false; battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check(worker.Record[0x31] == 0 && worker.Source.TemplateIndex == 10 && worker.Record[0x0f] == 0x3f && worker.Record[0x14] == 0x58 &&
+                mill.Record[0x24] == 1 && battle.Wood == handoffStock,
+                "Receiver acknowledges on its update; WRK return restores empty-worker fields before stock processing");
+            Check(worker.GatherTree == null && battle.GatherTimber([worker.Id], tree) == 1, "Manual delivery returns to idle and the worker can resume forestry");
             for (int i = 0; i < 3600 && battle.ProducedWood < 30; i++) battle.Advance(.1);
             Check(battle.ProducedWood == 30 && battle.Wood == initial - battle.Rules.Economy.WorkerPrice - battle.Rules.Economy.MillPrice + 30 &&
                 worker.Record[0x31] == 0 && mill.Record[0x24] == 0 && battle.Harvestable(tree),
@@ -112,9 +129,17 @@ public partial class TestRunner
         Check(hired.GatherTree == forest, "Context right-click on forest assigns the selected worker");
         scene.SelectCastle(); scene.BeginMillPlacement();
         Check(scene.PlacingMill, "Castle UI enters placement mode");
-        var site = EconomyMillCell(scene.Battle, forest); scene.Camera.Position = (Vector2)(site * 32);
+        var site = EconomyMillCell(scene.Battle, forest); scene.Camera.Zoom = Vector2.One * 2; scene.Camera.Position = (Vector2)(site * 32) - new Vector2(140, 0);
         for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         var screen = scene.GetViewport().GetCanvasTransform() * ((Vector2)(site * 32) + Vector2.One * 16);
+        if (DisplayServer.GetName() != "headless")
+        {
+            Input.WarpMouse(screen);
+            for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+            GetViewport().GetTexture().GetImage().SavePng("res://build/delivery-entry.png");
+        }
         Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true, Position = screen });
         Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = false, Position = screen });
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
