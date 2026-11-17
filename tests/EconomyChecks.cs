@@ -48,6 +48,21 @@ public partial class TestRunner
             var tree = EconomyTree(battle, worker);
             Check(battle.GatherTimber([battle.Hero.Id], tree) == 0 && battle.GatherTimber([worker.Id], tree) == 1,
                 "Only workers accept a timber order");
+            for (int i = 0; i < 2700 && worker.Record[0x2d] != 0x30; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check(worker.Record[0x2d] == 0x30 && worker.Record[0x2f] == worker.Parameters[0x75] && (worker.Record[0x34] & 31) == 19,
+                "Swing request retains the work gate until the animation impact");
+            battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            ushort swingFrame = (ushort)(worker.Template.InitialFrame + 8 * worker.Parameters[0x4a] + (worker.Record[0x25] & 7) * worker.Parameters[0x4b]);
+            Check(worker.Record[0x2d] == 0x33 && worker.Frame == swingFrame && worker.Record[0x24] == 0,
+                "Requested swing enters its original direction-specific frame block");
+            battle.Paused = true; var frozenStrike = worker.Record.ToArray(); battle.Advance(10);
+            Check(worker.Record.SequenceEqual(frozenStrike), "Pause freezes the entire strike record"); battle.Paused = false;
+            for (int i = 0; i < 5; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check(worker.Frame == swingFrame + 5 && worker.Record[0x2f] == worker.Parameters[0x75] && battle.Effects.Count == 0,
+                "Pre-impact frames retain the work gate and emit no chopping effect");
+            battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check(worker.Frame == swingFrame + 6 && worker.Record[0x2f] == 0 && battle.Effects.Count == 1 && worker.Record[0x31] == 0,
+                "Native impact frame resets the gate and emits one effect before cargo is granted");
             for (int i = 0; i < 900 && worker.Record[0x31] != 3; i++) battle.Advance(.1);
             Check(worker.Record[0x31] == 3 && worker.Source.TemplateIndex == 11 && battle.Harvestable(tree) && worker.Record[0x34] == 0x20 && worker.Record[0x16] == 5,
                 "Worker uses native work counters, retains the grove after one load and switches to loaded template");
@@ -76,7 +91,11 @@ public partial class TestRunner
             Check(battle.ProducedWood == 70 && battle.TerrainRevision > 0 && battle.ClearedGroves.Contains(tree) && !battle.Harvestable(tree),
                 $"Seventh load applies native terrain blending: produced={battle.ProducedWood}, job={worker.JobText}");
             Check(worker.GatherTree is { } next && next != tree && battle.Harvestable(next), "Worker automatically finds another grove after source terrain replacement");
+            for (int i = 0; i < 2700 && (worker.Record[0x2d] & 15) != 3; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check((worker.Record[0x2d] & 15) == 3, "Automatic next-grove task starts another native swing");
             battle.Stop([worker.Id]); before = battle.Wood; battle.Advance(5);
+            Check(!OriginalWorkerAnimation.Pending(worker.Record) && worker.GatherTree == null && worker.Record[0x31] == 0,
+                "Stop lets the current swing finish, then stays idle without granting cargo");
             Check(battle.Wood == before && battle.ProducedWood == 70, "Stopping the worker prevents further loads");
             var second = EconomyMillCell(battle, tree);
             Check(battle.BuildMill(second) != null && battle.Wood == before - battle.Rules.Economy.MillPrice,
@@ -107,6 +126,16 @@ public partial class TestRunner
             await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
             DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
             GetViewport().GetTexture().GetImage().SavePng("res://build/economy.png");
+        }
+        scene.TogglePause();
+        for (int i = 0; i < 3000 && ((hired.Record[0x2d] & 15) != 3 || hired.Record[0x24] != 5); i++) scene.Battle.Advance(1.0 / scene.Battle.Rules.TicksPerSecond);
+        Check((hired.Record[0x2d] & 15) == 3 && hired.Record[0x24] == 5, "UI worker reaches a source chopping frame");
+        scene.TogglePause(); scene.Camera.Position = hired.Position; scene._Process(0);
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        if (DisplayServer.GetName() != "headless")
+        {
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            GetViewport().GetTexture().GetImage().SavePng("res://build/worker-strike.png");
         }
         scene.TogglePause();
         for (int i = 0; i < 3600 && scene.Battle.ProducedWood < 70; i++) scene.Battle.Advance(.1);

@@ -34,6 +34,8 @@ def prepare(source, output):
         key=('ARMY__02.DAT',index);entry=tables[key[0]]['templates'][index]
         raw=bytes.fromhex(entry['raw_record_hex']);base=struct.unpack_from('<H',raw,0x48)[0]
         wanted.setdefault(key,set()).update(range(base,base+(8*raw[0x4a] if index in [10,11] else raw[0x4a]+1)))
+        if index == 10:
+            wanted[key].update(range(base + 8*raw[0x4a], base + 8*raw[0x4a] + 8*raw[0x4b]))
     entries=[];images=[]
     for (filename,index),frames in sorted(wanted.items()):
         entry=tables[filename]['templates'][index];sprite_name=filename.replace('.DAT','.SPR')
