@@ -29,6 +29,11 @@ def prepare(source, output):
             frames.add(base)
             if rules['units'][obj['template_name']]['damage']:
                 frames.update(range(base,base+8*raw[0x4a]))
+    # Runtime economy objects are not initially present in the player's source slot.
+    for index in [4,10,11]:
+        key=('ARMY__02.DAT',index);entry=tables[key[0]]['templates'][index]
+        raw=bytes.fromhex(entry['raw_record_hex']);base=struct.unpack_from('<H',raw,0x48)[0]
+        wanted.setdefault(key,set()).update(range(base,base+(8*raw[0x4a] if index in [10,11] else raw[0x4a]+1)))
     entries=[];images=[]
     for (filename,index),frames in sorted(wanted.items()):
         entry=tables[filename]['templates'][index];sprite_name=filename.replace('.DAT','.SPR')

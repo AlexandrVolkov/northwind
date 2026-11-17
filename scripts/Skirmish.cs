@@ -9,6 +9,7 @@ public sealed class SkirmishRules
     public int TicksPerSecond { get; set; } = 30;
     public float AggroRange { get; set; } = 360;
     public Dictionary<string, SkirmishUnitRules> Units { get; set; } = [];
+    public EconomyRules Economy { get; set; } = new();
 }
 public sealed class SkirmishUnitRules
 {
@@ -16,19 +17,21 @@ public sealed class SkirmishUnitRules
     public int Damage { get; set; }
     public float Range { get; set; }
     public float Cooldown { get; set; } = 1;
+    public bool Worker { get; set; }
 }
 public sealed class SkirmishActor
 {
     public uint Id => Source.RuntimeReference;
     public ObjectRecord Source { get; init; } = new();
-    public TemplateEntry Template { get; init; } = new();
-    public byte[] Parameters { get; init; } = [];
+    public TemplateEntry Template { get; set; } = new();
+    public byte[] Parameters { get; set; } = [];
     public byte[] Record { get; init; } = [];
     public SkirmishUnitRules Rules { get; init; } = new();
     public int Team { get; init; }
     public int Health { get; set; }
     public bool Alive => Health > 0;
-    public bool Structure => Rules.Damage == 0;
+    public bool Worker => Rules.Worker;
+    public bool Structure => Rules.Damage == 0 && !Worker;
     public bool Hero => Source.TemplateName == "Предводитель";
     public Vector2 Position => new(BinaryPrimitives.ReadUInt32LittleEndian(Record.AsSpan(4)), BinaryPrimitives.ReadUInt32LittleEndian(Record.AsSpan(8)));
     public Vector2I Cell => new((int)Position.X >> 5, (int)Position.Y >> 5);
@@ -42,6 +45,12 @@ public sealed class SkirmishActor
     public double AttackTimer { get; set; }
     public double ReplanTimer { get; set; }
     public int StalledTicks { get; set; }
+    public double ConstructionRemaining { get; set; }
+    public double ConstructionDuration { get; set; }
+    public Vector2I? GatherTree { get; set; }
+    public uint PreferredMill { get; set; }
+    public double HarvestTimer { get; set; }
+    public string JobText { get; set; } = "Без задания";
 }
 public sealed class BattleEffect
 {
@@ -52,7 +61,7 @@ public sealed class BattleEffect
 }
 
 /// <summary>Playable experimental mission. Native motion kernels; provisional route search, combat, teams and timing.</summary>
-public sealed class Skirmish : IDisposable
+public sealed partial class Skirmish : IDisposable
 {
     public MapData Map { get; }
     public SkirmishRules Rules { get; }
@@ -79,13 +88,14 @@ public sealed class Skirmish : IDisposable
         foreach (var slot in scenario.Slots.Where(s => s.SlotIndex == rules.PlayerSlot || s.SlotIndex == rules.EnemySlot))
         foreach (var obj in slot.Objects)
         {
-            if (!rules.Units.TryGetValue(obj.TemplateName, out var spec)) continue;
+            if (!rules.Units.TryGetValue(obj.TemplateName, out var spec) || spec.Worker) continue;
             var template = templates.Armies[obj.TemplateFile].Templates[obj.TemplateIndex];
             Actors.Add(new SkirmishActor { Source = obj, Template = template, Parameters = Convert.FromHexString(template.RawRecordHex),
                 Record = Convert.FromHexString(obj.RawRecordHex), Rules = spec, Health = spec.Health, Team = slot.SlotIndex == rules.PlayerSlot ? 0 : 1 });
         }
         _paths.Region = new Rect2I(0, 0, map.Width, map.Height);
         _paths.DiagonalMode = AStarGrid2D.DiagonalModeEnum.Never; _paths.Update();
+        InitializeEconomy(scenario, templates);
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
     }
     public SkirmishActor? Find(uint id) => Actors.FirstOrDefault(a => a.Id == id && a.Alive);
@@ -154,6 +164,7 @@ public sealed class Skirmish : IDisposable
                 if (used.Contains(goal) || !CanStand(actor, goal)) continue;
                 if (!actor.Stepping && !Plan(actor, goal)) continue;
                 actor.Target = 0; actor.Goal = goal; actor.ReplanTimer = 0;
+                actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestTimer = 0;
                 if (actor.Stepping) actor.Route.Clear();
                 used.Add(goal); assigned = true; accepted++;
             }
@@ -165,7 +176,7 @@ public sealed class Skirmish : IDisposable
     {
         if (Paused || Outcome != "" || Find(targetId) is not { Team: 1 }) return false;
         bool accepted = false;
-        foreach (var actor in ids.Distinct().Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && !a.Structure))
+        foreach (var actor in ids.Distinct().Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && !a.Structure && !a.Worker))
         { actor.Target = targetId; actor.Goal = null; actor.Route.Clear(); actor.ReplanTimer = 0; accepted = true; }
         if (accepted) Log($"Атаковать: {Find(targetId)!.Source.TemplateName}. Отряды сами сблизятся.");
         return accepted;
@@ -174,7 +185,7 @@ public sealed class Skirmish : IDisposable
     {
         if (Paused || Outcome != "") return;
         foreach (var actor in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0))
-        { actor.Target = 0; actor.Goal = null; actor.Route.Clear(); }
+        { actor.Target = 0; actor.Goal = null; actor.Route.Clear(); actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestTimer = 0; actor.JobText = "Без задания"; }
     }
     public void Advance(double delta)
     {
@@ -190,10 +201,12 @@ public sealed class Skirmish : IDisposable
         Elapsed += dt;
         foreach (var effect in Effects) effect.Remaining -= dt;
         Effects.RemoveAll(e => e.Remaining <= 0);
+        TickBuildings();
         foreach (var actor in Actors.Where(a => a.Alive && !a.Structure).ToArray())
         {
             if (!actor.Alive) continue;
             actor.AttackTimer -= dt; actor.ReplanTimer -= dt;
+            if (actor.Worker) { TickWorker(actor, dt); continue; }
             var target = Find(actor.Target);
             if (actor.Target != 0 && target == null) { actor.Target = 0; actor.Route.Clear(); actor.Goal = null; }
             // An assault on a building engages its nearby defenders first, then resumes the objective.
