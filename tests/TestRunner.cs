@@ -18,9 +18,10 @@ public partial class TestRunner : Node
             switch (mode)
             {
                 case "scene": await SceneChecks(); break;
-                case "simulation": SimulationChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); break;
+                case "simulation": SimulationChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); OriginalSpatialChecks(); break;
                 case "original-buildings": OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); break;
                 case "imported-occupancy": ImportedOccupancyChecks(); break;
+                case "original-spatial": OriginalSpatialChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
                 default: throw new ArgumentException($"Unknown test mode: {mode}");
             }
@@ -148,6 +149,7 @@ public partial class TestRunner : Node
         place = OriginalConstructionRules.ProbePlacement(live.Width, live.Height, sourceMap.Cells, properties, live.Cells, 4, 3, mask, 608, 720);
         Check(place == new ConstructionPlacement(ConstructionPlacementStatus.Occupied, appendedReference),
             "A newly created castle record registers in the same mutable occupancy map");
+        ImportedSpatialChecks(scene.OriginalOccupancy, sourceMap, castle);
         var before = scene.Model.Units.Select(u => (u.Id, u.Cell, u.Hp, u.Moves)).ToArray();
         scene.ToggleOriginalView();
         Check(scene.OriginalView && scene.EndButton.Disabled, "Original view disables battle");
