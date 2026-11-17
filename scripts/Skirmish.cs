@@ -265,16 +265,16 @@ public sealed partial class Skirmish : IDisposable
     {
         if (!actor.Stepping)
         {
-            if (actor.Route.Count == 0) return;
+            if (actor.Route.Count == 0) { if (actor.Worker && (actor.Record[0x2d] & 15) == 2) actor.Record[0x2d] = 0; return; }
             var next = actor.Route.Peek();
-            if (!CanStand(actor, next)) { actor.Route.Clear(); actor.ReplanTimer = 0; return; }
+            if (!CanStand(actor, next)) { actor.Route.Clear(); actor.ReplanTimer = 0; if (actor.Worker) actor.Record[0x2d] = 0; return; }
             var direction = next - actor.Cell;
-            if (Math.Abs(direction.X) + Math.Abs(direction.Y) != 1) { actor.Route.Clear(); return; }
+            if (Math.Abs(direction.X) + Math.Abs(direction.Y) != 1) { actor.Route.Clear(); if (actor.Worker) actor.Record[0x2d] = 0; return; }
             byte heading = direction.X > 0 ? (byte)2 : direction.X < 0 ? (byte)6 : direction.Y > 0 ? (byte)4 : (byte)0;
             actor.Record[0x25] = (byte)((actor.Record[0x25] & 7) | (heading << 3));
             actor.Record[0x24] = 3; actor.Record[0x2c] = 32;
             actor.StepGoal = next; actor.Route.Dequeue(); actor.Stepping = actor.Turning = true; actor.StalledTicks = 0;
-            _reservations[next] = actor.Id;
+            _reservations[next] = actor.Id; if (actor.Worker) actor.Record[0x2d] = 0x22;
         }
         OriginalMotionStep result;
         if (actor.Turning)
@@ -292,6 +292,7 @@ public sealed partial class Skirmish : IDisposable
         if (actor.Record[0x2c] == 0 || actor.StalledTicks > 120)
         {
             _reservations.Remove(actor.StepGoal); actor.Stepping = false;
+            if (actor.Worker && actor.Route.Count == 0) actor.Record[0x2d] = 0;
         }
     }
     private void Strike(SkirmishActor actor, SkirmishActor target)

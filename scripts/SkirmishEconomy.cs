@@ -192,40 +192,42 @@ public sealed partial class Skirmish
         BinaryPrimitives.ReadUInt32LittleEndian(actor.Parameters.AsSpan(0x40)), actor.Alive ? actor.Record[0x19] : (byte)0, actor.Parameters[0x46]);
     private void TickDelivery(SkirmishActor worker)
     {
-        if ((worker.Record[0x30] & 15) == 3)
-        {
-            if (OriginalWorkerDelivery.WaitHandoff(worker.Record) == DeliveryWait.Pending) { worker.JobText = "Ожидает приём груза"; return; }
-            ClearDelivery(worker); worker.JobText = "Повторяет доставку"; return;
-        }
         uint targetId = BinaryPrimitives.ReadUInt32LittleEndian(worker.Record.AsSpan(0x1c));
         var mill = Find(targetId);
         if (mill == null || mill.Team != 0 || OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y, [ReceiverCandidate(mill)]) == 0)
         {
-            ClearDelivery(worker);
+            ClearDelivery(worker); worker.Route.Clear();
+            if (worker.Stepping) { worker.Record[0x2d] &= 15; worker.JobText = "Получатель недоступен"; MoveTick(worker); return; }
+            worker.Record[0x2d] = 0;
             var preferred = Find(worker.PreferredMill);
             uint selected = preferred is { Team: 0 } ? OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y, [ReceiverCandidate(preferred)]) : 0;
             if (selected == 0) selected = OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y, Actors.Where(a => a.Team == 0).Select(ReceiverCandidate));
             mill = Find(selected);
             if (mill == null) { worker.JobText = "С грузом · нужна лесопилка"; return; }
             BinaryPrimitives.WriteUInt32LittleEndian(worker.Record.AsSpan(0x1c), selected); worker.Record[0x15] = 1;
-            worker.Route.Clear(); worker.ReplanTimer = 0;
+            worker.Route.Clear(); worker.ReplanTimer = 0; worker.JobText = "Выбирает лесопилку"; return;
         }
-        var point = OriginalWorkerDelivery.Approach(worker.Parameters, mill.Parameters, (uint)mill.Position.X, (uint)mill.Position.Y, (uint)(Map.Width * 32), (uint)(Map.Height * 32));
-        if (!point.Valid) { ClearDelivery(worker); worker.JobText = "Точка приёма за картой"; return; }
-        var cell = new Vector2I((int)(point.X >> 5), (int)(point.Y >> 5)); worker.JobText = "Доставляет древесину";
-        if (worker.Position == new Vector2(point.X, point.Y))
+        if ((worker.Record[0x30] & 15) == 2 && mill.ConstructionRemaining > 0)
+        { worker.JobText = "Ожидает строительства лесопилки"; return; }
+        var result = OriginalWorkerApproach.Step(worker.Record, mill.Record, worker.Parameters, mill.Parameters, (uint)(Map.Width * 32), (uint)(Map.Height * 32));
+        if (result.Status != WorkerApproachStatus.Pending)
         {
-            worker.Route.Clear();
-            if (mill.ConstructionRemaining > 0) { worker.JobText = "Ожидает строительства лесопилки"; return; }
-            byte heading = OriginalMotionPreparation.DirectionToward((uint)worker.Position.X, (uint)worker.Position.Y, (uint)mill.Position.X, (uint)mill.Position.Y);
-            if (!OriginalMotionPreparation.TurnToward(worker.Record, heading, worker.Parameters)) return;
-            OriginalWorkerDelivery.RequestHandoff(worker.Record, mill.Record); worker.JobText = "Передаёт древесину"; return;
+            ClearDelivery(worker); worker.Route.Clear(); worker.Record[0x2d] &= 15;
+            if (!worker.Stepping) worker.Record[0x2d] = 0;
+            worker.JobText = result.Status == WorkerApproachStatus.Blocked ? "Проход занят · повторяет выбор" : "Получатель недоступен · повторяет выбор";
+            if (worker.Stepping) MoveTick(worker); return;
         }
-        if (worker.ReplanTimer <= 0)
+        if (result.StopRequested)
+        { worker.Route.Clear(); if (!worker.Stepping) worker.Record[0x2d] = 0; }
+        if (result.MoveRequested)
         {
-            if (!Plan(worker, cell)) worker.JobText = "Проход к приёму груза занят";
-            worker.ReplanTimer = .7;
+            var goal = new Vector2I(worker.Record[0x22], worker.Record[0x23]);
+            Plan(worker, goal);
+            if (worker.Route.Count == 0) worker.Record[0x2d] = 0;
+            worker.JobText = "Доставляет древесину"; return;
         }
+        worker.JobText = (worker.Record[0x30] & 15) switch {
+            3 => "Ожидает приём груза", 2 => "Поворачивается к лесопилке", _ => "Доставляет древесину" };
         MoveTick(worker);
     }
     private void TickWorker(SkirmishActor worker, double dt)
@@ -237,7 +239,7 @@ public sealed partial class Skirmish
             if (impact is { } hit)
                 Effects.Add(new BattleEffect { From = new Vector2(hit.X, hit.Y), To = new Vector2(hit.TargetX, hit.TargetY), Team = 0, Remaining = .12 });
             if (OriginalWorkerAnimation.Pending(worker.Record))
-            { worker.JobText = "Рубит дерево"; return; }
+            { worker.JobText = (worker.Record[0x2d] & 15) == 1 ? "Поворачивается к лесопилке" : "Рубит дерево"; return; }
         }
         if (worker.Source.TemplateIndex == 11 && worker.Record[0x31] == 0)
         {
@@ -245,7 +247,7 @@ public sealed partial class Skirmish
             OriginalWorkerDelivery.ReturnEmpty(worker.Record, empty, _terrainCatalog.NextRandomByte()); ApplyWorkerTemplate(worker);
             ClearDelivery(worker); worker.PreferredMill = 0; worker.Route.Clear(); worker.HarvestPrepared = false;
         }
-        if (worker.Stepping) { MoveTick(worker); return; }
+        if (worker.Stepping && worker.Record[0x31] != 3) { MoveTick(worker); return; }
         if (worker.GatherTree == null && worker.PreferredMill == 0)
         {
             worker.JobText = worker.Record[0x31] == 3 ? "Несёт древесину · укажите лесопилку" : "Без задания · ПКМ по лесу";

@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using Godot;
 using Northwind;
 
@@ -27,14 +28,15 @@ public partial class TestRunner
         }
         throw new InvalidOperationException("No reachable forest near the source castle");
     }
-    private static Vector2I EconomyMillCell(Skirmish battle, Vector2I tree)
+    private static Vector2I EconomyMillCell(Skirmish battle, Vector2I tree, SkirmishActor? worker = null)
     {
         var cells = new List<Vector2I>();
         for (int y = -12; y <= 12; y++) for (int x = -12; x <= 12; x++) cells.Add(battle.PlayerCastle.Cell + new Vector2I(x, y));
         var p = battle.MillTemplate.Construction;
         return cells.OrderBy(c => ((Vector2)c).DistanceSquaredTo(tree)).First(c =>
             !new Rect2I(c - new Vector2I(p.FootprintWidth / 2, p.FootprintHeight / 2), new(p.FootprintWidth, p.FootprintHeight)).HasPoint(tree) &&
-            battle.ProbeMill(c).Status == ConstructionPlacementStatus.Clear);
+            battle.ProbeMill(c).Status == ConstructionPlacementStatus.Clear &&
+            (worker == null || (battle.MillEntry(c).Valid && battle.CanStand(worker, new((int)(battle.MillEntry(c).X >> 5), (int)(battle.MillEntry(c).Y >> 5))))));
     }
     private async Task EconomyChecks()
     {
@@ -76,8 +78,21 @@ public partial class TestRunner
             Check(mill.ConstructionRemaining > 0 && battle.Wood == before - battle.Rules.Economy.MillPrice &&
                 battle.ProbeMill(cell).Status == ConstructionPlacementStatus.Occupied,
                 "Construction debits wood and immediately reserves the source footprint");
-            Check(battle.DeliverTimber([worker.Id], mill.Id), "A loaded worker accepts an explicit receiver order without a gathering task");
             var entry = battle.MillEntry(cell);
+            var entryCell = new Vector2I((int)(entry.X >> 5), (int)(entry.Y >> 5)); var heroHome = battle.Hero.Cell;
+            Check(battle.Move([battle.Hero.Id], entryCell) == 1 && battle.Hero.Goal == entryCell, "A friendly unit can block the receiver entrance");
+            for (int i = 0; i < 2400 && (battle.Hero.Cell != entryCell || battle.Hero.Stepping); i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check(battle.Hero.Cell == entryCell && !battle.Hero.Stepping, "Entrance blocker reaches its cell before delivery begins");
+            Check(battle.DeliverTimber([worker.Id], mill.Id), "A loaded worker accepts an explicit receiver order without a gathering task");
+            for (int i = 0; i < 1200 && worker.Record[0x30] != 0x81; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check(worker.Record[0x30] == 0x81 && worker.Record[0x31] == 3 && battle.ProducedWood == 0,
+                "Blocked entry consumes the native retry counter without losing cargo");
+            battle.Paused = true; var frozenRetry = worker.Record.ToArray(); battle.Advance(10);
+            Check(worker.Record.SequenceEqual(frozenRetry), "Pause freezes the native approach retry counter"); battle.Paused = false;
+            for (int i = 0; i < 30 && BinaryPrimitives.ReadUInt32LittleEndian(worker.Record.AsSpan(0x1c)) != 0; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check(BinaryPrimitives.ReadUInt32LittleEndian(worker.Record.AsSpan(0x1c)) == 0 && worker.Record[0x31] == 3,
+                "Exhausted native attempts return control to receiver selection");
+            Check(battle.Move([battle.Hero.Id], heroHome) == 1, "The blocker can release the receiver entrance");
             Check(mill.Position.X % 32 == 0 && mill.Position.Y % 32 == 0 && entry.Valid && entry.X == (uint)mill.Position.X - 80 && entry.Y == (uint)mill.Position.Y + 16,
                 "Even-sized sawmill uses the source anchor and the narrow worker's DAT entrance");
             before = battle.Wood;
@@ -114,9 +129,23 @@ public partial class TestRunner
             Check(!OriginalWorkerAnimation.Pending(worker.Record) && worker.GatherTree == null && worker.Record[0x31] == 0,
                 "Stop lets the current swing finish, then stays idle without granting cargo");
             Check(battle.Wood == before && battle.ProducedWood == 70, "Stopping the worker prevents further loads");
-            var second = EconomyMillCell(battle, tree);
-            Check(battle.BuildMill(second) != null && battle.Wood == before - battle.Rules.Economy.MillPrice,
+            var second = EconomyMillCell(battle, tree, worker);
+            var reserveMill = battle.BuildMill(second);
+            Check(reserveMill != null && battle.Wood == before - battle.Rules.Economy.MillPrice,
                 "Delivered wood participates in a subsequent construction transaction");
+            var nextTree = EconomyTree(battle, worker); battle.GatherTimber([worker.Id], nextTree);
+            for (int i = 0; i < 1800 && worker.Record[0x31] != 3; i++) battle.Advance(.1);
+            battle.Stop([worker.Id]); Check(worker.Record[0x31] == 3 && battle.DeliverTimber([worker.Id], mill.Id), "Another cargo starts a delivery to the original receiver");
+            for (int i = 0; i < 3600 && ((worker.Record[0x30] & 15) != 1 || BinaryPrimitives.ReadUInt32LittleEndian(worker.Record.AsSpan(0x1c)) != mill.Id); i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check((worker.Record[0x30] & 15) == 1 && BinaryPrimitives.ReadUInt32LittleEndian(worker.Record.AsSpan(0x1c)) == mill.Id, "Target is lost during the native approach phase");
+            mill.Health = 0; mill.Record[0x19] = 0;
+            battle.Occupancy.ReplaceMatchingFootprint(mill.Parameters[3], mill.Parameters[4], mill.Record[0x0d], (uint)mill.Position.X, (uint)mill.Position.Y, mill.Id, 0);
+            for (int i = 0; i < 1200 && BinaryPrimitives.ReadUInt32LittleEndian(worker.Record.AsSpan(0x1c)) != reserveMill!.Id; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check(BinaryPrimitives.ReadUInt32LittleEndian(worker.Record.AsSpan(0x1c)) == reserveMill!.Id && worker.Record[0x31] == 3 && battle.ProducedWood == 70,
+                "Worker selects the surviving receiver while preserving the undelivered cargo");
+            for (int i = 0; i < 3600 && battle.ProducedWood < 80; i++) battle.Advance(.1);
+            Check(battle.ProducedWood == 80 && worker.Record[0x31] == 0 && worker.Source.TemplateIndex == 10, "Retargeted delivery completes once through the replacement sawmill");
+
         }
         GetTree().Root.Size = new Vector2I(1280, 800);
         var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
