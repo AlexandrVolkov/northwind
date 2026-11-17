@@ -2,7 +2,7 @@ using System.Collections;
 using Godot;
 namespace Northwind;
 
-/// <summary>Prototype adapter: AStar path prefixes in the original shared route pool.</summary>
+/// <summary>Prototype adapter: native search prefixes in the original shared route pool.</summary>
 public sealed class SkirmishRoute : IEnumerable<Vector2I>
 {
     private static readonly Vector2I[] Deltas = [new(0,-1),new(1,-1),new(1,0),new(1,1),new(0,1),new(-1,1),new(-1,0),new(-1,-1)];

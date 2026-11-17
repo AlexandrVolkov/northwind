@@ -48,6 +48,7 @@ public partial class TestRunner
             Check(battle.Outcome.StartsWith("Победа") && battle.Hero.Alive,
                 "The default mission can be won through normal approach, combat and destruction: " + battle.Outcome +
                 " | " + string.Join("; ", battle.Actors.Select(a => $"{a.Source.TemplateName}:{a.Team} hp{a.Health} {a.Position} route{a.Route.Count} step{a.Stepping}")));
+            Check(battle.GuidedRouteSearches > 0, "Distant assault retains explicit provisional guidance across the first-map river");
             Check(!battle.Objective.Alive && !battle.Actors.Any(a => a.Team == 1 && !a.Structure && a.Alive), "Victory requires both the castle and its guards");
             var positions = battle.Actors.Select(a => a.Position).ToArray(); battle.Advance(5);
             Check(positions.SequenceEqual(battle.Actors.Select(a => a.Position)), "A finished battle stops simulation");
