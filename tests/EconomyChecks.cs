@@ -1,0 +1,111 @@
+using Godot;
+using Northwind;
+
+public partial class TestRunner
+{
+    private static Vector2I EconomyTree(Skirmish battle, SkirmishActor worker)
+    {
+        var trees = new List<Vector2I>();
+        for (int y = 0; y < battle.Map.Height; y++) for (int x = 0; x < battle.Map.Width; x++)
+        {
+            var cell = new Vector2I(x, y);
+            if (battle.TimberAt(cell) >= 10 && ((Vector2)(cell * 32)).DistanceTo(battle.PlayerCastle.Position) < 500) trees.Add(cell);
+        }
+        foreach (var tree in trees.OrderBy(c => ((Vector2)c).DistanceSquaredTo(worker.Cell)))
+        foreach (var d in new[] { Vector2I.Up, Vector2I.Down, Vector2I.Left, Vector2I.Right })
+        {
+            var cell = tree + d;
+            if (battle.CanStand(worker, cell) && battle.Move([worker.Id], cell) == 1 && worker.Goal == cell) return tree;
+        }
+        throw new InvalidOperationException("No reachable forest near the source castle");
+    }
+    private static Vector2I EconomyMillCell(Skirmish battle, Vector2I tree)
+    {
+        var cells = new List<Vector2I>();
+        for (int y = -12; y <= 12; y++) for (int x = -12; x <= 12; x++) cells.Add(battle.PlayerCastle.Cell + new Vector2I(x, y));
+        var p = battle.MillTemplate.Construction;
+        return cells.OrderBy(c => ((Vector2)c).DistanceSquaredTo(tree)).First(c =>
+            !new Rect2I(c - new Vector2I(p.FootprintWidth / 2, p.FootprintHeight / 2), new(p.FootprintWidth, p.FootprintHeight)).HasPoint(tree) &&
+            battle.ProbeMill(c).Status == ConstructionPlacementStatus.Clear);
+    }
+    private async Task EconomyChecks()
+    {
+        OriginalLumbermillChecks();
+        using (var battle = CreateSkirmish())
+        {
+            uint initial = battle.Wood;
+            var worker = battle.TrainWorker() ?? throw new InvalidOperationException("Could not hire initial worker");
+            Check(worker.Worker && !worker.Structure && worker.Record.Length == 54 && battle.Wood == initial - battle.Rules.Economy.WorkerPrice,
+                "Castle hires a mobile 54-byte worker and debits the configured wood price");
+            var tree = EconomyTree(battle, worker);
+            Check(battle.GatherTimber([battle.Hero.Id], tree) == 0 && battle.GatherTimber([worker.Id], tree) == 1,
+                "Only workers accept a timber order");
+            for (int i = 0; i < 900 && worker.Record[0x31] != 3; i++) battle.Advance(.1);
+            Check(worker.Record[0x31] == 3 && worker.Source.TemplateIndex == 11 && battle.TimberAt(tree) == 20,
+                "Worker reaches forest, removes one finite load and uses the loaded worker template");
+            uint before = battle.Wood; battle.Advance(5);
+            Check(battle.Wood == before && worker.Record[0x31] == 3 && battle.ProducedWood == 0,
+                "Chopping and waiting without a sawmill do not credit the stock");
+            var cell = EconomyMillCell(battle, tree);
+            var mill = battle.BuildMill(cell) ?? throw new InvalidOperationException("Could not build sawmill");
+            Check(mill.ConstructionRemaining > 0 && battle.Wood == before - battle.Rules.Economy.MillPrice &&
+                battle.ProbeMill(cell).Status == ConstructionPlacementStatus.Occupied,
+                "Construction debits wood and immediately reserves the source footprint");
+            before = battle.Wood;
+            Check(battle.BuildMill(cell) == null && battle.BuildMill(new(-1, -1)) == null && battle.Wood == before,
+                "Occupied and outside placements do not spend tutorial resources");
+            battle.Paused = true; double remaining = mill.ConstructionRemaining; battle.Advance(10);
+            Check(mill.ConstructionRemaining == remaining && battle.TrainWorker() == null && battle.BuildMill(cell) == null && battle.GatherTimber([worker.Id], tree) == 0,
+                "Pause freezes construction and all economy orders");
+            battle.Paused = false;
+            for (int i = 0; i < 1800 && battle.ProducedWood < 30; i++) battle.Advance(.1);
+            Check(battle.ProducedWood == 30 && battle.Wood == initial - battle.Rules.Economy.WorkerPrice - battle.Rules.Economy.MillPrice + 30 &&
+                worker.Record[0x31] == 0 && mill.Record[0x24] == 0 && battle.TimberAt(tree) == 0,
+                $"Three loads travel through the native handoff and processing queue exactly once: wood={battle.Wood}, produced={battle.ProducedWood}, cargo={worker.Record[0x31]}, job={worker.JobText}, worker={worker.Position}, mill={mill.Position}");
+            Check(mill.ConstructionRemaining == 0 && mill.Record[0x19] == mill.Template.InitialCondition && mill.Record[0x14] == 0 && mill.Record[0x0f] == 0x20,
+                "Native C80D condition increments and completed-action transition finish the building");
+            before = battle.Wood; battle.Advance(5);
+            Check(battle.Wood == before && battle.ProducedWood == 30, "An exhausted forest cannot generate more wood");
+            var second = EconomyMillCell(battle, tree);
+            Check(battle.BuildMill(second) != null && battle.Wood == before - battle.Rules.Economy.MillPrice,
+                "Delivered wood participates in a subsequent construction transaction");
+        }
+        GetTree().Root.Size = new Vector2I(1280, 800);
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 4; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        scene.SelectCastle(); scene.HireWorker();
+        var hired = scene.Battle.Find(scene.Selection.Single())!;
+        Check(hired.Worker, "Castle UI hires and selects the new worker");
+        var forest = EconomyTree(scene.Battle, hired);
+        scene.IssueOrder((Vector2)(forest * 32) + Vector2.One * 16);
+        Check(hired.GatherTree == forest, "Context right-click on forest assigns the selected worker");
+        scene.SelectCastle(); scene.BeginMillPlacement();
+        Check(scene.PlacingMill, "Castle UI enters placement mode");
+        var site = EconomyMillCell(scene.Battle, forest); scene.Camera.Position = (Vector2)(site * 32);
+        for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        var screen = scene.GetViewport().GetCanvasTransform() * ((Vector2)(site * 32) + Vector2.One * 16);
+        Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true, Position = screen });
+        Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = false, Position = screen });
+        await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        Check(!scene.PlacingMill && scene.Battle.Actors.Any(a => a.Source.TemplateName == "Лесопилка"), "World placement click creates the sawmill");
+        scene.TogglePause(); scene.Selection.Clear(); scene.Selection.Add(hired.Id);
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        if (DisplayServer.GetName() != "headless")
+        {
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+            GetViewport().GetTexture().GetImage().SavePng("res://build/economy.png");
+        }
+        scene.TogglePause();
+        for (int i = 0; i < 1800 && scene.Battle.ProducedWood < 10; i++) scene.Battle.Advance(.1);
+        Check(scene.Battle.ProducedWood >= 10, "UI-issued hiring, gathering and placement complete a delivered-load cycle");
+        scene.TogglePause(); scene._Process(0);
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        if (DisplayServer.GetName() != "headless")
+        {
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            GetViewport().GetTexture().GetImage().SavePng("res://build/economy-delivery.png");
+        }
+        RemoveChild(scene); scene.Free();
+    }
+}

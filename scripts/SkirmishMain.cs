@@ -23,6 +23,9 @@ public partial class SkirmishMain : Node2D
     private Texture2D _terrain = null!, _sprites = null!;
     private readonly Dictionary<(string, int, int), BattleFrame> _frames = [];
     private Label _status = null!, _selection = null!, _events = null!;
+    private Label _economy = null!;
+    private Button _hire = null!, _buildMill = null!;
+    public bool PlacingMill { get; private set; }
     private Button _pause = null!, _speed = null!;
     private TextureRect _minimap = null!;
     private Control _markers = null!;
@@ -57,14 +60,32 @@ public partial class SkirmishMain : Node2D
         Battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"),
             GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), GameData.Read<SkirmishRules>("res://data/skirmish.json"));
-        Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = false;
+        Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = PlacingMill = false;
         FocusHero(); RefreshUi(); QueueRedraw();
     }
     public void SelectArmy()
     {
         Selection.Clear();
-        foreach (var actor in Battle.Actors.Where(a => a.Team == 0 && a.Alive && !a.Structure)) Selection.Add(actor.Id);
+        foreach (var actor in Battle.Actors.Where(a => a.Team == 0 && a.Alive && !a.Structure && !a.Worker)) Selection.Add(actor.Id);
         RefreshUi();
+    }
+    public void SelectCastle()
+    {
+        if (!Battle.PlayerCastle.Alive) return;
+        Selection.Clear(); Selection.Add(Battle.PlayerCastle.Id); PlacingMill = false;
+        Focus(Battle.PlayerCastle.Position); RefreshUi();
+    }
+    public void HireWorker()
+    {
+        if (!Selection.Contains(Battle.PlayerCastle.Id)) return;
+        var worker = Battle.TrainWorker();
+        if (worker != null) { Selection.Clear(); Selection.Add(worker.Id); }
+        RefreshUi();
+    }
+    public void BeginMillPlacement()
+    {
+        if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
+        PlacingMill = true; RefreshUi();
     }
     public void TogglePause() { if (!_ready || Battle.Outcome != "") return; Battle.Paused = !Battle.Paused; RefreshUi(); }
     public void ChangeSpeed() { Speed = Speed == 1 ? 2 : Speed == 2 ? 4 : 1; RefreshUi(); }
@@ -104,8 +125,11 @@ public partial class SkirmishMain : Node2D
         if (Battle.Paused || Battle.Outcome != "") return;
         if (Selection.Count == 0) { Battle.Log("Сначала выделите отряды: рамкой или Ctrl+A."); return; }
         var target = Battle.At(point);
+        var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
         if (target?.Team == 1) Battle.Attack(Selection, target.Id);
-        else Battle.Move(Selection, new((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32)));
+        else if (target?.Source.TemplateName == "Лесопилка" && Battle.DeliverTimber(Selection, target.Id)) { }
+        else if (Battle.TimberAt(cell) >= 10 && Selection.Any(id => Battle.Find(id)?.Worker == true)) Battle.GatherTimber(Selection, cell);
+        else Battle.Move(Selection, cell);
         _orderMark = point; _markUntil = Battle.Elapsed + 2;
     }
     public override void _Input(InputEvent e)
@@ -120,7 +144,7 @@ public partial class SkirmishMain : Node2D
             if (_dragStart.DistanceTo(_dragEnd) < 6)
             {
                 var point = GetViewport().GetCanvasTransform().AffineInverse() * button.Position;
-                if (Battle.At(point) is { Team: 0, Structure: false } actor)
+                if (Battle.At(point) is { Team: 0 } actor)
                 { if (!Selection.Add(actor.Id)) Selection.Remove(actor.Id); }
             }
             else
@@ -143,9 +167,10 @@ public partial class SkirmishMain : Node2D
                 case Key.Space: TogglePause(); break;
                 case Key.F: FocusHero(); break;
                 case Key.T: FocusObjective(); break;
+                case Key.C: SelectCastle(); break;
                 case Key.R: Restart(); break;
                 case Key.X: Battle.Stop(Selection); break;
-                case Key.Escape: Selection.Clear(); break;
+                case Key.Escape: if (PlacingMill) PlacingMill = false; else Selection.Clear(); break;
                 case Key.F10: GetTree().ChangeSceneToFile("res://scenes/main.tscn"); break;
             }
         }
@@ -153,6 +178,14 @@ public partial class SkirmishMain : Node2D
         {
             if (button.ButtonIndex == MouseButton.Middle) _pan = button.Pressed;
             if (!button.Pressed) return;
+            if (PlacingMill && button.ButtonIndex == MouseButton.Right) { PlacingMill = false; return; }
+            if (PlacingMill && button.ButtonIndex == MouseButton.Left)
+            {
+                var point = GetViewport().GetCanvasTransform().AffineInverse() * button.Position;
+                var mill = Battle.BuildMill(new((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32)));
+                if (mill != null) { PlacingMill = false; Selection.Clear(); Selection.Add(mill.Id); }
+                RefreshUi(); return;
+            }
             if (button.ButtonIndex is MouseButton.WheelUp or MouseButton.WheelDown)
             {
                 var before = GetGlobalMousePosition();
@@ -181,7 +214,30 @@ public partial class SkirmishMain : Node2D
             int tile = (int)(Battle.Map.Cells[y * Battle.Map.Width + x] & 65535);
             DrawTextureRectRegion(_terrain, new Rect2(x * 32, y * 32, 32, 32), new Rect2(tile % 32 * 32, tile / 32 * 32, 32, 32));
         }
+        foreach (var (cell, amount) in Battle.Timber.Where(p => p.Value == 0))
+        {
+            var rect = new Rect2((Vector2)(cell * 32), Vector2.One * 32);
+            DrawRect(rect, new Color(.14f, .12f, .07f, .7f)); DrawCircle(rect.GetCenter(), 5, new Color("94704a"));
+        }
         foreach (var actor in Battle.Actors.Where(a => a.Alive).OrderBy(a => a.Position.Y)) DrawActor(actor);
+        if (!PlacingMill && Selection.Any(id => Battle.Find(id)?.Worker == true))
+        {
+            var point = GetGlobalMousePosition(); var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
+            int wood = Battle.TimberAt(cell);
+            if (wood > 0)
+            {
+                DrawRect(new Rect2((Vector2)(cell * 32), Vector2.One * 32), new Color("a0dfa0"), false, 2);
+                DrawString(ThemeDB.FallbackFont, (Vector2)(cell * 32) - new Vector2(0, 4), $"Лес · {wood}", HorizontalAlignment.Left, -1, 12, new Color("d9e8b5"));
+            }
+        }
+        if (PlacingMill)
+        {
+            var point = GetGlobalMousePosition(); var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
+            var parameters = Battle.MillTemplate.Construction;
+            var rect = new Rect2((Vector2)((cell - new Vector2I(parameters.FootprintWidth / 2, parameters.FootprintHeight / 2)) * 32), new Vector2(parameters.FootprintWidth * 32, parameters.FootprintHeight * 32));
+            bool clear = !Battle.Paused && Battle.Wood >= Battle.Rules.Economy.MillPrice && Battle.ProbeMill(cell).Status == ConstructionPlacementStatus.Clear;
+            var color = clear ? new Color("8de5b8") : new Color("ef8272"); DrawRect(rect, new Color(color, .2f)); DrawRect(rect, color, false, 2);
+        }
         foreach (var effect in Battle.Effects)
         {
             DrawLine(effect.From - new Vector2(0, 16), effect.To - new Vector2(0, 16), new Color(effect.Team == 0 ? "f0d88a" : "f57862"), 2);
@@ -223,10 +279,13 @@ public partial class SkirmishMain : Node2D
         }
         else DrawCircle(point - Vector2.Down * 12, 9, color);
         float width = actor.Structure ? 72 : 30;
+        if (actor.Worker && actor.Record[0x31] == 3) DrawCircle(point + new Vector2(12, -24), 5, new Color("d3ac64"));
         var bar = new Rect2(point + new Vector2(-width / 2, 20), new Vector2(width, 5));
         DrawRect(bar, new Color("18211d")); DrawRect(new Rect2(bar.Position + Vector2.One, new Vector2((width - 2) * actor.Health / actor.Rules.Health, 3)), color);
+        if (actor.ConstructionRemaining > 0)
+            DrawRect(new Rect2(bar.Position + new Vector2(0, 8), new Vector2(width * (float)(1 - actor.ConstructionRemaining / actor.ConstructionDuration), 4)), new Color("e7cd82"));
         if (actor.Hero || actor.Structure || Selection.Contains(actor.Id) || actor.Id == _hover)
-            DrawString(ThemeDB.FallbackFont, point + new Vector2(-40, actor.Structure ? -110 : -42), actor.Hero ? "ПРЕДВОДИТЕЛЬ" : actor.Source.TemplateName, HorizontalAlignment.Left, -1, 11, color);
+            DrawString(ThemeDB.FallbackFont, point + new Vector2(-40, actor.Structure ? -(frame?.Height ?? actor.Template.Preview.Height) + 12 : -42), actor.Hero ? "ПРЕДВОДИТЕЛЬ" : actor.Source.TemplateName, HorizontalAlignment.Left, -1, 11, color);
         if (actor.Id == Battle.Objective.Id)
         { var box = Battle.Bounds(actor).Grow(4); DrawRect(box, new Color(color, .7f), false, 1); }
     }
@@ -265,13 +324,16 @@ public partial class SkirmishMain : Node2D
         };
         Row("ПРЕДВОДИТЕЛЬ [F]", FocusHero, "ЦЕЛЬ [T]", FocusObjective);
         _status = Text("Загрузка…", 16); _selection = Text("", 13);
+        _economy = Text("", 13);
+        _hire = new Button { FocusMode = Control.FocusModeEnum.None }; _hire.Pressed += HireWorker; column.AddChild(_hire);
+        _buildMill = new Button { FocusMode = Control.FocusModeEnum.None }; _buildMill.Pressed += BeginMillPlacement; column.AddChild(_buildMill);
         Row("ВОЙСКО [Ctrl+A]", SelectArmy, "СТОП [X]", () => Battle.Stop(Selection));
         (_pause, _speed) = Row("ПАУЗА [ПРОБЕЛ]", TogglePause, "СКОРОСТЬ ×1", ChangeSpeed);
         Button("НАЧАТЬ ЗАНОВО  [R]", Restart);
-        Text("ЛКМ / рамка — выделить\nShift — добавить к выделению\nПКМ — идти / атаковать\nWASD, стрелки, СКМ — камера\nКолесо — масштаб", 12);
+        Text("ЛКМ / рамка — выделить\nПКМ — идти / атаковать / рубить\nShift — добавить · C — замок\nWASD, стрелки, СКМ — камера\nКолесо — масштаб", 12);
         _events = Text("", 12);
         Button("ЛАБОРАТОРИЯ  [F10]", () => GetTree().ChangeSceneToFile("res://scenes/main.tscn"));
-        Text("Ранняя схватка: маршруты, бой и ИИ экспериментальные. Экономика и кампания ещё в работе.", 11);
+        Text("Ранняя версия: бой, ИИ и хозяйственные цены временные. Кампания ещё в работе.", 11);
     }
     private Rect2 MiniRect()
     { float side = Math.Min(_minimap.Size.X, _minimap.Size.Y); return new((_minimap.Size - Vector2.One * side) / 2, Vector2.One * side); }
@@ -293,6 +355,17 @@ public partial class SkirmishMain : Node2D
         var units = Selection.Select(Battle.Find).OfType<SkirmishActor>().ToArray();
         _selection.Text = units.Length == 1 ? $"{units[0].Source.TemplateName}\nЗдоровье {units[0].Health}/{units[0].Rules.Health}"
             : $"Выбрано отрядов: {units.Length}\nЖивых союзников: {Battle.Actors.Count(a => a.Team == 0 && a.Alive && !a.Structure)}";
+        if (units is [{ Worker: true } worker]) _selection.Text += $"\n{worker.JobText}";
+        if (units is [var selectedMill] && selectedMill.Source.TemplateName == "Лесопилка")
+            _selection.Text += selectedMill.ConstructionRemaining > 0 ? $"\nСтроится: {selectedMill.ConstructionRemaining:0} с" : $"\nГрузов в очереди: {selectedMill.Record[0x24]}";
+        _economy.Text = $"Дерево: {Battle.Wood}";
+        bool castle = units is [var selected] && selected.Id == Battle.PlayerCastle.Id && selected.Alive;
+        _hire.Visible = _buildMill.Visible = castle;
+        _hire.Text = $"РАБОЧИЙ · {Battle.Rules.Economy.WorkerPrice} дерева";
+        _buildMill.Text = $"ЛЕСОПИЛКА · {Battle.Rules.Economy.MillPrice} дерева";
+        _hire.Disabled = Battle.Paused || Battle.Outcome != "" || Battle.Wood < Battle.Rules.Economy.WorkerPrice;
+        _buildMill.Disabled = Battle.Paused || Battle.Outcome != "" || Battle.Wood < Battle.Rules.Economy.MillPrice;
+        if (PlacingMill) _status.Text = "Место для лесопилки\nЛКМ — строить · ПКМ/Esc — отмена";
         _pause.Text = Battle.Paused ? "ПРОДОЛЖИТЬ" : "ПАУЗА [ПРОБЕЛ]"; _speed.Text = $"СКОРОСТЬ ×{Speed}";
         _events.Text = string.Join('\n', Battle.Events.TakeLast(2));
     }
