@@ -37,6 +37,7 @@ public sealed class SkirmishActor
     public Vector2I Cell => new((int)Position.X >> 5, (int)Position.Y >> 5);
     public ushort Frame => BinaryPrimitives.ReadUInt16LittleEndian(Record.AsSpan(1));
     public SkirmishRoute Route { get; } = new();
+    internal Vector2I? GuidanceGoal { get; set; }
     public Vector2I? Goal { get; set; }
     public uint Target { get; set; }
     public bool Stepping { get; set; }
@@ -60,7 +61,7 @@ public sealed class BattleEffect
     public double Remaining { get; set; } = .22;
 }
 
-/// <summary>Playable experimental mission. Native motion kernels; provisional route search, combat, teams and timing.</summary>
+/// <summary>Playable experimental mission. Native contour search and motion kernels; provisional distant-order guidance, collisions, combat and timing.</summary>
 public sealed partial class Skirmish : IDisposable
 {
     public MapData Map { get; }
@@ -72,7 +73,9 @@ public sealed partial class Skirmish : IDisposable
     public string Outcome { get; private set; } = "";
     public bool Paused { get; set; }
     public double Elapsed { get; private set; }
-    private readonly AStarGrid2D _paths = new();
+    private readonly OriginalRouteSearch _search = new();
+    private readonly AStarGrid2D _guidance = new();
+    public int GuidedRouteSearches { get; private set; }
     private readonly OriginalRoutePool _routes = new();
     private readonly byte[] _properties;
     private readonly Dictionary<uint, MovementObject> _sourceMovementObjects = [];
@@ -100,8 +103,10 @@ public sealed partial class Skirmish : IDisposable
             Actors.Add(new SkirmishActor { Source = obj, Template = template, Parameters = Convert.FromHexString(template.RawRecordHex),
                 Record = Convert.FromHexString(obj.RawRecordHex), Rules = spec, Health = spec.Health, Team = slot.SlotIndex == rules.PlayerSlot ? 0 : 1 });
         }
-        _paths.Region = new Rect2I(0, 0, map.Width, map.Height);
-        _paths.DiagonalMode = AStarGrid2D.DiagonalModeEnum.Never; _paths.Update();
+        _guidance.Region = new Rect2I(0, 0, map.Width, map.Height);
+        _guidance.DiagonalMode = AStarGrid2D.DiagonalModeEnum.Always;
+        _guidance.DefaultComputeHeuristic = _guidance.DefaultEstimateHeuristic = AStarGrid2D.Heuristic.Chebyshev;
+        _guidance.Update();
         foreach (var actor in Actors.Where(a => !a.Structure)) actor.Route.Attach(_routes, actor.Record);
         InitializeEconomy(scenario, templates);
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
@@ -164,18 +169,58 @@ public sealed partial class Skirmish : IDisposable
     {
         foreach (var key in _reservations.Where(p => p.Value == reference).Select(p => p.Key).ToArray()) _reservations.Remove(key);
     }
-    private void PreparePaths(SkirmishActor actor)
+    private List<Vector2I> SearchPath(SkirmishActor actor, Vector2I goal)
     {
-        for (int y = 0; y < Map.Height; y++)
-        for (int x = 0; x < Map.Width; x++) _paths.SetPointSolid(new(x, y), !CanStand(actor, new(x, y)));
-        _paths.SetPointSolid(actor.Cell, false);
+        int fw = actor.Parameters[3], fh = actor.Parameters[4];
+        var offset = new Vector2I(fw / 2, fh / 2);
+        var start = actor.Cell - offset;
+        var cache = new byte[Map.Width * Map.Height];
+        bool Admit(byte left, byte top, byte direction)
+        {
+            if (left > Map.Width - fw || top > Map.Height - fh) return false;
+            int index = top * Map.Width + left;
+            if (cache[index] == 0) cache[index] = CanStand(actor, new Vector2I(left, top) + offset) ? (byte)1 : (byte)2;
+            return cache[index] == 1;
+        }
+        List<Vector2I> NativePath(Vector2I destination)
+        {
+            // The search consumes top-left coordinates; UI orders address the anchor cell.
+            var end = destination - offset;
+            var result = _search.Find(Occupancy.Width, Occupancy.Height, (byte)fw, (byte)fh,
+                new((byte)start.X, (byte)start.Y), new((byte)end.X, (byte)end.Y), Admit);
+            var path = new List<Vector2I> { actor.Cell };
+            foreach (byte direction in result.Directions)
+            {
+                var delta = OriginalRouteSearch.Deltas[direction];
+                path.Add(path[^1] + new Vector2I(delta.X, delta.Y));
+            }
+            return path;
+        }
+        if (actor.GuidanceGoal != goal)
+        {
+            actor.GuidanceGoal = null;
+            var native = NativePath(goal);
+            if (native.Count > 1 && native[^1] != actor.Cell) return native;
+            actor.GuidanceGoal = goal;
+        }
+        // Provisional distant-order guidance. Do not present these waypoints as recovered AI.
+        GuidedRouteSearches++;
+        for (int y = 0; y < Map.Height; y++) for (int x = 0; x < Map.Width; x++)
+            _guidance.SetPointSolid(new(x, y), !CanStand(actor, new(x, y)));
+        _guidance.SetPointSolid(actor.Cell, false);
+        var guide = _guidance.GetIdPath(actor.Cell, goal);
+        for (int i = Math.Min(16, guide.Count - 1); i > 0; i--)
+        {
+            var native = NativePath(guide[i]);
+            if (native.Count > 1 && native[^1] == guide[i]) return native;
+        }
+        return [actor.Cell];
     }
     private bool Plan(SkirmishActor actor, Vector2I goal)
     {
         actor.Route.Clear();
         if (!CanStand(actor, goal) || goal == actor.Cell) return goal == actor.Cell;
-        PreparePaths(actor);
-        var route = _paths.GetIdPath(actor.Cell, goal);
+        var route = SearchPath(actor, goal);
         return actor.Route.Set(route);
     }
     public int Move(IEnumerable<uint> ids, Vector2I destination)
@@ -273,7 +318,7 @@ public sealed partial class Skirmish : IDisposable
     }
     private void PlanAttack(SkirmishActor actor, SkirmishActor target)
     {
-        actor.Route.Clear(); PreparePaths(actor);
+        actor.Route.Clear();
         int radius = (int)Math.Ceiling(actor.Rules.Range / 32) + 3;
         var candidates = new List<Vector2I>();
         for (int y = -radius; y <= radius; y++)
@@ -285,7 +330,7 @@ public sealed partial class Skirmish : IDisposable
         }
         foreach (var cell in candidates.OrderBy(c => ((Vector2)c).DistanceSquaredTo(actor.Cell)))
         {
-            var path = _paths.GetIdPath(actor.Cell, cell);
+            var path = SearchPath(actor, cell);
             if (path.Count < 2) continue;
             if (actor.Route.Set(path)) break;
         }
@@ -298,8 +343,8 @@ public sealed partial class Skirmish : IDisposable
             var next = actor.Route.Peek();
             if (!CanStand(actor, next)) { actor.Route.Clear(); actor.ReplanTimer = 0; if (actor.Worker) actor.Record[0x2d] = 0; return; }
             var direction = next - actor.Cell;
-            if (Math.Abs(direction.X) + Math.Abs(direction.Y) != 1) { actor.Route.Clear(); if (actor.Worker) actor.Record[0x2d] = 0; return; }
-            byte heading = direction.X > 0 ? (byte)2 : direction.X < 0 ? (byte)6 : direction.Y > 0 ? (byte)4 : (byte)0;
+            if (Math.Max(Math.Abs(direction.X), Math.Abs(direction.Y)) != 1) { actor.Route.Clear(); if (actor.Worker) actor.Record[0x2d] = 0; return; }
+            byte heading = OriginalMotionPreparation.DirectionToward((uint)actor.Cell.X, (uint)actor.Cell.Y, (uint)next.X, (uint)next.Y);
             actor.Record[0x25] = (byte)((actor.Record[0x25] & 7) | (heading << 3));
             actor.Record[0x24] = 3; actor.Record[0x2c] = 32;
             actor.StepGoal = next; actor.Route.Dequeue(); actor.Stepping = actor.Turning = true; actor.StalledTicks = 0;
@@ -336,5 +381,5 @@ public sealed partial class Skirmish : IDisposable
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         Log($"{target.Source.TemplateName} {(target.Team == 0 ? "потерян" : "уничтожен")}.");
     }
-    public void Dispose() => _paths.Dispose();
+    public void Dispose() => _guidance.Dispose();
 }

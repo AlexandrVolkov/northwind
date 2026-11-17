@@ -89,7 +89,7 @@ public partial class TestRunner
     private void LongPackedMoveChecks()
     {
         using var battle = CreateSkirmish(); var hero = battle.Hero;
-        // An open arena gives a deterministic cardinal route longer than one native block.
+        // An open arena exercises repeated original search windows on a distant order.
         int width = battle.Map.Width;
         var properties = Convert.FromHexString(battle.Map.SegmentPropertiesHex);
         uint ground = (uint)Enumerable.Range(0, properties.Length / 8).First(i => properties[i * 8] == 0 && battle.Map.Terrain[i] == "ground");
@@ -101,10 +101,10 @@ public partial class TestRunner
         BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(8), 10 * 32 + 16);
         battle.Occupancy.WriteFootprint(1, 1, hero.Record[0x0d], 10 * 32 + 16, 10 * 32 + 16, hero.Id);
         var goal = new Vector2I(110,50);
-        Check(battle.Move([hero.Id],goal) == 1 && hero.Route.Count == 125 && hero.Goal == goal, "Ordinary long move keeps its goal beyond the packed prefix");
+        Check(battle.Move([hero.Id],goal) == 1 && hero.Route.Count == 16 && hero.Goal == goal, "Ordinary long move keeps its goal beyond the native 16-cell search window");
         for (int i = 0; i < 3000 && (hero.Cell != goal || hero.Stepping); i++) battle.Advance(.1);
         Check(hero.Cell == goal && !hero.Stepping && hero.Route.Count == 0 && OriginalRoutePool.Cursor(hero.Record) == uint.MaxValue,
-            $"Ordinary movement replans after a full prefix and reaches its final destination: {hero.Cell}");
+            $"Ordinary movement replans after each native prefix and reaches its final destination: {hero.Cell}");
         Check(battle.Occupancy.Cells.ToArray().Count(v => v == hero.Id) == 1, "Long packed movement leaves no stale occupancy");
     }
 }
