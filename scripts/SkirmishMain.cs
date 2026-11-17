@@ -1,6 +1,7 @@
 using Godot;
 namespace Northwind;
 
+public sealed class TerrainColorsData { public int[][] Colors { get; set; } = []; }
 public sealed class BattleFramesData { public BattleFrame[] Frames { get; set; } = []; }
 public sealed class BattleFrame
 {
@@ -28,6 +29,10 @@ public partial class SkirmishMain : Node2D
     public bool PlacingMill { get; private set; }
     private Button _pause = null!, _speed = null!;
     private TextureRect _minimap = null!;
+    private Image _minimapImage = null!;
+    private ImageTexture _minimapTexture = null!;
+    private int[][] _terrainColors = [];
+    private int _terrainRevision = -1;
     private Control _markers = null!;
     private CanvasLayer _ui = null!;
     private bool _ready, _drag, _pan;
@@ -48,7 +53,9 @@ public partial class SkirmishMain : Node2D
             if (_terrain == null || _sprites == null) throw new InvalidDataException("Bundled textures are missing");
             foreach (var frame in GameData.Read<BattleFramesData>("res://assets/imported/battle_frames.json").Frames)
                 _frames[(frame.TemplateFile, frame.TemplateIndex, frame.Frame)] = frame;
-            _minimap.Texture = GD.Load<Texture2D>("res://assets/imported/minimap.png");
+            _terrainColors = GameData.Read<TerrainColorsData>("res://assets/imported/terrain_colors.json").Colors;
+            _minimapImage = GD.Load<Texture2D>("res://assets/imported/minimap.png").GetImage();
+            _minimapTexture = ImageTexture.CreateFromImage(_minimapImage); _minimap.Texture = _minimapTexture;
             Restart(); _ready = true;
         }
         catch (Exception error) { GD.PushError(error.ToString()); _status.Text = "Не удалось загрузить схватку.\nСкачайте проект целиком."; }
@@ -61,7 +68,7 @@ public partial class SkirmishMain : Node2D
             GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), GameData.Read<SkirmishRules>("res://data/skirmish.json"));
         Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = PlacingMill = false;
-        FocusHero(); RefreshUi(); QueueRedraw();
+        _terrainRevision = -1; RefreshTerrain(); FocusHero(); RefreshUi(); QueueRedraw();
     }
     public void SelectArmy()
     {
@@ -106,7 +113,7 @@ public partial class SkirmishMain : Node2D
     public override void _Process(double delta)
     {
         if (!_ready) return;
-        Battle.Advance(delta * Speed);
+        Battle.Advance(delta * Speed); RefreshTerrain();
         Selection.RemoveWhere(id => Battle.Find(id) == null);
         Vector2 direction = Vector2.Zero;
         if (!Input.IsKeyPressed(Key.Ctrl))
@@ -128,7 +135,7 @@ public partial class SkirmishMain : Node2D
         var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
         if (target?.Team == 1) Battle.Attack(Selection, target.Id);
         else if (target?.Source.TemplateName == "Лесопилка" && Battle.DeliverTimber(Selection, target.Id)) { }
-        else if (Battle.TimberAt(cell) >= 10 && Selection.Any(id => Battle.Find(id)?.Worker == true)) Battle.GatherTimber(Selection, cell);
+        else if (Battle.Harvestable(cell) && Selection.Any(id => Battle.Find(id)?.Worker == true)) Battle.GatherTimber(Selection, cell);
         else Battle.Move(Selection, cell);
         _orderMark = point; _markUntil = Battle.Elapsed + 2;
     }
@@ -214,20 +221,14 @@ public partial class SkirmishMain : Node2D
             int tile = (int)(Battle.Map.Cells[y * Battle.Map.Width + x] & 65535);
             DrawTextureRectRegion(_terrain, new Rect2(x * 32, y * 32, 32, 32), new Rect2(tile % 32 * 32, tile / 32 * 32, 32, 32));
         }
-        foreach (var (cell, amount) in Battle.Timber.Where(p => p.Value == 0))
-        {
-            var rect = new Rect2((Vector2)(cell * 32), Vector2.One * 32);
-            DrawRect(rect, new Color(.14f, .12f, .07f, .7f)); DrawCircle(rect.GetCenter(), 5, new Color("94704a"));
-        }
         foreach (var actor in Battle.Actors.Where(a => a.Alive).OrderBy(a => a.Position.Y)) DrawActor(actor);
         if (!PlacingMill && Selection.Any(id => Battle.Find(id)?.Worker == true))
         {
             var point = GetGlobalMousePosition(); var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
-            int wood = Battle.TimberAt(cell);
-            if (wood > 0)
+            if (Battle.Harvestable(cell))
             {
                 DrawRect(new Rect2((Vector2)(cell * 32), Vector2.One * 32), new Color("a0dfa0"), false, 2);
-                DrawString(ThemeDB.FallbackFont, (Vector2)(cell * 32) - new Vector2(0, 4), $"Лес · {wood}", HorizontalAlignment.Left, -1, 12, new Color("d9e8b5"));
+                DrawString(ThemeDB.FallbackFont, (Vector2)(cell * 32) - new Vector2(0, 4), "Лес · ПКМ — рубить", HorizontalAlignment.Left, -1, 12, new Color("d9e8b5"));
             }
         }
         if (PlacingMill)
@@ -334,6 +335,17 @@ public partial class SkirmishMain : Node2D
         _events = Text("", 12);
         Button("ЛАБОРАТОРИЯ  [F10]", () => GetTree().ChangeSceneToFile("res://scenes/main.tscn"));
         Text("Ранняя версия: бой, ИИ и хозяйственные цены временные. Кампания ещё в работе.", 11);
+    }
+    private void RefreshTerrain()
+    {
+        if (_terrainRevision == Battle.TerrainRevision) return;
+        for (int y = 0; y < Battle.Map.Height; y++)
+        for (int x = 0; x < Battle.Map.Width; x++)
+        {
+            var rgb = _terrainColors[Battle.Map.Cells[y * Battle.Map.Width + x] & 65535];
+            _minimapImage.SetPixel(x, y, new Color(rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f));
+        }
+        _minimapTexture.Update(_minimapImage); _terrainRevision = Battle.TerrainRevision;
     }
     private Rect2 MiniRect()
     { float side = Math.Min(_minimap.Size.X, _minimap.Size.Y); return new((_minimap.Size - Vector2.One * side) / 2, Vector2.One * side); }

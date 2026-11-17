@@ -9,8 +9,16 @@ public partial class TestRunner
         for (int y = 0; y < battle.Map.Height; y++) for (int x = 0; x < battle.Map.Width; x++)
         {
             var cell = new Vector2I(x, y);
-            if (battle.TimberAt(cell) >= 10 && ((Vector2)(cell * 32)).DistanceTo(battle.PlayerCastle.Position) < 500) trees.Add(cell);
+            if (battle.Harvestable(cell) && ((Vector2)(cell * 32)).DistanceTo(battle.PlayerCastle.Position) < 500) trees.Add(cell);
         }
+        var map = GameData.Read<MapData>("res://assets/imported/map.json");
+        var properties = Convert.FromHexString(map.SegmentPropertiesHex);
+        var constants = GameData.Read<OriginalTerrainData>("res://data/original_terrain.json");
+        trees.RemoveAll(tree => {
+            var cells = (uint[])battle.Map.Cells.Clone();
+            return new OriginalTerrainCatalog(properties, constants).ClearTimber(cells, (byte)map.Width, (byte)map.Height, tree.X, tree.Y) == 0 ||
+                OriginalForestryRules.IsTimber(OriginalForestryRules.Property(properties, cells[tree.Y * map.Width + tree.X]));
+        });
         foreach (var tree in trees.OrderBy(c => ((Vector2)c).DistanceSquaredTo(worker.Cell)))
         foreach (var d in new[] { Vector2I.Up, Vector2I.Down, Vector2I.Left, Vector2I.Right })
         {
@@ -30,7 +38,7 @@ public partial class TestRunner
     }
     private async Task EconomyChecks()
     {
-        OriginalLumbermillChecks();
+        OriginalLumbermillChecks(); OriginalForestryMapChecks();
         using (var battle = CreateSkirmish())
         {
             uint initial = battle.Wood;
@@ -41,8 +49,8 @@ public partial class TestRunner
             Check(battle.GatherTimber([battle.Hero.Id], tree) == 0 && battle.GatherTimber([worker.Id], tree) == 1,
                 "Only workers accept a timber order");
             for (int i = 0; i < 900 && worker.Record[0x31] != 3; i++) battle.Advance(.1);
-            Check(worker.Record[0x31] == 3 && worker.Source.TemplateIndex == 11 && battle.TimberAt(tree) == 20,
-                "Worker reaches forest, removes one finite load and uses the loaded worker template");
+            Check(worker.Record[0x31] == 3 && worker.Source.TemplateIndex == 11 && battle.Harvestable(tree) && worker.Record[0x34] == 0x20 && worker.Record[0x16] == 5,
+                "Worker uses native work counters, retains the grove after one load and switches to loaded template");
             uint before = battle.Wood; battle.Advance(5);
             Check(battle.Wood == before && worker.Record[0x31] == 3 && battle.ProducedWood == 0,
                 "Chopping and waiting without a sawmill do not credit the stock");
@@ -58,14 +66,18 @@ public partial class TestRunner
             Check(mill.ConstructionRemaining == remaining && battle.TrainWorker() == null && battle.BuildMill(cell) == null && battle.GatherTimber([worker.Id], tree) == 0,
                 "Pause freezes construction and all economy orders");
             battle.Paused = false;
-            for (int i = 0; i < 1800 && battle.ProducedWood < 30; i++) battle.Advance(.1);
+            for (int i = 0; i < 3600 && battle.ProducedWood < 30; i++) battle.Advance(.1);
             Check(battle.ProducedWood == 30 && battle.Wood == initial - battle.Rules.Economy.WorkerPrice - battle.Rules.Economy.MillPrice + 30 &&
-                worker.Record[0x31] == 0 && mill.Record[0x24] == 0 && battle.TimberAt(tree) == 0,
+                worker.Record[0x31] == 0 && mill.Record[0x24] == 0 && battle.Harvestable(tree),
                 $"Three loads travel through the native handoff and processing queue exactly once: wood={battle.Wood}, produced={battle.ProducedWood}, cargo={worker.Record[0x31]}, job={worker.JobText}, worker={worker.Position}, mill={mill.Position}");
             Check(mill.ConstructionRemaining == 0 && mill.Record[0x19] == mill.Template.InitialCondition && mill.Record[0x14] == 0 && mill.Record[0x0f] == 0x20,
                 "Native C80D condition increments and completed-action transition finish the building");
-            before = battle.Wood; battle.Advance(5);
-            Check(battle.Wood == before && battle.ProducedWood == 30, "An exhausted forest cannot generate more wood");
+            for (int i = 0; i < 3600 && battle.ProducedWood < 70; i++) battle.Advance(.1);
+            Check(battle.ProducedWood == 70 && battle.TerrainRevision > 0 && battle.ClearedGroves.Contains(tree) && !battle.Harvestable(tree),
+                $"Seventh load applies native terrain blending: produced={battle.ProducedWood}, job={worker.JobText}");
+            Check(worker.GatherTree is { } next && next != tree && battle.Harvestable(next), "Worker automatically finds another grove after source terrain replacement");
+            battle.Stop([worker.Id]); before = battle.Wood; battle.Advance(5);
+            Check(battle.Wood == before && battle.ProducedWood == 70, "Stopping the worker prevents further loads");
             var second = EconomyMillCell(battle, tree);
             Check(battle.BuildMill(second) != null && battle.Wood == before - battle.Rules.Economy.MillPrice,
                 "Delivered wood participates in a subsequent construction transaction");
@@ -97,8 +109,8 @@ public partial class TestRunner
             GetViewport().GetTexture().GetImage().SavePng("res://build/economy.png");
         }
         scene.TogglePause();
-        for (int i = 0; i < 1800 && scene.Battle.ProducedWood < 10; i++) scene.Battle.Advance(.1);
-        Check(scene.Battle.ProducedWood >= 10, "UI-issued hiring, gathering and placement complete a delivered-load cycle");
+        for (int i = 0; i < 3600 && scene.Battle.ProducedWood < 70; i++) scene.Battle.Advance(.1);
+        Check(scene.Battle.ProducedWood >= 70 && scene.Battle.TerrainRevision > 0, "UI-issued hiring, gathering and placement complete seven loads and change terrain");
         scene.TogglePause(); scene._Process(0);
         for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         if (DisplayServer.GetName() != "headless")

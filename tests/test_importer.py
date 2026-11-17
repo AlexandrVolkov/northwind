@@ -1,4 +1,5 @@
 """Small synthetic format tests; real game data is optional and never committed."""
+import json
 import importlib.util
 from pathlib import Path
 import struct
@@ -52,6 +53,8 @@ class ImportTests(unittest.TestCase):
             self.assertEqual(data['cells'], [0x10000, 1])
             self.assertEqual(data['segment_unknown_tail_bytes'], 7)
             self.assertEqual(data['terrain'], ['ground', 'water'])
+            colors = json.loads((output / 'terrain_colors.json').read_text())
+            self.assertEqual(colors['colors'], [[16, 128, 32], [16, 32, 128]])
             self.assertEqual(manifest['decoded_sprite_records'], 37)
             with Image.open(output / 'terrain.png') as image:
                 self.assertEqual(image.getpixel((0, 0)), (16, 128, 32))

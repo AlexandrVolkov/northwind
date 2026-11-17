@@ -458,6 +458,11 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         mini.putpixel((index % width, index // width), tuple(palette[color:color + 3]))
     preview.resize((1024, 1024), Image.Resampling.NEAREST).save(destination / 'map_preview.png')
     mini.save(destination / 'minimap.png')
+    colors = [list(palette[index * 3:index * 3 + 3]) for index in segments[21:21 + count]]
+    (destination / 'terrain_colors.json').write_text(json.dumps({
+        'format_version': 1, 'source_sha256': {segment_name: hashlib.sha256(segments).hexdigest(),
+                                            'COLOR1.PAL': hashlib.sha256(palette).hexdigest()},
+        'colors': colors}, indent=2) + '\n', encoding='utf-8')
     sprite_data = read('ARMY__01.SPR')
     frames = decode_spr(sprite_data)
     if len(frames) < 37:
@@ -490,7 +495,7 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         scenario_path.unlink()  # Never leave a previous map's scenario in the output.
     from reference_frames import render_observations
     render_observations(source, destination, map_number, decode_spr_frame)
-    manifest = {'importer_version': 10, 'files': used, 'decoded_sprite_records': len(frames),
+    manifest = {'importer_version': 11, 'files': used, 'decoded_sprite_records': len(frames),
                 'notes': 'Graphics decoded; gameplay and terrain blocking are experimental.'}
     (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
     return manifest
