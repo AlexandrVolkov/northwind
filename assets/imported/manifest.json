@@ -1,0 +1,123 @@
+{
+  "importer_version": 10,
+  "files": {
+    "ARMY__00.DAT": {
+      "bytes": 5743,
+      "sha256": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385"
+    },
+    "ARMY__01.DAT": {
+      "bytes": 4394,
+      "sha256": "a8c5aa398ff63219eefcd58e56f89653b1135cd1443fed9d7cedd2cb03c61d6e"
+    },
+    "ARMY__02.DAT": {
+      "bytes": 5550,
+      "sha256": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475"
+    },
+    "ARMY__03.DAT": {
+      "bytes": 6884,
+      "sha256": "d6110b1bbdd2365dfd50df089f48a96b9ee2220ce2a6a4b66d5f1881c3437b1a"
+    },
+    "ARMY__04.DAT": {
+      "bytes": 201,
+      "sha256": "ca28d553d813348c3b93f2ff4b8ca8d5b64609cd9700f613c2473789610155c7"
+    },
+    "ARMY__05.DAT": {
+      "bytes": 951,
+      "sha256": "2ec96a210a3cca53c1c50cb5fbd52686e40e8878098010a9905891471660d013"
+    },
+    "SCENA_01.SCN": {
+      "bytes": 932,
+      "sha256": "6293d8f49adb517055af9ea3545c965948669eed8d769f1967e6f753a27c081f"
+    },
+    "MAP_1_01.OBE": {
+      "bytes": 392,
+      "sha256": "95d17fd664985108a03f5e88e1d36330ee74288b0424aeae33b10f08e705b930"
+    },
+    "MAP_1_02.OBE": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "MAP_1_03.OBE": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "MAP_1_04.OBE": {
+      "bytes": 284,
+      "sha256": "1743d1b36364384202e309bf875079680d85583827f827646706f2d217be6ef3"
+    },
+    "MAP_1_05.OBE": {
+      "bytes": 160,
+      "sha256": "a178c2a220e13e3676388d0ff45291f91af0e9fabdc3576ecf5523cfda88193e"
+    },
+    "MAP_1_06.OBE": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "MAP_1_07.OBE": {
+      "bytes": 955,
+      "sha256": "0f27559084da1d42ad927ff6673fa71ed17207437ed60bcbe2b9403145f25ae1"
+    },
+    "MAP_1_08.OBE": {
+      "bytes": 2376,
+      "sha256": "cc006e7fb1dfdea02ea379d00ffc69eaf4d4cf3ee851b6838a2d201b60957798"
+    },
+    "MAP_1.MAP": {
+      "bytes": 65561,
+      "sha256": "7fac22dfb8c3f01c350ec04f4584e788874bbb4ee1f79657f79fe404a53e30fc"
+    },
+    "MAPSEG01.SEG": {
+      "bytes": 700251,
+      "sha256": "6a01e68eb2ef52f57f80bcd2180526d46105fa28975d854bb816f33926d2404d"
+    },
+    "COLOR1.PAL": {
+      "bytes": 768,
+      "sha256": "022e87d1ccd4961b08d54e073da6bff5cf28a9aa9577dc78422b211407c33a32"
+    },
+    "ARMY__01.SPR": {
+      "bytes": 3234697,
+      "sha256": "fdd9ad3ae3d4b0eee3560bc25f543d34c0632d8f6e822bf9061700df41f4228c"
+    },
+    "ARMY__00.SPR": {
+      "bytes": 623741,
+      "sha256": "014ba1d6984166aeb82133b5d10e296bbb206ea273dbe47140457471450da5a0"
+    },
+    "ARMY__02.SPR": {
+      "bytes": 5197314,
+      "sha256": "a684ad0474ad9272ab08b0997753305f9a1297103ba83e054e736542dc00302f"
+    },
+    "ARMY__03.SPR": {
+      "bytes": 2223636,
+      "sha256": "5c26a245dd64ac2c9c969394b4bc3187d727ad58691562ec42d5b92426b52d81"
+    },
+    "ARMY__04.SPR": {
+      "bytes": 119027,
+      "sha256": "266bbae9d9aa162826544022524a9561cdea9725a37dea285e0213d2ee353a96"
+    },
+    "ARMY__05.SPR": {
+      "bytes": 59434,
+      "sha256": "3e122b8eb30fc32c6b1527ff239f6873eed0534a6328a5cab5ab017a05afbe55"
+    },
+    "ARMY__00.WRK": {
+      "bytes": 5403,
+      "sha256": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33"
+    },
+    "ARMY__02.WRK": {
+      "bytes": 6930,
+      "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b"
+    },
+    "ARMY__03.WRK": {
+      "bytes": 13412,
+      "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27"
+    },
+    "ARMY__05.WRK": {
+      "bytes": 882,
+      "sha256": "75e339a4869a7466714661f036fb3b933acab4ba73aaf2898dfd60691a13fafb"
+    },
+    "NORWIND.EXE": {
+      "bytes": 503789,
+      "sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8"
+    }
+  },
+  "decoded_sprite_records": 2326,
+  "notes": "Graphics decoded; gameplay and terrain blocking are experimental."
+}

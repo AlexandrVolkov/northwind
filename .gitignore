@@ -1,5 +1,4 @@
 .godot/
-assets/imported/
 __pycache__/
 *.pyc
 *.ISO

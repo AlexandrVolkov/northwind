@@ -73,7 +73,7 @@ public partial class TestRunner : Node
         Check(!Godot.FileAccess.FileExists("res://assets/imported/map.json"), "Fixture must not contain imported assets");
         var scene = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
         AddChild(scene);
-        Check(!scene.ReadyToPlay && scene.EndButton.Disabled, "Fresh checkout shows import instructions instead of starting a battle");
+        Check(!scene.ReadyToPlay && scene.EndButton.Disabled, "Missing resource fixture shows recovery instructions and disables battle");
         RemoveChild(scene); scene.Free();
     }
     private async Task Click(Main scene, Vector2I cell, MouseButton button)

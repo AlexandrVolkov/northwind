@@ -1,0 +1,68 @@
+{
+  "format_version": 1,
+  "status": "ready",
+  "samples": [
+    {
+      "id": "militia",
+      "title": "Ополченец — полная непрозрачная маска",
+      "image": "observed_militia.png",
+      "camera": [
+        320,
+        768
+      ],
+      "viewport_size": [
+        448,
+        448
+      ],
+      "spr": "ARMY__02.SPR",
+      "table": "COLOR_02.TAB",
+      "frame": 71,
+      "size": [
+        62,
+        62
+      ],
+      "world_top_left": [
+        305,
+        945
+      ],
+      "exclude": [],
+      "compared_opaque_pixels": 280,
+      "note": "Наблюдённое положение кадра; привязка к OBE и универсальный якорь не доказаны."
+    },
+    {
+      "id": "castle",
+      "title": "Замок — корпус без области флагштока",
+      "image": "observed_castle.png",
+      "camera": [
+        416,
+        480
+      ],
+      "viewport_size": [
+        448,
+        448
+      ],
+      "spr": "ARMY__02.SPR",
+      "table": "COLOR_02.TAB",
+      "frame": 884,
+      "size": [
+        128,
+        127
+      ],
+      "world_top_left": [
+        544,
+        657
+      ],
+      "exclude": [
+        [
+          16,
+          0,
+          10,
+          40
+        ]
+      ],
+      "compared_opaque_pixels": 10697,
+      "note": "Частичная маска: исключены 103 непрозрачных пикселя области флагштока; анимированный флаг не восстановлен."
+    }
+  ],
+  "note": "Independent frozen observations; not a synchronized game scene or live simulation."
+}
