@@ -1,0 +1,219 @@
+{
+  "format_version": 1,
+  "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "query_high": [
+    0,
+    65535,
+    18058
+  ],
+  "find": {
+    "patterns": [
+      [
+        0,
+        1,
+        0,
+        2
+      ],
+      [
+        0
+      ],
+      [
+        3,
+        2,
+        0,
+        1
+      ]
+    ],
+    "descriptors": [
+      0,
+      1,
+      257,
+      1717960721
+    ],
+    "footprints": [
+      [
+        1,
+        1
+      ],
+      [
+        4,
+        3
+      ]
+    ],
+    "radii": [
+      1,
+      3,
+      10
+    ]
+  },
+  "work": {
+    "modifiers": [
+      0,
+      31,
+      32,
+      127,
+      128,
+      250,
+      255
+    ],
+    "counters": [
+      0,
+      1,
+      7,
+      8,
+      9,
+      127,
+      255
+    ],
+    "bases": [
+      0,
+      1,
+      8,
+      255
+    ]
+  },
+  "prepare": {
+    "hits": [
+      0,
+      1,
+      20,
+      31,
+      32,
+      255
+    ],
+    "auxiliary": [
+      0,
+      1,
+      255
+    ]
+  },
+  "clear": {
+    "catalogs": [
+      0,
+      1,
+      2
+    ],
+    "random_indices": [
+      0,
+      1,
+      127,
+      255
+    ]
+  },
+  "results": {
+    "query": {
+      "case_count": 196608,
+      "sha256": "7e7ef4f00e8cda0ab39a5e0eade14f5ec9b802e4482b50d13a4cbfa9fa18e2bb"
+    },
+    "find": {
+      "case_count": 846,
+      "sha256": "3524fbf8634457040b7cced9440259eea22d9bb1dd78ac49a7dacaabaefeedef"
+    },
+    "prepare": {
+      "case_count": 4608,
+      "sha256": "f6228ef413e7fbdc704839a212a13e33ee9bdbb20fc2d68c24161f6475316e97"
+    },
+    "work": {
+      "case_count": 48608,
+      "sha256": "36de3f8444c99421f45acdaf749dced1a5db1417bff1bdee56009f27b7af0c94"
+    },
+    "modifier": {
+      "case_count": 256,
+      "sha256": "9ac6cdec25bf73b051f70d1e3377df0cbeacb704a9792daa13917232fd4a529c"
+    },
+    "clear": {
+      "case_count": 768,
+      "sha256": "e0561e3f50fc595dbdabf2b2c3785902443ff3bd8437e4fa45fd7b21a73c81e4"
+    },
+    "finish": {
+      "case_count": 96,
+      "sha256": "97aa7f1395a89fed230c9e8ac141fa7f23e0a5736c433c6d53d889caad6cb95a"
+    },
+    "source_map": {
+      "case_count": 76,
+      "sha256": "ffb5cd5c7ae66be22e654b10a3083ded83c3e898fb3f4fe99640705bc418bb3a"
+    }
+  },
+  "source_map": {
+    "cells_sha256": "f4d708c919286521dcad2fa407d945a60d30a5cde4f9bffda948a2d0951d5ac1",
+    "properties_sha256": "48096a01b694d1624e2a374958ed029b2db9150d1e54e77709beceb44244c126",
+    "points": [
+      [
+        6,
+        10
+      ],
+      [
+        9,
+        20
+      ],
+      [
+        10,
+        20
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        57,
+        2
+      ],
+      [
+        115,
+        5
+      ],
+      [
+        80,
+        10
+      ],
+      [
+        87,
+        15
+      ],
+      [
+        88,
+        21
+      ],
+      [
+        107,
+        29
+      ],
+      [
+        0,
+        45
+      ],
+      [
+        125,
+        55
+      ],
+      [
+        125,
+        71
+      ],
+      [
+        120,
+        85
+      ],
+      [
+        35,
+        96
+      ],
+      [
+        108,
+        102
+      ],
+      [
+        76,
+        110
+      ],
+      [
+        103,
+        117
+      ],
+      [
+        87,
+        122
+      ]
+    ]
+  }
+}

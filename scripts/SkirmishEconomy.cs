@@ -7,8 +7,6 @@ public sealed class EconomyRules
     public uint StartingWood { get; set; } = 120;
     public uint WorkerPrice { get; set; } = 10;
     public uint MillPrice { get; set; } = 50;
-    public double ChopSeconds { get; set; } = 2;
-    public int TimberPerCell { get; set; } = 30;
     public float BuildRadius { get; set; } = 640;
     public int WorkerLimit { get; set; } = 6;
 }
@@ -17,7 +15,9 @@ public sealed partial class Skirmish
 {
     public uint Wood { get; private set; }
     public uint ProducedWood { get; private set; }
-    public Dictionary<Vector2I, int> Timber { get; } = [];
+    public int TerrainRevision { get; private set; }
+    public HashSet<Vector2I> ClearedGroves { get; } = [];
+    private OriginalTerrainCatalog _terrainCatalog = null!;
     public SkirmishActor PlayerCastle => Actors.Single(a => a.Team == 0 && a.Source.TemplateName == "Замок");
     public TemplateEntry MillTemplate => _templates.Armies["ARMY__02.DAT"].Templates[4];
     private TemplatesData _templates = null!;
@@ -28,17 +28,23 @@ public sealed partial class Skirmish
     private void InitializeEconomy(ScenarioData scenario, TemplatesData templates)
     {
         _templates = templates; Wood = Rules.Economy.StartingWood;
+        _terrainCatalog = new OriginalTerrainCatalog(_properties, GameData.Read<OriginalTerrainData>("res://data/original_terrain.json"));
         _workerSeed = scenario.Slots.SelectMany(s => s.Objects)
             .First(o => o.TemplateFile == "ARMY__02.DAT" && o.TemplateIndex == 10);
     }
-    public int TimberAt(Vector2I cell)
+    public bool Harvestable(Vector2I cell) => Inside(cell) && OriginalForestryRules.IsTimber(
+        OriginalForestryRules.Property(_properties, Map.Cells[cell.Y * Map.Width + cell.X]));
+    private bool FindNextGrove(SkirmishActor worker)
     {
-        if (!Inside(cell)) return 0;
-        uint tile = Map.Cells[cell.Y * Map.Width + cell.X] & 65535;
-        // Provisional grove selection: exclude dark grass/shrub tiles classified as forest by palette alone.
-        // This is not yet the original harvest-eligibility function.
-        if (Map.Terrain[tile] != "forest" || (_properties[tile * 8] & 7) != 1) return 0;
-        return Timber.GetValueOrDefault(cell, Rules.Economy.TimberPerCell);
+        foreach (byte radius in new byte[] { 1, worker.Parameters[0x47] })
+        {
+            if (!OriginalForestryRules.FindTimber(Occupancy.Width, Occupancy.Height, Map.Cells, _properties,
+                (uint)worker.Position.X, (uint)worker.Position.Y, worker.Parameters[3], worker.Parameters[4], radius, out var cell)) continue;
+            worker.GatherTree = new Vector2I(cell.X, cell.Y); worker.HarvestPrepared = false;
+            worker.Route.Clear(); worker.ReplanTimer = 0; return true;
+        }
+        worker.GatherTree = null; worker.Route.Clear(); worker.JobText = "Поблизости нет леса";
+        Log("Поблизости нет подходящего леса. Укажите рабочему другой участок."); return false;
     }
     private SkirmishActor NewEconomyActor(int templateIndex, Vector2I cell, bool worker)
     {
@@ -109,12 +115,12 @@ public sealed partial class Skirmish
     }
     public int GatherTimber(IEnumerable<uint> ids, Vector2I tree)
     {
-        if (Paused || Outcome != "" || TimberAt(tree) < 10) return 0;
+        if (Paused || Outcome != "" || !Harvestable(tree)) return 0;
         int count = 0;
         foreach (var worker in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && a.Worker))
         {
             worker.GatherTree = tree; worker.PreferredMill = 0; worker.Goal = null; worker.Target = 0;
-            worker.Route.Clear(); worker.HarvestTimer = 0; worker.ReplanTimer = 0; count++;
+            worker.Route.Clear(); worker.HarvestPrepared = false; worker.ReplanTimer = 0; count++;
         }
         if (count > 0) Log($"Рубка леса: {count} раб. Груз будет доставляться в готовую лесопилку.");
         return count;
@@ -185,26 +191,50 @@ public sealed partial class Skirmish
                     worker.Record[0x31], BinaryPrimitives.ReadUInt32LittleEndian(worker.Parameters.AsSpan(0x40)));
                 BinaryPrimitives.WriteUInt16LittleEndian(mill.Record.AsSpan(0x17), state.MillFlags); mill.Record[0x24] = state.QueuedLoads;
                 BinaryPrimitives.WriteUInt16LittleEndian(worker.Record.AsSpan(0x17), state.WorkerFlags); worker.Record[0x31] = state.Cargo;
-                if (state.Accepted) { SetWorkerAppearance(worker, false); worker.PreferredMill = 0; worker.Route.Clear(); }
+                if (state.Accepted) { SetWorkerAppearance(worker, false); worker.PreferredMill = 0; worker.Route.Clear(); worker.HarvestPrepared = false; }
             }
             else if (worker.ReplanTimer <= 0) { PlanAttack(worker, mill); worker.ReplanTimer = .7; }
             MoveTick(worker); return;
         }
         var tree = worker.GatherTree!.Value;
-        if (TimberAt(tree) < 10)
+        if (!Harvestable(tree))
         {
-            worker.GatherTree = null; worker.Route.Clear(); worker.JobText = "Участок исчерпан · укажите другой лес";
-            Log("Участок леса исчерпан. Выберите рабочему другой участок."); return;
+            if (!FindNextGrove(worker)) return;
+            tree = worker.GatherTree!.Value;
         }
         var point = new Vector2(tree.X * 32 + 16, tree.Y * 32 + 16);
         worker.JobText = "Идёт к лесу";
-        if (worker.Position.DistanceTo(point) <= 48)
+        // 84F0..8535: exact Chebyshev stand-off for the selected footprint, not a circular radius.
+        float distance = Math.Max(Math.Abs(worker.Position.X - point.X), Math.Abs(worker.Position.Y - point.Y));
+        int standOff = ((worker.Parameters[3] << 4) + 16) & 255;
+        if (distance == standOff)
         {
-            worker.Route.Clear(); worker.JobText = "Рубит дерево"; worker.HarvestTimer += dt;
-            if (worker.HarvestTimer >= Rules.Economy.ChopSeconds)
+            worker.Route.Clear();
+            byte heading = OriginalMotionPreparation.DirectionToward((uint)worker.Position.X, (uint)worker.Position.Y, (uint)point.X, (uint)point.Y);
+            if (!OriginalMotionPreparation.TurnToward(worker.Record, heading, worker.Parameters)) { worker.JobText = "Поворачивается к дереву"; return; }
+            if (!worker.HarvestPrepared)
             {
-                Timber[tree] = TimberAt(tree) - 10; worker.HarvestTimer = 0; worker.Record[0x31] = 3;
-                SetWorkerAppearance(worker, true);
+                worker.Record[0x32] = (byte)tree.X; worker.Record[0x33] = (byte)tree.Y;
+                OriginalForestryRules.InitializeWork(worker.Record, worker.Parameters);
+                worker.Record[0x2f] = 0; worker.HarvestPrepared = true;
+            }
+            worker.JobText = $"Рубит дерево · {worker.Record[0x34] & 31}";
+            if ((worker.Record[0x34] & 31) != 0)
+            {
+                if (OriginalForestryRules.AdvanceWork(worker.Record, worker.Parameters) == HarvestWork.SwingQueued)
+                {
+                    // 945E resets the gate at animation impact. Full animation dispatch is still provisional.
+                    worker.Record[0x2f] = 0;
+                    Effects.Add(new BattleEffect { From = worker.Position, To = point, Team = 0, Remaining = .12 });
+                }
+            }
+            else
+            {
+                bool clear = OriginalForestryRules.FinishLoad(worker.Record);
+                if (clear && _terrainCatalog.ClearTimber(Map.Cells, Occupancy.Width, Occupancy.Height, tree.X, tree.Y) > 0)
+                { TerrainRevision++; if (!Harvestable(tree)) ClearedGroves.Add(tree); }
+                worker.Record[0x31] = 3; SetWorkerAppearance(worker, true);
+                OriginalForestryRules.ApplyLoadModifier(worker.Record); worker.HarvestPrepared = false;
             }
         }
         else if (worker.ReplanTimer <= 0)
