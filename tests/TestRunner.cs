@@ -18,8 +18,9 @@ public partial class TestRunner : Node
             switch (mode)
             {
                 case "scene": await SceneChecks(); break;
-                case "simulation": SimulationChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); break;
-                case "original-buildings": OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); break;
+                case "simulation": SimulationChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); break;
+                case "original-buildings": OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); break;
+                case "imported-occupancy": ImportedOccupancyChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
                 default: throw new ArgumentException($"Unknown test mode: {mode}");
             }
@@ -130,6 +131,23 @@ public partial class TestRunner : Node
         place = OriginalConstructionRules.ProbePlacement((byte)sourceMap.Width, (byte)sourceMap.Height,
             sourceMap.Cells, properties, occupancy, castle.Construction.FootprintWidth, castle.Construction.FootprintHeight, mask, 608, 720);
         Check(place == new ConstructionPlacement(ConstructionPlacementStatus.Occupied, 0x10), "Controlled occupancy blocks the imported footprint");
+        Check(scene.OriginalOccupancy is { MatchesReference: true }, "Main loads the source-backed initial occupancy snapshot");
+        var live = new OriginalOccupancyMap((byte)sourceMap.Width, (byte)sourceMap.Height);
+        live.LoadCells(scene.OriginalOccupancy!.Grid.Cells);
+        place = OriginalConstructionRules.ProbePlacement(live.Width, live.Height, sourceMap.Cells, properties, live.Cells,
+            castle.Construction.FootprintWidth, castle.Construction.FootprintHeight, mask, 608, 720);
+        Check(place == new ConstructionPlacement(ConstructionPlacementStatus.Occupied, 1) && scene.OriginalOccupancy.References[1].TemplateName == "Замок",
+            "Imported castle occupies its true footprint with nonzero runtime reference 1");
+        live.WriteFootprint(4, 3, 1, 608, 720, 0);
+        place = OriginalConstructionRules.ProbePlacement(live.Width, live.Height, sourceMap.Cells, properties, live.Cells, 4, 3, mask, 608, 720);
+        Check(place.Status == ConstructionPlacementStatus.Clear, "Clearing the original footprint changes placement immediately");
+        var fresh = OriginalBuildingLifecycle.CreateFreshCastleRecord(2, 0, 2, 608, 720, 1, castle.InitialFrame, castle.InitialCondition);
+        OriginalBuildingLifecycle.MarkConstruction(fresh);
+        uint appendedReference = 1 + (uint)GameData.Read<ScenarioData>("res://assets/imported/scenario.json").Slots[0].ObjectBytes;
+        live.WriteFootprint(4, 3, fresh[0x0d], 608, 720, appendedReference);
+        place = OriginalConstructionRules.ProbePlacement(live.Width, live.Height, sourceMap.Cells, properties, live.Cells, 4, 3, mask, 608, 720);
+        Check(place == new ConstructionPlacement(ConstructionPlacementStatus.Occupied, appendedReference),
+            "A newly created castle record registers in the same mutable occupancy map");
         var before = scene.Model.Units.Select(u => (u.Id, u.Cell, u.Hp, u.Moves)).ToArray();
         scene.ToggleOriginalView();
         Check(scene.OriginalView && scene.EndButton.Disabled, "Original view disables battle");

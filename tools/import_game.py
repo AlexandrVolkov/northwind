@@ -185,7 +185,7 @@ def decode_objects(data: bytes) -> list[dict]:
         records.append({'record_index': len(records), 'file_offset': offset,
                         'record_bytes': size, 'raw_code': raw[0], 'raw_byte_3': raw[3],
                         'raw_x': u32(raw, 4), 'raw_y': u32(raw, 8),
-                        'raw_record_hex': raw.hex()})
+                        'raw_layer': raw[13], 'raw_record_hex': raw.hex()})
         offset += size
     return records
 
@@ -483,12 +483,14 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
     (destination / 'templates.json').write_text(json.dumps({'format_version': 4, 'armies': tables}, ensure_ascii=False, indent=2), encoding='utf-8')
     scenario_path = destination / 'scenario.json'
     if scenario is not None:
+        from occupancy_profile import attach_initial_occupancy
+        attach_initial_occupancy(scenario, scenario_name, read)
         scenario_path.write_text(json.dumps(scenario, ensure_ascii=False, indent=2), encoding='utf-8')
     elif scenario_path.exists():
         scenario_path.unlink()  # Never leave a previous map's scenario in the output.
     from reference_frames import render_observations
     render_observations(source, destination, map_number, decode_spr_frame)
-    manifest = {'importer_version': 9, 'files': used, 'decoded_sprite_records': len(frames),
+    manifest = {'importer_version': 10, 'files': used, 'decoded_sprite_records': len(frames),
                 'notes': 'Graphics decoded; gameplay and terrain blocking are experimental.'}
     (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
     return manifest

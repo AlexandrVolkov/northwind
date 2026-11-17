@@ -52,6 +52,15 @@ public sealed class ScenarioData
     public string MapFile { get; set; } = "";
     public int SlotCount { get; set; }
     public ScenarioSlot[] Slots { get; set; } = [];
+    public InitialOccupancyData InitialOccupancy { get; set; } = new();
+}
+public sealed class InitialOccupancyData
+{
+    public string Status { get; set; } = "unavailable";
+    public string Reason { get; set; } = "";
+    public string ExpectedSha256 { get; set; } = "";
+    public int ObjectCount { get; set; }
+    public uint ClaimConflicts { get; set; }
 }
 public sealed class ScenarioSlot
 {
@@ -86,6 +95,9 @@ public sealed class ObjectRecord
     public uint RawX { get; set; }
     public uint RawY { get; set; }
     public string RawRecordHex { get; set; } = "";
+    public byte RawLayer { get; set; }
+    public uint RuntimeReference { get; set; }
+    public string OccupancyMode { get; set; } = "unverified";
 }
 
 public sealed class TemplatesData

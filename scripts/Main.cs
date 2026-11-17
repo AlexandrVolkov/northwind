@@ -19,6 +19,7 @@ public partial class Main : Node2D
     private bool _grid, _dragging;
     public bool OriginalView { get; private set; }
     public List<(string File, ObjectRecord Record)> OriginalObjects { get; } = [];
+    public OriginalOccupancySnapshot? OriginalOccupancy { get; private set; }
     private int _objectFocus;
     public TemplateGallery? Gallery { get; private set; }
     public ObservationView? Observation { get; private set; }
@@ -51,8 +52,14 @@ public partial class Main : Node2D
             _minimap.Texture = GD.Load<Texture2D>("res://assets/imported/minimap.png");
             if (_terrain == null || _warrior == null || _minimap.Texture == null) throw new InvalidDataException("Missing textures");
             if (Godot.FileAccess.FileExists("res://assets/imported/scenario.json"))
-                foreach (var slot in GameData.Read<ScenarioData>("res://assets/imported/scenario.json").Slots)
+            {
+                var scenario = GameData.Read<ScenarioData>("res://assets/imported/scenario.json");
+                foreach (var slot in scenario.Slots)
                     foreach (var record in slot.Objects) OriginalObjects.Add((slot.ObjectFile, record));
+                if (scenario.InitialOccupancy.Status == "ready")
+                    OriginalOccupancy = OriginalOccupancySnapshot.Build(_map, scenario,
+                        GameData.Read<TemplatesData>("res://assets/imported/templates.json"));
+            }
             ReadyToPlay = true; Restart();
         }
         catch (Exception error)

@@ -1,0 +1,65 @@
+{
+  "format_version": 1,
+  "width": 8,
+  "height": 8,
+  "footprints": [
+    [
+      1,
+      1
+    ],
+    [
+      4,
+      3
+    ],
+    [
+      4,
+      2
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      8,
+      8
+    ]
+  ],
+  "layers": [
+    0,
+    1,
+    2,
+    128,
+    129,
+    130
+  ],
+  "values": [
+    0,
+    1,
+    65537,
+    4294967295
+  ],
+  "patterns": [
+    [
+      0
+    ],
+    [
+      0,
+      1,
+      2,
+      65537,
+      4294967295
+    ]
+  ],
+  "case_count": {
+    "overwrite": 7968,
+    "conditional": 31872
+  },
+  "sha256": {
+    "overwrite": "6371149fe8ebb1ba9d59fa8687355a1ea4264a0ce9603984330256829ea4b597",
+    "conditional": "567955e410051e8276bcd842fe4594290bd700e7d9bbe12e5304b77b3634d163"
+  },
+  "conditional_mode": "CL=0; no victim damage",
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8"
+  }
+}
