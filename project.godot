@@ -2,8 +2,8 @@
 config_version=5
 
 [application]
-config/name="Орда — Северный ветер: лаборатория"
-run/main_scene="res://scenes/main.tscn"
+config/name="Орда — Северный ветер: ранняя версия"
+run/main_scene="res://scenes/skirmish.tscn"
 config/features=PackedStringArray("4.7", "C#", "GL Compatibility")
 
 [display]

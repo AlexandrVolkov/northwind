@@ -122,6 +122,8 @@ public partial class Main : Node2D
     public override void _UnhandledInput(InputEvent e)
     {
         if (!ReadyToPlay) return;
+        if (e is InputEventKey { Pressed: true, Echo: false, PhysicalKeycode: Key.F10 })
+        { GetTree().ChangeSceneToFile("res://scenes/skirmish.tscn"); return; }
         if (e is InputEventKey { Pressed: true, Echo: false, PhysicalKeycode: Key.B }) { OpenObservation(); return; }
         if (e is InputEventKey { Pressed: true, Echo: false, PhysicalKeycode: Key.P }) { OpenGallery(); return; }
         if (e is InputEventKey { Pressed: true, Echo: false, PhysicalKeycode: Key.O }) { ToggleOriginalView(); return; }
@@ -264,6 +266,8 @@ public partial class Main : Node2D
         _cell = LabelFor(column, "", 12, "91a59b");
         EndButton = new Button { Text = "ЗАВЕРШИТЬ ХОД    [ПРОБЕЛ]", CustomMinimumSize = new Vector2(0, 42), FocusMode = Control.FocusModeEnum.None };
         EndButton.Pressed += FinishTurn; column.AddChild(EndButton);
+        var skirmish = new Button { Text = "ИГРАТЬ В СХВАТКУ    [F10]", FocusMode = Control.FocusModeEnum.None };
+        skirmish.Pressed += () => GetTree().ChangeSceneToFile("res://scenes/skirmish.tscn"); column.AddChild(skirmish);
         var scenario = new Button { Text = "ДАННЫЕ СЦЕНАРИЯ    [I]", FocusMode = Control.FocusModeEnum.None }; scenario.Pressed += OpenScenario; column.AddChild(scenario);
         LabelFor(column, "ЛКМ — выбрать / атаковать\nПКМ — идти / атаковать\nWASD, стрелки, СКМ — камера\nКолесо — масштаб · F — к отряду\nG — сетка · R — начать заново", 12, "aebfb1");
         var gallery = new Button { Text = "ШАБЛОНЫ / КАДРЫ    [P]", FocusMode = Control.FocusModeEnum.None };

@@ -1,0 +1,14 @@
+{
+  "status": "experimental_skirmish_not_original_campaign",
+  "player_slot": 0,
+  "enemy_slot": 3,
+  "ticks_per_second": 30,
+  "aggro_range": 360,
+  "units": {
+    "Предводитель": { "health": 140, "damage": 12, "range": 48, "cooldown": 0.8 },
+    "Ополченец": { "health": 65, "damage": 7, "range": 48, "cooldown": 1.0 },
+    "Лучник": { "health": 45, "damage": 9, "range": 176, "cooldown": 1.1 },
+    "Замок": { "health": 260, "damage": 0, "range": 0, "cooldown": 1.0 },
+    "Ферма": { "health": 100, "damage": 0, "range": 0, "cooldown": 1.0 }
+  }
+}
