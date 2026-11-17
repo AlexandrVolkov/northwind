@@ -39,7 +39,7 @@ public partial class Main : Node2D
         AddChild(Camera); Camera.Enabled = true; BuildUi();
         if (!Godot.FileAccess.FileExists("res://assets/imported/map.json"))
         {
-            _selection.Text = "Нужны ресурсы игры\n\nЗапустите импорт:\npython tools/import_game.py\nпуть/к/Horde.ISO\n\nЗатем перезапустите проект.\nПодробности — в README.";
+            _selection.Text = "Не найдены ресурсы проекта.\n\nВосстановите папку assets/imported\nиз репозитория или скачайте\nполный ZIP проекта заново.\n\nЗатем перезапустите проект.";
             EndButton.Disabled = true; return;
         }
         try
@@ -64,7 +64,7 @@ public partial class Main : Node2D
         }
         catch (Exception error)
         {
-            GD.PushError(error.Message); _selection.Text = "Не удалось загрузить ресурсы.\nПовторите импорт."; EndButton.Disabled = true;
+            GD.PushError(error.Message); _selection.Text = "Не удалось загрузить ресурсы.\nВосстановите папку assets/imported\nиз репозитория и перезапустите проект."; EndButton.Disabled = true;
         }
     }
     public override void _ExitTree() => Model.Dispose();
