@@ -254,6 +254,9 @@ def decode_templates(data: bytes) -> dict:
                           'runtime_record_bytes': record[0],
                           'initial_condition': record[0x45],
                           'initial_frame': int.from_bytes(record[0x48:0x4a], 'little'),
+                          'construction': {'footprint_width': record[3], 'footprint_height': record[4],
+                                           'terrain_mask': list(record[0x58:0x60]),
+                                           'upfront_costs': list(struct.unpack_from('<4I', record, 0x7c))},
                           'commands': decode_template_commands(data, offset, boundary),
                           'raw_record_hex': record.hex()})
     return {'raw_header_hex': data[:2].hex(), 'table_bytes': table_bytes,
@@ -477,7 +480,7 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
     }
     (destination / 'map.json').write_text(json.dumps(result, separators=(',', ':')), encoding='utf-8')
     write_template_previews(tables, read, palette, destination)
-    (destination / 'templates.json').write_text(json.dumps({'format_version': 3, 'armies': tables}, ensure_ascii=False, indent=2), encoding='utf-8')
+    (destination / 'templates.json').write_text(json.dumps({'format_version': 4, 'armies': tables}, ensure_ascii=False, indent=2), encoding='utf-8')
     scenario_path = destination / 'scenario.json'
     if scenario is not None:
         scenario_path.write_text(json.dumps(scenario, ensure_ascii=False, indent=2), encoding='utf-8')
@@ -485,7 +488,7 @@ def import_directory(source: Path, destination: Path, map_number: int = 1) -> di
         scenario_path.unlink()  # Never leave a previous map's scenario in the output.
     from reference_frames import render_observations
     render_observations(source, destination, map_number, decode_spr_frame)
-    manifest = {'importer_version': 8, 'files': used, 'decoded_sprite_records': len(frames),
+    manifest = {'importer_version': 9, 'files': used, 'decoded_sprite_records': len(frames),
                 'notes': 'Graphics decoded; gameplay and terrain blocking are experimental.'}
     (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
     return manifest

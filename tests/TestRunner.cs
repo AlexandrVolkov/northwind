@@ -18,8 +18,8 @@ public partial class TestRunner : Node
             switch (mode)
             {
                 case "scene": await SceneChecks(); break;
-                case "simulation": SimulationChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); break;
-                case "original-buildings": OriginalBuildingChecks(); OriginalLifecycleChecks(); break;
+                case "simulation": SimulationChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); break;
+                case "original-buildings": OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
                 default: throw new ArgumentException($"Unknown test mode: {mode}");
             }
@@ -113,6 +113,23 @@ public partial class TestRunner : Node
         try { OriginalBuildingLifecycle.QueueDirectCommand(0, castle.Commands[3]); }
         catch (ArgumentException) { rejectedMenuMode = true; }
         Check(rejectedMenuMode, "A placement/menu command cannot silently become a direct order");
+        var barracks = GameData.Read<TemplatesData>("res://assets/imported/templates.json").Armies["ARMY__02.DAT"].Templates[3].Construction;
+        Check(barracks.FootprintWidth == 4 && barracks.FootprintHeight == 2 && barracks.UpfrontCosts.SequenceEqual(new uint[] { 50, 80, 150, 2 }),
+            "Original footprint and four upfront costs import from DAT");
+        var costs = barracks.UpfrontCosts;
+        var payment = OriginalConstructionRules.TryDebitUpfront(new(50, 80, 150, 2), new(costs[0], costs[1], costs[2], costs[3]));
+        Check(payment.Accepted && payment.Balances == new ResourceQuad(), "Imported construction price debits exact balances");
+        var sourceMap = GameData.Read<MapData>("res://assets/imported/map.json");
+        var properties = Convert.FromHexString(sourceMap.SegmentPropertiesHex);
+        var occupancy = new uint[sourceMap.Width * sourceMap.Height * 3]; // Controlled empty fixture, not reconstructed live occupancy.
+        var mask = castle.Construction.TerrainMask.ToArray();
+        var place = OriginalConstructionRules.ProbePlacement((byte)sourceMap.Width, (byte)sourceMap.Height,
+            sourceMap.Cells, properties, occupancy, castle.Construction.FootprintWidth, castle.Construction.FootprintHeight, mask, 608, 720);
+        Check(place.Status == ConstructionPlacementStatus.Clear, "SEG properties permit the known castle footprint on a controlled empty map");
+        occupancy[21 * sourceMap.Width + 17] = 0x10;
+        place = OriginalConstructionRules.ProbePlacement((byte)sourceMap.Width, (byte)sourceMap.Height,
+            sourceMap.Cells, properties, occupancy, castle.Construction.FootprintWidth, castle.Construction.FootprintHeight, mask, 608, 720);
+        Check(place == new ConstructionPlacement(ConstructionPlacementStatus.Occupied, 0x10), "Controlled occupancy blocks the imported footprint");
         var before = scene.Model.Units.Select(u => (u.Id, u.Cell, u.Hp, u.Moves)).ToArray();
         scene.ToggleOriginalView();
         Check(scene.OriginalView && scene.EndButton.Disabled, "Original view disables battle");

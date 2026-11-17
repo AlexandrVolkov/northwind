@@ -10,6 +10,7 @@ public sealed class MapData
     public int Height { get; set; }
     public uint[] Cells { get; set; } = [];
     public string[] Terrain { get; set; } = [];
+    public string SegmentPropertiesHex { get; set; } = "";
 }
 public sealed class UnitRules
 {
@@ -104,6 +105,14 @@ public sealed class TemplateEntry
     public int RuntimeRecordBytes { get; set; }
     public byte InitialCondition { get; set; }
     public ushort InitialFrame { get; set; }
+    public ConstructionParametersData Construction { get; set; } = new();
+}
+public sealed class ConstructionParametersData
+{
+    public byte FootprintWidth { get; set; }
+    public byte FootprintHeight { get; set; }
+    public List<byte> TerrainMask { get; set; } = [];
+    public uint[] UpfrontCosts { get; set; } = [];
 }
 public sealed class TemplateCommand
 {
