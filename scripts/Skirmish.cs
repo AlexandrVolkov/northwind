@@ -36,7 +36,7 @@ public sealed class SkirmishActor
     public Vector2 Position => new(BinaryPrimitives.ReadUInt32LittleEndian(Record.AsSpan(4)), BinaryPrimitives.ReadUInt32LittleEndian(Record.AsSpan(8)));
     public Vector2I Cell => new((int)Position.X >> 5, (int)Position.Y >> 5);
     public ushort Frame => BinaryPrimitives.ReadUInt16LittleEndian(Record.AsSpan(1));
-    public Queue<Vector2I> Route { get; } = new();
+    public SkirmishRoute Route { get; } = new();
     public Vector2I? Goal { get; set; }
     public uint Target { get; set; }
     public bool Stepping { get; set; }
@@ -73,6 +73,7 @@ public sealed partial class Skirmish : IDisposable
     public bool Paused { get; set; }
     public double Elapsed { get; private set; }
     private readonly AStarGrid2D _paths = new();
+    private readonly OriginalRoutePool _routes = new();
     private readonly byte[] _properties;
     private readonly Dictionary<uint, MovementObject> _sourceMovementObjects = [];
     private readonly Func<uint, MovementObject> _resolveMovement;
@@ -101,6 +102,7 @@ public sealed partial class Skirmish : IDisposable
         }
         _paths.Region = new Rect2I(0, 0, map.Width, map.Height);
         _paths.DiagonalMode = AStarGrid2D.DiagonalModeEnum.Never; _paths.Update();
+        foreach (var actor in Actors.Where(a => !a.Structure)) actor.Route.Attach(_routes, actor.Record);
         InitializeEconomy(scenario, templates);
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
     }
@@ -174,8 +176,7 @@ public sealed partial class Skirmish : IDisposable
         if (!CanStand(actor, goal) || goal == actor.Cell) return goal == actor.Cell;
         PreparePaths(actor);
         var route = _paths.GetIdPath(actor.Cell, goal);
-        foreach (var cell in route.Skip(1)) actor.Route.Enqueue(cell);
-        return route.Count > 1;
+        return actor.Route.Set(route);
     }
     public int Move(IEnumerable<uint> ids, Vector2I destination)
     {
@@ -286,8 +287,7 @@ public sealed partial class Skirmish : IDisposable
         {
             var path = _paths.GetIdPath(actor.Cell, cell);
             if (path.Count < 2) continue;
-            foreach (var c in path.Skip(1)) actor.Route.Enqueue(c);
-            break;
+            if (actor.Route.Set(path)) break;
         }
     }
     private void MoveTick(SkirmishActor actor)

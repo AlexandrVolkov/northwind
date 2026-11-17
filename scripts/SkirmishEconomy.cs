@@ -88,6 +88,7 @@ public sealed partial class Skirmish
         worker.Source.RawX = (uint)(spawn.Value.X * 32 + 16); worker.Source.RawY = (uint)(spawn.Value.Y * 32 + 16);
         if (!SpendWood(Rules.Economy.WorkerPrice)) return null;
         OriginalWorkerDelivery.InitializeEmpty(worker.Record, worker.Parameters, _terrainCatalog.NextRandomByte());
+        worker.Route.Attach(_routes, worker.Record);
         Actors.Add(worker); Occupancy.WriteFootprint(worker.Parameters[3], worker.Parameters[4], worker.Record[0x0d], (uint)worker.Position.X, (uint)worker.Position.Y, worker.Id);
         Log("Рабочий нанят. Выберите его и нажмите ПКМ по лесу."); return worker;
     }
