@@ -120,7 +120,7 @@ public sealed partial class Skirmish
         foreach (var worker in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && a.Worker))
         {
             worker.GatherTree = tree; worker.PreferredMill = 0; worker.Goal = null; worker.Target = 0;
-            worker.Route.Clear(); worker.HarvestPrepared = false; worker.ReplanTimer = 0; count++;
+            worker.Route.Clear(); worker.HarvestPrepared = false; worker.Record[0x2d] &= 15; worker.ReplanTimer = 0; count++;
         }
         if (count > 0) Log($"Рубка леса: {count} раб. Груз будет доставляться в готовую лесопилку.");
         return count;
@@ -170,6 +170,15 @@ public sealed partial class Skirmish
     }
     private void TickWorker(SkirmishActor worker, double dt)
     {
+        // WRK 883 calls the animation core before the work dispatcher; 856C waits while state 3 is active.
+        if (OriginalWorkerAnimation.Pending(worker.Record))
+        {
+            var impact = OriginalWorkerAnimation.Step(worker.Record, worker.Parameters);
+            if (impact is { } hit)
+                Effects.Add(new BattleEffect { From = new Vector2(hit.X, hit.Y), To = new Vector2(hit.TargetX, hit.TargetY), Team = 0, Remaining = .12 });
+            if (OriginalWorkerAnimation.Pending(worker.Record))
+            { worker.JobText = "Рубит дерево"; return; }
+        }
         if (worker.Stepping) { MoveTick(worker); return; }
         if (worker.GatherTree == null && worker.PreferredMill == 0)
         {
@@ -216,17 +225,13 @@ public sealed partial class Skirmish
             {
                 worker.Record[0x32] = (byte)tree.X; worker.Record[0x33] = (byte)tree.Y;
                 OriginalForestryRules.InitializeWork(worker.Record, worker.Parameters);
-                worker.Record[0x2f] = 0; worker.HarvestPrepared = true;
+                worker.HarvestPrepared = true; worker.JobText = "Готовится рубить";
+                return; // 8542 increments the work phase and returns before the first gate update.
             }
             worker.JobText = $"Рубит дерево · {worker.Record[0x34] & 31}";
             if ((worker.Record[0x34] & 31) != 0)
             {
-                if (OriginalForestryRules.AdvanceWork(worker.Record, worker.Parameters) == HarvestWork.SwingQueued)
-                {
-                    // 945E resets the gate at animation impact. Full animation dispatch is still provisional.
-                    worker.Record[0x2f] = 0;
-                    Effects.Add(new BattleEffect { From = worker.Position, To = point, Team = 0, Remaining = .12 });
-                }
+                OriginalForestryRules.AdvanceWork(worker.Record, worker.Parameters);
             }
             else
             {

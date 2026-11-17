@@ -5,6 +5,20 @@ from PIL import Image
 
 
 class SkirmishFramesTests(unittest.TestCase):
+    def test_all_worker_strike_frames_are_bundled(self):
+        root=Path(__file__).resolve().parents[1]/'assets/imported'
+        data=json.loads((root/'battle_frames.json').read_text(encoding='utf-8'))
+        entry=json.loads((root/'templates.json').read_text(encoding='utf-8'))['armies']['ARMY__02.DAT']['templates'][10]
+        raw=bytes.fromhex(entry['raw_record_hex']);base=int.from_bytes(raw[0x48:0x4a], 'little')
+        frames={f['frame']:f for f in data['frames'] if f['template_file']=='ARMY__02.DAT' and f['template_index']==10}
+        with Image.open(root/'battle_frames.png') as atlas:
+            for heading in range(8):
+                for progress in range(raw[0x4b]):
+                    frame=frames[base+8*raw[0x4a]+heading*raw[0x4b]+progress]
+                    self.assertEqual((frame['width'],frame['height']),(entry['width'],entry['height']))
+                    crop=atlas.crop((frame['x'],frame['y'],frame['x']+frame['width'],frame['y']+frame['height']))
+                    self.assertIsNotNone(crop.getbbox())
+
     def test_unit_and_castle_colors_match_previously_verified_observations(self):
         root=Path(__file__).resolve().parents[1]/'assets/imported'
         data=json.loads((root/'battle_frames.json').read_text(encoding='utf-8'))
