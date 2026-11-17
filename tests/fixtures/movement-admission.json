@@ -1,0 +1,174 @@
+{
+  "format_version": 1,
+  "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "results": {
+    "terrain": {
+      "case_count": 65536,
+      "sha256": "39916332c3b134abdd0262c7dd198f9dd2fb24e48fe8760f25ff0f1d82023518"
+    },
+    "support": {
+      "case_count": 9072,
+      "sha256": "6a4d54af9bcdd76734873f927afc9b1757e2a46415beb74a48368ff2a2e255e3"
+    },
+    "occupants": {
+      "case_count": 93312,
+      "sha256": "99c3ecf3239e97ba2aed05d4c87beabbade2265a66a92e8cfb5271115f3a4a90"
+    },
+    "footprints": {
+      "case_count": 74400,
+      "sha256": "a8b511280d026b8fb3289513f9281353838e49be7068075fe0da668d86a1f8a2"
+    }
+  },
+  "support": {
+    "terrain": [
+      0,
+      2,
+      8,
+      15,
+      128,
+      255
+    ],
+    "values": [
+      0,
+      1,
+      8,
+      127,
+      128,
+      129,
+      255
+    ],
+    "layers": [
+      0,
+      1,
+      2
+    ],
+    "flags": [
+      0,
+      2
+    ],
+    "conditions": [
+      0,
+      15,
+      16,
+      127,
+      128,
+      255
+    ],
+    "fields": [
+      8,
+      9,
+      10
+    ],
+    "thresholds": [
+      15,
+      128
+    ]
+  },
+  "occupants": {
+    "owners": [
+      0,
+      1,
+      31
+    ],
+    "masks": [
+      0,
+      1,
+      2147483648,
+      4294967295
+    ],
+    "mover_fields": [
+      0,
+      9,
+      255
+    ],
+    "other_fields": [
+      0,
+      1,
+      9,
+      10,
+      20,
+      255
+    ],
+    "flags": [
+      0,
+      8
+    ],
+    "work": [
+      0,
+      64
+    ],
+    "states": [
+      0,
+      32,
+      34,
+      47
+    ],
+    "phases": [
+      0,
+      2,
+      4
+    ],
+    "headings": [
+      0,
+      4,
+      63
+    ],
+    "directions": [
+      0,
+      2,
+      4
+    ]
+  },
+  "footprints": {
+    "sizes": [
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "patterns": [
+      [
+        0
+      ],
+      [
+        0,
+        100
+      ],
+      [
+        100,
+        200
+      ],
+      [
+        200,
+        100
+      ],
+      [
+        0,
+        300
+      ]
+    ],
+    "terrain": [
+      [
+        0
+      ],
+      [
+        0,
+        2,
+        3
+      ]
+    ],
+    "layers": [
+      0,
+      1,
+      2
+    ]
+  }
+}

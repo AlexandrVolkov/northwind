@@ -55,8 +55,8 @@ public sealed partial class Skirmish
         raw[0x14] = 0x80; raw[0x19] = raw[0x1a] = template.InitialCondition;
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(1), template.InitialFrame);
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(0x17), 0);
-        BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(4), OriginalWorkerDelivery.BuildingAnchor((byte)cell.X, parameters[3]));
-        BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(8), OriginalWorkerDelivery.BuildingAnchor((byte)cell.Y, parameters[4]));
+        BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(4), worker ? (uint)(cell.X * 32 + 16) : OriginalWorkerDelivery.BuildingAnchor((byte)cell.X, parameters[3]));
+        BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(8), worker ? (uint)(cell.Y * 32 + 16) : OriginalWorkerDelivery.BuildingAnchor((byte)cell.Y, parameters[4]));
         BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(0x10), (uint)raw.Length);
         if (worker) { raw[0x25] = 0; raw[0x26] = 0; raw[0x2c] = 0; raw[0x31] = 0; }
         return new SkirmishActor { Source = new ObjectRecord { RuntimeReference = _nextEconomyId++, TemplateName = template.Name,
@@ -88,7 +88,7 @@ public sealed partial class Skirmish
         worker.Source.RawX = (uint)(spawn.Value.X * 32 + 16); worker.Source.RawY = (uint)(spawn.Value.Y * 32 + 16);
         if (!SpendWood(Rules.Economy.WorkerPrice)) return null;
         OriginalWorkerDelivery.InitializeEmpty(worker.Record, worker.Parameters, _terrainCatalog.NextRandomByte());
-        Actors.Add(worker); Occupancy.WriteFootprint(1, 1, 1, (uint)worker.Position.X, (uint)worker.Position.Y, worker.Id);
+        Actors.Add(worker); Occupancy.WriteFootprint(worker.Parameters[3], worker.Parameters[4], worker.Record[0x0d], (uint)worker.Position.X, (uint)worker.Position.Y, worker.Id);
         Log("Рабочий нанят. Выберите его и нажмите ПКМ по лесу."); return worker;
     }
     public DeliveryPoint MillEntry(Vector2I cell)
@@ -108,7 +108,7 @@ public sealed partial class Skirmish
             parameters.FootprintWidth, parameters.FootprintHeight, parameters.TerrainMask.ToArray(), (uint)(cell.X * 32 + 16), (uint)(cell.Y * 32 + 16));
         if (result.Status != ConstructionPlacementStatus.Clear) return result;
         var area = new Rect2I(cell - new Vector2I(parameters.FootprintWidth / 2, parameters.FootprintHeight / 2), new(parameters.FootprintWidth, parameters.FootprintHeight));
-        if (_reservations.Any(r => area.HasPoint(r.Key))) return new(ConstructionPlacementStatus.Occupied);
+        if (_reservations.Any(r => area.HasPoint(r.Key.Cell))) return new(ConstructionPlacementStatus.Occupied);
         return result;
     }
     public SkirmishActor? BuildMill(Vector2I cell)

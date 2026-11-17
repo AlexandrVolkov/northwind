@@ -74,17 +74,23 @@ public sealed partial class Skirmish : IDisposable
     public double Elapsed { get; private set; }
     private readonly AStarGrid2D _paths = new();
     private readonly byte[] _properties;
-    private readonly Dictionary<Vector2I, uint> _reservations = [];
+    private readonly Dictionary<uint, MovementObject> _sourceMovementObjects = [];
+    private readonly Func<uint, MovementObject> _resolveMovement;
+    private readonly Dictionary<(Vector2I Cell, int Layer), uint> _reservations = [];
     private double _accumulator;
     public SkirmishActor Hero => Actors.Single(a => a.Team == 0 && a.Hero);
     public SkirmishActor Objective => Actors.Single(a => a.Team == 1 && a.Source.TemplateName == "Замок");
 
     public Skirmish(MapData map, ScenarioData scenario, TemplatesData templates, SkirmishRules rules)
     {
+        _resolveMovement = ResolveMovementObject;
         Map = map; Rules = rules; _properties = Convert.FromHexString(map.SegmentPropertiesHex);
         var snapshot = OriginalOccupancySnapshot.Build(map, scenario, templates);
         if (!snapshot.MatchesReference) throw new InvalidDataException("Scenario occupancy does not match its source profile");
         Occupancy = snapshot.Grid;
+        foreach (var (reference, obj) in snapshot.References)
+            _sourceMovementObjects[reference] = new(Convert.FromHexString(obj.RawRecordHex),
+                Convert.FromHexString(templates.Armies[obj.TemplateFile].Templates[obj.TemplateIndex].RawRecordHex));
         foreach (var slot in scenario.Slots.Where(s => s.SlotIndex == rules.PlayerSlot || s.SlotIndex == rules.EnemySlot))
         foreach (var obj in slot.Objects)
         {
@@ -121,18 +127,40 @@ public sealed partial class Skirmish : IDisposable
         var box = Bounds(target);
         return position.DistanceTo(new Vector2(Mathf.Clamp(position.X, box.Position.X, box.End.X), Mathf.Clamp(position.Y, box.Position.Y, box.End.Y)));
     }
+    private MovementObject ResolveMovementObject(uint reference)
+    {
+        // Runtime records override the initial snapshot, including worker template changes.
+        var actor = Actors.FirstOrDefault(a => a.Id == reference);
+        if (actor != null) return new(actor.Record, actor.Parameters);
+        if (_sourceMovementObjects.TryGetValue(reference, out var obj)) return obj;
+        throw new InvalidDataException($"Unknown movement reference {reference:X}");
+    }
     public bool CanStand(SkirmishActor actor, Vector2I cell)
     {
         if (!Inside(cell)) return false;
-        uint tile = Map.Cells[cell.Y * Map.Width + cell.X] & 65535;
-        if (Map.Terrain[tile] is "water" or "rock" || actor.Parameters[0x58 + (_properties[tile * 8] & 7)] == 0) return false;
-        int index = cell.Y * Map.Width + cell.X, area = Map.Width * Map.Height;
-        for (int plane = 0; plane < 3; plane++)
-        {
-            uint reference = Occupancy.Cells[index + plane * area];
-            if (reference != 0 && reference != actor.Id) return false;
-        }
-        return !_reservations.TryGetValue(cell, out uint id) || id == actor.Id;
+        byte fw = actor.Parameters[3], fh = actor.Parameters[4];
+        byte left = unchecked((byte)(cell.X - fw / 2)), top = unchecked((byte)(cell.Y - fh / 2));
+        var result = OriginalMovementAdmission.ProbeArea(Occupancy.Width, Occupancy.Height, Map.Cells, _properties,
+            Occupancy.Cells, actor.Parameters, actor.Record[0x0d], left, top, 0, 0, _resolveMovement, actor.Id);
+        // The prototype still avoids every occupied active-layer cell, including native soft statuses.
+        if (!result.Clear) return false;
+        for (int y = top; y < top + fh; y++) for (int x = left; x < left + fw; x++)
+            if (_reservations.TryGetValue((new(x, y), actor.Record[0x0d] & 3), out uint id) && id != actor.Id) return false;
+        return true;
+    }
+    private static IEnumerable<Vector2I> FootprintCells(SkirmishActor actor, Vector2I center)
+    {
+        int fw = actor.Parameters[3], fh = actor.Parameters[4];
+        for (int y = center.Y - fh / 2; y < center.Y - fh / 2 + fh; y++)
+        for (int x = center.X - fw / 2; x < center.X - fw / 2 + fw; x++) yield return new(x, y);
+    }
+    private void ReserveStep(SkirmishActor actor, Vector2I next)
+    {
+        foreach (var cell in FootprintCells(actor, next)) _reservations[(cell, actor.Record[0x0d] & 3)] = actor.Id;
+    }
+    private void ReleaseStep(uint reference)
+    {
+        foreach (var key in _reservations.Where(p => p.Value == reference).Select(p => p.Key).ToArray()) _reservations.Remove(key);
     }
     private void PreparePaths(SkirmishActor actor)
     {
@@ -152,7 +180,7 @@ public sealed partial class Skirmish : IDisposable
     public int Move(IEnumerable<uint> ids, Vector2I destination)
     {
         if (Paused || Outcome != "" || !Inside(destination)) return 0;
-        int accepted = 0; var used = new HashSet<Vector2I>();
+        int accepted = 0; var used = new HashSet<(Vector2I Cell, int Layer)>();
         foreach (var actor in ids.Distinct().Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && !a.Structure))
         {
             bool assigned = false;
@@ -161,13 +189,14 @@ public sealed partial class Skirmish : IDisposable
             for (int x = -radius; x <= radius && !assigned; x++)
             {
                 var goal = destination + new Vector2I(x, y);
-                if (used.Contains(goal) || !CanStand(actor, goal)) continue;
+                if (FootprintCells(actor, goal).Any(c => used.Contains((c, actor.Record[0x0d] & 3))) || !CanStand(actor, goal)) continue;
                 if (!actor.Stepping && !Plan(actor, goal)) continue;
                 actor.Target = 0; actor.Goal = goal; actor.ReplanTimer = 0;
                 actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false;
                 if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); }
                 if (actor.Stepping) actor.Route.Clear();
-                used.Add(goal); assigned = true; accepted++;
+                foreach (var cell in FootprintCells(actor, goal)) used.Add((cell, actor.Record[0x0d] & 3));
+                assigned = true; accepted++;
             }
         }
         Log(accepted > 0 ? $"Приказ движения: {accepted} отр. · цель отмечена на карте." : "До указанного места нет прохода.");
@@ -274,7 +303,7 @@ public sealed partial class Skirmish : IDisposable
             actor.Record[0x25] = (byte)((actor.Record[0x25] & 7) | (heading << 3));
             actor.Record[0x24] = 3; actor.Record[0x2c] = 32;
             actor.StepGoal = next; actor.Route.Dequeue(); actor.Stepping = actor.Turning = true; actor.StalledTicks = 0;
-            _reservations[next] = actor.Id; if (actor.Worker) actor.Record[0x2d] = 0x22;
+            ReserveStep(actor, next); if (actor.Worker) actor.Record[0x2d] = 0x22;
         }
         OriginalMotionStep result;
         if (actor.Turning)
@@ -291,7 +320,7 @@ public sealed partial class Skirmish : IDisposable
         }
         if (actor.Record[0x2c] == 0 || actor.StalledTicks > 120)
         {
-            _reservations.Remove(actor.StepGoal); actor.Stepping = false;
+            ReleaseStep(actor.Id); actor.Stepping = false;
             if (actor.Worker && actor.Route.Count == 0) actor.Record[0x2d] = 0;
         }
     }
@@ -304,7 +333,7 @@ public sealed partial class Skirmish : IDisposable
         var cells = Occupancy.Cells.ToArray();
         for (int i = 0; i < cells.Length; i++) if (cells[i] == target.Id) cells[i] = 0;
         Occupancy.LoadCells(cells);
-        _reservations.Remove(target.StepGoal); target.Route.Clear(); target.Stepping = false;
+        ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         Log($"{target.Source.TemplateName} {(target.Team == 0 ? "потерян" : "уничтожен")}.");
     }
     public void Dispose() => _paths.Dispose();
