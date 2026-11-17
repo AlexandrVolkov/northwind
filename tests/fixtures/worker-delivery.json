@@ -1,0 +1,187 @@
+{
+  "format_version": 1,
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475",
+    "ARMY__02.WRK": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b"
+  },
+  "results": {
+    "search": {
+      "case_count": 46080,
+      "sha256": "10989797763ec70f59bd6f4fbc657e4ee06a1d7ab764837a6d0c5b2ab1675af5"
+    },
+    "approach": {
+      "case_count": 72,
+      "sha256": "ba6a73ba05c30f39233ee44e108da2ca1ec1c24e4c52ffea6ccac4b0a6c604e3"
+    },
+    "anchor": {
+      "case_count": 256,
+      "sha256": "39c751891a82e3d64a80a34bb6055d431221f7239ca4a4d309c29cf3e2e5b53d"
+    },
+    "request": {
+      "case_count": 75,
+      "sha256": "a09f7347cf5928064f91bb199e0e01c36e04a03e9ddea6219258fb2a37a13201"
+    },
+    "wait": {
+      "case_count": 1280,
+      "sha256": "d098066a6845c68926caa3572ebb1da99d815f7ab0a6370132896e7e90a30172"
+    },
+    "grant": {
+      "case_count": 16384,
+      "sha256": "9c66bd11dddbfcb0abcff4301b267270cee70601b238b0730992b8370bec6096"
+    },
+    "return": {
+      "case_count": 1024,
+      "sha256": "d8367891c1403a93c89a34a36325f77a48e946322c4566e5c27fc07610b33cc2"
+    },
+    "waiting": {
+      "case_count": 384,
+      "sha256": "d8ef1a4003abeb6d76c312c40202c7fc5ffd8d693743be87a20cb41ca76e1924"
+    }
+  },
+  "search": {
+    "origins": [
+      [
+        0,
+        0
+      ],
+      [
+        128,
+        128
+      ],
+      [
+        4294967295,
+        2147483648
+      ]
+    ],
+    "positions": [
+      [
+        [
+          64,
+          64
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          160,
+          0
+        ]
+      ],
+      [
+        [
+          192,
+          160
+        ],
+        [
+          160,
+          192
+        ],
+        [
+          320,
+          320
+        ]
+      ],
+      [
+        [
+          2147483648,
+          0
+        ],
+        [
+          0,
+          2147483648
+        ],
+        [
+          4294967295,
+          4294967295
+        ]
+      ]
+    ],
+    "thresholds": [
+      0,
+      10,
+      127,
+      128,
+      255
+    ],
+    "flags": [
+      512,
+      520,
+      768,
+      4608
+    ]
+  },
+  "approach": {
+    "widths": [
+      1,
+      2,
+      255
+    ],
+    "flags": [
+      0,
+      8
+    ],
+    "offsets": [
+      [
+        176,
+        16,
+        160,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        128,
+        127,
+        255,
+        1
+      ]
+    ],
+    "positions": [
+      [
+        0,
+        0
+      ],
+      [
+        16,
+        16
+      ],
+      [
+        128,
+        240
+      ],
+      [
+        4294967295,
+        4294967295
+      ]
+    ]
+  },
+  "random_indices": [
+    0,
+    1,
+    127,
+    255
+  ],
+  "headings": [
+    0,
+    7,
+    63,
+    255
+  ],
+  "grant_flags": [
+    0,
+    131072,
+    131840,
+    4294967295
+  ],
+  "templates_sha256": {
+    "4": "26b6a1a943548bb0d446f1fdd89b56608e31c5ff0d7f1e754dcaf7f8e92311f3",
+    "10": "30dec9921542e318c3eb12978cdbc63cbc54eec5375007769468350b63860b53",
+    "11": "e60b0e8b6bf204e50850a6bd1b2ef0f0ebf98d0063549435f9c85cce4cf6bbf1"
+  }
+}

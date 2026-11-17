@@ -55,13 +55,13 @@ public sealed partial class Skirmish
         raw[0x14] = 0x80; raw[0x19] = raw[0x1a] = template.InitialCondition;
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(1), template.InitialFrame);
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(0x17), 0);
-        BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(4), (uint)(cell.X * 32 + 16));
-        BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(8), (uint)(cell.Y * 32 + 16));
+        BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(4), OriginalWorkerDelivery.BuildingAnchor((byte)cell.X, parameters[3]));
+        BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(8), OriginalWorkerDelivery.BuildingAnchor((byte)cell.Y, parameters[4]));
         BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(0x10), (uint)raw.Length);
         if (worker) { raw[0x25] = 0; raw[0x26] = 0; raw[0x2c] = 0; raw[0x31] = 0; }
         return new SkirmishActor { Source = new ObjectRecord { RuntimeReference = _nextEconomyId++, TemplateName = template.Name,
                 TemplateFile = "ARMY__02.DAT", TemplateIndex = templateIndex, RecordBytes = raw.Length,
-                RawX = (uint)(cell.X * 32 + 16), RawY = (uint)(cell.Y * 32 + 16), RawLayer = 1 },
+                RawX = BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(4)), RawY = BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(8)), RawLayer = 1 },
             Template = template, Parameters = parameters, Record = raw, Rules = Rules.Units[template.Name], Team = 0,
             Health = Rules.Units[template.Name].Health };
     }
@@ -87,8 +87,17 @@ public sealed partial class Skirmish
         BinaryPrimitives.WriteUInt32LittleEndian(worker.Record.AsSpan(8), (uint)(spawn.Value.Y * 32 + 16));
         worker.Source.RawX = (uint)(spawn.Value.X * 32 + 16); worker.Source.RawY = (uint)(spawn.Value.Y * 32 + 16);
         if (!SpendWood(Rules.Economy.WorkerPrice)) return null;
+        OriginalWorkerDelivery.InitializeEmpty(worker.Record, worker.Parameters, _terrainCatalog.NextRandomByte());
         Actors.Add(worker); Occupancy.WriteFootprint(1, 1, 1, (uint)worker.Position.X, (uint)worker.Position.Y, worker.Id);
         Log("Рабочий нанят. Выберите его и нажмите ПКМ по лесу."); return worker;
+    }
+    public DeliveryPoint MillEntry(Vector2I cell)
+    {
+        if (!Inside(cell)) return new(0, 0, false, false);
+        var target = Convert.FromHexString(MillTemplate.RawRecordHex);
+        var visitor = Convert.FromHexString(_templates.Armies["ARMY__02.DAT"].Templates[11].RawRecordHex);
+        return OriginalWorkerDelivery.Approach(visitor, target, OriginalWorkerDelivery.BuildingAnchor((byte)cell.X, target[3]),
+            OriginalWorkerDelivery.BuildingAnchor((byte)cell.Y, target[4]), (uint)(Map.Width * 32), (uint)(Map.Height * 32));
     }
     public ConstructionPlacement ProbeMill(Vector2I cell)
     {
@@ -119,7 +128,7 @@ public sealed partial class Skirmish
         int count = 0;
         foreach (var worker in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && a.Worker))
         {
-            worker.GatherTree = tree; worker.PreferredMill = 0; worker.Goal = null; worker.Target = 0;
+            worker.GatherTree = tree; worker.PreferredMill = 0; ClearDelivery(worker); worker.Goal = null; worker.Target = 0;
             worker.Route.Clear(); worker.HarvestPrepared = false; worker.Record[0x2d] &= 15; worker.ReplanTimer = 0; count++;
         }
         if (count > 0) Log($"Рубка леса: {count} раб. Груз будет доставляться в готовую лесопилку.");
@@ -130,7 +139,7 @@ public sealed partial class Skirmish
         if (Paused || Outcome != "" || Find(millId) is not { Team: 0 } mill || mill.Source.TemplateName != "Лесопилка") return false;
         bool accepted = false;
         foreach (var worker in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && a.Worker && a.Record[0x31] == 3))
-        { worker.PreferredMill = millId; worker.Route.Clear(); worker.Goal = null; worker.ReplanTimer = 0; accepted = true; }
+        { ClearDelivery(worker); worker.PreferredMill = millId; worker.Route.Clear(); worker.Goal = null; worker.ReplanTimer = 0; accepted = true; }
         return accepted;
     }
     private void TickBuildings()
@@ -158,15 +167,66 @@ public sealed partial class Skirmish
             var state = OriginalLumbermillRules.Process(new(mill.Record[0x23], mill.Record[0x24], Wood, ProducedWood), mill.Parameters[0x79]);
             mill.Record[0x23] = state.Countdown; mill.Record[0x24] = state.QueuedLoads;
             Wood = state.Stock; ProducedWood = state.Statistics;
+            uint visitorId = OriginalWorkerDelivery.WaitingWorker(Occupancy.Width, Occupancy.Height, Occupancy.Cells, mill.Record[0x0d],
+                (uint)mill.Position.X, (uint)mill.Position.Y, mill.Parameters);
+            if (Find(visitorId) is { } visitor)
+            {
+                var handoff = OriginalLumbermillRules.Receive(BinaryPrimitives.ReadUInt16LittleEndian(mill.Record.AsSpan(0x17)), mill.Record[0x24],
+                    BinaryPrimitives.ReadUInt16LittleEndian(visitor.Record.AsSpan(0x17)), visitor.Record.Length > 0x31 ? visitor.Record[0x31] : (byte)0, BinaryPrimitives.ReadUInt32LittleEndian(visitor.Parameters.AsSpan(0x40)));
+                BinaryPrimitives.WriteUInt16LittleEndian(mill.Record.AsSpan(0x17), handoff.MillFlags); mill.Record[0x24] = handoff.QueuedLoads;
+                BinaryPrimitives.WriteUInt16LittleEndian(visitor.Record.AsSpan(0x17), handoff.WorkerFlags); if (visitor.Record.Length > 0x31) visitor.Record[0x31] = handoff.Cargo;
+            }
         }
     }
-    private void SetWorkerAppearance(SkirmishActor worker, bool loaded)
+    private static void ClearDelivery(SkirmishActor worker)
     {
-        int index = loaded ? 11 : 10;
-        worker.Source.TemplateIndex = index; worker.Template = _templates.Armies["ARMY__02.DAT"].Templates[index];
-        worker.Parameters = Convert.FromHexString(worker.Template.RawRecordHex); worker.Record[0x0e] = (byte)index;
-        ushort frame = unchecked((ushort)(worker.Template.InitialFrame + (byte)((worker.Record[0x25] & 7) * worker.Parameters[0x4a])));
-        BinaryPrimitives.WriteUInt16LittleEndian(worker.Record.AsSpan(1), frame);
+        BinaryPrimitives.WriteUInt32LittleEndian(worker.Record.AsSpan(0x1c), 0);
+        worker.Record[0x30] = 0; worker.Record[0x17] &= 0xbf;
+    }
+    private void ApplyWorkerTemplate(SkirmishActor worker)
+    {
+        int index = worker.Record[0x0e]; worker.Source.TemplateIndex = index;
+        worker.Template = _templates.Armies["ARMY__02.DAT"].Templates[index]; worker.Parameters = Convert.FromHexString(worker.Template.RawRecordHex);
+    }
+    private static DeliveryCandidate ReceiverCandidate(SkirmishActor actor) => new(actor.Id, (uint)actor.Position.X, (uint)actor.Position.Y,
+        BinaryPrimitives.ReadUInt32LittleEndian(actor.Parameters.AsSpan(0x40)), actor.Alive ? actor.Record[0x19] : (byte)0, actor.Parameters[0x46]);
+    private void TickDelivery(SkirmishActor worker)
+    {
+        if ((worker.Record[0x30] & 15) == 3)
+        {
+            if (OriginalWorkerDelivery.WaitHandoff(worker.Record) == DeliveryWait.Pending) { worker.JobText = "Ожидает приём груза"; return; }
+            ClearDelivery(worker); worker.JobText = "Повторяет доставку"; return;
+        }
+        uint targetId = BinaryPrimitives.ReadUInt32LittleEndian(worker.Record.AsSpan(0x1c));
+        var mill = Find(targetId);
+        if (mill == null || mill.Team != 0 || OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y, [ReceiverCandidate(mill)]) == 0)
+        {
+            ClearDelivery(worker);
+            var preferred = Find(worker.PreferredMill);
+            uint selected = preferred is { Team: 0 } ? OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y, [ReceiverCandidate(preferred)]) : 0;
+            if (selected == 0) selected = OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y, Actors.Where(a => a.Team == 0).Select(ReceiverCandidate));
+            mill = Find(selected);
+            if (mill == null) { worker.JobText = "С грузом · нужна лесопилка"; return; }
+            BinaryPrimitives.WriteUInt32LittleEndian(worker.Record.AsSpan(0x1c), selected); worker.Record[0x15] = 1;
+            worker.Route.Clear(); worker.ReplanTimer = 0;
+        }
+        var point = OriginalWorkerDelivery.Approach(worker.Parameters, mill.Parameters, (uint)mill.Position.X, (uint)mill.Position.Y, (uint)(Map.Width * 32), (uint)(Map.Height * 32));
+        if (!point.Valid) { ClearDelivery(worker); worker.JobText = "Точка приёма за картой"; return; }
+        var cell = new Vector2I((int)(point.X >> 5), (int)(point.Y >> 5)); worker.JobText = "Доставляет древесину";
+        if (worker.Position == new Vector2(point.X, point.Y))
+        {
+            worker.Route.Clear();
+            if (mill.ConstructionRemaining > 0) { worker.JobText = "Ожидает строительства лесопилки"; return; }
+            byte heading = OriginalMotionPreparation.DirectionToward((uint)worker.Position.X, (uint)worker.Position.Y, (uint)mill.Position.X, (uint)mill.Position.Y);
+            if (!OriginalMotionPreparation.TurnToward(worker.Record, heading, worker.Parameters)) return;
+            OriginalWorkerDelivery.RequestHandoff(worker.Record, mill.Record); worker.JobText = "Передаёт древесину"; return;
+        }
+        if (worker.ReplanTimer <= 0)
+        {
+            if (!Plan(worker, cell)) worker.JobText = "Проход к приёму груза занят";
+            worker.ReplanTimer = .7;
+        }
+        MoveTick(worker);
     }
     private void TickWorker(SkirmishActor worker, double dt)
     {
@@ -179,6 +239,12 @@ public sealed partial class Skirmish
             if (OriginalWorkerAnimation.Pending(worker.Record))
             { worker.JobText = "Рубит дерево"; return; }
         }
+        if (worker.Source.TemplateIndex == 11 && worker.Record[0x31] == 0)
+        {
+            var empty = Convert.FromHexString(_templates.Armies["ARMY__02.DAT"].Templates[10].RawRecordHex);
+            OriginalWorkerDelivery.ReturnEmpty(worker.Record, empty, _terrainCatalog.NextRandomByte()); ApplyWorkerTemplate(worker);
+            ClearDelivery(worker); worker.PreferredMill = 0; worker.Route.Clear(); worker.HarvestPrepared = false;
+        }
         if (worker.Stepping) { MoveTick(worker); return; }
         if (worker.GatherTree == null && worker.PreferredMill == 0)
         {
@@ -187,24 +253,7 @@ public sealed partial class Skirmish
             { if (worker.Cell == goal) worker.Goal = null; else { Plan(worker, goal); worker.ReplanTimer = .7; } }
             MoveTick(worker); return;
         }
-        if (worker.Record[0x31] == 3)
-        {
-            var mill = Actors.Where(a => a.Alive && a.Team == 0 && a.Source.TemplateName == "Лесопилка" && a.ConstructionRemaining <= 0)
-                .OrderBy(a => a.Id == worker.PreferredMill ? 0 : 1).ThenBy(a => a.Position.DistanceSquaredTo(worker.Position)).FirstOrDefault();
-            if (mill == null) { worker.JobText = "С грузом · нужна готовая лесопилка"; return; }
-            worker.JobText = "Доставляет древесину";
-            if (Distance(worker.Position, mill) <= worker.Rules.Range && mill.Record[0x24] < 64)
-            {
-                ushort millFlags = (ushort)(BinaryPrimitives.ReadUInt16LittleEndian(mill.Record.AsSpan(0x17)) | 0x40);
-                var state = OriginalLumbermillRules.Receive(millFlags, mill.Record[0x24], BinaryPrimitives.ReadUInt16LittleEndian(worker.Record.AsSpan(0x17)),
-                    worker.Record[0x31], BinaryPrimitives.ReadUInt32LittleEndian(worker.Parameters.AsSpan(0x40)));
-                BinaryPrimitives.WriteUInt16LittleEndian(mill.Record.AsSpan(0x17), state.MillFlags); mill.Record[0x24] = state.QueuedLoads;
-                BinaryPrimitives.WriteUInt16LittleEndian(worker.Record.AsSpan(0x17), state.WorkerFlags); worker.Record[0x31] = state.Cargo;
-                if (state.Accepted) { SetWorkerAppearance(worker, false); worker.PreferredMill = 0; worker.Route.Clear(); worker.HarvestPrepared = false; }
-            }
-            else if (worker.ReplanTimer <= 0) { PlanAttack(worker, mill); worker.ReplanTimer = .7; }
-            MoveTick(worker); return;
-        }
+        if (worker.Record[0x31] == 3) { TickDelivery(worker); return; }
         var tree = worker.GatherTree!.Value;
         if (!Harvestable(tree))
         {
@@ -238,7 +287,10 @@ public sealed partial class Skirmish
                 bool clear = OriginalForestryRules.FinishLoad(worker.Record);
                 if (clear && _terrainCatalog.ClearTimber(Map.Cells, Occupancy.Width, Occupancy.Height, tree.X, tree.Y) > 0)
                 { TerrainRevision++; if (!Harvestable(tree)) ClearedGroves.Add(tree); }
-                worker.Record[0x31] = 3; SetWorkerAppearance(worker, true);
+                var loaded = Convert.FromHexString(_templates.Armies["ARMY__02.DAT"].Templates[11].RawRecordHex);
+                if (!OriginalWorkerDelivery.GrantTimber(worker.Record, worker.Parameters, loaded, _terrainCatalog.NextRandomByte()))
+                    throw new InvalidOperationException("Harvest callback rejected the worker");
+                ApplyWorkerTemplate(worker); ClearDelivery(worker);
                 OriginalForestryRules.ApplyLoadModifier(worker.Record); worker.HarvestPrepared = false;
             }
         }

@@ -238,6 +238,14 @@ public partial class SkirmishMain : Node2D
             var rect = new Rect2((Vector2)((cell - new Vector2I(parameters.FootprintWidth / 2, parameters.FootprintHeight / 2)) * 32), new Vector2(parameters.FootprintWidth * 32, parameters.FootprintHeight * 32));
             bool clear = !Battle.Paused && Battle.Wood >= Battle.Rules.Economy.MillPrice && Battle.ProbeMill(cell).Status == ConstructionPlacementStatus.Clear;
             var color = clear ? new Color("8de5b8") : new Color("ef8272"); DrawRect(rect, new Color(color, .2f)); DrawRect(rect, color, false, 2);
+            var entry = Battle.MillEntry(cell);
+            if (entry.Valid)
+            {
+                var pointOfEntry = new Vector2(entry.X, entry.Y);
+                DrawLine(rect.GetCenter(), pointOfEntry, new Color("e7cd82"), 2);
+                DrawCircle(pointOfEntry, 6, new Color("e7cd82"));
+                DrawString(ThemeDB.FallbackFont, pointOfEntry + new Vector2(-24, -10), "Приём груза", HorizontalAlignment.Left, -1, 12, new Color("e7cd82"));
+            }
         }
         foreach (var effect in Battle.Effects)
         {
@@ -377,7 +385,7 @@ public partial class SkirmishMain : Node2D
         _buildMill.Text = $"ЛЕСОПИЛКА · {Battle.Rules.Economy.MillPrice} дерева";
         _hire.Disabled = Battle.Paused || Battle.Outcome != "" || Battle.Wood < Battle.Rules.Economy.WorkerPrice;
         _buildMill.Disabled = Battle.Paused || Battle.Outcome != "" || Battle.Wood < Battle.Rules.Economy.MillPrice;
-        if (PlacingMill) _status.Text = "Место для лесопилки\nЛКМ — строить · ПКМ/Esc — отмена";
+        if (PlacingMill) _status.Text = "Место для лесопилки\nОставьте проход к жёлтой точке.\nЛКМ — строить · ПКМ/Esc — отмена";
         _pause.Text = Battle.Paused ? "ПРОДОЛЖИТЬ" : "ПАУЗА [ПРОБЕЛ]"; _speed.Text = $"СКОРОСТЬ ×{Speed}";
         _events.Text = string.Join('\n', Battle.Events.TakeLast(2));
     }

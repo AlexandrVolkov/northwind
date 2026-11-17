@@ -94,10 +94,14 @@ public sealed class OriginalTerrainCatalog
         }
     }
     private uint Descriptor(int tile) => OriginalForestryRules.Property(_properties, (uint)tile);
+    public byte NextRandomByte()
+    {
+        byte value = _random[RandomIndex]; RandomIndex = unchecked((byte)(RandomIndex + 1)); return value;
+    }
     private bool Choose(uint descriptor, out ushort tile)
     {
         if (!_variants.TryGetValue(descriptor & 0xffff0f00, out var candidates)) { tile = 0; return false; }
-        byte value = _random[RandomIndex]; RandomIndex = unchecked((byte)(RandomIndex + 1));
+        byte value = NextRandomByte();
         tile = candidates[(value * candidates.Count) >> 8]; return true;
     }
     public int ClearTimber(uint[] cells, byte width, byte height, int x, int y)

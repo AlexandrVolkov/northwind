@@ -165,7 +165,7 @@ public sealed partial class Skirmish : IDisposable
                 if (!actor.Stepping && !Plan(actor, goal)) continue;
                 actor.Target = 0; actor.Goal = goal; actor.ReplanTimer = 0;
                 actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false;
-                if (actor.Worker) actor.Record[0x2d] &= 15;
+                if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); }
                 if (actor.Stepping) actor.Route.Clear();
                 used.Add(goal); assigned = true; accepted++;
             }
@@ -186,7 +186,7 @@ public sealed partial class Skirmish : IDisposable
     {
         if (Paused || Outcome != "") return;
         foreach (var actor in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0))
-        { actor.Target = 0; actor.Goal = null; actor.Route.Clear(); actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false; if (actor.Worker) actor.Record[0x2d] &= 15; actor.JobText = "Без задания"; }
+        { actor.Target = 0; actor.Goal = null; actor.Route.Clear(); actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false; if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); } actor.JobText = "Без задания"; }
     }
     public void Advance(double delta)
     {
