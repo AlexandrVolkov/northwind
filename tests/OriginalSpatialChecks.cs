@@ -154,6 +154,7 @@ public partial class TestRunner
         foreach (var obj in slot.Objects) Convert.FromHexString(obj.RawRecordHex).CopyTo(pool, (int)obj.RuntimeReference);
         var archer = slot.Objects[1];
         var parameters = templates.Armies[archer.TemplateFile].Templates[archer.TemplateIndex];
+        ImportedMotionPreparationChecks(snapshot, map, archer, parameters);
         uint flags = BinaryPrimitives.ReadUInt32LittleEndian(Convert.FromHexString(parameters.RawRecordHex).AsSpan(0x40));
         var live = new OriginalOccupancyMap((byte)map.Width, (byte)map.Height);
         live.LoadCells(snapshot.Grid.Cells);
