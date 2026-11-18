@@ -110,6 +110,7 @@ public sealed partial class Skirmish : IDisposable
         foreach (var actor in Actors.Where(a => !a.Structure)) actor.Route.Attach(_routes, actor.Record);
         InitializeEconomy(scenario, templates);
         InitializePopulation(scenario);
+        InitializeProduction();
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
     }
     public SkirmishActor? Find(uint id) => Actors.FirstOrDefault(a => a.Id == id && a.Alive);
@@ -279,6 +280,7 @@ public sealed partial class Skirmish : IDisposable
         foreach (var effect in Effects) effect.Remaining -= dt;
         Effects.RemoveAll(e => e.Remaining <= 0);
         TickBuildings();
+        TickProduction();
         TickPopulation();
         foreach (var actor in Actors.Where(a => a.Alive && !a.Structure).ToArray())
         {

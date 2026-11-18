@@ -74,7 +74,7 @@ public partial class TestRunner
     private void MovementBridgeChecks()
     {
         using var battle = CreateFundedSkirmish();
-        var first = battle.TrainWorker()!; var second = battle.TrainWorker()!;
+        var first = Recruit(battle, true)!; var second = Recruit(battle, true)!;
         var props = Convert.FromHexString(battle.Map.SegmentPropertiesHex);
         int water = Enumerable.Range(0, props.Length / 8).First(i => props[i * 8] == 2 && battle.Map.Terrain[i] == "water");
         int ground = Enumerable.Range(0, props.Length / 8).First(i => props[i * 8] == 0 && battle.Map.Terrain[i] == "ground");

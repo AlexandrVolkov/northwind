@@ -46,7 +46,7 @@ public partial class TestRunner
         {
             Check(battle.Resources == new ResourceQuad(1000, 1000, 1000, 0), "Normal play starts with the original Oleg SCN balances");
             var initial = battle.Resources;
-            Check(battle.TrainWorker() == null && battle.TrainMilitia() == null && battle.Resources == initial,
+            Check(Recruit(battle, true) == null && Recruit(battle, false) == null && battle.Resources == initial,
                 "Zero native free population rejects recruitment without spending any material");
             var site = FarmSite(battle); var farm = battle.BuildFarm(site)!;
             Check(farm is { ConstructionRemaining: > 0 } && farm.Record.Length == 34 && farm.Parameters[3] == 4 && farm.Parameters[4] == 2 && battle.ProbeFarm(site).Status == ConstructionPlacementStatus.Occupied,
@@ -54,7 +54,7 @@ public partial class TestRunner
             Check(battle.Resources == new ResourceQuad(1000, 970, 950, 0) && battle.BuildFarm(site) == null,
                 "Farm consumes the source wood and gold prices once and rejects its occupied footprint");
             battle.Paused = true; var condition = farm.Record[0x19]; battle.Advance(40);
-            Check(farm.Record[0x19] == condition && battle.FreePeople == 0 && battle.TrainMilitia() == null, "Pause freezes construction, population growth and recruitment");
+            Check(farm.Record[0x19] == condition && battle.FreePeople == 0 && Recruit(battle, false) == null, "Pause freezes construction, population growth and recruitment");
             battle.Paused = false;
             for (int i = 0; i < 512 && farm.ConstructionRemaining > 0; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
             battle.Advance(32.0 / battle.Rules.TicksPerSecond);
@@ -69,10 +69,10 @@ public partial class TestRunner
             Check(battle.FreePeople > 0, "Ordinary simulation ticks replenish available people after farm construction");
             for (int i = 0; i < 2400 && battle.FreePeople < 2; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
             uint initialLoad = battle.Population.Used; var beforeHire = battle.Resources;
-            var worker = battle.TrainWorker(); var recruit = battle.TrainMilitia();
-            Check(worker != null && recruit is { Worker: false, Structure: false } && recruit.Record.Length == 49 && battle.FreePeople == 0,
+            var worker = Recruit(battle, true); var recruit = Recruit(battle, false);
+            Check(worker != null && recruit is { Worker: false, Structure: false } && recruit.Record.Length == 49,
                 "Source population growth enables worker and militia recruitment without a tutorial reserve");
-            Check(battle.Resources == new ResourceQuad(beforeHire.First - 15, beforeHire.Second, beforeHire.Third - 80, beforeHire.Fourth - 2) && battle.Population.Used == initialLoad + 2,
+            Check(battle.Resources == new ResourceQuad(beforeHire.First - 15, beforeHire.Second, beforeHire.Third - 80, battle.FreePeople) && battle.Population.Used == initialLoad + 2,
                 "Both recruitments pay metal, gold and people directly from DAT while keeping wood unchanged");
             var destination = new[] { Vector2I.Right, Vector2I.Down, Vector2I.Left, Vector2I.Up }.Select(d => recruit!.Cell + d).First(c => battle.CanStand(recruit!, c));
             Check(battle.Move([recruit!.Id], destination) == 1, "Newly recruited militia accepts normal movement orders");
@@ -85,11 +85,11 @@ public partial class TestRunner
         var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json"); rules.Economy.StartingResources = new(1000, 500, 1000, 12);
         using (var many = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"), GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules))
         {
-            var workers = Enumerable.Range(0, 7).Select(_ => many.TrainWorker()).ToArray();
+            var workers = Enumerable.Range(0, 7).Select(_ => Recruit(many, true)).ToArray();
             Check(workers.All(w => w != null) && many.FreePeople == 5, "Free population replaces the old six-worker tutorial ceiling");
             var grid = many.Occupancy.Cells.ToArray(); Array.Fill(grid, many.Hero.Id); many.Occupancy.LoadCells(grid);
             uint wood = many.Wood, people = many.FreePeople;
-            Check(many.TrainWorker() == null && many.TrainMilitia() == null && many.Wood == wood && many.FreePeople == people,
+            Check(Recruit(many, true) == null && Recruit(many, false) == null && many.Wood == wood && many.FreePeople == people,
                 "An occupied spawn area rejects recruitment without losing either resource");
         }
         var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
@@ -104,7 +104,11 @@ public partial class TestRunner
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         Check(!scene.PlacingBuilding && scene.Battle.Find(scene.Selection.Single())?.Source.TemplateName == "Ферма", $"Mouse places and selects a farm through the castle build flow: placing={scene.PlacingBuilding}, cell={cell}, screen={screen}, events={string.Join(";", scene.Battle.Events)}");
         for (int i = 0; i < 1600 && scene.Battle.FreePeople == 0; i++) scene.Battle.Advance(1.0 / scene.Battle.Rules.TicksPerSecond);
-        scene.SelectCastle(); scene.HireMilitia(); Check(scene.Battle.Find(scene.Selection.Single())?.Source.TemplateName == "Ополченец", "Castle UI hires and selects a militia soldier");
+        scene.SelectCastle(); uint previousRecruit = scene.Battle.LastRecruitId; scene.HireMilitia();
+        Check(scene.Selection.Single() == scene.Battle.PlayerCastle.Id, "Queue command keeps the castle selected for subsequent orders");
+        var recruited = WaitForRecruit(scene.Battle, previousRecruit);
+        scene.Selection.Clear(); scene.Selection.Add(recruited.Id);
+        Check(recruited.Source.TemplateName == "Ополченец", "Castle UI queue produces a militia soldier over time");
         if (DisplayServer.GetName() != "headless")
         {
             scene.SelectCastle(); scene.Battle.Advance(10); scene.TogglePause();

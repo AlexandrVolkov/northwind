@@ -25,7 +25,8 @@ public partial class SkirmishMain : Node2D
     private Texture2D _terrain = null!, _sprites = null!;
     private readonly Dictionary<(string, int, int), BattleFrame> _frames = [];
     private Label _status = null!, _selection = null!, _events = null!;
-    private Label _economy = null!;
+    private Label _economy = null!, _recruitment = null!;
+    private Button _cancelRecruitment = null!;
     private Button _hire = null!, _buildMill = null!, _hireMilitia = null!, _buildFarm = null!;
     public bool PlacingMill { get; private set; }
     public bool PlacingFarm { get; private set; }
@@ -88,15 +89,18 @@ public partial class SkirmishMain : Node2D
     public void HireWorker()
     {
         if (!Selection.Contains(Battle.PlayerCastle.Id)) return;
-        var worker = Battle.TrainWorker();
-        if (worker != null) { Selection.Clear(); Selection.Add(worker.Id); }
+        Battle.QueueWorker();
         RefreshUi();
     }
     public void HireMilitia()
     {
         if (!Selection.Contains(Battle.PlayerCastle.Id)) return;
-        var soldier = Battle.TrainMilitia();
-        if (soldier != null) { Selection.Clear(); Selection.Add(soldier.Id); }
+        Battle.QueueMilitia();
+        RefreshUi();
+    }
+    public void CancelRecruitment()
+    {
+        if (Selection.Contains(Battle.PlayerCastle.Id)) Battle.CancelRecruitment();
         RefreshUi();
     }
     public void BeginFarmPlacement()
@@ -238,6 +242,13 @@ public partial class SkirmishMain : Node2D
             DrawTextureRectRegion(_terrain, new Rect2(x * 32, y * 32, 32, 32), new Rect2(tile % 32 * 32, tile / 32 * 32, 32, 32));
         }
         foreach (var actor in Battle.Actors.Where(a => a.Alive).OrderBy(a => a.Position.Y)) DrawActor(actor);
+        if (!PlacingBuilding && Selection.Contains(Battle.PlayerCastle.Id) && Battle.PlayerCastle.Alive)
+        {
+            var exit = Battle.RecruitExit(Battle.RecruitmentTemplate ?? Battle.WorkerTemplate);
+            var point = new Vector2(exit.X, exit.Y); var color = new Color(Battle.RecruitmentBlocked ? "ef8272" : "e7cd82");
+            DrawArc(point, 10, 0, Mathf.Tau, 24, color, 2);
+            DrawString(ThemeDB.FallbackFont, point + new Vector2(-22, 22), "Выход", HorizontalAlignment.Left, -1, 12, color);
+        }
         if (!PlacingBuilding && Selection.Any(id => Battle.Find(id)?.Worker == true))
         {
             var point = GetGlobalMousePosition(); var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
@@ -352,6 +363,9 @@ public partial class SkirmishMain : Node2D
         _economy = Text("", 13);
         (_hire, _hireMilitia) = Row("", HireWorker, "", HireMilitia);
         (_buildMill, _buildFarm) = Row("", BeginMillPlacement, "", BeginFarmPlacement);
+        _recruitment = Text("", 12);
+        _cancelRecruitment = new Button { Text = "ОЧИСТИТЬ ОЧЕРЕДЬ", FocusMode = Control.FocusModeEnum.None };
+        _cancelRecruitment.Pressed += CancelRecruitment; column.AddChild(_cancelRecruitment);
         Row("ВОЙСКО [Ctrl+A]", SelectArmy, "СТОП [X]", () => Battle.Stop(Selection));
         (_pause, _speed) = Row("ПАУЗА [ПРОБЕЛ]", TogglePause, "СКОРОСТЬ ×1", ChangeSpeed);
         Button("НАЧАТЬ ЗАНОВО  [R]", Restart);
@@ -408,12 +422,16 @@ public partial class SkirmishMain : Node2D
         _buildMill.Text = $"ЛЕСОПИЛКА\n{Skirmish.PriceText(Battle.MillTemplate)}";
         _buildFarm.Text = $"ФЕРМА\n{Skirmish.PriceText(Battle.FarmTemplate)}";
         bool blocked = Battle.Paused || Battle.Outcome != "";
-        _hire.Disabled = blocked || !Battle.CanAfford(Battle.WorkerTemplate);
-        _hireMilitia.Disabled = blocked || !Battle.CanAfford(Battle.MilitiaTemplate);
+        _hire.Disabled = blocked || Battle.RecruitmentCount == 5;
+        _hireMilitia.Disabled = blocked || Battle.RecruitmentCount == 5;
         _buildMill.Disabled = blocked || !Battle.CanAfford(Battle.MillTemplate);
         _buildFarm.Disabled = blocked || !Battle.CanAfford(Battle.FarmTemplate);
-        _hire.TooltipText = Battle.MissingResources(Battle.WorkerTemplate);
-        _hireMilitia.TooltipText = Battle.MissingResources(Battle.MilitiaTemplate);
+        _recruitment.Visible = _cancelRecruitment.Visible = castle;
+        _recruitment.Text = Battle.RecruitmentText;
+        _cancelRecruitment.Disabled = blocked || Battle.RecruitmentCount == 0;
+        _cancelRecruitment.TooltipText = "Снимает все заказы. Оплаченный заказ возвращает людей целиком, материалы — пропорционально накопленному прогрессу по формуле оригинала.";
+        _hire.TooltipText = "Добавить в очередь; оплата при начале подготовки. " + Battle.MissingResources(Battle.WorkerTemplate);
+        _hireMilitia.TooltipText = "Казармы пока недоступны; ополченцев готовит замок. Оплата при начале подготовки. " + Battle.MissingResources(Battle.MilitiaTemplate);
         _buildMill.TooltipText = Battle.MissingResources(Battle.MillTemplate);
         _buildFarm.TooltipText = Battle.MissingResources(Battle.FarmTemplate);
         if (PlacingFarm) _status.Text = "Место для фермы\nЛКМ — строить · ПКМ/Esc — отмена";

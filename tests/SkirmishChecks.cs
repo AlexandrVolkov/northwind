@@ -16,6 +16,40 @@ public partial class TestRunner
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
     }
 
+    private static SkirmishActor WaitForRecruit(Skirmish battle, uint previousId)
+    {
+        for (int i = 0; i < 5000 && battle.LastRecruitId == previousId; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+        var actor = battle.Find(battle.LastRecruitId);
+        if (actor == null || battle.LastRecruitId == previousId) throw new InvalidOperationException("Recruit did not leave the castle: " + battle.RecruitmentText);
+        return actor;
+    }
+    private static SkirmishActor? Recruit(Skirmish battle, bool worker)
+    {
+        if (!battle.CanAfford(worker ? battle.WorkerTemplate : battle.MilitiaTemplate)) return null;
+        if (battle.Paused || battle.Outcome != "") return null;
+        var exit = battle.RecruitExit(worker ? battle.WorkerTemplate : battle.MilitiaTemplate);
+        var gate = new Vector2I((int)(exit.X >> 5), (int)(exit.Y >> 5));
+        var previousActor = battle.Find(battle.LastRecruitId);
+        if (previousActor != null && previousActor.Cell == gate)
+        {
+            var cells = new List<Vector2I>();
+            for (int y = -8; y <= 8; y++) for (int x = -8; x <= 8; x++)
+                if (Math.Max(Math.Abs(x), Math.Abs(y)) >= 3) cells.Add(gate + new Vector2I(x,y));
+            bool moved = false;
+            foreach (var cell in cells.OrderBy(c => ((Vector2)c).DistanceSquaredTo(gate)))
+            {
+                if (!battle.CanStand(previousActor, cell) || battle.Move([previousActor.Id], cell) != 1 || previousActor.Goal != cell) continue;
+                for (int i = 0; i < 600 && (previousActor.Cell != cell || previousActor.Stepping); i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+                if (previousActor.Cell == cell && !previousActor.Stepping) { moved = true; break; }
+            }
+            if (!moved) return null;
+        }
+        uint previous = battle.LastRecruitId;
+        if (!(worker ? battle.QueueWorker() : battle.QueueMilitia())) return null;
+        return WaitForRecruit(battle, previous);
+    }
+
+
     private async Task SkirmishChecks()
     {
         GetTree().Root.Size = new Vector2I(1280, 800);

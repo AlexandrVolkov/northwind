@@ -1025,28 +1025,226 @@
       "status": "ported",
       "evidence": [
         "docs/scenario-resources.md",
-        "tests/fixtures/resources.json"
+        "tests/fixtures/resources.json",
+        "docs/recruitment-production.md"
       ],
       "implementation": [
         "scripts/OriginalConstructionRules.cs",
         "scripts/OriginalResourceRules.cs",
-        "scripts/SkirmishEconomy.cs"
+        "scripts/SkirmishEconomy.cs",
+        "scripts/SkirmishProduction.cs"
       ],
-      "limitations": "Только проверка и списание запасов до изменения фазы производителя. Мгновенный наём, проверка выхода до оплаты и отдельные runtime-ссылки прототипа не воспроизводят исходный производственный автомат/аллокатор."
+      "limitations": "Только проверка и списание запасов до изменения фазы производителя. Оплата первого заказа и ожидание выхода подключены через отдельные проверенные операции; полный исходный диспетчер и аллокатор не перенесены."
     },
     {
       "id": "recruitment-production-and-refund",
       "module": "LE:1",
       "start": 43296,
-      "end": 43699,
-      "name": "Production timing, spawn, queue advance and cancellation refund",
+      "end": 43316,
+      "name": "Production cancellation gate and participant speed lookup",
       "classification": "code",
       "status": "partial",
       "evidence": [
-        "docs/scenario-resources.md"
+        "docs/recruitment-production.md"
+      ],
+      "implementation": [
+        "scripts/SkirmishProduction.cs"
+      ],
+      "limitations": "Подтверждены внешние переходы и получение интервала/модификатора. Полный A879/C88C и исходный пересчёт AI не перенесены; адаптер использует модификатор 0 для текущего поселения."
+    },
+    {
+      "id": "recruitment-queue-capacity",
+      "module": "LE:1",
+      "start": 25342,
+      "end": 25348,
+      "name": "Check fifth queue slot",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/recruitment-production.md",
+        "tests/fixtures/production.json"
+      ],
+      "implementation": [
+        "scripts/OriginalProductionRules.cs"
+      ],
+      "limitations": "Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора."
+    },
+    {
+      "id": "recruitment-queue-append",
+      "module": "LE:1",
+      "start": 25392,
+      "end": 25410,
+      "name": "Append a template to the first unused queue slot",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/recruitment-production.md",
+        "tests/fixtures/production.json"
+      ],
+      "implementation": [
+        "scripts/OriginalProductionRules.cs"
+      ],
+      "limitations": "Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора."
+    },
+    {
+      "id": "recruitment-paid-start",
+      "module": "LE:1",
+      "start": 43279,
+      "end": 43296,
+      "name": "Initialize paid production phase and counters",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/recruitment-production.md",
+        "tests/fixtures/production.json"
+      ],
+      "implementation": [
+        "scripts/OriginalProductionRules.cs"
+      ],
+      "limitations": "Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора."
+    },
+    {
+      "id": "recruitment-timer-progress",
+      "module": "LE:1",
+      "start": 43316,
+      "end": 43362,
+      "name": "Advance interval and detect ready production",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/recruitment-production.md",
+        "tests/fixtures/production.json"
+      ],
+      "implementation": [
+        "scripts/OriginalProductionRules.cs"
+      ],
+      "limitations": "Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора."
+    },
+    {
+      "id": "recruitment-exit-coordinates",
+      "module": "LE:1",
+      "start": 43362,
+      "end": 43428,
+      "name": "Select size-dependent signed production exit and layer",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/recruitment-production.md",
+        "tests/fixtures/production.json"
+      ],
+      "implementation": [
+        "scripts/OriginalProductionRules.cs"
+      ],
+      "limitations": "Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора."
+    },
+    {
+      "id": "recruitment-spawn-allocation",
+      "module": "LE:1",
+      "start": 43428,
+      "end": 43574,
+      "name": "Check exit, allocate produced unit and update participant statistics",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/recruitment-production.md"
       ],
       "implementation": [],
-      "limitations": "Установлены переходы по статическому коду: интервал, DAT[45], AC63/A758, сдвиг очереди и возврат. Нет динамической проверки полного автомата, переноса очереди, времени выпуска и отмены."
+      "limitations": "Исходные AC63/A758, сигналы блокирующему объекту и статистика не перенесены полностью. Для 1x1 юнитов используются существующие проходимость/занятость и runtime-адаптер."
+    },
+    {
+      "id": "recruitment-queue-advance",
+      "module": "LE:1",
+      "start": 43574,
+      "end": 43610,
+      "name": "Advance queue and finish an empty queue",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/recruitment-production.md",
+        "tests/fixtures/production.json"
+      ],
+      "implementation": [
+        "scripts/OriginalProductionRules.cs"
+      ],
+      "limitations": "Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора."
+    },
+    {
+      "id": "recruitment-progress-wait-return",
+      "module": "LE:1",
+      "start": 43610,
+      "end": 43621,
+      "name": "Increment production progress and retain active work flags",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/recruitment-production.md",
+        "tests/fixtures/production.json"
+      ],
+      "implementation": [
+        "scripts/OriginalProductionRules.cs"
+      ],
+      "limitations": "Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора."
+    },
+    {
+      "id": "recruitment-refund-template-lookup",
+      "module": "LE:1",
+      "start": 43621,
+      "end": 43638,
+      "name": "Resolve producer owner and template for cancellation",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/recruitment-production.md"
+      ],
+      "implementation": [],
+      "limitations": "Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора."
+    },
+    {
+      "id": "recruitment-progress-refund",
+      "module": "LE:1",
+      "start": 43638,
+      "end": 43697,
+      "name": "Credit native byte-arithmetic cancellation refund",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/recruitment-production.md",
+        "tests/fixtures/production.json"
+      ],
+      "implementation": [
+        "scripts/OriginalProductionRules.cs"
+      ],
+      "limitations": "Без native #DE: делитель ненулевой, все частные <=255. Верхние16 бит затрат сохраняются; четвёртый ресурс возвращается целиком. Кнопка очистки — композиция возврата и удаления всех заказов, не полный исходный путь отмены."
+    },
+    {
+      "id": "castle-production-table",
+      "module": "ARMY__02.WRK",
+      "start": 545,
+      "end": 593,
+      "name": "Castle seven-byte header and production rows",
+      "classification": "data",
+      "status": "partial",
+      "evidence": [
+        "docs/recruitment-production.md",
+        "data/original_production.json"
+      ],
+      "implementation": [],
+      "limitations": "Заголовок сохранён без выдуманных назначений. Разобраны строки index/frame/interval. Ополченца в таблице замка нет."
+    },
+    {
+      "id": "barracks-production-table",
+      "module": "ARMY__02.WRK",
+      "start": 822,
+      "end": 846,
+      "name": "Barracks seven-byte header and production rows",
+      "classification": "data",
+      "status": "partial",
+      "evidence": [
+        "docs/recruitment-production.md",
+        "data/original_production.json"
+      ],
+      "implementation": [],
+      "limitations": "Разобраны строки лучника, ополченца, поджигателя и рыцаря; само здание казармы ещё не подключено. Интервал ополченца временно используется очередью замка."
     }
   ]
 }
