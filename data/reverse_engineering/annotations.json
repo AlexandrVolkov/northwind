@@ -1243,8 +1243,11 @@
         "docs/recruitment-production.md",
         "data/original_production.json"
       ],
-      "implementation": [],
-      "limitations": "Разобраны строки лучника, ополченца, поджигателя и рыцаря; само здание казармы ещё не подключено. Интервал ополченца временно используется очередью замка."
+      "implementation": [
+        "scripts/SkirmishEconomy.cs",
+        "scripts/SkirmishProduction.cs"
+      ],
+      "limitations": "Разобраны строки лучника, ополченца, поджигателя и рыцаря. Строительство казармы и отдельная очередь ополченца подключены; полный WRK-диспетчер остаётся задачей."
     }
   ]
 }

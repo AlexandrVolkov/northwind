@@ -60,6 +60,16 @@ public partial class TestRunner
     private async Task ProductionChecks()
     {
         OriginalProductionChecks();
+        using (var battle=CreateFundedSkirmish())
+        {
+            var first=battle.BuildBarracks(BarracksSite(battle)) ?? throw new InvalidOperationException("First barracks placement failed");
+            var second=battle.BuildBarracks(BarracksSite(battle)) ?? throw new InvalidOperationException("Second barracks placement failed");
+            Check(first.Id!=second.Id,"Two source-sized barracks can occupy separate clear sites");
+            for(int i=0;i<700 && (first.ConstructionRemaining>0 || second.ConstructionRemaining>0);i++)battle.Advance(1.0/battle.Rules.TicksPerSecond);
+            Check(battle.QueueBarracksMilitia(first) && battle.QueueBarracksMilitia(second),"Each completed barracks accepts its own militia order");
+            Check(battle.BarracksRecruitmentCountFor(first)==1 && battle.BarracksRecruitmentCountFor(second)==1,"Barracks queue slots are independent");
+            Check(battle.CancelBarracksRecruitment(first) && battle.BarracksRecruitmentCountFor(second)==1,"Canceling one barracks does not clear another");
+        }
         using (var battle=CreateSkirmish())
         {
             var stocks=battle.Resources; int actors=battle.Actors.Count;
@@ -119,13 +129,22 @@ public partial class TestRunner
         }
         var scene=GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>();AddChild(scene);
         for(int i=0;i<4;i++)await ToSignal(GetTree(),SceneTree.SignalName.ProcessFrame);
-        scene.SelectCastle();scene.HireWorker();scene.HireMilitia();
-        Check(scene.Battle.RecruitmentCount==2 && scene.Selection.Single()==scene.Battle.PlayerCastle.Id,"Castle buttons append orders and retain castle selection");
+        scene.SelectCastle();scene.HireWorker();
+        Check(scene.Battle.RecruitmentCount==1 && scene.Selection.Single()==scene.Battle.PlayerCastle.Id,"Castle queues its source worker");
+        scene.CancelRecruitment();
+        var farm=scene.Battle.BuildFarm(FarmSite(scene.Battle));
+        Check(farm!=null,"Farm can start with original zero-person stock");
+        for(int i=0;i<4200 && scene.Battle.FreePeople<2;i++)scene.Battle.Advance(1.0/scene.Battle.Rules.TicksPerSecond);
+        var barracks=scene.Battle.BuildBarracks(BarracksSite(scene.Battle))!;
+        for(int i=0;i<700 && barracks.ConstructionRemaining>0;i++)scene.Battle.Advance(1.0/scene.Battle.Rules.TicksPerSecond);
+        scene.SelectCastle();scene.HireWorker();
+        scene.Selection.Clear();scene.Selection.Add(barracks.Id);scene.HireMilitia();
+        Check(scene.Battle.BarracksRecruitmentCount==1 && scene.Battle.RecruitmentCount==1,"Barracks queues militia independently of the castle");
         if(DisplayServer.GetName()!="headless")
         {
             scene._Process(0);await ToSignal(RenderingServer.Singleton,RenderingServer.SignalName.FramePostDraw);
             DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));GetViewport().GetTexture().GetImage().SavePng("res://build/recruitment-queue.png");
         }
-        scene.CancelRecruitment();Check(scene.Battle.RecruitmentCount==0,"UI clear command removes the waiting orders");RemoveChild(scene);scene.Free();
+        scene.CancelRecruitment();Check(scene.Battle.BarracksRecruitmentCount==0 && scene.Battle.RecruitmentCount==1,"UI clear affects only selected producer");RemoveChild(scene);scene.Free();
     }
 }
