@@ -97,8 +97,7 @@ public sealed partial class Skirmish
         return new SkirmishActor { Source = new ObjectRecord { RuntimeReference = _nextEconomyId++, TemplateName = template.Name,
                 TemplateFile = "ARMY__02.DAT", TemplateIndex = templateIndex, RecordBytes = raw.Length,
                 RawX = BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(4)), RawY = BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(8)), RawLayer = 1 },
-            Template = template, Parameters = parameters, Record = raw, Rules = Rules.Units[template.Name], Team = 0,
-            Health = Rules.Units[template.Name].Health };
+            Template = template, Parameters = parameters, Record = raw, Rules = Rules.Units[template.Name], Team = 0 };
     }
     public DeliveryPoint MillEntry(Vector2I cell)
     {

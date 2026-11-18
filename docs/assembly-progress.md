@@ -4,10 +4,10 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 137589 | 5000 | 0 | 4293 | 44 |
+| LE:1 | 146882 | 137075 | 5000 | 0 | 4807 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61833 | 0 | 0 | 0 | 0 |
-| ARMY__00.WRK | 5403 | 5403 | 0 | 0 | 0 | 0 |
+| ARMY__00.WRK | 5403 | 5216 | 100 | 0 | 87 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
 | ARMY__02.WRK | 6930 | 6109 | 609 | 0 | 212 | 7 |
 | ARMY__03.WRK | 13412 | 13412 | 0 | 0 | 0 | 1 |
@@ -20,6 +20,8 @@
 
 | Модуль / полуоткрытый диапазон | Имя | Статус | Доказательства | Ограничения |
 | --- | --- | --- | --- | --- |
+| ARMY__00.WRK `0x4F3..0x54A` | Melee strike effect: experience attack, lookup, hit, sound | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Объект-эффект и его анимация в схватке не создаются. |
+| ARMY__00.WRK `0x6FE..0x762` | Spark effect types 4/5 creation and countdown | partial | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Перенесено создание (AH=0); обновление кадров не подключено. |
 | ARMY__02.WRK `0x13B..0x157` | Castle AH=5 visitor validator | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Принимающая ветка 1B8 общая с хвостом обработчика. |
 | ARMY__02.WRK `0x221..0x251` | Castle seven-byte header and production rows | partial | [recruitment-production.md](../docs/recruitment-production.md); [original_production.json](../data/original_production.json) | Заголовок сохранён без выдуманных назначений. Разобраны строки index/frame/interval. Ополченца в таблице замка нет. |
 | ARMY__02.WRK `0x336..0x34E` | Barracks seven-byte header and production rows | partial | [recruitment-production.md](../docs/recruitment-production.md); [original_production.json](../data/original_production.json) | Разобраны строки лучника, ополченца, поджигателя и рыцаря. Строительство казармы и отдельная очередь ополченца подключены; полный WRK-диспетчер остаётся задачей. |
@@ -63,8 +65,10 @@
 | LE:1 `0x85D5..0x85E2` | Worker signed-result modifier increment | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Точная байтовая операция; полное игровое назначение поля +16 пока не утверждается. |
 | LE:1 `0x86B6..0x877F` | Ore carrier phases: mine, receiver, back-off | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | 8F70/C439 подключены отдельно; 8B0F (отход) остаётся мостом. Глобальная запись [522] из 8D89 не переносится. |
 | LE:1 `0x8DB0..0x8E0E` | Choose visitor entry point | ported | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Исходные DAT-смещения по размеру посетителя, u32-координаты и проверка границ; последующее движение отдельное. |
+| LE:1 `0x8E0E..0x8E3C` | Request a move to a random map cell | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
 | LE:1 `0x8F70..0x902F` | Approach and handoff state machine | partial | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Все фазы проверены с валидатором лесопилки. Произвольные WRK-валидаторы, путь и вызывающий диспетчер не заменены полным исходным автоматом. |
 | LE:1 `0x90E9..0x9124` | Common worker animation update prefix | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md) | Известны вызов перед диспетчером рабочего, префикс состояния и RNG; остальные ветви общего обновления до 9210 не размечены как обработанные. |
+| LE:1 `0x90E9..0x9210` | Unit prefix: death dispatch, regeneration, bleeding, rest, flee, wound voice, experience, terrain death | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Гибель на местности отключена в схватке до проверки на оригинале; звуки не воспроизводятся. |
 | LE:1 `0x9210..0x92FC` | Worker stationary animation dispatch | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Состояния 0/1/3 и их запросы; движение, специальные состояния и общий префикс 90E9 не входят в этот контракт. |
 | LE:1 `0x9354..0x937F` | Worker stationary turn timer | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Поворотное состояние 1, с первым немедленным уменьшением таймера; эффекты и другие состояния анимации не включены. |
 | LE:1 `0x93AD..0x9429` | Initialize worker strike animation | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Только ветвь цели-клетки. Цель-объект OBE[22]=FF и специальные варианты не включены. |
@@ -72,6 +76,7 @@
 | LE:1 `0x945C..0x9498` | Prepare worker strike effect arguments | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Возвращаются аргументы на границе вызова 9727; сам полный обработчик эффекта и его дальнейшие действия не перенесены. |
 | LE:1 `0x9653..0x9688` | Turn one heading sector | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Включает исходный ZF от расчёта кадра; общий таймер обновлений задаётся вызывающей стороной. |
 | LE:1 `0x9688..0x96CD` | Direction toward world coordinates | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Исходная u32-арифметика и переполнения; правило отличается от направления локального поиска 79C0. |
+| LE:1 `0x982B..0x98CC` | Object under an effect point with footprint containment | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Схватка пока бьёт явную цель вместо точки удара. |
 | LE:1 `0x98CC..0x996F` | Detach object from owner chain | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Корректная монотонная цепочка с достижимым объектом; момент смерти, порождение эффекта и повторное выделение записи не включены. |
 | LE:1 `0x9B0D..0x9B86` | Transfer occupancy at step midpoint | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Области и плоскости корректны; особый соседний вариант 9A97..9B0C не покрыт. Полное исходное размещение крупных движущихся объектов ещё не подключено в схватке. |
 | LE:1 `0x9B86..0x9BF9` | Gap between object footprints | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Сохранены байтовые сдвиги размеров и u32-переполнения; игровое использование включает лишь проверенные ветви подхода. |
@@ -93,6 +98,7 @@
 | LE:1 `0xB47F..0xB502` | Mine update: visitor handoff, stock debit and wear | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Проверен целиком с C4CD, 123D3 и B502 на первой карте. Разрушение шахты после износа +19 не подключено. |
 | LE:1 `0xB502..0xB5AB` | Remove one random ore mark and replace its surface | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Пометка грязной области экрана (B565..B5A4) не переносится. |
 | LE:1 `0xBE04..0xBE2E` | Apply damage to one prepared target | ported | [building-condition-kernel.md](../docs/building-condition-kernel.md); [building-kernel.json](../tests/fixtures/building-kernel.json) | Хвост после подготовки шаблона и силы; выбор цели, генерация силы, площадное действие и смерть с эффектами вне контракта. |
+| LE:1 `0xBFC9..0xC010` | Apply a hit: attack minus defence or a small chance of one point | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
 | LE:1 `0xC35F..0xC439` | Find harvestable forest footprint | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Непустая область внутри карты и поисковый прямоугольник без переполнения правого/нижнего конца; поведение для выходящих областей не включено. |
 | LE:1 `0xC439..0xC4CD` | Find worker cargo receiver | ported | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Порядок цепочки передан вызывающей стороной; выбирается последний при равном расстоянии. Полный пул владельца схватки ещё не используется как хранилище. |
 | LE:1 `0xC4CD..0xC5D7` | Find waiting worker at building | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Только фиксированный вход через DAT[53]/[54] и C591; общий обход периметра здания не включён. |

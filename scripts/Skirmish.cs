@@ -28,7 +28,10 @@ public sealed class SkirmishActor
     public byte[] Record { get; init; } = [];
     public SkirmishUnitRules Rules { get; init; } = new();
     public int Team { get; init; }
-    public int Health { get; set; }
+    /// <summary>Original condition byte OBE[19] (signed); damage, healing and death act on the record.</summary>
+    public int Health { get => Math.Max(0, (int)(sbyte)Record[0x19]); set => Record[0x19] = (byte)Math.Clamp(value, 0, 127); }
+    /// <summary>OBE[1A] for units (90E9 regeneration limit); DAT initial condition for structures.</summary>
+    public int MaxHealth => Structure ? Math.Max(1, (int)Template.InitialCondition) : Math.Max(1, (int)Record[0x1a]);
     public bool Alive => Health > 0;
     public bool Worker => Rules.Worker;
     public bool Structure => Rules.Damage == 0 && !Worker;
@@ -103,7 +106,7 @@ public sealed partial class Skirmish : IDisposable
             if (!rules.Units.TryGetValue(obj.TemplateName, out var spec) || spec.Worker) continue;
             var template = templates.Armies[obj.TemplateFile].Templates[obj.TemplateIndex];
             Actors.Add(new SkirmishActor { Source = obj, Template = template, Parameters = Convert.FromHexString(template.RawRecordHex),
-                Record = Convert.FromHexString(obj.RawRecordHex), Rules = spec, Health = spec.Health, Team = slot.SlotIndex == rules.PlayerSlot ? 0 : 1 });
+                Record = Convert.FromHexString(obj.RawRecordHex), Rules = spec, Team = slot.SlotIndex == rules.PlayerSlot ? 0 : 1 });
         }
         _guidance.Region = new Rect2I(0, 0, map.Width, map.Height);
         _guidance.DiagonalMode = AStarGrid2D.DiagonalModeEnum.Always;
@@ -289,6 +292,7 @@ public sealed partial class Skirmish : IDisposable
         {
             if (!actor.Alive) continue;
             actor.AttackTimer -= dt; actor.ReplanTimer -= dt;
+            if (TickVitals(actor)) continue;
             if (actor.Worker) { TickWorker(actor, dt); continue; }
             var target = Find(actor.Target);
             if (actor.Target != 0 && target == null) { actor.Target = 0; actor.Route.Clear(); actor.Goal = null; }
@@ -379,14 +383,40 @@ public sealed partial class Skirmish : IDisposable
     private void Strike(SkirmishActor actor, SkirmishActor target)
     {
         actor.AttackTimer = actor.Rules.Cooldown;
-        target.Health = Math.Max(0, target.Health - actor.Rules.Damage);
+        // Original hit formula (BFC9) with the attack of the strike effect (ARMY__00.WRK 4F5..4FD / 764..772).
+        // Strike timing, the effect object and projectile flight remain bridge behaviour; see docs/combat.md.
+        byte kind = actor.Rules.Range > 64 ? (byte)(actor.Record[0x14] & 7) : (byte)0;
+        OriginalCombatRules.Hit(target.Record, target.Parameters, OriginalCombatRules.StrikeAttack(actor.Record[0x16]), kind, _terrainCatalog.NextRandomByte);
         Effects.Add(new BattleEffect { From = actor.Position, To = target.Position, Team = actor.Team });
         if (target.Alive) return;
+        Kill(target);
+    }
+    private void Kill(SkirmishActor target)
+    {
         var cells = Occupancy.Cells.ToArray();
         for (int i = 0; i < cells.Length; i++) if (cells[i] == target.Id) cells[i] = 0;
         Occupancy.LoadCells(cells);
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         Log($"{target.Source.TemplateName} {(target.Team == 0 ? "потерян" : "уничтожен")}.");
+    }
+    /// <summary>90E9 unit prefix; returns true when the unit died this update.
+    /// Terrain death (91AE..9202) is disabled here: scenario units start on cell corners whose class the DAT marks lethal,
+    /// so the runtime position/terrain convention must be confirmed on the running original first (docs/combat.md).</summary>
+    private bool TickVitals(SkirmishActor actor)
+    {
+        byte before = actor.Record[0x2d];
+        OriginalCombatRules.Vitals(actor.Record, actor.Parameters, _globalTick, (byte)Map.Width, (byte)Map.Height, Map.Cells, _properties, _terrainCatalog, _vitalsWorld ??= new(this), terrainDeath: false);
+        if (!actor.Alive) { Kill(actor); return true; }
+        // 8E0E requested flight to a random cell; non-workers follow it through the route bridge.
+        if (!actor.Worker && (actor.Record[0x2d] >> 4) == 2 && (before >> 4) != 2)
+        { actor.Target = 0; actor.Goal = new Vector2I(actor.Record[0x22], actor.Record[0x23]); actor.Route.Clear(); actor.ReplanTimer = 0; }
+        return false;
+    }
+    private VitalsWorld? _vitalsWorld;
+    private sealed class VitalsWorld(Skirmish battle) : IVitalsWorld
+    {
+        public void Sound(uint reference) { } // Sound banks (*.FX) are not ported yet.
+        public uint Occupant(int plane, int cell) => battle.Occupancy.Cells[plane * battle.Occupancy.Width * battle.Occupancy.Height + cell];
     }
     public void Dispose() => _guidance.Dispose();
 }

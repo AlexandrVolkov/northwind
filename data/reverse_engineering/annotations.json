@@ -1491,6 +1491,110 @@
         "scripts/OriginalOreRules.cs"
       ],
       "limitations": "Принимающая ветка 1B8 общая с хвостом обработчика."
+    },
+    {
+      "id": "combat-hit-formula",
+      "module": "LE:1",
+      "start": 49097,
+      "end": 49168,
+      "name": "Apply a hit: attack minus defence or a small chance of one point",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/combat.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCombatRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "effect-struck-object",
+      "module": "LE:1",
+      "start": 38955,
+      "end": 39116,
+      "name": "Object under an effect point with footprint containment",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/combat.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCombatRules.cs"
+      ],
+      "limitations": "Схватка пока бьёт явную цель вместо точки удара."
+    },
+    {
+      "id": "unit-vitals-prefix",
+      "module": "LE:1",
+      "start": 37097,
+      "end": 37392,
+      "name": "Unit prefix: death dispatch, regeneration, bleeding, rest, flee, wound voice, experience, terrain death",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/combat.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCombatRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": "Гибель на местности отключена в схватке до проверки на оригинале; звуки не воспроизводятся."
+    },
+    {
+      "id": "unit-flee-request",
+      "module": "LE:1",
+      "start": 36366,
+      "end": 36412,
+      "name": "Request a move to a random map cell",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/combat.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCombatRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "melee-strike-effect",
+      "module": "ARMY__00.WRK",
+      "start": 1267,
+      "end": 1354,
+      "name": "Melee strike effect: experience attack, lookup, hit, sound",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/combat.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCombatRules.cs"
+      ],
+      "limitations": "Объект-эффект и его анимация в схватке не создаются."
+    },
+    {
+      "id": "strike-spark-effects",
+      "module": "ARMY__00.WRK",
+      "start": 1790,
+      "end": 1890,
+      "name": "Spark effect types 4/5 creation and countdown",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/combat.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCombatRules.cs"
+      ],
+      "limitations": "Перенесено создание (AH=0); обновление кадров не подключено."
     }
   ]
 }
