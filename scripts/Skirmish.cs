@@ -51,6 +51,8 @@ public sealed class SkirmishActor
     public Vector2I? GatherTree { get; set; }
     public uint PreferredMill { get; set; }
     public bool HarvestPrepared { get; set; }
+    /// <summary>Bridge flag for WRK action 4 (86B6, mine work).</summary>
+    public bool MineJob { get; set; }
     public string JobText { get; set; } = "Без задания";
 }
 public sealed class BattleEffect
@@ -263,7 +265,7 @@ public sealed partial class Skirmish : IDisposable
     {
         if (Paused || Outcome != "") return;
         foreach (var actor in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0))
-        { actor.Target = 0; actor.Goal = null; actor.Route.Clear(); actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false; if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); } actor.JobText = "Без задания"; }
+        { actor.Target = 0; actor.Goal = null; actor.Route.Clear(); actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false; actor.MineJob = false; if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); } actor.JobText = "Без задания"; }
     }
     public void Advance(double delta)
     {
@@ -280,6 +282,7 @@ public sealed partial class Skirmish : IDisposable
         foreach (var effect in Effects) effect.Remaining -= dt;
         Effects.RemoveAll(e => e.Remaining <= 0);
         TickBuildings();
+        TickMining();
         TickProduction();
         TickPopulation();
         foreach (var actor in Actors.Where(a => a.Alive && !a.Structure).ToArray())

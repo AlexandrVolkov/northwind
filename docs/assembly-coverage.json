@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "9b6c58b8a178baf13253d77c0743dffbc98aab4cb45743629829772bd1a87ec3",
+  "annotation_sha256": "045397b1eb07cf83d17ffb8ef67854d6352054acf7f8663b68dfd9200a288f27",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,9 +32,9 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 4893,
-        "ported": 3665,
-        "unreviewed": 138324
+        "partial": 5000,
+        "ported": 4293,
+        "unreviewed": 137589
       },
       "linear_rows": 45008,
       "flow_candidate_instructions": 30465,
@@ -369,6 +369,22 @@
         },
         {
           "start": 34274,
+          "end": 34486,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 34486,
+          "end": 34687,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ore-carrier-controller"
+          ]
+        },
+        {
+          "start": 34687,
           "end": 36272,
           "status": "unreviewed",
           "classification": "unknown",
@@ -726,6 +742,24 @@
         },
         {
           "start": 46207,
+          "end": 46338,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "mine-extract-step"
+          ]
+        },
+        {
+          "start": 46338,
+          "end": 46507,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "mine-ore-depletion"
+          ]
+        },
+        {
+          "start": 46507,
           "end": 48644,
           "status": "unreviewed",
           "classification": "unknown",
@@ -810,6 +844,22 @@
         },
         {
           "start": 51424,
+          "end": 52347,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 52347,
+          "end": 52420,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "castle-goods-receive"
+          ]
+        },
+        {
+          "start": 52420,
           "end": 52594,
           "status": "unreviewed",
           "classification": "unknown",
@@ -876,6 +926,31 @@
         },
         {
           "start": 54705,
+          "end": 73392,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 73392,
+          "end": 73419,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "goods-gold-credit"
+          ]
+        },
+        {
+          "start": 73419,
+          "end": 73446,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "goods-metal-credit"
+          ]
+        },
+        {
+          "start": 73446,
           "end": 74707,
           "status": "unreviewed",
           "classification": "unknown",
@@ -892,6 +967,22 @@
         },
         {
           "start": 74756,
+          "end": 74810,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 74810,
+          "end": 74917,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "goods-credit-dispatch"
+          ]
+        },
+        {
+          "start": 74917,
           "end": 146882,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1020,9 +1111,9 @@
       "zero_fill_bytes": 0,
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
-        "partial": 435,
-        "ported": 128,
-        "unreviewed": 6367
+        "partial": 609,
+        "ported": 212,
+        "unreviewed": 6109
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -1034,6 +1125,22 @@
       "regions": [
         {
           "start": 0,
+          "end": 315,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 315,
+          "end": 343,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "castle-visitor-check"
+          ]
+        },
+        {
+          "start": 343,
           "end": 545,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1130,6 +1237,22 @@
         },
         {
           "start": 1346,
+          "end": 1427,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1427,
+          "end": 1459,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "mine-visitor-check"
+          ]
+        },
+        {
+          "start": 1459,
           "end": 1494,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1185,6 +1308,16 @@
         },
         {
           "start": 2129,
+          "end": 2215,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "worker-wrk-grant",
+            "worker-ore-grant"
+          ]
+        },
+        {
+          "start": 2215,
           "end": 2281,
           "status": "partial",
           "classification": "code",
@@ -1210,6 +1343,31 @@
         },
         {
           "start": 2514,
+          "end": 2541,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 2541,
+          "end": 2715,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "ore-worker-dispatch"
+          ]
+        },
+        {
+          "start": 2715,
+          "end": 2739,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ore-worker-return-empty"
+          ]
+        },
+        {
+          "start": 2739,
           "end": 6930,
           "status": "unreviewed",
           "classification": "unknown",

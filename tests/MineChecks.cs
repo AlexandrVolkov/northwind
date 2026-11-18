@@ -42,6 +42,27 @@ public partial class TestRunner
             Check(mine.ConstructionRemaining == 0 && mine.Record[0x19] == mine.Template.InitialCondition
                 && BinaryPrimitives.ReadUInt32LittleEndian(mine.Record.AsSpan(0x24)) == deposit.Remaining,
                 "Mine reaches completed condition while retaining its source deposit state");
+            var worker = Recruit(battle, true) ?? throw new InvalidOperationException("Could not hire a miner");
+            for (int i = 0; i < 300 && battle.Find(worker.Id) != null && worker.Cell == battle.PlayerCastle.Cell; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            uint metal = battle.Metal, gold = battle.Gold, stock = BinaryPrimitives.ReadUInt32LittleEndian(mine.Record.AsSpan(0x24));
+            Check(!battle.WorkMine([battle.Hero.Id], mine.Id) && battle.WorkMine([worker.Id], mine.Id) && worker.MineJob,
+                "Only workers accept the mine order");
+            bool carried = false;
+            for (int i = 0; i < 9000 && (battle.Metal == metal && battle.Gold == gold); i++)
+            {
+                battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+                if (worker.Source.TemplateIndex == OriginalOreRules.OreWorker) carried = true;
+            }
+            uint after = BinaryPrimitives.ReadUInt32LittleEndian(mine.Record.AsSpan(0x24));
+            bool goldMine = deposit.Type == 1;
+            Check(carried && after == stock - 100, $"Mine B47F hands one bag to the worker and debits 100 ({stock} -> {after})");
+            Check(goldMine ? battle.Gold == gold + 100 && battle.Metal == metal : battle.Metal == metal + 100 && battle.Gold == gold,
+                $"Castle CC7B credits exactly one bag of {Skirmish.OreName(deposit.Type)} (metal {metal}->{battle.Metal}, gold {gold}->{battle.Gold})");
+            Check(worker.Record[0x31] == 0 && (goldMine ? battle.ProducedGold : battle.ProducedMetal) == 100, "Delivered cargo is cleared and counted once in statistics");
+            for (int i = 0; i < 9000 && (battle.Metal == metal && battle.Gold == gold || after == BinaryPrimitives.ReadUInt32LittleEndian(mine.Record.AsSpan(0x24))); i++)
+                battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check(BinaryPrimitives.ReadUInt32LittleEndian(mine.Record.AsSpan(0x24)) == stock - 200 && worker.MineJob,
+                "The worker returns to the mine for the next bag");
         }
         var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
         for (int i = 0; i < 4; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);

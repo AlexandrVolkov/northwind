@@ -167,6 +167,7 @@ public partial class SkirmishMain : Node2D
         var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
         if (target?.Team == 1) Battle.Attack(Selection, target.Id);
         else if (target?.Source.TemplateName == "Лесопилка" && Battle.DeliverTimber(Selection, target.Id)) { }
+        else if (target?.Source.TemplateName == "Шахта" && Battle.WorkMine(Selection, target.Id)) { }
         else if (Battle.Harvestable(cell) && Selection.Any(id => Battle.Find(id)?.Worker == true)) Battle.GatherTimber(Selection, cell);
         else Battle.Move(Selection, cell);
         _orderMark = point; _markUntil = Battle.Elapsed + 2;
@@ -438,7 +439,8 @@ public partial class SkirmishMain : Node2D
         if (units is [var selectedMill] && selectedMill.Source.TemplateName == "Лесопилка")
             _selection.Text += selectedMill.ConstructionRemaining > 0 ? $"\nСтроится: {selectedMill.ConstructionRemaining:0} с" : $"\nГрузов в очереди: {selectedMill.Record[0x24]}";
         if (units is [var selectedMine] && selectedMine.Source.TemplateName == "Шахта")
-            _selection.Text += $"\nРудных клеток: {BinaryPrimitives.ReadUInt32LittleEndian(selectedMine.Record.AsSpan(0x24)) >> 11}\nТип месторождения: {selectedMine.Record[0x23]}";
+            _selection.Text += selectedMine.ConstructionRemaining > 0 ? $"\nСтроится: {selectedMine.ConstructionRemaining:0} с" :
+                $"\nРуда: {Skirmish.OreName(selectedMine.Record[0x23])} · мешков: {(BinaryPrimitives.ReadUInt32LittleEndian(selectedMine.Record.AsSpan(0x24)) + 99) / 100}\nПКМ рабочими — добывать";
         _economy.Text = $"Металл: {Battle.Metal} · Дерево: {Battle.Wood}\nЗолото: {Battle.Gold} · Люди: {Battle.FreePeople}\nПоддержка ферм: {Battle.Population.FarmSupport} · Нагрузка: {Battle.Population.Used}";
         if (Battle.FreePeople == 0) _economy.Text += Battle.PopulationGrowthSeconds is { } seconds ? $"\nПополнение через {Math.Ceiling(seconds)} с" : "\nДля прироста нужна ферма";
         bool castle = units is [var selected] && selected.Id == Battle.PlayerCastle.Id && selected.Alive;
