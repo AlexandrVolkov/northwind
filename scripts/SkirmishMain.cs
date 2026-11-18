@@ -340,7 +340,7 @@ public partial class SkirmishMain : Node2D
         float width = actor.Structure ? 72 : 30;
         if (actor.Worker && actor.Record[0x31] == 3) DrawCircle(point + new Vector2(12, -24), 5, new Color("d3ac64"));
         var bar = new Rect2(point + new Vector2(-width / 2, 20), new Vector2(width, 5));
-        DrawRect(bar, new Color("18211d")); DrawRect(new Rect2(bar.Position + Vector2.One, new Vector2((width - 2) * actor.Health / actor.Rules.Health, 3)), color);
+        DrawRect(bar, new Color("18211d")); DrawRect(new Rect2(bar.Position + Vector2.One, new Vector2((width - 2) * actor.Health / actor.MaxHealth, 3)), color);
         if (actor.ConstructionRemaining > 0)
             DrawRect(new Rect2(bar.Position + new Vector2(0, 8), new Vector2(width * (float)(1 - actor.ConstructionRemaining / actor.ConstructionDuration), 4)), new Color("e7cd82"));
         if (actor.Hero || actor.Structure || Selection.Contains(actor.Id) || actor.Id == _hover)
@@ -428,7 +428,7 @@ public partial class SkirmishMain : Node2D
             !Battle.Objective.Alive ? $"Замок разрушен\nОсталось защитников: {Battle.Actors.Count(a => a.Team == 1 && !a.Structure && a.Alive)} · T — найти" :
             $"Время {TimeSpan.FromSeconds(Battle.Elapsed):mm\\:ss} · ×{Speed}";
         var units = Selection.Select(Battle.Find).OfType<SkirmishActor>().ToArray();
-        _selection.Text = units.Length == 1 ? $"{units[0].Source.TemplateName}\nЗдоровье {units[0].Health}/{units[0].Rules.Health}"
+        _selection.Text = units.Length == 1 ? $"{units[0].Source.TemplateName}\nЗдоровье {units[0].Health}/{units[0].MaxHealth}"
             : $"Выбрано отрядов: {units.Length}\nЖивых союзников: {Battle.Actors.Count(a => a.Team == 0 && a.Alive && !a.Structure)}";
         if (units is [{ Worker: true } worker]) _selection.Text += $"\n{worker.JobText}";
         if (units is [var selectedFarm] && selectedFarm.Source.TemplateName == "Ферма")

@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "045397b1eb07cf83d17ffb8ef67854d6352054acf7f8663b68dfd9200a288f27",
+  "annotation_sha256": "7a42518f16a4a8fea40498a32293755754226f6ae87ec7435f79ea045a8ca057",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 5000,
-        "ported": 4293,
-        "unreviewed": 137589
+        "ported": 4807,
+        "unreviewed": 137075
       },
       "linear_rows": 45008,
       "flow_candidate_instructions": 30465,
@@ -401,6 +401,15 @@
         },
         {
           "start": 36366,
+          "end": 36412,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "unit-flee-request"
+          ]
+        },
+        {
+          "start": 36412,
           "end": 36720,
           "status": "unreviewed",
           "classification": "unknown",
@@ -428,15 +437,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "worker-common-update"
+            "worker-common-update",
+            "unit-vitals-prefix"
           ]
         },
         {
           "start": 37156,
           "end": 37392,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "unit-vitals-prefix"
+          ]
         },
         {
           "start": 37392,
@@ -524,10 +536,19 @@
         },
         {
           "start": 38605,
-          "end": 39116,
+          "end": 38955,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 38955,
+          "end": 39116,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "effect-struck-object"
+          ]
         },
         {
           "start": 39116,
@@ -776,6 +797,22 @@
         },
         {
           "start": 48686,
+          "end": 49097,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 49097,
+          "end": 49168,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "combat-hit-formula"
+          ]
+        },
+        {
+          "start": 49168,
           "end": 50015,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1055,7 +1092,9 @@
       "zero_fill_bytes": 0,
       "sha256": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33",
       "byte_status": {
-        "unreviewed": 5403
+        "partial": 100,
+        "ported": 87,
+        "unreviewed": 5216
       },
       "linear_rows": 1709,
       "flow_candidate_instructions": 416,
@@ -1067,6 +1106,38 @@
       "regions": [
         {
           "start": 0,
+          "end": 1267,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1267,
+          "end": 1354,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "melee-strike-effect"
+          ]
+        },
+        {
+          "start": 1354,
+          "end": 1790,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1790,
+          "end": 1890,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "strike-spark-effects"
+          ]
+        },
+        {
+          "start": 1890,
           "end": 5403,
           "status": "unreviewed",
           "classification": "unknown",

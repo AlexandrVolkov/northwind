@@ -96,6 +96,12 @@ public sealed class OriginalTerrainCatalog
     public uint Descriptor(int tile) => OriginalForestryRules.Property(_properties, (uint)tile);
     /// <summary>CE9D: random tile whose descriptor matches under FFFF0F00; consumes RNG only when a candidate exists.</summary>
     public bool ReplaceSurface(uint descriptor, out ushort tile) => Choose(descriptor, out tile);
+    /// <summary>Second index into the same table, used by 9E55 ([19EC]).</summary>
+    public byte SecondaryIndex { get; set; }
+    public byte NextSecondaryByte()
+    {
+        byte value = _random[SecondaryIndex]; SecondaryIndex = unchecked((byte)(SecondaryIndex + 1)); return value;
+    }
     public byte NextRandomByte()
     {
         byte value = _random[RandomIndex]; RandomIndex = unchecked((byte)(RandomIndex + 1)); return value;
