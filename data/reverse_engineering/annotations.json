@@ -67,6 +67,24 @@
       "limitations": "Статически установлено ветвление AH=0/1/2/4/5. Полная добыча, формы груза, получатель и ресурсные слоты ещё не восстановлены."
     },
     {
+      "id": "mine-deposit-initialization",
+      "module": "ARMY__02.WRK",
+      "start": 1494,
+      "end": 1566,
+      "name": "Mine first-update ore selection and reserve",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/mine-deposits.md",
+        "tests/fixtures/mine-deposits.json"
+      ],
+      "implementation": [
+        "scripts/OriginalMineRules.cs",
+        "scripts/SkirmishEconomy.cs"
+      ],
+      "limitations": "Перенесены выбор более частого типа 1/2 и начальный запас. Внешние вызовы и полный цикл обновления здания не включены."
+    },
+    {
       "id": "farm-event-and-counter",
       "module": "ARMY__02.WRK",
       "start": 1878,
@@ -779,6 +797,23 @@
         "scripts/OriginalBuildingLifecycle.cs"
       ],
       "limitations": "Три записи состояния после создания объекта; размещение и последующий жизненный цикл отдельны."
+    },
+    {
+      "id": "mine-ore-neighborhood-counter",
+      "module": "LE:1",
+      "start": 46071,
+      "end": 46207,
+      "name": "Count source ore subtype in clipped three-by-three neighborhood",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/mine-deposits.md",
+        "tests/fixtures/mine-deposits.json"
+      ],
+      "implementation": [
+        "scripts/OriginalMineRules.cs"
+      ],
+      "limitations": "Проверены 108 координат первой карты и оба типа руды по настоящему коду. Остальные карты и необычные размеры требуют отдельных проверок."
     },
     {
       "id": "target-damage-tail",
