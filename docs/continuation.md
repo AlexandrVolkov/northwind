@@ -24,9 +24,7 @@
 
 ## Облачная среда
 
-В облачной сессии Claude Code движок Godot 4.7.2 .NET и Ghidra 12.2 собираются из исходников (готовые релизы GitHub недоступны через прокси): `/opt/src/godot` (`scons platform=linuxbsd target=editor module_mono_enabled=yes`, затем генерация glue и `build_assemblies.py`), `/opt/src/ghidra` (`gradlew buildGhidra`, нужен JDK 25 и `LC_ALL=C.UTF-8`). .NET SDK 10.0.4xx ставится `dotnet-install.sh` в `/opt/dotnet`. Распакованная игра — `/opt/game/install/Program_Executable_Files` (из ISO через `7z` и `unshield`). Эти каталоги не сохраняются между сессиями.
-
-Локальный анализ предыдущих сессий находился в `build/assembly-final/assembly.sqlite` и `build/rea-assembly-initial/`, но эти папки игнорируются Git и **не будут доступны в новой чистой копии**. Их можно восстановить из собственной установленной игры/ISO по [инструкции для базы](assembly-database.md). Для игры и большинства тестов они не нужны. Профили SHA-256, доказательства и пометки уже в Git; адреса `LE:1` относятся к первому LE-объекту, а `WRK` — к началу указанного файла. Не смешивайте эти пространства адресов.
+Окружение `northwind` ставит инструменты setup-скриптом и восстанавливает готовые Godot 4.7.2 .NET (`/opt/godot`, команда `godot`) и Ghidra 12.2 (`/opt/ghidra/current`, подключена к REA) из ветки `toolchain`. Вручную: `git fetch --depth 1 origin toolchain:refs/remotes/origin/toolchain && git worktree add /tmp/tc origin/toolchain && bash /tmp/tc/install.sh`. .NET SDK 10.0.4xx — `/opt/dotnet`, нужен `DOTNET_ROOT=/opt/dotnet`. Игру распаковать из ISO: `7z x` образа, затем `unshield -d install x Setup/data1.cab`; файлы — в `install/Program_Executable_Files`. Pull request создаётся через REST (`gh api repos/.../pulls`), GraphQL и релизы в облачной сессии недоступны.
 
 ## Быстрая проверка
 
