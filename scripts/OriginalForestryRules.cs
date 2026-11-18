@@ -93,7 +93,9 @@ public sealed class OriginalTerrainCatalog
             if ((descriptor & 0xf00) == 0x200) _cleared.Add((ushort)i);
         }
     }
-    private uint Descriptor(int tile) => OriginalForestryRules.Property(_properties, (uint)tile);
+    public uint Descriptor(int tile) => OriginalForestryRules.Property(_properties, (uint)tile);
+    /// <summary>CE9D: random tile whose descriptor matches under FFFF0F00; consumes RNG only when a candidate exists.</summary>
+    public bool ReplaceSurface(uint descriptor, out ushort tile) => Choose(descriptor, out tile);
     public byte NextRandomByte()
     {
         byte value = _random[RandomIndex]; RandomIndex = unchecked((byte)(RandomIndex + 1)); return value;

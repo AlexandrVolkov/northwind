@@ -30,9 +30,10 @@ public static class OriginalWorkerApproach
     private static WorkerApproachResult Invalid(Span<byte> visitor)
     { visitor[0x17] &= 0xbf; return new(WorkerApproachStatus.Invalid); }
     public static WorkerApproachResult Step(Span<byte> visitor, Span<byte> receiver,
-        ReadOnlySpan<byte> visitorTemplate, ReadOnlySpan<byte> receiverTemplate, uint widthPixels, uint heightPixels)
+        ReadOnlySpan<byte> visitorTemplate, ReadOnlySpan<byte> receiverTemplate, uint widthPixels, uint heightPixels, bool? receiverAccepts = null)
     {
-        if (BinaryPrimitives.ReadUInt32LittleEndian(visitor[0x1c..]) == 0 || receiver.IsEmpty || !AcceptsVisitor(visitorTemplate)) return Invalid(visitor);
+        // receiverAccepts carries another receiver's verified WRK AH=5 result (mine/castle: OriginalOreRules).
+        if (BinaryPrimitives.ReadUInt32LittleEndian(visitor[0x1c..]) == 0 || receiver.IsEmpty || !(receiverAccepts ?? AcceptsVisitor(visitorTemplate))) return Invalid(visitor);
         int current = visitor[0x2d] & 15, requested = visitor[0x2d] >> 4;
         int phase = visitor[0x30] & 15;
         if (phase == 3)

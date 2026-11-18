@@ -61,10 +61,11 @@
       "classification": "code",
       "status": "partial",
       "evidence": [
-        "docs/game-logic-map.md"
+        "docs/game-logic-map.md",
+        "docs/ore-extraction.md"
       ],
       "implementation": [],
-      "limitations": "Статически установлено ветвление AH=0/1/2/4/5. Полная добыча, формы груза, получатель и ресурсные слоты ещё не восстановлены."
+      "limitations": "Статически установлено ветвление AH=0/1/2/4/5. Ветви AH=5 и действие добычи (67D → B47F) разобраны в docs/ore-extraction.md; события 2/4 не перенесены."
     },
     {
       "id": "mine-deposit-initialization",
@@ -1283,6 +1284,213 @@
         "scripts/SkirmishProduction.cs"
       ],
       "limitations": "Разобраны строки лучника, ополченца, поджигателя и рыцаря. Строительство казармы и отдельная очередь ополченца подключены; полный WRK-диспетчер остаётся задачей."
+    },
+    {
+      "id": "mine-extract-step",
+      "module": "LE:1",
+      "start": 46207,
+      "end": 46338,
+      "name": "Mine update: visitor handoff, stock debit and wear",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ore-extraction.md",
+        "tests/fixtures/ore-extraction.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOreRules.cs",
+        "scripts/SkirmishMining.cs"
+      ],
+      "limitations": "Проверен целиком с C4CD, 123D3 и B502 на первой карте. Разрушение шахты после износа +19 не подключено."
+    },
+    {
+      "id": "mine-ore-depletion",
+      "module": "LE:1",
+      "start": 46338,
+      "end": 46507,
+      "name": "Remove one random ore mark and replace its surface",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ore-extraction.md",
+        "tests/fixtures/ore-extraction.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOreRules.cs"
+      ],
+      "limitations": "Пометка грязной области экрана (B565..B5A4) не переносится."
+    },
+    {
+      "id": "ore-carrier-controller",
+      "module": "LE:1",
+      "start": 34486,
+      "end": 34687,
+      "name": "Ore carrier phases: mine, receiver, back-off",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ore-extraction.md",
+        "tests/fixtures/ore-extraction.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOreRules.cs",
+        "scripts/SkirmishMining.cs"
+      ],
+      "limitations": "8F70/C439 подключены отдельно; 8B0F (отход) остаётся мостом. Глобальная запись [522] из 8D89 не переносится."
+    },
+    {
+      "id": "castle-goods-receive",
+      "module": "LE:1",
+      "start": 52347,
+      "end": 52420,
+      "name": "Castle takes cargo from the worker in its entry",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ore-extraction.md",
+        "tests/fixtures/ore-extraction.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOreRules.cs",
+        "scripts/SkirmishMining.cs"
+      ],
+      "limitations": "Проверены грузы 0..2; прочие коды идут в слоты предметов 1243A и не перенесены."
+    },
+    {
+      "id": "goods-credit-dispatch",
+      "module": "LE:1",
+      "start": 74810,
+      "end": 74917,
+      "name": "Goods handler dispatch and item slots",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/ore-extraction.md",
+        "tests/fixtures/ore-extraction.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOreRules.cs"
+      ],
+      "limitations": "Перенесены коды 0..2. Слоты +CD, UI/звук для локального игрока (5593/A4A9) не перенесены."
+    },
+    {
+      "id": "goods-gold-credit",
+      "module": "LE:1",
+      "start": 73392,
+      "end": 73419,
+      "name": "Goods code 1: +100 gold and statistics",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ore-extraction.md",
+        "tests/fixtures/ore-extraction.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOreRules.cs"
+      ],
+      "limitations": "Только AH=2."
+    },
+    {
+      "id": "goods-metal-credit",
+      "module": "LE:1",
+      "start": 73419,
+      "end": 73446,
+      "name": "Goods code 2: +100 metal and statistics",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ore-extraction.md",
+        "tests/fixtures/ore-extraction.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOreRules.cs"
+      ],
+      "limitations": "Только AH=2."
+    },
+    {
+      "id": "worker-ore-grant",
+      "module": "ARMY__02.WRK",
+      "start": 2129,
+      "end": 2215,
+      "name": "Empty worker AH=7 cargo selection",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ore-extraction.md",
+        "tests/fixtures/ore-extraction.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOreRules.cs"
+      ],
+      "limitations": "Проверены все коды AL; древесная ветвь 8CE совпадает с ранее перенесённой."
+    },
+    {
+      "id": "ore-worker-dispatch",
+      "module": "ARMY__02.WRK",
+      "start": 2541,
+      "end": 2715,
+      "name": "Ore worker handler header, init and action table",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/ore-extraction.md",
+        "tests/fixtures/ore-extraction.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOreRules.cs"
+      ],
+      "limitations": "Перенесены инициализация A09 и переход A37..A43; общий префикс 90E9 и диспетчер 8227 не перенесены."
+    },
+    {
+      "id": "ore-worker-return-empty",
+      "module": "ARMY__02.WRK",
+      "start": 2715,
+      "end": 2739,
+      "name": "Empty ore worker becomes template 10",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ore-extraction.md",
+        "tests/fixtures/ore-extraction.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOreRules.cs"
+      ],
+      "limitations": "Ветка сброса груза AB3..ACE (объект 26h) не перенесена."
+    },
+    {
+      "id": "mine-visitor-check",
+      "module": "ARMY__02.WRK",
+      "start": 1427,
+      "end": 1459,
+      "name": "Mine AH=5 visitor validator",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ore-extraction.md",
+        "tests/fixtures/ore-extraction.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOreRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "castle-visitor-check",
+      "module": "ARMY__02.WRK",
+      "start": 315,
+      "end": 343,
+      "name": "Castle AH=5 visitor validator",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ore-extraction.md",
+        "tests/fixtures/ore-extraction.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOreRules.cs"
+      ],
+      "limitations": "Принимающая ветка 1B8 общая с хвостом обработчика."
     }
   ]
 }

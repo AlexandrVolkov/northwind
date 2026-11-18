@@ -8,12 +8,13 @@ public enum DeliveryWait : byte { Completed = 0, Expired = 2, Pending = 255 }
 public static class OriginalWorkerDelivery
 {
     // C439..C4CC: owner-chain order is supplied by the caller. Equal distances select the later record.
-    public static uint FindReceiver(uint x, uint y, IEnumerable<DeliveryCandidate> ownerChain)
+    // Callers pass EAX/EBX: 200h/F00h for the lumbermill (8659), 508h/F08h for ore receivers (872A).
+    public static uint FindReceiver(uint x, uint y, IEnumerable<DeliveryCandidate> ownerChain, uint kind = 0x200, uint mask = 0xf00)
     {
         uint result = 0, best = uint.MaxValue;
         foreach (var candidate in ownerChain)
         {
-            if ((candidate.Flags & 0xf00) != 0x200 || (sbyte)candidate.Condition <= (sbyte)candidate.Threshold) continue;
+            if ((candidate.Flags & mask) != kind || (sbyte)candidate.Condition <= (sbyte)candidate.Threshold) continue;
             uint dx = SignedAbs(unchecked(candidate.X - x)), dy = SignedAbs(unchecked(candidate.Y - y));
             uint distance = Math.Max(dx, dy);
             if (distance > best) continue;

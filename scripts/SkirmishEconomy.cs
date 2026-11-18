@@ -168,7 +168,7 @@ public sealed partial class Skirmish
         OriginalBuildingLifecycle.MarkConstruction(mine.Record);
         Actors.Add(mine);
         Occupancy.WriteFootprint(mine.Parameters[3], mine.Parameters[4], mine.Record[0x0d], (uint)mine.Position.X, (uint)mine.Position.Y, mine.Id);
-        Log($"Шахта строится. Рудных клеток вокруг: {deposit.Count}; тип: {deposit.Type}."); return mine;
+        Log($"Шахта строится. Рудных клеток вокруг: {deposit.Count}; руда: {OreName(deposit.Type)}."); return mine;
     }
     public int GatherTimber(IEnumerable<uint> ids, Vector2I tree)
     {
@@ -176,7 +176,7 @@ public sealed partial class Skirmish
         int count = 0;
         foreach (var worker in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && a.Worker))
         {
-            worker.GatherTree = tree; worker.PreferredMill = 0; ClearDelivery(worker); worker.Goal = null; worker.Target = 0;
+            worker.GatherTree = tree; worker.PreferredMill = 0; worker.MineJob = false; ClearDelivery(worker); worker.Goal = null; worker.Target = 0;
             worker.Route.Clear(); worker.HarvestPrepared = false; worker.Record[0x2d] &= 15; worker.ReplanTimer = 0; count++;
         }
         if (count > 0) Log($"Рубка леса: {count} раб. Груз будет доставляться в готовую лесопилку.");
@@ -187,7 +187,7 @@ public sealed partial class Skirmish
         if (Paused || Outcome != "" || Find(millId) is not { Team: 0 } mill || mill.Source.TemplateName != "Лесопилка") return false;
         bool accepted = false;
         foreach (var worker in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && a.Worker && a.Record[0x31] == 3))
-        { ClearDelivery(worker); worker.PreferredMill = millId; worker.Route.Clear(); worker.Goal = null; worker.ReplanTimer = 0; accepted = true; }
+        { ClearDelivery(worker); worker.MineJob = false; worker.PreferredMill = millId; worker.Route.Clear(); worker.Goal = null; worker.ReplanTimer = 0; accepted = true; }
         return accepted;
     }
     private void TickBuildings()
@@ -293,6 +293,7 @@ public sealed partial class Skirmish
             if (OriginalWorkerAnimation.Pending(worker.Record))
             { worker.JobText = (worker.Record[0x2d] & 15) == 1 ? "Поворачивается к лесопилке" : "Рубит дерево"; return; }
         }
+        if (worker.MineJob || worker.Source.TemplateIndex == OriginalOreRules.OreWorker) { TickOreWorker(worker); return; }
         if (worker.Source.TemplateIndex == 11 && worker.Record[0x31] == 0)
         {
             var empty = Convert.FromHexString(_templates.Armies["ARMY__02.DAT"].Templates[10].RawRecordHex);
