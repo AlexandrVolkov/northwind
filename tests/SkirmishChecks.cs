@@ -50,6 +50,15 @@ public partial class TestRunner
     }
 
 
+    private static Vector2I BarracksSite(Skirmish battle)
+    {
+        var cells = new List<Vector2I>();
+        for (int y = -12; y <= 12; y++) for (int x = -12; x <= 12; x++)
+            cells.Add(battle.PlayerCastle.Cell + new Vector2I(x, y));
+        return cells.OrderBy(c => ((Vector2)c).DistanceSquaredTo(battle.PlayerCastle.Cell))
+            .First(c => battle.ProbeBarracks(c).Status == ConstructionPlacementStatus.Clear);
+    }
+
     private async Task SkirmishChecks()
     {
         GetTree().Root.Size = new Vector2I(1280, 800);

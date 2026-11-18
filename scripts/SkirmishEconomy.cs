@@ -50,6 +50,7 @@ public sealed partial class Skirmish
     public HashSet<Vector2I> ClearedGroves { get; } = [];
     private OriginalTerrainCatalog _terrainCatalog = null!;
     public SkirmishActor PlayerCastle => Actors.Single(a => a.Team == 0 && a.Source.TemplateName == "Замок");
+    public TemplateEntry BarracksTemplate => _templates.Armies["ARMY__02.DAT"].Templates[3];
     public TemplateEntry MillTemplate => _templates.Armies["ARMY__02.DAT"].Templates[4];
     private TemplatesData _templates = null!;
     private ObjectRecord _workerSeed = null!;
@@ -130,6 +131,21 @@ public sealed partial class Skirmish
         Actors.Add(mill); Occupancy.WriteFootprint(mill.Parameters[3], mill.Parameters[4], 1, (uint)mill.Position.X, (uint)mill.Position.Y, mill.Id);
         Log("Лесопилка строится. Рабочий сможет сдавать сюда древесину после завершения."); return mill;
     }
+    public ConstructionPlacement ProbeBarracks(Vector2I cell) => ProbeEconomyBuilding(cell, BarracksTemplate);
+    public SkirmishActor? BuildBarracks(Vector2I cell)
+    {
+        if (Paused || Outcome != "" || !PlayerCastle.Alive) return null;
+        if (ProbeBarracks(cell).Status != ConstructionPlacementStatus.Clear) { Log("Для казармы нужна свободная площадка рядом с замком."); return null; }
+        if (!Spend(BarracksTemplate)) return null;
+        var barracks = NewEconomyActor(3, cell, false);
+        barracks.ConstructionDuration = barracks.ConstructionRemaining = barracks.Template.InitialCondition * Math.Max(1, (int)barracks.Parameters[0x57]) / (double)Rules.TicksPerSecond;
+        OriginalBuildingLifecycle.MarkConstruction(barracks.Record);
+        barracks.Record.AsSpan(0x22, 5).Fill(0xff);
+        barracks.Record[0x20] = 0xff; barracks.Record[0x27] = 0xff;
+        Actors.Add(barracks);
+        Occupancy.WriteFootprint(barracks.Parameters[3], barracks.Parameters[4], barracks.Record[0x0d], (uint)barracks.Position.X, (uint)barracks.Position.Y, barracks.Id);
+        Log("Казарма строится. Ополченцев можно заказать после завершения."); return barracks;
+    }
     public int GatherTimber(IEnumerable<uint> ids, Vector2I tree)
     {
         if (Paused || Outcome != "" || !Harvestable(tree)) return 0;
@@ -152,7 +168,7 @@ public sealed partial class Skirmish
     }
     private void TickBuildings()
     {
-        foreach (var building in Actors.Where(a => a.Alive && a.Team == 0 && (a.Source.TemplateName is "Лесопилка" or "Ферма")))
+        foreach (var building in Actors.Where(a => a.Alive && a.Team == 0 && (a.Source.TemplateName is "Лесопилка" or "Ферма" or "Казарма")))
         {
             if (building.ConstructionRemaining > 0)
             {
@@ -167,7 +183,7 @@ public sealed partial class Skirmish
                 building.ConstructionRemaining = maintenance.ContinueAction
                     ? ((building.Template.InitialCondition - maintenance.State.Condition + 1) * Math.Max(1, (int)building.Parameters[0x57]) - maintenance.State.Counter) / (double)Rules.TicksPerSecond : 0;
                 // Provisional visual stage binding; the full C88C frame/effects handler is not connected.
-                if (building.Source.TemplateName == "Ферма")
+                if (building.Source.TemplateName is "Ферма" or "Казарма")
                     BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(building.Template.InitialFrame + Math.Min(building.Parameters[0x4a], building.Record[0x19] * (building.Parameters[0x4a] + 1) / (building.Template.InitialCondition + 1))));
                 if (maintenance.ContinueAction) continue;
                 var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(building.Record[0x14], building.Record[0x15], building.Record[0x0f]));

@@ -103,12 +103,16 @@ public partial class TestRunner
         Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = false, Position = screen });
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         Check(!scene.PlacingBuilding && scene.Battle.Find(scene.Selection.Single())?.Source.TemplateName == "Ферма", $"Mouse places and selects a farm through the castle build flow: placing={scene.PlacingBuilding}, cell={cell}, screen={screen}, events={string.Join(";", scene.Battle.Events)}");
-        for (int i = 0; i < 1600 && scene.Battle.FreePeople == 0; i++) scene.Battle.Advance(1.0 / scene.Battle.Rules.TicksPerSecond);
-        scene.SelectCastle(); uint previousRecruit = scene.Battle.LastRecruitId; scene.HireMilitia();
-        Check(scene.Selection.Single() == scene.Battle.PlayerCastle.Id, "Queue command keeps the castle selected for subsequent orders");
+        for (int i = 0; i < 4200 && scene.Battle.FreePeople < 3; i++) scene.Battle.Advance(1.0 / scene.Battle.Rules.TicksPerSecond);
+        var barracks = scene.Battle.BuildBarracks(BarracksSite(scene.Battle))!;
+        for (int i = 0; i < 700 && barracks.ConstructionRemaining > 0; i++) scene.Battle.Advance(1.0 / scene.Battle.Rules.TicksPerSecond);
+        Check(barracks.ConstructionRemaining == 0 && scene.Battle.BarracksReady, "Barracks construction completes before recruiting militia");
+        scene.Selection.Clear(); scene.Selection.Add(barracks.Id);
+        uint previousRecruit = scene.Battle.LastRecruitId; scene.HireMilitia();
+        Check(scene.Battle.BarracksRecruitmentCount == 1, "Militia order enters barracks queue");
         var recruited = WaitForRecruit(scene.Battle, previousRecruit);
         scene.Selection.Clear(); scene.Selection.Add(recruited.Id);
-        Check(recruited.Source.TemplateName == "Ополченец", "Castle UI queue produces a militia soldier over time");
+        Check(recruited.Source.TemplateName == "Ополченец", "Barracks UI queue produces a militia soldier over time");
         if (DisplayServer.GetName() != "headless")
         {
             scene.SelectCastle(); scene.Battle.Advance(10); scene.TogglePause();

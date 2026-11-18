@@ -104,5 +104,5 @@
     "10": 30,
     "0": 40
   },
-  "limitations": "Militia retains the experimental castle menu, but its interval belongs to barracks. Seven-byte headers are not production rows."
+  "limitations": "Militia uses the barracks menu and its separate queue. A legacy laboratory API still permits direct castle enqueue. Seven-byte headers are not production rows."
 }
