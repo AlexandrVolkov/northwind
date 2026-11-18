@@ -8,7 +8,9 @@ public sealed class EconomyRules
     public uint WorkerPrice { get; set; } = 10;
     public uint MillPrice { get; set; } = 50;
     public float BuildRadius { get; set; } = 640;
-    public int WorkerLimit { get; set; } = 6;
+    public uint StartingPeople { get; set; } = 2;
+    public uint FarmPrice { get; set; } = 30;
+    public uint MilitiaPrice { get; set; } = 20;
 }
 
 public sealed partial class Skirmish
@@ -46,11 +48,11 @@ public sealed partial class Skirmish
         worker.GatherTree = null; worker.Route.Clear(); worker.JobText = "Поблизости нет леса";
         Log("Поблизости нет подходящего леса. Укажите рабочему другой участок."); return false;
     }
-    private SkirmishActor NewEconomyActor(int templateIndex, Vector2I cell, bool worker)
+    private SkirmishActor NewEconomyActor(int templateIndex, Vector2I cell, bool worker, bool soldier = false)
     {
         var template = _templates.Armies["ARMY__02.DAT"].Templates[templateIndex];
         var parameters = Convert.FromHexString(template.RawRecordHex);
-        var raw = worker ? Convert.FromHexString(_workerSeed.RawRecordHex) : new byte[template.RuntimeRecordBytes];
+        var raw = worker ? Convert.FromHexString(_workerSeed.RawRecordHex) : soldier ? Convert.FromHexString(_militiaSeed.RawRecordHex).AsSpan(0, template.RuntimeRecordBytes).ToArray() : new byte[template.RuntimeRecordBytes];
         raw[0] = 2; raw[3] = (byte)Rules.PlayerSlot; raw[0x0d] = 1; raw[0x0e] = (byte)templateIndex;
         raw[0x14] = 0x80; raw[0x19] = raw[0x1a] = template.InitialCondition;
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(1), template.InitialFrame);
@@ -58,7 +60,7 @@ public sealed partial class Skirmish
         BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(4), worker ? (uint)(cell.X * 32 + 16) : OriginalWorkerDelivery.BuildingAnchor((byte)cell.X, parameters[3]));
         BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(8), worker ? (uint)(cell.Y * 32 + 16) : OriginalWorkerDelivery.BuildingAnchor((byte)cell.Y, parameters[4]));
         BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(0x10), (uint)raw.Length);
-        if (worker) { raw[0x25] = 0; raw[0x26] = 0; raw[0x2c] = 0; raw[0x31] = 0; }
+        if (worker || soldier) { raw[0x24] = 0; raw[0x25] = 0; raw[0x26] = 0; raw[0x2c] = 0; raw[0x2d] = 0; raw[0x30] = 0; if (worker) raw[0x31] = 0; }
         return new SkirmishActor { Source = new ObjectRecord { RuntimeReference = _nextEconomyId++, TemplateName = template.Name,
                 TemplateFile = "ARMY__02.DAT", TemplateIndex = templateIndex, RecordBytes = raw.Length,
                 RawX = BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(4)), RawY = BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(8)), RawLayer = 1 },
@@ -75,22 +77,15 @@ public sealed partial class Skirmish
     public SkirmishActor? TrainWorker()
     {
         if (Paused || Outcome != "" || !PlayerCastle.Alive) return null;
-        if (Actors.Count(a => a.Worker && a.Team == 0 && a.Alive) >= Rules.Economy.WorkerLimit)
-        { Log("Достигнут предел рабочих этой схватки."); return null; }
+        if (FreePeople == 0) { Log("Нет свободных людей. Постройте ферму и дождитесь пополнения."); return null; }
         if (Wood < Rules.Economy.WorkerPrice) { Log("Недостаточно дерева для найма рабочего."); return null; }
         var worker = NewEconomyActor(10, PlayerCastle.Cell, true);
-        var cells = new List<Vector2I>();
-        for (int y = -6; y <= 6; y++) for (int x = -6; x <= 6; x++) cells.Add(PlayerCastle.Cell + new Vector2I(x, y));
-        var spawn = cells.Where(c => CanStand(worker, c)).OrderBy(c => ((Vector2)c).DistanceSquaredTo(Hero.Cell)).Cast<Vector2I?>().FirstOrDefault();
-        if (spawn == null) { Log("Вокруг замка нет свободного места для рабочего."); return null; }
-        BinaryPrimitives.WriteUInt32LittleEndian(worker.Record.AsSpan(4), (uint)(spawn.Value.X * 32 + 16));
-        BinaryPrimitives.WriteUInt32LittleEndian(worker.Record.AsSpan(8), (uint)(spawn.Value.Y * 32 + 16));
-        worker.Source.RawX = (uint)(spawn.Value.X * 32 + 16); worker.Source.RawY = (uint)(spawn.Value.Y * 32 + 16);
-        if (!SpendWood(Rules.Economy.WorkerPrice)) return null;
+        if (!PlaceRecruit(worker)) { Log("Вокруг замка нет свободного места для рабочего."); return null; }
+        if (!SpendRecruitment(Rules.Economy.WorkerPrice, BinaryPrimitives.ReadUInt32LittleEndian(worker.Parameters.AsSpan(0x88)))) return null;
         OriginalWorkerDelivery.InitializeEmpty(worker.Record, worker.Parameters, _terrainCatalog.NextRandomByte());
         worker.Route.Attach(_routes, worker.Record);
         Actors.Add(worker); Occupancy.WriteFootprint(worker.Parameters[3], worker.Parameters[4], worker.Record[0x0d], (uint)worker.Position.X, (uint)worker.Position.Y, worker.Id);
-        Log("Рабочий нанят. Выберите его и нажмите ПКМ по лесу."); return worker;
+        RecountPopulation(); Log("Рабочий нанят. Выберите его и нажмите ПКМ по лесу."); return worker;
     }
     public DeliveryPoint MillEntry(Vector2I cell)
     {
@@ -100,11 +95,12 @@ public sealed partial class Skirmish
         return OriginalWorkerDelivery.Approach(visitor, target, OriginalWorkerDelivery.BuildingAnchor((byte)cell.X, target[3]),
             OriginalWorkerDelivery.BuildingAnchor((byte)cell.Y, target[4]), (uint)(Map.Width * 32), (uint)(Map.Height * 32));
     }
-    public ConstructionPlacement ProbeMill(Vector2I cell)
+    public ConstructionPlacement ProbeMill(Vector2I cell) => ProbeEconomyBuilding(cell, MillTemplate);
+    private ConstructionPlacement ProbeEconomyBuilding(Vector2I cell, TemplateEntry template)
     {
         if (!Inside(cell) || !PlayerCastle.Alive || (new Vector2(cell.X * 32 + 16, cell.Y * 32 + 16)).DistanceTo(PlayerCastle.Position) > Rules.Economy.BuildRadius)
             return new(ConstructionPlacementStatus.Rejected);
-        var parameters = MillTemplate.Construction;
+        var parameters = template.Construction;
         var result = OriginalConstructionRules.ProbePlacement(Occupancy.Width, Occupancy.Height, Map.Cells, _properties, Occupancy.Cells,
             parameters.FootprintWidth, parameters.FootprintHeight, parameters.TerrainMask.ToArray(), (uint)(cell.X * 32 + 16), (uint)(cell.Y * 32 + 16));
         if (result.Status != ConstructionPlacementStatus.Clear) return result;
@@ -145,36 +141,40 @@ public sealed partial class Skirmish
     }
     private void TickBuildings()
     {
-        foreach (var mill in Actors.Where(a => a.Alive && a.Team == 0 && a.Source.TemplateName == "Лесопилка"))
+        foreach (var building in Actors.Where(a => a.Alive && a.Team == 0 && (a.Source.TemplateName is "Лесопилка" or "Ферма")))
         {
-            if (mill.ConstructionRemaining > 0)
+            if (building.ConstructionRemaining > 0)
             {
-                var maintenance = OriginalBuildingRules.StepMaintenance(new(mill.Record[0x19], mill.Record[0x16], mill.Record[0x0f],
-                        BinaryPrimitives.ReadUInt16LittleEndian(mill.Record.AsSpan(0x17))),
-                    new(mill.Template.InitialCondition, mill.Parameters[0x57], new(
-                        BinaryPrimitives.ReadUInt32LittleEndian(mill.Parameters.AsSpan(0x8c)),
-                        BinaryPrimitives.ReadUInt32LittleEndian(mill.Parameters.AsSpan(0x90)),
-                        BinaryPrimitives.ReadUInt32LittleEndian(mill.Parameters.AsSpan(0x94)))), default, false);
-                mill.Record[0x19] = maintenance.State.Condition; mill.Record[0x16] = maintenance.State.Counter; mill.Record[0x0f] = maintenance.State.WorkFlags;
-                BinaryPrimitives.WriteUInt16LittleEndian(mill.Record.AsSpan(0x17), maintenance.State.ObjectFlags);
-                mill.ConstructionRemaining = maintenance.ContinueAction
-                    ? ((mill.Template.InitialCondition - maintenance.State.Condition + 1) * Math.Max(1, (int)mill.Parameters[0x57]) - maintenance.State.Counter) / (double)Rules.TicksPerSecond : 0;
+                var maintenance = OriginalBuildingRules.StepMaintenance(new(building.Record[0x19], building.Record[0x16], building.Record[0x0f],
+                        BinaryPrimitives.ReadUInt16LittleEndian(building.Record.AsSpan(0x17))),
+                    new(building.Template.InitialCondition, building.Parameters[0x57], new(
+                        BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x8c)),
+                        BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x90)),
+                        BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x94)))), default, false);
+                building.Record[0x19] = maintenance.State.Condition; building.Record[0x16] = maintenance.State.Counter; building.Record[0x0f] = maintenance.State.WorkFlags;
+                BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(0x17), maintenance.State.ObjectFlags);
+                building.ConstructionRemaining = maintenance.ContinueAction
+                    ? ((building.Template.InitialCondition - maintenance.State.Condition + 1) * Math.Max(1, (int)building.Parameters[0x57]) - maintenance.State.Counter) / (double)Rules.TicksPerSecond : 0;
+                // Provisional visual stage binding; the full C88C frame/effects handler is not connected.
+                if (building.Source.TemplateName == "Ферма")
+                    BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(building.Template.InitialFrame + Math.Min(building.Parameters[0x4a], building.Record[0x19] * (building.Parameters[0x4a] + 1) / (building.Template.InitialCondition + 1))));
                 if (maintenance.ContinueAction) continue;
-                var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(mill.Record[0x14], mill.Record[0x15], mill.Record[0x0f]));
-                mill.Record[0x14] = completed.EncodedState; mill.Record[0x15] = completed.Auxiliary; mill.Record[0x0f] = completed.WorkFlags;
-                BinaryPrimitives.WriteUInt16LittleEndian(mill.Record.AsSpan(1), (ushort)(mill.Template.InitialFrame + mill.Parameters[0x4a]));
-                Log("Лесопилка готова.");
+                var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(building.Record[0x14], building.Record[0x15], building.Record[0x0f]));
+                building.Record[0x14] = completed.EncodedState; building.Record[0x15] = completed.Auxiliary; building.Record[0x0f] = completed.WorkFlags;
+                BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(building.Template.InitialFrame + building.Parameters[0x4a]));
+                Log(building.Source.TemplateName + " готова.");
             }
-            var state = OriginalLumbermillRules.Process(new(mill.Record[0x23], mill.Record[0x24], Wood, ProducedWood), mill.Parameters[0x79]);
-            mill.Record[0x23] = state.Countdown; mill.Record[0x24] = state.QueuedLoads;
+            if (building.Source.TemplateName != "Лесопилка") continue;
+            var state = OriginalLumbermillRules.Process(new(building.Record[0x23], building.Record[0x24], Wood, ProducedWood), building.Parameters[0x79]);
+            building.Record[0x23] = state.Countdown; building.Record[0x24] = state.QueuedLoads;
             Wood = state.Stock; ProducedWood = state.Statistics;
-            uint visitorId = OriginalWorkerDelivery.WaitingWorker(Occupancy.Width, Occupancy.Height, Occupancy.Cells, mill.Record[0x0d],
-                (uint)mill.Position.X, (uint)mill.Position.Y, mill.Parameters);
+            uint visitorId = OriginalWorkerDelivery.WaitingWorker(Occupancy.Width, Occupancy.Height, Occupancy.Cells, building.Record[0x0d],
+                (uint)building.Position.X, (uint)building.Position.Y, building.Parameters);
             if (Find(visitorId) is { } visitor)
             {
-                var handoff = OriginalLumbermillRules.Receive(BinaryPrimitives.ReadUInt16LittleEndian(mill.Record.AsSpan(0x17)), mill.Record[0x24],
+                var handoff = OriginalLumbermillRules.Receive(BinaryPrimitives.ReadUInt16LittleEndian(building.Record.AsSpan(0x17)), building.Record[0x24],
                     BinaryPrimitives.ReadUInt16LittleEndian(visitor.Record.AsSpan(0x17)), visitor.Record.Length > 0x31 ? visitor.Record[0x31] : (byte)0, BinaryPrimitives.ReadUInt32LittleEndian(visitor.Parameters.AsSpan(0x40)));
-                BinaryPrimitives.WriteUInt16LittleEndian(mill.Record.AsSpan(0x17), handoff.MillFlags); mill.Record[0x24] = handoff.QueuedLoads;
+                BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(0x17), handoff.MillFlags); building.Record[0x24] = handoff.QueuedLoads;
                 BinaryPrimitives.WriteUInt16LittleEndian(visitor.Record.AsSpan(0x17), handoff.WorkerFlags); if (visitor.Record.Length > 0x31) visitor.Record[0x31] = handoff.Cargo;
             }
         }
