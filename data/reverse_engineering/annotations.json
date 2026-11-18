@@ -71,28 +71,30 @@
       "module": "ARMY__02.WRK",
       "start": 1878,
       "end": 1923,
-      "name": "Farm update prefix and owner counter increment",
+      "name": "Farm update prefix and owner support increment",
       "classification": "code",
       "status": "partial",
       "evidence": [
-        "docs/game-logic-map.md"
+        "docs/game-logic-map.md",
+        "docs/population-farms.md"
       ],
       "implementation": [],
-      "limitations": "Статическое наблюдение регистрации и добавления DAT.u32[78] в поле владельца +2C; смысл счётчика не доказан, исполнение полного WRK не проверено."
+      "limitations": "Статически установлены регистрация и начальное добавление DAT.u32[78] в поле владельца +2C. По пересчёту D453 этот вклад фермы входит в показатель поддержки. Первые переходные события WRK не подключены буквально; исполнение полного WRK, глобальный такт и бунт не перенесены."
     },
     {
       "id": "farm-counter-decrement",
       "module": "ARMY__02.WRK",
       "start": 1949,
       "end": 1981,
-      "name": "Farm owner counter decrement branch",
+      "name": "Farm owner support decrement branch",
       "classification": "code",
       "status": "partial",
       "evidence": [
-        "docs/game-logic-map.md"
+        "docs/game-logic-map.md",
+        "docs/population-farms.md"
       ],
       "implementation": [],
-      "limitations": "Статическое наблюдение условного уменьшения +2C с ограничением нулём; полный триггер ветви и связь с населением/содержанием пока не доказаны."
+      "limitations": "Статически установлено условное уменьшение вклада поддержки +2C с ограничением нулём; назначение агрегата подтверждено пересчётом D453. Переходные события первого обновления и потери вклада WRK ещё не подключены буквально; полный жизненный цикл фермы и бунт не перенесены."
     },
     {
       "id": "worker-wrk-grant",
@@ -944,6 +946,40 @@
         "scripts/OriginalOccupancyMap.cs"
       ],
       "limitations": "Перенесена ветвь CL=0 с заменой совпавших ячеек и подсчётом конфликтов. Ветка повреждения чужих объектов не перенесена."
+    },
+    {
+      "id": "owner-population-growth",
+      "module": "LE:1",
+      "start": 54284,
+      "end": 54355,
+      "name": "Owner free population growth",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/population-farms.md",
+        "tests/fixtures/population.json"
+      ],
+      "implementation": [
+        "scripts/OriginalPopulationRules.cs"
+      ],
+      "limitations": "Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены."
+    },
+    {
+      "id": "owner-population-recount",
+      "module": "LE:1",
+      "start": 54355,
+      "end": 54705,
+      "name": "Owner population demand, support and limit recount",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/population-farms.md",
+        "tests/fixtures/population.json"
+      ],
+      "implementation": [
+        "scripts/OriginalPopulationRules.cs"
+      ],
+      "limitations": "Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены."
     },
     {
       "id": "worker-grant-timber",

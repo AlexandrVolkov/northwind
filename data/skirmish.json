@@ -54,6 +54,8 @@
     "worker_price": 10,
     "mill_price": 50,
     "build_radius": 640,
-    "worker_limit": 6
+    "starting_people": 2,
+    "farm_price": 30,
+    "militia_price": 20
   }
 }
