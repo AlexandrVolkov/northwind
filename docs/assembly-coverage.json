@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "667fd66611c24130c71c8da8796a1b9e7cdbf8fa81407472c76979e41e4e4d1b",
+  "annotation_sha256": "2689077cc1f18d4b93da4ef1f3180460ddf0d5f0d093c82be87a4221aa522634",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,9 +32,9 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 5113,
-        "ported": 3270,
-        "unreviewed": 138499
+        "partial": 4893,
+        "ported": 3529,
+        "unreviewed": 138460
       },
       "linear_rows": 45008,
       "flow_candidate_instructions": 30465,
@@ -144,6 +144,38 @@
         },
         {
           "start": 17523,
+          "end": 25342,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 25342,
+          "end": 25348,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "recruitment-queue-capacity"
+          ]
+        },
+        {
+          "start": 25348,
+          "end": 25392,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 25392,
+          "end": 25410,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "recruitment-queue-append"
+          ]
+        },
+        {
+          "start": 25410,
           "end": 29029,
           "status": "unreviewed",
           "classification": "unknown",
@@ -550,13 +582,15 @@
         {
           "start": 43279,
           "end": 43296,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "recruitment-paid-start"
+          ]
         },
         {
           "start": 43296,
-          "end": 43699,
+          "end": 43316,
           "status": "partial",
           "classification": "code",
           "claims": [
@@ -564,7 +598,70 @@
           ]
         },
         {
-          "start": 43699,
+          "start": 43316,
+          "end": 43362,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "recruitment-timer-progress"
+          ]
+        },
+        {
+          "start": 43362,
+          "end": 43428,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "recruitment-exit-coordinates"
+          ]
+        },
+        {
+          "start": 43428,
+          "end": 43574,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "recruitment-spawn-allocation"
+          ]
+        },
+        {
+          "start": 43574,
+          "end": 43610,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "recruitment-queue-advance"
+          ]
+        },
+        {
+          "start": 43610,
+          "end": 43621,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "recruitment-progress-wait-return"
+          ]
+        },
+        {
+          "start": 43621,
+          "end": 43638,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "recruitment-refund-template-lookup"
+          ]
+        },
+        {
+          "start": 43638,
+          "end": 43697,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "recruitment-progress-refund"
+          ]
+        },
+        {
+          "start": 43697,
           "end": 44383,
           "status": "unreviewed",
           "classification": "unknown",
@@ -907,9 +1004,9 @@
       "zero_fill_bytes": 0,
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
-        "partial": 291,
+        "partial": 363,
         "ported": 128,
-        "unreviewed": 6511
+        "unreviewed": 6439
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -921,6 +1018,38 @@
       "regions": [
         {
           "start": 0,
+          "end": 545,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 545,
+          "end": 593,
+          "status": "partial",
+          "classification": "data",
+          "claims": [
+            "castle-production-table"
+          ]
+        },
+        {
+          "start": 593,
+          "end": 822,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 822,
+          "end": 846,
+          "status": "partial",
+          "classification": "data",
+          "claims": [
+            "barracks-production-table"
+          ]
+        },
+        {
+          "start": 846,
           "end": 867,
           "status": "unreviewed",
           "classification": "unknown",

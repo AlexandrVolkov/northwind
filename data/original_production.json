@@ -1,0 +1,108 @@
+{
+  "format_version": 1,
+  "source_file": "ARMY__02.WRK",
+  "source_sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
+  "tables": {
+    "castle": {
+      "table_offset": 545,
+      "raw_header_hex": "00000000000080",
+      "entries": [
+        {
+          "template": 3,
+          "icon_frame": 893,
+          "interval": 20,
+          "raw_hex": "037d0314"
+        },
+        {
+          "template": 4,
+          "icon_frame": 920,
+          "interval": 10,
+          "raw_hex": "0498030a"
+        },
+        {
+          "template": 6,
+          "icon_frame": 1018,
+          "interval": 20,
+          "raw_hex": "06fa0314"
+        },
+        {
+          "template": 9,
+          "icon_frame": 1151,
+          "interval": 10,
+          "raw_hex": "097f040a"
+        },
+        {
+          "template": 12,
+          "icon_frame": 1663,
+          "interval": 20,
+          "raw_hex": "0c7f0614"
+        },
+        {
+          "template": 15,
+          "icon_frame": 1636,
+          "interval": 20,
+          "raw_hex": "0f640614"
+        },
+        {
+          "template": 22,
+          "icon_frame": 2781,
+          "interval": 30,
+          "raw_hex": "16dd0a1e"
+        },
+        {
+          "template": 23,
+          "icon_frame": 2797,
+          "interval": 20,
+          "raw_hex": "17ed0a14"
+        },
+        {
+          "template": 24,
+          "icon_frame": 2824,
+          "interval": 40,
+          "raw_hex": "18080b28"
+        },
+        {
+          "template": 10,
+          "icon_frame": 1169,
+          "interval": 30,
+          "raw_hex": "0a91041e"
+        }
+      ]
+    },
+    "barracks": {
+      "table_offset": 822,
+      "raw_header_hex": "00000000000080",
+      "entries": [
+        {
+          "template": 1,
+          "icon_frame": 590,
+          "interval": 40,
+          "raw_hex": "014e0228"
+        },
+        {
+          "template": 0,
+          "icon_frame": 0,
+          "interval": 40,
+          "raw_hex": "00000028"
+        },
+        {
+          "template": 17,
+          "icon_frame": 2864,
+          "interval": 40,
+          "raw_hex": "11300b28"
+        },
+        {
+          "template": 18,
+          "icon_frame": 285,
+          "interval": 40,
+          "raw_hex": "121d0128"
+        }
+      ]
+    }
+  },
+  "recruitment_intervals": {
+    "10": 30,
+    "0": 40
+  },
+  "limitations": "Militia retains the experimental castle menu, but its interval belongs to barracks. Seven-byte headers are not production rows."
+}

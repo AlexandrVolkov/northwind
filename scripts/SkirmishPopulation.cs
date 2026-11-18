@@ -38,27 +38,6 @@ public sealed partial class Skirmish
         if ((_populationTick & 31) == 0) RecountPopulation();
         FreePeople = OriginalPopulationRules.Grow(_populationTick, FreePeople, Population.Used, Population.FarmSupport, Population.Limit);
     }
-    public SkirmishActor? TrainMilitia()
-    {
-        if (Paused || Outcome != "" || !PlayerCastle.Alive) return null;
-        if (!CanAfford(MilitiaTemplate)) { Log(MissingResources(MilitiaTemplate)); return null; }
-        var soldier = NewEconomyActor(0, PlayerCastle.Cell, false, true);
-        if (!PlaceRecruit(soldier)) { Log("Вокруг замка нет свободного места для отряда."); return null; }
-        if (!Spend(MilitiaTemplate)) return null;
-        soldier.Route.Attach(_routes, soldier.Record); Actors.Add(soldier);
-        Occupancy.WriteFootprint(soldier.Parameters[3], soldier.Parameters[4], soldier.Record[0x0d], (uint)soldier.Position.X, (uint)soldier.Position.Y, soldier.Id);
-        RecountPopulation(); Log("Ополченец нанят. Выделите его и отдайте приказ."); return soldier;
-    }
-    private bool PlaceRecruit(SkirmishActor recruit)
-    {
-        var cells = new List<Vector2I>();
-        for (int y = -6; y <= 6; y++) for (int x = -6; x <= 6; x++) cells.Add(PlayerCastle.Cell + new Vector2I(x, y));
-        var cell = cells.Where(c => CanStand(recruit, c)).OrderBy(c => ((Vector2)c).DistanceSquaredTo(Hero.Cell)).Cast<Vector2I?>().FirstOrDefault();
-        if (cell == null) return false;
-        uint xRaw = (uint)(cell.Value.X * 32 + 16), yRaw = (uint)(cell.Value.Y * 32 + 16);
-        BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(4), xRaw); BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(8), yRaw);
-        recruit.Source.RawX = xRaw; recruit.Source.RawY = yRaw; return true;
-    }
     public ConstructionPlacement ProbeFarm(Vector2I cell) => ProbeEconomyBuilding(cell, FarmTemplate);
     public SkirmishActor? BuildFarm(Vector2I cell)
     {

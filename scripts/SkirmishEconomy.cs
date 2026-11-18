@@ -98,18 +98,6 @@ public sealed partial class Skirmish
             Template = template, Parameters = parameters, Record = raw, Rules = Rules.Units[template.Name], Team = 0,
             Health = Rules.Units[template.Name].Health };
     }
-    public SkirmishActor? TrainWorker()
-    {
-        if (Paused || Outcome != "" || !PlayerCastle.Alive) return null;
-        if (!CanAfford(WorkerTemplate)) { Log(MissingResources(WorkerTemplate)); return null; }
-        var worker = NewEconomyActor(10, PlayerCastle.Cell, true);
-        if (!PlaceRecruit(worker)) { Log("Вокруг замка нет свободного места для рабочего."); return null; }
-        if (!Spend(WorkerTemplate)) return null;
-        OriginalWorkerDelivery.InitializeEmpty(worker.Record, worker.Parameters, _terrainCatalog.NextRandomByte());
-        worker.Route.Attach(_routes, worker.Record);
-        Actors.Add(worker); Occupancy.WriteFootprint(worker.Parameters[3], worker.Parameters[4], worker.Record[0x0d], (uint)worker.Position.X, (uint)worker.Position.Y, worker.Id);
-        RecountPopulation(); Log("Рабочий нанят. Выберите его и нажмите ПКМ по лесу."); return worker;
-    }
     public DeliveryPoint MillEntry(Vector2I cell)
     {
         if (!Inside(cell)) return new(0, 0, false, false);

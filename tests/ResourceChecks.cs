@@ -54,7 +54,7 @@ public partial class TestRunner
             Check(!battle.CanAfford(battle.MillTemplate) && battle.BuildMill(millSite) == null && battle.Resources == funds && battle.Actors.Count == actors && battle.ProbeMill(millSite).Status == ConstructionPlacementStatus.Clear,
                 "Missing any native resource rejects a sawmill without debit, actor or occupied footprint");
             if (funds.First == 0 || funds.Third == 0 || funds.Fourth == 0)
-                Check(battle.TrainWorker() == null && battle.TrainMilitia() == null && battle.Resources == funds && battle.Actors.Count == actors,
+                Check(Recruit(battle, true) == null && Recruit(battle, false) == null && battle.Resources == funds && battle.Actors.Count == actors,
                     "Recruitment rejects missing metal, gold or people without partial spending");
             if (funds.Second == 0 || funds.Third == 0)
                 Check(battle.BuildFarm(site) == null && battle.Resources == funds && battle.Actors.Count == actors,

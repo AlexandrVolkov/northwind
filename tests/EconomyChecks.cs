@@ -20,7 +20,8 @@ public partial class TestRunner
             return new OriginalTerrainCatalog(properties, constants).ClearTimber(cells, (byte)map.Width, (byte)map.Height, tree.X, tree.Y) == 0 ||
                 OriginalForestryRules.IsTimber(OriginalForestryRules.Property(properties, cells[tree.Y * map.Width + tree.X]));
         });
-        foreach (var tree in trees.OrderBy(c => ((Vector2)c).DistanceSquaredTo(worker.Cell)))
+        // Keep the forestry scenario anchored to the original army, independent of the new production exit.
+        foreach (var tree in trees.OrderBy(c => ((Vector2)c).DistanceSquaredTo(battle.Hero.Cell)))
         foreach (var d in new[] { Vector2I.Up, Vector2I.Down, Vector2I.Left, Vector2I.Right })
         {
             var cell = tree + d;
@@ -44,7 +45,7 @@ public partial class TestRunner
         using (var battle = CreateFundedSkirmish())
         {
             uint initial = battle.Wood;
-            var worker = battle.TrainWorker() ?? throw new InvalidOperationException("Could not hire initial worker");
+            var worker = Recruit(battle, true) ?? throw new InvalidOperationException("Could not hire initial worker");
             Check(worker.Worker && !worker.Structure && worker.Record.Length == 54 && battle.Wood == initial - Skirmish.Price(battle.WorkerTemplate).Second,
                 "Castle hires a mobile 54-byte worker and debits the native DAT price");
             var tree = EconomyTree(battle, worker);
@@ -99,7 +100,7 @@ public partial class TestRunner
             Check(battle.BuildMill(cell) == null && battle.BuildMill(new(-1, -1)) == null && battle.Wood == before,
                 "Occupied and outside placements do not spend tutorial resources");
             battle.Paused = true; double remaining = mill.ConstructionRemaining; battle.Advance(10);
-            Check(mill.ConstructionRemaining == remaining && battle.TrainWorker() == null && battle.BuildMill(cell) == null && battle.GatherTimber([worker.Id], tree) == 0,
+            Check(mill.ConstructionRemaining == remaining && Recruit(battle, true) == null && battle.BuildMill(cell) == null && battle.GatherTimber([worker.Id], tree) == 0,
                 "Pause freezes construction and all economy orders");
             battle.Paused = false;
             for (int i = 0; i < 3600 && worker.Record[0x30] != 0xf3; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
@@ -122,7 +123,8 @@ public partial class TestRunner
             for (int i = 0; i < 3600 && battle.ProducedWood < 70; i++) battle.Advance(.1);
             Check(battle.ProducedWood == 70 && battle.TerrainRevision > 0 && battle.ClearedGroves.Contains(tree) && !battle.Harvestable(tree),
                 $"Seventh load applies native terrain blending: produced={battle.ProducedWood}, job={worker.JobText}");
-            Check(worker.GatherTree is { } next && next != tree && battle.Harvestable(next), "Worker automatically finds another grove after source terrain replacement");
+            for (int i = 0; i < 180 && (worker.GatherTree == null || worker.GatherTree == tree); i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
+            Check(worker.GatherTree is { } next && next != tree && battle.Harvestable(next), $"Worker automatically finds another grove after source terrain replacement: tree={worker.GatherTree}, job={worker.JobText}");
             for (int i = 0; i < 2700 && (worker.Record[0x2d] & 15) != 3; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
             Check((worker.Record[0x2d] & 15) == 3, "Automatic next-grove task starts another native swing");
             battle.Stop([worker.Id]); before = battle.Wood; battle.Advance(5);
@@ -153,8 +155,9 @@ public partial class TestRunner
         var starterFarm = scene.Battle.BuildFarm(FarmSite(scene.Battle));
         Check(starterFarm != null, "Original zero-person start can build a farm without population cost");
         for (int i = 0; i < 4000 && scene.Battle.FreePeople < 3; i++) scene.Battle.Advance(1.0 / scene.Battle.Rules.TicksPerSecond);
-        scene.SelectCastle(); scene.HireWorker();
-        var hired = scene.Battle.Find(scene.Selection.Single())!;
+        scene.SelectCastle(); uint previousRecruit = scene.Battle.LastRecruitId; scene.HireWorker();
+        var hired = WaitForRecruit(scene.Battle, previousRecruit);
+        scene.Selection.Clear(); scene.Selection.Add(hired.Id);
         Check(hired.Worker, "Castle UI hires and selects the new worker");
         var forest = EconomyTree(scene.Battle, hired);
         scene.IssueOrder((Vector2)(forest * 32) + Vector2.One * 16);
