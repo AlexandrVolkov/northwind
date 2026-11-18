@@ -997,6 +997,56 @@
         "scripts/OriginalWorkerDelivery.cs"
       ],
       "limitations": "Живой рабочий, флаг 20000, пустой груз и AL=3. Другие грузы, непустой груз и все WRK-получатели не перенесены."
+    },
+    {
+      "id": "scenario-resource-stock-copy",
+      "module": "LE:1",
+      "start": 12035,
+      "end": 12059,
+      "name": "Copy four initial resource stocks from SCN",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/scenario-resources.md",
+        "tests/fixtures/resources.json"
+      ],
+      "implementation": [
+        "scripts/OriginalResourceRules.cs"
+      ],
+      "limitations": "Только извлечение четырёх dword SCN +15..24; прочие поля владельца, DOS-загрузка и цикл всех слотов вне перенесённого участка."
+    },
+    {
+      "id": "recruitment-resource-debit",
+      "module": "LE:1",
+      "start": 43195,
+      "end": 43279,
+      "name": "Check and debit all four recruitment prices",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/scenario-resources.md",
+        "tests/fixtures/resources.json"
+      ],
+      "implementation": [
+        "scripts/OriginalConstructionRules.cs",
+        "scripts/OriginalResourceRules.cs",
+        "scripts/SkirmishEconomy.cs"
+      ],
+      "limitations": "Только проверка и списание запасов до изменения фазы производителя. Мгновенный наём, проверка выхода до оплаты и отдельные runtime-ссылки прототипа не воспроизводят исходный производственный автомат/аллокатор."
+    },
+    {
+      "id": "recruitment-production-and-refund",
+      "module": "LE:1",
+      "start": 43296,
+      "end": 43699,
+      "name": "Production timing, spawn, queue advance and cancellation refund",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/scenario-resources.md"
+      ],
+      "implementation": [],
+      "limitations": "Установлены переходы по статическому коду: интервал, DAT[45], AC63/A758, сдвиг очереди и возврат. Нет динамической проверки полного автомата, переноса очереди, времени выпуска и отмены."
     }
   ]
 }

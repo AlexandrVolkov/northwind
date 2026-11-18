@@ -7,6 +7,15 @@ public partial class TestRunner
         GameData.Read<ScenarioData>("res://assets/imported/scenario.json"), GameData.Read<TemplatesData>("res://assets/imported/templates.json"),
         GameData.Read<SkirmishRules>("res://data/skirmish.json"));
 
+    // Isolate movement/delivery checks from population growth; gameplay uses unmodified SCN.
+    private static Skirmish CreateFundedSkirmish(uint people = 12)
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        rules.Economy.StartingResources = new(1000, 1000, 1000, people);
+        return new(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+    }
+
     private async Task SkirmishChecks()
     {
         GetTree().Root.Size = new Vector2I(1280, 800);

@@ -4,18 +4,47 @@ namespace Northwind;
 
 public sealed class EconomyRules
 {
-    public uint StartingWood { get; set; } = 120;
-    public uint WorkerPrice { get; set; } = 10;
-    public uint MillPrice { get; set; } = 50;
+    // Optional explicit scenario override for experiments/tests; normal play reads SCN.
+    public ResourceQuad? StartingResources { get; set; }
     public float BuildRadius { get; set; } = 640;
-    public uint StartingPeople { get; set; } = 2;
-    public uint FarmPrice { get; set; } = 30;
-    public uint MilitiaPrice { get; set; } = 20;
 }
 
 public sealed partial class Skirmish
 {
+    public uint Metal { get; private set; }
     public uint Wood { get; private set; }
+    public uint Gold { get; private set; }
+    public ResourceQuad Resources => new(Metal, Wood, Gold, FreePeople);
+    public TemplateEntry WorkerTemplate => _templates.Armies["ARMY__02.DAT"].Templates[10];
+    public TemplateEntry MilitiaTemplate => _templates.Armies["ARMY__02.DAT"].Templates[0];
+    public static ResourceQuad Price(TemplateEntry template) => OriginalResourceRules.ReadPrice(Convert.FromHexString(template.RawRecordHex));
+    public bool CanAfford(TemplateEntry template) => OriginalConstructionRules.TryDebitUpfront(Resources, Price(template)).Accepted;
+    public static string PriceText(TemplateEntry template)
+    {
+        var price = Price(template); var parts = new List<string>();
+        if (price.First != 0) parts.Add($"{price.First} мет.");
+        if (price.Second != 0) parts.Add($"{price.Second} дер.");
+        if (price.Third != 0) parts.Add($"{price.Third} зол.");
+        if (price.Fourth != 0) parts.Add($"{price.Fourth} чел.");
+        return string.Join("\n", parts.Chunk(2).Select(pair => string.Join(" · ", pair)));
+    }
+    public string MissingResources(TemplateEntry template)
+    {
+        var price = Price(template); var missing = new List<string>();
+        if (Metal < price.First) missing.Add($"металла: {price.First - Metal}");
+        if (Wood < price.Second) missing.Add($"дерева: {price.Second - Wood}");
+        if (Gold < price.Third) missing.Add($"золота: {price.Third - Gold}");
+        if (FreePeople < price.Fourth) missing.Add($"людей: {price.Fourth - FreePeople}");
+        return missing.Count == 0 ? "" : "Не хватает " + string.Join(", ", missing) + ".";
+    }
+    private void SetResources(ResourceQuad value)
+    { Metal = value.First; Wood = value.Second; Gold = value.Third; FreePeople = value.Fourth; }
+    private bool Spend(TemplateEntry template)
+    {
+        var payment = OriginalConstructionRules.TryDebitUpfront(Resources, Price(template));
+        if (!payment.Accepted) { Log(MissingResources(template)); return false; }
+        SetResources(payment.Balances); return true;
+    }
     public uint ProducedWood { get; private set; }
     public int TerrainRevision { get; private set; }
     public HashSet<Vector2I> ClearedGroves { get; } = [];
@@ -29,7 +58,9 @@ public sealed partial class Skirmish
 
     private void InitializeEconomy(ScenarioData scenario, TemplatesData templates)
     {
-        _templates = templates; Wood = Rules.Economy.StartingWood;
+        _templates = templates;
+        var slot = scenario.Slots.Single(s => s.SlotIndex == Rules.PlayerSlot);
+        SetResources(Rules.Economy.StartingResources ?? OriginalResourceRules.ReadScenario(Convert.FromHexString(slot.RawRecordHex)));
         _terrainCatalog = new OriginalTerrainCatalog(_properties, GameData.Read<OriginalTerrainData>("res://data/original_terrain.json"));
         _workerSeed = scenario.Slots.SelectMany(s => s.Objects)
             .First(o => o.TemplateFile == "ARMY__02.DAT" && o.TemplateIndex == 10);
@@ -67,21 +98,13 @@ public sealed partial class Skirmish
             Template = template, Parameters = parameters, Record = raw, Rules = Rules.Units[template.Name], Team = 0,
             Health = Rules.Units[template.Name].Health };
     }
-    private bool SpendWood(uint amount)
-    {
-        // Tutorial prices use only the confirmed +1C slot. Other original costs are not silently assigned names.
-        var payment = OriginalConstructionRules.TryDebitUpfront(new(0, Wood, 0, 0), new(0, amount, 0, 0));
-        if (!payment.Accepted) return false;
-        Wood = payment.Balances.Second; return true;
-    }
     public SkirmishActor? TrainWorker()
     {
         if (Paused || Outcome != "" || !PlayerCastle.Alive) return null;
-        if (FreePeople == 0) { Log("Нет свободных людей. Постройте ферму и дождитесь пополнения."); return null; }
-        if (Wood < Rules.Economy.WorkerPrice) { Log("Недостаточно дерева для найма рабочего."); return null; }
+        if (!CanAfford(WorkerTemplate)) { Log(MissingResources(WorkerTemplate)); return null; }
         var worker = NewEconomyActor(10, PlayerCastle.Cell, true);
         if (!PlaceRecruit(worker)) { Log("Вокруг замка нет свободного места для рабочего."); return null; }
-        if (!SpendRecruitment(Rules.Economy.WorkerPrice, BinaryPrimitives.ReadUInt32LittleEndian(worker.Parameters.AsSpan(0x88)))) return null;
+        if (!Spend(WorkerTemplate)) return null;
         OriginalWorkerDelivery.InitializeEmpty(worker.Record, worker.Parameters, _terrainCatalog.NextRandomByte());
         worker.Route.Attach(_routes, worker.Record);
         Actors.Add(worker); Occupancy.WriteFootprint(worker.Parameters[3], worker.Parameters[4], worker.Record[0x0d], (uint)worker.Position.X, (uint)worker.Position.Y, worker.Id);
@@ -112,7 +135,7 @@ public sealed partial class Skirmish
     {
         if (Paused || Outcome != "" || !PlayerCastle.Alive) return null;
         if (ProbeMill(cell).Status != ConstructionPlacementStatus.Clear) { Log("Здесь нельзя строить: нужна свободная площадка рядом с замком."); return null; }
-        if (!SpendWood(Rules.Economy.MillPrice)) { Log("Недостаточно дерева для лесопилки."); return null; }
+        if (!Spend(MillTemplate)) return null;
         var mill = NewEconomyActor(4, cell, false);
         mill.ConstructionDuration = mill.ConstructionRemaining = mill.Template.InitialCondition * Math.Max(1, (int)mill.Parameters[0x57]) / (double)Rules.TicksPerSecond;
         OriginalBuildingLifecycle.MarkConstruction(mill.Record); mill.Record[0x23] = 100; mill.Record[0x24] = 0;

@@ -9,12 +9,10 @@ public sealed partial class Skirmish
     private uint _populationTick;
     private ObjectRecord _militiaSeed = null!;
     public TemplateEntry FarmTemplate => _templates.Armies["ARMY__02.DAT"].Templates[9];
-    public bool CanRecruit => FreePeople >= 1;
     public double? PopulationGrowthSeconds => unchecked(FreePeople + Population.Used) < Population.Limit
         ? (OriginalPopulationRules.GrowthPeriod(Population.FarmSupport) - _populationTick % OriginalPopulationRules.GrowthPeriod(Population.FarmSupport)) / (double)Rules.TicksPerSecond : null;
     private void InitializePopulation(ScenarioData scenario)
     {
-        FreePeople = Rules.Economy.StartingPeople;
         _militiaSeed = scenario.Slots.SelectMany(s => s.Objects).First(o => o.TemplateFile == "ARMY__02.DAT" && o.TemplateIndex == 0);
         RecountPopulation();
     }
@@ -40,21 +38,13 @@ public sealed partial class Skirmish
         if ((_populationTick & 31) == 0) RecountPopulation();
         FreePeople = OriginalPopulationRules.Grow(_populationTick, FreePeople, Population.Used, Population.FarmSupport, Population.Limit);
     }
-    private bool SpendRecruitment(uint wood, uint people)
-    {
-        var payment = OriginalConstructionRules.TryDebitUpfront(new(0, Wood, 0, FreePeople), new(0, wood, 0, people));
-        if (!payment.Accepted) return false;
-        Wood = payment.Balances.Second; FreePeople = payment.Balances.Fourth; return true;
-    }
     public SkirmishActor? TrainMilitia()
     {
         if (Paused || Outcome != "" || !PlayerCastle.Alive) return null;
-        if (FreePeople == 0) { Log("Нет свободных людей. Фермы увеличивают возможности поселения."); return null; }
-        if (Wood < Rules.Economy.MilitiaPrice) { Log("Недостаточно дерева для найма ополченца."); return null; }
+        if (!CanAfford(MilitiaTemplate)) { Log(MissingResources(MilitiaTemplate)); return null; }
         var soldier = NewEconomyActor(0, PlayerCastle.Cell, false, true);
         if (!PlaceRecruit(soldier)) { Log("Вокруг замка нет свободного места для отряда."); return null; }
-        uint people = BinaryPrimitives.ReadUInt32LittleEndian(soldier.Parameters.AsSpan(0x88));
-        if (!SpendRecruitment(Rules.Economy.MilitiaPrice, people)) return null;
+        if (!Spend(MilitiaTemplate)) return null;
         soldier.Route.Attach(_routes, soldier.Record); Actors.Add(soldier);
         Occupancy.WriteFootprint(soldier.Parameters[3], soldier.Parameters[4], soldier.Record[0x0d], (uint)soldier.Position.X, (uint)soldier.Position.Y, soldier.Id);
         RecountPopulation(); Log("Ополченец нанят. Выделите его и отдайте приказ."); return soldier;
@@ -74,7 +64,7 @@ public sealed partial class Skirmish
     {
         if (Paused || Outcome != "" || !PlayerCastle.Alive) return null;
         if (ProbeFarm(cell).Status != ConstructionPlacementStatus.Clear) { Log("Для фермы нужна свободная площадка рядом с замком."); return null; }
-        if (!SpendWood(Rules.Economy.FarmPrice)) { Log("Недостаточно дерева для фермы."); return null; }
+        if (!Spend(FarmTemplate)) return null;
         var farm = NewEconomyActor(9, cell, false);
         farm.ConstructionDuration = farm.ConstructionRemaining = farm.Template.InitialCondition * Math.Max(1, (int)farm.Parameters[0x57]) / (double)Rules.TicksPerSecond;
         OriginalBuildingLifecycle.MarkConstruction(farm.Record); Actors.Add(farm);

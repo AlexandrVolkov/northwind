@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 139010 | 4710 | 0 | 3162 | 44 |
+| LE:1 | 146882 | 138499 | 5113 | 0 | 3270 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61833 | 0 | 0 | 0 | 0 |
 | ARMY__00.WRK | 5403 | 5403 | 0 | 0 | 0 | 0 |
@@ -28,6 +28,7 @@
 | ARMY__02.WRK `0x79D..0x7BD` | Farm owner support decrement branch | partial | [game-logic-map.md](../docs/game-logic-map.md); [population-farms.md](../docs/population-farms.md) | Статически установлено условное уменьшение вклада поддержки +2C с ограничением нулём; назначение агрегата подтверждено пересчётом D453. Переходные события первого обновления и потери вклада WRK ещё не подключены буквально; полный жизненный цикл фермы и бунт не перенесены. |
 | ARMY__02.WRK `0x851..0x8E9` | Worker callback timber branch | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Перенесена древесная ветвь пустого рабочего и нужные поля инициализации; диапазон содержит и другие неперенесённые ветви/вызовы. |
 | ARMY__02.WRK `0x9B2..0x9D2` | Return loaded worker to empty template | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Только пустой груз; ветвь сбрасываемого груза/эффекта после 09D0 и смерть не перенесены. |
+| LE:1 `0x2F03..0x2F1B` | Copy four initial resource stocks from SCN | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json) | Только извлечение четырёх dword SCN +15..24; прочие поля владельца, DOS-загрузка и цикл всех слотов вне перенесённого участка. |
 | LE:1 `0x3593..0x35A8` | DAT header and record stride | partial | [executable-analysis.md](../docs/executable-analysis.md) | Статически подтверждён участок чтения заголовка и шага 171; полный загрузчик, ошибки и релокации не перенесены. |
 | LE:1 `0x35B9..0x35C2` | WRK base assignment | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждено сохранение адреса WRK; это не весь загрузчик. |
 | LE:1 `0x433A..0x434C` | DAT to WRK callback dispatch | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждены выбор DAT[3B], AH=1 и косвенный вызов; общий цикл обновления не перенесён. |
@@ -64,6 +65,8 @@
 | LE:1 `0x9B0D..0x9B86` | Transfer occupancy at step midpoint | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Области и плоскости корректны; особый соседний вариант 9A97..9B0C не покрыт. Полное исходное размещение крупных движущихся объектов ещё не подключено в схватке. |
 | LE:1 `0x9B86..0x9BF9` | Gap between object footprints | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Сохранены байтовые сдвиги размеров и u32-переполнения; игровое использование включает лишь проверенные ветви подхода. |
 | LE:1 `0xA758..0xA870` | Allocate and initialize object record | partial | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [building-lifecycle.json](../tests/fixtures/building-lifecycle.json) | Перенесён лишь путь новой пустой цепочки для 49-байтового замка; поиск дыр, универсальный аллокатор и ошибки не покрыты. |
+| LE:1 `0xA8BB..0xA90F` | Check and debit all four recruitment prices | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json) | Только проверка и списание запасов до изменения фазы производителя. Мгновенный наём, проверка выхода до оплаты и отдельные runtime-ссылки прототипа не воспроизводят исходный производственный автомат/аллокатор. |
+| LE:1 `0xA920..0xAAB3` | Production timing, spawn, queue advance and cancellation refund | partial | [scenario-resources.md](../docs/scenario-resources.md) | Установлены переходы по статическому коду: интервал, DAT[45], AC63/A758, сдвиг очереди и возврат. Нет динамической проверки полного автомата, переноса очереди, времени выпуска и отмены. |
 | LE:1 `0xAD5F..0xAE3A` | Construction footprint placement probe | ported | [construction-payment-placement.md](../docs/construction-payment-placement.md); [construction.json](../tests/fixtures/construction.json) | Корректная байтовая карта, ненулевые размеры области; дополнительные разрешения стройки и ветвь существующего объекта не включены. |
 | LE:1 `0xB083..0xB0E9` | Four-slot upfront debit | ported | [construction-payment-placement.md](../docs/construction-payment-placement.md); [construction.json](../tests/fixtures/construction.json) | Проверка и списание четырёх u32 запасов; позднее выделение/размещение может отказать, возврат платежа не моделируется. |
 | LE:1 `0xB16A..0xB176` | Mark new construction state | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [building-lifecycle.json](../tests/fixtures/building-lifecycle.json) | Три записи состояния после создания объекта; размещение и последующий жизненный цикл отдельны. |

@@ -252,7 +252,7 @@ public partial class SkirmishMain : Node2D
             var point = GetGlobalMousePosition(); var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
             var parameters = (PlacingFarm ? Battle.FarmTemplate : Battle.MillTemplate).Construction;
             var rect = new Rect2((Vector2)((cell - new Vector2I(parameters.FootprintWidth / 2, parameters.FootprintHeight / 2)) * 32), new Vector2(parameters.FootprintWidth * 32, parameters.FootprintHeight * 32));
-            bool clear = !Battle.Paused && Battle.Wood >= (PlacingFarm ? Battle.Rules.Economy.FarmPrice : Battle.Rules.Economy.MillPrice) && (PlacingFarm ? Battle.ProbeFarm(cell) : Battle.ProbeMill(cell)).Status == ConstructionPlacementStatus.Clear;
+            bool clear = !Battle.Paused && Battle.CanAfford(PlacingFarm ? Battle.FarmTemplate : Battle.MillTemplate) && (PlacingFarm ? Battle.ProbeFarm(cell) : Battle.ProbeMill(cell)).Status == ConstructionPlacementStatus.Clear;
             var color = clear ? new Color("8de5b8") : new Color("ef8272"); DrawRect(rect, new Color(color, .2f)); DrawRect(rect, color, false, 2);
             var entry = Battle.MillEntry(cell);
             if (PlacingMill && entry.Valid)
@@ -358,7 +358,7 @@ public partial class SkirmishMain : Node2D
         Text("ЛКМ / рамка — выделить\nПКМ — идти / атаковать / рубить\nShift — добавить · C — замок\nWASD, стрелки, СКМ — камера\nКолесо — масштаб", 12);
         _events = Text("", 12);
         Button("ЛАБОРАТОРИЯ  [F10]", () => GetTree().ChangeSceneToFile("res://scenes/main.tscn"));
-        Text("Ранняя версия: бой, ИИ и хозяйственные цены временные. Кампания ещё в работе.", 11);
+        Text("Ранняя версия: бой и ИИ временные. Кампания ещё в работе.", 11);
     }
     private void RefreshTerrain()
     {
@@ -399,18 +399,23 @@ public partial class SkirmishMain : Node2D
         }
         if (units is [var selectedMill] && selectedMill.Source.TemplateName == "Лесопилка")
             _selection.Text += selectedMill.ConstructionRemaining > 0 ? $"\nСтроится: {selectedMill.ConstructionRemaining:0} с" : $"\nГрузов в очереди: {selectedMill.Record[0x24]}";
-        _economy.Text = $"Дерево: {Battle.Wood} · Люди: {Battle.FreePeople}\nПоддержка ферм: {Battle.Population.FarmSupport} · Нагрузка: {Battle.Population.Used}";
+        _economy.Text = $"Металл: {Battle.Metal} · Дерево: {Battle.Wood}\nЗолото: {Battle.Gold} · Люди: {Battle.FreePeople}\nПоддержка ферм: {Battle.Population.FarmSupport} · Нагрузка: {Battle.Population.Used}";
         if (Battle.FreePeople == 0) _economy.Text += Battle.PopulationGrowthSeconds is { } seconds ? $"\nПополнение через {Math.Ceiling(seconds)} с" : "\nДля прироста нужна ферма";
         bool castle = units is [var selected] && selected.Id == Battle.PlayerCastle.Id && selected.Alive;
         _hire.Visible = _buildMill.Visible = _hireMilitia.Visible = _buildFarm.Visible = castle;
-        _hire.Text = $"РАБОЧИЙ\n{Battle.Rules.Economy.WorkerPrice} д. · 1 чел.";
-        _hireMilitia.Text = $"ОПОЛЧЕНЕЦ\n{Battle.Rules.Economy.MilitiaPrice} д. · 1 чел.";
-        _buildMill.Text = $"ЛЕСОПИЛКА\n{Battle.Rules.Economy.MillPrice} дерева";
-        _buildFarm.Text = $"ФЕРМА\n{Battle.Rules.Economy.FarmPrice} дерева";
-        _hire.Disabled = Battle.Paused || Battle.Outcome != "" || !Battle.CanRecruit || Battle.Wood < Battle.Rules.Economy.WorkerPrice;
-        _hireMilitia.Disabled = Battle.Paused || Battle.Outcome != "" || !Battle.CanRecruit || Battle.Wood < Battle.Rules.Economy.MilitiaPrice;
-        _buildMill.Disabled = Battle.Paused || Battle.Outcome != "" || Battle.Wood < Battle.Rules.Economy.MillPrice;
-        _buildFarm.Disabled = Battle.Paused || Battle.Outcome != "" || Battle.Wood < Battle.Rules.Economy.FarmPrice;
+        _hire.Text = $"РАБОЧИЙ\n{Skirmish.PriceText(Battle.WorkerTemplate)}";
+        _hireMilitia.Text = $"ОПОЛЧЕНЕЦ\n{Skirmish.PriceText(Battle.MilitiaTemplate)}";
+        _buildMill.Text = $"ЛЕСОПИЛКА\n{Skirmish.PriceText(Battle.MillTemplate)}";
+        _buildFarm.Text = $"ФЕРМА\n{Skirmish.PriceText(Battle.FarmTemplate)}";
+        bool blocked = Battle.Paused || Battle.Outcome != "";
+        _hire.Disabled = blocked || !Battle.CanAfford(Battle.WorkerTemplate);
+        _hireMilitia.Disabled = blocked || !Battle.CanAfford(Battle.MilitiaTemplate);
+        _buildMill.Disabled = blocked || !Battle.CanAfford(Battle.MillTemplate);
+        _buildFarm.Disabled = blocked || !Battle.CanAfford(Battle.FarmTemplate);
+        _hire.TooltipText = Battle.MissingResources(Battle.WorkerTemplate);
+        _hireMilitia.TooltipText = Battle.MissingResources(Battle.MilitiaTemplate);
+        _buildMill.TooltipText = Battle.MissingResources(Battle.MillTemplate);
+        _buildFarm.TooltipText = Battle.MissingResources(Battle.FarmTemplate);
         if (PlacingFarm) _status.Text = "Место для фермы\nЛКМ — строить · ПКМ/Esc — отмена";
         if (PlacingMill) _status.Text = "Место для лесопилки\nОставьте проход к жёлтой точке.\nЛКМ — строить · ПКМ/Esc — отмена";
         _pause.Text = Battle.Paused ? "ПРОДОЛЖИТЬ" : "ПАУЗА [ПРОБЕЛ]"; _speed.Text = $"СКОРОСТЬ ×{Speed}";

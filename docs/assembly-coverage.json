@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "519079c47257552ab9e796ba8e36838153882bc4f300613fff862ebe31c88bb7",
+  "annotation_sha256": "667fd66611c24130c71c8da8796a1b9e7cdbf8fa81407472c76979e41e4e4d1b",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,9 +32,9 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 4710,
-        "ported": 3162,
-        "unreviewed": 139010
+        "partial": 5113,
+        "ported": 3270,
+        "unreviewed": 138499
       },
       "linear_rows": 45008,
       "flow_candidate_instructions": 30465,
@@ -46,6 +46,22 @@
       "regions": [
         {
           "start": 0,
+          "end": 12035,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 12035,
+          "end": 12059,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "scenario-resource-stock-copy"
+          ]
+        },
+        {
+          "start": 12059,
           "end": 13715,
           "status": "unreviewed",
           "classification": "unknown",
@@ -517,6 +533,38 @@
         },
         {
           "start": 43120,
+          "end": 43195,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 43195,
+          "end": 43279,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "recruitment-resource-debit"
+          ]
+        },
+        {
+          "start": 43279,
+          "end": 43296,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 43296,
+          "end": 43699,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "recruitment-production-and-refund"
+          ]
+        },
+        {
+          "start": 43699,
           "end": 44383,
           "status": "unreviewed",
           "classification": "unknown",
