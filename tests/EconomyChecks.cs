@@ -41,12 +41,12 @@ public partial class TestRunner
     private async Task EconomyChecks()
     {
         OriginalLumbermillChecks(); OriginalForestryMapChecks();
-        using (var battle = CreateSkirmish())
+        using (var battle = CreateFundedSkirmish())
         {
             uint initial = battle.Wood;
             var worker = battle.TrainWorker() ?? throw new InvalidOperationException("Could not hire initial worker");
-            Check(worker.Worker && !worker.Structure && worker.Record.Length == 54 && battle.Wood == initial - battle.Rules.Economy.WorkerPrice,
-                "Castle hires a mobile 54-byte worker and debits the configured wood price");
+            Check(worker.Worker && !worker.Structure && worker.Record.Length == 54 && battle.Wood == initial - Skirmish.Price(battle.WorkerTemplate).Second,
+                "Castle hires a mobile 54-byte worker and debits the native DAT price");
             var tree = EconomyTree(battle, worker);
             Check(battle.GatherTimber([battle.Hero.Id], tree) == 0 && battle.GatherTimber([worker.Id], tree) == 1,
                 "Only workers accept a timber order");
@@ -75,7 +75,7 @@ public partial class TestRunner
             Check(worker.GatherTree == null && worker.Record[0x31] == 3, "Stop retains a loaded worker for a manual delivery order");
             var cell = EconomyMillCell(battle, tree);
             var mill = battle.BuildMill(cell) ?? throw new InvalidOperationException("Could not build sawmill");
-            Check(mill.ConstructionRemaining > 0 && battle.Wood == before - battle.Rules.Economy.MillPrice &&
+            Check(mill.ConstructionRemaining > 0 && battle.Wood == before - Skirmish.Price(battle.MillTemplate).Second &&
                 battle.ProbeMill(cell).Status == ConstructionPlacementStatus.Occupied,
                 "Construction debits wood and immediately reserves the source footprint");
             var entry = battle.MillEntry(cell);
@@ -114,7 +114,7 @@ public partial class TestRunner
                 "Receiver acknowledges on its update; WRK return restores empty-worker fields before stock processing");
             Check(worker.GatherTree == null && battle.GatherTimber([worker.Id], tree) == 1, "Manual delivery returns to idle and the worker can resume forestry");
             for (int i = 0; i < 3600 && battle.ProducedWood < 30; i++) battle.Advance(.1);
-            Check(battle.ProducedWood == 30 && battle.Wood == initial - battle.Rules.Economy.WorkerPrice - battle.Rules.Economy.MillPrice + 30 &&
+            Check(battle.ProducedWood == 30 && battle.Wood == initial - Skirmish.Price(battle.WorkerTemplate).Second - Skirmish.Price(battle.MillTemplate).Second + 30 &&
                 worker.Record[0x31] == 0 && mill.Record[0x24] == 0 && battle.Harvestable(tree),
                 $"Three loads travel through the native handoff and processing queue exactly once: wood={battle.Wood}, produced={battle.ProducedWood}, cargo={worker.Record[0x31]}, job={worker.JobText}, worker={worker.Position}, mill={mill.Position}");
             Check(mill.ConstructionRemaining == 0 && mill.Record[0x19] == mill.Template.InitialCondition && mill.Record[0x14] == 0 && mill.Record[0x0f] == 0x20,
@@ -131,7 +131,7 @@ public partial class TestRunner
             Check(battle.Wood == before && battle.ProducedWood == 70, "Stopping the worker prevents further loads");
             var second = EconomyMillCell(battle, tree, worker);
             var reserveMill = battle.BuildMill(second);
-            Check(reserveMill != null && battle.Wood == before - battle.Rules.Economy.MillPrice,
+            Check(reserveMill != null && battle.Wood == before - Skirmish.Price(battle.MillTemplate).Second,
                 "Delivered wood participates in a subsequent construction transaction");
             var nextTree = EconomyTree(battle, worker); battle.GatherTimber([worker.Id], nextTree);
             for (int i = 0; i < 1800 && worker.Record[0x31] != 3; i++) battle.Advance(.1);
@@ -150,6 +150,9 @@ public partial class TestRunner
         GetTree().Root.Size = new Vector2I(1280, 800);
         var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
         for (int i = 0; i < 4; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        var starterFarm = scene.Battle.BuildFarm(FarmSite(scene.Battle));
+        Check(starterFarm != null, "Original zero-person start can build a farm without population cost");
+        for (int i = 0; i < 4000 && scene.Battle.FreePeople < 3; i++) scene.Battle.Advance(1.0 / scene.Battle.Rules.TicksPerSecond);
         scene.SelectCastle(); scene.HireWorker();
         var hired = scene.Battle.Find(scene.Selection.Single())!;
         Check(hired.Worker, "Castle UI hires and selects the new worker");

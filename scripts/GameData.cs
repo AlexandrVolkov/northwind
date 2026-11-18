@@ -64,6 +64,7 @@ public sealed class InitialOccupancyData
 }
 public sealed class ScenarioSlot
 {
+    public string RawRecordHex { get; set; } = "";
     public int SlotIndex { get; set; }
     public int FileOffset { get; set; }
     public string LeaderName { get; set; } = "";
