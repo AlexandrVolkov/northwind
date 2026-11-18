@@ -35,6 +35,14 @@ class SkirmishFramesTests(unittest.TestCase):
         frames={f['frame']for f in data['frames']if f['template_file']=='ARMY__02.DAT'and f['template_index']==3}
         self.assertTrue(set(range(base,base+raw[0x4a]+1)).issubset(frames))
 
+    def test_mine_construction_frames_are_bundled(self):
+        root=Path(__file__).resolve().parents[1]/'assets/imported'
+        data=json.loads((root/'battle_frames.json').read_text(encoding='utf-8'))
+        raw=bytes.fromhex(json.loads((root/'templates.json').read_text(encoding='utf-8'))['armies']['ARMY__02.DAT']['templates'][6]['raw_record_hex'])
+        base=int.from_bytes(raw[0x48:0x4a],'little')
+        frames={f['frame']for f in data['frames']if f['template_file']=='ARMY__02.DAT'and f['template_index']==6}
+        self.assertTrue(set(range(base,base+raw[0x4a]+1)).issubset(frames))
+
     def test_unit_and_castle_colors_match_previously_verified_observations(self):
         root=Path(__file__).resolve().parents[1]/'assets/imported'
         data=json.loads((root/'battle_frames.json').read_text(encoding='utf-8'))

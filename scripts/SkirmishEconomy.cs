@@ -51,6 +51,7 @@ public sealed partial class Skirmish
     private OriginalTerrainCatalog _terrainCatalog = null!;
     public SkirmishActor PlayerCastle => Actors.Single(a => a.Team == 0 && a.Source.TemplateName == "Замок");
     public TemplateEntry BarracksTemplate => _templates.Armies["ARMY__02.DAT"].Templates[3];
+    public TemplateEntry MineTemplate => _templates.Armies["ARMY__02.DAT"].Templates[6];
     public TemplateEntry MillTemplate => _templates.Armies["ARMY__02.DAT"].Templates[4];
     private TemplatesData _templates = null!;
     private ObjectRecord _workerSeed = null!;
@@ -146,6 +147,29 @@ public sealed partial class Skirmish
         Occupancy.WriteFootprint(barracks.Parameters[3], barracks.Parameters[4], barracks.Record[0x0d], (uint)barracks.Position.X, (uint)barracks.Position.Y, barracks.Id);
         Log("Казарма строится. Ополченцев можно заказать после завершения."); return barracks;
     }
+    public MineDeposit MineDepositAt(Vector2I cell)
+    {
+        var parameters = MineTemplate.Construction;
+        uint x = OriginalWorkerDelivery.BuildingAnchor((byte)cell.X, parameters.FootprintWidth);
+        uint y = OriginalWorkerDelivery.BuildingAnchor((byte)cell.Y, parameters.FootprintHeight);
+        return OriginalMineRules.Initialize(Map.Cells, Map.Width, Map.Height, x, y);
+    }
+    public ConstructionPlacement ProbeMine(Vector2I cell) => ProbeEconomyBuilding(cell, MineTemplate);
+    public SkirmishActor? BuildMine(Vector2I cell)
+    {
+        if (Paused || Outcome != "" || !PlayerCastle.Alive) return null;
+        if (ProbeMine(cell).Status != ConstructionPlacementStatus.Clear) { Log("Для шахты нужна свободная площадка рядом с замком."); return null; }
+        if (!Spend(MineTemplate)) return null;
+        var mine = NewEconomyActor(6, cell, false);
+        var deposit = OriginalMineRules.Initialize(Map.Cells, Map.Width, Map.Height, (uint)mine.Position.X, (uint)mine.Position.Y);
+        mine.Record[0x23] = deposit.Type;
+        BinaryPrimitives.WriteUInt32LittleEndian(mine.Record.AsSpan(0x24), deposit.Remaining);
+        mine.ConstructionDuration = mine.ConstructionRemaining = mine.Template.InitialCondition * Math.Max(1, (int)mine.Parameters[0x57]) / (double)Rules.TicksPerSecond;
+        OriginalBuildingLifecycle.MarkConstruction(mine.Record);
+        Actors.Add(mine);
+        Occupancy.WriteFootprint(mine.Parameters[3], mine.Parameters[4], mine.Record[0x0d], (uint)mine.Position.X, (uint)mine.Position.Y, mine.Id);
+        Log($"Шахта строится. Рудных клеток вокруг: {deposit.Count}; тип: {deposit.Type}."); return mine;
+    }
     public int GatherTimber(IEnumerable<uint> ids, Vector2I tree)
     {
         if (Paused || Outcome != "" || !Harvestable(tree)) return 0;
@@ -168,7 +192,7 @@ public sealed partial class Skirmish
     }
     private void TickBuildings()
     {
-        foreach (var building in Actors.Where(a => a.Alive && a.Team == 0 && (a.Source.TemplateName is "Лесопилка" or "Ферма" or "Казарма")))
+        foreach (var building in Actors.Where(a => a.Alive && a.Team == 0 && (a.Source.TemplateName is "Лесопилка" or "Ферма" or "Казарма" or "Шахта")))
         {
             if (building.ConstructionRemaining > 0)
             {
@@ -183,7 +207,7 @@ public sealed partial class Skirmish
                 building.ConstructionRemaining = maintenance.ContinueAction
                     ? ((building.Template.InitialCondition - maintenance.State.Condition + 1) * Math.Max(1, (int)building.Parameters[0x57]) - maintenance.State.Counter) / (double)Rules.TicksPerSecond : 0;
                 // Provisional visual stage binding; the full C88C frame/effects handler is not connected.
-                if (building.Source.TemplateName is "Ферма" or "Казарма")
+                if (building.Source.TemplateName is "Ферма" or "Казарма" or "Шахта")
                     BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(building.Template.InitialFrame + Math.Min(building.Parameters[0x4a], building.Record[0x19] * (building.Parameters[0x4a] + 1) / (building.Template.InitialCondition + 1))));
                 if (maintenance.ContinueAction) continue;
                 var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(building.Record[0x14], building.Record[0x15], building.Record[0x0f]));

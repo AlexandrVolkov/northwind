@@ -4,12 +4,12 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 138460 | 4893 | 0 | 3529 | 44 |
+| LE:1 | 146882 | 138324 | 4893 | 0 | 3665 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61833 | 0 | 0 | 0 | 0 |
 | ARMY__00.WRK | 5403 | 5403 | 0 | 0 | 0 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
-| ARMY__02.WRK | 6930 | 6439 | 363 | 0 | 128 | 7 |
+| ARMY__02.WRK | 6930 | 6367 | 435 | 0 | 128 | 7 |
 | ARMY__03.WRK | 13412 | 13412 | 0 | 0 | 0 | 1 |
 | ARMY__04.WRK | 411 | 411 | 0 | 0 | 0 | 0 |
 | ARMY__05.WRK | 882 | 882 | 0 | 0 | 0 | 2 |
@@ -21,11 +21,12 @@
 | Модуль / полуоткрытый диапазон | Имя | Статус | Доказательства | Ограничения |
 | --- | --- | --- | --- | --- |
 | ARMY__02.WRK `0x221..0x251` | Castle seven-byte header and production rows | partial | [recruitment-production.md](../docs/recruitment-production.md); [original_production.json](../data/original_production.json) | Заголовок сохранён без выдуманных назначений. Разобраны строки index/frame/interval. Ополченца в таблице замка нет. |
-| ARMY__02.WRK `0x336..0x34E` | Barracks seven-byte header and production rows | partial | [recruitment-production.md](../docs/recruitment-production.md); [original_production.json](../data/original_production.json) | Разобраны строки лучника, ополченца, поджигателя и рыцаря; строительство казармы и отдельная очередь ополченца подключены. Полный WRK-диспетчер остаётся задачей. |
+| ARMY__02.WRK `0x336..0x34E` | Barracks seven-byte header and production rows | partial | [recruitment-production.md](../docs/recruitment-production.md); [original_production.json](../data/original_production.json) | Разобраны строки лучника, ополченца, поджигателя и рыцаря. Строительство казармы и отдельная очередь ополченца подключены; полный WRK-диспетчер остаётся задачей. |
 | ARMY__02.WRK `0x363..0x383` | Validate lumbermill visitor | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Ветка AH=5 проверяет флаги посетителя, не состояние здания. Другие события WRK не включены. |
 | ARMY__02.WRK `0x3E4..0x412` | Process queued timber load | ported | [wood-economy.md](../docs/wood-economy.md); [lumbermill.json](../tests/fixtures/lumbermill.json) | Вход после внешних проверок здания; таймер очереди и зачисление 10 древесины. Полный WRK-цикл и исходная частота обновлений вне контракта. |
 | ARMY__02.WRK `0x41C..0x44E` | Accept timber from prepared waiting worker | ported | [wood-economy.md](../docs/wood-economy.md); [lumbermill.json](../tests/fixtures/lumbermill.json) | Вход после внешнего поиска посетителя; точная ветвь очереди, груза и флагов, без полного обработчика здания. |
 | ARMY__02.WRK `0x524..0x542` | Mine event header | partial | [game-logic-map.md](../docs/game-logic-map.md) | Статически установлено ветвление AH=0/1/2/4/5. Полная добыча, формы груза, получатель и ресурсные слоты ещё не восстановлены. |
+| ARMY__02.WRK `0x5D6..0x61E` | Mine first-update ore selection and reserve | partial | [mine-deposits.md](../docs/mine-deposits.md); [mine-deposits.json](../tests/fixtures/mine-deposits.json) | Перенесены выбор более частого типа 1/2 и начальный запас. Внешние вызовы и полный цикл обновления здания не включены. |
 | ARMY__02.WRK `0x756..0x783` | Farm update prefix and owner support increment | partial | [game-logic-map.md](../docs/game-logic-map.md); [population-farms.md](../docs/population-farms.md) | Статически установлены регистрация и начальное добавление DAT.u32[78] в поле владельца +2C. По пересчёту D453 этот вклад фермы входит в показатель поддержки. Первые переходные события WRK не подключены буквально; исполнение полного WRK, глобальный такт и бунт не перенесены. |
 | ARMY__02.WRK `0x79D..0x7BD` | Farm owner support decrement branch | partial | [game-logic-map.md](../docs/game-logic-map.md); [population-farms.md](../docs/population-farms.md) | Статически установлено условное уменьшение вклада поддержки +2C с ограничением нулём; назначение агрегата подтверждено пересчётом D453. Переходные события первого обновления и потери вклада WRK ещё не подключены буквально; полный жизненный цикл фермы и бунт не перенесены. |
 | ARMY__02.WRK `0x851..0x8E9` | Worker callback timber branch | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Перенесена древесная ветвь пустого рабочего и нужные поля инициализации; диапазон содержит и другие неперенесённые ветви/вызовы. |
@@ -82,6 +83,7 @@
 | LE:1 `0xAD5F..0xAE3A` | Construction footprint placement probe | ported | [construction-payment-placement.md](../docs/construction-payment-placement.md); [construction.json](../tests/fixtures/construction.json) | Корректная байтовая карта, ненулевые размеры области; дополнительные разрешения стройки и ветвь существующего объекта не включены. |
 | LE:1 `0xB083..0xB0E9` | Four-slot upfront debit | ported | [construction-payment-placement.md](../docs/construction-payment-placement.md); [construction.json](../tests/fixtures/construction.json) | Проверка и списание четырёх u32 запасов; позднее выделение/размещение может отказать, возврат платежа не моделируется. |
 | LE:1 `0xB16A..0xB176` | Mark new construction state | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [building-lifecycle.json](../tests/fixtures/building-lifecycle.json) | Три записи состояния после создания объекта; размещение и последующий жизненный цикл отдельны. |
+| LE:1 `0xB3F7..0xB47F` | Count source ore subtype in clipped three-by-three neighborhood | ported | [mine-deposits.md](../docs/mine-deposits.md); [mine-deposits.json](../tests/fixtures/mine-deposits.json) | Проверены 108 координат первой карты и оба типа руды по настоящему коду. Остальные карты и необычные размеры требуют отдельных проверок. |
 | LE:1 `0xBE04..0xBE2E` | Apply damage to one prepared target | ported | [building-condition-kernel.md](../docs/building-condition-kernel.md); [building-kernel.json](../tests/fixtures/building-kernel.json) | Хвост после подготовки шаблона и силы; выбор цели, генерация силы, площадное действие и смерть с эффектами вне контракта. |
 | LE:1 `0xC35F..0xC439` | Find harvestable forest footprint | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Непустая область внутри карты и поисковый прямоугольник без переполнения правого/нижнего конца; поведение для выходящих областей не включено. |
 | LE:1 `0xC439..0xC4CD` | Find worker cargo receiver | ported | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Порядок цепочки передан вызывающей стороной; выбирается последний при равном расстоянии. Полный пул владельца схватки ещё не используется как хранилище. |
