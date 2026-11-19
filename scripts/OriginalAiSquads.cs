@@ -509,6 +509,8 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
         OriginalAiSquadSteps.NearestEnemy(world, s[0x3a], s[0], s[0x20] * 32u, s[0x21] * 32u, s[0x4d], s[0x4e], s[0x4f], s[0x50]);
 
     /// <summary>21CA0: hostile objects of the area (D7B1) counted into the enemy census fields.</summary>
+    /// <summary>21CA0 for another caller (209B0): true when hostile objects are in the area.</summary>
+    public bool AreaCensus(byte participant, byte x0, byte y0, byte x1, byte y1) => Census(participant, x0, y0, x1, y1);
     private bool Census(byte participant, byte x0, byte y0, byte x1, byte y1)
     {
         uint hostile = world.HostileMask(participant);
@@ -1400,5 +1402,155 @@ public sealed class OriginalAiMilitary(IAiMilitaryWorld world, byte[] gatherClas
         }
         if (OriginalAiRecruitment.Mine(world.Chain(other), ai, r[8]) is not { } mine) return true;  // home of this block (ESI)
         return BecomeChase(ai, r, mine.Record);
+    }
+}
+
+/// <summary>World of 209B0: the military world plus the second and third random streams (9E55 [19EC], 9E69 [19ED]).</summary>
+public interface IAiGarrisonWorld : IAiMilitaryWorld
+{
+    byte Random2();
+    byte Random3();
+}
+
+/// <summary>Garrison step LE:1 209B0 (docs/ai.md, «Гарнизон»), by AI block +19E4: bit 0 enables it; bit 1 — units wander
+/// over the own land and attack intruders; bit 2 — units wander over the map; otherwise strength orders, guards of the
+/// own buildings (request 4), areas around hostile buildings on the own land (request 1) and patrols (state 8).
+/// Sets the class filter of request mode 2 ([ED39]/[ED3D] = 808h/800h).</summary>
+public sealed class OriginalAiGarrison(IAiGarrisonWorld world, OriginalAiMilitary military, OriginalAiSquadStates states)
+{
+    private static uint U32(ReadOnlySpan<byte> raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw[offset..]);
+    private static void W32(Span<byte> raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw[offset..], value);
+    private const int Military = OriginalAiMilitary.List, Orders = OriginalAiMilitary.Orders;
+
+    public void Run(Span<byte> ai)
+    {
+        if ((ai[0x19e4] & 1) == 0) return;
+        military.ClassMask = 0x808; military.ClassValue = 0x800;
+        var chain = world.Chain(ai[0]);
+        uint turn = U32(ai, 1);
+        if ((ai[0x19e4] & 2) != 0) { Wander(ai, chain, turn); return; }
+        if ((ai[0x19e4] & 4) != 0) { Roam(ai, chain, turn); return; }
+
+        if ((turn & 0x3ff) == 0)
+        {
+            // 21696 with EBX = −1 at (0, 0): gathers every free unit (808h/800h) and disbands again; EBX = their strength.
+            var (_, free) = OriginalAiRecruitment.GatherFree(ai, chain, 0, 0, uint.MaxValue, 0x808, 0x800);
+            uint wanted = (ai[0x1a27] & 2) != 0 ? 1000u : 100u;
+            if (wanted > free) OriginalAiMilitary.Request(ai, Orders, 1, 0x1b, 0x40, 0, 0, 0x88, 0, wanted - free);
+        }
+        if ((turn & 0x3f) == 0)
+            foreach (var (record, template) in chain.ToArray())
+            {
+                if (!Building(record, template)) continue;
+                uint reference = world.Reference(record);
+                int guard = OriginalAiSquads.FindByState(ai, 4, reference);
+                if (guard < 0) { OriginalAiMilitary.Request(ai, Military, 4, 0x19, 0x80, 0, 0, 0, 0, reference); continue; }
+                uint wanted = (uint)(template[0x45] - (template[0x45] >> 2));   // 2160B
+                uint have = U32(ai, guard + 0x36);
+                if (wanted > have) { OriginalAiMilitary.Request(ai, Military, 2, ai[guard + 1], 0x80, ai[guard + 1], 0, 0, 0, wanted - have); continue; }
+                uint surplus = have - wanted;
+                if (surplus <= 0x50 || ai[guard + 0x4a] != 0) continue;
+                Release(chain, ai[guard + 1], surplus - 0x50);
+            }
+        if ((turn & 0xff) == 0 && ai[0x5c] != 0)
+        {
+            uint hostile = U32(world.Participant(ai[0]), 0x12);
+            uint size = unchecked((uint)(ai[0x65] | ai[0x66] << 8) - (uint)(ai[0x63] | ai[0x64] << 8) + 0x101);
+            foreach (uint reference in OriginalTargetRules.Collect(new Grid(world), ai[0x63], ai[0x64], (byte)size, (byte)(size >> 8)))
+            {
+                var (record, template) = world.Resolve(reference);
+                if ((hostile >> (record[3] & 31) & 1) == 0 || !Building(record, template)) continue;
+                var (x0, y0, x1, y1) = OriginalTargetRules.Clip((byte)(U32(record, 4) >> 5), (byte)(U32(record, 8) >> 5), 0x14, 0x14, world.MapWidth, world.MapHeight);
+                OriginalAiMilitary.Request(ai, Military, 1, 0x1a, 0x80, x0, y0, x1, y1, 0);
+            }
+        }
+        if ((turn & 0x3ff) == 0)
+        {
+            byte patrols = (byte)(((0xff - ai[0x1a01]) * ai[0x21] >> 8) >> 4);
+            if (patrols > ai[0x19e8])
+            {
+                int s = OriginalAiRecruitment.Gather(ai, chain, ai[0x61], ai[0x62], 0xfa, U32(ai, 0x22), 0xa08, 0x800);
+                if (s >= 0) { ai[s + 4] = 0xfa; ai[s + 2] = 8; ai[s + 5] = 0; } // 1FACD
+            }
+        }
+    }
+
+    private static bool Building(byte[] record, byte[] template) =>
+        (U32(template, 0x40) & 8) != 0 && (U32(template, 0x40) & 0x20) == 0 && (sbyte)record[0x19] > (sbyte)template[0x46];
+
+    /// <summary>202FB: members of squad <paramref name="id"/> leave it (+1B = 0) until their DAT[76] reach the limit.</summary>
+    public static uint Release(IEnumerable<(byte[] Record, byte[] Template)> chain, byte id, uint limit)
+    {
+        uint sum = 0;
+        foreach (var (r, t) in chain)
+        {
+            if (r[0x1b] != id) continue;
+            r[0x1b] = 0; sum += t[0x76];
+            if (sum >= limit) break;
+        }
+        return sum;
+    }
+
+    /// <summary>+19E4 bit 1: now and then a unit picked by weight DAT[88] walks to a random cell of the own land (unless it is
+    /// busy there), and every 256 turns, with intruders on the land (21CA0), each unit not attacking (+14 ≠ 2) takes the
+    /// nearest of them (20408, command 50h).</summary>
+    private void Wander(Span<byte> ai, IReadOnlyList<(byte[] Record, byte[] Template)> chain, uint turn)
+    {
+        uint high = U32(ai, 0x5d) >> 4;
+        uint mask = (0x3ffu >> (int)(high & 31)) | 1;
+        if ((turn & mask) == 0)
+        {
+            uint pick = (high & 0xffffff00) | (uint)(world.Random() * ai[0x5d] >> 8);
+            foreach (var (record, template) in chain)
+            {
+                uint weight = U32(template, 0x88);
+                if (pick >= weight) { pick -= weight; continue; }
+                pick -= weight;   // the original subtracts before testing; later objects never borrow again
+                if ((U32(template, 0x40) & 8) != 0) continue;
+                if (record[0x14] != 0)
+                {
+                    byte cx = (byte)(U32(record, 4) >> 5), cy = (byte)(U32(record, 8) >> 5);
+                    if (cx >= ai[0x63] && cx <= ai[0x65] && cy >= ai[0x64] && cy <= ai[0x66]) continue;
+                }
+                uint span = unchecked((uint)(ai[0x65] | ai[0x66] << 8) - (uint)(ai[0x63] | ai[0x64] << 8));
+                record[0x22] = (byte)(ai[0x63] + (world.Random() * (byte)span >> 8));
+                record[0x23] = (byte)(ai[0x64] + (world.Random2() * (byte)(span >> 8) >> 8));
+                record[0x14] = (byte)((record[0x14] & 7) | 0x48);
+                break;
+            }
+        }
+        if ((turn & 0xff) != 0 || !states.AreaCensus(ai[0], ai[0x63], ai[0x64], ai[0x65], ai[0x66])) return;
+        foreach (var (record, template) in chain)
+        {
+            if ((U32(template, 0x40) & 8) != 0 || record[0x14] == 2) continue;
+            var (enemy, _) = OriginalAiSquadSteps.NearestEnemy(world, template[0x74], record[3], U32(record, 4), U32(record, 8), ai[0x63], ai[0x64], ai[0x65], ai[0x66]);
+            if (enemy == 0) continue;
+            W32(record, 0x1c, enemy); record[0x14] = (byte)((record[0x14] & 7) | 0x50);
+        }
+    }
+
+    /// <summary>+19E4 bit 2: every 2048 turns each idle unit, with a 1 in 8 chance (9E69), walks to a random cell of the map.</summary>
+    private void Roam(Span<byte> ai, IReadOnlyList<(byte[] Record, byte[] Template)> chain, uint turn)
+    {
+        if ((turn & 0x7ff) != 0) return;
+        foreach (var (record, template) in chain)
+        {
+            if ((world.Random3() & 7) != 0 || (U32(template, 0x40) & 8) != 0 || record[0x14] != 0) continue;
+            record[0x22] = (byte)(world.Random() * world.MapWidth >> 8);
+            record[0x23] = (byte)(world.Random2() * world.MapHeight >> 8);
+            record[0x14] = (byte)((record[0x14] & 7) | 0x48);
+        }
+    }
+
+    private sealed class Grid(IAiSquadWorld world) : IEnemySearchWorld
+    {
+        public byte MapWidth => world.MapWidth;
+        public byte MapHeight => world.MapHeight;
+        public uint HostileMask => throw new NotSupportedException();
+        public uint Occupant(int plane, int cell) => world.Occupant(plane, cell);
+        public (byte[] Record, byte[] Template) Resolve(uint reference) => world.Resolve(reference);
+        public bool Contact(byte owner) => throw new NotSupportedException();
+        public byte TerrainClass(ReadOnlySpan<byte> record) => throw new NotSupportedException();
+        public void Contacted(FirstContact contact) => throw new NotSupportedException();
     }
 }

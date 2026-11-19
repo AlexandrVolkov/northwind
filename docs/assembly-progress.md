@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 119826 | 5512 | 97 | 21447 | 44 |
+| LE:1 | 146882 | 118655 | 5512 | 97 | 22618 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -100,6 +100,7 @@
 | LE:1 `0x9B0D..0x9B86` | Transfer occupancy at step midpoint | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Области и плоскости корректны; особый соседний вариант 9A97..9B0C не покрыт. Полное исходное размещение крупных движущихся объектов ещё не подключено в схватке. |
 | LE:1 `0x9B86..0x9BF9` | Gap between object footprints | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Сохранены байтовые сдвиги размеров и u32-переполнения; игровое использование включает лишь проверенные ветви подхода. |
 | LE:1 `0x9E41..0x9E69` | Random byte streams [19EB]/[19EC] over table DS:297E | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | third stream 9E69 ([19ED]) is not covered |
+| LE:1 `0x9E69..0x9E7D` | Random byte stream [19ED] over table DS:297E | ported | [ai.md](../docs/ai.md); [ai-garrison.json](../tests/fixtures/ai-garrison.json) |  |
 | LE:1 `0xA10B..0xA1D1` | Game speed gate and slow-tick flags | partial | [game-timing.md](../docs/game-timing.md) | Перенесены частота и шаг по умолчанию; клавиши смены скорости и флаги [19E7] не подключены. |
 | LE:1 `0xA4DF..0xA5B8` | Death frames by hit kind, corpse object and removal | ported | [combat.md](../docs/combat.md); [death.json](../tests/fixtures/death.json) | Объект-труп (9727) и удаление 98DB исполняет мост схватки. |
 | LE:1 `0xA5B8..0xA5F4` | Sixteen-way missile direction frame | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) |  |
@@ -170,11 +171,13 @@
 | LE:1 `0x1FBB1..0x20095` | AI squad retreat, march, fight and strength helpers | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | 20001 (stuck-member rescue) and the A4C2 message display are hooks |
 | LE:1 `0x20095..0x2029F` | AI squad registry: numbers, create, remove, disband, transfer, lookups | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) | on overflow 200B5 releases pool byte «participant» instead of the new number, as in the original |
 | LE:1 `0x2029F..0x202D0` | Free units join a squad up to a strength | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
+| LE:1 `0x202FB..0x2035A` | Squad members leave up to a strength | ported | [ai.md](../docs/ai.md); [ai-garrison.json](../tests/fixtures/ai-garrison.json) |  |
 | LE:1 `0x2035A..0x20408` | Nearest free object of a class | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x20408..0x205FB` | Nearest visible hostile object in a cell area | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) | object visibility OBE[20] is not maintained by the skirmish yet |
 | LE:1 `0x205FB..0x206D5` | AI squad census from its members | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) |  |
 | LE:1 `0x207CB..0x2087C` | Squad stands; members outside the area return | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) |  |
 | LE:1 `0x2098B..0x209B0` | Find AI squad by state and target object | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) |  |
+| LE:1 `0x209B0..0x20DD0` | AI garrison: unit orders, building guards, hostile buildings, patrols, wandering | ported | [ai.md](../docs/ai.md); [ai-garrison.json](../tests/fixtures/ai-garrison.json) |  |
 | LE:1 `0x20DD0..0x21459` | AI military requests (list +1AB, modes 1..10) | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) | bytes filled from register leftovers are written as zero |
 | LE:1 `0x21459..0x21490` | Set mutual war bits | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0x214C3..0x215F1` | AI raid targets: random building, nearest mine | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
