@@ -37,7 +37,7 @@ public sealed partial class Skirmish
     private void TickMining()
     {
         _globalTick = unchecked((byte)(_globalTick + 1));
-        foreach (var mine in Actors.Where(a => a.Alive && a.Team == 0 && a.Source.TemplateName == "Шахта" && a.ConstructionRemaining <= 0).ToArray())
+        foreach (var mine in Actors.Where(a => a.Alive && a.Source.TemplateName == "Шахта" && a.ConstructionRemaining <= 0).ToArray())
         {
             var visitor = EntryVisitor(mine);
             uint before = BinaryPrimitives.ReadUInt32LittleEndian(mine.Record.AsSpan(0x24));
@@ -54,20 +54,26 @@ public sealed partial class Skirmish
                     if (OriginalOreRules.Deplete(Map.Cells, (byte)Map.Width, (byte)Map.Height, (uint)mine.Position.X, (uint)mine.Position.Y,
                         cargo, radius, _terrainCatalog) >= 0) TerrainRevision++;
                 });
-            if (result == OreExtraction.Granted && before >= 100 && BinaryPrimitives.ReadUInt32LittleEndian(mine.Record.AsSpan(0x24)) == 0)
+            if (result == OreExtraction.Granted && before >= 100 && BinaryPrimitives.ReadUInt32LittleEndian(mine.Record.AsSpan(0x24)) == 0 && mine.Team == 0)
                 Log("Шахта истощена: руда закончилась.");
         }
-        var castle = PlayerCastle;
-        if (!castle.Alive) return;
+        foreach (var castle in Actors.Where(a => a.Alive && a.Source.TemplateName == "Замок").ToArray()) CastleReceive(castle);
+    }
+
+    private void CastleReceive(SkirmishActor castle)
+    {
         var carrier = EntryVisitor(castle);
         // 1243A goods other than ore use item slots that are not ported; such a visitor is left for the next update.
         if (carrier != null && carrier.Record.Length > 0x31 && carrier.Record[0x31] > 2) return;
-        var credit = new OreCredit(Metal, Gold, ProducedMetal, ProducedGold);
+        // The enemy castle credits the enemy's metal and gold (participant +18/+20); its statistics are not kept (adapter).
+        var wallet = Wallet(castle.Team);
+        var credit = castle.Team == 0 ? new OreCredit(Metal, Gold, ProducedMetal, ProducedGold) : new OreCredit(wallet.First, wallet.Third, 0, 0);
         byte cargoBefore = carrier?.Record.Length > 0x31 ? carrier.Record[0x31] : (byte)0;
         if (OriginalOreRules.CastleReceive(castle.Record, _globalTick, carrier != null ? carrier.Record : Span<byte>.Empty,
-                carrier != null ? carrier.Parameters : ReadOnlySpan<byte>.Empty, ref credit) && cargoBefore != 0)
+                carrier != null ? carrier.Parameters : ReadOnlySpan<byte>.Empty, ref credit) && cargoBefore != 0 && castle.Team == 0)
             Log($"В замок доставлено 100: {OreName(cargoBefore)}.");
-        Metal = credit.Metal; Gold = credit.Gold; ProducedMetal = credit.MetalStatistics; ProducedGold = credit.GoldStatistics;
+        if (castle.Team == 0) { Metal = credit.Metal; Gold = credit.Gold; ProducedMetal = credit.MetalStatistics; ProducedGold = credit.GoldStatistics; }
+        else EnemyResources = wallet with { First = credit.Metal, Third = credit.Gold };
     }
 
     private void TickOreWorker(SkirmishActor worker)

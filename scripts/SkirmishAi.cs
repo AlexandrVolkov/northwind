@@ -5,17 +5,18 @@ namespace Northwind;
 /// <summary>The settlement AI of the original (LE:1 1E7EA, docs/ai.md) driving the enemy settlement of the skirmish.
 ///
 /// Ported and verified parts run as in the original, once per game tick after the object update (LE:1 31D6): census
-/// (1E87A, every 32 turns), squad steps (1ED26), squad states (1F078), garrison (209B0), military requests (20DD0), orders (227C7), upkeep (226F1), the turn
+/// (1E87A, every 32 turns), squad steps (1ED26), squad states (1F078), garrison (209B0), military requests (20DD0), orders (227C7), economy (21E99, 221AE), upkeep (226F1), the turn
 /// with its decisions (2323A), the plan executor (23667) and research (23C11). Adapters of the port, not the original:
 /// <list type="bullet">
-/// <item>Not yet ported steps are skipped: 21E99/221AE (economy), the
+/// <item>Not yet ported steps are skipped: the worker states 9/10 (workers for mines and lumbermills), 21E99/221AE (economy), the
 /// construction stage 23551, worker states 9/10, the formation table of step 4, messages A4C2, the rescue 20001.</item>
 /// <item>Step 4 (formation march) sends the members to the target cell with command 48h instead of a formation.</item>
 /// <item>Commands the AI writes into OBE +14 (48h move to +22/+23, 50h/58h attack +1C, 40h stand) are carried out by
 /// <see cref="ExecuteAiCommands"/> through the port's movement and attack, as the player's orders are, and replaced by
 /// activity codes (0 idle, 1 moving, 2/3 attacking) inferred from what the AI reads back; the original WRK command
 /// handlers are not ported.</item>
-/// <item>Fog of war is not ported: every cell counts as explored ([18DA]), objects keep their scenario visibility FFh.</item>
+/// <item>Fog of war is not ported: the fog map [18DA] counts the enemy's land +63..+66 grown by 8 cells as seen and the rest
+/// as unseen (patrols 1EBEF go there; mine sites 22613 need seen cells); objects keep their scenario visibility FFh.</item>
 /// <item>Only the enemy settlement thinks; the player's block is initialised and counted (census) so that the enemy can
 /// weigh it, but it gives no orders. Participant records (F5h) are rebuilt from the diplomacy state around each turn.</item>
 /// <item>[18E6]/[18EA] (bounds start of B977) are taken as the map size in fixed point; [19E9] (state 6 timer) as FFh.</item>
@@ -32,6 +33,8 @@ public sealed partial class Skirmish
     private OriginalAiMilitary? _aiMilitary;
     private OriginalAiGarrison? _aiGarrison;
     private OriginalAiOrders? _aiOrders;
+    private OriginalAiEconomy? _aiEconomy;
+    private OriginalAiWorkers? _aiWorkers;
     private Dictionary<byte, byte[]> _aiMakes = [];
     private readonly Dictionary<(byte Producer, byte Made), byte> _aiIntervals = [];
     private byte[] _aiFortification = [];
@@ -90,6 +93,8 @@ public sealed partial class Skirmish
         _aiMilitary = new OriginalAiMilitary(_aiSquadWorld, Convert.FromHexString(data.ArmyClassesHex));
         _aiGarrison = new OriginalAiGarrison(_aiSquadWorld, _aiMilitary, _aiStates);
         _aiOrders = new OriginalAiOrders(_aiSquadWorld, _aiMilitary);
+        _aiEconomy = new OriginalAiEconomy(_aiSquadWorld, _aiMilitary);
+        _aiWorkers = new OriginalAiWorkers(_aiSquadWorld);
         _aiRandom = GameData.Read<OriginalTerrainData>("res://data/original_terrain.json").RandomValues.ToArray();
         var characters = data.Table();
         foreach (byte p in new[] { (byte)Rules.PlayerSlot, (byte)Rules.EnemySlot })
@@ -149,6 +154,8 @@ public sealed partial class Skirmish
         _aiGarrison!.Run(ai);
         _aiMilitary.Run(ai);
         _aiOrders!.Run(ai);
+        _aiEconomy!.Plan(ai);      // 21E99
+        _aiEconomy.Execute(ai);    // 221AE
         OriginalAiRules.Upkeep(ai, chain);
         if (OriginalAiTurn.Decide(_aiTurnWorld!, me, 0, (uint)Map.Width, _aiThreat))
             BinaryPrimitives.WriteUInt32LittleEndian(ai.AsSpan(1), BinaryPrimitives.ReadUInt32LittleEndian(ai.AsSpan(1)) - 0x42); // 23551 not ported; 2365C
@@ -181,6 +188,7 @@ public sealed partial class Skirmish
             if ((order & 0xf8) == 0x60) building.Record[0x14] = 4;              // produce: the queue head +22 is the template
             else if ((order & 0xf8) == 0x58) { EnemyBuild(building); building.Record[0x14] = 0; }
         }
+        foreach (var worker in Actors.Where(a => a.Team == 1 && a.Alive && a.Worker)) EnemyWorkerCommand(worker);
         foreach (var actor in Actors.Where(a => a.Team == 1 && a.Alive && !a.Structure && !a.Worker))
         {
             byte value = actor.Record[0x14];
@@ -213,12 +221,63 @@ public sealed partial class Skirmish
         }
     }
 
+    /// <summary>Commands in +14 of an enemy worker, from the AI (1F476/1F653) or from the worker's own WRK steps (123D3 gives
+    /// 60h with a load, the return to the empty worker gives 58h), are handed to the port's worker jobs (adapter):
+    /// 58h — chop the tree +32/+33; 60h — with timber, deliver to the nearest own lumbermill; with ore, carry it to the
+    /// castle; empty, work the mine +1C; 40h — stand; 48h — go to +22/+23. The activity left in +14 is 3 for timber work,
+    /// 4 for mine work, 1 while walking and 0 (with +15 = 0) when the worker has no job; 206D5 takes members with 1 or 0/0.</summary>
+    private void EnemyWorkerCommand(SkirmishActor worker)
+    {
+        byte value = worker.Record[0x14];
+        if ((value & 0x40) != 0)
+        {
+            byte cargo = worker.Record[0x31];
+            switch (value & 0xf8)
+            {
+                case 0x40: worker.GatherTree = null; worker.PreferredMill = 0; worker.MineJob = false; worker.Goal = null; break;
+                case 0x48: worker.GatherTree = null; worker.PreferredMill = 0; worker.MineJob = false;
+                    OrderMove(worker, new Vector2I(worker.Record[0x22], worker.Record[0x23])); break;
+                case 0x58:
+                    var tree = new Vector2I(worker.Record[0x32], worker.Record[0x33]);
+                    if (cargo == 0 && Harvestable(tree)) { worker.GatherTree = tree; worker.MineJob = false; worker.Goal = null; worker.HarvestPrepared = false; worker.Route.Clear(); }
+                    break;
+                case 0x60 when cargo == 3:
+                    var mill = Find(OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y,
+                        Actors.Where(a => a.Team == worker.Team).Select(ReceiverCandidate)));
+                    if (mill != null) { worker.PreferredMill = mill.Id; worker.MineJob = false; worker.Goal = null; }
+                    break;
+                case 0x60 when worker.MineJob: break;   // 123D3's 60h on a loaded carrier: the carrier phases go on
+                case 0x60:
+                    uint mine = BinaryPrimitives.ReadUInt32LittleEndian(worker.Record.AsSpan(0x1c));
+                    if (cargo is 1 or 2 || Find(mine) is { Team: 1, Alive: true } m && m.Source.TemplateName == "Шахта")
+                    {
+                        if (cargo == 0) { BinaryPrimitives.WriteUInt32LittleEndian(worker.Record.AsSpan(0x32), 0); worker.Record[0x30] = 0; }
+                        worker.GatherTree = null; worker.PreferredMill = 0; worker.Goal = null; worker.Route.Clear(); worker.ReplanTimer = 0;
+                        worker.Record[0x15] = 0; worker.Record[0x17] &= 0xbf; worker.MineJob = true;
+                    }
+                    break;
+            }
+        }
+        // A walk whose route could not be planned (TickWorker set the replan delay, no route) ends there, as a soldier's does.
+        if (worker.Goal != null && worker.Route.Count == 0 && !worker.Stepping && worker.ReplanTimer > 0) worker.Goal = null;
+        if (worker.MineJob) worker.Record[0x14] = 4;
+        else if (worker.GatherTree != null || worker.PreferredMill != 0) worker.Record[0x14] = 3;
+        else if (worker.Goal != null || worker.Route.Count > 0 || worker.Stepping) worker.Record[0x14] = 1;
+        else { worker.Record[0x14] = 0; worker.Record[0x15] = 0; }
+    }
+
     private PopulationTotals _enemyPopulation;
     /// <summary>The enemy's free people (participant +24) grow by the ported population rules, as the player's do.</summary>
     private void TickEnemyPopulation()
     {
         if (!AiEnabled || _aiBlocks[Rules.EnemySlot] == null) return;
-        if ((_populationTick & 31) == 0 || _enemyPopulation.Limit == 0) _enemyPopulation = PopulationOf((byte)Rules.EnemySlot);
+        if ((_populationTick & 31) == 0 || _enemyPopulation.Limit == 0)
+        {
+            _enemyPopulation = PopulationOf((byte)Rules.EnemySlot);
+            // D453 keeps participant +28 (load) and +2C (farm support); the AI's census and 21E99 read them.
+            var record = _participants[Rules.EnemySlot];
+            W32(record, 0x28, _enemyPopulation.Used); W32(record, 0x2c, _enemyPopulation.FarmSupport);
+        }
         var r = EnemyResources;
         uint people = OriginalPopulationRules.Grow(_populationTick, r.Fourth, _enemyPopulation.Used, _enemyPopulation.FarmSupport, _enemyPopulation.Limit);
         if (people != r.Fourth) EnemyResources = r with { Fourth = people };
@@ -244,7 +303,22 @@ public sealed partial class Skirmish
     {
         var ai = _aiBlocks[Rules.EnemySlot];
         if (ai == null) return;
-        OrderMove(recruit, new Vector2I(ai[0x61], ai[0x62]));
+        OrderMove(recruit, new Vector2I(ai[0x61], ai[0x62]), 15);   // a crowded home still leaves room further out
+    }
+
+    /// <summary>An enemy producer whose exit is taken by one of the enemy's own idle units sends that unit away towards the
+    /// home (adapter, like <see cref="EnemyRecruitLeaves"/>; the player clears the exit by hand).</summary>
+    private void EnemyClearExit(SkirmishActor producer, TemplateEntry template)
+    {
+        var exit = RecruitExit(producer, template);
+        var cell = new Vector2I((int)(exit.X >> 5), (int)(exit.Y >> 5));
+        var blocker = Actors.FirstOrDefault(a => a.Team == 1 && a.Alive && !a.Structure && !a.Stepping && a.Goal == null && a.Target == 0
+            && FootprintCells(a, a.Cell).Contains(cell));
+        var ai = _aiBlocks[Rules.EnemySlot];
+        if (blocker == null || ai == null) return;
+        var home = new Vector2I(ai[0x61], ai[0x62]);
+        if ((blocker.Cell - home).LengthSquared() <= 4) home += (blocker.Cell - (Vector2I)(producer.Position / 32)).Sign() * 6;
+        OrderMove(blocker, home, 15);
     }
 
     /// <summary>Command 58h of the enemy castle: build template +22 on the site +29/+2B (adapter). The building rules of the
@@ -266,8 +340,9 @@ public sealed partial class Skirmish
         building.ConstructionDuration = building.ConstructionRemaining = template.InitialCondition * Math.Max(1, (int)building.Parameters[0x57]) / (double)Rules.TicksPerSecond;
         OriginalBuildingLifecycle.MarkConstruction(building.Record);
         building.Record[0x14] &= 7;   // the handled construction command leaves activity 1 at once (see ExecuteAiCommands)
-        building.Record.AsSpan(0x22, 5).Fill(0xff); building.Record[0x20] = 0xff; building.Record[0x27] = 0xff;
-        if (template.Name == "Шахта")
+        if (building.Record.Length > 0x20) building.Record[0x20] = 0xff;
+        if (building.Record.Length >= 0x28) { building.Record.AsSpan(0x22, 5).Fill(0xff); building.Record[0x27] = 0xff; }   // producers' queue
+        if (template.Name == "Шахта" && building.Record.Length >= 0x28)
         {
             var deposit = OriginalMineRules.Initialize(Map.Cells, Map.Width, Map.Height, (uint)building.Position.X, (uint)building.Position.Y);
             building.Record[0x23] = deposit.Type; BinaryPrimitives.WriteUInt32LittleEndian(building.Record.AsSpan(0x24), deposit.Remaining);
@@ -288,10 +363,10 @@ public sealed partial class Skirmish
     }
 
     /// <summary>Move one unit like <see cref="Move"/> does for the player: the nearest free standing place around the cell.</summary>
-    private bool OrderMove(SkirmishActor actor, Vector2I destination)
+    private bool OrderMove(SkirmishActor actor, Vector2I destination, int reach = 5)
     {
         if (!Inside(destination)) return false;
-        for (int radius = 0; radius <= 5; radius++)
+        for (int radius = 0; radius <= reach; radius++)
         for (int y = -radius; y <= radius; y++)
         for (int x = -radius; x <= radius; x++)
         {
@@ -305,7 +380,7 @@ public sealed partial class Skirmish
         return false;
     }
 
-    private sealed class AiSquadWorld(Skirmish battle) : IAiGarrisonWorld, IAiSquadStateWorld, IAiOrdersWorld
+    private sealed class AiSquadWorld(Skirmish battle) : IAiGarrisonWorld, IAiSquadStateWorld, IAiOrdersWorld, IAiEconomyWorld, IAiWorkerWorld
     {
         private readonly SearchWorld _search = new(battle, (byte)battle.Rules.EnemySlot);
         public IReadOnlyList<(byte[] Record, byte[] Template)> Chain(byte participant) => battle.AiChain(participant);
@@ -326,10 +401,23 @@ public sealed partial class Skirmish
         public byte Random() => battle._terrainCatalog.NextRandomByte();
         public byte Random2() => battle._terrainCatalog.NextSecondaryByte();
         public byte Random3() => battle._aiRandom[battle._aiRandom3++];   // 9E69: third index [19ED] into the same table
-        public byte Explored(int cell) => 0xff;
+        public byte Fog(int cell)
+        {
+            var ai = battle._aiBlocks[battle.Rules.EnemySlot];
+            int x = cell % battle.Map.Width, y = cell / battle.Map.Width;
+            bool seen = ai != null && x >= ai[0x63] - 8 && x <= ai[0x65] + 8 && y >= ai[0x64] - 8 && y <= ai[0x66] + 8;
+            return seen ? (byte)~(1 << battle.Rules.EnemySlot) : (byte)0xff;
+        }
+        public Span<byte> ParticipantRecord(byte participant) => battle._participants[participant];
+        public byte TileOre(int cell) => cell >= 0 && cell < battle.Map.Cells.Length ? (byte)(battle.Map.Cells[cell] >> 16) : (byte)0;
+        public bool SiteAllowed(byte template, byte army, byte participant, byte x, byte y) =>
+            battle.Inside(new Vector2I(x, y)) && battle.EnemyPlacement(template, new Vector2I(x, y)) == ConstructionPlacementStatus.Clear;
+        public void Send(byte type, byte other, byte owner, byte bh, uint parameter) => battle._aiTurnWorld!.Send(type, other, owner, bh, parameter);
         public void Message(ReadOnlySpan<byte> squad, uint text) { }
         public void Rescue(Span<byte> squad) { }
-        public void WorkerState(Span<byte> squad) { }
+        public void WorkerState(Span<byte> ai, int at) => battle._aiWorkers!.Run(ai, at);
+        public uint TileProperty(int cell) => cell >= 0 && cell < battle.Map.Cells.Length
+            ? BinaryPrimitives.ReadUInt32LittleEndian(battle._properties.AsSpan((int)(battle.Map.Cells[cell] & 0xffff) * 8)) : 0;
         public Span<byte> Block(byte participant) => battle._aiBlocks[participant];
         public ReadOnlySpan<byte> Participant(byte participant) => battle._participants[participant];
         public byte ParticipantCount => battle._participantCount;

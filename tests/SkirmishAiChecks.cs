@@ -20,7 +20,9 @@ public partial class TestRunner
         Check(battle.Actors.Any(a => a.Team == 1 && a.Source.TemplateName == "Казарма"), "The enemy AI orders a barracks (227C7 mode 5 → 3, castle command 58h)");
         Check(battle.EnemyResources.Third < start.Third, "The enemy pays from its own resources (participant +18..+24)");
         Check(battle.Actors.Count(a => a.Team == 1 && a.Alive && !a.Structure) > units0, "The barracks hires units for the enemy (command 60h)");
-        Check(Enumerable.Range(0, ai[0x9df]).All(k => ai[0x9e0 + k * 0x52 + 2] is 4 or 8), "In peace the garrison sets guards (state 4) and patrols (state 8)");
+        Check(Enumerable.Range(0, ai[0x9df]).All(k => ai[0x9e0 + k * 0x52 + 2] is 4 or 8 or 9 or 10), "In peace the garrison sets guards (state 4) and patrols (state 8); workers form squads 9/10");
+        Check(Enumerable.Range(0, ai[0x9df]).Any(k => ai[0x9e0 + k * 0x52 + 2] is 9 or 10), "The enemy economy forms worker squads (221AE → states 9/10)");
+        Check(battle.Actors.Any(a => a.Team == 1 && a.Alive && a.Worker && (a.Record[0x14] & 7) is 3 or 4), "Enemy workers take jobs from the AI (1F476/1F653: timber or mine)");
         var enemy = battle.Actors.Where(a => a.Team == 1 && !a.Structure).ToArray();
         Check(enemy.All(a => a.Target == 0 && a.Record[0x14] is not (2 or 3)), "In peace the enemy attacks nobody");
 

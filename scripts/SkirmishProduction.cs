@@ -88,9 +88,9 @@ public sealed partial class Skirmish
     {
         if (!producer.Alive || producer.ConstructionRemaining > 0 || QueuedTemplate(producer) is not { } template) return;
         var record = producer.Record;
-        if (producer.Team != 0 && (!Rules.Units.TryGetValue(template.Name, out var unitRules) || template.TemplateIndex == 10 || unitRules.Damage == 0
+        if (producer.Team != 0 && template.TemplateIndex != 10 && (!Rules.Units.TryGetValue(template.Name, out var unitRules) || unitRules.Damage == 0
             || (!_soldierSeeds.ContainsKey(template.TemplateIndex) && unitRules.Range > 48)))
-        { OriginalProductionRules.Complete(record); return; }   // no rules, a worker (no enemy economy), or a ranged unit without a seed record: dropped
+        { OriginalProductionRules.Complete(record); return; }   // no rules, or a ranged unit without a seed record: dropped
         if (record[0x15] == 0)
         {
             var payment = OriginalConstructionRules.TryDebitUpfront(Wallet(producer.Team), Price(template));
@@ -99,8 +99,19 @@ public sealed partial class Skirmish
         }
         byte interval = producer.Team == 0 ? _production.Interval(producer.Source.TemplateName, record[0x22]) : EnemyInterval(producer, record[0x22]);
         if (!OriginalProductionRules.Tick(record, interval, ProductionSpeedShift, template.InitialCondition)) return;
-        if (!ReleaseRecruit(producer, template)) { SetBlocked(producer, true); return; }
+        if (!ReleaseRecruit(producer, template)) { SetBlocked(producer, true); if (producer.Team != 0) EnemyClearExit(producer, template); return; }
         OriginalProductionRules.Complete(record); SetBlocked(producer, false);
+    }
+    private Vector2I? EnemyExitCell(SkirmishActor recruit, Vector2I exit, byte layer)
+    {
+        for (int radius = 1; radius <= 3; radius++)
+            for (int y = -radius; y <= radius; y++)
+                for (int x = -radius; x <= radius; x++)
+                {
+                    var cell = exit + new Vector2I(x, y);
+                    if (Math.Max(Math.Abs(x), Math.Abs(y)) == radius && Inside(cell) && CanStand(recruit, cell) && !_reservations.ContainsKey((cell, layer))) return cell;
+                }
+        return null;
     }
     private bool ReleaseRecruit(SkirmishActor producer, TemplateEntry template)
     {
@@ -111,7 +122,14 @@ public sealed partial class Skirmish
         recruit.Record[0x0d] = exit.Layer;
         BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(4), exit.X);
         BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(8), exit.Y);
-        if (!CanStand(recruit, cell) || _reservations.ContainsKey((cell, exit.Layer))) return false;
+        if (!CanStand(recruit, cell) || _reservations.ContainsKey((cell, exit.Layer)))
+        {
+            // The enemy has nobody to clear its exit: its recruit takes the nearest free cell within 3 of it (adapter).
+            if (producer.Team == 0 || EnemyExitCell(recruit, cell, exit.Layer) is not { } free) return false;
+            cell = free; exit = exit with { X = (uint)(free.X * 32 + 16), Y = (uint)(free.Y * 32 + 16) };
+            BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(4), exit.X);
+            BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(8), exit.Y);
+        }
         recruit.Source.RawX = exit.X; recruit.Source.RawY = exit.Y; recruit.Source.RawLayer = exit.Layer;
         if (worker) OriginalWorkerDelivery.InitializeEmpty(recruit.Record, recruit.Parameters, _terrainCatalog.NextRandomByte());
         recruit.Record[0x17] |= 0x20;

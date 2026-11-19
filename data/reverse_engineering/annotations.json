@@ -2950,7 +2950,7 @@
       "limitations": ""
     },
     {
-      "id": "exploration-reveal",
+"id": "exploration-reveal",
       "module": "LE:1",
       "start": 33086,
       "end": 33241,
@@ -3478,7 +3478,173 @@
       "implementation": [
         "assets/imported/credits/manifest.json"
       ],
-      "limitations": "6 записей по49байт, адреса callbacks, геометрия и кадры. Фон/спрайты сверены по снимку, весь callback lifecycle не перенесён."
+      "limitations": "6 записей по49байт, адреса callbacks, геометрия и кадры. Фон/спрайты сверены по снимку, весь callback lifecycle не перенесён.",
+    "id": "ai-economy-plan",
+      "module": "LE:1",
+      "start": 138905,
+      "end": 139694,
+      "name": "AI economy planning: income, upkeep, economy requests, farm and building orders",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-economy-execute",
+      "module": "LE:1",
+      "start": 139694,
+      "end": 140212,
+      "name": "AI economy executor over list +4F3 (workers, mines, lumbermill)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "D363 occupancy check is a hook"
+    },
+    {
+      "id": "ai-gather-workers",
+      "module": "LE:1",
+      "start": 140341,
+      "end": 140497,
+      "name": "Gather free workers into a squad",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-mine-site",
+      "module": "LE:1",
+      "start": 140819,
+      "end": 140942,
+      "name": "Random seen ore cell around the home for a mine",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-worker-state-9-init",
+      "module": "LE:1",
+      "start": 128497,
+      "end": 128555,
+      "name": "Set worker squad state 9 with its target area",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-worker-state-10-init",
+      "module": "LE:1",
+      "start": 128794,
+      "end": 128812,
+      "name": "Set worker squad state 10",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-worker-state-9",
+      "module": "LE:1",
+      "start": 128118,
+      "end": 128497,
+      "name": "AI squad state 9: timber workers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-worker-state-10",
+      "module": "LE:1",
+      "start": 128595,
+      "end": 128794,
+      "name": "AI squad state 10: mine workers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-idle-member",
+      "module": "LE:1",
+      "start": 132821,
+      "end": 132912,
+      "name": "Random idle member of a squad",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-member-activity",
+      "module": "LE:1",
+      "start": 132912,
+      "end": 132977,
+      "name": "Squad member with an activity code",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-nearest-timber",
+      "module": "LE:1",
+      "start": 140497,
+      "end": 140687,
+      "name": "Nearest terrain cell of a class in the squad area",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "The original's distance formula (|dx| - y against ±y) is kept"
+    },
+    {
+      "id": "ai-random-grove",
+      "module": "LE:1",
+      "start": 140687,
+      "end": 140819,
+      "name": "Random seen grove cell around the squad centre",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-area-terrain-class",
+      "module": "LE:1",
+      "start": 140942,
+      "end": 141041,
+      "name": "Terrain class present in an area",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-squad-covers-cell",
+      "module": "LE:1",
+      "start": 133469,
+      "end": 133515,
+      "name": "Squad of a state whose area holds a cell",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
     }
   ]
 }

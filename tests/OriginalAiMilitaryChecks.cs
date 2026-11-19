@@ -122,7 +122,7 @@ public partial class TestRunner
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(), "AI military requests 20DD0 match original x86");
     }
 
-    private sealed class MilitaryProbe(byte[][] dat, byte[] tree, byte[] random, byte index, byte count) : IAiGarrisonWorld, IAiSquadStateWorld, IAiOrdersWorld
+    private sealed class MilitaryProbe(byte[][] dat, byte[] tree, byte[] random, byte index, byte count) : IAiGarrisonWorld, IAiSquadStateWorld, IAiOrdersWorld, IAiEconomyWorld
     {
         private readonly uint[] _grid = new uint[3 * 1024];
         private readonly Dictionary<uint, (byte[], byte[])> _objects = [];
@@ -152,10 +152,9 @@ public partial class TestRunner
         public byte Random2() => random[RandomIndex2++];
         public byte Random3() => random[RandomIndex3++];
         public byte Global19E9 => 0xff;
-        public byte Explored(int cell) => 0xff;
         public void Message(ReadOnlySpan<byte> squad, uint text) { }
         public void Rescue(Span<byte> squad) { }
-        public void WorkerState(Span<byte> squad) { }
+        public void WorkerState(Span<byte> ai, int at) { }
         public Span<byte> Block(byte participant) => Blocks[participant];
         public ReadOnlySpan<byte> Participant(byte participant) => Participants[participant];
         public byte ParticipantCount => count;
@@ -178,5 +177,16 @@ public partial class TestRunner
         public byte TileClass(int cell) => Terrain(cell);
         public byte[]? Fortification(uint index) => index == 0 ? Pattern : null;
         public bool TreeAllows(byte participant, byte template) => OriginalTechRules.Available(tree, template);
+        public Func<int, byte> FogAt = _ => 0, OreAt = _ => 0;
+        public Span<byte> ParticipantRecord(byte participant) => Participants[participant];
+        public byte Fog(int cell) => FogAt(cell);   // default 0: everything seen
+        public byte TileOre(int cell) => OreAt(cell);
+        public bool SiteAllowed(byte template, byte army, byte participant, byte x, byte y)
+        {
+            PlacementLog.Add(template); PlacementLog.AddRange(BitConverter.GetBytes((ushort)(template | army << 8))); PlacementLog.Add(x); PlacementLog.Add(y);
+            return ((x ^ y ^ template ^ Seed) & 3) != 0;
+        }
+        public void Send(byte type, byte other, byte owner, byte bh, uint parameter)
+        { PlacementLog.Add((byte)'M'); PlacementLog.Add(type); PlacementLog.Add(other); PlacementLog.Add(owner); PlacementLog.AddRange(BitConverter.GetBytes(parameter)); }
     }
 }

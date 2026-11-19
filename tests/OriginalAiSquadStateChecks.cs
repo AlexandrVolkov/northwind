@@ -97,7 +97,7 @@ public partial class TestRunner
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(), "AI squad states 1F078 (F083 0..8) match original x86");
     }
 
-    private sealed class StateProbe(byte[] random, byte global, byte index, byte index2, byte[] explored) : IAiSquadStateWorld
+    private sealed class StateProbe(byte[] random, byte global, byte index, byte index2, byte[] explored) : IAiSquadStateWorld, IAiWorkerWorld
     {
         private readonly uint[] _grid = new uint[3 * 1024];
         private readonly Dictionary<uint, (byte[], byte[])> _objects = [];
@@ -123,9 +123,12 @@ public partial class TestRunner
         public byte Global19E9 => global;
         public byte Random() => random[RandomIndex++];
         public byte Random2() => random[RandomIndex2++];
-        public byte Explored(int cell) => explored[cell];
+        public byte Fog(int cell) => explored[cell];
         public void Message(ReadOnlySpan<byte> squad, uint text) { Log.Add(1); Log.AddRange(BitConverter.GetBytes(text)); }
         public void Rescue(Span<byte> squad) { Log.Add(2); Log.Add(squad[1]); }
-        public void WorkerState(Span<byte> squad) { Log.Add(3); Log.Add(squad[1]); }
+        public OriginalAiWorkers? Workers;
+        public Func<int, uint> Property = _ => 0;
+        public uint TileProperty(int cell) => Property(cell);
+        public void WorkerState(Span<byte> ai, int at) { if (Workers != null) { Workers.Run(ai, at); return; } Log.Add(3); Log.Add(ai[at + 1]); }
     }
 }

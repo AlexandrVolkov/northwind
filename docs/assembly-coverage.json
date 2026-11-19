@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "96e318965adea6b0dedf74fda22344035a2d60184397b9fdc384b7364013971b",
+  "annotation_sha256": "ab6ec547c047bb533d91fca9a85843454593e4a4376aec05e0024a74b14d11af",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 5847,
-        "ported": 25718,
-        "unreviewed": 115143,
+        "ported": 28581,
+        "unreviewed": 112280,
         "verified": 174
       },
       "linear_rows": 45008,
@@ -1788,10 +1788,46 @@
         },
         {
           "start": 128118,
-          "end": 128812,
+          "end": 128497,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-worker-state-9"
+          ]
+        },
+        {
+          "start": 128497,
+          "end": 128555,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-worker-state-9-init"
+          ]
+        },
+        {
+          "start": 128555,
+          "end": 128595,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 128595,
+          "end": 128794,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-worker-state-10"
+          ]
+        },
+        {
+          "start": 128794,
+          "end": 128812,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-worker-state-10-init"
+          ]
         },
         {
           "start": 128812,
@@ -1874,6 +1910,24 @@
         },
         {
           "start": 132821,
+          "end": 132912,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-idle-member"
+          ]
+        },
+        {
+          "start": 132912,
+          "end": 132977,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-member-activity"
+          ]
+        },
+        {
+          "start": 132977,
           "end": 133067,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1890,10 +1944,19 @@
         },
         {
           "start": 133244,
-          "end": 133515,
+          "end": 133469,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 133469,
+          "end": 133515,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-squad-covers-cell"
+          ]
         },
         {
           "start": 133515,
@@ -2024,10 +2087,21 @@
         },
         {
           "start": 138905,
+          "end": 139694,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-economy-plan"
+          ]
+        },
+        {
+          "start": 139694,
           "end": 140212,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-economy-execute"
+          ]
         },
         {
           "start": 140212,
@@ -2040,10 +2114,48 @@
         },
         {
           "start": 140341,
+          "end": 140497,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-gather-workers"
+          ]
+        },
+        {
+          "start": 140497,
+          "end": 140687,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-nearest-timber"
+          ]
+        },
+        {
+          "start": 140687,
+          "end": 140819,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-random-grove"
+          ]
+        },
+        {
+          "start": 140819,
+          "end": 140942,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-mine-site"
+          ]
+        },
+        {
+          "start": 140942,
           "end": 141041,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-area-terrain-class"
+          ]
         },
         {
           "start": 141041,
@@ -2241,8 +2353,7 @@
       "sha256": "4132774a01f6e36ffae04af2eecbf50e08f64981ec6de1a04d9dcec99ba3398d",
       "byte_status": {
         "ported": 747,
-        "unreviewed": 60792,
-        "verified": 294
+        "unreviewed": 61086
       },
       "linear_rows": 29343,
       "flow_candidate_instructions": 0,
@@ -2254,22 +2365,6 @@
       "regions": [
         {
           "start": 0,
-          "end": 56476,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 56476,
-          "end": 56770,
-          "status": "verified",
-          "classification": "data",
-          "claims": [
-            "authors-widget-records"
-          ]
-        },
-        {
-          "start": 56770,
           "end": 60739,
           "status": "unreviewed",
           "classification": "unknown",

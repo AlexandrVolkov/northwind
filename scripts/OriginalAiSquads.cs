@@ -398,7 +398,7 @@ public static class OriginalAiSquadSteps
     }
 }
 
-/// <summary>World of the squad states (1F078): random streams 9E41/9E55, the explored-cells map [18DA], the global byte
+/// <summary>World of the squad states (1F078): random streams 9E41/9E55, the fog map [18DA], the global byte
 /// [19E9] read by state 6, and hooks for what is not ported yet: messages A4C2, the stuck-member rescue 20001 and the
 /// worker states 9 and 10.</summary>
 public interface IAiSquadStateWorld : IAiSquadWorld
@@ -406,11 +406,14 @@ public interface IAiSquadStateWorld : IAiSquadWorld
     byte Global19E9 { get; }
     byte Random();
     byte Random2();
-    byte Explored(int cell);
+    /// <summary>[18DA]: per cell, bit n set while participant n has not seen the cell (1EBEF patrols there; 22613 sites
+    /// mines only where the bit is clear).</summary>
+    byte Fog(int cell);
     /// <summary>A4C2 at the squad centre with the text id from table LE:3 F02E.</summary>
     void Message(ReadOnlySpan<byte> squad, uint text);
     void Rescue(Span<byte> squad);
-    void WorkerState(Span<byte> squad);
+    /// <summary>States 9 and 10 (worker squads, <see cref="OriginalAiWorkers"/>) of the squad at <paramref name="at"/>.</summary>
+    void WorkerState(Span<byte> ai, int at);
 }
 
 /// <summary>Squad states of LE:1 1F078 (table LE:3 F083), states 0..8; 9 and 10 (workers) are hooks. Requests the states
@@ -458,7 +461,7 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
             case 6: Retreating(ai, at); break;
             case 7: JoinSquad(ai, at); break;
             case 8: Patrol(ai, at); break;
-            case 9: case 10: world.WorkerState(s); break;
+            case 9: case 10: world.WorkerState(ai, at); break;
             default: throw new InvalidDataException($"Squad state {s[2]} is outside table F083");
         }
     }
@@ -957,10 +960,10 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
         if (s[5] == 0)
         {
             if ((U32(s, 0x1b) & 0x1f) != 0) return;
-            // 1EBEF: a random cell; when the participant has explored it ([18DA] bit), an area of 20×20 around it.
+            // 1EBEF: a random cell; when the participant has not seen it yet ([18DA] bit set), an area of 20×20 around it.
             byte x = (byte)(world.Random() * world.MapWidth >> 8), y = (byte)(world.Random2() * world.MapHeight >> 8);
             byte bit = (byte)(s[0] < 8 ? 1 << s[0] : 0);
-            if ((world.Explored(world.MapWidth * y + x) & bit) == 0) return;
+            if ((world.Fog(world.MapWidth * y + x) & bit) == 0) return;
             (s[0x17], s[0x18], s[0x19], s[0x1a]) = Clip(x, y, 0x14, 0x14);
             s[6] = 0; s[5] = 1;
         }
@@ -1856,5 +1859,402 @@ public sealed class OriginalAiOrders(IAiOrdersWorld world, OriginalAiMilitary mi
         public bool Contact(byte owner) => throw new NotSupportedException();
         public byte TerrainClass(ReadOnlySpan<byte> record) => throw new NotSupportedException();
         public void Contacted(FirstContact contact) => throw new NotSupportedException();
+    }
+}
+
+/// <summary>World of the AI economy (21E99, 221AE): the turn world for messages, the participant record to change, the
+/// fog map [18DA] (bit set = cell not yet seen by the participant), map tile bytes and the mine placement check D363.</summary>
+public interface IAiEconomyWorld : IAiMilitaryWorld
+{
+    byte Random2();
+    Span<byte> ParticipantRecord(byte participant);
+    /// <summary>[18DA]: bit n set while participant n has not seen the cell.</summary>
+    byte Fog(int cell);
+    /// <summary>Byte 2 of the map tile word ([18EE] + 4·cell + 2): the ore kind of the cell.</summary>
+    byte TileOre(int cell);
+    /// <summary>D363: the template may be placed at the cell (WRK AH=4 and occupancy; hook).</summary>
+    bool SiteAllowed(byte template, byte army, byte participant, byte x, byte y);
+    /// <summary>EDD5: message type, other, owner, BH, parameter.</summary>
+    void Send(byte type, byte other, byte owner, byte bh, uint parameter);
+}
+
+/// <summary>AI economy LE:1 21E99 (income, upkeep, economic requests in list +4F3, farm and building orders) and 221AE
+/// (worker squads for mines and lumbermills, mine sites, lumbermill orders). See docs/ai.md, «Экономика».</summary>
+public sealed class OriginalAiEconomy(IAiEconomyWorld world, OriginalAiMilitary military)
+{
+    public const int Economy = 0x4f3, Orders = 0x34f, Military = 0x1ab, Size = 0x15;
+    private static uint U32(ReadOnlySpan<byte> raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw[offset..]);
+    private static void W32(Span<byte> raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw[offset..], value);
+    private static void Request(Span<byte> ai, int list, byte mode, byte first, byte third, uint parameter, byte cl = 0, byte ch = 0) =>
+        OriginalAiMilitary.Request(ai, list, mode, first, third, cl, ch, 0, 0, parameter);
+
+    /// <summary>21E99 (the turn counter is +0Dh for the duration of the step).</summary>
+    public void Plan(Span<byte> ai)
+    {
+        W32(ai, 1, U32(ai, 1) + 0xd);
+        uint turn = U32(ai, 1);
+        var p = world.ParticipantRecord(ai[0]);
+        if ((turn & 0x1fff) == 0)
+        {
+            uint income = U32(p, 0x24) << 1;
+            W32(p, 0x18, U32(p, 0x18) + income); W32(p, 0x1c, U32(p, 0x1c) + income);
+            income <<= 2; W32(p, 0x20, U32(p, 0x20) + income);
+            world.Send(9, ai[0], ai[0], 0, income);
+            uint upkeep = U32(ai, 0x19ed) << 4;
+            if (U32(p, 0x20) < upkeep)
+            {
+                W32(p, 0x20, 0);
+                if ((ai[0x1a27] & 2) == 0 && U32(ai, 0x19ed) > 0x1e) W32(ai, 0x73, 0x2711);
+            }
+            else W32(p, 0x20, U32(p, 0x20) - upkeep);
+        }
+        if ((ai[0x19ff] & 1) != 0)
+        {
+            if ((turn & 0xff) == 0)
+            {
+                if ((byte)((byte)U32(ai, 0x5d) * ai[0x1b] >> 8) + 1 is var wanted && (byte)wanted > ai[0x1a00])
+                    Request(ai, Economy, 4, 0x38, 0xc8, 0);
+                if (ai[0x1a02] < ai[0x27] >> 4) Request(ai, Economy, 2, 0x39, Urgency(ai[0x1a02], U32(p, 0x20)), 1);
+                if (ai[0x1a03] < ai[0x28] >> 4) Request(ai, Economy, 2, 0x3a, Urgency(ai[0x1a03], U32(p, 0x18)), 2);
+            }
+            if ((turn & 0x1ff) == 0)
+                foreach (var (r, t) in world.Chain(ai[0]))
+                    if ((sbyte)r[0x19] > 0 && (U32(t, 0x40) & 0xf08) == 0x408 && U32(r, 0x24) != 0
+                        && OriginalAiSquads.FindByState(ai, 0x0a, world.Reference(r)) < 0)
+                        Request(ai, Economy, 3, 0x3b, 0xc0, world.Reference(r));
+            if ((turn & 0x1ff) == 0 && U32(ai, 0x4e) > U32(p, 0x2c))
+            {
+                byte urgency = (byte)((ulong)(U32(ai, 0x4e) - U32(p, 0x2c)) * 200 / U32(ai, 0x4e));
+                if (Random(ai, 0xf08, 0x108) is { } farm) Request(ai, Orders, 8, 0x3c, urgency, farm);
+            }
+            if (((turn + 0x100) & 0x1ff) == 0)
+                foreach (var (r, t) in world.Chain(ai[0]))
+                    if ((sbyte)r[0x19] > 0 && (U32(t, 0x40) & 0xf08) == 0x208 && OriginalAiSquads.FindByState(ai, 9, world.Reference(r)) < 0)
+                        Request(ai, Economy, 5, 0x3d, 0xc0, world.Reference(r));
+            if ((turn & 0x1ff) == 0 && ai[0x20] > ai[0x1a26])
+            {
+                byte urgency = (byte)((ai[0x20] - ai[0x1a26]) * 0x96 / ai[0x20]);
+                if (Random(ai, 0xf08, 0xb08) is { } building) Request(ai, Orders, 5, 0x3e, urgency, building);
+            }
+        }
+        W32(ai, 1, U32(ai, 1) - 0xd);
+    }
+
+    private static byte Urgency(byte count, uint stock) => (byte)(0x82 + (count == 0 ? 0x50 : 0) + (stock <= 0x96 ? 0x1e : 0));
+
+    /// <summary>22E46: a random open template of the class as template | army &lt;&lt; 8.</summary>
+    private uint? Random(ReadOnlySpan<byte> ai, uint mask, uint value)
+    {
+        var open = world.Buildable(ai[0], mask, value);
+        if (open.Count == 0) return null;
+        byte t = open[(world.Random() * open.Count) >> 8];
+        return (uint)(t | world.Participant(ai[0])[0] << 8);
+    }
+
+    /// <summary>221AE over list +4F3: mode 5 — workers (class F08h/300h) for a lumbermill (state 9), 3 — for a mine
+    /// (state 10), 2 — a mine site near the home on seen ore of kind +8, 4 — a lumbermill order.</summary>
+    public void Execute(Span<byte> ai)
+    {
+        if ((ai[0x19ff] & 1) == 0) return;
+        military.ClassMask = 0xf08; military.ClassValue = 0x300;
+        for (int k = 0; k < 20; k++)
+        {
+            int at = Economy + k * Size;
+            if (!Process(ai, at)) ai[at] = 0xff;
+            W32(ai, at + 0x10, U32(ai, at + 0x10) + 1);
+        }
+    }
+
+    private bool Process(Span<byte> ai, int at)
+    {
+        var r = ai.Slice(at, Size);
+        switch (r[0])
+        {
+            case 5:
+            case 3:
+                {
+                    bool lumber = r[0] == 5;
+                    uint reference = U32(r, 8);
+                    int squad = Workers(ai, lumber ? U32(ai, 0x1c) : 0x1e);
+                    if (squad >= 0)
+                    {
+                        var s = ai.Slice(squad, OriginalAiSquads.Size);
+                        W32(s, 0x0f, reference);
+                        if (lumber)
+                        {
+                            var o = world.Resolve(reference).Record;
+                            (s[0x4d], s[0x4e], s[0x4f], s[0x50]) = OriginalTargetRules.Clip((byte)(U32(o, 4) >> 5), (byte)(U32(o, 8) >> 5), 10, 10, world.MapWidth, world.MapHeight);
+                            s[0x4b] = 2; s[2] = 9; s[5] = 1; s[0x1f] = 0;   // 1F5F1
+                        }
+                        else { s[2] = 10; s[5] = 0; }                        // 1F71A
+                        return false;
+                    }
+                    var open = world.Buildable(ai[0], 0xf08, 0x300);
+                    if (open.Count == 0) return false;
+                    byte t = open[(world.Random() * open.Count) >> 8];
+                    byte capacity = world.Template(ai[0], t)[0x9d];
+                    uint quotient = (U32(ai, 0x1c) & 0xffff) / capacity;   // DIV r/m8
+                    if (quotient > 0xff) throw new OverflowException("221AE: the original faults on DIV overflow");
+                    Request(ai, Orders, 2, lumber ? (byte)0x35 : (byte)0x33, lumber ? (byte)0xc0 : (byte)0xf0, (byte)quotient, t, world.Participant(ai[0])[0]);
+                    return false;
+                }
+            case 2:
+                {
+                    if (r[2] == 0)
+                    {
+                        r[2]++;
+                        var open = world.Buildable(ai[0], 0xf08, 0x408);
+                        if (open.Count == 0) return false;
+                        r[9] = open[(world.Random() * open.Count) >> 8]; r[0x0a] = world.Participant(ai[0])[0];
+                    }
+                    if ((U32(r, 0x10) & 0x1f) != 0) return true;
+                    byte radius = (byte)(++r[0x14] + 0x0f);
+                    if (radius > 0x40)
+                    {
+                        if (r[3] > 0x80) Request(ai, Military, 0x0a, 0x32, r[3], U32(r, 8));
+                        return false;
+                    }
+                    if (Site(r[8], ai[0], ai[0x61], ai[0x62], radius) is not { } cell) return true;
+                    if (!world.SiteAllowed(r[9], r[0x0a], ai[0], cell.X, cell.Y)) return true;
+                    Request(ai, Orders, 3, 0x32, r[3], (uint)(r[9] | r[0x0a] << 8), cell.X, cell.Y);
+                    return false;
+                }
+            case 4:
+                if (Random(ai, 0xf08, 0x208) is { } mill) Request(ai, Orders, 8, 0x34, r[3], mill);
+                return false;
+            default: return false;
+        }
+    }
+
+    /// <summary>22435: a new squad takes free workers (class [ED39]/[ED3D]) until their DAT[9D] cover the wanted amount;
+    /// otherwise it is disbanded. Returns the squad offset or −1.</summary>
+    private int Workers(Span<byte> ai, uint wanted)
+    {
+        var chain = world.Chain(ai[0]);
+        int at = OriginalAiSquads.Create(ai, chain.Select(m => m.Record));
+        if (at < 0) return -1;
+        uint left = wanted;
+        foreach (var (r, t) in chain)
+        {
+            if (r[0x1b] != 0 || (U32(t, 0x40) & military.ClassMask) != military.ClassValue) continue;
+            r[0x1b] = ai[at + 1];
+            if (left <= t[0x9d]) return at;
+            left -= t[0x9d];
+        }
+        OriginalAiSquads.Disband(ai, chain.Select(m => m.Record), ai[at + 1]);
+        return -1;
+    }
+
+    /// <summary>22613: up to five random cells around the home (radius grows with the attempts) that the participant has
+    /// seen ([18DA] bit clear) and whose tile carries ore of the kind.</summary>
+    private (byte X, byte Y)? Site(byte kind, byte participant, byte x, byte y, byte radius)
+    {
+        byte bit = (byte)(participant < 8 ? 1 << participant : 0);
+        var (x0, y0, x1, y1) = OriginalTargetRules.Clip(x, y, radius, radius, world.MapWidth, world.MapHeight);
+        uint size = unchecked((uint)(x1 | y1 << 8) + 0x101 - (uint)(x0 | y0 << 8));
+        for (int tries = 5; tries > 0; tries--)
+        {
+            byte cx = (byte)(x0 + (world.Random() * (byte)size >> 8)), cy = (byte)(y0 + (world.Random2() * (byte)(size >> 8) >> 8));
+            int cell = world.MapWidth * cy + cx;
+            if ((world.Fog(cell) & bit) != 0) continue;
+            if (world.TileOre(cell) == kind) return (cx, cy);
+        }
+        return null;
+    }
+}
+
+/// <summary>World of the worker squad states: the squad world plus the random streams 9E41/9E55, the fog map [18DA] and the
+/// terrain descriptor dword ([18FE] + 8 · tile index of the cell).</summary>
+public interface IAiWorkerWorld : IAiSquadWorld
+{
+    byte Random();
+    byte Random2();
+    byte Fog(int cell);
+    uint TileProperty(int cell);
+}
+
+/// <summary>Worker squad states of 1F078: 9 (1F476, timber) and 10 (1F653, ore). Each 32 ticks one random idle member gets a
+/// job: command 58h with the tree cell in +32/+33, or command 60h (to the receiver, or to the mine +0F in +1C). See
+/// docs/ai.md, «Рабочие отряды».</summary>
+public sealed class OriginalAiWorkers(IAiWorkerWorld world)
+{
+    public const int Military = 0x1ab, Economy = 0x4f3;
+    private static uint U32(ReadOnlySpan<byte> raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw[offset..]);
+    private static void W32(Span<byte> raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw[offset..], value);
+    private (byte, byte, byte, byte) Clip(byte x, byte y, byte w, byte h) => OriginalTargetRules.Clip(x, y, w, h, world.MapWidth, world.MapHeight);
+    private void Disband(Span<byte> ai, int at) => OriginalAiSquads.Disband(ai, world.Chain(ai[at]).Select(m => m.Record), ai[at + 1]);
+    private static void Command(byte[] member, byte command) => member[0x14] = (byte)(member[0x14] & 7 | command);
+
+    public void Run(Span<byte> ai, int at)
+    {
+        if (ai[at + 2] == 9) Timber(ai, at); else Ore(ai, at);
+    }
+
+    /// <summary>State 9 (1F476): find a grove, gather there, then send idle members to trees or loaded ones to a lumbermill.</summary>
+    private void Timber(Span<byte> ai, int at)
+    {
+        var s = ai.Slice(at, OriginalAiSquads.Size);
+        if (U32(s, 0x22) == 0) { Disband(ai, at); return; }
+        if (s[5] == 0)
+        {
+            if ((U32(s, 0x1b) & 0x1f) != 0) return;
+            s[0x1f]++;
+            if (Grove(ai, s, (byte)(s[0x1f] + 9)) is not { } area) return;
+            (s[0x13], s[0x14], s[0x15], s[0x16]) = area;      // 1FE97
+            (s[0x4d], s[0x4e], s[0x4f], s[0x50]) = area;      // 1F004
+            s[0x4b] = 2; s[5] = 1; return;                     // 1EDFD
+        }
+        if (s[5] == 1)
+        {
+            if (((s[0x4b] & 0x80) != 0 ? s[0x4a] : s[0x4b]) == 2) return;   // 1F06D
+            (s[0x13], s[0x14], s[0x15], s[0x16]) = Clip(s[0x20], s[0x21], 10, 10);
+            s[5] = 2;
+        }
+        if (s[5] != 2 || (U32(s, 0x1b) & 0x1f) != 0) return;
+        Alarm(ai, s);
+        if (Idle(s) is not var (member, template)) return;
+        if ((U32(template, 0x40) & 0xf08) != 0x300) { Disband(ai, at); return; }
+        if ((member[0x0f] & 8) == 0)
+        {
+            if (Receiver(member, 0x208)) { Command(member, 0x60); return; }
+            // Lumbermill request; CL..DH are leftovers of C439 (written as zero).
+            OriginalAiMilitary.Request(ai, Economy, 4, s[1], 0x0f, 0, 0, 0, 0, 0xf00u | s[1]);
+            return;
+        }
+        if (Tree(s, member, 1) is var (x, y)) { member[0x32] = x; member[0x33] = y; Command(member, 0x58); return; }
+        var busy = Activity(s, 3) ?? Activity(s, 4);
+        if (busy == null) { s[5] = 0; s[0x1f] = 0; return; }
+        (s[0x13], s[0x14], s[0x15], s[0x16]) = Clip((byte)(U32(busy, 4) >> 5), (byte)(U32(busy, 8) >> 5), 10, 10);
+    }
+
+    /// <summary>State 10 (1F653): empty workers (DAT[31] = 8) go to the mine +0F while it has ore, loaded ones to a castle.</summary>
+    private void Ore(Span<byte> ai, int at)
+    {
+        var s = ai.Slice(at, OriginalAiSquads.Size);
+        if (U32(s, 0x22) == 0) { Disband(ai, at); return; }
+        if ((U32(s, 0x1b) & 0x1f) != 0) return;
+        Alarm(ai, s);
+        if (Idle(s) is not var (member, template)) return;
+        if ((U32(template, 0x40) & 0xf08) != 0x300) { Disband(ai, at); return; }
+        if (template[0x31] == 8)
+        {
+            uint mine = U32(s, 0x0f);
+            if (mine == 0 || U32(world.Resolve(mine).Record, 0x24) == 0) { Disband(ai, at); return; }
+            W32(member, 0x1c, mine); Command(member, 0x60); return;
+        }
+        if (!Receiver(member, 0x508)) { Disband(ai, at); return; }
+        Command(member, 0x60);
+    }
+
+    /// <summary>205E7 and a military request 1 over 20×20 cells around the centre; +8 (EBP) is a leftover, written as zero.</summary>
+    private void Alarm(Span<byte> ai, ReadOnlySpan<byte> s)
+    {
+        uint r = (U32(s, 0x22) >> 2) + 12; byte radius = r > 0x19 ? (byte)0x19 : (byte)r;
+        var (x0, y0, x1, y1) = Clip(s[0x20], s[0x21], radius, radius);
+        if (OriginalAiSquadSteps.NearestEnemy(world, s[0x3a], s[0], s[0x20] * 32u, s[0x21] * 32u, x0, y0, x1, y1).Reference == 0) return;
+        var (a, b, c, d) = Clip(s[0x20], s[0x21], 0x14, 0x14);
+        OriginalAiMilitary.Request(ai, Military, 1, s[1], s[4], a, b, c, d, 0);
+    }
+
+    /// <summary>206D5: a random member index (9E41 · count) picks the last idle member (+14 = 1, or +14 = +15 = 0) seen
+    /// before the countdown goes negative.</summary>
+    private (byte[] Record, byte[] Template)? Idle(ReadOnlySpan<byte> s)
+    {
+        int left = (world.Random() * s[0x22]) >> 8;
+        (byte[], byte[])? picked = null;
+        foreach (var (o, t) in world.Chain(s[0]))
+        {
+            if (o[0x1b] != s[1]) continue;
+            left--;
+            if (o[0x14] != 1 && (o[0x14] != 0 || o[0x15] != 0)) continue;
+            picked = (o, t);
+            if (left < 0) break;
+        }
+        return picked;
+    }
+
+    /// <summary>20730: a member whose activity (+14 &amp; 7) is <paramref name="code"/>.</summary>
+    private byte[]? Activity(ReadOnlySpan<byte> s, byte code)
+    {
+        foreach (var (o, _) in world.Chain(s[0])) if (o[0x1b] == s[1] && (o[0x14] & 7) == code) return o;
+        return null;
+    }
+
+    /// <summary>C439: the nearest live (+19 above DAT[46], signed) object of the member's owner with class (DAT[40] &amp; F08h)
+    /// = <paramref name="kind"/>.</summary>
+    private bool Receiver(byte[] member, uint kind)
+    {
+        foreach (var (o, t) in world.Chain(member[3]))
+            if ((U32(t, 0x40) & 0xf08) == kind && (sbyte)o[0x19] > (sbyte)t[0x46]) return true;
+        return false;
+    }
+
+    /// <summary>224D1: the cell of the squad area +13..+16 with terrain class <paramref name="kind"/> (descriptor bits 8..11
+    /// clear) nearest to the member. The original's distance takes |dx| − y (byte) against y or −y (byte): kept as is.</summary>
+    private (byte, byte)? Tree(ReadOnlySpan<byte> s, byte[] member, byte kind)
+    {
+        byte wx = (byte)(U32(member, 4) >> 5), wy = (byte)(U32(member, 8) >> 5), best = 0xff, cx = 0, cy = 0;
+        byte y = s[0x14];
+        do
+        {
+            byte x = s[0x13];
+            do
+            {
+                uint p = world.TileProperty(world.MapWidth * y + x);
+                if ((p & 0xf00) == 0 && (p & 7) == kind)
+                {
+                    byte a = wx >= x ? (byte)(wx - x) : (byte)(x - wx);
+                    byte high = a < y ? (byte)-wy : wy;
+                    a = (byte)(a - y);
+                    byte d = a < high ? high : a;
+                    if (d < best) { best = d; cx = x; cy = y; }
+                }
+                x++;
+            } while (x <= s[0x15]);
+            y++;
+        } while (y <= s[0x16]);
+        return best == 0xff ? null : (cx, cy);
+    }
+
+    /// <summary>2258F: up to five random cells within <paramref name="size"/> of the centre that the participant has seen
+    /// and no state-9 squad covers (2095D); the first whose 10×10 area has terrain class 1 (2268E) gives that area.</summary>
+    private (byte, byte, byte, byte)? Grove(ReadOnlySpan<byte> ai, ReadOnlySpan<byte> s, byte size)
+    {
+        for (int tries = 5; tries > 0; tries--)
+        {
+            byte x = (byte)((size >> 1) + s[0x20] - ((world.Random() * size) >> 8));
+            if (x >= world.MapWidth) continue;
+            byte y = (byte)((size >> 1) + s[0x21] - ((world.Random2() * size) >> 8));
+            if (y >= world.MapHeight) continue;
+            if ((world.Fog(world.MapWidth * y + x) & (1 << (s[0] & 7))) != 0) continue;
+            if (Covered(ai, 9, x, y)) continue;
+            var area = Clip(x, y, 10, 10);
+            if (HasClass(area, 1)) return area;
+        }
+        return null;
+    }
+
+    /// <summary>2095D: a squad of the block in <paramref name="state"/> whose area +13..+16 holds the cell.</summary>
+    private static bool Covered(ReadOnlySpan<byte> ai, byte state, byte x, byte y)
+    {
+        for (int k = 0; k < ai[OriginalAiSquads.List]; k++)
+        {
+            var r = ai.Slice(OriginalAiSquads.Record(k), OriginalAiSquads.Size);
+            if (r[2] == state && x >= r[0x13] && y >= r[0x14] && x <= r[0x15] && y <= r[0x16]) return true;
+        }
+        return false;
+    }
+
+    /// <summary>2268E: a cell of the area whose terrain class (descriptor byte &amp; 7) is <paramref name="kind"/>.</summary>
+    private bool HasClass((byte X0, byte Y0, byte X1, byte Y1) area, byte kind)
+    {
+        byte y = area.Y0;
+        do
+        {
+            byte x = area.X0;
+            do { if ((world.TileProperty(world.MapWidth * y + x) & 7) == kind) return true; x++; } while (x <= area.X1);
+            y++;
+        } while (y <= area.Y1);
+        return false;
     }
 }
