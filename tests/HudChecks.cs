@@ -31,7 +31,7 @@ public partial class TestRunner
         for (int i = 0; i < 4; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         scene.SetProcess(false); // Keep orders and camera assertions independent of frame time.
         void LeftClick(Vector2 hudPoint) => scene._UnhandledInput(new InputEventMouseButton
-        { ButtonIndex = MouseButton.Left, Pressed = true, Position = scene.HudOrigin + hudPoint * scene.HudScale });
+        { ButtonIndex = MouseButton.Left, Pressed = true, Position = scene.ClassicToScreen(hudPoint) });
         void Press(Key physical, bool ctrl = false, bool echo = false) => scene._UnhandledInput(new InputEventKey
         { PhysicalKeycode = physical, Keycode = (Key)'И', Pressed = true, CtrlPressed = ctrl, Echo = echo });
         async Task CameraSettles()
@@ -119,7 +119,7 @@ public partial class TestRunner
         if (DisplayServer.GetName() != "headless")
         {
             scene.FocusWorld(worker.Position); await CameraSettles();
-            Input.WarpMouse(scene.HudOrigin + OriginalHud.Slot(4).GetCenter() * scene.HudScale);
+            Input.WarpMouse(scene.ClassicToScreen(OriginalHud.Slot(4).GetCenter()));
             await CameraSettles(); scene.QueueRedraw(); scene.Hud.QueueRedraw();
             await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
             GetViewport().GetTexture().GetImage().SavePng("res://build/hud-command-hint.png");

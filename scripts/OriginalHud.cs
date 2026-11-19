@@ -21,6 +21,15 @@ public partial class OriginalHud : Node2D
     private static readonly Rect2 HealthBar = new(572, 176, 9, 50), ExperienceBar = new(587, 176, 9, 50);
 
     public SkirmishMain Game { get; set; } = null!;
+    /// <summary>Logical width of the screen: 640 as in the original (4:3); wider screens widen the map window to the left of the
+    /// panel, which keeps the original pixels and stays at the right edge (port extension, docs/interface.md «Широкий экран»).</summary>
+    public float Width { get; set; } = 640;
+    public float Shift => Width - 640;
+    public Rect2 MapRect => new(16, 16, Width - 192, 448);
+    /// <summary>Point of the original 640×480 frame in the current logical screen (panel points move right by <see cref="Shift"/>).</summary>
+    public Vector2 FromClassic(Vector2 point) => point.X >= 464 ? point + new Vector2(Shift, 0) : point;
+    /// <summary>Logical point back to the original frame for hit tests of the panel.</summary>
+    public Vector2 ToClassic(Vector2 point) => point.X >= 464 + Shift ? point - new Vector2(Shift, 0) : point;
     public bool MenuOpen { get; set; }
     /// <summary>Order button slots: two columns, 71 px apart, rows 43 px apart from (485, 313); rows 1–2 measured, row 3 assumed.</summary>
     public static Rect2 Slot(int index) => new(485 + index % 2 * 71, 313 + index / 2 * 43, 69, 35);
@@ -73,26 +82,43 @@ public partial class OriginalHud : Node2D
 
     public override void _Draw()
     {
-        // Letterbox: everything outside 640×480 stays black.
-        DrawRect(new Rect2(-4000, -4000, 8640, 4000), Colors.Black); DrawRect(new Rect2(-4000, 480, 8640, 4000), Colors.Black);
-        DrawRect(new Rect2(-4000, 0, 4000, 480), Colors.Black); DrawRect(new Rect2(640, 0, 4000, 480), Colors.Black);
-        DrawTexture(_frame, Vector2.Zero);
+        // Letterbox: everything outside the logical screen stays black.
+        DrawRect(new Rect2(-4000, -4000, Width + 8000, 4000), Colors.Black); DrawRect(new Rect2(-4000, 480, Width + 8000, 4000), Colors.Black);
+        DrawRect(new Rect2(-4000, 0, 4000, 480), Colors.Black); DrawRect(new Rect2(Width, 0, 4000, 480), Colors.Black);
+        DrawFrame();
         if (Game?.Battle == null) return;
         var b = Game.Battle;
         _font.Draw(this, new Vector2(CounterX[0], 0), b.Metal.ToString());
         _font.Draw(this, new Vector2(CounterX[1], 0), b.Gold.ToString());
         _font.Draw(this, new Vector2(CounterX[2], 0), b.Wood.ToString());
         _red.Draw(this, new Vector2(CounterX[3], 0), b.FreePeople.ToString());
+        DrawSetTransform(new Vector2(Shift, 0));
         if (MenuOpen) DrawTexture(_menuPanel, new Vector2(464, 0));
         else { DrawMinimap(); DrawSelection(); }
+        DrawSetTransform(Vector2.Zero);
         if (b.Paused)
         {
-            DrawRect(new Rect2(161, 224, 158, 24), new Color(0, 0, 0, .85f));
-            _font.Draw(this, new Vector2(169, 228), "ПАУЗА (Esc)");
+            var at = new Vector2(MapRect.GetCenter().X - 79, 224);
+            DrawRect(new Rect2(at, 158, 24), new Color(0, 0, 0, .85f));
+            _font.Draw(this, at + new Vector2(8, 4), "ПАУЗА (Esc)");
         }
         if (_cursor != null && _cursorTexture != null && GetViewport().GetVisibleRect().HasPoint(GetViewport().GetMousePosition()))
             DrawTextureRectRegion(_cursorTexture, new Rect2(GetLocalMousePosition(), new Vector2(32, 32)),
                 _cursor.Region((int)CursorFrame - _cursor.FirstSprite));
+    }
+
+    /// <summary>Frame SCREENS.SCR #0: its left part 0..463, the right part 464..639 at the right edge, and for wider screens the
+    /// gap of the top and bottom borders filled with copies of the plain stretch 384..463 (no icons there).</summary>
+    private void DrawFrame()
+    {
+        DrawTextureRectRegion(_frame, new Rect2(0, 0, 464, 480), new Rect2(0, 0, 464, 480));
+        for (float x = 464; x < 464 + Shift; x += 80)
+        {
+            float w = Math.Min(80, 464 + Shift - x);
+            DrawTextureRectRegion(_frame, new Rect2(x, 0, w, 16), new Rect2(384, 0, w, 16));
+            DrawTextureRectRegion(_frame, new Rect2(x, 464, w, 16), new Rect2(384, 464, w, 16));
+        }
+        DrawTextureRectRegion(_frame, new Rect2(464 + Shift, 0, 176, 480), new Rect2(464, 0, 176, 480));
     }
 
     private void DrawMinimap()
@@ -135,7 +161,7 @@ public partial class OriginalHud : Node2D
                 if ((Game.PendingOrder, command.Mode, command.RawGroup) is (2, 1, 2) or (3, 2, 3) or (4, 4, 4) or (8, 8, 7))
                     DrawRect(Slot(k).Grow(-1), new Color("d5b85c"), false, 1);
             }
-        var hover = CommandAt(GetLocalMousePosition());
+        var hover = CommandAt(ToClassic(GetLocalMousePosition()));
         string hint = hover != null ? OriginalCommandKeys.Hint(hover) : Game.PendingOrder switch
         {
             2 => "Укажите место", 3 => "Укажите врага", 4 => "Укажите лес", 8 => "Укажите шахту", _ => "",
@@ -210,7 +236,8 @@ public partial class OriginalHud : Node2D
     public bool Click(Vector2 point, MouseButton button)
     {
         if (Game.Battle.Paused) return true;
-        if (MapWindow.HasPoint(point)) return false;
+        if (MapRect.HasPoint(point)) return false;
+        point = ToClassic(point);
         if (button != MouseButton.Left) return true;
         if (MenuOpen)
         {
