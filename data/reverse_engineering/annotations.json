@@ -2648,6 +2648,78 @@
       "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-steps.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
       "limitations": ""
+    },
+    {
+      "id": "ai-squad-states",
+      "module": "LE:1",
+      "start": 127096,
+      "end": 128118,
+      "name": "AI squad states 0..3 and the state loop",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-squad-states-4-8",
+      "module": "LE:1",
+      "start": 128812,
+      "end": 129969,
+      "name": "AI squad states 4..8",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-squad-state-helpers",
+      "module": "LE:1",
+      "start": 129969,
+      "end": 131221,
+      "name": "AI squad retreat, march, fight and strength helpers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "20001 (stuck-member rescue) and the A4C2 message display are hooks"
+    },
+    {
+      "id": "ai-area-census",
+      "module": "LE:1",
+      "start": 138400,
+      "end": 138628,
+      "name": "Hostile objects of an area for AI squads",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "direction-byte",
+      "module": "LE:1",
+      "start": 27030,
+      "end": 27134,
+      "name": "Direction byte between two points (arctangent table DS:287E)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-random-explored-cell",
+      "module": "LE:1",
+      "start": 125935,
+      "end": 126015,
+      "name": "Random explored cell for AI patrol",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
     }
   ]
 }

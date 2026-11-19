@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "4588449d2b708f1a31357cf47cb978cb6852a1724d58a5883089ff5598b4880b",
+  "annotation_sha256": "d5d4cb4c56402a81b58349503d3916ff4561995d8c4fe0a8a424feab7555762a",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 5512,
-        "ported": 14340,
-        "unreviewed": 126933,
+        "ported": 18183,
+        "unreviewed": 123090,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -281,6 +281,22 @@
         },
         {
           "start": 25591,
+          "end": 27030,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 27030,
+          "end": 27134,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "direction-byte"
+          ]
+        },
+        {
+          "start": 27134,
           "end": 28143,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1567,6 +1583,22 @@
         },
         {
           "start": 125800,
+          "end": 125935,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 125935,
+          "end": 126015,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-random-explored-cell"
+          ]
+        },
+        {
+          "start": 126015,
           "end": 126112,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1615,10 +1647,44 @@
         },
         {
           "start": 126969,
-          "end": 131221,
+          "end": 127096,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 127096,
+          "end": 128118,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-squad-states"
+          ]
+        },
+        {
+          "start": 128118,
+          "end": 128812,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 128812,
+          "end": 129969,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-squad-states-4-8"
+          ]
+        },
+        {
+          "start": 129969,
+          "end": 131221,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-squad-state-helpers"
+          ]
         },
         {
           "start": 131221,
@@ -1720,6 +1786,22 @@
         },
         {
           "start": 137728,
+          "end": 138400,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 138400,
+          "end": 138628,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-area-census"
+          ]
+        },
+        {
+          "start": 138628,
           "end": 140212,
           "status": "unreviewed",
           "classification": "unknown",

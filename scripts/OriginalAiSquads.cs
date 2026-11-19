@@ -397,3 +397,586 @@ public static class OriginalAiSquadSteps
         return (found, strength);
     }
 }
+
+/// <summary>World of the squad states (1F078): random streams 9E41/9E55, the explored-cells map [18DA], the global byte
+/// [19E9] read by state 6, and hooks for what is not ported yet: messages A4C2, the stuck-member rescue 20001 and the
+/// worker states 9 and 10.</summary>
+public interface IAiSquadStateWorld : IAiSquadWorld
+{
+    byte Global19E9 { get; }
+    byte Random();
+    byte Random2();
+    byte Explored(int cell);
+    /// <summary>A4C2 at the squad centre with the text id from table LE:3 F02E.</summary>
+    void Message(ReadOnlySpan<byte> squad, uint text);
+    void Rescue(Span<byte> squad);
+    void WorkerState(Span<byte> squad);
+}
+
+/// <summary>Squad states of LE:1 1F078 (table LE:3 F083), states 0..8; 9 and 10 (workers) are hooks. Requests the states
+/// make go to lists +1AB (military) and +34F (orders) through 1EB5C; bytes the original fills from register leftovers
+/// (+3 where noted, +5..+7, +8 when EBP is a leftover) are written as zero. See docs/ai.md, «Состояния отряда».</summary>
+public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arctangent, byte[] messages)
+{
+    public const int Military = 0x1ab, Orders = 0x34f;
+    private static uint U32(ReadOnlySpan<byte> raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw[offset..]);
+    private static void W32(Span<byte> raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw[offset..], value);
+
+    // 21CA0 results: [F0E0] count, [F0D0..F0DF] kinds, [F0CC] strength, [F0E4]/[F0E5] approximate centre ([F0E5] is not reset).
+    public uint EnemyCount, EnemyStrength;
+    public readonly byte[] EnemyKinds = new byte[16];
+    public byte EnemyX = 0xff, EnemyY;
+
+    /// <summary>1F078: runs the state of every squad; a dead target +0F is forgotten; +19E8 counts squads in state 8.</summary>
+    public void Run(Span<byte> ai)
+    {
+        ai[0x19e8] = 0;
+        int k = 0;
+        while (k < ai[OriginalAiSquads.List])
+        {
+            int count = ai[OriginalAiSquads.List];
+            var squad = ai.Slice(OriginalAiSquads.Record(k), OriginalAiSquads.Size);
+            if (U32(squad, 0x0f) != 0 && (sbyte)world.Resolve(U32(squad, 0x0f)).Record[0x19] <= 0) W32(squad, 0x0f, 0);
+            if (squad[2] == 8) ai[0x19e8]++;
+            State(ai, OriginalAiSquads.Record(k));
+            if (count > ai[OriginalAiSquads.List]) continue;
+            k++;
+        }
+    }
+
+    private void State(Span<byte> ai, int at)
+    {
+        var s = ai.Slice(at, OriginalAiSquads.Size);
+        switch (s[2])
+        {
+            case 0: Idle(ai, at); break;
+            case 1: GoToPoint(ai, at); break;
+            case 2: HoldArea(ai, at); break;
+            case 3: AttackArea(ai, at); break;
+            case 4: AttackObject(ai, at); break;
+            case 5: ChaseObject(ai, at); break;
+            case 6: Retreating(ai, at); break;
+            case 7: JoinSquad(ai, at); break;
+            case 8: Patrol(ai, at); break;
+            case 9: case 10: world.WorkerState(s); break;
+            default: throw new InvalidDataException($"Squad state {s[2]} is outside table F083");
+        }
+    }
+
+    private IReadOnlyList<(byte[] Record, byte[] Template)> Chain(ReadOnlySpan<byte> s) => world.Chain(s[0]);
+    private void Disband(Span<byte> ai, int at) => OriginalAiSquads.Disband(ai, Chain(ai.Slice(at)).Select(m => m.Record), ai[at + 1]);
+    private static byte Step(ReadOnlySpan<byte> s) => (s[0x4b] & 0x80) != 0 ? s[0x4a] : s[0x4b]; // 1F06D
+    private static void ToIdle(Span<byte> s, byte priority) { s[4] = priority; s[2] = 0; s[5] = 0; } // 1F3E9
+    private static void SetMode(Span<byte> s, int mode) { if (mode is 0 or 1) s[7] = 2; } // 1FE78 writes 2 for both
+    private static void Counter(Span<byte> ai, int offset, byte owner) => ai[offset + 3 * owner]++; // 1ECF8 (+17C) / 1ED0F (+17D)
+
+    /// <summary>1EB5C: add to a 20-record list unless a record with this mode and +1 exists (a 0FFh mode is always added).</summary>
+    public static void Request(Span<byte> ai, int list, byte mode, byte first, byte third, byte fourth, uint parameter)
+    {
+        for (int k = 0; k < 20; k++)
+            if (ai[list + k * 0x15] == mode && ai[list + k * 0x15 + 1] == first && mode != 0xff) return;
+        for (int k = 0; k < 20; k++)
+        {
+            var r = ai.Slice(list + k * 0x15, 0x15);
+            if (r[0] != 0xff) continue;
+            r[0] = mode; r[1] = first; r[2] = 0; r[3] = third; r[4] = fourth; r[5] = r[6] = r[7] = 0;
+            W32(r, 8, parameter); W32(r, 0x0c, 0); W32(r, 0x10, 0); r[0x14] = 0;
+            return;
+        }
+    }
+
+    private static byte Radius(ReadOnlySpan<byte> s) { uint r = (U32(s, 0x22) >> 2) + 12; return r > 0x19 ? (byte)0x19 : (byte)r; }
+
+    private (byte, byte, byte, byte) Clip(byte x, byte y, byte w, byte h) => OriginalTargetRules.Clip(x, y, w, h, world.MapWidth, world.MapHeight);
+
+    /// <summary>1FECE: area +17..+1A centred on the object.</summary>
+    private void AreaAround(Span<byte> s, uint reference)
+    {
+        var o = world.Resolve(reference).Record;
+        byte r = Radius(s);
+        (s[0x17], s[0x18], s[0x19], s[0x1a]) = Clip((byte)(U32(o, 4) >> 5), (byte)(U32(o, 8) >> 5), r, r);
+    }
+
+    /// <summary>205E7: enemy near the squad centre (area 1F011, restored afterwards).</summary>
+    private (uint Reference, uint Strength) NearCentre(Span<byte> s)
+    {
+        byte r = Radius(s);
+        var (x0, y0, x1, y1) = Clip(s[0x20], s[0x21], r, r);
+        return OriginalAiSquadSteps.NearestEnemy(world, s[0x3a], s[0], s[0x20] * 32u, s[0x21] * 32u, x0, y0, x1, y1);
+    }
+
+    private (uint Reference, uint Strength) InStepArea(ReadOnlySpan<byte> s) =>
+        OriginalAiSquadSteps.NearestEnemy(world, s[0x3a], s[0], s[0x20] * 32u, s[0x21] * 32u, s[0x4d], s[0x4e], s[0x4f], s[0x50]);
+
+    /// <summary>21CA0: hostile objects of the area (D7B1) counted into the enemy census fields.</summary>
+    private bool Census(byte participant, byte x0, byte y0, byte x1, byte y1)
+    {
+        uint hostile = world.HostileMask(participant);
+        EnemyStrength = 0; EnemyCount = 0; Array.Clear(EnemyKinds); EnemyX = 0xff;
+        uint size = unchecked((uint)(x1 | y1 << 8) - (uint)(x0 | y0 << 8) + 0x101);
+        foreach (uint reference in OriginalTargetRules.Collect(new Grid(world), x0, y0, (byte)size, (byte)(size >> 8)))
+        {
+            var (o, t) = world.Resolve(reference);
+            if ((hostile >> (o[3] & 31) & 1) == 0) continue;
+            EnemyCount++; EnemyKinds[t[0x41] & 0xf]++; EnemyStrength += t[0x76];
+            if (EnemyX == 0xff) { EnemyX = (byte)(U32(o, 4) >> 5); EnemyY = (byte)(U32(o, 8) >> 5); }
+            else { EnemyX = (byte)((EnemyX >> 1) + (byte)(U32(o, 4) >> 6)); EnemyY = (byte)((EnemyY >> 1) + (byte)(U32(o, 8) >> 6)); }
+        }
+        return EnemyCount != 0;
+    }
+    private bool CensusStep(ReadOnlySpan<byte> s) => Census(s[0], s[0x4d], s[0x4e], s[0x4f], s[0x50]);  // 1FF2E
+    private bool CensusHome(ReadOnlySpan<byte> s) => Census(s[0], s[0x17], s[0x18], s[0x19], s[0x1a]);  // 1FF51
+
+    private sealed class Grid(IAiSquadWorld world) : IEnemySearchWorld
+    {
+        public byte MapWidth => world.MapWidth;
+        public byte MapHeight => world.MapHeight;
+        public uint HostileMask => throw new NotSupportedException();
+        public uint Occupant(int plane, int cell) => world.Occupant(plane, cell);
+        public (byte[] Record, byte[] Template) Resolve(uint reference) => world.Resolve(reference);
+        public bool Contact(byte owner) => throw new NotSupportedException();
+        public byte TerrainClass(ReadOnlySpan<byte> record) => throw new NotSupportedException();
+        public void Contacted(FirstContact contact) => throw new NotSupportedException();
+    }
+
+    /// <summary>1FF19: distance of a cell from the centre; the original compares both coordinates with +20.</summary>
+    private static byte Distance(ReadOnlySpan<byte> s, byte x, byte y)
+    {
+        byte dx = (byte)(x >= s[0x20] ? x - s[0x20] : s[0x20] - x), dy = (byte)(y >= s[0x20] ? y - s[0x20] : s[0x20] - y);
+        return Math.Max(dx, dy);
+    }
+
+    /// <summary>1FF74: enemy strength in the step area above the squad's own, minus friendly squads around the target
+    /// area centre, plus block +0A; 0 when not stronger.</summary>
+    private uint EnemyExcess(ReadOnlySpan<byte> ai, ReadOnlySpan<byte> s)
+    {
+        var (_, strength) = InStepArea(s);
+        if (strength < U32(s, 0x36)) return 0;
+        uint own = OriginalAiSquads.StrengthInArea(ai, (byte)((byte)(s[0x15] + s[0x13]) >> 1), (byte)((byte)(s[0x16] + s[0x14]) >> 1));
+        if (strength <= own) return 0;
+        return strength - own + U32(ai, 0x0a);
+    }
+
+    /// <summary>1FFB7: enemies of the area +17..+1A (21CA0, strength scaled by block +0E and shifted by +77) stronger than
+    /// the friendly squads at its centre; returns the shortfall.</summary>
+    private uint EnemyStronger(ReadOnlySpan<byte> ai, ReadOnlySpan<byte> s)
+    {
+        CensusHome(s);
+        uint enemy = unchecked(EnemyStrength * U32(ai, 0x0e)) >> 5 >> (ai[0x77] & 31);
+        uint own = OriginalAiSquads.StrengthInArea(ai, (byte)((byte)(s[0x19] + s[0x17]) >> 1), (byte)((byte)(s[0x1a] + s[0x18]) >> 1));
+        return enemy > own ? enemy - own : 0;
+    }
+
+    /// <summary>20071: squad message by the AI character (+29) from table LE:3 F02E, when the squad has more than 10 members.</summary>
+    private void Say(ReadOnlySpan<byte> ai, ReadOnlySpan<byte> s, int parameter)
+    {
+        if (U32(s, 0x22) <= 10) return;
+        world.Message(s, U32(messages, 12 * ai[0x29] + parameter));
+    }
+
+    /// <summary>1FC6B: march in formation (step 4, kind 4) to the cell +0D/+0E; false when finished or off the map.</summary>
+    private static bool MoveTo(Span<byte> s, byte mapWidth, byte mapHeight)
+    {
+        if (s[6] == 1 || s[6] == 0) { if (s[6] == 1 && Step(s) == 4) return true; }
+        else return Step(s) == 4;
+        byte x = s[0x0d], y = s[0x0e];
+        if (x >= mapWidth || y >= mapHeight) return false;
+        s[8] = 4; s[9] = x; s[0x0a] = y; s[0x0b] = (byte)(x + 1); s[0x0c] = y; s[0x4b] = 4; // 1EFB8
+        s[6] = 2;
+        return true;
+    }
+
+    /// <summary>1FC28: go to the centre of +17..+1A. Returns (moving, arrived): arrived when the centre is already inside.</summary>
+    private (bool Moving, bool Arrived) GoHome(Span<byte> s)
+    {
+        if (s[6] == 0) { s[0x0d] = (byte)((byte)(s[0x17] + s[0x19]) >> 1); s[0x0e] = (byte)((byte)(s[0x18] + s[0x1a]) >> 1); }
+        else if (s[0x20] >= s[0x17] && s[0x21] >= s[0x18] && s[0x20] <= s[0x19] && s[0x21] <= s[0x1a]) return (false, true);
+        return (MoveTo(s, world.MapWidth, world.MapHeight), false);
+    }
+
+    /// <summary>1FBB1: retreat five cells away from the enemies of +17..+1A, then march there.</summary>
+    private bool Retreat(ReadOnlySpan<byte> ai, Span<byte> s)
+    {
+        if (s[6] == 0)
+        {
+            if (!CensusHome(s)) return false;
+            byte direction = (byte)((byte)(Direction(EnemyX, EnemyY, s[0x20], s[0x21]) + 0x10) >> 5);
+            var (dx, dy) = Directions[direction & 7];
+            byte x = (byte)(dx * 5 + s[0x20]);
+            if (x >= world.MapWidth) return false;
+            s[0x0d] = x;
+            byte y = (byte)(dy * 5 + s[0x21]);
+            if (y >= world.MapHeight) return false;
+            s[0x0e] = y;
+            Say(ai, s, 8);
+        }
+        return MoveTo(s, world.MapWidth, world.MapHeight);
+    }
+    private static readonly (int X, int Y)[] Directions = [(0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1)]; // DS:19C7
+
+    /// <summary>6996: direction byte (0..255, 0 = north, clockwise) from (x1, y1) to (x2, y2) with the arctangent table DS:287E.</summary>
+    public byte Direction(uint x1, uint y1, uint x2, uint y2)
+    {
+        byte quadrant = 0x40;
+        uint ecx = x2, eax = x1, edx = y2, ebx = y1;
+        if (ecx < eax) { ecx = eax - ecx; (edx, ebx) = (ebx, edx); quadrant += 0x80; } else ecx -= eax;
+        if (edx < ebx) { edx = ebx - edx; (edx, ecx) = (ecx, edx); quadrant -= 0x40; } else edx -= ebx;
+        if (ecx == edx) return (byte)(0x20 + quadrant);
+        if (ecx > edx) return (byte)(arctangent[(byte)((edx << 8) / (ecx & 0xffff))] + quadrant);
+        return (byte)(0x40 - arctangent[(byte)((ecx << 8) / (edx & 0xffff))] + quadrant);
+    }
+
+    /// <summary>1FCED: fight in the area, by mode +7 (0: chase the enemy centre, 1: march, then clear, 2: clear +17..+1A).
+    /// True while the fight goes on.</summary>
+    private bool Engage(Span<byte> s)
+    {
+        switch (s[7])
+        {
+            case 0:
+                if (s[6] != 0 && (U32(s, 0x1b) & 0x1f) != 0) return true;
+                byte r = Radius(s);
+                (s[0x4d], s[0x4e], s[0x4f], s[0x50]) = Clip(s[0x20], s[0x21], r, r);
+                if (!CensusStep(s)) return false;
+                byte kind = Distance(s, EnemyX, EnemyY) > (byte)((byte)(s[0x4f] - s[0x4d]) >> 1) ? (byte)4 : (byte)3;
+                if (s[6] != kind) { s[6] = kind; Formation(s, (byte)(kind - 1), s[0x20], s[0x21], EnemyX, EnemyY); }
+                return true;
+            case 1:
+                for (;;)
+                    switch (s[6])
+                    {
+                        case 0:
+                            if (!CensusHome(s)) return false;
+                            if (Distance(s, EnemyX, EnemyY) <= 6) return Clear(s, 3);
+                            Formation(s, 2, s[0x20], s[0x21], EnemyX, EnemyY); s[6] = 1; return true;
+                        case 1:
+                            if (Step(s) == 4) return true;
+                            if (!CensusHome(s)) return false;
+                            s[0x4d] = EnemyX; s[0x4e] = EnemyY; s[0x4b] = 5; s[6] = 2; return true; // 1EFF9
+                        case 2:
+                            if ((U32(s, 0x1b) & 0xf) != 0) return true;
+                            if (!CensusHome(s)) return false;
+                            if (Distance(s, EnemyX, EnemyY) > 6) return true;
+                            return Clear(s, 3);
+                        case 3: return Step(s) == 3;
+                        default: throw new InvalidOperationException("1FCED loops forever on this stage"); // 1FDE5 <-> 1FE2E
+                    }
+            case 2:
+                if (s[6] != 0) return Step(s) == 3;
+                return Clear(s, 1);
+            default: return true;
+        }
+    }
+    private static bool Clear(Span<byte> s, byte stage)
+    {
+        (s[0x4d], s[0x4e], s[0x4f], s[0x50]) = (s[0x17], s[0x18], s[0x19], s[0x1a]); // 1F054
+        s[0x4b] = 3; s[8] = 0; s[6] = stage; return true; // 1EF21
+    }
+    private static void Formation(Span<byte> s, byte kind, byte x, byte y, byte tx, byte ty)
+    { s[9] = x; s[0x0a] = y; s[0x0b] = tx; s[0x0c] = ty; s[8] = kind; s[0x4b] = 4; } // 1EFB8
+
+    /// <summary>State 0 (1F31E): stand; fight an enemy that comes near, retreat from a stronger one.</summary>
+    private void Idle(Span<byte> ai, int at)
+    {
+        var s = ai.Slice(at, OriginalAiSquads.Size);
+        if (U32(s, 0x22) <= 1) { Disband(ai, at); return; }
+        if (s[5] == 0)
+        {
+            var (enemy, _) = NearCentre(s);
+            if (enemy != 0) { Engaged(ai, s, enemy); return; }
+            s[5] = 1;
+        }
+        if (s[5] == 1)
+        {
+            if ((U32(s, 0x1b) & 0x1f) != 0) return;
+            var (enemy, _) = NearCentre(s);
+            if (enemy != 0) { Engaged(ai, s, enemy); return; }
+            if ((U32(s, 0x1b) & 0x3ff) == 0) world.Rescue(s);
+            if ((world.Random() & 0x1f) == 0) Say(ai, s, 0);
+            return;
+        }
+        if (s[5] == 2)
+        {
+            if ((U32(s, 0x1b) & 0x3f) == 0 && EnemyStronger(ai, s) != 0) { s[5] = 3; s[6] = 0; return; }
+            if (!Engage(s)) s[5] = 0;
+            return;
+        }
+        if (!Retreat(ai, s)) s[5] = 0;
+    }
+    private void Engaged(Span<byte> ai, Span<byte> s, uint enemy)
+    {
+        Counter(ai, 0x17c, world.Resolve(enemy).Record[3]);
+        AreaAround(s, enemy); SetMode(s, 0); s[6] = 0; s[5] = 2;
+    }
+
+    /// <summary>State 1 (1F3F5, set by 1F464): march to +0D/+0E; fight on the way; back to state 0 at the end.</summary>
+    private void GoToPoint(Span<byte> ai, int at)
+    {
+        var s = ai.Slice(at, OriginalAiSquads.Size);
+        if (s[5] == 0) { s[6] = 0; s[5] = 1; }
+        if (s[5] != 1)
+        {
+            if (Engage(s))
+            {
+                if ((U32(s, 0x1b) & 0x3f) == 0 && EnemyStronger(ai, s) != 0) ToIdle(s, 0);
+                return;
+            }
+            s[6] = 0; s[5] = 1;
+        }
+        if (!MoveTo(s, world.MapWidth, world.MapHeight)) { ToIdle(s, 0); return; }
+        if ((U32(s, 0x1b) & 0xf) != 0) return;
+        var (enemy, strength) = NearCentre(s);
+        if (enemy == 0 || ((s[0x41] & 2) == 0 && strength <= 5)) return;
+        Counter(ai, 0x17c, world.Resolve(enemy).Record[3]);
+        AreaAround(s, enemy); SetMode(s, 1); s[6] = 0; s[5] = 2;
+    }
+
+    /// <summary>State 2 (1F1DF, set by 1F306): hold the area +13..+16.</summary>
+    private void HoldArea(Span<byte> ai, int at)
+    {
+        var s = ai.Slice(at, OriginalAiSquads.Size);
+        if (U32(s, 0x22) == 0) { Disband(ai, at); return; }
+        while (true)
+        {
+            if (s[5] == 0) { (s[0x17], s[0x18], s[0x19], s[0x1a]) = (s[0x13], s[0x14], s[0x15], s[0x16]); s[5] = 1; s[6] = 0; return; }
+            if (s[5] == 1)
+            {
+                if ((U32(s, 0x1b) & 0xf) == 0)
+                {
+                    var (enemy, strength) = NearCentre(s);
+                    if (enemy != 0 && ((s[0x41] & 2) != 0 || strength > 5))
+                    {
+                        Counter(ai, 0x17d, world.Resolve(enemy).Record[3]);
+                        AreaAround(s, enemy); SetMode(s, 1); s[6] = 0; s[5] = 3; return;
+                    }
+                }
+                var (moving, arrived) = GoHome(s);
+                if (moving) return;
+                if (!arrived)
+                {
+                    var (x0, y0, x1, y1) = Clip(s[0x20], s[0x21], 0x14, 0x14);
+                    Request(ai, Orders, 0x0a, s[1], s[4], x0, 0);
+                    ToIdle(s, 0); return;
+                }
+                (s[0x17], s[0x18], s[0x19], s[0x1a]) = (s[0x13], s[0x14], s[0x15], s[0x16]);
+                SetMode(s, 1); s[6] = 0; s[5] = 2; Say(ai, s, 4); return;
+            }
+            if (s[5] == 4)
+            {
+                if (Retreat(ai, s)) return;
+                Retreat6(s, 0x20); return;
+            }
+            if ((U32(s, 0x1b) & 0x3f) == 0)
+            {
+                uint need = EnemyStronger(ai, s);
+                if (need != 0) { Request(ai, Military, 3, s[1], (byte)(need >> 8), s[1], need); s[5] = 4; s[6] = 0; return; }
+            }
+            if (Engage(s)) return;
+            if (s[5] == 3) { s[5] = 0; continue; }
+            ToIdle(s, 0); return;
+        }
+    }
+    private static void Retreat6(Span<byte> s, byte time) { s[5] = (byte)(time << 2); s[0x1f] = s[2]; s[2] = 6; } // 1F7B9
+
+    /// <summary>State 3 (1F0D5, set by 1F1C7): gather in the area +13..+16 and clear it.</summary>
+    private void AttackArea(Span<byte> ai, int at)
+    {
+        var s = ai.Slice(at, OriginalAiSquads.Size);
+        if (U32(s, 0x22) == 0) { Disband(ai, at); return; }
+        if (s[5] == 0) { (s[0x4d], s[0x4e], s[0x4f], s[0x50]) = (s[0x13], s[0x14], s[0x15], s[0x16]); s[0x4b] = 2; s[5] = 1; return; }
+        if (s[5] == 1) { if (Step(s) == 2) return; s[5] = 2; }
+        if (s[5] == 2)
+        {
+            var (enemy, _) = InStepArea(s);
+            if (enemy == 0) return;
+            AreaAround(s, enemy); Counter(ai, 0x17c, world.Resolve(enemy).Record[3]);
+            SetMode(s, 0); s[5] = 3; s[6] = 0; return;
+        }
+        if (s[5] == 3)
+        {
+            if ((U32(s, 0x1b) & 0x3f) == 0)
+            {
+                uint excess = EnemyExcess(ai, s);
+                if (excess != 0) Request(ai, Military, 3, s[1], (byte)(excess >> 8), s[1], 0);
+            }
+            if (Engage(s)) return;
+            s[5] = 0;
+            uint area = (uint)(byte)((byte)(s[0x15] - s[0x13] + 1) * (byte)(s[0x16] - s[0x14] + 1) >> 4) * ai[0x2a]; // 215F1
+            if (area > U32(s, 0x36)) Request(ai, Military, 2, s[1], 0, s[1], area - U32(s, 0x36));
+            return;
+        }
+        if (Step(s) == 4) return;
+        (s[0x4d], s[0x4e], s[0x4f], s[0x50]) = (s[0x13], s[0x14], s[0x15], s[0x16]); s[0x4b] = 3; s[5] = 3;
+    }
+
+    /// <summary>2160B: strength wanted against an object: DAT[45] − DAT[45]/4.</summary>
+    private uint ObjectStrength(uint reference) { byte v = world.Resolve(reference).Template[0x45]; return (uint)(v - (v >> 2)); }
+
+    /// <summary>State 4 (1F8CF, set by 1F9EC): go to the object +0F and clear the area around it.</summary>
+    private void AttackObject(Span<byte> ai, int at)
+    {
+        var s = ai.Slice(at, OriginalAiSquads.Size);
+        uint target = U32(s, 0x0f);
+        if (target == 0) { ToIdle(s, 0); return; }
+        if (U32(s, 0x22) == 0) { Disband(ai, at); return; }
+        switch (s[5])
+        {
+            case 0: AreaAround(s, target); s[5] = 1; s[6] = 0; return;
+            case 1:
+                var (moving, arrived) = GoHome(s);
+                if (moving) return;
+                if (!arrived) { ToIdle(s, 0); return; }
+                s[5] = 2; return;
+            case 2:
+                if ((U32(s, 0x1b) & 0x1f) != 0) return;
+                (s[0x4d], s[0x4e], s[0x4f], s[0x50]) = (s[0x17], s[0x18], s[0x19], s[0x1a]);
+                var (enemy, _) = InStepArea(s);
+                if (enemy == 0) return;
+                Counter(ai, 0x17c, world.Resolve(enemy).Record[3]); SetMode(s, 0); s[5] = 3; s[6] = 0; return;
+            case 3:
+                if ((U32(s, 0x1b) & 0x3f) == 0)
+                {
+                    uint need = EnemyStronger(ai, s);
+                    if (need != 0)
+                    {
+                        Request(ai, Military, 3, s[1], (byte)(need >> 8), s[1], need);
+                        if (s[4] < 0x40) { s[5] = 4; s[6] = 0; return; }
+                    }
+                }
+                if (Engage(s)) return;
+                s[5] = 0;
+                uint wanted = ObjectStrength(target);
+                if (wanted > U32(s, 0x36)) Request(ai, Military, 2, s[1], 0, s[1], wanted - U32(s, 0x36));
+                return;
+            default:
+                if (Retreat(ai, s)) return;
+                Retreat6(s, 0x20); return;
+        }
+    }
+
+    /// <summary>State 5 (1FAD9, set by 1FB9C): follow the object +0F and fight what is met on the way.</summary>
+    private void ChaseObject(Span<byte> ai, int at)
+    {
+        var s = ai.Slice(at, OriginalAiSquads.Size);
+        if (U32(s, 0x0f) == 0) { ToIdle(s, 0); return; }
+        if (U32(s, 0x22) == 0) { Disband(ai, at); return; }
+        while (true)
+        {
+            if (s[5] == 0)
+            {
+                if (U32(s, 0x0f) == 0) { ToIdle(s, 0); return; }
+                AreaAround(s, U32(s, 0x0f)); s[5] = 1; s[6] = 0; return;
+            }
+            if (s[5] == 1)
+            {
+                if ((U32(s, 0x1b) & 0xf) == 0)
+                {
+                    var (enemy, strength) = NearCentre(s);
+                    if (enemy != 0 && ((s[0x41] & 2) != 0 || strength > 5))
+                    {
+                        Counter(ai, 0x17d, world.Resolve(enemy).Record[3]);
+                        AreaAround(s, enemy); SetMode(s, 1); s[6] = 0; s[5] = 3; return;
+                    }
+                }
+                var (moving, arrived) = GoHome(s);
+                if (moving) return;
+                if (!arrived || U32(s, 0x0f) == 0) { ToIdle(s, 0); return; }
+                SetMode(s, 1); s[6] = 0; s[5] = 2; return;
+            }
+            if (Engage(s)) return;
+            if (s[5] == 3) { s[5] = 0; continue; }
+            ToIdle(s, 0); return;
+        }
+    }
+
+    /// <summary>State 6 (1F72C, entered by 1F7B9): retreat for a while, then return to the state saved in +1F.</summary>
+    private void Retreating(Span<byte> ai, int at)
+    {
+        var s = ai.Slice(at, OriginalAiSquads.Size);
+        if (world.Global19E9 == 0xff)
+        {
+            bool expired = s[5] < 4; s[5] -= 4;
+            if (expired) { s[2] = s[0x1f]; s[5] = 0; return; }
+        }
+        if (U32(s, 0x22) <= 1) { Disband(ai, at); return; }
+        switch (s[5] & 3)
+        {
+            case 0:
+                if ((U32(s, 0x1b) & 0x1f) != 0) return;
+                var (enemy, _) = NearCentre(s);
+                if (enemy == 0) return;
+                AreaAround(s, enemy); SetMode(s, 0); s[6] = 0; s[5]++; return;
+            case 1:
+                if ((U32(s, 0x1b) & 0x3f) == 0 && EnemyStronger(ai, s) != 0) { s[5]++; s[6] = 0; return; }
+                if (!Engage(s)) s[5] &= 0xfc;
+                return;
+            case 2:
+                if (!Retreat(ai, s)) s[5] &= 0xfc;
+                return;
+            default: s[2] = s[0x1f]; s[5] = 0; return;
+        }
+    }
+
+    /// <summary>State 7 (1F7CA, set by 1F8C0): walk to the squad +13 and merge into it (201F6).</summary>
+    private void JoinSquad(Span<byte> ai, int at)
+    {
+        var s = ai.Slice(at, OriginalAiSquads.Size);
+        int other = OriginalAiSquads.Find(ai, s[0x13]);
+        if (other < 0) { ToIdle(s, 0); return; }
+        if (U32(s, 0x22) == 0) { Disband(ai, at); return; }
+        if (s[5] == 0) { s[0x0d] = ai[other + 0x20]; s[0x0e] = ai[other + 0x21]; s[6] = 0; s[5] = 1; }
+        if (s[5] != 1) { if (!Engage(s)) s[5] = 0; return; }
+        if (MoveTo(s, world.MapWidth, world.MapHeight))
+        {
+            if ((U32(s, 0x1b) & 0xf) != 0) return;
+            byte x = ai[other + 0x20], y = ai[other + 0x21];
+            if (s[0x0d] != x || s[0x0e] != y) { s[5] = 0; return; }
+            if (Distance(s, x, y) > 6)
+            {
+                var (enemy, strength) = NearCentre(s);
+                if (enemy == 0 || ((s[0x41] & 2) == 0 && strength <= 5)) return;
+                AreaAround(s, enemy); SetMode(s, 1); s[6] = 0; s[5] = 2; return;
+            }
+        }
+        ai[other + 5] = (byte)(ai[other + 2] == 6 ? 3 : 0);
+        OriginalAiSquads.Transfer(ai, Chain(s).Select(m => m.Record), s[1], ai[other + 1]);
+    }
+
+    /// <summary>State 8 (1FA01, set by 1FACD): walk to random explored places (1EBEF) and fight what is met.</summary>
+    private void Patrol(Span<byte> ai, int at)
+    {
+        var s = ai.Slice(at, OriginalAiSquads.Size);
+        if (U32(s, 0x22) == 0) { Disband(ai, at); return; }
+        if (s[5] == 4) { if (!Retreat(ai, s)) s[5] = 0; return; }
+        if ((U32(s, 0x1b) & 0x1f) == 0)
+        {
+            var (enemy, _) = NearCentre(s);
+            if (enemy != 0) { AreaAround(s, enemy); SetMode(s, 0); s[6] = 0; s[5] = 2; return; }
+        }
+        if (s[5] == 0)
+        {
+            if ((U32(s, 0x1b) & 0x1f) != 0) return;
+            // 1EBEF: a random cell; when the participant has explored it ([18DA] bit), an area of 20×20 around it.
+            byte x = (byte)(world.Random() * world.MapWidth >> 8), y = (byte)(world.Random2() * world.MapHeight >> 8);
+            byte bit = (byte)(s[0] < 8 ? 1 << s[0] : 0);
+            if ((world.Explored(world.MapWidth * y + x) & bit) == 0) return;
+            (s[0x17], s[0x18], s[0x19], s[0x1a]) = Clip(x, y, 0x14, 0x14);
+            s[6] = 0; s[5] = 1;
+        }
+        if (s[5] == 1)
+        {
+            var (moving, arrived) = GoHome(s);
+            if (moving) return;
+            if (!arrived)
+            {
+                var (x0, y0, x1, y1) = Clip(s[0x20], s[0x21], 0x14, 0x14);
+                Request(ai, Orders, 0x0a, s[1], 0x40, x0, 0);
+            }
+            s[5] = 0; return;
+        }
+        if (!Engage(s)) { s[5] = 0; return; }
+        if ((U32(s, 0x1b) & 0xf) != 0) return;
+        if (EnemyStronger(ai, s) == 0) return;
+        s[5] = 4; s[6] = 0;
+        if (!Retreat(ai, s)) s[5] = 0;
+    }
+}
