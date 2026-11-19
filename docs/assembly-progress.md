@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 115328 | 6314 | 97 | 25143 | 44 |
+| LE:1 | 146882 | 115328 | 5847 | 97 | 25610 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -102,7 +102,7 @@
 | LE:1 `0x9B86..0x9BF9` | Gap between object footprints | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Сохранены байтовые сдвиги размеров и u32-переполнения; игровое использование включает лишь проверенные ветви подхода. |
 | LE:1 `0x9E41..0x9E69` | Random byte streams [19EB]/[19EC] over table DS:297E | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | third stream 9E69 ([19ED]) is not covered |
 | LE:1 `0x9E69..0x9E7D` | Random byte stream [19ED] over table DS:297E | ported | [ai.md](../docs/ai.md); [ai-garrison.json](../tests/fixtures/ai-garrison.json) |  |
-| LE:1 `0x9F38..0xA10B` | Fog viewport scratch and weighted corner shading | partial | [fog-of-war.md](../docs/fog-of-war.md); [visibility.json](../tests/fixtures/visibility.json) | Сверены 16384 маски углов и 28 номеров WORK; копирование viewport scratch и цветовые пиксели пока не перенесены. |
+| LE:1 `0x9F38..0xA10B` | Fog viewport scratch and weighted corner shading | ported | [fog-of-war.md](../docs/fog-of-war.md); [visibility.json](../tests/fixtures/visibility.json); [fog-raster.json](../tests/fixtures/fog-raster.json); [fog-edge.json](../docs/reference/fog-edge.json) | 135 полных кадров совпали по индексам и RGB, 16384 маски углов и 28 селекторов. Визуальная сверка 196 тайлов оригинала, из них 16 с краем тумана. DOS scratch/dirty-cache заменён прямым обходом и Godot-изображением. В renderer схватки не встроено. |
 | LE:1 `0xA10B..0xA1D1` | Game speed gate and slow-tick flags | partial | [game-timing.md](../docs/game-timing.md) | Перенесены частота и шаг по умолчанию; клавиши смены скорости и флаги [19E7] не подключены. |
 | LE:1 `0xA1D1..0xA320` | Explored minimap pixels and camera outline | partial | [fog-of-war.md](../docs/fog-of-war.md); [visibility.json](../tests/fixtures/visibility.json) | 60 полных native framebuffer совпали с C#. Расписание перерисовки 1C4E/1C60, dirty-учёт и DOS-адреса не входят; 3EEA заглушён. |
 | LE:1 `0xA4DF..0xA5B8` | Death frames by hit kind, corpse object and removal | ported | [combat.md](../docs/combat.md); [death.json](../tests/fixtures/death.json) | Объект-труп (9727) и удаление 98DB исполняет мост схватки. |

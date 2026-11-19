@@ -1,0 +1,352 @@
+{
+  "format_version": 1,
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "WORK.SPR": "27d8d82fb49a41e6ec8786af996ba1fe24e15090202a1588dea117b538e22e0d",
+    "FADE_COL.TAB": "780d10e5bbea882c3d1e8157d72c3a454160e8e572044eff9d3175f1621e4b09",
+    "COLOR1.PAL": "022e87d1ccd4961b08d54e073da6bff5cf28a9aa9577dc78422b211407c33a32"
+  },
+  "weights_atlas": "fog_weights.png",
+  "weights": [
+    {
+      "sprite": 166,
+      "corners": 1,
+      "parity": 0,
+      "rectangle": [
+        0,
+        0,
+        32,
+        32
+      ],
+      "sha256": "b158f2abfee45f7ce3a7e824840b2fcb497ff5809645fc9ad6fc0fda7139be59"
+    },
+    {
+      "sprite": 167,
+      "corners": 1,
+      "parity": 1,
+      "rectangle": [
+        32,
+        0,
+        32,
+        32
+      ],
+      "sha256": "1ddde284493801b21c273af3df9cb0daded35817b0146577883e3a06e0e23506"
+    },
+    {
+      "sprite": 168,
+      "corners": 2,
+      "parity": 0,
+      "rectangle": [
+        64,
+        0,
+        32,
+        32
+      ],
+      "sha256": "d68bcf76ae183d8d2bcd3fca4860376169c08701dbad501c9f6c988df71e9130"
+    },
+    {
+      "sprite": 169,
+      "corners": 2,
+      "parity": 1,
+      "rectangle": [
+        96,
+        0,
+        32,
+        32
+      ],
+      "sha256": "42c79500d969a532dbe831f6e6ebe18a87510840ab7edd628c0ff57c97c3e229"
+    },
+    {
+      "sprite": 170,
+      "corners": 3,
+      "parity": 0,
+      "rectangle": [
+        128,
+        0,
+        32,
+        32
+      ],
+      "sha256": "f7448c8b21e94ba8141353a6274da73d87fef5e8228b408dcf48dd28f1d2df9a"
+    },
+    {
+      "sprite": 171,
+      "corners": 3,
+      "parity": 1,
+      "rectangle": [
+        160,
+        0,
+        32,
+        32
+      ],
+      "sha256": "f0dd6c7a95a320d67896992b215ed1e9a766e2543448551136420634fb7a3c26"
+    },
+    {
+      "sprite": 172,
+      "corners": 4,
+      "parity": 0,
+      "rectangle": [
+        192,
+        0,
+        32,
+        32
+      ],
+      "sha256": "19681d6b1ce74606eabbc2023c37d40d809b1062c3ca0bc73ec709b30e296e90"
+    },
+    {
+      "sprite": 173,
+      "corners": 4,
+      "parity": 1,
+      "rectangle": [
+        224,
+        0,
+        32,
+        32
+      ],
+      "sha256": "1568aa3980c9016b2495b33a2aefeba7ce8c1468970f9a3910701ce69a02c674"
+    },
+    {
+      "sprite": 174,
+      "corners": 5,
+      "parity": 0,
+      "rectangle": [
+        0,
+        32,
+        32,
+        32
+      ],
+      "sha256": "208522d3bddc5fd478203de5083806fe6106d130ed43390d064f1695228fc293"
+    },
+    {
+      "sprite": 175,
+      "corners": 5,
+      "parity": 1,
+      "rectangle": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "sha256": "d91d7e4299faf3ca30ee6a10742b2665a3450f04a659b1e7ae79d6eb20ddf72d"
+    },
+    {
+      "sprite": 176,
+      "corners": 6,
+      "parity": 0,
+      "rectangle": [
+        64,
+        32,
+        32,
+        32
+      ],
+      "sha256": "38c9188bc26ba4137d4150a0c7dc616b7a67ea9a0c18652a7eba7f01e5eadd29"
+    },
+    {
+      "sprite": 177,
+      "corners": 6,
+      "parity": 1,
+      "rectangle": [
+        96,
+        32,
+        32,
+        32
+      ],
+      "sha256": "9af7e28c9ba5a5a5b7baa1d2e11d9c4eb0383f396bf4b7fc43bc7ad8bb8523b5"
+    },
+    {
+      "sprite": 178,
+      "corners": 7,
+      "parity": 0,
+      "rectangle": [
+        128,
+        32,
+        32,
+        32
+      ],
+      "sha256": "1c13ac39280de7b10b22adab07d7161cef29ca7957fc9910f6f2fc161c1199a7"
+    },
+    {
+      "sprite": 179,
+      "corners": 7,
+      "parity": 1,
+      "rectangle": [
+        160,
+        32,
+        32,
+        32
+      ],
+      "sha256": "b8dee9d30200c8c907f072863cf53ff08875ae2e8eaa7010d4075d0b9afdfba9"
+    },
+    {
+      "sprite": 180,
+      "corners": 8,
+      "parity": 0,
+      "rectangle": [
+        192,
+        32,
+        32,
+        32
+      ],
+      "sha256": "1be5530f2879b913838b4c5a2fa1afec4920b74482232d1dd59f22ccbb99b6b4"
+    },
+    {
+      "sprite": 181,
+      "corners": 8,
+      "parity": 1,
+      "rectangle": [
+        224,
+        32,
+        32,
+        32
+      ],
+      "sha256": "c47dd1b38f673e1402ccf79acd06deb749a3e88ad6457ceb75651688fbb9b923"
+    },
+    {
+      "sprite": 182,
+      "corners": 9,
+      "parity": 0,
+      "rectangle": [
+        0,
+        64,
+        32,
+        32
+      ],
+      "sha256": "93985466374a14f772f84ec08f9f34bb8edc8d07a9bf5a95c6096762304f7724"
+    },
+    {
+      "sprite": 183,
+      "corners": 9,
+      "parity": 1,
+      "rectangle": [
+        32,
+        64,
+        32,
+        32
+      ],
+      "sha256": "d7451aa10cea4f40ed1fafc979a99cb66b4566da4e1250032ceb12cf16cfee45"
+    },
+    {
+      "sprite": 184,
+      "corners": 10,
+      "parity": 0,
+      "rectangle": [
+        64,
+        64,
+        32,
+        32
+      ],
+      "sha256": "9eec1457557b85c872a0ba7fcc658cf9fd900b831962e665531a79a2b2dfc194"
+    },
+    {
+      "sprite": 185,
+      "corners": 10,
+      "parity": 1,
+      "rectangle": [
+        96,
+        64,
+        32,
+        32
+      ],
+      "sha256": "473ee8bc914fb07228c87441a5e3bf4db518d3dd97dac60aa7cff575c66ca89a"
+    },
+    {
+      "sprite": 186,
+      "corners": 11,
+      "parity": 0,
+      "rectangle": [
+        128,
+        64,
+        32,
+        32
+      ],
+      "sha256": "016a7e767b4a6a027768d436112cd199007ee9200c5473bea917843f382c2179"
+    },
+    {
+      "sprite": 187,
+      "corners": 11,
+      "parity": 1,
+      "rectangle": [
+        160,
+        64,
+        32,
+        32
+      ],
+      "sha256": "4acde9c816bfceffa8665edd6c1fa0456f75d96942bff35cd90914ad2ffb954e"
+    },
+    {
+      "sprite": 188,
+      "corners": 12,
+      "parity": 0,
+      "rectangle": [
+        192,
+        64,
+        32,
+        32
+      ],
+      "sha256": "233504346be25b46683dce600f7a918db261434c1d2b660f27de3f768d1b86e7"
+    },
+    {
+      "sprite": 189,
+      "corners": 12,
+      "parity": 1,
+      "rectangle": [
+        224,
+        64,
+        32,
+        32
+      ],
+      "sha256": "de2b1e58c357bf55660406369796b577259e113758360cca7bc9db8d58a4970e"
+    },
+    {
+      "sprite": 190,
+      "corners": 13,
+      "parity": 0,
+      "rectangle": [
+        0,
+        96,
+        32,
+        32
+      ],
+      "sha256": "4346fc183bf2c7d42897f1adfd69120adbc878889142d5f017be13f360dddbb3"
+    },
+    {
+      "sprite": 191,
+      "corners": 13,
+      "parity": 1,
+      "rectangle": [
+        32,
+        96,
+        32,
+        32
+      ],
+      "sha256": "7e880c170de90f40e97f91e2a0321ac4621e7ec6cda1f0b21f36bdb8f79083d1"
+    },
+    {
+      "sprite": 192,
+      "corners": 14,
+      "parity": 0,
+      "rectangle": [
+        64,
+        96,
+        32,
+        32
+      ],
+      "sha256": "44fefd63b60a424eddca8733bb4fc278ff473d97d1f558a2a456c620aa2ffc5d"
+    },
+    {
+      "sprite": 193,
+      "corners": 14,
+      "parity": 1,
+      "rectangle": [
+        96,
+        96,
+        32,
+        32
+      ],
+      "sha256": "96f74bd358910ea0fc10c97ac037691279b25447b7bae4574e4fff8580005c35"
+    }
+  ],
+  "shade_indices": "shade_indices.png",
+  "palette": "palette.png",
+  "shade_sha256": "9e25aabbf1c4d068fdf04b684000edf599cd8b49b8e12d83d576e19b2c79a5b1",
+  "palette_sha256": "6e7ebac5e5be5a75988771c0d70ed79987862b737a3bc4a181c73ef15a51982d"
+}

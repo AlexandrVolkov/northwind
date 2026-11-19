@@ -4,11 +4,12 @@
 
 | Статус | Процедур | Инструкций |
 |---|---|---|
-| partial | 2 | 234 |
+| partial | 1 | 89 |
+| ported | 1 | 145 |
 
 | Процедура | Инстр. | Статус | Имя | Вызывает (✓ перенесено, ~ частично, · нет) |
 |---|---|---|---|---|
-| 9F38 | 145 | partial | Fog viewport scratch and weighted corner shading | 1E133· |
+| 9F38 | 145 | ported | Fog viewport scratch and weighted corner shading | 1E133· |
 | A1D1 | 89 | partial | Explored minimap pixels and camera outline | 3EEA· |
 
 ## Вызываемое вне диапазона

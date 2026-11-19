@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "b05b85be9f4b227bd5027c5c8288828032e2133c07914f2e5957fd68e4af5a25",
+  "annotation_sha256": "12374f9de0c7de36ff3cc257935abf6fbc49157ee71c830ea0a6f07e85190623",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,8 +32,8 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 6314,
-        "ported": 25143,
+        "partial": 5847,
+        "ported": 25610,
         "unreviewed": 115328,
         "verified": 97
       },
@@ -891,7 +891,7 @@
         {
           "start": 40760,
           "end": 41227,
-          "status": "partial",
+          "status": "ported",
           "classification": "code",
           "claims": [
             "fog-corner-selection"

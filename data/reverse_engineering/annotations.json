@@ -2990,15 +2990,18 @@
       "end": 41227,
       "name": "Fog viewport scratch and weighted corner shading",
       "classification": "code",
-      "status": "partial",
+      "status": "ported",
       "evidence": [
         "docs/fog-of-war.md",
-        "tests/fixtures/visibility.json"
+        "tests/fixtures/visibility.json",
+        "tests/fixtures/fog-raster.json",
+        "docs/reference/fog-edge.json"
       ],
       "implementation": [
-        "scripts/OriginalVisibilityRules.cs"
+        "scripts/OriginalVisibilityRules.cs",
+        "scripts/OriginalFogGraphics.cs"
       ],
-      "limitations": "Сверены 16384 маски углов и 28 номеров WORK; копирование viewport scratch и цветовые пиксели пока не перенесены."
+      "limitations": "135 полных кадров совпали по индексам и RGB, 16384 маски углов и 28 селекторов. Визуальная сверка 196 тайлов оригинала, из них 16 с краем тумана. DOS scratch/dirty-cache заменён прямым обходом и Godot-изображением. В renderer схватки не встроено."
     },
     {
       "id": "exploration-minimap",

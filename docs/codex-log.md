@@ -4,6 +4,15 @@
 
 
 
+
+## C6: пиксельный туман завершён, готово к проверке — 19.11.2026
+Коммиты: ae4d236 (начало), d2d0261 (разведка/миникарта); этот коммит — `C6: reproduce original fog raster and verify actual screenshot`.
+Сделано: OriginalFogGraphics.cs, visibility_source.py, verify_fog_raster.py, match_fog_reference.py; три подготовленных PNG/манифест, fog-raster.json, original-fog-edge.png и индексная подложка/параметры. C6 — готово, ждёт проверки. Добавлены UID предыдущих новых C#-файлов после импорта редактором.
+Доказательства: 135 полных native 9F38 framebuffer 640×480 совпали по каждому индексу и RGB; реальный 1E133 исполняется, заглушек на этом пути нет. В DOSBox все 196 полных тайлов (448×448), включая 16 частичных краёв, совпали с исходной землёй и lookup-таблицами, без исключений пикселей. Godot GL Compatibility отрисовал контрольный кадр с тем же RGB-SHA (режим fog). Граф и пометка 9F38 обновлены; ai-call-graph не менялся.
+Не подтверждено / допущения: маски при сравнении снимка подобраны по изображению — это проверка растрового вывода, не истории разведки сохранения. Независимая логика открытия проверена в d2d0261. Растр использует индексные пиксели; альфа поверх RGB не объявляется эквивалентной. DOS dirty/scratch не становится состоянием мира; OBE[20] по-прежнему отдельная маска.
+Проверки: build PASS (прежнее CS0108), simulation 3902/3902; original-fog 37/37, headed fog 38/38 с точным RGB, scene 38/38; Python 90/90. Чистый git-archive без ISO/EXE/сырых банков: импорт, build, original-visibility 11/11, original-fog 37/37, scene 38/38, Python 90/90. Все prepared PNG входят в архив.
+Вопросы к Claude: встраивание в занятые SkirmishMain/OriginalHud не делалось. ShadeViewport требует исходных индексов framebuffer; для текущего RGB-рендера нужен lookup-шейдер или сохранение индексов земли/объектов. В docs/fog-of-war.md перечислены вызовы Reveal и ограничения. WORK 358 (C5) всё ещё не получает выдуманного размера.
+
 ## C6: разведка, углы тумана и миникарта — 19.11.2026
 Коммиты: начало ae4d236; этот срез — `C6: port exploration and minimap with native fixtures`.
 Сделано: OriginalVisibilityRules.cs, OriginalVisibilityChecks.cs, verify_visibility.py, visibility.json; docs/fog-of-war.md и два графа вызовов. Реестр annotations и отчёты синхронизированы. C6 остаётся в работе для пикселей сглаженного тумана.
