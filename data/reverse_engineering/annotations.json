@@ -2552,6 +2552,54 @@
         "scripts/OriginalAiRules.cs"
       ],
       "limitations": ""
+    },
+    {
+      "id": "ai-squad-registry",
+      "module": "LE:1",
+      "start": 131221,
+      "end": 131743,
+      "name": "AI squad registry: numbers, create, remove, disband, transfer, lookups",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squads.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "on overflow 200B5 releases pool byte «participant» instead of the new number, as in the original"
+    },
+    {
+      "id": "ai-squad-census",
+      "module": "LE:1",
+      "start": 132603,
+      "end": 132821,
+      "name": "AI squad census from its members",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squads.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-squad-find-state",
+      "module": "LE:1",
+      "start": 133515,
+      "end": 133552,
+      "name": "Find AI squad by state and target object",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squads.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "group-orders",
+      "module": "LE:1",
+      "start": 46949,
+      "end": 47595,
+      "name": "Group orders to squad members and squad bounds",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squads.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "the order primitives write the OBE command fields only; their execution by WRK is a separate system"
     }
   ]
 }
