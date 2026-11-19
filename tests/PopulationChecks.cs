@@ -78,6 +78,7 @@ public partial class TestRunner
             Check(battle.Move([recruit!.Id], destination) == 1, "Newly recruited militia accepts normal movement orders");
             for (int i = 0; i < 300 && (recruit.Cell != destination || recruit.Stepping); i++) battle.Advance(.1);
             Check(recruit.Cell == destination && !recruit.Stepping, "New soldier completes native motion and occupancy transfer");
+            battle.Attack([recruit.Id], battle.Objective.Id); // first order only warns before war (4F04)
             Check(battle.Attack([recruit.Id], battle.Objective.Id), "Recruited militia accepts the ordinary attack command");
             farm.Health = 0; farm.Record[0x19] = 0; battle.Advance(32.0 / battle.Rules.TicksPerSecond);
             Check(battle.Population.FarmSupport == 0, "Lost farm is removed from support on the original recount cadence");
