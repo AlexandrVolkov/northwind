@@ -12,8 +12,9 @@ public partial class TestRunner
     {
         var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
         rules.Economy.StartingResources = new(1000, 1000, 1000, people);
+        // The enemy AI hires and builds too; these player-economy checks count objects and run without it.
         return new(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
-            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules) { AiEnabled = false };
     }
 
     private static SkirmishActor WaitForRecruit(Skirmish battle, uint previousId)
@@ -82,8 +83,11 @@ public partial class TestRunner
             Check(battle.Move(ids, next + new Vector2I(3, 0)) == 5 && friends.Select(a => a.Goal).Distinct().Count() == 5,
                 "Group move assigns distinct reachable destinations");
         }
+        // Movement and combat flow against the scenario's own defenders: the enemy AI (which now hires an army) is off here;
+        // its behaviour is checked by mode "skirmish-ai".
         using (var battle = CreateSkirmish())
         {
+            battle.AiEnabled = false;
             uint[] ids = battle.Actors.Where(a => a.Team == 0 && !a.Structure).Select(a => a.Id).ToArray();
             Check(!battle.AtWar(battle.Hero, battle.Objective) && !battle.Attack(ids, battle.Objective.Id),
                 "Settlements start without war; the first attack order on them only warns (4F04)");

@@ -5,10 +5,10 @@ namespace Northwind;
 /// <summary>The settlement AI of the original (LE:1 1E7EA, docs/ai.md) driving the enemy settlement of the skirmish.
 ///
 /// Ported and verified parts run as in the original, once per game tick after the object update (LE:1 31D6): census
-/// (1E87A, every 32 turns), squad steps (1ED26), squad states (1F078), garrison (209B0), military requests (20DD0), upkeep (226F1), the turn
+/// (1E87A, every 32 turns), squad steps (1ED26), squad states (1F078), garrison (209B0), military requests (20DD0), orders (227C7), upkeep (226F1), the turn
 /// with its decisions (2323A), the plan executor (23667) and research (23C11). Adapters of the port, not the original:
 /// <list type="bullet">
-/// <item>Not yet ported steps are skipped: 227C7, 21E99/221AE (economy), the
+/// <item>Not yet ported steps are skipped: 21E99/221AE (economy), the
 /// construction stage 23551, worker states 9/10, the formation table of step 4, messages A4C2, the rescue 20001.</item>
 /// <item>Step 4 (formation march) sends the members to the target cell with command 48h instead of a formation.</item>
 /// <item>Commands the AI writes into OBE +14 (48h move to +22/+23, 50h/58h attack +1C, 40h stand) are carried out by
@@ -31,6 +31,9 @@ public sealed partial class Skirmish
     private OriginalAiSquadStates? _aiStates;
     private OriginalAiMilitary? _aiMilitary;
     private OriginalAiGarrison? _aiGarrison;
+    private OriginalAiOrders? _aiOrders;
+    private Dictionary<byte, byte[]> _aiMakes = [];
+    private byte[] _aiFortification = [];
     private byte[] _aiRandom = [];
     private byte _aiRandom3;
     private AiSquadWorld? _aiSquadWorld;
@@ -38,6 +41,14 @@ public sealed partial class Skirmish
 
     /// <summary>When false the enemy keeps the old experimental behaviour (tests that need a passive enemy).</summary>
     public bool AiEnabled { get; set; } = true;
+    /// <summary>The enemy's metal, wood, gold and people: participant +18, +1C, +20, +24 (the AI's own accounting).</summary>
+    public ResourceQuad EnemyResources
+    {
+        get { var p = _participants[Rules.EnemySlot]; return new(U32(p, 0x18), U32(p, 0x1c), U32(p, 0x20), U32(p, 0x24)); }
+        set { var p = _participants[Rules.EnemySlot]; W32(p, 0x18, value.First); W32(p, 0x1c, value.Second); W32(p, 0x20, value.Third); W32(p, 0x24, value.Fourth); }
+    }
+    private static uint U32(byte[] raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(offset));
+    private static void W32(byte[] raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(offset), value);
     public ReadOnlySpan<byte> EnemyAiBlock => _aiBlocks[Rules.EnemySlot];
     public int EnemySquadCount => _aiBlocks[Rules.EnemySlot][OriginalAiSquads.List];
 
@@ -56,11 +67,20 @@ public sealed partial class Skirmish
             _participants[slot.SlotIndex][0x16] = raw[0x13];   // character (1E53A takes participant +16 from SCN +13)
         }
         SyncParticipants();
+        var enemySlot = scenario.Slots.Single(s => s.SlotIndex == Rules.EnemySlot);
+        EnemyResources = OriginalResourceRules.ReadScenario(Convert.FromHexString(enemySlot.RawRecordHex));
+        // The enemy castle starts without WorkFlags; the player's castle shows 24h (observed in DOSBox, docs/interface.md).
+        foreach (var castle in Actors.Where(a => a.Team == 1 && a.Source.TemplateName == "Замок" && a.Record[0x0f] == 0)) castle.Record[0x0f] = 0x24;
+        using (var producers = GameData.Read<System.Text.Json.JsonDocument>("res://data/original_producers.json"))
+            foreach (var item in producers.RootElement.GetProperty("producers").EnumerateObject())
+                _aiMakes[byte.Parse(item.Name)] = item.Value.GetProperty("makes").EnumerateArray().Select(v => (byte)v.GetInt32()).ToArray();
+        _aiFortification = data.Fortifications.Count > 0 ? Convert.FromHexString(data.Fortifications[0]) : [];
         _aiSquadWorld = new AiSquadWorld(this);
         _aiTurnWorld = new AiTurnWorld(this);
         _aiStates = new OriginalAiSquadStates(_aiSquadWorld, Convert.FromHexString(data.ArctangentHex), Convert.FromHexString(data.SquadMessagesHex));
         _aiMilitary = new OriginalAiMilitary(_aiSquadWorld, Convert.FromHexString(data.ArmyClassesHex));
         _aiGarrison = new OriginalAiGarrison(_aiSquadWorld, _aiMilitary, _aiStates);
+        _aiOrders = new OriginalAiOrders(_aiSquadWorld, _aiMilitary);
         _aiRandom = GameData.Read<OriginalTerrainData>("res://data/original_terrain.json").RandomValues.ToArray();
         var characters = data.Table();
         foreach (byte p in new[] { (byte)Rules.PlayerSlot, (byte)Rules.EnemySlot })
@@ -119,6 +139,7 @@ public sealed partial class Skirmish
         _aiStates.Run(ai);
         _aiGarrison!.Run(ai);
         _aiMilitary.Run(ai);
+        _aiOrders!.Run(ai);
         OriginalAiRules.Upkeep(ai, chain);
         if (OriginalAiTurn.Decide(_aiTurnWorld!, me, 0, (uint)Map.Width, _aiThreat))
             BinaryPrimitives.WriteUInt32LittleEndian(ai.AsSpan(1), BinaryPrimitives.ReadUInt32LittleEndian(ai.AsSpan(1)) - 0x42); // 23551 not ported; 2365C
@@ -135,6 +156,19 @@ public sealed partial class Skirmish
     /// arrival, attacking when the target is gone.</summary>
     private void ExecuteAiCommands()
     {
+        foreach (var building in Actors.Where(a => a.Team == 1 && a.Alive && a.Structure).ToArray())
+        {
+            // An idle producer can take work (WorkFlags bit 2, as the idle castle's 24h observed in DOSBox); the WRK that sets
+            // WorkFlags after construction and production is not ported (adapter).
+            if (building.Source.TemplateName is "Замок" or "Казарма" && building.ConstructionRemaining <= 0 && building.Record.Length >= 0x27)
+            {
+                bool idle = building.Record[0x22] == 0xff && building.Record[0x15] == 0;
+                building.Record[0x0f] = idle ? (byte)(building.Record[0x0f] | 0x24) : (byte)(building.Record[0x0f] & ~4);
+            }
+            byte order = building.Record[0x14];
+            if ((order & 0xf8) == 0x60) building.Record[0x14] = 4;              // produce: the queue head +22 is the template
+            else if ((order & 0xf8) == 0x58) { EnemyBuild(building); building.Record[0x14] = 0; }
+        }
         foreach (var actor in Actors.Where(a => a.Team == 1 && a.Alive && !a.Structure && !a.Worker))
         {
             byte value = actor.Record[0x14];
@@ -167,6 +201,54 @@ public sealed partial class Skirmish
         }
     }
 
+    /// <summary>An enemy recruit walks from the producer's exit to the settlement's home cell (AI block +61/+62), so the exit
+    /// is free for the next one (adapter: the player clears the exit by hand, the original's WRK release is not ported).</summary>
+    private void EnemyRecruitLeaves(SkirmishActor recruit)
+    {
+        var ai = _aiBlocks[Rules.EnemySlot];
+        if (ai == null) return;
+        OrderMove(recruit, new Vector2I(ai[0x61], ai[0x62]));
+    }
+
+    /// <summary>Command 58h of the enemy castle: build template +22 on the site +29/+2B (adapter). The building rules of the
+    /// port are used: ProbePlacement on the site, payment from the enemy's resources, construction over time. Templates the
+    /// skirmish has no rules for are not built. The castle's +22 (head of its production queue) is cleared afterwards.</summary>
+    private void EnemyBuild(SkirmishActor builder)
+    {
+        byte index = builder.Record[0x22];
+        builder.Record[0x22] = 0xff;
+        var templates = _templates.Armies["ARMY__02.DAT"].Templates;
+        if (index >= templates.Count() || !Rules.Units.ContainsKey(templates[index].Name) || templates[index].Name is "Замок") return;
+        var template = templates[index];
+        var cell = new Vector2I(BinaryPrimitives.ReadUInt16LittleEndian(builder.Record.AsSpan(0x29)) >> 5, BinaryPrimitives.ReadUInt16LittleEndian(builder.Record.AsSpan(0x2b)) >> 5);
+        if (!Inside(cell) || EnemyPlacement(index, cell) != ConstructionPlacementStatus.Clear) return;
+        var payment = OriginalConstructionRules.TryDebitUpfront(EnemyResources, Price(template));
+        if (!payment.Accepted) return;
+        EnemyResources = payment.Balances;
+        var building = NewEconomyActor(index, cell, false, false, 1);
+        building.ConstructionDuration = building.ConstructionRemaining = template.InitialCondition * Math.Max(1, (int)building.Parameters[0x57]) / (double)Rules.TicksPerSecond;
+        OriginalBuildingLifecycle.MarkConstruction(building.Record);
+        building.Record.AsSpan(0x22, 5).Fill(0xff); building.Record[0x20] = 0xff; building.Record[0x27] = 0xff;
+        if (template.Name == "Шахта")
+        {
+            var deposit = OriginalMineRules.Initialize(Map.Cells, Map.Width, Map.Height, (uint)building.Position.X, (uint)building.Position.Y);
+            building.Record[0x23] = deposit.Type; BinaryPrimitives.WriteUInt32LittleEndian(building.Record.AsSpan(0x24), deposit.Remaining);
+        }
+        Actors.Add(building);
+        Occupancy.WriteFootprint(building.Parameters[3], building.Parameters[4], building.Record[0x0d], (uint)building.Position.X, (uint)building.Position.Y, building.Id);
+    }
+
+    private ConstructionPlacementStatus EnemyPlacement(byte template, Vector2I cell)
+    {
+        var parameters = _templates.Armies["ARMY__02.DAT"].Templates[template].Construction;
+        if (parameters.FootprintWidth == 0) return ConstructionPlacementStatus.Rejected;
+        var result = OriginalConstructionRules.ProbePlacement(Occupancy.Width, Occupancy.Height, Map.Cells, _properties, Occupancy.Cells,
+            parameters.FootprintWidth, parameters.FootprintHeight, parameters.TerrainMask.ToArray(), (uint)(cell.X * 32 + 16), (uint)(cell.Y * 32 + 16));
+        if (result.Status != ConstructionPlacementStatus.Clear) return result.Status;
+        var area = new Rect2I(cell - new Vector2I(parameters.FootprintWidth / 2, parameters.FootprintHeight / 2), new(parameters.FootprintWidth, parameters.FootprintHeight));
+        return _reservations.Any(r => area.HasPoint(r.Key.Cell)) ? ConstructionPlacementStatus.Occupied : ConstructionPlacementStatus.Clear;
+    }
+
     /// <summary>Move one unit like <see cref="Move"/> does for the player: the nearest free standing place around the cell.</summary>
     private bool OrderMove(SkirmishActor actor, Vector2I destination)
     {
@@ -185,12 +267,13 @@ public sealed partial class Skirmish
         return false;
     }
 
-    private sealed class AiSquadWorld(Skirmish battle) : IAiGarrisonWorld, IAiSquadStateWorld
+    private sealed class AiSquadWorld(Skirmish battle) : IAiGarrisonWorld, IAiSquadStateWorld, IAiOrdersWorld
     {
         private readonly SearchWorld _search = new(battle, (byte)battle.Rules.EnemySlot);
         public IReadOnlyList<(byte[] Record, byte[] Template)> Chain(byte participant) => battle.AiChain(participant);
         public (byte[] Record, byte[] Template) Resolve(uint reference) => _search.Resolve(reference);
-        public uint Occupant(int plane, int cell) => _search.Occupant(plane, cell);
+        // Cells outside the map read memory beyond the grid in the original; here they are empty.
+        public uint Occupant(int plane, int cell) => cell >= 0 && cell < battle.Map.Width * battle.Map.Height ? _search.Occupant(plane, cell) : 0;
         public byte MapWidth => (byte)battle.Map.Width;
         public byte MapHeight => (byte)battle.Map.Height;
         public uint HostileMask(byte participant) => participant < battle.Diplomacy.Count ? battle.Diplomacy.Hostile[participant] : 0;
@@ -215,6 +298,17 @@ public sealed partial class Skirmish
         public IReadOnlyList<byte> Buildable(byte participant, uint mask, uint value) => OriginalTechRules.Buildable(battle._aiTemplates, battle._aiTree, true, mask, value);
         public byte[] Template(byte participant, byte template) => battle._aiTemplates[template];
         public uint Reference(byte[] record) => battle.Actors.FirstOrDefault(a => ReferenceEquals(a.Record, record))?.Id ?? 0;
+        public IReadOnlyList<byte> Makes(byte template) => battle._aiMakes.TryGetValue(template, out var m) ? m : [];
+        public byte TemplateCount => (byte)battle._aiTemplates.Length;
+        /// <summary>AF07 replaced by the port's building placement check (ProbePlacement), adapter.</summary>
+        public bool PlacementAllowed(byte template, byte army, byte participant, uint x, uint y)
+        {
+            var cell = new Vector2I((int)(x >> 5), (int)(y >> 5));
+            return battle.Inside(cell) && battle.EnemyPlacement(template, cell) == ConstructionPlacementStatus.Clear;
+        }
+        public byte TileClass(int cell) => cell >= 0 && cell < battle.Map.Cells.Length ? (byte)(battle._properties[(int)(battle.Map.Cells[cell] & 0xffff) * 8] & 7) : (byte)0;
+        public byte[]? Fortification(uint index) => index == 0 && battle._aiFortification.Length > 0 ? battle._aiFortification : null;
+        public bool TreeAllows(byte participant, byte template) => OriginalTechRules.Available(battle._aiTree, template);
     }
 
     private sealed class AiTurnWorld(Skirmish battle) : IAiTurnWorld
