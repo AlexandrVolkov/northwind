@@ -70,3 +70,45 @@ public partial class TestRunner
         public void Contacted(FirstContact contact) { }
     }
 }
+
+public partial class TestRunner
+{
+    private void OriginalAiInitChecks()
+    {
+        using var reference = GameData.Read<JsonDocument>("res://tests/fixtures/ai-init.json");
+        var root = reference.RootElement;
+        var templates = GameData.Read<TemplatesData>("res://assets/imported/templates.json").Armies["ARMY__02.DAT"].Templates;
+        byte[] Dat(int index) => Convert.FromHexString(templates[index].RawRecordHex);
+        var table = GameData.Read<OriginalAiData>("res://data/original_ai.json").Table();
+        Check(table.Length == OriginalAiRules.CharacterSize * OriginalAiRules.CharacterCount, "AI character table has 9 records");
+        Check(Convert.ToHexStringLower(SHA256.HashData(table)) == root.GetProperty("character_table_sha256").GetString(), "AI character table matches LE:3 ED43");
+        using var digest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        int count = 0;
+        foreach (var c in root.GetProperty("cases").EnumerateArray())
+        {
+            byte player = (byte)c.GetProperty("player").GetInt32();
+            uint w = c.GetProperty("width").GetUInt32(), h = c.GetProperty("height").GetUInt32();
+            byte index = 0;
+            foreach (var part in c.GetProperty("participants").EnumerateArray())
+            {
+                var participant = new byte[0xf5]; participant[0x16] = (byte)part.GetProperty("character").GetInt32();
+                var chain = new List<(byte[], byte[])>();
+                foreach (var o in part.GetProperty("objects").EnumerateArray())
+                {
+                    int t = o[0].GetInt32();
+                    var rec = CombatUnit((byte)t, index, (byte)o[3].GetInt32(), 0, o[1].GetUInt32(), o[2].GetUInt32(), 1);
+                    rec[0x14] = (byte)o[4].GetInt32(); BinaryPrimitives.WriteUInt32LittleEndian(rec.AsSpan(0x10), 0x40);
+                    chain.Add((rec, Dat(t)));
+                }
+                var ai = new byte[OriginalAiRules.BlockSize]; Array.Fill(ai, (byte)0x5a);
+                OriginalAiRules.Initialize(ai, participant, index, player, table, chain, w, h);
+                digest.AppendData(ai); digest.AppendData(participant.AsSpan(0x16, 1));
+                index++;
+            }
+            count++;
+        }
+        var result = root.GetProperty("results").GetProperty("init");
+        Check(count == result.GetProperty("case_count").GetInt32(), $"AI init reference coverage ({count})");
+        Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(), "AI block initialisation 1E53A matches original x86");
+    }
+}
