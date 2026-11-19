@@ -26,6 +26,10 @@ public partial class SkirmishMain : Node2D
     public byte Pan { get; private set; } = OriginalScrollRules.DefaultPan;
     public (ushort First, ushort Last) CursorFamily { get; private set; } = OriginalScrollRules.Arrow;
     public int CursorHotSpot { get; private set; }
+    /// <summary>WASD scrolling speed in original pixels per second (port convenience).</summary>
+    public const float WasdSpeed = 560;
+    /// <summary>Wheel zoom limits relative to one original pixel per interface pixel (port convenience).</summary>
+    public const float MinZoom = .5f, MaxZoom = 2.5f;
     private double _scrollTicks; private byte _scrollLast;
     public Skirmish Battle { get; private set; } = null!;
     public HashSet<uint> Selection { get; } = [];
@@ -85,6 +89,9 @@ public partial class SkirmishMain : Node2D
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), GameData.Read<SkirmishRules>("res://data/skirmish.json"));
         Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false;
         PendingOrder = 0; Hud.MenuOpen = false;
+        // DOSBox screenshots: the idle castle shows «Выбор» and «Разрушить» (WorkFlags bits 2 and 5 = 24h) although its OBE record holds 0;
+        // the WRK handler that sets them is not ported, so the observed idle value is applied here.
+        if (Battle.PlayerCastle.Record[0x0f] == 0) Battle.PlayerCastle.Record[0x0f] = 0x24;
         _terrainRevision = -1; RefreshTerrain(); FocusHero(); RefreshUi(); QueueRedraw();
     }
     public void SelectArmy()
@@ -99,6 +106,17 @@ public partial class SkirmishMain : Node2D
         Selection.Clear(); Selection.Add(Battle.PlayerCastle.Id); PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false;
         Focus(Battle.PlayerCastle.Position); RefreshUi();
     }
+    /// <summary>Castle build list opened by the «eye» button (WORK sprite 874) as on DOSBox screenshots: barracks, sawmill, mine,
+    /// farm, worker. The original greys the mine with full resources for a reason not found yet; the port greys unaffordable items.</summary>
+    public bool BuildMenuOpen { get; set; }
+    public sealed record BuildItem(TemplateEntry Template, int TemplateIndex, Action Start);
+    public BuildItem[] CastleBuildItems() =>
+    [
+        new(Battle.BarracksTemplate, 3, BeginBarracksPlacement), new(Battle.MillTemplate, 4, BeginMillPlacement),
+        new(Battle.MineTemplate, 6, BeginMinePlacement), new(Battle.FarmTemplate, 9, BeginFarmPlacement), new(Battle.WorkerTemplate, 10, HireWorker),
+    ];
+    public bool BuildMenuVisible => BuildMenuOpen && Selection.Count == 1 && Selection.Contains(Battle.PlayerCastle.Id) && Battle.PlayerCastle.Alive;
+    public TemplateEntry? PlacingTemplate => PlacingBarracks ? Battle.BarracksTemplate : PlacingMill ? Battle.MillTemplate : PlacingMine ? Battle.MineTemplate : PlacingFarm ? Battle.FarmTemplate : null;
     public void HireWorker()
     {
         if (!Selection.Contains(Battle.PlayerCastle.Id)) return;
@@ -218,6 +236,7 @@ public partial class SkirmishMain : Node2D
             case (2, 3): PendingOrder = 3; break;
             case (4, 4) when unit.Worker: PendingOrder = 4; break;
             case (8, 7) when unit.Worker: PendingOrder = 8; break;
+            case var _ when slot.Sprite == 874 && unit.Id == Battle.PlayerCastle.Id: BuildMenuOpen = !BuildMenuOpen; break;
             default: Battle.Log($"Приказ «{slot.Label}» ещё не перенесён."); break;
         }
     }
@@ -247,7 +266,11 @@ public partial class SkirmishMain : Node2D
             keys && Input.IsKeyPressed(Key.Left), keys && Input.IsKeyPressed(Key.Right), keys && Input.IsKeyPressed(Key.Up), keys && Input.IsKeyPressed(Key.Down));
         var step = OriginalScrollRules.Step(input, unchecked((byte)(ulong)_scrollTicks), _scrollLast, Pan);
         _scrollLast = step.LastTimer; CursorFamily = (step.CursorFirst, step.CursorLast); CursorHotSpot = 0;
-        if (CursorFamily == OriginalScrollRules.Arrow && PendingOrder is 2 or 3 && MapScreenRect.HasPoint(GetViewport().GetMousePosition()))
+        var logical = ToHud(GetViewport().GetMousePosition());
+        if (CursorFamily == OriginalScrollRules.Arrow && Hud.BuildItemAt(logical) != null) CursorFamily = OriginalOrderCursor.Select;   // sickle over the list
+        else if (CursorFamily == OriginalScrollRules.Arrow && PlacingBuilding && MapScreenRect.HasPoint(GetViewport().GetMousePosition()))
+        { CursorFamily = OriginalOrderCursor.Place; CursorHotSpot = OriginalOrderCursor.HotSpot; }
+        else if (CursorFamily == OriginalScrollRules.Arrow && PendingOrder is 2 or 3 && MapScreenRect.HasPoint(GetViewport().GetMousePosition()))
         {
             // Port pending orders 2 (move) and 3 (attack) correspond to the original modes 1 and 2; gather/mine cursors are not confirmed.
             var hovered = Battle.At(GetGlobalMousePosition());
@@ -256,10 +279,20 @@ public partial class SkirmishMain : Node2D
             CursorFamily = OriginalOrderCursor.For(PendingOrder == 2 ? 1 : 2, cls); CursorHotSpot = OriginalOrderCursor.HotSpot;
         }
         if (step.Dx != 0 || step.Dy != 0) { Camera.Position += new Vector2(step.Dx, step.Dy) * 32; ClampCamera(); }
+        // Port convenience (requested): WASD scrolls smoothly in addition to the original arrow keys.
+        var wasd = Vector2.Zero;
+        if (keys)
+        {
+            if (Input.IsPhysicalKeyPressed(Key.A)) wasd.X--;
+            if (Input.IsPhysicalKeyPressed(Key.D)) wasd.X++;
+            if (Input.IsPhysicalKeyPressed(Key.W)) wasd.Y--;
+            if (Input.IsPhysicalKeyPressed(Key.S)) wasd.Y++;
+        }
+        if (wasd != Vector2.Zero) { Camera.Position += wasd.Normalized() * (float)delta * WasdSpeed / Camera.Zoom.X * HudScale; ClampCamera(); }
     }
     /// <summary>Pointer scrolling at the screen edge (can be turned off for tests).</summary>
     public bool EdgeScrolling { get; set; } = true;
-    public void ExitMission() => GetTree().ChangeSceneToFile("res://scenes/main.tscn");
+    public void ExitMission() => GetTree().ChangeSceneToFile("res://scenes/menus.tscn");
     public override void _Process(double delta)
     {
         if (!_ready) return;
@@ -268,6 +301,8 @@ public partial class SkirmishMain : Node2D
         Battle.Advance(delta * Speed); RefreshTerrain();
         Selection.RemoveWhere(id => Battle.Find(id) == null);
         ScrollMap(delta);
+        // While a building is being placed the castle also shows slot 4 «Построить» (bit 4), as on the screenshot.
+        if (Battle.PlayerCastle.Alive) Battle.PlayerCastle.Record[0x0f] = (byte)(PlacingBuilding ? Battle.PlayerCastle.Record[0x0f] | 0x10 : Battle.PlayerCastle.Record[0x0f] & ~0x10);
         _hover = (int)(Battle.At(GetGlobalMousePosition())?.Id ?? 0);
         RefreshUi(); QueueRedraw(); _markers.QueueRedraw(); Hud.QueueRedraw();
     }
@@ -360,8 +395,17 @@ public partial class SkirmishMain : Node2D
                 var point = GetViewport().GetCanvasTransform().AffineInverse() * button.Position;
                 var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
                 var mill = PlacingFarm ? Battle.BuildFarm(cell) : PlacingBarracks ? Battle.BuildBarracks(cell) : PlacingMine ? Battle.BuildMine(cell) : Battle.BuildMill(cell);
-                if (mill != null) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; Selection.Clear(); Selection.Add(mill.Id); }
+                // The original keeps the castle selected and its build list open after placing (DOSBox screenshots).
+                if (mill != null) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; if (!BuildMenuVisible) { Selection.Clear(); Selection.Add(mill.Id); } }
                 RefreshUi(); return;
+            }
+            if (button.ButtonIndex is MouseButton.WheelUp or MouseButton.WheelDown)
+            {
+                // Port convenience (requested): zoom around the pointer; the original had a fixed scale.
+                var before = GetGlobalMousePosition();
+                float factor = Mathf.Clamp(Camera.Zoom.X / HudScale * (button.ButtonIndex == MouseButton.WheelUp ? 1.15f : 1 / 1.15f), MinZoom, MaxZoom);
+                Camera.Zoom = Vector2.One * HudScale * factor; Camera.ForceUpdateScroll();
+                Camera.Position += before - GetGlobalMousePosition(); ClampCamera(); return;
             }
             if (button.ButtonIndex == MouseButton.Left && PendingOrder != 0)
                 ApplyPanelOrder(GetViewport().GetCanvasTransform().AffineInverse() * button.Position);
@@ -414,7 +458,17 @@ public partial class SkirmishMain : Node2D
             var parameters = (PlacingFarm ? Battle.FarmTemplate : PlacingBarracks ? Battle.BarracksTemplate : PlacingMine ? Battle.MineTemplate : Battle.MillTemplate).Construction;
             var rect = new Rect2((Vector2)((cell - new Vector2I(parameters.FootprintWidth / 2, parameters.FootprintHeight / 2)) * 32), new Vector2(parameters.FootprintWidth * 32, parameters.FootprintHeight * 32));
             bool clear = !Battle.Paused && Battle.CanAfford(PlacingFarm ? Battle.FarmTemplate : PlacingBarracks ? Battle.BarracksTemplate : PlacingMine ? Battle.MineTemplate : Battle.MillTemplate) && (PlacingFarm ? Battle.ProbeFarm(cell) : PlacingBarracks ? Battle.ProbeBarracks(cell) : PlacingMine ? Battle.ProbeMine(cell) : Battle.ProbeMill(cell)).Status == ConstructionPlacementStatus.Clear;
-            var color = clear ? new Color("8de5b8") : new Color("ef8272"); DrawRect(rect, new Color(color, .2f)); DrawRect(rect, color, false, 2);
+            if (_ui.Visible) { var color = clear ? new Color("8de5b8") : new Color("ef8272"); DrawRect(rect, new Color(color, .2f)); DrawRect(rect, color, false, 2); }
+            else
+            {
+                // Original placement outline: 1-px blue (40,28,223) with cut corners; the colour of a refused place is an assumption.
+                var c = clear ? new Color(40 / 255f, 28 / 255f, 223 / 255f) : new Color(200 / 255f, 30 / 255f, 30 / 255f);
+                var r = rect.Grow(-1);
+                DrawRect(new Rect2(r.Position.X + 3, r.Position.Y, r.Size.X - 6, 1), c); DrawRect(new Rect2(r.Position.X + 3, r.End.Y - 1, r.Size.X - 6, 1), c);
+                DrawRect(new Rect2(r.Position.X, r.Position.Y + 3, 1, r.Size.Y - 6), c); DrawRect(new Rect2(r.End.X - 1, r.Position.Y + 3, 1, r.Size.Y - 6), c);
+                foreach (var (cx, cy, dx, dy) in new[] { (r.Position.X, r.Position.Y, 1, 1), (r.End.X - 1, r.Position.Y, -1, 1), (r.Position.X, r.End.Y - 1, 1, -1), (r.End.X - 1, r.End.Y - 1, -1, -1) })
+                { DrawRect(new Rect2(cx + dx, cy + dy * 2, 1, 1), c); DrawRect(new Rect2(cx + dx * 2, cy + dy, 1, 1), c); }
+            }
             if (PlacingMine && cell.X >= 0 && cell.Y >= 0 && cell.X < Battle.Map.Width && cell.Y < Battle.Map.Height)
             {
                 var deposit = Battle.MineDepositAt(cell);
