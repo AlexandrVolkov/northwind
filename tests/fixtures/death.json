@@ -1,0 +1,128 @@
+{
+  "format_version": 1,
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475"
+  },
+  "templates_sha256": {
+    "0": "096dcc81394f05943ea0ff4d5df154bc0c4cbc071b81f7bf3ecbcebb789e5b5f",
+    "1": "b477e3531513d3b8ce7618cb1774cf13978bf8e8b11462ee66ae6362516dc872",
+    "18": "9face01042e1506124451d5f06ddbee14be9a7ae4453a9398d2c17f1ab8c5e26",
+    "20": "e9c1f4ebfa34cec0233820a4c66b00c8ad692e0bd2118078289086106a5cfd4e"
+  },
+  "results": {
+    "dispatch": {
+      "case_count": 20,
+      "sha256": "e53a258df97b24e3189579c817bff934a1cb6e66c78c0f447ff157c9ac050713"
+    },
+    "death": {
+      "case_count": 76800,
+      "sha256": "62bf724575972dcefdccba0c8d591151727cf668de6c4f87adf45d1d0741b725"
+    }
+  },
+  "dispatch": {
+    "flags": [
+      0,
+      1048576
+    ],
+    "health": [
+      0,
+      1,
+      244,
+      243,
+      128
+    ],
+    "marks": [
+      0,
+      128
+    ]
+  },
+  "death": {
+    "templates": [
+      0,
+      1,
+      18,
+      20
+    ],
+    "health": [
+      0,
+      1,
+      252,
+      244,
+      243,
+      241,
+      240,
+      251,
+      250,
+      239
+    ],
+    "marks": [
+      0,
+      8,
+      16,
+      24,
+      128
+    ],
+    "counters": [
+      0,
+      1,
+      2
+    ],
+    "parity": [
+      0,
+      1
+    ],
+    "headings": [
+      0,
+      3,
+      7,
+      255
+    ],
+    "cells": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        0
+      ],
+      [
+        5,
+        3
+      ]
+    ],
+    "corpses": [
+      [
+        255,
+        255,
+        255,
+        255
+      ],
+      [
+        4,
+        5,
+        6,
+        7
+      ]
+    ],
+    "kinds": [
+      [
+        3,
+        0,
+        2,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ]
+    ]
+  }
+}

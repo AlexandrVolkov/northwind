@@ -9,6 +9,17 @@ from PIL import Image
 from import_game import decode_spr_frame
 
 
+def action_frames(raw, base):
+    """Swing frames (9406: base + 8*DAT[4A] + direction*DAT[4B]) and death frames."""
+    return set(range(base + 8*raw[0x4a], base + 8*raw[0x4a] + 8*raw[0x4b])) | death_frames(raw, base)
+
+
+def death_frames(raw, base):
+    """A4DF: base + 8*(DAT[4A]+DAT[4B]) + 4*sum(DAT[4F..52]) frames for four directions and hit kinds."""
+    start = base + 8*((raw[0x4a] + raw[0x4b]) & 255)
+    return set(range(start, start + 4*sum(raw[0x4f:0x53])))
+
+
 def prepare(source, output):
     tables=json.loads((output/'templates.json').read_text(encoding='utf-8'))['armies']
     scenario=json.loads((output/'scenario.json').read_text(encoding='utf-8'))
@@ -29,6 +40,7 @@ def prepare(source, output):
             frames.add(base)
             if rules['units'][obj['template_name']]['damage']:
                 frames.update(range(base,base+8*raw[0x4a]))
+                frames.update(action_frames(raw, base))
     # Runtime economy objects are not initially present in the player's source slot.
     for index in [3,4,6,9,10,11]:
         key=('ARMY__02.DAT',index);entry=tables[key[0]]['templates'][index]
@@ -36,6 +48,8 @@ def prepare(source, output):
         wanted.setdefault(key,set()).update(range(base,base+(8*raw[0x4a] if index in [10,11] else raw[0x4a]+1)))
         if index == 10:
             wanted[key].update(range(base + 8*raw[0x4a], base + 8*raw[0x4a] + 8*raw[0x4b]))
+        if index in [10,11]:
+            wanted[key].update(death_frames(raw, base))
     entries=[];images=[]
     for (filename,index),frames in sorted(wanted.items()):
         entry=tables[filename]['templates'][index];sprite_name=filename.replace('.DAT','.SPR')

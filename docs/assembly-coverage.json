@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "2fc3a206383c38b4d162b9b026dfc9b964eb81c9fd3179fd80ab278dbcb7a25f",
+  "annotation_sha256": "7f05e2f672060b31a125d09b689bd5a8455d378f121df70acdb32ebc472ec094",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 5000,
-        "ported": 5339,
-        "unreviewed": 136543
+        "ported": 5612,
+        "unreviewed": 136270
       },
       "linear_rows": 45008,
       "flow_candidate_instructions": 30465,
@@ -571,6 +571,22 @@
         },
         {
           "start": 38040,
+          "end": 38355,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 38355,
+          "end": 38411,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "death-dispatch"
+          ]
+        },
+        {
+          "start": 38411,
           "end": 38483,
           "status": "unreviewed",
           "classification": "unknown",
@@ -664,10 +680,19 @@
         },
         {
           "start": 39929,
-          "end": 42424,
+          "end": 42207,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 42207,
+          "end": 42424,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "death-animation"
+          ]
         },
         {
           "start": 42424,
