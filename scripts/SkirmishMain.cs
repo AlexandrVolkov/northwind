@@ -80,6 +80,7 @@ public partial class SkirmishMain : Node2D
             GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), GameData.Read<SkirmishRules>("res://data/skirmish.json"));
         Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false;
+        PendingOrder = 0; Hud.MenuOpen = false;
         _terrainRevision = -1; RefreshTerrain(); FocusHero(); RefreshUi(); QueueRedraw();
     }
     public void SelectArmy()
@@ -261,7 +262,12 @@ public partial class SkirmishMain : Node2D
                 case Key.C: SelectCastle(); break;
                 case Key.R: Restart(); break;
                 case Key.X: Battle.Stop(Selection); break;
-                case Key.Escape: if (PlacingBuilding) { PlacingMill = false; PlacingFarm = PlacingBarracks = PlacingMine = false; } else Selection.Clear(); break;
+                case Key.Escape:
+                    if (PendingOrder != 0) PendingOrder = 0;
+                    else if (PlacingBuilding) { PlacingMill = false; PlacingFarm = PlacingBarracks = PlacingMine = false; }
+                    else if (Hud.MenuOpen) Hud.MenuOpen = false;
+                    else Selection.Clear();
+                    break;
                 case Key.F10: GetTree().ChangeSceneToFile("res://scenes/main.tscn"); break;
                 case Key.F1: _ui.Visible = !_ui.Visible; break;
             }
@@ -272,6 +278,7 @@ public partial class SkirmishMain : Node2D
             if (!button.Pressed) return;
             if (button.ButtonIndex is MouseButton.Left or MouseButton.Right && Hud.Click(ToHud(button.Position), button.ButtonIndex)) return;
             if (!MapScreenRect.HasPoint(button.Position)) return;
+            if (button.ButtonIndex == MouseButton.Right && PendingOrder != 0) { PendingOrder = 0; return; }
             if (PlacingBuilding && button.ButtonIndex == MouseButton.Right) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; RefreshUi(); return; }
             if (PlacingBuilding && button.ButtonIndex == MouseButton.Left)
             {

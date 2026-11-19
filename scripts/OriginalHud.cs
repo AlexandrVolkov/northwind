@@ -120,11 +120,13 @@ public partial class OriginalHud : Node2D
             else if (ScrollFaster.HasPoint(point)) Game.ChangeScrollSpeed(+1);
         }
         else if (MenuButton.HasPoint(point)) MenuOpen = true;
-        else if (SingleUnit() is { } unit && Template(unit) is { } template)
-            for (int k = 0; k < template.Slots.Count; k++)
-                if (template.Slots[k].Sprite != 0 && Slot(k).HasPoint(point)) Game.Order(template.Slots[k].Sprite);
         else if (Minimap.HasPoint(point))
             Game.FocusWorld((point - Minimap.Position) / Minimap.Size * new Vector2(Game.Battle.Map.Width, Game.Battle.Map.Height) * 32);
+        else if (SingleUnit() is { } unit && Template(unit) is { } template)
+        {
+            for (int k = 0; k < template.Slots.Count; k++)
+                if (template.Slots[k].Sprite != 0 && Slot(k).HasPoint(point)) Game.Order(template.Slots[k].Sprite);
+        }
         QueueRedraw();
         return true;
     }
