@@ -193,7 +193,7 @@ public sealed partial class Skirmish
     {
         foreach (var building in Actors.Where(a => a.Alive && a.Structure && (a.ConstructionRemaining > 0 || a.Source.TemplateName is "Лесопилка" or "Ферма" or "Казарма" or "Шахта")).ToArray())
         {
-            if (building.Team != 0 && building.ConstructionRemaining <= 0) continue;   // the enemy's economy is not simulated yet
+            if (building.Team != 0 && building.ConstructionRemaining <= 0 && building.Source.TemplateName != "Лесопилка") continue;
             if (building.ConstructionRemaining > 0)
             {
                 var maintenance = OriginalBuildingRules.StepMaintenance(new(building.Record[0x19], building.Record[0x16], building.Record[0x0f],
@@ -217,9 +217,11 @@ public sealed partial class Skirmish
                 if (building.Team != 0) { EnemyBuildingFinished(building); continue; }
             }
             if (building.Source.TemplateName != "Лесопилка") continue;
-            var state = OriginalLumbermillRules.Process(new(building.Record[0x23], building.Record[0x24], Wood, ProducedWood), building.Parameters[0x79]);
+            // The enemy's lumbermill credits the enemy's wood (participant +1C); its statistics are not kept (adapter).
+            var wallet = Wallet(building.Team);
+            var state = OriginalLumbermillRules.Process(new(building.Record[0x23], building.Record[0x24], wallet.Second, building.Team == 0 ? ProducedWood : 0), building.Parameters[0x79]);
             building.Record[0x23] = state.Countdown; building.Record[0x24] = state.QueuedLoads;
-            Wood = state.Stock; ProducedWood = state.Statistics;
+            if (building.Team == 0) { Wood = state.Stock; ProducedWood = state.Statistics; } else EnemyResources = wallet with { Second = state.Stock };
             uint visitorId = OriginalWorkerDelivery.WaitingWorker(Occupancy.Width, Occupancy.Height, Occupancy.Cells, building.Record[0x0d],
                 (uint)building.Position.X, (uint)building.Position.Y, building.Parameters);
             if (Find(visitorId) is { } visitor)
@@ -247,14 +249,14 @@ public sealed partial class Skirmish
     {
         uint targetId = BinaryPrimitives.ReadUInt32LittleEndian(worker.Record.AsSpan(0x1c));
         var mill = Find(targetId);
-        if (mill == null || mill.Team != 0 || OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y, [ReceiverCandidate(mill)]) == 0)
+        if (mill == null || mill.Team != worker.Team || OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y, [ReceiverCandidate(mill)]) == 0)
         {
             ClearDelivery(worker); worker.Route.Clear();
             if (worker.Stepping) { worker.Record[0x2d] &= 15; worker.JobText = "Получатель недоступен"; MoveTick(worker); return; }
             worker.Record[0x2d] = 0;
             var preferred = Find(worker.PreferredMill);
-            uint selected = preferred is { Team: 0 } ? OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y, [ReceiverCandidate(preferred)]) : 0;
-            if (selected == 0) selected = OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y, Actors.Where(a => a.Team == 0).Select(ReceiverCandidate));
+            uint selected = preferred != null && preferred.Team == worker.Team ? OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y, [ReceiverCandidate(preferred)]) : 0;
+            if (selected == 0) selected = OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y, Actors.Where(a => a.Team == worker.Team).Select(ReceiverCandidate));
             mill = Find(selected);
             if (mill == null) { worker.JobText = "С грузом · нужна лесопилка"; return; }
             BinaryPrimitives.WriteUInt32LittleEndian(worker.Record.AsSpan(0x1c), selected); worker.Record[0x15] = 1;

@@ -154,7 +154,7 @@ public partial class TestRunner
         public byte Global19E9 => 0xff;
         public void Message(ReadOnlySpan<byte> squad, uint text) { }
         public void Rescue(Span<byte> squad) { }
-        public void WorkerState(Span<byte> squad) { }
+        public void WorkerState(Span<byte> ai, int at) { }
         public Span<byte> Block(byte participant) => Blocks[participant];
         public ReadOnlySpan<byte> Participant(byte participant) => Participants[participant];
         public byte ParticipantCount => count;

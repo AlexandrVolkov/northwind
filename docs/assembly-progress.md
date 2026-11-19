@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 114657 | 5512 | 97 | 26616 | 44 |
+| LE:1 | 146882 | 113456 | 5512 | 97 | 27817 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -167,7 +167,9 @@
 | LE:1 `0x1ED26..0x1EF26` | AI squad step loop and steps 0..3 | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) | step 4 (1EF26) is a hook |
 | LE:1 `0x1EFCC..0x1EFF9` | AI squad step 5: formation march | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) |  |
 | LE:1 `0x1F078..0x1F476` | AI squad states 0..3 and the state loop | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | the state setters 1F1C7, 1F306 and 1F464 are field writes made by the military requests, not ported yet |
+| LE:1 `0x1F476..0x1F5F1` | AI squad state 9: timber workers | ported | [ai.md](../docs/ai.md); [ai-workers.json](../tests/fixtures/ai-workers.json) |  |
 | LE:1 `0x1F5F1..0x1F62B` | Set worker squad state 9 with its target area | ported | [ai.md](../docs/ai.md); [ai-economy.json](../tests/fixtures/ai-economy.json) |  |
+| LE:1 `0x1F653..0x1F71A` | AI squad state 10: mine workers | ported | [ai.md](../docs/ai.md); [ai-workers.json](../tests/fixtures/ai-workers.json) |  |
 | LE:1 `0x1F71A..0x1F72C` | Set worker squad state 10 | ported | [ai.md](../docs/ai.md); [ai-economy.json](../tests/fixtures/ai-economy.json) |  |
 | LE:1 `0x1F72C..0x1FBB1` | AI squad states 4..8 | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0x1FBB1..0x20095` | AI squad retreat, march, fight and strength helpers | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | 20001 (stuck-member rescue) and the A4C2 message display are hooks |
@@ -177,7 +179,10 @@
 | LE:1 `0x2035A..0x20408` | Nearest free object of a class | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x20408..0x205FB` | Nearest visible hostile object in a cell area | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) | object visibility OBE[20] is not maintained by the skirmish yet |
 | LE:1 `0x205FB..0x206D5` | AI squad census from its members | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) |  |
+| LE:1 `0x206D5..0x20730` | Random idle member of a squad | ported | [ai.md](../docs/ai.md); [ai-workers.json](../tests/fixtures/ai-workers.json) |  |
+| LE:1 `0x20730..0x20771` | Squad member with an activity code | ported | [ai.md](../docs/ai.md); [ai-workers.json](../tests/fixtures/ai-workers.json) |  |
 | LE:1 `0x207CB..0x2087C` | Squad stands; members outside the area return | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) |  |
+| LE:1 `0x2095D..0x2098B` | Squad of a state whose area holds a cell | ported | [ai.md](../docs/ai.md); [ai-workers.json](../tests/fixtures/ai-workers.json) |  |
 | LE:1 `0x2098B..0x209B0` | Find AI squad by state and target object | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) |  |
 | LE:1 `0x209B0..0x20DD0` | AI garrison: unit orders, building guards, hostile buildings, patrols, wandering | ported | [ai.md](../docs/ai.md); [ai-garrison.json](../tests/fixtures/ai-garrison.json) |  |
 | LE:1 `0x20DD0..0x21459` | AI military requests (list +1AB, modes 1..10) | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) | bytes filled from register leftovers are written as zero |
@@ -193,7 +198,10 @@
 | LE:1 `0x221AE..0x223B4` | AI economy executor over list +4F3 (workers, mines, lumbermill) | ported | [ai.md](../docs/ai.md); [ai-economy.json](../tests/fixtures/ai-economy.json) | D363 occupancy check is a hook |
 | LE:1 `0x223B4..0x22435` | List templates of a DAT class | ported | [tech.md](../docs/tech.md); [tech.json](../tests/fixtures/tech.json); [original_tech.json](../data/original_tech.json) |  |
 | LE:1 `0x22435..0x224D1` | Gather free workers into a squad | ported | [ai.md](../docs/ai.md); [ai-economy.json](../tests/fixtures/ai-economy.json) |  |
+| LE:1 `0x224D1..0x2258F` | Nearest terrain cell of a class in the squad area | ported | [ai.md](../docs/ai.md); [ai-workers.json](../tests/fixtures/ai-workers.json) | The original's distance formula (/dx/ - y against ±y) is kept |
+| LE:1 `0x2258F..0x22613` | Random seen grove cell around the squad centre | ported | [ai.md](../docs/ai.md); [ai-workers.json](../tests/fixtures/ai-workers.json) |  |
 | LE:1 `0x22613..0x2268E` | Random seen ore cell around the home for a mine | ported | [ai.md](../docs/ai.md); [ai-economy.json](../tests/fixtures/ai-economy.json) |  |
+| LE:1 `0x2268E..0x226F1` | Terrain class present in an area | ported | [ai.md](../docs/ai.md); [ai-workers.json](../tests/fixtures/ai-workers.json) |  |
 | LE:1 `0x226F1..0x227C7` | AI upkeep: repair requests and decay | ported | [ai.md](../docs/ai.md); [ai-upkeep.json](../tests/fixtures/ai-upkeep.json) |  |
 | LE:1 `0x227C7..0x22E46` | AI order executor (list +34F, modes 1..10) | ported | [ai.md](../docs/ai.md); [ai-orders.json](../tests/fixtures/ai-orders.json); [original_producers.json](../data/original_producers.json) | order mode 5 leaves [ED39]/[ED3D] = 68h/8, as the original |
 | LE:1 `0x22E46..0x22E85` | Random open template of a DAT class | ported | [ai.md](../docs/ai.md); [ai-research.json](../tests/fixtures/ai-research.json) |  |

@@ -88,9 +88,9 @@ public sealed partial class Skirmish
     {
         if (!producer.Alive || producer.ConstructionRemaining > 0 || QueuedTemplate(producer) is not { } template) return;
         var record = producer.Record;
-        if (producer.Team != 0 && (!Rules.Units.TryGetValue(template.Name, out var unitRules) || template.TemplateIndex == 10 || unitRules.Damage == 0
+        if (producer.Team != 0 && template.TemplateIndex != 10 && (!Rules.Units.TryGetValue(template.Name, out var unitRules) || unitRules.Damage == 0
             || (!_soldierSeeds.ContainsKey(template.TemplateIndex) && unitRules.Range > 48)))
-        { OriginalProductionRules.Complete(record); return; }   // no rules, a worker (no enemy economy), or a ranged unit without a seed record: dropped
+        { OriginalProductionRules.Complete(record); return; }   // no rules, or a ranged unit without a seed record: dropped
         if (record[0x15] == 0)
         {
             var payment = OriginalConstructionRules.TryDebitUpfront(Wallet(producer.Team), Price(template));
