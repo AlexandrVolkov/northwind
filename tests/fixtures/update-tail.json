@@ -1,0 +1,54 @@
+{
+  "format_version": 1,
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8"
+  },
+  "tail": {
+    "health": [
+      0,
+      1,
+      10,
+      127,
+      128,
+      255
+    ],
+    "previous": [
+      0,
+      10
+    ],
+    "targets": [
+      0,
+      1
+    ],
+    "target_flags": [
+      0,
+      512,
+      65023,
+      65535
+    ],
+    "target_health": [
+      0,
+      1,
+      127,
+      128,
+      255
+    ],
+    "flags": [
+      0,
+      551,
+      65535
+    ],
+    "ticks": [
+      0,
+      1,
+      7,
+      8
+    ]
+  },
+  "results": {
+    "tail": {
+      "case_count": 5760,
+      "sha256": "da40bf5d87e01f7997c8a40b77ca7ae2170855920e7132e3010817f0ce6137ed"
+    }
+  }
+}

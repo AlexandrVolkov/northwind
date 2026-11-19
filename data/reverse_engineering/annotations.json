@@ -1931,6 +1931,40 @@
         "scripts/Skirmish.cs"
       ],
       "limitations": ""
+    },
+    {
+      "id": "update-tail",
+      "module": "LE:1",
+      "start": 17229,
+      "end": 17284,
+      "name": "Object update tail: previous condition, stale target, periodic mark reset",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/update-tail.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCombatRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "update-traversal",
+      "module": "LE:1",
+      "start": 17127,
+      "end": 17229,
+      "name": "Traverse settlements and object chains, dispatch AH=1",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/game-timing.md"
+      ],
+      "implementation": [
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": "Юниты обходятся по владельцу; здания и юниты не в одной цепочке пула."
     }
   ]
 }

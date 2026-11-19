@@ -153,4 +153,15 @@ public static class OriginalCombatRules
         return false;
     }
 
+
+    /// <summary>42BB tail 434D..4384 after each AH=1 update: previous condition, removed/dead target, periodic hit-mark reset.</summary>
+    public static void AfterUpdate(Span<byte> unit, ReadOnlySpan<byte> target, byte tick)
+    {
+        unit[0x1a] = unit[0x19];
+        if (U32(unit, 0x1c) != 0 && (target.IsEmpty || (BinaryPrimitives.ReadUInt16LittleEndian(target[0x17..]) & 0x200) != 0 || (sbyte)target[0x19] < 0))
+            BinaryPrimitives.WriteUInt32LittleEndian(unit[0x1c..], 0);
+        if ((tick & 7) == 0)
+            BinaryPrimitives.WriteUInt16LittleEndian(unit[0x17..], (ushort)(BinaryPrimitives.ReadUInt16LittleEndian(unit[0x17..]) & 0xfdd8));
+    }
+
 }

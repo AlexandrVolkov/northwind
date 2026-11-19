@@ -31,8 +31,8 @@ public sealed class SkirmishActor
     public int Team { get; init; }
     /// <summary>Original condition byte OBE[19] (signed); damage, healing and death act on the record.</summary>
     public int Health { get => Math.Max(0, (int)(sbyte)Record[0x19]); set => Record[0x19] = (byte)Math.Clamp(value, 0, 127); }
-    /// <summary>OBE[1A] for units (90E9 regeneration limit); DAT initial condition for structures.</summary>
-    public int MaxHealth => Structure ? Math.Max(1, (int)Template.InitialCondition) : Math.Max(1, (int)Record[0x1a]);
+    /// <summary>DAT initial condition. OBE[1A] is the condition at the previous update (42BB), not a maximum.</summary>
+    public int MaxHealth => Math.Max(1, (int)Template.InitialCondition);
     public bool Alive => Health > 0;
     /// <summary>A completed building at or below its DAT[46] condition threshold counts as destroyed (8ABF/C439 use the same test).</summary>
     public bool Ruined => Structure && ConstructionRemaining <= 0 && (sbyte)Record[0x19] <= (sbyte)Parameters[0x46];
@@ -300,12 +300,24 @@ public sealed partial class Skirmish : IDisposable
         TickMining();
         TickProduction();
         TickPopulation();
-        foreach (var actor in Actors.Where(a => a.Alive && !a.Structure).ToArray())
+        // 42BB visits the settlements in order and each settlement's objects in pool order.
+        foreach (var actor in Actors.Where(a => a.Alive && !a.Structure).OrderBy(a => a.Record[3]).ToArray())
         {
             if (!actor.Alive) continue;
+            UpdateUnit(actor, dt);
+            if (!actor.Alive) continue;
+            var engaged = Find(BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(0x1c)));
+            OriginalCombatRules.AfterUpdate(actor.Record, engaged != null ? engaged.Record : ReadOnlySpan<byte>.Empty, _globalTick);
+        }
+        if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";
+        else if (!Objective.Standing && !Actors.Any(a => a.Team == 1 && !a.Structure && a.Alive)) Outcome = "Победа — вражеское поселение разбито";
+    }
+    private void UpdateUnit(SkirmishActor actor, double dt)
+    {
+            if (!actor.Alive) return;
             actor.AttackTimer -= dt; actor.ReplanTimer -= dt;
-            if (TickVitals(actor)) continue;
-            if (actor.Worker) { TickWorker(actor, dt); continue; }
+            if (TickVitals(actor)) return;
+            if (actor.Worker) { TickWorker(actor, dt); return; }
             var target = Find(actor.Target);
             if (actor.Target != 0 && target == null) { actor.Target = 0; actor.Route.Clear(); actor.Goal = null; }
             // An assault on a building engages its nearby defenders first, then resumes the objective.
@@ -327,7 +339,7 @@ public sealed partial class Skirmish : IDisposable
                     if (target != null) { actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); }
                 }
             }
-            if (target != null && !actor.Stepping && AttackStep(actor, target)) continue;
+            if (target != null && !actor.Stepping && AttackStep(actor, target)) return;
             if (target != null && actor.Target == 0) target = null;
             if (!actor.Stepping && target != null && actor.ReplanTimer <= 0)
             {
@@ -339,10 +351,7 @@ public sealed partial class Skirmish : IDisposable
                 else { Plan(actor, goal); actor.ReplanTimer = ReplanDelay; }
             }
             MoveTick(actor);
-        }
-        if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";
-        else if (!Objective.Standing && !Actors.Any(a => a.Team == 1 && !a.Structure && a.Alive)) Outcome = "Победа — вражеское поселение разбито";
-    }
+            }
     private void PlanAttack(SkirmishActor actor, SkirmishActor target)
     {
         actor.Route.Clear();
