@@ -102,6 +102,7 @@ public sealed class InterfaceData
 {
     public int FormatVersion { get; set; }
     public InterfaceAtlas HeroPortraits { get; set; } = new();
+    public InterfaceAtlas? ArrowCursor { get; set; }
     public List<InterfaceArmy> Armies { get; set; } = [];
     public List<InterfaceScreen> Screens { get; set; } = [];
     public List<InterfaceFont> Fonts { get; set; } = [];

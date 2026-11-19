@@ -3,12 +3,24 @@ import json
 import sys
 import unittest
 from pathlib import Path
+from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 from interface_source import unpack_screen, glyphs, spr_records, spr_image  # noqa: E402
 
 
 class InterfaceSourceTest(unittest.TestCase):
+    def test_bundled_arrow_frames_are_complete(self):
+        root = Path(__file__).resolve().parents[1] / 'assets/imported/interface'
+        cursor = json.loads((root / 'interface.json').read_text())['arrow_cursor']
+        self.assertEqual(cursor['sprites'], list(range(15)))
+        self.assertEqual(cursor['cell'], [32, 32])
+        with Image.open(root / cursor['atlas']) as atlas:
+            self.assertEqual(atlas.size, (256, 64))
+            for k in range(15):
+                frame = atlas.crop((k % 8 * 32, k // 8 * 32, k % 8 * 32 + 32, k // 8 * 32 + 32))
+                self.assertIsNotNone(frame.getchannel('A').getbbox())
+
     def test_packaged_command_metadata_matches_verified_dat_import(self):
         root = Path(__file__).resolve().parents[1]
         interface = json.loads((root / 'assets/imported/interface/interface.json').read_text())

@@ -134,12 +134,16 @@ def convert(game, output):
             red.save(output / f'font_{stem}_red.png')
         manifest['fonts'].append({'file': font, 'atlas': f'font_{stem}.png', 'palette': palette, 'cell': [span, cell], 'glyphs': entries})
     work = spr_records((game / 'WORK.SPR').read_bytes()); colour = pal('COLOR1.PAL')
+    # LE:1 2515 selects the inclusive 0..14 cursor range; 3D67 draws 32x32 WORK.SPR frames.
+    arrow, cell = make_atlas([spr_image(work[i], 32, 32, colour) for i in range(15)], 8)
+    arrow.save(output / 'arrow_cursor.png')
+    manifest['arrow_cursor'] = {'atlas': 'arrow_cursor.png', 'cell': cell, 'first_sprite': 0, 'sprites': list(range(15))}
     heroes, cell = make_atlas([spr_image(work[i], 64, 70, colour) for i in range(195, 227)], 8)
     heroes.save(output / 'hero_portraits.png')
     manifest['hero_portraits'] = {'atlas': 'hero_portraits.png', 'cell': cell, 'first_sprite': 195, 'source': 'WORK.SPR',
                                   'known': {'Олег': 196}}
     manifest['armies'] = [army_panel(game, 2, colour, output)]
-    manifest['source_sha256'] = {n: hashlib.sha256((game / n).read_bytes()).hexdigest() for n in ['SCREENS.SCR', 'WORK.SPR', 'ARMY__02.SPR', 'ARMY__02.DAT', *FONTS]}
+    manifest['source_sha256'] = {n: hashlib.sha256((game / n).read_bytes()).hexdigest() for n in ['SCREENS.SCR', 'WORK.SPR', 'ARMY__02.SPR', 'ARMY__02.DAT', 'COLOR1.PAL', *FONTS]}
     (output / 'interface.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
 
 

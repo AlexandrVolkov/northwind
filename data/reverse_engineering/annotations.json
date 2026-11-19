@@ -2,6 +2,18 @@
   "format_version": 1,
   "regions": [
     {
+      "id": "cursor-animation-step",
+      "module": "LE:1",
+      "start": 15797,
+      "end": 15858,
+      "name": "Advance cursor frame on a four-tick byte timer interval",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/interface.md", "tests/fixtures/cursor-animation.json"],
+      "implementation": ["scripts/OriginalCursorRules.cs"],
+      "limitations": "Числовой шаг проверен на 35840 входах. Выбор семейства, DOS-мышь, фоновый буфер и полный цикл отрисовки курсора не включены; HUD использует только диапазон обычной стрелки."
+    },
+    {
       "id": "group-command-panel-filter",
       "module": "LE:1",
       "start": 46893,

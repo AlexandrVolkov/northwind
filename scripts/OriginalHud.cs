@@ -30,16 +30,44 @@ public partial class OriginalHud : Node2D
     private Texture2D _portraits = null!, _buttons = null!, _heroAtlas = null!;
     private Texture2D _frame = null!, _menuPanel = null!;
     private OriginalFont _font = null!, _red = null!;
+    private InterfaceAtlas? _cursor;
+    private Texture2D? _cursorTexture;
+    private Input.MouseModeEnum? _previousMouseMode;
+    private CursorAnimation _cursorAnimation;
+    private double _cursorTime;
+    public uint CursorFrame => _cursorAnimation.Frame;
 
     public override void _Ready()
     {
         TextureFilter = TextureFilterEnum.Nearest;
         var data = InterfaceData.Load();
+        _cursor = data.ArrowCursor;
+        if (_cursor != null)
+        {
+            _cursorTexture = GD.Load<Texture2D>(InterfaceData.Root + _cursor.Atlas);
+            if (DisplayServer.GetName() != "headless")
+            { _previousMouseMode = Input.MouseMode; Input.MouseMode = Input.MouseModeEnum.Hidden; }
+        }
         _frame = InterfaceData.Screen("game_frame"); _menuPanel = InterfaceData.Screen("panel_menu");
         Army = data.Armies.Single(a => a.Army == 2); _heroes = data.HeroPortraits;
         _portraits = GD.Load<Texture2D>(InterfaceData.Root + Army.Portraits.Atlas); _buttons = GD.Load<Texture2D>(InterfaceData.Root + Army.Buttons.Atlas);
         _heroAtlas = GD.Load<Texture2D>(InterfaceData.Root + _heroes.Atlas);
         _font = OriginalFont.Load(data, "FONT_01.FNT"); _red = OriginalFont.Load(data, "FONT_01.FNT", "font_font_01_red.png");
+    }
+
+    public override void _Process(double delta)
+    {
+        if (_cursor == null || Game?.Battle == null) return;
+        _cursorTime += Math.Max(0, delta) * OriginalCursorRules.TimerHz;
+        if (!Game.Battle.Paused)
+            _cursorAnimation = OriginalCursorRules.Step(_cursorAnimation, unchecked((byte)(ulong)_cursorTime),
+                (ushort)_cursor.FirstSprite, (ushort)(_cursor.FirstSprite + _cursor.Sprites.Count - 1));
+        QueueRedraw();
+    }
+
+    public override void _ExitTree()
+    {
+        if (_previousMouseMode is { } previous && Input.MouseMode == Input.MouseModeEnum.Hidden) Input.MouseMode = previous;
     }
 
     public override void _Draw()
@@ -61,6 +89,9 @@ public partial class OriginalHud : Node2D
             DrawRect(new Rect2(161, 224, 158, 24), new Color(0, 0, 0, .85f));
             _font.Draw(this, new Vector2(169, 228), "ПАУЗА (Esc)");
         }
+        if (_cursor != null && _cursorTexture != null && GetViewport().GetVisibleRect().HasPoint(GetViewport().GetMousePosition()))
+            DrawTextureRectRegion(_cursorTexture, new Rect2(GetLocalMousePosition(), new Vector2(32, 32)),
+                _cursor.Region((int)CursorFrame - _cursor.FirstSprite));
     }
 
     private void DrawMinimap()

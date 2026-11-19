@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 129889 | 5468 | 97 | 11428 | 44 |
+| LE:1 | 146882 | 129828 | 5468 | 97 | 11489 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -42,6 +42,7 @@
 | LE:1 `0x2F03..0x2F1B` | Copy four initial resource stocks from SCN | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json) | Только извлечение четырёх dword SCN +15..24; прочие поля владельца, DOS-загрузка и цикл всех слотов вне перенесённого участка. |
 | LE:1 `0x3593..0x35A8` | DAT header and record stride | partial | [executable-analysis.md](../docs/executable-analysis.md) | Статически подтверждён участок чтения заголовка и шага 171; полный загрузчик, ошибки и релокации не перенесены. |
 | LE:1 `0x35B9..0x35C2` | WRK base assignment | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждено сохранение адреса WRK; это не весь загрузчик. |
+| LE:1 `0x3DB5..0x3DF2` | Advance cursor frame on a four-tick byte timer interval | ported | [interface.md](../docs/interface.md); [cursor-animation.json](../tests/fixtures/cursor-animation.json) | Числовой шаг проверен на 35840 входах. Выбор семейства, DOS-мышь, фоновый буфер и полный цикл отрисовки курсора не включены; HUD использует только диапазон обычной стрелки. |
 | LE:1 `0x418A..0x41C6` | Program PIT channel 0 to 72.8 Hz and hook INT 8 | verified | [game-timing.md](../docs/game-timing.md) | Установлено чтением инструкций; частота в схватке задана данными. |
 | LE:1 `0x41C6..0x41EB` | Timer interrupt: tick counter and chained BIOS handler | verified | [game-timing.md](../docs/game-timing.md) | Установлено чтением инструкций; частота в схватке задана данными. |
 | LE:1 `0x42BB..0x430E` | Object update gate every second world step and global tick | partial | [game-timing.md](../docs/game-timing.md) | Обход цепочек объектов по участникам не перенесён. |

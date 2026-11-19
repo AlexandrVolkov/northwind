@@ -4006,6 +4006,31 @@
    }
   }
  ],
+ "arrow_cursor": {
+  "atlas": "arrow_cursor.png",
+  "cell": [
+   32,
+   32
+  ],
+  "first_sprite": 0,
+  "sprites": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14
+  ]
+ },
  "hero_portraits": {
   "atlas": "hero_portraits.png",
   "cell": [
@@ -5770,6 +5795,7 @@
   "WORK.SPR": "27d8d82fb49a41e6ec8786af996ba1fe24e15090202a1588dea117b538e22e0d",
   "ARMY__02.SPR": "a684ad0474ad9272ab08b0997753305f9a1297103ba83e054e736542dc00302f",
   "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475",
+  "COLOR1.PAL": "022e87d1ccd4961b08d54e073da6bff5cf28a9aa9577dc78422b211407c33a32",
   "FONT_01.FNT": "fdf78bb6045797667ccbe78b8a231cf47e8291cf24d9f3b31151bf8520040011",
   "MENU.FNT": "b71198c1507e34e6c53de44dc7dd308ddf835bae3c5052b8512edfe8ae4958d7",
   "MENU2.FNT": "4bd54da77a433b69647707b0d71904a2630b40c0af5e2d00d1a696fada30a9ca"
