@@ -17,6 +17,20 @@ public partial class TestRunner
         menus.AdvanceTicks(1360 * 7 + 30 * 7 + 7);
         Check(menus.Current == OriginalMenus.Screen.Main, "The history ends after its last line leaves the screen");
         if (DisplayServer.GetName() != "headless") { await Shot(menus, "menus-main"); Compare("menus-main", "original-main-menu", 12); }
+        var (resolution, fullscreen, classic) = (DisplaySettings.Resolution, DisplaySettings.Fullscreen, DisplaySettings.ClassicLayout);
+        menus.Click(OriginalMenus.ScreenButton.GetCenter());
+        Check(DisplaySettings.WindowOpen, "«Экран» on the main menu opens the screen settings");
+        var window = DisplaySettings.Window!;
+        if (DisplayServer.GetName() != "headless") { await Shot(menus, "menus-screen-settings"); }
+        var item = window.Items().First(i => i.Text == "1920 на 1080");
+        window.Click(item.Hit.GetCenter());
+        Check(DisplaySettings.Resolution == new Vector2I(1920, 1080) && !DisplaySettings.Fullscreen, "Choosing 1920 на 1080 sets the window size");
+        window.Click(window.Items().First(i => i.Text.StartsWith("Рамка")).Hit.GetCenter());
+        Check(DisplaySettings.ClassicLayout != classic, "The frame item toggles the classic 4:3 layout");
+        window.Click(window.Items().First(i => i.Text.StartsWith("Рамка")).Hit.GetCenter());
+        window.Click(window.Items().First(i => i.Text == "Назад").Hit.GetCenter());
+        Check(!DisplaySettings.WindowOpen, "«Назад» closes the settings");
+        DisplaySettings.Set(resolution: resolution, fullscreen: fullscreen, classic: classic);
         menus.Click(OriginalMenus.SignGame.GetCenter());
         Check(menus.Current == OriginalMenus.Screen.Slots, "«Игра» opens the save chest");
         if (DisplayServer.GetName() != "headless") { await Shot(menus, "menus-slots"); Compare("menus-slots", "original-save-slots", 12); }

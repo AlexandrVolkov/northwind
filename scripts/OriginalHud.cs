@@ -16,6 +16,8 @@ public partial class OriginalHud : Node2D
     public static readonly Rect2 ScrollSlower = new(470, 78, 18, 20), ScrollFaster = new(624, 78, 18, 20);
     public static readonly Rect2 GameSlower = new(470, 124, 18, 20), GameFaster = new(624, 124, 18, 20);
     public static readonly Rect2 PauseButton = new(494, 402, 124, 24), ExitButton = new(494, 428, 124, 24);
+    /// <summary>Port addition: «Экран» (screen settings) on the empty wood between «Тест» and «Пауза».</summary>
+    public static readonly Rect2 ScreenButton = new(488, 340, 128, 28);
     private static readonly int[] CounterX = [66, 159, 260, 365];
     private readonly Dictionary<int, Color> _uiColors = [];
     private static readonly Rect2 HealthBar = new(572, 176, 9, 50), ExperienceBar = new(587, 176, 9, 50);
@@ -37,7 +39,7 @@ public partial class OriginalHud : Node2D
     public InterfaceArmy Army { get; private set; } = null!;
     private InterfaceAtlas _heroes = null!;
     private Texture2D _portraits = null!, _buttons = null!, _heroAtlas = null!;
-    private Texture2D _frame = null!, _menuPanel = null!;
+    private Texture2D _frame = null!, _menuPanel = null!, _blankButton = null!;
     private OriginalFont _font = null!, _red = null!;
     private InterfaceAtlas? _cursor;
     private Texture2D? _cursorTexture;
@@ -58,7 +60,7 @@ public partial class OriginalHud : Node2D
             if (DisplayServer.GetName() != "headless")
             { _previousMouseMode = Input.MouseMode; Input.MouseMode = Input.MouseModeEnum.Hidden; }
         }
-        _frame = InterfaceData.Screen("game_frame"); _menuPanel = InterfaceData.Screen("panel_menu");
+        _frame = InterfaceData.Screen("game_frame"); _menuPanel = InterfaceData.Screen("panel_menu"); _blankButton = InterfaceData.Screen("button_blank");
         Army = data.Armies.Single(a => a.Army == 2); _heroes = data.HeroPortraits;
         _portraits = GD.Load<Texture2D>(InterfaceData.Root + Army.Portraits.Atlas); _buttons = GD.Load<Texture2D>(InterfaceData.Root + Army.Buttons.Atlas);
         _heroAtlas = GD.Load<Texture2D>(InterfaceData.Root + _heroes.Atlas);
@@ -93,7 +95,12 @@ public partial class OriginalHud : Node2D
         _font.Draw(this, new Vector2(CounterX[2], 0), b.Wood.ToString());
         _red.Draw(this, new Vector2(CounterX[3], 0), b.FreePeople.ToString());
         DrawSetTransform(new Vector2(Shift, 0));
-        if (MenuOpen) { DrawTexture(_menuPanel, new Vector2(464, 0)); DrawSlider(103, Game.Pan, 16); DrawSlider(151, Game.GameSpeed - 0xef, 15); }
+        if (MenuOpen)
+        {
+            DrawTexture(_menuPanel, new Vector2(464, 0)); DrawSlider(103, Game.Pan, 16); DrawSlider(151, Game.GameSpeed - 0xef, 15);
+            DrawTexture(_blankButton, ScreenButton.Position);
+            _font.Draw(this, new Vector2(ScreenButton.GetCenter().X - _font.Width("Экран") / 2f, ScreenButton.Position.Y + 7), "Экран");
+        }
         else { DrawMinimap(); DrawSelection(); }
         DrawSetTransform(Vector2.Zero);
         if (b.Paused)
@@ -102,7 +109,7 @@ public partial class OriginalHud : Node2D
             DrawRect(new Rect2(at, 158, 24), new Color(0, 0, 0, .85f));
             _font.Draw(this, at + new Vector2(8, 4), "ПАУЗА (Esc)");
         }
-        if (_cursor != null && _cursorTexture != null && GetViewport().GetVisibleRect().HasPoint(GetViewport().GetMousePosition()))
+        if (!DisplaySettings.WindowOpen && _cursor != null && _cursorTexture != null && GetViewport().GetVisibleRect().HasPoint(GetViewport().GetMousePosition()))
             DrawTextureRectRegion(_cursorTexture, new Rect2(GetLocalMousePosition() - Vector2.One * (Game?.CursorHotSpot ?? 0), new Vector2(32, 32)),
                 _cursor.Region((int)CursorFrame - _cursor.FirstSprite));
     }
@@ -257,6 +264,7 @@ public partial class OriginalHud : Node2D
             if (BackButton.HasPoint(point)) MenuOpen = false;
             else if (PauseButton.HasPoint(point)) Game.TogglePause();
             else if (ExitButton.HasPoint(point)) Game.ExitMission();
+            else if (ScreenButton.HasPoint(point)) DisplaySettings.Open();
             else if (GameSlower.HasPoint(point)) Game.ChangeSpeed(-1);
             else if (GameFaster.HasPoint(point)) Game.ChangeSpeed(+1);
             else if (ScrollSlower.HasPoint(point)) Game.ChangeScrollSpeed(-1);

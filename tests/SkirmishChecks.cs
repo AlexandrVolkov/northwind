@@ -158,6 +158,9 @@ public partial class TestRunner
         for (int i = 0; i < 20; i++) scene.Hud.Click(scene.Hud.FromClassic(OriginalHud.GameSlower.GetCenter()), MouseButton.Left);
         Check(scene.GameSpeed == 0xf0 && Math.Abs(scene.Speed - 2f / 15) < 1e-6, "«Игра» − stops at F0h: a step every 15 ticks");
         while (scene.GameSpeed < 0xfd) scene.ChangeSpeed(1);
+        scene.Hud.Click(scene.Hud.FromClassic(OriginalHud.ScreenButton.GetCenter()), MouseButton.Left);
+        Check(DisplaySettings.WindowOpen, "«Экран» on the menu panel opens the screen settings");
+        DisplaySettings.Close();
         scene.Hud.Click(scene.Hud.FromClassic(OriginalHud.BackButton.GetCenter()), MouseButton.Left);
         Check(!scene.Hud.MenuOpen, "«Назад» closes the menu panel");
         Check(!scene.Hud.Click(scene.Hud.MapRect.GetCenter(), MouseButton.Left), "Clicks inside the map window reach the world");

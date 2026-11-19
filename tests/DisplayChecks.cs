@@ -59,6 +59,17 @@ public partial class TestRunner
             await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
             GetViewport().GetTexture().GetImage().SavePng("res://build/display-attack-cursor.png");
             scene.CancelOrder();
+            for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            Input.WarpMouse(scene.ClassicToScreen(OriginalHud.Slot(1).GetCenter()));
+            for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true, Position = scene.ClassicToScreen(OriginalHud.Slot(1).GetCenter()) });
+            Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = false, Position = scene.ClassicToScreen(OriginalHud.Slot(1).GetCenter()) });
+            for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            Input.WarpMouse(scene.GetViewport().GetCanvasTransform() * (archer.Position + new Vector2(96, 96)));
+            for (int i = 0; i < 4; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            GD.Print($"MOVE pending={scene.PendingOrder} family={scene.CursorFamily} sel={scene.Selection.Count}");
+            Check(scene.PendingOrder == 2 && scene.CursorFamily == OriginalOrderCursor.Move, "The move button shows the gold cross over the map");
+            scene.CancelOrder();
         }
         RemoveChild(scene); scene.Free();
         GetTree().Root.Size = new Vector2I(1280, 800);

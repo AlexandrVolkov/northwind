@@ -8970,6 +8970,22 @@
   "Игорь",
   "Эйрик"
  ],
+ "button_blank": {
+  "atlas": "button_blank.png",
+  "size": [
+   128,
+   28
+  ],
+  "source": "SCREENS.SCR #2 «Пауза» without its text"
+ },
+ "window_scroll": {
+  "atlas": "window_scroll.png",
+  "size": [
+   250,
+   200
+  ],
+  "source": "HISTORY.SPR 51"
+ },
  "source_sha256": {
   "SCREENS.SCR": "1625a8088cb61a51bea2d7f449b7026625813e950fad38e2b396b406a3f6e1fc",
   "WORK.SPR": "27d8d82fb49a41e6ec8786af996ba1fe24e15090202a1588dea117b538e22e0d",
