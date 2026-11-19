@@ -2756,6 +2756,102 @@
       "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
       "limitations": "implemented inside the squad states; the dead branch 21646..2165D is not used"
+    },
+    {
+      "id": "ai-military-requests",
+      "module": "LE:1",
+      "start": 134608,
+      "end": 136281,
+      "name": "AI military requests (list +1AB, modes 1..10)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "bytes filled from register leftovers are written as zero"
+    },
+    {
+      "id": "ai-target-choice",
+      "module": "LE:1",
+      "start": 136387,
+      "end": 136689,
+      "name": "AI raid targets: random building, nearest mine",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-recruitment",
+      "module": "LE:1",
+      "start": 136800,
+      "end": 137088,
+      "name": "AI squad recruitment (21660/21696 free units, 216DF nearest with lower-priority squads)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-recruit-candidate",
+      "module": "LE:1",
+      "start": 138708,
+      "end": 138905,
+      "name": "Nearest object for a squad of a priority",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-sight-strength",
+      "module": "LE:1",
+      "start": 126062,
+      "end": 126112,
+      "name": "Area in sight of an object",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "area-strength-tally",
+      "module": "LE:1",
+      "start": 137384,
+      "end": 137667,
+      "name": "Friendly and hostile strength in an area",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-recruit-free",
+      "module": "LE:1",
+      "start": 131743,
+      "end": 131792,
+      "name": "Free units join a squad up to a strength",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-nearest-free",
+      "module": "LE:1",
+      "start": 131930,
+      "end": 132104,
+      "name": "Nearest free object of a class",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
     }
   ]
 }

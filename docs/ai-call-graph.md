@@ -4,14 +4,14 @@
 
 | Статус | Процедур | Инструкций |
 |---|---|---|
-| not ported | 46 | 2810 |
+| not ported | 34 | 1992 |
 | partial | 2 | 421 |
-| ported | 79 | 2556 |
+| ported | 91 | 3374 |
 
 | Процедура | Инстр. | Статус | Имя | Вызывает (✓ перенесено, ~ частично, · нет) |
 |---|---|---|---|---|
 | 1E53A | 99 | ported | AI block initialisation from character table | 1EB33✓, 1ECA0✓, 219C3✓ |
-| 1E7EA | 34 | not ported |  | 1E87A~, 1ED26✓, 1F078✓, 209B0·, 20DD0·, 21E99·, 221AE·, 226F1✓, 227C7·, 2323A~, 23667✓, 23C11✓ |
+| 1E7EA | 34 | not ported |  | 1E87A~, 1ED26✓, 1F078✓, 209B0·, 20DD0✓, 21E99·, 221AE·, 226F1✓, 227C7·, 2323A~, 23667✓, 23C11✓ |
 | 1E87A | 154 | partial | AI settlement census | 68BD✓, 1EC3F·, 219C3✓ |
 | 1EAD8 | 6 | ported | AI block of participant |  |
 | 1EAED | 24 | ported | Add AI plan record |  |
@@ -20,7 +20,7 @@
 | 1EB5C | 6 | ported | Find or add AI plan | 1EB40✓ |
 | 1EBEF | 24 | ported | Random explored cell for AI patrol | 9E41✓, 9E55✓, 219C3✓ |
 | 1EC3F | 20 | not ported |  |  |
-| 1EC6E | 18 | not ported |  | 6885✓, 218A8·, 219C3✓ |
+| 1EC6E | 18 | ported | Area in sight of an object | 6885✓, 218A8✓, 219C3✓ |
 | 1ECA0 | 30 | ported | First living object of a DAT class | 68BD✓ |
 | 1ECF8 | 7 | not ported |  |  |
 | 1ED0F | 7 | not ported |  |  |
@@ -87,9 +87,9 @@
 | 201F6 | 18 | ported | AI squad registry: numbers, create, remove, disband, transfer, lookups | 20143✓ |
 | 20232 | 13 | ported | AI squad registry: numbers, create, remove, disband, transfer, lookups |  |
 | 20275 | 18 | ported | AI squad registry: numbers, create, remove, disband, transfer, lookups |  |
-| 2029F | 22 | not ported |  | 2035A· |
+| 2029F | 22 | ported | Free units join a squad up to a strength | 2035A✓ |
 | 202FB | 30 | not ported |  |  |
-| 2035A | 49 | not ported |  |  |
+| 2035A | 49 | ported | Nearest free object of a class |  |
 | 20408 | 73 | ported | Nearest visible hostile object in a cell area | 6877✓, 2055C✓ |
 | 20458 | 74 | ported | Nearest visible hostile object in a cell area | 2055C✓ |
 | 2055C | 41 | ported | Nearest visible hostile object in a cell area |  |
@@ -100,20 +100,20 @@
 | 207CB | 51 | ported | Squad stands; members outside the area return |  |
 | 2095D | 20 | not ported |  |  |
 | 2098B | 15 | ported | Find AI squad by state and target object |  |
-| 209B0 | 277 | not ported |  | 68BD✓, 9E41✓, 9E55✓, 9E69·, D7B1✓, 1EB5C✓, 1FACD✓, 202FB·, 20408✓, 2098B✓, 2160B✓, 21696·, 216DF·, 219C3✓, 21CA0✓ |
-| 20DD0 | 420 | not ported |  | 9E41✓, 1EB40✓, 1EB5C✓, 1EC6E·, 1F306✓, 1F464✓, 1F8C0✓, 1F9EC✓, 1FB9C✓, 20232✓, 2029F·, 214C3·, 21555·, 215F1✓, 2160B✓, 21660·, 216DF·, 22E46✓ |
-| 214C3 | 39 | not ported |  | 68BD✓, 9E41✓, C331· |
-| 21555 | 42 | not ported |  | 68BD✓, C331· |
+| 209B0 | 277 | not ported |  | 68BD✓, 9E41✓, 9E55✓, 9E69·, D7B1✓, 1EB5C✓, 1FACD✓, 202FB·, 20408✓, 2098B✓, 2160B✓, 21696✓, 216DF✓, 219C3✓, 21CA0✓ |
+| 20DD0 | 420 | ported | AI military requests (list +1AB, modes 1..10) | 9E41✓, 1EB40✓, 1EB5C✓, 1EC6E✓, 1F306✓, 1F464✓, 1F8C0✓, 1F9EC✓, 1FB9C✓, 20232✓, 2029F✓, 214C3✓, 21555✓, 215F1✓, 2160B✓, 21660✓, 216DF✓, 22E46✓ |
+| 214C3 | 39 | ported | AI raid targets: random building, nearest mine | 68BD✓, 9E41✓, C331· |
+| 21555 | 42 | ported | AI raid targets: random building, nearest mine | 68BD✓, C331· |
 | 215F1 | 10 | ported | AI strength wanted for an area (215F1) and against an object (2160B) |  |
 | 2160B | 22 | ported | AI strength wanted for an area (215F1) and against an object (2160B) | 68BD✓, C331· |
-| 21660 | 12 | not ported |  | 21696· |
-| 21696 | 30 | not ported |  | 200B5✓, 201B8✓, 2029F· |
-| 216DF | 55 | not ported |  | 68BD✓, 200B5✓, 201B8✓, 21DD4· |
-| 218A8 | 52 | not ported |  | 21966· |
-| 21966 | 26 | not ported |  |  |
+| 21660 | 12 | ported | AI squad recruitment (21660/21696 free units, 216DF nearest with lower-priority squads) | 21696✓ |
+| 21696 | 30 | ported | AI squad recruitment (21660/21696 free units, 216DF nearest with lower-priority squads) | 200B5✓, 201B8✓, 2029F✓ |
+| 216DF | 55 | ported | AI squad recruitment (21660/21696 free units, 216DF nearest with lower-priority squads) | 68BD✓, 200B5✓, 201B8✓, 21DD4✓ |
+| 218A8 | 52 | ported | Friendly and hostile strength in an area | 21966✓ |
+| 21966 | 26 | ported | Friendly and hostile strength in an area |  |
 | 219C3 | 23 | ported | Clip a centred area to the map |  |
 | 21CA0 | 59 | ported | Hostile objects of an area for AI squads | D7B1✓ |
-| 21DD4 | 53 | not ported |  | 6885✓, 20232✓ |
+| 21DD4 | 53 | ported | Nearest object for a squad of a priority | 6885✓, 20232✓ |
 | 21E99 | 210 | not ported |  | EDD5✓, 1EB5C✓, 2098B✓, 22E46✓ |
 | 221AE | 131 | not ported |  | D363·, 1EB5C✓, 1F5F1·, 1F71A·, 22435·, 22613·, 22E46✓ |
 | 223B4 | 34 | ported | List templates of a DAT class | A673✓ |
@@ -123,7 +123,7 @@
 | 22613 | 38 | not ported |  | 9E41✓, 9E55✓, 219C3✓ |
 | 2268E | 33 | not ported |  |  |
 | 226F1 | 57 | ported | AI upkeep: repair requests and decay | 68BD✓ |
-| 227C7 | 469 | not ported |  | 68A0✓, 9E41✓, 9E55✓, 1EAED✓, 1EB5C✓, 2035A·, 219C3✓, 22E46✓, 22E85·, 22F76·, 22F82·, 22FE4·, 23201· |
+| 227C7 | 469 | not ported |  | 68A0✓, 9E41✓, 9E55✓, 1EAED✓, 1EB5C✓, 2035A✓, 219C3✓, 22E46✓, 22E85·, 22F76·, 22F82·, 22FE4·, 23201· |
 | 22E46 | 26 | ported | Random open template of a DAT class | 68A0✓, 9E41✓, 223B4✓ |
 | 22E85 | 88 | not ported |  | 6885✓, 9E41✓, A673✓, D19C· |
 | 22F76 | 4 | not ported |  |  |
