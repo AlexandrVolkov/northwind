@@ -21,7 +21,7 @@ class InterfaceSourceTest(unittest.TestCase):
         record = bytes([1, 0x82, 5, 6, 0x81, 7])   # 1 clear, 2 pixels, then 1 pixel; the rest of 2x3 is omitted
         data = struct.pack('<H', 1) + (0).to_bytes(3, 'little') + record
         [only] = spr_records(data)
-        im = spr_image(only, 2, 3, bytes(range(256)) * 3)
+        im = spr_image(only, 2, 3, bytes(v for i in range(256) for v in (i, i, i)))
         self.assertEqual([im.getpixel((x, y))[3] for y in range(3) for x in range(2)], [0, 255, 255, 255, 0, 0])
         self.assertEqual(im.getpixel((0, 1))[0], 6)
 
