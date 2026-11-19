@@ -1779,6 +1779,68 @@
         "scripts/Skirmish.cs"
       ],
       "limitations": "Объект-труп (9727) и удаление 98DB исполняет мост схватки."
+    },
+    {
+      "id": "timing-418a",
+      "module": "LE:1",
+      "start": 16778,
+      "end": 16838,
+      "name": "Program PIT channel 0 to 72.8 Hz and hook INT 8",
+      "classification": "code",
+      "status": "verified",
+      "evidence": [
+        "docs/game-timing.md"
+      ],
+      "implementation": [],
+      "limitations": "Установлено чтением инструкций; частота в схватке задана данными."
+    },
+    {
+      "id": "timing-41c6",
+      "module": "LE:1",
+      "start": 16838,
+      "end": 16875,
+      "name": "Timer interrupt: tick counter and chained BIOS handler",
+      "classification": "code",
+      "status": "verified",
+      "evidence": [
+        "docs/game-timing.md"
+      ],
+      "implementation": [],
+      "limitations": "Установлено чтением инструкций; частота в схватке задана данными."
+    },
+    {
+      "id": "timing-a10b",
+      "module": "LE:1",
+      "start": 41227,
+      "end": 41425,
+      "name": "Game speed gate and slow-tick flags",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/game-timing.md"
+      ],
+      "implementation": [
+        "scripts/Skirmish.cs",
+        "data/skirmish.json"
+      ],
+      "limitations": "Перенесены частота и шаг по умолчанию; клавиши смены скорости и флаги [19E7] не подключены."
+    },
+    {
+      "id": "timing-42bb",
+      "module": "LE:1",
+      "start": 17083,
+      "end": 17166,
+      "name": "Object update gate every second world step and global tick",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/game-timing.md"
+      ],
+      "implementation": [
+        "scripts/Skirmish.cs",
+        "data/skirmish.json"
+      ],
+      "limitations": "Обход цепочек объектов по участникам не перенесён."
     }
   ]
 }

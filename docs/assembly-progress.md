@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 136270 | 5000 | 0 | 5612 | 44 |
+| LE:1 | 146882 | 135892 | 5281 | 97 | 5612 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61833 | 0 | 0 | 0 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -42,6 +42,9 @@
 | LE:1 `0x2F03..0x2F1B` | Copy four initial resource stocks from SCN | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json) | Только извлечение четырёх dword SCN +15..24; прочие поля владельца, DOS-загрузка и цикл всех слотов вне перенесённого участка. |
 | LE:1 `0x3593..0x35A8` | DAT header and record stride | partial | [executable-analysis.md](../docs/executable-analysis.md) | Статически подтверждён участок чтения заголовка и шага 171; полный загрузчик, ошибки и релокации не перенесены. |
 | LE:1 `0x35B9..0x35C2` | WRK base assignment | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждено сохранение адреса WRK; это не весь загрузчик. |
+| LE:1 `0x418A..0x41C6` | Program PIT channel 0 to 72.8 Hz and hook INT 8 | verified | [game-timing.md](../docs/game-timing.md) | Установлено чтением инструкций; частота в схватке задана данными. |
+| LE:1 `0x41C6..0x41EB` | Timer interrupt: tick counter and chained BIOS handler | verified | [game-timing.md](../docs/game-timing.md) | Установлено чтением инструкций; частота в схватке задана данными. |
+| LE:1 `0x42BB..0x430E` | Object update gate every second world step and global tick | partial | [game-timing.md](../docs/game-timing.md) | Обход цепочек объектов по участникам не перенесён. |
 | LE:1 `0x433A..0x434C` | DAT to WRK callback dispatch | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждены выбор DAT[3B], AH=1 и косвенный вызов; общий цикл обновления не перенесён. |
 | LE:1 `0x43B0..0x43E5` | Occupancy rectangle coordinate preparation | ported | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Корректные размеры области и ссылки; запись вне карты отклоняется C# до изменения сетки. |
 | LE:1 `0x43E5..0x4409` | Occupancy footprint writer wrapper | ported | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Область полностью внутри карты, слои 0..2; исходное поведение вне этой области не заявляется совместимым. |
@@ -88,6 +91,7 @@
 | LE:1 `0x9A1B..0x9A8E` | Missile aim scatter by distance and experience | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) |  |
 | LE:1 `0x9B0D..0x9B86` | Transfer occupancy at step midpoint | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Области и плоскости корректны; особый соседний вариант 9A97..9B0C не покрыт. Полное исходное размещение крупных движущихся объектов ещё не подключено в схватке. |
 | LE:1 `0x9B86..0x9BF9` | Gap between object footprints | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Сохранены байтовые сдвиги размеров и u32-переполнения; игровое использование включает лишь проверенные ветви подхода. |
+| LE:1 `0xA10B..0xA1D1` | Game speed gate and slow-tick flags | partial | [game-timing.md](../docs/game-timing.md) | Перенесены частота и шаг по умолчанию; клавиши смены скорости и флаги [19E7] не подключены. |
 | LE:1 `0xA4DF..0xA5B8` | Death frames by hit kind, corpse object and removal | ported | [combat.md](../docs/combat.md); [death.json](../tests/fixtures/death.json) | Объект-труп (9727) и удаление 98DB исполняет мост схватки. |
 | LE:1 `0xA5B8..0xA5F4` | Sixteen-way missile direction frame | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) |  |
 | LE:1 `0xA758..0xA870` | Allocate and initialize object record | partial | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [building-lifecycle.json](../tests/fixtures/building-lifecycle.json) | Перенесён лишь путь новой пустой цепочки для 49-байтового замка; поиск дыр, универсальный аллокатор и ошибки не покрыты. |

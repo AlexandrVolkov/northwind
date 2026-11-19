@@ -86,7 +86,8 @@ public partial class TestRunner
         {
             uint[] ids = battle.Actors.Where(a => a.Team == 0 && !a.Structure).Select(a => a.Id).ToArray();
             Check(battle.Attack(ids, battle.Objective.Id), "Attack order accepts a distant enemy building and plans an approach");
-            for (int i = 0; i < 3600 && battle.Outcome == ""; i++)
+            // Up to 12 minutes of game time (about 13 100 object updates at the original 18.2 per second).
+            for (int i = 0; i < 7200 && battle.Outcome == ""; i++)
             {
                 // After destroying the objective, issue ordinary player orders against surviving guards.
                 if (!battle.Objective.Standing && i % 10 == 0)
