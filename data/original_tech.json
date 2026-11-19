@@ -1,0 +1,1247 @@
+{
+ "format_version": 1,
+ "armies": [
+  {
+   "army": 0,
+   "file": "ARMY__00.TRE",
+   "sha256": "2db707c43c8b7bdac97de688843b54a403dc4a77c6bc5d637770b7993ac8008a",
+   "end": 516,
+   "terminator": "ffff",
+   "records": [
+    {
+     "offset": 0,
+     "kind": 128,
+     "id": 0,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 16,
+     "kind": 128,
+     "id": 1,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 32,
+     "kind": 128,
+     "id": 2,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 48,
+     "kind": 128,
+     "id": 3,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 64,
+     "kind": 1,
+     "id": 3,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       15
+      ]
+     ]
+    },
+    {
+     "offset": 82,
+     "kind": 128,
+     "id": 4,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 98,
+     "kind": 1,
+     "id": 4,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       15
+      ],
+      [
+       128,
+       5
+      ],
+      [
+       128,
+       7
+      ]
+     ]
+    },
+    {
+     "offset": 120,
+     "kind": 128,
+     "id": 5,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 136,
+     "kind": 1,
+     "id": 5,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       13
+      ]
+     ]
+    },
+    {
+     "offset": 154,
+     "kind": 128,
+     "id": 6,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 170,
+     "kind": 128,
+     "id": 7,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 186,
+     "kind": 1,
+     "id": 7,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       13
+      ]
+     ]
+    },
+    {
+     "offset": 204,
+     "kind": 128,
+     "id": 9,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 220,
+     "kind": 2,
+     "id": 0,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       0,
+       22
+      ]
+     ]
+    },
+    {
+     "offset": 238,
+     "kind": 128,
+     "id": 10,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 254,
+     "kind": 128,
+     "id": 12,
+     "unmet": 1,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 270,
+     "kind": 128,
+     "id": 13,
+     "unmet": 0,
+     "text_offset": 245,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": "Изобретение башни",
+     "children": []
+    },
+    {
+     "offset": 286,
+     "kind": 128,
+     "id": 14,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 302,
+     "kind": 128,
+     "id": 15,
+     "unmet": 2,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 318,
+     "kind": 1,
+     "id": 15,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       12
+      ]
+     ]
+    },
+    {
+     "offset": 336,
+     "kind": 0,
+     "id": 16,
+     "unmet": 0,
+     "text_offset": 197,
+     "cost": 300,
+     "unknown_0b": "00000000",
+     "text": "Изобретение катапульты",
+     "children": []
+    },
+    {
+     "offset": 352,
+     "kind": 2,
+     "id": 9,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       17
+      ]
+     ]
+    },
+    {
+     "offset": 370,
+     "kind": 128,
+     "id": 17,
+     "unmet": 1,
+     "text_offset": 241,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": "Исследование огня",
+     "children": []
+    },
+    {
+     "offset": 386,
+     "kind": 2,
+     "id": 8,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       18
+      ]
+     ]
+    },
+    {
+     "offset": 404,
+     "kind": 128,
+     "id": 18,
+     "unmet": 1,
+     "text_offset": 188,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": "Исследование брони",
+     "children": []
+    },
+    {
+     "offset": 420,
+     "kind": 128,
+     "id": 19,
+     "unmet": 0,
+     "text_offset": 136,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": "Изобретение ямы",
+     "children": []
+    },
+    {
+     "offset": 436,
+     "kind": 128,
+     "id": 20,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 452,
+     "kind": 128,
+     "id": 21,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 468,
+     "kind": 0,
+     "id": 22,
+     "unmet": 1,
+     "text_offset": 104,
+     "cost": 300,
+     "unknown_0b": "00000000",
+     "text": "Изобретение конюшни",
+     "children": []
+    },
+    {
+     "offset": 484,
+     "kind": 128,
+     "id": 23,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 500,
+     "kind": 128,
+     "id": 24,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    }
+   ]
+  },
+  {
+   "army": 1,
+   "file": "ARMY__01.TRE",
+   "sha256": "fa230819130cbf62245f91dd1e28fc8fb101614147c8798f3de38a6eca9f03be",
+   "end": 402,
+   "terminator": "ffff",
+   "records": [
+    {
+     "offset": 0,
+     "kind": 128,
+     "id": 0,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 16,
+     "kind": 128,
+     "id": 1,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 32,
+     "kind": 128,
+     "id": 2,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 48,
+     "kind": 128,
+     "id": 3,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 64,
+     "kind": 1,
+     "id": 3,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       6
+      ]
+     ]
+    },
+    {
+     "offset": 82,
+     "kind": 128,
+     "id": 4,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 98,
+     "kind": 2,
+     "id": 0,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       0,
+       14
+      ]
+     ]
+    },
+    {
+     "offset": 116,
+     "kind": 2,
+     "id": 8,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       5
+      ]
+     ]
+    },
+    {
+     "offset": 134,
+     "kind": 128,
+     "id": 5,
+     "unmet": 1,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 150,
+     "kind": 128,
+     "id": 6,
+     "unmet": 2,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 166,
+     "kind": 128,
+     "id": 7,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 182,
+     "kind": 128,
+     "id": 8,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 198,
+     "kind": 1,
+     "id": 8,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       10
+      ]
+     ]
+    },
+    {
+     "offset": 216,
+     "kind": 128,
+     "id": 9,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 232,
+     "kind": 1,
+     "id": 9,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       10
+      ]
+     ]
+    },
+    {
+     "offset": 250,
+     "kind": 128,
+     "id": 10,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 266,
+     "kind": 128,
+     "id": 11,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 282,
+     "kind": 2,
+     "id": 9,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       12
+      ]
+     ]
+    },
+    {
+     "offset": 300,
+     "kind": 128,
+     "id": 12,
+     "unmet": 1,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 316,
+     "kind": 128,
+     "id": 13,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 332,
+     "kind": 1,
+     "id": 13,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       6
+      ],
+      [
+       128,
+       8
+      ],
+      [
+       128,
+       9
+      ]
+     ]
+    },
+    {
+     "offset": 354,
+     "kind": 128,
+     "id": 14,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 370,
+     "kind": 128,
+     "id": 15,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 386,
+     "kind": 128,
+     "id": 18,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    }
+   ]
+  },
+  {
+   "army": 2,
+   "file": "ARMY__02.TRE",
+   "sha256": "aa488ba6caddff7ac0a9c8788ecb705fce1466fd56d7308e36f92e93f740d540",
+   "end": 602,
+   "terminator": "ffff",
+   "records": [
+    {
+     "offset": 0,
+     "kind": 128,
+     "id": 0,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 16,
+     "kind": 128,
+     "id": 1,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 32,
+     "kind": 128,
+     "id": 2,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 48,
+     "kind": 128,
+     "id": 3,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 64,
+     "kind": 1,
+     "id": 3,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       15
+      ]
+     ]
+    },
+    {
+     "offset": 82,
+     "kind": 128,
+     "id": 4,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 98,
+     "kind": 1,
+     "id": 4,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       15
+      ],
+      [
+       128,
+       5
+      ],
+      [
+       128,
+       7
+      ]
+     ]
+    },
+    {
+     "offset": 120,
+     "kind": 128,
+     "id": 5,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 136,
+     "kind": 1,
+     "id": 5,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       13
+      ]
+     ]
+    },
+    {
+     "offset": 154,
+     "kind": 128,
+     "id": 6,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 170,
+     "kind": 128,
+     "id": 7,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 186,
+     "kind": 1,
+     "id": 7,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       13
+      ]
+     ]
+    },
+    {
+     "offset": 204,
+     "kind": 128,
+     "id": 9,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 220,
+     "kind": 2,
+     "id": 0,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       0,
+       22
+      ]
+     ]
+    },
+    {
+     "offset": 238,
+     "kind": 128,
+     "id": 10,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 254,
+     "kind": 128,
+     "id": 12,
+     "unmet": 1,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 270,
+     "kind": 128,
+     "id": 13,
+     "unmet": 0,
+     "text_offset": 331,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": "Изобретение башни",
+     "children": []
+    },
+    {
+     "offset": 286,
+     "kind": 128,
+     "id": 14,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 302,
+     "kind": 128,
+     "id": 15,
+     "unmet": 2,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 318,
+     "kind": 1,
+     "id": 15,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       12
+      ]
+     ]
+    },
+    {
+     "offset": 336,
+     "kind": 0,
+     "id": 16,
+     "unmet": 0,
+     "text_offset": 283,
+     "cost": 500,
+     "unknown_0b": "00000000",
+     "text": "Изобретение катапульты",
+     "children": []
+    },
+    {
+     "offset": 352,
+     "kind": 2,
+     "id": 9,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       17
+      ]
+     ]
+    },
+    {
+     "offset": 370,
+     "kind": 128,
+     "id": 17,
+     "unmet": 1,
+     "text_offset": 327,
+     "cost": 500,
+     "unknown_0b": "00000000",
+     "text": "Исследование огня",
+     "children": []
+    },
+    {
+     "offset": 386,
+     "kind": 2,
+     "id": 8,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       18
+      ]
+     ]
+    },
+    {
+     "offset": 404,
+     "kind": 128,
+     "id": 18,
+     "unmet": 1,
+     "text_offset": 274,
+     "cost": 500,
+     "unknown_0b": "00000000",
+     "text": "Исследование брони",
+     "children": []
+    },
+    {
+     "offset": 420,
+     "kind": 128,
+     "id": 19,
+     "unmet": 0,
+     "text_offset": 222,
+     "cost": 500,
+     "unknown_0b": "00000000",
+     "text": "Изобретение ямы",
+     "children": []
+    },
+    {
+     "offset": 436,
+     "kind": 128,
+     "id": 20,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 452,
+     "kind": 128,
+     "id": 21,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 468,
+     "kind": 0,
+     "id": 22,
+     "unmet": 1,
+     "text_offset": 190,
+     "cost": 1000,
+     "unknown_0b": "00000000",
+     "text": "Изобретение конюшни",
+     "children": []
+    },
+    {
+     "offset": 484,
+     "kind": 1,
+     "id": 22,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       23
+      ]
+     ]
+    },
+    {
+     "offset": 502,
+     "kind": 128,
+     "id": 23,
+     "unmet": 1,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 518,
+     "kind": 1,
+     "id": 23,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": [
+      [
+       128,
+       24
+      ]
+     ]
+    },
+    {
+     "offset": 536,
+     "kind": 128,
+     "id": 24,
+     "unmet": 1,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 552,
+     "kind": 128,
+     "id": 25,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    },
+    {
+     "offset": 568,
+     "kind": 3,
+     "id": 200,
+     "unmet": 0,
+     "text_offset": 167,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": "Находка медвежих жил",
+     "children": [
+      [
+       0,
+       26
+      ]
+     ]
+    },
+    {
+     "offset": 586,
+     "kind": 0,
+     "id": 26,
+     "unmet": 1,
+     "text_offset": 129,
+     "cost": 500,
+     "unknown_0b": "00000000",
+     "text": "Изобретение балисты",
+     "children": []
+    }
+   ]
+  },
+  {
+   "army": 3,
+   "file": "ARMY__03.TRE",
+   "sha256": "ef114197d7164542b313a393db4070666134602d676e811d194d8f053d6b97df",
+   "end": 16,
+   "terminator": "ffff",
+   "records": [
+    {
+     "offset": 0,
+     "kind": 128,
+     "id": 0,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    }
+   ]
+  },
+  {
+   "army": 4,
+   "file": "ARMY__04.TRE",
+   "sha256": "ef114197d7164542b313a393db4070666134602d676e811d194d8f053d6b97df",
+   "end": 16,
+   "terminator": "ffff",
+   "records": [
+    {
+     "offset": 0,
+     "kind": 128,
+     "id": 0,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    }
+   ]
+  },
+  {
+   "army": 5,
+   "file": "ARMY__05.TRE",
+   "sha256": "ef114197d7164542b313a393db4070666134602d676e811d194d8f053d6b97df",
+   "end": 16,
+   "terminator": "ffff",
+   "records": [
+    {
+     "offset": 0,
+     "kind": 128,
+     "id": 0,
+     "unmet": 0,
+     "text_offset": 0,
+     "cost": 0,
+     "unknown_0b": "00000000",
+     "text": null,
+     "children": []
+    }
+   ]
+  }
+ ]
+}

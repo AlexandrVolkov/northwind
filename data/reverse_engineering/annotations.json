@@ -2368,6 +2368,96 @@
         "scripts/OriginalAiRules.cs"
       ],
       "limitations": ""
+    },
+    {
+      "id": "tech-a673",
+      "module": "LE:1",
+      "start": 42611,
+      "end": 42670,
+      "name": "Template open in development tree",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/tech.md",
+        "tests/fixtures/tech.json",
+        "data/original_tech.json"
+      ],
+      "implementation": [
+        "scripts/OriginalTechRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "tech-a6ae",
+      "module": "LE:1",
+      "start": 42670,
+      "end": 42745,
+      "name": "Complete development item",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/tech.md",
+        "tests/fixtures/tech.json",
+        "data/original_tech.json"
+      ],
+      "implementation": [
+        "scripts/OriginalTechRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "tech-a6f9",
+      "module": "LE:1",
+      "start": 42745,
+      "end": 42774,
+      "name": "Find development record",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/tech.md",
+        "tests/fixtures/tech.json",
+        "data/original_tech.json"
+      ],
+      "implementation": [
+        "scripts/OriginalTechRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "tech-a716",
+      "module": "LE:1",
+      "start": 42774,
+      "end": 42840,
+      "name": "List open research items",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/tech.md",
+        "tests/fixtures/tech.json",
+        "data/original_tech.json"
+      ],
+      "implementation": [
+        "scripts/OriginalTechRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "tech-223b4",
+      "module": "LE:1",
+      "start": 140212,
+      "end": 140341,
+      "name": "List templates of a DAT class",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/tech.md",
+        "tests/fixtures/tech.json",
+        "data/original_tech.json"
+      ],
+      "implementation": [
+        "scripts/OriginalTechRules.cs"
+      ],
+      "limitations": ""
     }
   ]
 }
