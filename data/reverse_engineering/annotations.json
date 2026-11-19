@@ -2143,6 +2143,78 @@
         "scripts/OriginalAiRules.cs"
       ],
       "limitations": ""
+    },
+    {
+      "id": "ai-init-1e53a",
+      "module": "LE:1",
+      "start": 124218,
+      "end": 124610,
+      "name": "AI block initialisation from character table",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-init.json",
+        "data/original_ai.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-plan-list-clear-1eb33",
+      "module": "LE:1",
+      "start": 125747,
+      "end": 125760,
+      "name": "Clear AI plan list",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-init.json",
+        "data/original_ai.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-first-object-1eca0",
+      "module": "LE:1",
+      "start": 126112,
+      "end": 126200,
+      "name": "First living object of a DAT class",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-init.json",
+        "data/original_ai.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": "inlined for mask 38h value 0"
+    },
+    {
+      "id": "ai-characters-ed43",
+      "module": "LE:3",
+      "start": 60739,
+      "end": 61486,
+      "name": "AI character table",
+      "classification": "data",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-init.json",
+        "data/original_ai.json"
+      ],
+      "implementation": [
+        "data/original_ai.json"
+      ],
+      "limitations": ""
     }
   ]
 }

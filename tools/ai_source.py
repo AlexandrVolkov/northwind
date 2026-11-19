@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+"""Extract the AI character table (LE:3 ED43, 9 x 53h; fixup 1E654 -> 3:ED43) from NORWIND.EXE into data/original_ai.json.
+
+1E53A copies record [participant +16] (SCN slot +13; the player's own slot gets 0) to the AI block +5..+57."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import struct
+from forestry_source import read_le_objects, INNER_MZ, EXE_SHA256
+
+TABLE, SIZE, COUNT = 0xed43, 0x53, 9
+FIELDS = {'u32_%02x' % at: at for at in [0x31, 0x35, 0x39, 0x3d, 0x41, 0x45, 0x49, 0x4d, 0x51]}
+
+
+def extract(game):
+    data = (game / 'NORWIND.EXE').read_bytes()
+    if hashlib.sha256(data).hexdigest() != EXE_SHA256: raise ValueError('Unknown EXE version')
+    le, objects = read_le_objects(data, INNER_MZ)
+    u32 = lambda at: struct.unpack_from('<I', data, at)[0]
+    pages = le + u32(le + 0x68); records = le + u32(le + 0x6c); source = 0x1e654
+    blob = data[records + u32(pages + source // 4096 * 4):records + u32(pages + (source // 4096 + 1) * 4)]
+    if blob.count(struct.pack('<BBHBH', 7, 0, source % 4096, 3, TABLE)) != 1: raise ValueError('Unexpected LE fixup record')
+    payload = objects[2]['payload']
+    characters = []
+    for k in range(COUNT):
+        raw = payload[TABLE + SIZE * k:TABLE + SIZE * (k + 1)]
+        item = {'index': k, 'raw_hex': raw.hex(), 'mode': raw[0]}
+        item.update({name: struct.unpack_from('<I', raw, at - 5)[0] for name, at in FIELDS.items()})
+        characters.append(item)
+    return {'format_version': 1, 'source_sha256': EXE_SHA256, 'fixup': {'source_operand': source, 'target_object': 3, 'target_offset': TABLE},
+            'block_offset': 5, 'characters': characters}
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--game', type=Path, required=True)
+    parser.add_argument('--output', type=Path, default=Path(__file__).resolve().parents[1] / 'data/original_ai.json')
+    args = parser.parse_args()
+    args.output.write_text(json.dumps(extract(args.game), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
