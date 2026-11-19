@@ -3,7 +3,7 @@ config_version=5
 
 [application]
 config/name="Орда — Северный ветер: ранняя версия"
-run/main_scene="res://scenes/skirmish.tscn"
+run/main_scene="res://scenes/menus.tscn"
 config/features=PackedStringArray("4.7", "C#", "GL Compatibility")
 
 [autoload]

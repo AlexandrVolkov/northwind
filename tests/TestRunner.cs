@@ -21,6 +21,7 @@ public partial class TestRunner : Node
                 case "hud": await HudChecks(); break;
                 case "pause": await PauseChecks(); break;
                 case "display": await DisplayChecks(); break;
+                case "menus": await MenuChecks(); break;
                 case "cursor": await CursorChecks(); break;
                 case "status-bars": await StatusBarChecks(); break;
                 case "skirmish": await SkirmishChecks(); break;
