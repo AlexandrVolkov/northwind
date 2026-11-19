@@ -2,6 +2,18 @@
   "format_version": 1,
   "regions": [
     {
+      "id": "single-command-panel",
+      "module": "LE:1",
+      "start": 28353,
+      "end": 28440,
+      "name": "Single selection command panel filtered by WorkFlags",
+      "classification": "code",
+      "status": "partial",
+      "evidence": ["docs/interface.md", "tests/fixtures/command-panel.json"],
+      "implementation": ["scripts/OriginalInterface.cs", "scripts/OriginalHud.cs"],
+      "limitations": "Маски одиночной панели проверены для пяти DAT-шаблонов и всех 256 WorkFlags. Исходный runtime-буфер указателей, группа выделения и полный диспетчер кликов не перенесены."
+    },
+    {
       "id": "lumbermill-visitor-validator",
       "module": "ARMY__02.WRK",
       "start": 867,

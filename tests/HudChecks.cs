@@ -1,10 +1,22 @@
 using Godot;
 using Northwind;
+using System.Text.Json;
 
 public partial class TestRunner
 {
+    private void OriginalCommandPanelChecks()
+    {
+        using var fixture = GameData.Read<JsonDocument>("res://tests/fixtures/command-panel.json");
+        foreach (var c in fixture.RootElement.GetProperty("cases").EnumerateArray())
+        {
+            int mask = 0;
+            for (int slot = 0; slot < 6; slot++) if (OriginalCommandPanel.Enabled(c[1].GetByte(), slot)) mask |= 1 << slot;
+            Check(mask == c[2].GetInt32(), "Command visibility matches original LE:1 6EC1..6F17");
+        }
+    }
     private async Task HudChecks()
     {
+        OriginalCommandPanelChecks();
         var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>();
         AddChild(scene);
         for (int i = 0; i < 4; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
@@ -48,6 +60,59 @@ public partial class TestRunner
         LeftClick(OriginalHud.Slot(1).GetCenter()); LeftClick(OriginalHud.MenuButton.GetCenter());
         scene.Restart();
         Check(scene.PendingOrder == 0 && !scene.Hud.MenuOpen, "Restart clears targeting and the open panel");
+        scene.Selection.Clear(); scene.Selection.Add(scene.Battle.Hero.Id);
+        var heroTemplate = scene.Hud.Template(scene.Battle.Hero)!;
+        Check(heroTemplate.Slots.Where((s, k) => s.Present && OriginalCommandPanel.Enabled(scene.Battle.Hero.Record[15], k)).Count() == 3,
+            "Original hero WorkFlags exposes three commands instead of all six template icons");
+        LeftClick(OriginalHud.Slot(3).GetCenter());
+        Check(scene.PendingOrder == 0, "Hidden duplicate hero command does not react to clicks");
+
+        var farm = scene.Battle.BuildFarm(FarmSite(scene.Battle)) ?? throw new InvalidOperationException("Farm failed");
+        for (int i = 0; i < 5000 && scene.Battle.FreePeople == 0; i++) scene.Battle.Advance(1.0 / scene.Battle.Rules.TicksPerSecond);
+        var worker = Recruit(scene.Battle, true) ?? throw new InvalidOperationException("Worker failed");
+        scene.Selection.Clear(); scene.Selection.Add(worker.Id);
+        var workerTemplate = scene.Hud.Template(worker)!;
+        Check(workerTemplate.Slots[0].Label == "Стоять" && workerTemplate.Slots[1].Label == "Идти", "Worker commands retain decoded DAT labels");
+        LeftClick(OriginalHud.Slot(1).GetCenter());
+        Check(scene.PendingOrder == 2, "Worker move command works despite having a different sprite from the soldier");
+        LeftClick(OriginalHud.Slot(0).GetCenter());
+        Check(scene.PendingOrder == 0 && worker.Goal == null, "Worker stop command cancels targeting");
+        LeftClick(OriginalHud.Slot(3).GetCenter());
+        Check(scene.PendingOrder == 4, "Worker forestry command arms forest targeting");
+        scene.FocusWorld(worker.Position); await CameraSettles();
+        var worldPoint = GetViewport().GetCanvasTransform() * worker.Position;
+        scene._UnhandledInput(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true, Position = worldPoint });
+        Check(scene.PendingOrder == 4 && worker.GatherTree == null, "Forestry targeting rejects a non-forest click without moving the worker");
+        var forest = (from y in Enumerable.Range(1, scene.Battle.Map.Height - 2)
+                      from x in Enumerable.Range(1, scene.Battle.Map.Width - 2)
+                      let cell = new Vector2I(x, y)
+                      where scene.Battle.Harvestable(cell)
+                      orderby cell.DistanceSquaredTo(worker.Cell)
+                      select cell).First();
+        scene.FocusWorld((Vector2)(forest * 32)); await CameraSettles();
+        worldPoint = GetViewport().GetCanvasTransform() * (Vector2)(forest * 32 + Vector2I.One * 16);
+        scene._UnhandledInput(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true, Position = worldPoint });
+        Check(scene.PendingOrder == 0 && worker.GatherTree == forest, "Forestry button and forest click start the existing harvest cycle");
+        scene.Battle.Stop(scene.Selection);
+        LeftClick(OriginalHud.Slot(4).GetCenter());
+        Check(scene.PendingOrder == 8, "Worker mine command replaces forest targeting");
+        scene.Battle.Paused = true;
+        LeftClick(OriginalHud.Slot(1).GetCenter());
+        Check(scene.PendingOrder == 8, "Paused battle does not accept a new panel command");
+        scene.Battle.Paused = false;
+        for (int i = 0; i < 9000 && scene.Battle.FreePeople < 4; i++) scene.Battle.Advance(1.0 / scene.Battle.Rules.TicksPerSecond);
+        var mineSite = (from y in Enumerable.Range(1, scene.Battle.Map.Height - 2)
+                        from x in Enumerable.Range(1, scene.Battle.Map.Width - 2)
+                        let cell = new Vector2I(x, y)
+                        where scene.Battle.ProbeMine(cell).Status == ConstructionPlacementStatus.Clear
+                        orderby cell.DistanceSquaredTo(scene.Battle.PlayerCastle.Cell)
+                        select cell).First();
+        var mine = scene.Battle.BuildMine(mineSite) ?? throw new InvalidOperationException("Mine failed");
+        scene.FocusWorld(mine.Position); await CameraSettles();
+        worldPoint = GetViewport().GetCanvasTransform() * mine.Position;
+        scene._UnhandledInput(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true, Position = worldPoint });
+        Check(scene.PendingOrder == 0 && worker.MineJob, "Mine button and mine click start the existing mining cycle");
+        scene.Restart();
         if (DisplayServer.GetName() != "headless")
         {
             scene.Hud.QueueRedraw(); await CameraSettles();

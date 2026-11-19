@@ -178,19 +178,36 @@ public partial class SkirmishMain : Node2D
     }
     public void ChangeSpeed(int step) { Speed = Math.Clamp(step > 0 ? Speed * 2 : Speed / 2, .5f, 4); RefreshUi(); }
     public void ChangeScrollSpeed(int step) => ScrollSpeed = Math.Clamp(ScrollSpeed + step * 175, 175, 1400);
-    /// <summary>Pending order of a panel button (button sprite); applied by the next left click in the map window.</summary>
+    /// <summary>Pending targeting: 2 move, 3 attack, 4 forestry, 8 mine; UI adapter to the supported world commands.</summary>
     public int PendingOrder { get; private set; }
-    /// <summary>Order button pressed (ARMY__02.SPR sprite of the slot). Meanings follow the pictures, the WRK handlers are not ported:
-    /// 1 shield — stop, 2 arrows — move, 3 skull — attack; others are reported as not yet ported.</summary>
-    public void Order(int sprite)
+    /// <summary>Use the decoded DAT mode/group pair, shared by differently drawn worker and soldier buttons.</summary>
+    public void OrderSlot(SkirmishActor unit, InterfaceSlot slot)
+    {
+        if (Battle.Paused || Battle.Outcome != "" || unit.Team != 0 || !unit.Alive || !Selection.Contains(unit.Id)) return;
+        switch (slot.Mode, slot.RawGroup)
+        {
+            case (0, 1): Battle.Stop(Selection); PendingOrder = 0; break;
+            case (1, 2): PendingOrder = 2; break;
+            case (2, 3): PendingOrder = 3; break;
+            case (4, 4) when unit.Worker: PendingOrder = 4; break;
+            case (8, 7) when unit.Worker: PendingOrder = 8; break;
+            default: Battle.Log($"Приказ «{slot.Label}» ещё не перенесён."); break;
+        }
+    }
+    private void ApplyPanelOrder(Vector2 point)
     {
         if (Battle.Paused || Battle.Outcome != "") return;
-        switch (sprite)
+        var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
+        var target = Battle.At(point);
+        bool accepted = PendingOrder switch
         {
-            case 1: Battle.Stop(Selection); PendingOrder = 0; break;
-            case 2 or 3: PendingOrder = sprite; break;
-            default: Battle.Log("Этот приказ ещё не перенесён."); break;
-        }
+            2 => Battle.Move(Selection, cell) > 0,
+            3 => target is { Team: 1 } && Battle.Attack(Selection, target.Id),
+            4 => Battle.GatherTimber(Selection, cell) > 0,
+            8 => target?.Source.TemplateName == "Шахта" && Battle.WorkMine(Selection, target.Id),
+            _ => false,
+        };
+        if (accepted) { PendingOrder = 0; _orderMark = point; _markUntil = Battle.Elapsed + 2; }
     }
     public void ExitMission() => GetTree().ChangeSceneToFile("res://scenes/main.tscn");
     public override void _Process(double delta)
@@ -289,7 +306,7 @@ public partial class SkirmishMain : Node2D
                 RefreshUi(); return;
             }
             if (button.ButtonIndex == MouseButton.Left && PendingOrder != 0)
-            { IssueOrder(GetViewport().GetCanvasTransform().AffineInverse() * button.Position); PendingOrder = 0; }
+                ApplyPanelOrder(GetViewport().GetCanvasTransform().AffineInverse() * button.Position);
             else if (button.ButtonIndex == MouseButton.Left && !Battle.Paused && Battle.Outcome == "")
             { _drag = true; _dragStart = _dragEnd = button.Position; }
             else if (button.ButtonIndex == MouseButton.Right) IssueOrder(GetViewport().GetCanvasTransform().AffineInverse() * button.Position);

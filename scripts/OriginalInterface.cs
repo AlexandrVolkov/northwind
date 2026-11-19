@@ -30,10 +30,19 @@ public sealed class InterfaceAtlas
 }
 public sealed class InterfaceSlot
 {
-    public int[] Bytes { get; set; } = [];
     public int Sprite { get; set; }
     public int? Button { get; set; }
-    public uint Handler { get; set; }
+    public bool Present { get; set; }
+    public byte Mode { get; set; }
+    public byte RawGroup { get; set; }
+    public string Label { get; set; } = "";
+    public int? HotkeyScanCode { get; set; }
+}
+
+/// <summary>LE:1 6EC1..6F17: six DAT commands filtered by the low six OBE WorkFlags bits.</summary>
+public static class OriginalCommandPanel
+{
+    public static bool Enabled(byte workFlags, int slot) => slot is >= 0 and < 6 && (workFlags & (1 << slot)) != 0;
 }
 public sealed class InterfaceTemplate
 {
@@ -57,7 +66,12 @@ public sealed class InterfaceData
     public List<InterfaceScreen> Screens { get; set; } = [];
     public List<InterfaceFont> Fonts { get; set; } = [];
     public const string Root = "res://assets/imported/interface/";
-    public static InterfaceData Load() => GameData.Read<InterfaceData>(Root + "interface.json");
+    public static InterfaceData Load()
+    {
+        var data = GameData.Read<InterfaceData>(Root + "interface.json");
+        if (data.FormatVersion != 2) throw new InvalidDataException("Update the bundled interface data: command schema 2 is required.");
+        return data;
+    }
     public static Texture2D Screen(string name) => GD.Load<Texture2D>(Root + name + ".png");
 }
 

@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 130031 | 5326 | 97 | 11428 | 44 |
+| LE:1 | 146882 | 129944 | 5413 | 97 | 11428 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -53,6 +53,7 @@
 | LE:1 `0x4409..0x4473` | Occupancy rectangle writer | ported | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Только корректные ненулевые прямоугольники внутри сетки; нативный писатель сам не проверяет границы. |
 | LE:1 `0x62FE..0x6304` | Check fifth queue slot | ported | [recruitment-production.md](../docs/recruitment-production.md); [production.json](../tests/fixtures/production.json) | Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора. |
 | LE:1 `0x6330..0x6342` | Append a template to the first unused queue slot | ported | [recruitment-production.md](../docs/recruitment-production.md); [production.json](../tests/fixtures/production.json) | Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора. |
+| LE:1 `0x6EC1..0x6F18` | Single selection command panel filtered by WorkFlags | partial | [interface.md](../docs/interface.md); [command-panel.json](../tests/fixtures/command-panel.json) | Маски одиночной панели проверены для пяти DAT-шаблонов и всех 256 WorkFlags. Исходный runtime-буфер указателей, группа выделения и полный диспетчер кликов не перенесены. |
 | LE:1 `0x7165..0x7180` | Pending turn and motion entry | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Связка с поворотом и подготовкой движения, до анимации/эффектов; полный диспетчер состояний 70B0 не переносится этим статусом. |
 | LE:1 `0x7180..0x71F5` | DAT and SEG movement accumulator | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Координаты внутри карты, свойства SEG присутствуют; назначение всех DAT/SEG полей вне операции ещё не установлено. |
 | LE:1 `0x71F5..0x725C` | Fractional motion step | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Граница 725C до анимации, эффектов и завершения действия; специальные варианты движения не включены. |

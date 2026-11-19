@@ -1,5 +1,5 @@
 {
- "format_version": 1,
+ "format_version": 2,
  "screens": [
   {
    "index": 0,
@@ -4087,58 +4087,58 @@
      "portrait": 0,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1,
        "button": 0,
-       "handler": 5284
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 2,
        "button": 1,
-       "handler": 5265
+       "present": true,
+       "mode": 1,
+       "raw_group": 2,
+       "label": "Идти",
+       "hotkey_scan_code": 48
       },
       {
-       "bytes": [
-        1,
-        2
-       ],
        "sprite": 3,
        "button": 2,
-       "handler": 5281
+       "present": true,
+       "mode": 2,
+       "raw_group": 3,
+       "label": "Атаковать",
+       "hotkey_scan_code": 33
       },
       {
-       "bytes": [
-        2,
-        3
-       ],
        "sprite": 4,
        "button": 3,
-       "handler": 5467
+       "present": true,
+       "mode": 6,
+       "raw_group": 6,
+       "label": "Захватить",
+       "hotkey_scan_code": 25
       },
       {
-       "bytes": [
-        6,
-        6
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -4147,58 +4147,58 @@
      "portrait": 1,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1,
        "button": 0,
-       "handler": 5113
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 2,
        "button": 1,
-       "handler": 5094
+       "present": true,
+       "mode": 1,
+       "raw_group": 2,
+       "label": "Идти",
+       "hotkey_scan_code": 48
       },
       {
-       "bytes": [
-        1,
-        2
-       ],
        "sprite": 3,
        "button": 2,
-       "handler": 5110
+       "present": true,
+       "mode": 2,
+       "raw_group": 3,
+       "label": "Атаковать",
+       "hotkey_scan_code": 33
       },
       {
-       "bytes": [
-        2,
-        3
-       ],
        "sprite": 4,
        "button": 3,
-       "handler": 5296
+       "present": true,
+       "mode": 6,
+       "raw_group": 6,
+       "label": "Захватить",
+       "hotkey_scan_code": 25
       },
       {
-       "bytes": [
-        6,
-        6
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -4207,58 +4207,58 @@
      "portrait": 2,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 872,
        "button": 4,
-       "handler": 4971
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Отмена",
+       "hotkey_scan_code": 36
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 873,
        "button": 5,
-       "handler": 4976
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Ремонт",
+       "hotkey_scan_code": 35
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 874,
        "button": 6,
-       "handler": 4993
+       "present": true,
+       "mode": 7,
+       "raw_group": 0,
+       "label": "Выбор",
+       "hotkey_scan_code": 32
       },
       {
-       "bytes": [
-        7,
-        0
-       ],
        "sprite": 875,
        "button": 7,
-       "handler": 4997
+       "present": true,
+       "mode": 3,
+       "raw_group": 0,
+       "label": "Построить",
+       "hotkey_scan_code": 34
       },
       {
-       "bytes": [
-        3,
-        0
-       ],
        "sprite": 875,
        "button": 7,
-       "handler": 4989
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Построить",
+       "hotkey_scan_code": 34
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 2865,
        "button": 8,
-       "handler": 4957
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Разрушить",
+       "hotkey_scan_code": 255
       }
      ]
     },
@@ -4267,58 +4267,58 @@
      "portrait": 3,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 872,
        "button": 4,
-       "handler": 4800
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Отмена",
+       "hotkey_scan_code": 36
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 873,
        "button": 5,
-       "handler": 4805
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Ремонт",
+       "hotkey_scan_code": 35
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 874,
        "button": 6,
-       "handler": 4822
+       "present": true,
+       "mode": 7,
+       "raw_group": 0,
+       "label": "Выбор",
+       "hotkey_scan_code": 32
       },
       {
-       "bytes": [
-        7,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 875,
        "button": 7,
-       "handler": 4818
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Построить",
+       "hotkey_scan_code": 34
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 2865,
        "button": 8,
-       "handler": 4786
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Разрушить",
+       "hotkey_scan_code": 255
       }
      ]
     },
@@ -4327,58 +4327,58 @@
      "portrait": 4,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 872,
        "button": 4,
-       "handler": 4629
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Отмена",
+       "hotkey_scan_code": 36
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 873,
        "button": 5,
-       "handler": 4634
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Ремонт",
+       "hotkey_scan_code": 35
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 2865,
        "button": 8,
-       "handler": 4615
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Разрушить",
+       "hotkey_scan_code": 255
       }
      ]
     },
@@ -4387,58 +4387,58 @@
      "portrait": 5,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -4447,58 +4447,58 @@
      "portrait": 6,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 872,
        "button": 4,
-       "handler": 4287
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Отмена",
+       "hotkey_scan_code": 36
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 873,
        "button": 5,
-       "handler": 4292
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Ремонт",
+       "hotkey_scan_code": 35
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 2865,
        "button": 8,
-       "handler": 4273
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Разрушить",
+       "hotkey_scan_code": 255
       }
      ]
     },
@@ -4507,58 +4507,58 @@
      "portrait": 7,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -4567,58 +4567,58 @@
      "portrait": 8,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1170,
        "button": 9,
-       "handler": 3916
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 1171,
        "button": 10,
-       "handler": 3897
+       "present": true,
+       "mode": 1,
+       "raw_group": 2,
+       "label": "Идти",
+       "hotkey_scan_code": 48
       },
       {
-       "bytes": [
-        1,
-        2
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1455,
        "button": 11,
-       "handler": 4041
+       "present": true,
+       "mode": 0,
+       "raw_group": 5,
+       "label": "Отнести мешок",
+       "hotkey_scan_code": 21
       },
       {
-       "bytes": [
-        0,
-        5
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -4627,58 +4627,58 @@
      "portrait": 9,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 872,
        "button": 4,
-       "handler": 3774
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Отмена",
+       "hotkey_scan_code": 36
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 873,
        "button": 5,
-       "handler": 3779
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Ремонт",
+       "hotkey_scan_code": 35
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 2865,
        "button": 8,
-       "handler": 3760
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Разрушить",
+       "hotkey_scan_code": 255
       }
      ]
     },
@@ -4687,58 +4687,58 @@
      "portrait": 10,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1170,
        "button": 9,
-       "handler": 3574
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 1171,
        "button": 10,
-       "handler": 3555
+       "present": true,
+       "mode": 1,
+       "raw_group": 2,
+       "label": "Идти",
+       "hotkey_scan_code": 48
       },
       {
-       "bytes": [
-        1,
-        2
-       ],
        "sprite": 3,
        "button": 2,
-       "handler": 3571
+       "present": true,
+       "mode": 2,
+       "raw_group": 3,
+       "label": "Атаковать",
+       "hotkey_scan_code": 33
       },
       {
-       "bytes": [
-        2,
-        3
-       ],
        "sprite": 1172,
        "button": 12,
-       "handler": 3645
+       "present": true,
+       "mode": 4,
+       "raw_group": 4,
+       "label": "Рубить лес",
+       "hotkey_scan_code": 35
       },
       {
-       "bytes": [
-        4,
-        4
-       ],
        "sprite": 1455,
        "button": 11,
-       "handler": 3654
+       "present": true,
+       "mode": 8,
+       "raw_group": 7,
+       "label": "Обслуживать шахту",
+       "hotkey_scan_code": 36
       },
       {
-       "bytes": [
-        8,
-        7
-       ],
        "sprite": 1173,
        "button": 13,
-       "handler": 3768
+       "present": true,
+       "mode": 5,
+       "raw_group": 0,
+       "label": "Вырыть яму",
+       "hotkey_scan_code": 32
       }
      ]
     },
@@ -4747,58 +4747,58 @@
      "portrait": 11,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1170,
        "button": 9,
-       "handler": 3403
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 1171,
        "button": 10,
-       "handler": 3384
+       "present": true,
+       "mode": 1,
+       "raw_group": 2,
+       "label": "Идти",
+       "hotkey_scan_code": 48
       },
       {
-       "bytes": [
-        1,
-        2
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1172,
        "button": 12,
-       "handler": 3507
+       "present": true,
+       "mode": 0,
+       "raw_group": 5,
+       "label": "Отнести бревно",
+       "hotkey_scan_code": 21
       },
       {
-       "bytes": [
-        0,
-        5
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -4807,58 +4807,58 @@
      "portrait": 12,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 872,
        "button": 4,
-       "handler": 3261
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Отмена",
+       "hotkey_scan_code": 36
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 873,
        "button": 5,
-       "handler": 3266
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Ремонт",
+       "hotkey_scan_code": 35
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 874,
        "button": 6,
-       "handler": 3439
+       "present": true,
+       "mode": 9,
+       "raw_group": 0,
+       "label": "Вход",
+       "hotkey_scan_code": 32
       },
       {
-       "bytes": [
-        9,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 2865,
        "button": 8,
-       "handler": 3247
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Разрушить",
+       "hotkey_scan_code": 255
       }
      ]
     },
@@ -4867,58 +4867,58 @@
      "portrait": 13,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 872,
        "button": 4,
-       "handler": 3090
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Отмена",
+       "hotkey_scan_code": 36
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 873,
        "button": 5,
-       "handler": 3095
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Ремонт",
+       "hotkey_scan_code": 35
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 2865,
        "button": 8,
-       "handler": 3076
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Разрушить",
+       "hotkey_scan_code": 255
       }
      ]
     },
@@ -4927,58 +4927,58 @@
      "portrait": 14,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1627,
        "button": 14,
-       "handler": 3051
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Открыть",
+       "hotkey_scan_code": 255
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1628,
        "button": 15,
-       "handler": 3053
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Закрыть",
+       "hotkey_scan_code": 255
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1625,
        "button": 16,
-       "handler": 3055
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Автомат",
+       "hotkey_scan_code": 255
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -4987,58 +4987,58 @@
      "portrait": 15,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 872,
        "button": 4,
-       "handler": 2748
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Отмена",
+       "hotkey_scan_code": 36
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 873,
        "button": 5,
-       "handler": 2753
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Ремонт",
+       "hotkey_scan_code": 35
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 874,
        "button": 6,
-       "handler": 2770
+       "present": true,
+       "mode": 7,
+       "raw_group": 0,
+       "label": "Выбор",
+       "hotkey_scan_code": 32
       },
       {
-       "bytes": [
-        7,
-        0
-       ],
        "sprite": 875,
        "button": 7,
-       "handler": 2774
+       "present": true,
+       "mode": 3,
+       "raw_group": 0,
+       "label": "Построить",
+       "hotkey_scan_code": 34
       },
       {
-       "bytes": [
-        3,
-        0
-       ],
        "sprite": 875,
        "button": 7,
-       "handler": 2766
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Построить",
+       "hotkey_scan_code": 34
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 2865,
        "button": 8,
-       "handler": 2734
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Разрушить",
+       "hotkey_scan_code": 255
       }
      ]
     },
@@ -5047,58 +5047,58 @@
      "portrait": 16,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1,
        "button": 0,
-       "handler": 2548
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 2,
        "button": 1,
-       "handler": 2529
+       "present": true,
+       "mode": 1,
+       "raw_group": 2,
+       "label": "Идти",
+       "hotkey_scan_code": 48
       },
       {
-       "bytes": [
-        1,
-        2
-       ],
        "sprite": 3,
        "button": 2,
-       "handler": 2545
+       "present": true,
+       "mode": 2,
+       "raw_group": 3,
+       "label": "Атаковать",
+       "hotkey_scan_code": 33
       },
       {
-       "bytes": [
-        2,
-        3
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -5107,58 +5107,58 @@
      "portrait": 17,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1,
        "button": 0,
-       "handler": 2377
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 2,
        "button": 1,
-       "handler": 2358
+       "present": true,
+       "mode": 1,
+       "raw_group": 2,
+       "label": "Идти",
+       "hotkey_scan_code": 48
       },
       {
-       "bytes": [
-        1,
-        2
-       ],
        "sprite": 3,
        "button": 2,
-       "handler": 2374
+       "present": true,
+       "mode": 2,
+       "raw_group": 3,
+       "label": "Атаковать",
+       "hotkey_scan_code": 33
       },
       {
-       "bytes": [
-        2,
-        3
-       ],
        "sprite": 4,
        "button": 3,
-       "handler": 2560
+       "present": true,
+       "mode": 6,
+       "raw_group": 6,
+       "label": "Захватить",
+       "hotkey_scan_code": 25
       },
       {
-       "bytes": [
-        6,
-        6
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -5167,58 +5167,58 @@
      "portrait": 18,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1,
        "button": 0,
-       "handler": 2206
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 2,
        "button": 1,
-       "handler": 2187
+       "present": true,
+       "mode": 1,
+       "raw_group": 2,
+       "label": "Идти",
+       "hotkey_scan_code": 48
       },
       {
-       "bytes": [
-        1,
-        2
-       ],
        "sprite": 3,
        "button": 2,
-       "handler": 2203
+       "present": true,
+       "mode": 2,
+       "raw_group": 3,
+       "label": "Атаковать",
+       "hotkey_scan_code": 33
       },
       {
-       "bytes": [
-        2,
-        3
-       ],
        "sprite": 4,
        "button": 3,
-       "handler": 2389
+       "present": true,
+       "mode": 6,
+       "raw_group": 6,
+       "label": "Захватить",
+       "hotkey_scan_code": 25
       },
       {
-       "bytes": [
-        6,
-        6
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -5227,58 +5227,58 @@
      "portrait": 7,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -5287,58 +5287,58 @@
      "portrait": 18,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1,
        "button": 0,
-       "handler": 1864
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 2,
        "button": 1,
-       "handler": 1845
+       "present": true,
+       "mode": 1,
+       "raw_group": 2,
+       "label": "Идти",
+       "hotkey_scan_code": 48
       },
       {
-       "bytes": [
-        1,
-        2
-       ],
        "sprite": 3,
        "button": 2,
-       "handler": 1861
+       "present": true,
+       "mode": 2,
+       "raw_group": 3,
+       "label": "Атаковать",
+       "hotkey_scan_code": 33
       },
       {
-       "bytes": [
-        2,
-        3
-       ],
        "sprite": 1,
        "button": 0,
-       "handler": 1840
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 875,
        "button": 7,
-       "handler": 1911
+       "present": true,
+       "mode": 5,
+       "raw_group": 0,
+       "label": "Построить",
+       "hotkey_scan_code": 34
       },
       {
-       "bytes": [
-        5,
-        0
-       ],
        "sprite": 874,
        "button": 6,
-       "handler": 1891
+       "present": true,
+       "mode": 11,
+       "raw_group": 0,
+       "label": "Выбор",
+       "hotkey_scan_code": 32
       }
      ]
     },
@@ -5347,58 +5347,58 @@
      "portrait": 19,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1,
        "button": 0,
-       "handler": 1693
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 2,
        "button": 1,
-       "handler": 1674
+       "present": true,
+       "mode": 1,
+       "raw_group": 2,
+       "label": "Идти",
+       "hotkey_scan_code": 48
       },
       {
-       "bytes": [
-        1,
-        2
-       ],
        "sprite": 3,
        "button": 2,
-       "handler": 1690
+       "present": true,
+       "mode": 2,
+       "raw_group": 3,
+       "label": "Атаковать",
+       "hotkey_scan_code": 33
       },
       {
-       "bytes": [
-        2,
-        3
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -5407,58 +5407,58 @@
      "portrait": 20,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 872,
        "button": 4,
-       "handler": 1551
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Отмена",
+       "hotkey_scan_code": 36
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 873,
        "button": 5,
-       "handler": 1556
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Ремонт",
+       "hotkey_scan_code": 35
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 874,
        "button": 6,
-       "handler": 1573
+       "present": true,
+       "mode": 7,
+       "raw_group": 0,
+       "label": "Выбор",
+       "hotkey_scan_code": 32
       },
       {
-       "bytes": [
-        7,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 875,
        "button": 7,
-       "handler": 1569
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Построить",
+       "hotkey_scan_code": 34
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 2865,
        "button": 8,
-       "handler": 1537
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Разрушить",
+       "hotkey_scan_code": 255
       }
      ]
     },
@@ -5467,58 +5467,58 @@
      "portrait": 21,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 872,
        "button": 4,
-       "handler": 1380
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Отмена",
+       "hotkey_scan_code": 36
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 873,
        "button": 5,
-       "handler": 1385
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Ремонт",
+       "hotkey_scan_code": 35
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 2865,
        "button": 8,
-       "handler": 1366
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Разрушить",
+       "hotkey_scan_code": 255
       }
      ]
     },
@@ -5527,58 +5527,58 @@
      "portrait": 22,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 872,
        "button": 4,
-       "handler": 1209
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Отмена",
+       "hotkey_scan_code": 36
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 873,
        "button": 5,
-       "handler": 1214
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Ремонт",
+       "hotkey_scan_code": 35
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 2865,
        "button": 8,
-       "handler": 1195
+       "present": true,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "Разрушить",
+       "hotkey_scan_code": 255
       }
      ]
     },
@@ -5587,58 +5587,58 @@
      "portrait": 23,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -5647,58 +5647,58 @@
      "portrait": 24,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1,
        "button": 0,
-       "handler": 838
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 2,
        "button": 1,
-       "handler": 819
+       "present": true,
+       "mode": 1,
+       "raw_group": 2,
+       "label": "Идти",
+       "hotkey_scan_code": 48
       },
       {
-       "bytes": [
-        1,
-        2
-       ],
        "sprite": 3,
        "button": 2,
-       "handler": 835
+       "present": true,
+       "mode": 2,
+       "raw_group": 3,
+       "label": "Атаковать",
+       "hotkey_scan_code": 33
       },
       {
-       "bytes": [
-        2,
-        3
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     },
@@ -5707,58 +5707,58 @@
      "portrait": 18,
      "slots": [
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 1,
        "button": 0,
-       "handler": 667
+       "present": true,
+       "mode": 0,
+       "raw_group": 1,
+       "label": "Стоять",
+       "hotkey_scan_code": 46
       },
       {
-       "bytes": [
-        0,
-        1
-       ],
        "sprite": 2,
        "button": 1,
-       "handler": 648
+       "present": true,
+       "mode": 1,
+       "raw_group": 2,
+       "label": "Идти",
+       "hotkey_scan_code": 48
       },
       {
-       "bytes": [
-        1,
-        2
-       ],
        "sprite": 3,
        "button": 2,
-       "handler": 664
+       "present": true,
+       "mode": 2,
+       "raw_group": 3,
+       "label": "Атаковать",
+       "hotkey_scan_code": 33
       },
       {
-       "bytes": [
-        2,
-        3
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       },
       {
-       "bytes": [
-        0,
-        0
-       ],
        "sprite": 0,
        "button": null,
-       "handler": 0
+       "present": false,
+       "mode": 0,
+       "raw_group": 0,
+       "label": "",
+       "hotkey_scan_code": null
       }
      ]
     }

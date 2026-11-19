@@ -86,7 +86,7 @@ public partial class OriginalHud : Node2D
             DrawTextureRectRegion(_portraits, new Rect2(PortraitAt, 80, 50), Army.Portraits.Region(template.Portrait));
         if (Template(unit) is { } t && unit.Team == 0)
             for (int k = 0; k < t.Slots.Count; k++)
-                if (t.Slots[k].Button is { } button)
+                if (OriginalCommandPanel.Enabled(unit.Record[0x0f], k) && t.Slots[k] is { Present: true, Button: { } button })
                     DrawTextureRectRegion(_buttons, Slot(k), Army.Buttons.Region(button));
         DrawBar(HealthBar, unit.MaxHealth > 0 ? Math.Clamp(unit.Health / (float)unit.MaxHealth, 0, 1) : 0);
         DrawBar(ExperienceBar, 0);
@@ -125,7 +125,8 @@ public partial class OriginalHud : Node2D
         else if (SingleUnit() is { } unit && Template(unit) is { } template)
         {
             for (int k = 0; k < template.Slots.Count; k++)
-                if (template.Slots[k].Sprite != 0 && Slot(k).HasPoint(point)) Game.Order(template.Slots[k].Sprite);
+                if (unit.Team == 0 && OriginalCommandPanel.Enabled(unit.Record[0x0f], k) && template.Slots[k].Present
+                    && template.Slots[k].Button != null && Slot(k).HasPoint(point)) Game.OrderSlot(unit, template.Slots[k]);
         }
         QueueRedraw();
         return true;
