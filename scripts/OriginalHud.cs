@@ -103,7 +103,7 @@ public partial class OriginalHud : Node2D
             _font.Draw(this, at + new Vector2(8, 4), "ПАУЗА (Esc)");
         }
         if (_cursor != null && _cursorTexture != null && GetViewport().GetVisibleRect().HasPoint(GetViewport().GetMousePosition()))
-            DrawTextureRectRegion(_cursorTexture, new Rect2(GetLocalMousePosition(), new Vector2(32, 32)),
+            DrawTextureRectRegion(_cursorTexture, new Rect2(GetLocalMousePosition() - Vector2.One * (Game?.CursorHotSpot ?? 0), new Vector2(32, 32)),
                 _cursor.Region((int)CursorFrame - _cursor.FirstSprite));
     }
 

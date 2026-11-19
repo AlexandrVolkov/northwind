@@ -46,6 +46,19 @@ public partial class TestRunner
             await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
             GetViewport().GetTexture().GetImage().SavePng("res://build/display-scroll-left.png");
             Input.WarpMouse(new Vector2(640, 360));
+            var archer = scene.Battle.Actors.First(x => x.Team == 0 && x.Source.TemplateName == "Лучник");
+            scene.Selection.Clear(); scene.Selection.Add(archer.Id); scene.FocusWorld(archer.Position);
+            for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            scene.Hud.Click(scene.Hud.FromClassic(OriginalHud.Slot(2).GetCenter()), MouseButton.Left);
+            Input.WarpMouse(scene.GetViewport().GetCanvasTransform() * (archer.Position + new Vector2(96, 96)));
+            for (int i = 0; i < 4; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            Check(scene.PendingOrder == 3 && scene.CursorFamily == OriginalOrderCursor.Target && scene.CursorHotSpot == 15, "The attack order shows the grey skull over the ground");
+            Input.WarpMouse(scene.GetViewport().GetCanvasTransform() * archer.Position);
+            for (int i = 0; i < 4; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            Check(scene.CursorFamily == OriginalOrderCursor.TargetObject, "Over an own unit the skull turns gold");
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            GetViewport().GetTexture().GetImage().SavePng("res://build/display-attack-cursor.png");
+            scene.CancelOrder();
         }
         RemoveChild(scene); scene.Free();
         GetTree().Root.Size = new Vector2I(1280, 800);
