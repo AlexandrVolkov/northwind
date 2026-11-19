@@ -32,6 +32,8 @@ public partial class TestRunner
         scene.SetProcess(false); // Keep orders and camera assertions independent of frame time.
         void LeftClick(Vector2 hudPoint) => scene._UnhandledInput(new InputEventMouseButton
         { ButtonIndex = MouseButton.Left, Pressed = true, Position = scene.HudOrigin + hudPoint * scene.HudScale });
+        void Press(Key physical, bool ctrl = false, bool echo = false) => scene._UnhandledInput(new InputEventKey
+        { PhysicalKeycode = physical, Keycode = (Key)'И', Pressed = true, CtrlPressed = ctrl, Echo = echo });
         async Task CameraSettles()
         { for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); }
         var archer = scene.Battle.Actors.First(a => a.Team == 0 && a.Source.TemplateName == "Лучник");
@@ -75,9 +77,25 @@ public partial class TestRunner
         Check(scene.PendingOrder == 2, "Group movement can be armed from the original panel");
         LeftClick(OriginalHud.Slot(0).GetCenter());
         Check(scene.PendingOrder == 0 && scene.Selection.Count == 5, "Group stop preserves the whole selection");
+        Press(Key.B);
+        Check(scene.PendingOrder == 2, "Physical B uses the original DAT hotkey even with a Cyrillic logical key");
+        Press(Key.C);
+        Check(scene.PendingOrder == 0 && scene.Selection.Count == 5, "Original C stop takes precedence over the legacy castle shortcut");
+        var beforeAttackKey = scene.Camera.Position;
+        Press(Key.F);
+        Check(scene.PendingOrder == 3 && scene.Camera.Position == beforeAttackKey, "Original F attack takes precedence over the legacy focus shortcut");
+        Press(Key.Escape);
+        Press(Key.B, ctrl: true); Press(Key.B, echo: true);
+        Check(scene.PendingOrder == 0, "Modifier shortcuts and key repeat do not activate DAT commands");
+        scene.Hud.MenuOpen = true; Press(Key.B);
+        Check(scene.PendingOrder == 0, "Menu panel prevents command hotkeys");
+        scene.Hud.MenuOpen = false;
+        Press(Key.Home);
+        Check(scene.Selection.SetEquals([scene.Battle.PlayerCastle.Id]), "Home always selects the castle despite original C binding");
+        scene.SelectArmy();
         if (DisplayServer.GetName() != "headless")
         {
-            scene.FocusHero(); await CameraSettles(); scene.Hud.QueueRedraw();
+            scene.FocusHero(); await CameraSettles(); scene.QueueRedraw(); scene.Hud.QueueRedraw();
             await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
             DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
             GetViewport().GetTexture().GetImage().SavePng("res://build/hud-group.png");
@@ -95,6 +113,17 @@ public partial class TestRunner
         scene.Selection.Clear(); scene.Selection.Add(worker.Id);
         var workerTemplate = scene.Hud.Template(worker)!;
         Check(workerTemplate.Slots[0].Label == "Стоять" && workerTemplate.Slots[1].Label == "Идти", "Worker commands retain decoded DAT labels");
+        Check(OriginalCommandKeys.Hint(scene.Hud.CommandAt(OriginalHud.Slot(3).GetCenter())!) == "Рубить лес [H]", "Hovered worker button exposes its source label and scan-code key");
+        Press(Key.H); Check(scene.PendingOrder == 4, "Original H hotkey selects forestry");
+        Press(Key.J); Check(scene.PendingOrder == 8, "Original J hotkey selects the mine command");
+        if (DisplayServer.GetName() != "headless")
+        {
+            scene.FocusWorld(worker.Position); await CameraSettles();
+            Input.WarpMouse(scene.HudOrigin + OriginalHud.Slot(4).GetCenter() * scene.HudScale);
+            await CameraSettles(); scene.QueueRedraw(); scene.Hud.QueueRedraw();
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            GetViewport().GetTexture().GetImage().SavePng("res://build/hud-command-hint.png");
+        }
         LeftClick(OriginalHud.Slot(1).GetCenter());
         Check(scene.PendingOrder == 2, "Worker move command works despite having a different sprite from the soldier");
         LeftClick(OriginalHud.Slot(0).GetCenter());
@@ -137,7 +166,7 @@ public partial class TestRunner
         scene.Restart();
         if (DisplayServer.GetName() != "headless")
         {
-            await CameraSettles(); scene.Hud.QueueRedraw();
+            await CameraSettles(); scene.QueueRedraw(); scene.Hud.QueueRedraw();
             await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
             DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
             GetViewport().GetTexture().GetImage().SavePng("res://build/hud-navigation.png");

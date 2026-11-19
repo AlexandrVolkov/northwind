@@ -64,6 +64,26 @@ public static class OriginalCommandPanel
     }
 }
 public readonly record struct CommandPanelMember(byte Flags, InterfaceTemplate Template);
+
+/// <summary>Physical keys for the set-1 DOS scan codes used by the current ARMY__02 command descriptions.</summary>
+public static class OriginalCommandKeys
+{
+    public static int Scan(Key key) => key switch
+    {
+        Key.Y => 0x15, Key.P => 0x19, Key.D => 0x20, Key.F => 0x21, Key.G => 0x22,
+        Key.H => 0x23, Key.J => 0x24, Key.C => 0x2e, Key.B => 0x30, _ => -1,
+    };
+    public static string Name(int? scan) => scan switch
+    {
+        0x15 => "Y", 0x19 => "P", 0x20 => "D", 0x21 => "F", 0x22 => "G",
+        0x23 => "H", 0x24 => "J", 0x2e => "C", 0x30 => "B", _ => "",
+    };
+    public static string Hint(InterfaceSlot command)
+    {
+        string key = Name(command.HotkeyScanCode);
+        return key.Length == 0 ? command.Label : $"{command.Label} [{key}]";
+    }
+}
 public sealed class InterfaceTemplate
 {
     public int Template { get; set; }

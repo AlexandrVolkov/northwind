@@ -91,7 +91,53 @@ public partial class OriginalHud : Node2D
         else if (Game.Selection.Count > 1) _font.Draw(this, new Vector2(482, 160), $"Выбрано: {Game.Selection.Count}");
         var commands = Commands();
         for (int k = 0; k < commands.Length; k++)
-            if (commands[k] is { Present: true, Button: { } button }) DrawTextureRectRegion(_buttons, Slot(k), Army.Buttons.Region(button));
+            if (commands[k] is { Present: true, Button: { } button } command)
+            {
+                DrawTextureRectRegion(_buttons, Slot(k), Army.Buttons.Region(button));
+                if ((Game.PendingOrder, command.Mode, command.RawGroup) is (2, 1, 2) or (3, 2, 3) or (4, 4, 4) or (8, 8, 7))
+                    DrawRect(Slot(k).Grow(-1), new Color("d5b85c"), false, 1);
+            }
+        var hover = CommandAt(GetLocalMousePosition());
+        string hint = hover != null ? OriginalCommandKeys.Hint(hover) : Game.PendingOrder switch
+        {
+            2 => "Укажите место", 3 => "Укажите врага", 4 => "Укажите лес", 8 => "Укажите шахту", _ => "",
+        };
+        DrawHint(hint);
+    }
+
+    // Placement and pending-order outlines are UI feedback of the port, not a recovered DOS drawing routine.
+    private void DrawHint(string hint)
+    {
+        string line = ""; int y = 256;
+        foreach (string word in hint.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (y >= 304) break;
+            string next = line.Length == 0 ? word : line + " " + word;
+            if (_font.Width(next) > 142 && line.Length != 0)
+            { _font.Draw(this, new Vector2(482, y), line); y += 16; line = word; }
+            else line = next;
+        }
+        if (line.Length != 0 && y < 304) _font.Draw(this, new Vector2(482, y), line);
+    }
+
+    public InterfaceSlot? CommandAt(Vector2 point)
+    {
+        if (MenuOpen) return null;
+        var commands = Commands();
+        for (int k = 0; k < commands.Length; k++)
+            if (Slot(k).HasPoint(point) && commands[k] is { Present: true, Button: not null } command) return command;
+        return null;
+    }
+
+    public bool Hotkey(Key key)
+    {
+        if (MenuOpen || Game.Battle.Paused || Game.Battle.Outcome != "") return false;
+        int scan = OriginalCommandKeys.Scan(key);
+        if (scan < 0) return false;
+        var command = Commands().FirstOrDefault(c => c is { Present: true, Button: not null } && c.HotkeyScanCode == scan);
+        var unit = Game.Battle.Actors.FirstOrDefault(a => Game.Selection.Contains(a.Id));
+        if (command == null || unit == null) return false;
+        Game.OrderSlot(unit, command); QueueRedraw(); return true;
     }
 
     /// <summary>Selection order follows the scene's owner/object list, rather than mouse insertion order.</summary>
@@ -138,9 +184,7 @@ public partial class OriginalHud : Node2D
             Game.FocusWorld((point - Minimap.Position) / Minimap.Size * new Vector2(Game.Battle.Map.Width, Game.Battle.Map.Height) * 32);
         else if (Game.Battle.Actors.FirstOrDefault(a => Game.Selection.Contains(a.Id)) is { } unit)
         {
-            var commands = Commands();
-            for (int k = 0; k < commands.Length; k++)
-                if (commands[k] is { Present: true, Button: not null } command && Slot(k).HasPoint(point)) Game.OrderSlot(unit, command);
+            if (CommandAt(point) is { } command) Game.OrderSlot(unit, command);
         }
         QueueRedraw();
         return true;

@@ -270,13 +270,16 @@ public partial class SkirmishMain : Node2D
         if (!_ready) return;
         if (e is InputEventKey { Pressed: true, Echo: false } key)
         {
+            if (!key.CtrlPressed && !key.AltPressed && !key.MetaPressed && !key.ShiftPressed && Hud.Hotkey(key.PhysicalKeycode)) return;
             if (key.CtrlPressed && key.PhysicalKeycode == Key.A) SelectArmy();
             else switch (key.PhysicalKeycode)
             {
                 case Key.Space: TogglePause(); break;
                 case Key.F: FocusHero(); break;
+                case Key.End: FocusHero(); break;
                 case Key.T: FocusObjective(); break;
                 case Key.C: SelectCastle(); break;
+                case Key.Home: SelectCastle(); break;
                 case Key.R: Restart(); break;
                 case Key.X: Battle.Stop(Selection); break;
                 case Key.Escape:
@@ -477,7 +480,7 @@ public partial class SkirmishMain : Node2D
             if (!_ready || e is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } b) return;
             var rect = MiniRect(); if (rect.HasPoint(b.Position)) Focus((b.Position - rect.Position) / rect.Size * new Vector2(Battle.Map.Width, Battle.Map.Height) * 32);
         };
-        Row("ПРЕДВОДИТЕЛЬ [F]", FocusHero, "ЦЕЛЬ [T]", FocusObjective);
+        Row("ПРЕДВОДИТЕЛЬ [End]", FocusHero, "ЦЕЛЬ [T]", FocusObjective);
         _status = Text("Загрузка…", 16); _selection = Text("", 13);
         _economy = Text("", 13);
         (_hire, _hireMilitia) = Row("", HireWorker, "", HireMilitia);
@@ -490,7 +493,7 @@ public partial class SkirmishMain : Node2D
         Row("ВОЙСКО [Ctrl+A]", SelectArmy, "СТОП [X]", () => Battle.Stop(Selection));
         (_pause, _speed) = Row("ПАУЗА [ПРОБЕЛ]", TogglePause, "СКОРОСТЬ ×1", ChangeSpeed);
         Button("НАЧАТЬ ЗАНОВО  [R]", Restart);
-        Text("ЛКМ / рамка — выделить\nПКМ — идти / атаковать / рубить\nShift — добавить · C — замок\nWASD, стрелки, СКМ — камера\nКолесо — масштаб", 12);
+        Text("ЛКМ / рамка — выделить\nПКМ — идти / атаковать / рубить\nShift — добавить · Home — замок\nWASD, стрелки, СКМ — камера", 12);
         _events = Text("", 12);
         Button("ЛАБОРАТОРИЯ  [F10]", () => GetTree().ChangeSceneToFile("res://scenes/main.tscn"));
         Text("Ранняя версия: бой и ИИ временные. Кампания ещё в работе.", 11);
