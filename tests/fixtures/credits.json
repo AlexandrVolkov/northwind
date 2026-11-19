@@ -1,0 +1,172 @@
+{
+  "format_version": 1,
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "MENU.SPR": "d112bb0527dcd8837ad033d0d3188e2f06ffb64dfcbdf3e192f866f0ea317766",
+    "FROM_AUT.PAL": "ca5942d0e4abd44784209270ea5503888f9f2969289265840cd54abbe4d621e8"
+  },
+  "sprites": [
+    {
+      "sprite": 280,
+      "width": 64,
+      "height": 66,
+      "rgba_sha256": "03df65637804b5ec14ab0e9cee30bdbe8185bbe7cdcbee9c9c95bc44ecbd10da"
+    },
+    {
+      "sprite": 281,
+      "width": 64,
+      "height": 66,
+      "rgba_sha256": "a04af9e2711bf6d14de382426f99b27d7deff5dbe8dc66004b7efbc32ebb99cf"
+    },
+    {
+      "sprite": 282,
+      "width": 64,
+      "height": 66,
+      "rgba_sha256": "71a59157e9a822bdec28e7e9aa80528573364458edb9edadc9df107b817f64b5"
+    },
+    {
+      "sprite": 283,
+      "width": 64,
+      "height": 66,
+      "rgba_sha256": "265842a689d7462dae8a951d03fd460bbdcb1fa6fd0192ead97d20b5466ee54b"
+    },
+    {
+      "sprite": 284,
+      "width": 64,
+      "height": 66,
+      "rgba_sha256": "484de6178ebe5071933f9fbdabd24b2a4d5ddb6a34ce9f97d18620a60ffda94c"
+    },
+    {
+      "sprite": 285,
+      "width": 64,
+      "height": 66,
+      "rgba_sha256": "1b8326dd5033723543cf9ca72f1296f8b2f7bc2fb9fbff00dd18a8480cd23f59"
+    },
+    {
+      "sprite": 286,
+      "width": 64,
+      "height": 66,
+      "rgba_sha256": "f24242a473d80ea893a904d8f24b79b60a8813f17816a247a975ad12031a6c0e"
+    },
+    {
+      "sprite": 287,
+      "width": 64,
+      "height": 66,
+      "rgba_sha256": "128576094051bb4fe65f0957c9f1f514687de03cdb5437ff87260d78624ced6a"
+    },
+    {
+      "sprite": 288,
+      "width": 64,
+      "height": 66,
+      "rgba_sha256": "cb08125e5d3cda48ddcd2ffd08ae6ccfcc1b0b2fd73c52df204a7f0238add449"
+    },
+    {
+      "sprite": 289,
+      "width": 45,
+      "height": 52,
+      "rgba_sha256": "706f2fdb256bb6819483d0963ea891853e5b023ab0e02a5314f4ba18320c5999"
+    },
+    {
+      "sprite": 290,
+      "width": 45,
+      "height": 52,
+      "rgba_sha256": "c2989d96f1b441abc30301485e9859b2e195fca79ad253933cdb5ce8d4981755"
+    },
+    {
+      "sprite": 291,
+      "width": 45,
+      "height": 52,
+      "rgba_sha256": "388d8810f459c1e738442c0d9f5ddcd35a8a48c59a04fe490bb6dfd58b9c25dc"
+    },
+    {
+      "sprite": 292,
+      "width": 45,
+      "height": 52,
+      "rgba_sha256": "47892f78eed72fa8720b6e66ed5717f75f97b632396508863636e2b20b6608e2"
+    },
+    {
+      "sprite": 293,
+      "width": 45,
+      "height": 52,
+      "rgba_sha256": "4380e9cac4beff992aed58e8260eace228ddb68d1b7f26bb12e3478bd6934b54"
+    },
+    {
+      "sprite": 294,
+      "width": 45,
+      "height": 52,
+      "rgba_sha256": "cca7826ad2c6f18307bcd0d679efb089b2790c95bc993d83ec005f3fe6e3b02b"
+    },
+    {
+      "sprite": 295,
+      "width": 64,
+      "height": 36,
+      "rgba_sha256": "5c0d5a064524821c2e6ecb9b7b014d83b8efdacbe9fc61816a829d566df2da57"
+    },
+    {
+      "sprite": 296,
+      "width": 64,
+      "height": 36,
+      "rgba_sha256": "f1c76f3490246f1fa480b510fcf40b88dbec38c255947c7a0385340a941be060"
+    },
+    {
+      "sprite": 297,
+      "width": 320,
+      "height": 180,
+      "rgba_sha256": "40c934e885e458ce6c444e8e9006d55a0b84a6c529774c5c150a855ba12827bd"
+    },
+    {
+      "sprite": 298,
+      "width": 320,
+      "height": 180,
+      "rgba_sha256": "6a038bdfe8eca454025a9e6848587037598c51862f12f98f71422759a0deec24"
+    },
+    {
+      "sprite": 299,
+      "width": 320,
+      "height": 180,
+      "rgba_sha256": "e87dc804bf15046f5a7dae206a809c824c7aa05b0da4053fafd0d52bfc03ede6"
+    },
+    {
+      "sprite": 300,
+      "width": 320,
+      "height": 180,
+      "rgba_sha256": "5de4a728154ed9c371fda9ee1a8fe1264d4796e1f2e73e01410f879755158605"
+    },
+    {
+      "sprite": 301,
+      "width": 320,
+      "height": 180,
+      "rgba_sha256": "5e8b01bd1350eed284286e1baac9233e56db0fa488ff3d7c5485227ba521cbe0"
+    },
+    {
+      "sprite": 302,
+      "width": 320,
+      "height": 180,
+      "rgba_sha256": "6c778b30d4f106249ddb8e134fea369951b3e58e756ae0e0a0c267b49b716d7e"
+    },
+    {
+      "sprite": 303,
+      "width": 320,
+      "height": 180,
+      "rgba_sha256": "51c54dbb7474ca1c00c82a1b417d3c5ccc3174d51dc8267d04c7fa8dd6d8a541"
+    },
+    {
+      "sprite": 304,
+      "width": 320,
+      "height": 180,
+      "rgba_sha256": "0392e01748665b3e77b5d2c44413ef3c8c652ed0fe80d42777836c9713cf5216"
+    },
+    {
+      "sprite": 305,
+      "width": 320,
+      "height": 180,
+      "rgba_sha256": "a22676e77dc613e4098a57ec6d98c4d087c704cc6b3852f9d351dfc6cc714a8e"
+    },
+    {
+      "sprite": 306,
+      "width": 320,
+      "height": 180,
+      "rgba_sha256": "4ccdcf1d3193e882be19d2c0926026e4e8759dd8747396889746e82685a00c28"
+    }
+  ]
+}

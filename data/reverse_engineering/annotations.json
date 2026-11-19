@@ -3444,6 +3444,41 @@
         "data/original_order_buttons.json"
       ],
       "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "menu-large-width-rle",
+      "module": "LE:1",
+      "start": 103525,
+      "end": 103602,
+      "name": "Render MENU RLE with dword width, including 320px rule pages",
+      "classification": "code",
+      "status": "verified",
+      "evidence": [
+        "docs/credits-layout.md",
+        "tests/fixtures/credits.json"
+      ],
+      "implementation": [
+        "tools/credits_source.py",
+        "tests/OriginalCreditsChecks.cs"
+      ],
+      "limitations": "27 исходных изображений совпали по RGBA с исполнением 19465. Это подготовленные PNG для Godot, не C#-дубликат RLE-рисовальщика. Заглушён dirty-helper 3EEA."
+    },
+    {
+      "id": "authors-widget-records",
+      "module": "LE:3",
+      "start": 56476,
+      "end": 56770,
+      "name": "Six authors-screen widget records",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/credits-layout.md",
+        "docs/reference/original-credits-empty.png"
+      ],
+      "implementation": [
+        "assets/imported/credits/manifest.json"
+      ],
+      "limitations": "6 записей по49байт, адреса callbacks, геометрия и кадры. Фон/спрайты сверены по снимку, весь callback lifecycle не перенесён."
     }
   ]
 }

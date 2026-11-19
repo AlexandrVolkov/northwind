@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "6bae10c535fc9f63148317a0d1d6a93d3d79b964f4a081a6425d4da1d1783f22",
+  "annotation_sha256": "96e318965adea6b0dedf74fda22344035a2d60184397b9fdc384b7364013971b",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -34,8 +34,8 @@
       "byte_status": {
         "partial": 5847,
         "ported": 25718,
-        "unreviewed": 115220,
-        "verified": 97
+        "unreviewed": 115143,
+        "verified": 174
       },
       "linear_rows": 45008,
       "flow_candidate_instructions": 30465,
@@ -1608,6 +1608,22 @@
         },
         {
           "start": 74917,
+          "end": 103525,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 103525,
+          "end": 103602,
+          "status": "verified",
+          "classification": "code",
+          "claims": [
+            "menu-large-width-rle"
+          ]
+        },
+        {
+          "start": 103602,
           "end": 124218,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2225,7 +2241,8 @@
       "sha256": "4132774a01f6e36ffae04af2eecbf50e08f64981ec6de1a04d9dcec99ba3398d",
       "byte_status": {
         "ported": 747,
-        "unreviewed": 61086
+        "unreviewed": 60792,
+        "verified": 294
       },
       "linear_rows": 29343,
       "flow_candidate_instructions": 0,
@@ -2237,6 +2254,22 @@
       "regions": [
         {
           "start": 0,
+          "end": 56476,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 56476,
+          "end": 56770,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "authors-widget-records"
+          ]
+        },
+        {
+          "start": 56770,
           "end": 60739,
           "status": "unreviewed",
           "classification": "unknown",
