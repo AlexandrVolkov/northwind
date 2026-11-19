@@ -350,16 +350,16 @@ public sealed partial class Skirmish : IDisposable
     {
         if (!actor.Stepping)
         {
-            if (actor.Route.Count == 0) { if (actor.Worker && (actor.Record[0x2d] & 15) == 2) actor.Record[0x2d] = 0; return; }
+            if (actor.Route.Count == 0) { if ((actor.Record[0x2d] & 15) == 2) actor.Record[0x2d] = 0; return; }
             var next = actor.Route.Peek();
-            if (!CanStand(actor, next)) { actor.Route.Clear(); actor.ReplanTimer = 0; if (actor.Worker) actor.Record[0x2d] = 0; return; }
+            if (!CanStand(actor, next)) { actor.Route.Clear(); actor.ReplanTimer = 0; actor.Record[0x2d] = 0; return; }
             var direction = next - actor.Cell;
-            if (Math.Max(Math.Abs(direction.X), Math.Abs(direction.Y)) != 1) { actor.Route.Clear(); if (actor.Worker) actor.Record[0x2d] = 0; return; }
+            if (Math.Max(Math.Abs(direction.X), Math.Abs(direction.Y)) != 1) { actor.Route.Clear(); actor.Record[0x2d] = 0; return; }
             byte heading = OriginalMotionPreparation.DirectionToward((uint)actor.Cell.X, (uint)actor.Cell.Y, (uint)next.X, (uint)next.Y);
             actor.Record[0x25] = (byte)((actor.Record[0x25] & 7) | (heading << 3));
             actor.Record[0x24] = 3; actor.Record[0x2c] = 32;
             actor.StepGoal = next; actor.Route.Dequeue(); actor.Stepping = actor.Turning = true; actor.StalledTicks = 0;
-            ReserveStep(actor, next); if (actor.Worker) actor.Record[0x2d] = 0x22;
+            ReserveStep(actor, next); actor.Record[0x2d] = 0x22; // movement state 2 for every unit (90E9 skips idle-only rules)
         }
         OriginalMotionStep result;
         if (actor.Turning)
@@ -377,7 +377,7 @@ public sealed partial class Skirmish : IDisposable
         if (actor.Record[0x2c] == 0 || actor.StalledTicks > 120)
         {
             ReleaseStep(actor.Id); actor.Stepping = false;
-            if (actor.Worker && actor.Route.Count == 0) actor.Record[0x2d] = 0;
+            if (actor.Route.Count == 0) actor.Record[0x2d] = 0;
         }
     }
     private void Strike(SkirmishActor actor, SkirmishActor target)
@@ -399,13 +399,11 @@ public sealed partial class Skirmish : IDisposable
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         Log($"{target.Source.TemplateName} {(target.Team == 0 ? "потерян" : "уничтожен")}.");
     }
-    /// <summary>90E9 unit prefix; returns true when the unit died this update.
-    /// Terrain death (91AE..9202) is disabled here: scenario units start on cell corners whose class the DAT marks lethal,
-    /// so the runtime position/terrain convention must be confirmed on the running original first (docs/combat.md).</summary>
+    /// <summary>90E9 unit prefix; returns true when the unit died this update.</summary>
     private bool TickVitals(SkirmishActor actor)
     {
         byte before = actor.Record[0x2d];
-        OriginalCombatRules.Vitals(actor.Record, actor.Parameters, _globalTick, (byte)Map.Width, (byte)Map.Height, Map.Cells, _properties, _terrainCatalog, _vitalsWorld ??= new(this), terrainDeath: false);
+        OriginalCombatRules.Vitals(actor.Record, actor.Parameters, _globalTick, (byte)Map.Width, (byte)Map.Height, Map.Cells, _properties, _terrainCatalog, _vitalsWorld ??= new(this));
         if (!actor.Alive) { Kill(actor); return true; }
         // 8E0E requested flight to a random cell; non-workers follow it through the route bridge.
         if (!actor.Worker && (actor.Record[0x2d] >> 4) == 2 && (before >> 4) != 2)

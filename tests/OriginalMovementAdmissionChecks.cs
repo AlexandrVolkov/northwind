@@ -80,6 +80,8 @@ public partial class TestRunner
         int ground = Enumerable.Range(0, props.Length / 8).First(i => props[i * 8] == 0 && battle.Map.Terrain[i] == "ground");
         Array.Fill(battle.Map.Cells, (uint)water); battle.Occupancy.LoadCells(new uint[battle.Occupancy.Cells.Length]);
         for (int y = 90; y < 95; y++) for (int x = 40; x < 50; x++) if (x < 44 || x > 45) battle.Map.Cells[y * battle.Map.Width + x] = (uint)ground;
+        // 90E9 drowns idle units on unsupported water; keep ground under the rest of the army so the mission continues.
+        foreach (var other in battle.Actors.Where(a => !a.Structure && a != first && a != second)) battle.Map.Cells[other.Cell.Y * battle.Map.Width + other.Cell.X] = (uint)ground;
         void Place(SkirmishActor actor, int x, int y)
         {
             BinaryPrimitives.WriteUInt32LittleEndian(actor.Record.AsSpan(4), (uint)(x * 32 + 16)); BinaryPrimitives.WriteUInt32LittleEndian(actor.Record.AsSpan(8), (uint)(y * 32 + 16));
