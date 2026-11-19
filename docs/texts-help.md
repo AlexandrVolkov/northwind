@@ -82,7 +82,24 @@ LE:3 CA0E (`1B1B7`), см. [interface.md](interface.md).
 
 ## Повторная генерация
 
+Отдельный просмотр без ISO: открыть `tests/HelpPreview.tscn` в редакторе и
+нажать F6, либо запустить `godot --path . tests/HelpPreview.tscn`. Кнопки и
+стрелки листают исходные PNG в масштабе 1:1; это инструмент просмотра, пока
+F1 в игровом HUD не подключён ведущим.
+
+`OriginalHelpRules.Step` повторяет переход страницы из `68FC..6956`, включая
+случай одновременных флагов назад/вперёд и отсутствие перерисовки при возврате
+на ту же страницу. Внешний запрет повтора на удержанной клавише и модальный
+цикл сюда не включены. `OriginalMessageCatalog` ищет запись по байтовому коду
+и даёт исходный/читаемый текст и цветовые участки.
+
+`original-texts` сверяет C# с native-фикстурой (навигация, все коды сообщений,
+RGB всех 32 страниц); эти проверки включены также в `simulation`. Режим
+`help` проверяет импорт текстур Godot, просмотр всех страниц и границы
+навигации; графический запуск сохраняет `build/help-preview.png`.
+
 ```sh
+godot --headless --path . tests/TestRunner.tscn -- help
 python tools/texts_source.py --game /path/to/Program_Executable_Files
 python tools/verify_texts.py --game /path/to/Program_Executable_Files --fixture /tmp/texts.json
 python -m unittest discover -s tests -p 'test_*.py'
