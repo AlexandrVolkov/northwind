@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 133211 | 5326 | 97 | 8248 | 44 |
+| LE:1 | 146882 | 132215 | 5326 | 97 | 9244 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -143,12 +143,18 @@
 | LE:1 `0x1243A..0x124A5` | Goods handler dispatch and item slots | partial | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Перенесены коды 0..2. Слоты +CD, UI/звук для локального игрока (5593/A4A9) не перенесены. |
 | LE:1 `0x1E53A..0x1E6C2` | AI block initialisation from character table | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
 | LE:1 `0x1E87A..0x1EAC1` | AI settlement census | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) | 1EC3F (every 256 turns) not included |
+| LE:1 `0x1EAD8..0x1EAED` | AI block of participant | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
+| LE:1 `0x1EAED..0x1EB33` | Add AI plan record | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) | plan bytes +5..+7 are register leftovers, written as zero |
 | LE:1 `0x1EB33..0x1EB40` | Clear AI plan list | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
+| LE:1 `0x1EB40..0x1EB68` | Find or add AI plan | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
 | LE:1 `0x1ECA0..0x1ECF8` | First living object of a DAT class | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) | inlined for mask 38h value 0 |
 | LE:1 `0x21459..0x21490` | Set mutual war bits | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0x219C3..0x21A00` | Clip a centred area to the map | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
+| LE:1 `0x2323A..0x23551` | AI turn: tribute, collapse, relation decisions | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) | plan bytes +5..+7 are register leftovers, written as zero |
 | LE:1 `0x23A6E..0x23A95` | Set mutual relation | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
+| LE:1 `0x23A95..0x23ABB` | AI has plan for target | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
 | LE:1 `0x23B10..0x23B6A` | AI territory threat by owner | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) |  |
+| LE:1 `0x23B6A..0x23B8E` | Territories overlap | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
 | LE:3 `0xED43..0xF02E` | AI character table | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
 
 Порядок работы и определения статусов: [assembly-database.md](assembly-database.md).
