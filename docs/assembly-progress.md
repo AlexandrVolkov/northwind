@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 137075 | 5000 | 0 | 4807 | 44 |
+| LE:1 | 146882 | 136890 | 5000 | 0 | 4992 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61833 | 0 | 0 | 0 | 0 |
 | ARMY__00.WRK | 5403 | 5216 | 100 | 0 | 87 | 0 |
@@ -64,6 +64,9 @@
 | LE:1 `0x8585..0x85CC` | Worker strike requests and timber-load counter | partial | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Проверены ожидание/запрос взмаха и завершение младшего счётчика. Нужны внешние 8AF4/8C89, завершение анимации и вызовы изменения леса/выдачи груза; весь внешний автомат рабочего не перенесён. |
 | LE:1 `0x85D5..0x85E2` | Worker signed-result modifier increment | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Точная байтовая операция; полное игровое назначение поля +16 пока не утверждается. |
 | LE:1 `0x86B6..0x877F` | Ore carrier phases: mine, receiver, back-off | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | 8F70/C439 подключены отдельно; 8B0F (отход) остаётся мостом. Глобальная запись [522] из 8D89 не переносится. |
+| LE:1 `0x8ABF..0x8AF4` | Dead target check and experience reward | ported | [combat.md](../docs/combat.md); [attack.json](../tests/fixtures/attack.json) |  |
+| LE:1 `0x8AF4..0x8B0F` | Swing delay against DAT[75] and experience | ported | [combat.md](../docs/combat.md); [attack.json](../tests/fixtures/attack.json) |  |
+| LE:1 `0x8B5E..0x8BC7` | Attack reach: pierce, plane mask, distance band, water | ported | [combat.md](../docs/combat.md); [attack.json](../tests/fixtures/attack.json) |  |
 | LE:1 `0x8DB0..0x8E0E` | Choose visitor entry point | ported | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Исходные DAT-смещения по размеру посетителя, u32-координаты и проверка границ; последующее движение отдельное. |
 | LE:1 `0x8E0E..0x8E3C` | Request a move to a random map cell | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
 | LE:1 `0x8F70..0x902F` | Approach and handoff state machine | partial | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Все фазы проверены с валидатором лесопилки. Произвольные WRK-валидаторы, путь и вызывающий диспетчер не заменены полным исходным автоматом. |
@@ -72,6 +75,7 @@
 | LE:1 `0x9210..0x92FC` | Worker stationary animation dispatch | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Состояния 0/1/3 и их запросы; движение, специальные состояния и общий префикс 90E9 не входят в этот контракт. |
 | LE:1 `0x9354..0x937F` | Worker stationary turn timer | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Поворотное состояние 1, с первым немедленным уменьшением таймера; эффекты и другие состояния анимации не включены. |
 | LE:1 `0x93AD..0x9429` | Initialize worker strike animation | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Только ветвь цели-клетки. Цель-объект OBE[22]=FF и специальные варианты не включены. |
+| LE:1 `0x93DF..0x9406` | Swing start with an object target | ported | [combat.md](../docs/combat.md); [attack.json](../tests/fixtures/attack.json) | Ветка без цели (9275) не перенесена. |
 | LE:1 `0x9429..0x945C` | Advance worker strike frames | ported | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Стационарный взмах состояния 3, включая байтовые/словные переполнения; внешняя обработка эффекта отдельна. |
 | LE:1 `0x945C..0x9498` | Prepare worker strike effect arguments | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Возвращаются аргументы на границе вызова 9727; сам полный обработчик эффекта и его дальнейшие действия не перенесены. |
 | LE:1 `0x9653..0x9688` | Turn one heading sector | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Включает исходный ZF от расчёта кадра; общий таймер обновлений задаётся вызывающей стороной. |

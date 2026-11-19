@@ -33,6 +33,9 @@ public sealed class SkirmishActor
     /// <summary>OBE[1A] for units (90E9 regeneration limit); DAT initial condition for structures.</summary>
     public int MaxHealth => Structure ? Math.Max(1, (int)Template.InitialCondition) : Math.Max(1, (int)Record[0x1a]);
     public bool Alive => Health > 0;
+    /// <summary>A completed building at or below its DAT[46] condition threshold counts as destroyed (8ABF/C439 use the same test).</summary>
+    public bool Ruined => Structure && ConstructionRemaining <= 0 && (sbyte)Record[0x19] <= (sbyte)Parameters[0x46];
+    public bool Standing => Alive && !Ruined;
     public bool Worker => Rules.Worker;
     public bool Structure => Rules.Damage == 0 && !Worker;
     public bool Hero => Source.TemplateName == "Предводитель";
@@ -307,12 +310,8 @@ public sealed partial class Skirmish : IDisposable
                     .OrderBy(a => Distance(actor.Position, a)).FirstOrDefault();
                 if (target != null) actor.Target = target.Id;
             }
-            if (target != null && !actor.Stepping && Distance(actor.Position, target) <= actor.Rules.Range)
-            {
-                actor.Route.Clear();
-                if (actor.AttackTimer <= 0) Strike(actor, target);
-                continue;
-            }
+            if (target != null && !actor.Stepping && AttackStep(actor, target)) continue;
+            if (target != null && actor.Target == 0) target = null;
             if (!actor.Stepping && target != null && actor.ReplanTimer <= 0)
             {
                 PlanAttack(actor, target); actor.ReplanTimer = .7;
@@ -325,7 +324,7 @@ public sealed partial class Skirmish : IDisposable
             MoveTick(actor);
         }
         if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";
-        else if (!Objective.Alive && !Actors.Any(a => a.Team == 1 && !a.Structure && a.Alive)) Outcome = "Победа — вражеское поселение разбито";
+        else if (!Objective.Standing && !Actors.Any(a => a.Team == 1 && !a.Structure && a.Alive)) Outcome = "Победа — вражеское поселение разбито";
     }
     private void PlanAttack(SkirmishActor actor, SkirmishActor target)
     {
@@ -380,16 +379,49 @@ public sealed partial class Skirmish : IDisposable
             if (actor.Route.Count == 0) actor.Record[0x2d] = 0;
         }
     }
-    private void Strike(SkirmishActor actor, SkirmishActor target)
+    /// <summary>Phase-1 attack loop of 843E/8EC7: reach 8B5E, swing delay 8AF4, turn, swing request 8C7C and the
+    /// animation impact (945E) resolved by the strike effect. Returns true while the unit stays engaged in place.</summary>
+    private bool AttackStep(SkirmishActor actor, SkirmishActor target)
     {
-        actor.AttackTimer = actor.Rules.Cooldown;
-        // Original hit formula (BFC9) with the attack of the strike effect (ARMY__00.WRK 4F5..4FD / 764..772).
-        // Strike timing, the effect object and projectile flight remain bridge behaviour; see docs/combat.md.
-        byte kind = actor.Rules.Range > 64 ? (byte)(actor.Record[0x14] & 7) : (byte)0;
-        OriginalCombatRules.Hit(target.Record, target.Parameters, OriginalCombatRules.StrikeAttack(actor.Record[0x16]), kind, _terrainCatalog.NextRandomByte);
-        Effects.Add(new BattleEffect { From = actor.Position, To = target.Position, Team = actor.Team });
-        if (target.Alive) return;
-        Kill(target);
+        if (OriginalWorkerAnimation.Pending(actor.Record))
+        {
+            if (OriginalWorkerAnimation.Step(actor.Record, actor.Parameters, target.Record) is { } impact) ResolveImpact(actor, target, impact);
+            return true;
+        }
+        BinaryPrimitives.WriteUInt32LittleEndian(actor.Record.AsSpan(0x1c), target.Id);
+        if (!OriginalCombatRules.TargetAlive(actor.Record, target.Record, target.Parameters)) { actor.Target = 0; return false; }
+        int index = target.Cell.Y * Map.Width + target.Cell.X;
+        byte terrain = (byte)(_properties[(int)(Map.Cells[index] & 0xffff) * 8] & 7);
+        byte reach = OriginalCombatRules.Reach(actor.Record, actor.Parameters, target.Record, target.Parameters, terrain);
+        if (reach >= 2) { actor.Target = 0; return false; }
+        if (reach == 1) return false;
+        actor.Route.Clear();
+        // The bridge's finished step leaves movement state 2; 8BEA waits for rest (8C98) before turning.
+        if ((actor.Record[0x2d] & 15) == 2 || (actor.Record[0x2d] >> 4) == 2) { actor.Record[0x2d] = 0; return true; }
+        if (!OriginalCombatRules.SwingReady(actor.Record, actor.Parameters)) return true;
+        byte heading = OriginalMotionPreparation.DirectionToward((uint)actor.Position.X, (uint)actor.Position.Y, (uint)target.Position.X, (uint)target.Position.Y);
+        if (!OriginalMotionPreparation.TurnToward(actor.Record, heading, actor.Parameters)) return true;
+        actor.Record[0x22] = 0xff; actor.Record[0x2d] = (byte)((actor.Record[0x2d] & 15) | 0x30); // 8C7C
+        return true;
+    }
+    private void ResolveImpact(SkirmishActor actor, SkirmishActor target, WorkerImpact impact)
+    {
+        if (impact.X >= Map.Width * 32 || impact.Y >= Map.Height * 32) return; // 9727 rejects points outside the map
+        Effects.Add(new BattleEffect { From = actor.Position, To = new Vector2(impact.X, impact.Y), Team = actor.Team });
+        if (impact.Code >= 128 && (impact.Code & 0x7f) == 0)
+        {
+            int plane = Occupancy.Width * Occupancy.Height;
+            var found = OriginalCombatRules.FindStruck(impact.X, impact.Y, impact.Layer, (byte)Map.Width, Map.Cells, _properties,
+                (p, cell) => Occupancy.Cells[p * plane + cell], r => Find(r) is { } a ? (a.Record, a.Parameters) : null);
+            var victim = Find(found.Reference);
+            OriginalCombatRules.StrikeEffect(new byte[0x22], actor.Record, victim != null ? victim.Record : new byte[54],
+                victim != null ? victim.Parameters : actor.Parameters, victim != null, _terrainCatalog.NextRandomByte);
+            if (victim is { Alive: false }) Kill(victim);
+            return;
+        }
+        // Missile effects (ARMY__00.WRK 762 and others) are not ported: the hit lands on the engaged target with the same attack.
+        OriginalCombatRules.Hit(target.Record, target.Parameters, OriginalCombatRules.StrikeAttack(actor.Record[0x16]), (byte)(actor.Record[0x14] & 7), _terrainCatalog.NextRandomByte);
+        if (!target.Alive) Kill(target);
     }
     private void Kill(SkirmishActor target)
     {

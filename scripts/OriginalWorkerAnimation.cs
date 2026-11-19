@@ -9,7 +9,7 @@ public static class OriginalWorkerAnimation
 {
     public static bool Pending(ReadOnlySpan<byte> record) => (record[0x2d] & 15) is 1 or 3 || (record[0x2d] >> 4) is 1 or 3;
 
-    public static WorkerImpact? Step(Span<byte> record, ReadOnlySpan<byte> template)
+    public static WorkerImpact? Step(Span<byte> record, ReadOnlySpan<byte> template, ReadOnlySpan<byte> objectTarget = default)
     {
         if (record.Length < 0x30 || template.Length < 0x71) throw new ArgumentException("Truncated worker animation data");
         int state = record[0x2d] & 15, requested = record[0x2d] >> 4;
@@ -53,11 +53,22 @@ public static class OriginalWorkerAnimation
         {
             record[0x26] = 2; AdvanceTurn(record, template); return null;
         }
-        // Only the tile-target branch 93AD..93DD is included; FF denotes an object target.
-        if (record[0x22] == 255) throw new ArgumentException("Worker swing requires a tile target");
-        BinaryPrimitives.WriteUInt16LittleEndian(record[0x28..], (ushort)(record[0x22] * 32 + 16));
-        BinaryPrimitives.WriteUInt16LittleEndian(record[0x2a..], (ushort)(record[0x23] * 32 + 16));
-        record[0x27] = 1;
+        if (record[0x22] == 255)
+        {
+            // 93DF..9403: object target from OBE[1C]; the caller passes that object's record.
+            if (BinaryPrimitives.ReadUInt32LittleEndian(record[0x1c..]) == 0 || objectTarget.IsEmpty)
+                throw new ArgumentException("Swing at an absent object target (9275 branch) is not ported");
+            BinaryPrimitives.WriteUInt16LittleEndian(record[0x28..], (ushort)BinaryPrimitives.ReadUInt32LittleEndian(objectTarget[4..]));
+            BinaryPrimitives.WriteUInt16LittleEndian(record[0x2a..], (ushort)BinaryPrimitives.ReadUInt32LittleEndian(objectTarget[8..]));
+            record[0x27] = (byte)(objectTarget[0x0d] & 3);
+        }
+        else
+        {
+            // 93AD..93DD: tile target.
+            BinaryPrimitives.WriteUInt16LittleEndian(record[0x28..], (ushort)(record[0x22] * 32 + 16));
+            BinaryPrimitives.WriteUInt16LittleEndian(record[0x2a..], (ushort)(record[0x23] * 32 + 16));
+            record[0x27] = 1;
+        }
         BinaryPrimitives.WriteUInt16LittleEndian(record[1..], unchecked((ushort)(baseFrame + 8 * template[0x4a] + heading * template[0x4b])));
         record[0x26] = template[0x4c];
         return null;

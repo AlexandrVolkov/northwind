@@ -89,7 +89,7 @@ public partial class TestRunner
             for (int i = 0; i < 3600 && battle.Outcome == ""; i++)
             {
                 // After destroying the objective, issue ordinary player orders against surviving guards.
-                if (!battle.Objective.Alive && i % 10 == 0)
+                if (!battle.Objective.Standing && i % 10 == 0)
                 {
                     var guard = battle.Actors.Where(a => a.Team == 1 && a.Alive && !a.Structure)
                         .OrderBy(a => a.Position.DistanceSquaredTo(battle.Hero.Position)).FirstOrDefault();
@@ -101,7 +101,7 @@ public partial class TestRunner
                 "The default mission can be won through normal approach, combat and destruction: " + battle.Outcome +
                 " | " + string.Join("; ", battle.Actors.Select(a => $"{a.Source.TemplateName}:{a.Team} hp{a.Health} {a.Position} route{a.Route.Count} step{a.Stepping}")));
             Check(battle.GuidedRouteSearches > 0, "Distant assault retains explicit provisional guidance across the first-map river");
-            Check(!battle.Objective.Alive && !battle.Actors.Any(a => a.Team == 1 && !a.Structure && a.Alive), "Victory requires both the castle and its guards");
+            Check(!battle.Objective.Standing && !battle.Actors.Any(a => a.Team == 1 && !a.Structure && a.Alive), "Victory requires both the castle and its guards");
             var positions = battle.Actors.Select(a => a.Position).ToArray(); battle.Advance(5);
             Check(positions.SequenceEqual(battle.Actors.Select(a => a.Position)), "A finished battle stops simulation");
         }

@@ -131,7 +131,7 @@ public partial class SkirmishMain : Node2D
     public void FocusHero() => Focus(Battle.Hero.Position - new Vector2(0, 100));
     public void FocusObjective()
     {
-        var target = Battle.Objective.Alive ? Battle.Objective : Battle.Actors.FirstOrDefault(a => a.Team == 1 && a.Alive && !a.Structure);
+        var target = Battle.Objective.Standing ? Battle.Objective : Battle.Actors.FirstOrDefault(a => a.Team == 1 && a.Alive && !a.Structure);
         Focus(target?.Position ?? Battle.Objective.Position);
     }
     private void Focus(Vector2 point) { Camera.Position = point - new Vector2(PanelWidth / (2 * Camera.Zoom.X), 0); ClampCamera(); }
@@ -425,7 +425,7 @@ public partial class SkirmishMain : Node2D
     {
         if (Battle == null) return;
         _status.Text = Battle.Outcome != "" ? Battle.Outcome + "\nR — повторить" : Battle.Paused ? "ПАУЗА · Пробел — продолжить" :
-            !Battle.Objective.Alive ? $"Замок разрушен\nОсталось защитников: {Battle.Actors.Count(a => a.Team == 1 && !a.Structure && a.Alive)} · T — найти" :
+            !Battle.Objective.Standing ? $"Замок разрушен\nОсталось защитников: {Battle.Actors.Count(a => a.Team == 1 && !a.Structure && a.Alive)} · T — найти" :
             $"Время {TimeSpan.FromSeconds(Battle.Elapsed):mm\\:ss} · ×{Speed}";
         var units = Selection.Select(Battle.Find).OfType<SkirmishActor>().ToArray();
         _selection.Text = units.Length == 1 ? $"{units[0].Source.TemplateName}\nЗдоровье {units[0].Health}/{units[0].MaxHealth}"

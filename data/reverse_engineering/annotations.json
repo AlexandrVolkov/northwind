@@ -1595,6 +1595,82 @@
         "scripts/OriginalCombatRules.cs"
       ],
       "limitations": "Перенесено создание (AH=0); обновление кадров не подключено."
+    },
+    {
+      "id": "attack-target-alive",
+      "module": "LE:1",
+      "start": 35519,
+      "end": 35572,
+      "name": "Dead target check and experience reward",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/attack.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCombatRules.cs",
+        "scripts/OriginalWorkerAnimation.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "attack-swing-gate",
+      "module": "LE:1",
+      "start": 35572,
+      "end": 35599,
+      "name": "Swing delay against DAT[75] and experience",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/attack.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCombatRules.cs",
+        "scripts/OriginalWorkerAnimation.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "attack-reach",
+      "module": "LE:1",
+      "start": 35678,
+      "end": 35783,
+      "name": "Attack reach: pierce, plane mask, distance band, water",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/attack.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCombatRules.cs",
+        "scripts/OriginalWorkerAnimation.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "swing-object-target",
+      "module": "LE:1",
+      "start": 37855,
+      "end": 37894,
+      "name": "Swing start with an object target",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/attack.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCombatRules.cs",
+        "scripts/OriginalWorkerAnimation.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": "Ветка без цели (9275) не перенесена."
     }
   ]
 }
