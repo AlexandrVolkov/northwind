@@ -28,7 +28,7 @@ public partial class OriginalMenus : Node2D
 
     private InterfaceData _data = null!;
     private readonly Dictionary<string, Texture2D> _textures = [];
-    private OriginalFont _introFont = null!, _menuFont = null!, _gameFont = null!;
+    private OriginalFont _introFont = null!, _menuFont = null!, _gameFont = null!, _hudFont = null!;
     private double _ticks, _screenTicks;
     private Vector2 _mouse;
 
@@ -40,6 +40,7 @@ public partial class OriginalMenus : Node2D
         // MENU2.FNT for the hero name on the campaign map; all with one pixel between glyphs.
         _introFont = OriginalFont.Load(_data, "SCROLL.FNT");
         _menuFont = OriginalFont.Load(_data, "MENU.FNT", "font_menu_menu2.png"); _gameFont = OriginalFont.Load(_data, "MENU2.FNT", "font_menu2_color1.png");
+        _hudFont = OriginalFont.Load(_data, "FONT_01.FNT");
         if (DisplayServer.GetName() != "headless") Input.MouseMode = Input.MouseModeEnum.Hidden;
     }
 
@@ -121,7 +122,7 @@ public partial class OriginalMenus : Node2D
                 break;
             case Screen.Loading:
                 DrawTexture(InterfaceData.Screen("loading"), Vector2.Zero);
-                _gameFont.Draw(this, new Vector2(4, 466), "Загрузка эпизода_");   // font and place not verified
+                _hudFont.Draw(this, new Vector2(6, 464), "Загрузка эпизода_");   // FONT_01, matched on the screenshot (colour error 4)
                 break;
         }
         var cursor = Group("menu_cursor");
