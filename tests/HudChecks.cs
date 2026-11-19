@@ -13,6 +13,15 @@ public partial class TestRunner
             for (int slot = 0; slot < 6; slot++) if (OriginalCommandPanel.Enabled(c[1].GetByte(), slot)) mask |= 1 << slot;
             Check(mask == c[2].GetInt32(), "Command visibility matches original LE:1 6EC1..6F17");
         }
+        var templates = InterfaceData.Load().Armies.Single(a => a.Army == 2).Templates;
+        foreach (var c in fixture.RootElement.GetProperty("groups").EnumerateArray())
+        {
+            var members = c.GetProperty("members").EnumerateArray().Select(m => new CommandPanelMember(m[1].GetByte(), templates[m[0].GetInt32()])).ToArray();
+            var commands = OriginalCommandPanel.Compose(members);
+            int mask = 0;
+            for (int k = 0; k < 6; k++) if (commands[k] != null) mask |= 1 << k;
+            Check(mask == c.GetProperty("mask").GetInt32(), "Group command intersection matches original B72D..B762");
+        }
     }
     private async Task HudChecks()
     {
@@ -60,6 +69,19 @@ public partial class TestRunner
         LeftClick(OriginalHud.Slot(1).GetCenter()); LeftClick(OriginalHud.MenuButton.GetCenter());
         scene.Restart();
         Check(scene.PendingOrder == 0 && !scene.Hud.MenuOpen, "Restart clears targeting and the open panel");
+        scene.SelectArmy();
+        Check(scene.Hud.Commands().Count(c => c is { Present: true }) == 3, "Mixed hero and soldier selection exposes three common commands");
+        LeftClick(OriginalHud.Slot(1).GetCenter());
+        Check(scene.PendingOrder == 2, "Group movement can be armed from the original panel");
+        LeftClick(OriginalHud.Slot(0).GetCenter());
+        Check(scene.PendingOrder == 0 && scene.Selection.Count == 5, "Group stop preserves the whole selection");
+        if (DisplayServer.GetName() != "headless")
+        {
+            scene.FocusHero(); await CameraSettles(); scene.Hud.QueueRedraw();
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+            GetViewport().GetTexture().GetImage().SavePng("res://build/hud-group.png");
+        }
         scene.Selection.Clear(); scene.Selection.Add(scene.Battle.Hero.Id);
         var heroTemplate = scene.Hud.Template(scene.Battle.Hero)!;
         Check(heroTemplate.Slots.Where((s, k) => s.Present && OriginalCommandPanel.Enabled(scene.Battle.Hero.Record[15], k)).Count() == 3,
@@ -115,7 +137,7 @@ public partial class TestRunner
         scene.Restart();
         if (DisplayServer.GetName() != "headless")
         {
-            scene.Hud.QueueRedraw(); await CameraSettles();
+            await CameraSettles(); scene.Hud.QueueRedraw();
             await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
             DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
             GetViewport().GetTexture().GetImage().SavePng("res://build/hud-navigation.png");

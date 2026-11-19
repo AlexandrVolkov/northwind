@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 129944 | 5413 | 97 | 11428 | 44 |
+| LE:1 | 146882 | 129889 | 5468 | 97 | 11428 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -118,6 +118,7 @@
 | LE:1 `0xB3F7..0xB47F` | Count source ore subtype in clipped three-by-three neighborhood | ported | [mine-deposits.md](../docs/mine-deposits.md); [mine-deposits.json](../tests/fixtures/mine-deposits.json) | Проверены 108 координат первой карты и оба типа руды по настоящему коду. Остальные карты и необычные размеры требуют отдельных проверок. |
 | LE:1 `0xB47F..0xB502` | Mine update: visitor handoff, stock debit and wear | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Проверен целиком с C4CD, 123D3 и B502 на первой карте. Разрушение шахты после износа +19 не подключено. |
 | LE:1 `0xB502..0xB5AB` | Remove one random ore mark and replace its surface | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Пометка грязной области экрана (B565..B5A4) не переносится. |
+| LE:1 `0xB72D..0xB764` | Intersect command slots across selected group members | partial | [interface.md](../docs/interface.md); [command-panel.json](../tests/fixtures/command-panel.json) | Фильтрация шести слотов по WorkFlags и ненулевому совпадающему raw_group проверена на 1600 парах. Исходный обход цепочки выделения и запись runtime-указателей не перенесены. |
 | LE:1 `0xBE04..0xBE2E` | Apply damage to one prepared target | ported | [building-condition-kernel.md](../docs/building-condition-kernel.md); [building-kernel.json](../tests/fixtures/building-kernel.json) | Хвост после подготовки шаблона и силы; выбор цели, генерация силы, площадное действие и смерть с эффектами вне контракта. |
 | LE:1 `0xBFC9..0xC010` | Apply a hit: attack minus defence or a small chance of one point | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
 | LE:1 `0xC344..0xC35F` | Chebyshev distance between object centres | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |

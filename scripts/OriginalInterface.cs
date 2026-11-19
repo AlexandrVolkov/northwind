@@ -43,7 +43,27 @@ public sealed class InterfaceSlot
 public static class OriginalCommandPanel
 {
     public static bool Enabled(byte workFlags, int slot) => slot is >= 0 and < 6 && (workFlags & (1 << slot)) != 0;
+
+    // B72D..B762 filters the first member's six slots; group zero never survives a second member.
+    public static InterfaceSlot?[] Compose(IReadOnlyList<CommandPanelMember> members)
+    {
+        var result = new InterfaceSlot?[6];
+        if (members.Count == 0) return result;
+        for (int slot = 0; slot < 6; slot++)
+        {
+            var first = members[0];
+            if (!Enabled(first.Flags, slot)) continue;
+            var command = first.Template.Slots[slot];
+            bool keep = true;
+            for (int i = 1; i < members.Count; i++)
+                if (!Enabled(members[i].Flags, slot) || command.RawGroup == 0 || members[i].Template.Slots[slot].RawGroup != command.RawGroup)
+                { keep = false; break; }
+            if (keep) result[slot] = command;
+        }
+        return result;
+    }
 }
+public readonly record struct CommandPanelMember(byte Flags, InterfaceTemplate Template);
 public sealed class InterfaceTemplate
 {
     public int Template { get; set; }

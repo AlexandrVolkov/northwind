@@ -2,6 +2,18 @@
   "format_version": 1,
   "regions": [
     {
+      "id": "group-command-panel-filter",
+      "module": "LE:1",
+      "start": 46893,
+      "end": 46948,
+      "name": "Intersect command slots across selected group members",
+      "classification": "code",
+      "status": "partial",
+      "evidence": ["docs/interface.md", "tests/fixtures/command-panel.json"],
+      "implementation": ["scripts/OriginalInterface.cs", "scripts/OriginalHud.cs"],
+      "limitations": "Фильтрация шести слотов по WorkFlags и ненулевому совпадающему raw_group проверена на 1600 парах. Исходный обход цепочки выделения и запись runtime-указателей не перенесены."
+    },
+    {
       "id": "single-command-panel",
       "module": "LE:1",
       "start": 28353,

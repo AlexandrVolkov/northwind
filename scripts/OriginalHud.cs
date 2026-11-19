@@ -78,18 +78,32 @@ public partial class OriginalHud : Node2D
 
     private void DrawSelection()
     {
-        if (SingleUnit() is not { } unit) return;
-        _font.Draw(this, new Vector2(482, 160), unit.Hero ? Game.HeroName : unit.Source.TemplateName);
-        if (unit.Hero && _heroes.Known.TryGetValue(Game.HeroName, out int hero))
-            DrawTextureRectRegion(_heroAtlas, new Rect2(PortraitAt, 64, 70), _heroes.Region(hero - _heroes.FirstSprite));
-        else if (Template(unit) is { } template)
-            DrawTextureRectRegion(_portraits, new Rect2(PortraitAt, 80, 50), Army.Portraits.Region(template.Portrait));
-        if (Template(unit) is { } t && unit.Team == 0)
-            for (int k = 0; k < t.Slots.Count; k++)
-                if (OriginalCommandPanel.Enabled(unit.Record[0x0f], k) && t.Slots[k] is { Present: true, Button: { } button })
-                    DrawTextureRectRegion(_buttons, Slot(k), Army.Buttons.Region(button));
-        DrawBar(HealthBar, unit.MaxHealth > 0 ? Math.Clamp(unit.Health / (float)unit.MaxHealth, 0, 1) : 0);
-        DrawBar(ExperienceBar, 0);
+        if (SingleUnit() is { } unit)
+        {
+            _font.Draw(this, new Vector2(482, 160), unit.Hero ? Game.HeroName : unit.Source.TemplateName);
+            if (unit.Hero && _heroes.Known.TryGetValue(Game.HeroName, out int hero))
+                DrawTextureRectRegion(_heroAtlas, new Rect2(PortraitAt, 64, 70), _heroes.Region(hero - _heroes.FirstSprite));
+            else if (Template(unit) is { } template)
+                DrawTextureRectRegion(_portraits, new Rect2(PortraitAt, 80, 50), Army.Portraits.Region(template.Portrait));
+            DrawBar(HealthBar, unit.MaxHealth > 0 ? Math.Clamp(unit.Health / (float)unit.MaxHealth, 0, 1) : 0);
+            DrawBar(ExperienceBar, 0);
+        }
+        else if (Game.Selection.Count > 1) _font.Draw(this, new Vector2(482, 160), $"Выбрано: {Game.Selection.Count}");
+        var commands = Commands();
+        for (int k = 0; k < commands.Length; k++)
+            if (commands[k] is { Present: true, Button: { } button }) DrawTextureRectRegion(_buttons, Slot(k), Army.Buttons.Region(button));
+    }
+
+    /// <summary>Selection order follows the scene's owner/object list, rather than mouse insertion order.</summary>
+    public InterfaceSlot?[] Commands()
+    {
+        var members = new List<CommandPanelMember>();
+        foreach (var unit in Game.Battle.Actors.Where(a => Game.Selection.Contains(a.Id)))
+        {
+            if (!unit.Alive || unit.Team != 0 || Template(unit) is not { } template) return new InterfaceSlot?[6];
+            members.Add(new(unit.Record[0x0f], template));
+        }
+        return OriginalCommandPanel.Compose(members);
     }
 
     /// <summary>Order slots of the unit's DAT template (ARMY__02 only for now).</summary>
@@ -122,11 +136,11 @@ public partial class OriginalHud : Node2D
         else if (MenuButton.HasPoint(point)) MenuOpen = true;
         else if (Minimap.HasPoint(point))
             Game.FocusWorld((point - Minimap.Position) / Minimap.Size * new Vector2(Game.Battle.Map.Width, Game.Battle.Map.Height) * 32);
-        else if (SingleUnit() is { } unit && Template(unit) is { } template)
+        else if (Game.Battle.Actors.FirstOrDefault(a => Game.Selection.Contains(a.Id)) is { } unit)
         {
-            for (int k = 0; k < template.Slots.Count; k++)
-                if (unit.Team == 0 && OriginalCommandPanel.Enabled(unit.Record[0x0f], k) && template.Slots[k].Present
-                    && template.Slots[k].Button != null && Slot(k).HasPoint(point)) Game.OrderSlot(unit, template.Slots[k]);
+            var commands = Commands();
+            for (int k = 0; k < commands.Length; k++)
+                if (commands[k] is { Present: true, Button: not null } command && Slot(k).HasPoint(point)) Game.OrderSlot(unit, command);
         }
         QueueRedraw();
         return true;
