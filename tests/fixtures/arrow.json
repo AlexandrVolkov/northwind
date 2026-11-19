@@ -1,0 +1,141 @@
+{
+  "format_version": 1,
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475",
+    "ARMY__00.WRK": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33"
+  },
+  "templates_sha256": {
+    "0": "096dcc81394f05943ea0ff4d5df154bc0c4cbc071b81f7bf3ecbcebb789e5b5f",
+    "2": "5418e774623844bdb25f39db4ced48728de222976752c30e0db232021c5ea208"
+  },
+  "results": {
+    "create": {
+      "case_count": 480,
+      "sha256": "268dfb7422b7170ca6065a514bf5bbdf76b966ea09353bf322780e1e792bc2ef"
+    },
+    "step": {
+      "case_count": 7680,
+      "sha256": "e1300221d6630b757ac74044c30140e4f8fd4ddcfa5af918c587090b8659f4f1"
+    }
+  },
+  "create": {
+    "origins": [
+      [
+        48,
+        48
+      ],
+      [
+        250,
+        260
+      ],
+      [
+        500,
+        16
+      ]
+    ],
+    "targets": [
+      [
+        48,
+        48
+      ],
+      [
+        80,
+        48
+      ],
+      [
+        48,
+        400
+      ],
+      [
+        300,
+        301
+      ],
+      [
+        16,
+        500
+      ],
+      [
+        511,
+        511
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        250,
+        20
+      ]
+    ],
+    "experience": [
+      0,
+      15,
+      16,
+      127,
+      255
+    ],
+    "random_indices": [
+      0,
+      1,
+      99,
+      255
+    ]
+  },
+  "step": {
+    "remaining": [
+      0,
+      5,
+      16,
+      17,
+      1000
+    ],
+    "velocities": [
+      [
+        3840,
+        0
+      ],
+      [
+        -3840,
+        768
+      ],
+      [
+        64,
+        -3840
+      ],
+      [
+        2560,
+        2560
+      ]
+    ],
+    "present": [
+      0,
+      1
+    ],
+    "flags": [
+      0,
+      8,
+      16,
+      24
+    ],
+    "owners": [
+      0,
+      3
+    ],
+    "health": [
+      0,
+      1,
+      10
+    ],
+    "defences": [
+      0,
+      3,
+      4,
+      7
+    ],
+    "random_indices": [
+      0,
+      1
+    ]
+  }
+}

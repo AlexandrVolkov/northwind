@@ -4,10 +4,10 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 136890 | 5000 | 0 | 4992 | 44 |
+| LE:1 | 146882 | 136543 | 5000 | 0 | 5339 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61833 | 0 | 0 | 0 | 0 |
-| ARMY__00.WRK | 5403 | 5216 | 100 | 0 | 87 | 0 |
+| ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
 | ARMY__02.WRK | 6930 | 6109 | 609 | 0 | 212 | 7 |
 | ARMY__03.WRK | 13412 | 13412 | 0 | 0 | 0 | 1 |
@@ -21,6 +21,7 @@
 | Модуль / полуоткрытый диапазон | Имя | Статус | Доказательства | Ограничения |
 | --- | --- | --- | --- | --- |
 | ARMY__00.WRK `0x4F3..0x54A` | Melee strike effect: experience attack, lookup, hit, sound | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Объект-эффект и его анимация в схватке не создаются. |
+| ARMY__00.WRK `0x593..0x6C7` | Arrow effect: launch, flight, early and arrival hits | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) | Обработчики 7FE/AEB не перенесены. |
 | ARMY__00.WRK `0x6FE..0x762` | Spark effect types 4/5 creation and countdown | partial | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Перенесено создание (AH=0); обновление кадров не подключено. |
 | ARMY__02.WRK `0x13B..0x157` | Castle AH=5 visitor validator | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Принимающая ветка 1B8 общая с хвостом обработчика. |
 | ARMY__02.WRK `0x221..0x251` | Castle seven-byte header and production rows | partial | [recruitment-production.md](../docs/recruitment-production.md); [original_production.json](../data/original_production.json) | Заголовок сохранён без выдуманных назначений. Разобраны строки index/frame/interval. Ополченца в таблице замка нет. |
@@ -82,8 +83,11 @@
 | LE:1 `0x9688..0x96CD` | Direction toward world coordinates | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Исходная u32-арифметика и переполнения; правило отличается от направления локального поиска 79C0. |
 | LE:1 `0x982B..0x98CC` | Object under an effect point with footprint containment | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Схватка пока бьёт явную цель вместо точки удара. |
 | LE:1 `0x98CC..0x996F` | Detach object from owner chain | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Корректная монотонная цепочка с достижимым объектом; момент смерти, порождение эффекта и повторное выделение записи не включены. |
+| LE:1 `0x996F..0x9A1B` | Missile distance, 24.8 velocity and arc speed | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) | Деление на ноль/переполнение DIV при вырожденных расстояниях не воспроизводится. |
+| LE:1 `0x9A1B..0x9A8E` | Missile aim scatter by distance and experience | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) |  |
 | LE:1 `0x9B0D..0x9B86` | Transfer occupancy at step midpoint | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Области и плоскости корректны; особый соседний вариант 9A97..9B0C не покрыт. Полное исходное размещение крупных движущихся объектов ещё не подключено в схватке. |
 | LE:1 `0x9B86..0x9BF9` | Gap between object footprints | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Сохранены байтовые сдвиги размеров и u32-переполнения; игровое использование включает лишь проверенные ветви подхода. |
+| LE:1 `0xA5B8..0xA5F4` | Sixteen-way missile direction frame | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) |  |
 | LE:1 `0xA758..0xA870` | Allocate and initialize object record | partial | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [building-lifecycle.json](../tests/fixtures/building-lifecycle.json) | Перенесён лишь путь новой пустой цепочки для 49-байтового замка; поиск дыр, универсальный аллокатор и ошибки не покрыты. |
 | LE:1 `0xA8BB..0xA90F` | Check and debit all four recruitment prices | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json); [recruitment-production.md](../docs/recruitment-production.md) | Только проверка и списание запасов до изменения фазы производителя. Оплата первого заказа и ожидание выхода подключены через отдельные проверенные операции; полный исходный диспетчер и аллокатор не перенесены. |
 | LE:1 `0xA90F..0xA920` | Initialize paid production phase and counters | ported | [recruitment-production.md](../docs/recruitment-production.md); [production.json](../tests/fixtures/production.json) | Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора. |

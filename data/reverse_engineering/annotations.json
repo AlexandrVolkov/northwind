@@ -1671,6 +1671,78 @@
         "scripts/Skirmish.cs"
       ],
       "limitations": "Ветка без цели (9275) не перенесена."
+    },
+    {
+      "id": "arrow-9a1b",
+      "module": "LE:1",
+      "start": 39451,
+      "end": 39566,
+      "name": "Missile aim scatter by distance and experience",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/arrow.json"
+      ],
+      "implementation": [
+        "scripts/OriginalArrowRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "arrow-996f",
+      "module": "LE:1",
+      "start": 39279,
+      "end": 39451,
+      "name": "Missile distance, 24.8 velocity and arc speed",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/arrow.json"
+      ],
+      "implementation": [
+        "scripts/OriginalArrowRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": "Деление на ноль/переполнение DIV при вырожденных расстояниях не воспроизводится."
+    },
+    {
+      "id": "arrow-a5b8",
+      "module": "LE:1",
+      "start": 42424,
+      "end": 42484,
+      "name": "Sixteen-way missile direction frame",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/arrow.json"
+      ],
+      "implementation": [
+        "scripts/OriginalArrowRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "arrow-593",
+      "module": "ARMY__00.WRK",
+      "start": 1427,
+      "end": 1735,
+      "name": "Arrow effect: launch, flight, early and arrival hits",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/arrow.json"
+      ],
+      "implementation": [
+        "scripts/OriginalArrowRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": "Обработчики 7FE/AEB не перенесены."
     }
   ]
 }
