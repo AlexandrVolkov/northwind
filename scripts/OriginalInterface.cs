@@ -30,10 +30,59 @@ public sealed class InterfaceAtlas
 }
 public sealed class InterfaceSlot
 {
-    public int[] Bytes { get; set; } = [];
     public int Sprite { get; set; }
     public int? Button { get; set; }
-    public uint Handler { get; set; }
+    public bool Present { get; set; }
+    public byte Mode { get; set; }
+    public byte RawGroup { get; set; }
+    public string Label { get; set; } = "";
+    public int? HotkeyScanCode { get; set; }
+}
+
+/// <summary>LE:1 6EC1..6F17: six DAT commands filtered by the low six OBE WorkFlags bits.</summary>
+public static class OriginalCommandPanel
+{
+    public static bool Enabled(byte workFlags, int slot) => slot is >= 0 and < 6 && (workFlags & (1 << slot)) != 0;
+
+    // B72D..B762 filters the first member's six slots; group zero never survives a second member.
+    public static InterfaceSlot?[] Compose(IReadOnlyList<CommandPanelMember> members)
+    {
+        var result = new InterfaceSlot?[6];
+        if (members.Count == 0) return result;
+        for (int slot = 0; slot < 6; slot++)
+        {
+            var first = members[0];
+            if (!Enabled(first.Flags, slot)) continue;
+            var command = first.Template.Slots[slot];
+            bool keep = true;
+            for (int i = 1; i < members.Count; i++)
+                if (!Enabled(members[i].Flags, slot) || command.RawGroup == 0 || members[i].Template.Slots[slot].RawGroup != command.RawGroup)
+                { keep = false; break; }
+            if (keep) result[slot] = command;
+        }
+        return result;
+    }
+}
+public readonly record struct CommandPanelMember(byte Flags, InterfaceTemplate Template);
+
+/// <summary>Physical keys for the set-1 DOS scan codes used by the current ARMY__02 command descriptions.</summary>
+public static class OriginalCommandKeys
+{
+    public static int Scan(Key key) => key switch
+    {
+        Key.Y => 0x15, Key.P => 0x19, Key.D => 0x20, Key.F => 0x21, Key.G => 0x22,
+        Key.H => 0x23, Key.J => 0x24, Key.C => 0x2e, Key.B => 0x30, _ => -1,
+    };
+    public static string Name(int? scan) => scan switch
+    {
+        0x15 => "Y", 0x19 => "P", 0x20 => "D", 0x21 => "F", 0x22 => "G",
+        0x23 => "H", 0x24 => "J", 0x2e => "C", 0x30 => "B", _ => "",
+    };
+    public static string Hint(InterfaceSlot command)
+    {
+        string key = Name(command.HotkeyScanCode);
+        return key.Length == 0 ? command.Label : $"{command.Label} [{key}]";
+    }
 }
 public sealed class InterfaceTemplate
 {
@@ -53,11 +102,18 @@ public sealed class InterfaceData
 {
     public int FormatVersion { get; set; }
     public InterfaceAtlas HeroPortraits { get; set; } = new();
+    public InterfaceAtlas? ArrowCursor { get; set; }
+    public Dictionary<int, int[]> UiColors { get; set; } = [];
     public List<InterfaceArmy> Armies { get; set; } = [];
     public List<InterfaceScreen> Screens { get; set; } = [];
     public List<InterfaceFont> Fonts { get; set; } = [];
     public const string Root = "res://assets/imported/interface/";
-    public static InterfaceData Load() => GameData.Read<InterfaceData>(Root + "interface.json");
+    public static InterfaceData Load()
+    {
+        var data = GameData.Read<InterfaceData>(Root + "interface.json");
+        if (data.FormatVersion != 3) throw new InvalidDataException("Update the bundled interface data: schema 3 is required.");
+        return data;
+    }
     public static Texture2D Screen(string name) => GD.Load<Texture2D>(Root + name + ".png");
 }
 

@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import struct
 from PIL import Image
+from import_game import decode_template_commands
 
 SCREENS = {0: ('game_frame', 'COLOR1.PAL'), 1: ('loading', 'COLOR1.PAL'), 2: ('panel_menu', 'COLOR1.PAL'),
            3: ('panel_commands', 'COLOR1.PAL'), 4: ('main_menu', 'MENU1.PAL'), 5: ('save_slots', 'MENU2.PAL'),
@@ -75,7 +76,7 @@ def make_atlas(images, columns):
 
 
 def army_panel(game, army, palette, output):
-    """Portraits (DAT +5, 80x50) and order buttons (six 8-byte slots from DAT +9: two bytes, u16 sprite, u32 WRK handler; 69x35)."""
+    """Portraits (DAT +5) and six commands at DAT +0B, decoded by the shared DAT importer."""
     dat = (game / f'ARMY__0{army}.DAT').read_bytes(); records = spr_records((game / f'ARMY__0{army}.SPR').read_bytes())
     count = struct.unpack_from('<H', dat)[0] // 171; portraits = []; buttons = []; templates = []
     for t in range(count):
@@ -83,10 +84,12 @@ def army_panel(game, army, palette, output):
         portrait = struct.unpack_from('<H', r, 5)[0]
         if portrait not in portraits: portraits.append(portrait)
         slots = []
-        for k in range(6):
-            a, b, sprite, handler = struct.unpack_from('<BBHI', r, 9 + 8 * k)
+        for command in decode_template_commands(dat, 2 + 171 * t, 2 + count * 171):
+            sprite = command['icon_frame']
             if sprite and sprite not in buttons: buttons.append(sprite)
-            slots.append({'bytes': [a, b], 'sprite': sprite, 'button': buttons.index(sprite) if sprite else None, 'handler': handler})
+            slots.append({'sprite': sprite, 'button': buttons.index(sprite) if sprite else None,
+                          'present': command['present'], 'mode': command['mode'], 'raw_group': command['raw_group'],
+                          'label': command['label'], 'hotkey_scan_code': command['hotkey_scan_code']})
         templates.append({'template': t, 'portrait': portraits.index(portrait), 'slots': slots})
     sheet, cell = make_atlas([spr_image(records[i], 80, 50, palette) for i in portraits], 8)
     sheet.save(output / f'army{army:02d}_portraits.png')
@@ -105,7 +108,7 @@ def image(width, height, pixels, palette, transparent=False):
 def convert(game, output):
     output.mkdir(parents=True, exist_ok=True)
     pal = lambda name: (game / name).read_bytes()
-    raw = (game / 'SCREENS.SCR').read_bytes(); manifest = {'format_version': 1, 'screens': [], 'fonts': []}
+    raw = (game / 'SCREENS.SCR').read_bytes(); manifest = {'format_version': 3, 'screens': [], 'fonts': []}
     for index, (width, height, pixels) in enumerate(screens(raw)):
         if index not in SCREENS: manifest['screens'].append({'index': index, 'size': [width, height], 'palette': None}); continue
         name, palette = SCREENS[index]
@@ -131,12 +134,18 @@ def convert(game, output):
             red.save(output / f'font_{stem}_red.png')
         manifest['fonts'].append({'file': font, 'atlas': f'font_{stem}.png', 'palette': palette, 'cell': [span, cell], 'glyphs': entries})
     work = spr_records((game / 'WORK.SPR').read_bytes()); colour = pal('COLOR1.PAL')
+    # Display colors after the original VGA DAC's six-bit conversion, as used by the verified sprite renderer.
+    manifest['ui_colors'] = {str(i): [(v & 252) | (v >> 6) for v in colour[i*3:i*3+3]] for i in [0, 0x44, 0xb2, 0x51, 0x22, 0x94]}
+    # LE:1 2515 selects the inclusive 0..14 cursor range; 3D67 draws 32x32 WORK.SPR frames.
+    arrow, cell = make_atlas([spr_image(work[i], 32, 32, colour) for i in range(15)], 8)
+    arrow.save(output / 'arrow_cursor.png')
+    manifest['arrow_cursor'] = {'atlas': 'arrow_cursor.png', 'cell': cell, 'first_sprite': 0, 'sprites': list(range(15))}
     heroes, cell = make_atlas([spr_image(work[i], 64, 70, colour) for i in range(195, 227)], 8)
     heroes.save(output / 'hero_portraits.png')
     manifest['hero_portraits'] = {'atlas': 'hero_portraits.png', 'cell': cell, 'first_sprite': 195, 'source': 'WORK.SPR',
                                   'known': {'Олег': 196}}
     manifest['armies'] = [army_panel(game, 2, colour, output)]
-    manifest['source_sha256'] = {n: hashlib.sha256((game / n).read_bytes()).hexdigest() for n in ['SCREENS.SCR', 'WORK.SPR', 'ARMY__02.SPR', 'ARMY__02.DAT', *FONTS]}
+    manifest['source_sha256'] = {n: hashlib.sha256((game / n).read_bytes()).hexdigest() for n in ['SCREENS.SCR', 'WORK.SPR', 'ARMY__02.SPR', 'ARMY__02.DAT', 'COLOR1.PAL', *FONTS]}
     (output / 'interface.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
 
 

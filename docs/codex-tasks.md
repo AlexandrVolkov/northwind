@@ -8,6 +8,10 @@
 
 Сцены и код интерфейса: `scripts/OriginalHud.cs`, `scripts/OriginalInterface.cs`, `scripts/SkirmishMain.cs`, `scenes/`, `tools/interface_source.py`, `assets/imported/interface/`, `docs/interface.md`, `tests/SkirmishChecks.cs`, а также `project.godot`, `AGENTS.md`, `docs/continuation.md`.
 
+## Принятые работы вне очереди
+
+- **H1–H7, ветка `codex-work` до 19.11 (df61d94):** исправления навигации HUD и отмены приказа; панели команд из DAT и WorkFlags (сверка `tools/verify_command_panel.py`); общие панели для групп; горячие клавиши и подсказки; заморозка ввода и камеры на паузе; анимация курсора-стрелки (`tools/verify_cursor_animation.py`); шкалы здоровья и опыта (`tools/verify_status_bars.py`). **Принято в main целиком.** Проверено: все режимы тестов PASS, три фикстуры заново получены из оригинального EXE и совпали байт в байт, вид экрана сверен со снимком оригинала.
+
 ## Задачи
 
 ### C1. Звуковые банки FX — открыта

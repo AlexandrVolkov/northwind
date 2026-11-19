@@ -2,6 +2,66 @@
   "format_version": 1,
   "regions": [
     {
+      "id": "status-bar-raster",
+      "module": "LE:1",
+      "start": 28143,
+      "end": 28338,
+      "name": "Rasterize a column-filled status gauge",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/interface.md", "tests/fixtures/status-bars.json"],
+      "implementation": ["scripts/OriginalStatusBarRules.cs"],
+      "limitations": "Сверены индексы всех пикселей 1314 изображений в трёх размерах, current<=maximum и особый нулевой предел. DOS framebuffer и dirty-cache заменены отрисовкой Godot; опасные размеры и DIV за пределами контракта не перенесены."
+    },
+    {
+      "id": "health-gauge-color",
+      "module": "LE:1",
+      "start": 25547,
+      "end": 25591,
+      "name": "Update health gauge value and threshold color",
+      "classification": "code",
+      "status": "partial",
+      "evidence": ["docs/interface.md", "tests/fixtures/status-bars.json"],
+      "implementation": ["scripts/OriginalStatusBarRules.cs", "scripts/OriginalHud.cs"],
+      "limitations": "Перенесён выбор цвета по половине и четверти исходного предела. Runtime-буфер виджета и его dirty-флаг не воспроизводятся."
+    },
+    {
+      "id": "cursor-animation-step",
+      "module": "LE:1",
+      "start": 15797,
+      "end": 15858,
+      "name": "Advance cursor frame on a four-tick byte timer interval",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/interface.md", "tests/fixtures/cursor-animation.json"],
+      "implementation": ["scripts/OriginalCursorRules.cs"],
+      "limitations": "Числовой шаг проверен на 35840 входах. Выбор семейства, DOS-мышь, фоновый буфер и полный цикл отрисовки курсора не включены; HUD использует только диапазон обычной стрелки."
+    },
+    {
+      "id": "group-command-panel-filter",
+      "module": "LE:1",
+      "start": 46893,
+      "end": 46948,
+      "name": "Intersect command slots across selected group members",
+      "classification": "code",
+      "status": "partial",
+      "evidence": ["docs/interface.md", "tests/fixtures/command-panel.json"],
+      "implementation": ["scripts/OriginalInterface.cs", "scripts/OriginalHud.cs"],
+      "limitations": "Фильтрация шести слотов по WorkFlags и ненулевому совпадающему raw_group проверена на 1600 парах. Исходный обход цепочки выделения и запись runtime-указателей не перенесены."
+    },
+    {
+      "id": "single-command-panel",
+      "module": "LE:1",
+      "start": 28353,
+      "end": 28440,
+      "name": "Single selection command panel filtered by WorkFlags",
+      "classification": "code",
+      "status": "partial",
+      "evidence": ["docs/interface.md", "tests/fixtures/command-panel.json"],
+      "implementation": ["scripts/OriginalInterface.cs", "scripts/OriginalHud.cs"],
+      "limitations": "Маски одиночной панели проверены для пяти DAT-шаблонов и всех 256 WorkFlags. Исходный runtime-буфер указателей, группа выделения и полный диспетчер кликов не перенесены."
+    },
+    {
       "id": "lumbermill-visitor-validator",
       "module": "ARMY__02.WRK",
       "start": 867,
