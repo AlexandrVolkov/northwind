@@ -21,6 +21,7 @@ public partial class TestRunner : Node
                 case "hud": await HudChecks(); break;
                 case "pause": await PauseChecks(); break;
                 case "cursor": await CursorChecks(); break;
+                case "status-bars": await StatusBarChecks(); break;
                 case "skirmish": await SkirmishChecks(); break;
                 case "original-route-search": OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); break;
                 case "original-route-pool": OriginalRoutePoolChecks(); PackedRouteIntegrationChecks(); break;
@@ -33,7 +34,7 @@ public partial class TestRunner : Node
                 case "mine": await MineChecks(); break;
                 case "population": await PopulationChecks(); break;
                 case "economy": await EconomyChecks(); break;
-                case "simulation": SimulationChecks(); OriginalCommandPanelChecks(); OriginalCursorChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); OriginalSpatialChecks(); OriginalMotionPreparationChecks(); OriginalLumbermillChecks(); OriginalForestryChecks(); OriginalWorkerAnimationChecks(); OriginalWorkerDeliveryChecks(); OriginalWorkerApproachChecks(); OriginalMovementAdmissionChecks(); MovementBridgeChecks(); OriginalRoutePoolChecks(); PackedRouteIntegrationChecks(); OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); OriginalPopulationChecks(); OriginalResourceChecks(); OriginalProductionChecks(); OriginalOreChecks(); OriginalCombatChecks(); OriginalAttackChecks(); OriginalArrowChecks(); OriginalDeathChecks(); OriginalTargetChecks(); OriginalDiplomacyChecks(); OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); OriginalTechChecks(); OriginalAiResearchChecks(); break;
+                case "simulation": SimulationChecks(); OriginalCommandPanelChecks(); OriginalCursorChecks(); OriginalStatusBarChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); OriginalSpatialChecks(); OriginalMotionPreparationChecks(); OriginalLumbermillChecks(); OriginalForestryChecks(); OriginalWorkerAnimationChecks(); OriginalWorkerDeliveryChecks(); OriginalWorkerApproachChecks(); OriginalMovementAdmissionChecks(); MovementBridgeChecks(); OriginalRoutePoolChecks(); PackedRouteIntegrationChecks(); OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); OriginalPopulationChecks(); OriginalResourceChecks(); OriginalProductionChecks(); OriginalOreChecks(); OriginalCombatChecks(); OriginalAttackChecks(); OriginalArrowChecks(); OriginalDeathChecks(); OriginalTargetChecks(); OriginalDiplomacyChecks(); OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); OriginalTechChecks(); OriginalAiResearchChecks(); break;
                 case "original-buildings": OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); break;
                 case "imported-occupancy": ImportedOccupancyChecks(); break;
                 case "original-spatial": OriginalSpatialChecks(); break;

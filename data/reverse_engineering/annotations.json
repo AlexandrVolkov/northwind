@@ -2,6 +2,30 @@
   "format_version": 1,
   "regions": [
     {
+      "id": "status-bar-raster",
+      "module": "LE:1",
+      "start": 28143,
+      "end": 28338,
+      "name": "Rasterize a column-filled status gauge",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/interface.md", "tests/fixtures/status-bars.json"],
+      "implementation": ["scripts/OriginalStatusBarRules.cs"],
+      "limitations": "Сверены индексы всех пикселей 1314 изображений в трёх размерах, current<=maximum и особый нулевой предел. DOS framebuffer и dirty-cache заменены отрисовкой Godot; опасные размеры и DIV за пределами контракта не перенесены."
+    },
+    {
+      "id": "health-gauge-color",
+      "module": "LE:1",
+      "start": 25547,
+      "end": 25591,
+      "name": "Update health gauge value and threshold color",
+      "classification": "code",
+      "status": "partial",
+      "evidence": ["docs/interface.md", "tests/fixtures/status-bars.json"],
+      "implementation": ["scripts/OriginalStatusBarRules.cs", "scripts/OriginalHud.cs"],
+      "limitations": "Перенесён выбор цвета по половине и четверти исходного предела. Runtime-буфер виджета и его dirty-флаг не воспроизводятся."
+    },
+    {
       "id": "cursor-animation-step",
       "module": "LE:1",
       "start": 15797,

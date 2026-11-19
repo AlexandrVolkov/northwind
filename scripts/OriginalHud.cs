@@ -17,7 +17,7 @@ public partial class OriginalHud : Node2D
     public static readonly Rect2 GameSlower = new(470, 124, 18, 20), GameFaster = new(624, 124, 18, 20);
     public static readonly Rect2 PauseButton = new(494, 402, 124, 24), ExitButton = new(494, 428, 124, 24);
     private static readonly int[] CounterX = [66, 159, 260, 365];
-    private static readonly Color BarBorder = new(146 / 255f, 85 / 255f, 0), BarFill = new(65 / 255f, 93 / 255f, 48 / 255f);
+    private readonly Dictionary<int, Color> _uiColors = [];
     private static readonly Rect2 HealthBar = new(572, 176, 9, 50), ExperienceBar = new(587, 176, 9, 50);
 
     public SkirmishMain Game { get; set; } = null!;
@@ -41,6 +41,7 @@ public partial class OriginalHud : Node2D
     {
         TextureFilter = TextureFilterEnum.Nearest;
         var data = InterfaceData.Load();
+        foreach (var (index, rgb) in data.UiColors) _uiColors[index] = new Color(rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f);
         _cursor = data.ArrowCursor;
         if (_cursor != null)
         {
@@ -120,8 +121,10 @@ public partial class OriginalHud : Node2D
                 DrawTextureRectRegion(_heroAtlas, new Rect2(PortraitAt, 64, 70), _heroes.Region(hero - _heroes.FirstSprite));
             else if (Template(unit) is { } template)
                 DrawTextureRectRegion(_portraits, new Rect2(PortraitAt, 80, 50), Army.Portraits.Region(template.Portrait));
-            DrawBar(HealthBar, unit.MaxHealth > 0 ? Math.Clamp(unit.Health / (float)unit.MaxHealth, 0, 1) : 0);
-            DrawBar(ExperienceBar, 0);
+            byte maximum = unit.Parameters[0x45], condition = (byte)Math.Clamp(unit.Health, 0, maximum);
+            DrawBar(HealthBar, condition, maximum, OriginalStatusBarRules.HealthColor(condition, maximum));
+            // +16 is experience for living units; buildings use it as a maintenance counter.
+            DrawBar(ExperienceBar, unit.Structure ? (byte)0 : (byte)Math.Min(127, (int)unit.Record[0x16]), 127, 0x94);
         }
         else if (Game.Selection.Count > 1) _font.Draw(this, new Vector2(482, 160), $"Выбрано: {Game.Selection.Count}");
         var commands = Commands();
@@ -191,12 +194,16 @@ public partial class OriginalHud : Node2D
     public InterfaceTemplate? Template(SkirmishActor unit) =>
         unit.Source.TemplateFile == "ARMY__02.DAT" && unit.Source.TemplateIndex < Army.Templates.Count ? Army.Templates[unit.Source.TemplateIndex] : null;
 
-    private void DrawBar(Rect2 rect, float fill)
+    private void DrawBar(Rect2 rect, byte current, byte maximum, byte color)
     {
-        DrawRect(rect, Colors.Black);
-        int height = (int)MathF.Round((rect.Size.Y - 2) * fill);
-        if (height > 0) DrawRect(new Rect2(rect.Position.X + 1, rect.End.Y - 1 - height, rect.Size.X - 2, height), BarFill);
-        DrawRect(new Rect2(rect.Position + new Vector2(.5f, .5f), rect.Size - Vector2.One), BarBorder, false, 1);
+        int filled = OriginalStatusBarRules.FilledColumns((int)rect.Size.X, current, maximum);
+        DrawRect(rect, _uiColors[0]);
+        if (filled > 0) DrawRect(new Rect2(rect.Position + Vector2.One, new Vector2(filled, rect.Size.Y - 2)), _uiColors[color]);
+        var border = _uiColors[0x44];
+        DrawRect(new Rect2(rect.Position, new Vector2(rect.Size.X, 1)), border);
+        DrawRect(new Rect2(rect.Position.X, rect.End.Y - 1, rect.Size.X, 1), border);
+        DrawRect(new Rect2(rect.Position, new Vector2(1, rect.Size.Y)), border);
+        DrawRect(new Rect2(rect.End.X - 1, rect.Position.Y, 1, rect.Size.Y), border);
     }
 
     /// <summary>Handles a click in screen coordinates of the 640×480 frame; returns true when the interface consumed it.</summary>

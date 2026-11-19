@@ -25,7 +25,7 @@ class InterfaceSourceTest(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         interface = json.loads((root / 'assets/imported/interface/interface.json').read_text())
         templates = json.loads((root / 'assets/imported/templates.json').read_text())['armies']['ARMY__02.DAT']['templates']
-        self.assertEqual(interface['format_version'], 2)
+        self.assertEqual(interface['format_version'], 3)
         for panel, template in zip(interface['armies'][0]['templates'], templates):
             self.assertEqual(len(panel['slots']), 6)
             for slot, command in zip(panel['slots'], template['commands']):

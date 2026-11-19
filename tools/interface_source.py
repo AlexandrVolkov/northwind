@@ -108,7 +108,7 @@ def image(width, height, pixels, palette, transparent=False):
 def convert(game, output):
     output.mkdir(parents=True, exist_ok=True)
     pal = lambda name: (game / name).read_bytes()
-    raw = (game / 'SCREENS.SCR').read_bytes(); manifest = {'format_version': 2, 'screens': [], 'fonts': []}
+    raw = (game / 'SCREENS.SCR').read_bytes(); manifest = {'format_version': 3, 'screens': [], 'fonts': []}
     for index, (width, height, pixels) in enumerate(screens(raw)):
         if index not in SCREENS: manifest['screens'].append({'index': index, 'size': [width, height], 'palette': None}); continue
         name, palette = SCREENS[index]
@@ -134,6 +134,8 @@ def convert(game, output):
             red.save(output / f'font_{stem}_red.png')
         manifest['fonts'].append({'file': font, 'atlas': f'font_{stem}.png', 'palette': palette, 'cell': [span, cell], 'glyphs': entries})
     work = spr_records((game / 'WORK.SPR').read_bytes()); colour = pal('COLOR1.PAL')
+    # Display colors after the original VGA DAC's six-bit conversion, as used by the verified sprite renderer.
+    manifest['ui_colors'] = {str(i): [(v & 252) | (v >> 6) for v in colour[i*3:i*3+3]] for i in [0, 0x44, 0xb2, 0x51, 0x22, 0x94]}
     # LE:1 2515 selects the inclusive 0..14 cursor range; 3D67 draws 32x32 WORK.SPR frames.
     arrow, cell = make_atlas([spr_image(work[i], 32, 32, colour) for i in range(15)], 8)
     arrow.save(output / 'arrow_cursor.png')

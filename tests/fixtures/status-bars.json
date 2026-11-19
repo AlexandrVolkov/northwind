@@ -1,0 +1,28 @@
+{
+  "format_version": 1,
+  "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "dimensions": [
+    [
+      9,
+      50
+    ],
+    [
+      5,
+      7
+    ],
+    [
+      16,
+      16
+    ]
+  ],
+  "maxima": [
+    0,
+    1,
+    5,
+    10,
+    70,
+    127
+  ],
+  "case_count": 1314,
+  "sha256": "51c5d61657921389862c1fad8ce8f51f37c6d413259d2d45d0818eb4e81fa35f"
+}

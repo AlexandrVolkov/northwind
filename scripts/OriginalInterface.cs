@@ -103,6 +103,7 @@ public sealed class InterfaceData
     public int FormatVersion { get; set; }
     public InterfaceAtlas HeroPortraits { get; set; } = new();
     public InterfaceAtlas? ArrowCursor { get; set; }
+    public Dictionary<int, int[]> UiColors { get; set; } = [];
     public List<InterfaceArmy> Armies { get; set; } = [];
     public List<InterfaceScreen> Screens { get; set; } = [];
     public List<InterfaceFont> Fonts { get; set; } = [];
@@ -110,7 +111,7 @@ public sealed class InterfaceData
     public static InterfaceData Load()
     {
         var data = GameData.Read<InterfaceData>(Root + "interface.json");
-        if (data.FormatVersion != 2) throw new InvalidDataException("Update the bundled interface data: command schema 2 is required.");
+        if (data.FormatVersion != 3) throw new InvalidDataException("Update the bundled interface data: schema 3 is required.");
         return data;
     }
     public static Texture2D Screen(string name) => GD.Load<Texture2D>(Root + name + ".png");
