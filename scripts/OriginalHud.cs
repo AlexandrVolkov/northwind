@@ -22,6 +22,12 @@ public partial class OriginalHud : Node2D
 
     public SkirmishMain Game { get; set; } = null!;
     public bool MenuOpen { get; set; }
+    /// <summary>Order button slots: two columns, 71 px apart, rows 43 px apart from (485, 313); rows 1–2 measured, row 3 assumed.</summary>
+    public static Rect2 Slot(int index) => new(485 + index % 2 * 71, 313 + index / 2 * 43, 69, 35);
+    public static readonly Vector2 PortraitAt = new(482, 176);
+    public InterfaceArmy Army { get; private set; } = null!;
+    private InterfaceAtlas _heroes = null!;
+    private Texture2D _portraits = null!, _buttons = null!, _heroAtlas = null!;
     private Texture2D _frame = null!, _menuPanel = null!;
     private OriginalFont _font = null!, _red = null!;
 
@@ -30,6 +36,9 @@ public partial class OriginalHud : Node2D
         TextureFilter = TextureFilterEnum.Nearest;
         var data = InterfaceData.Load();
         _frame = InterfaceData.Screen("game_frame"); _menuPanel = InterfaceData.Screen("panel_menu");
+        Army = data.Armies.Single(a => a.Army == 2); _heroes = data.HeroPortraits;
+        _portraits = GD.Load<Texture2D>(InterfaceData.Root + Army.Portraits.Atlas); _buttons = GD.Load<Texture2D>(InterfaceData.Root + Army.Buttons.Atlas);
+        _heroAtlas = GD.Load<Texture2D>(InterfaceData.Root + _heroes.Atlas);
         _font = OriginalFont.Load(data, "FONT_01.FNT"); _red = OriginalFont.Load(data, "FONT_01.FNT", "font_font_01_red.png");
     }
 
@@ -61,15 +70,31 @@ public partial class OriginalHud : Node2D
         DrawRect(new Rect2(Minimap.Position + view.Position / world * Minimap.Size, view.Size / world * Minimap.Size), Colors.White, false, 1);
     }
 
-    private void DrawSelection()
+    private SkirmishActor? SingleUnit()
     {
         var units = Game.Selection.Select(Game.Battle.Find).OfType<SkirmishActor>().ToArray();
-        if (units.Length != 1) return;
-        var unit = units[0];
+        return units.Length == 1 ? units[0] : null;
+    }
+
+    private void DrawSelection()
+    {
+        if (SingleUnit() is not { } unit) return;
         _font.Draw(this, new Vector2(482, 160), unit.Hero ? Game.HeroName : unit.Source.TemplateName);
+        if (unit.Hero && _heroes.Known.TryGetValue(Game.HeroName, out int hero))
+            DrawTextureRectRegion(_heroAtlas, new Rect2(PortraitAt, 64, 70), _heroes.Region(hero - _heroes.FirstSprite));
+        else if (Template(unit) is { } template)
+            DrawTextureRectRegion(_portraits, new Rect2(PortraitAt, 80, 50), Army.Portraits.Region(template.Portrait));
+        if (Template(unit) is { } t && unit.Team == 0)
+            for (int k = 0; k < t.Slots.Count; k++)
+                if (t.Slots[k].Button is { } button)
+                    DrawTextureRectRegion(_buttons, Slot(k), Army.Buttons.Region(button));
         DrawBar(HealthBar, unit.MaxHealth > 0 ? Math.Clamp(unit.Health / (float)unit.MaxHealth, 0, 1) : 0);
         DrawBar(ExperienceBar, 0);
     }
+
+    /// <summary>Order slots of the unit's DAT template (ARMY__02 only for now).</summary>
+    public InterfaceTemplate? Template(SkirmishActor unit) =>
+        unit.Source.TemplateFile == "ARMY__02.DAT" && unit.Source.TemplateIndex < Army.Templates.Count ? Army.Templates[unit.Source.TemplateIndex] : null;
 
     private void DrawBar(Rect2 rect, float fill)
     {
@@ -95,6 +120,9 @@ public partial class OriginalHud : Node2D
             else if (ScrollFaster.HasPoint(point)) Game.ChangeScrollSpeed(+1);
         }
         else if (MenuButton.HasPoint(point)) MenuOpen = true;
+        else if (SingleUnit() is { } unit && Template(unit) is { } template)
+            for (int k = 0; k < template.Slots.Count; k++)
+                if (template.Slots[k].Sprite != 0 && Slot(k).HasPoint(point)) Game.Order(template.Slots[k].Sprite);
         else if (Minimap.HasPoint(point))
             Game.FocusWorld((point - Minimap.Position) / Minimap.Size * new Vector2(Game.Battle.Map.Width, Game.Battle.Map.Height) * 32);
         QueueRedraw();

@@ -18,10 +18,42 @@ public sealed class InterfaceFont
     /// <summary>Code (CP866) → [width, top, height].</summary>
     public Dictionary<string, int[]> Glyphs { get; set; } = [];
 }
+public sealed class InterfaceAtlas
+{
+    public string Atlas { get; set; } = "";
+    public int[] Cell { get; set; } = [];
+    public List<int> Sprites { get; set; } = [];
+    public int FirstSprite { get; set; }
+    public Dictionary<string, int> Known { get; set; } = [];
+    /// <summary>Source rectangle of entry <paramref name="index"/> in an 8-column atlas.</summary>
+    public Rect2 Region(int index) => new(index % 8 * Cell[0], index / 8 * Cell[1], Cell[0], Cell[1]);
+}
+public sealed class InterfaceSlot
+{
+    public int[] Bytes { get; set; } = [];
+    public int Sprite { get; set; }
+    public int? Button { get; set; }
+    public uint Handler { get; set; }
+}
+public sealed class InterfaceTemplate
+{
+    public int Template { get; set; }
+    public int Portrait { get; set; }
+    public List<InterfaceSlot> Slots { get; set; } = [];
+}
+public sealed class InterfaceArmy
+{
+    public int Army { get; set; }
+    public InterfaceAtlas Portraits { get; set; } = new();
+    public InterfaceAtlas Buttons { get; set; } = new();
+    public List<InterfaceTemplate> Templates { get; set; } = [];
+}
 /// <summary>assets/imported/interface/interface.json from tools/interface_source.py.</summary>
 public sealed class InterfaceData
 {
     public int FormatVersion { get; set; }
+    public InterfaceAtlas HeroPortraits { get; set; } = new();
+    public List<InterfaceArmy> Armies { get; set; } = [];
     public List<InterfaceScreen> Screens { get; set; } = [];
     public List<InterfaceFont> Fonts { get; set; } = [];
     public const string Root = "res://assets/imported/interface/";
@@ -29,7 +61,7 @@ public sealed class InterfaceData
     public static Texture2D Screen(string name) => GD.Load<Texture2D>(Root + name + ".png");
 }
 
-/// <summary>Bitmap font of the original (FNT). Text is encoded as CP866; glyphs are drawn one pixel apart
+/// <summary>Bitmap font of the original (FNT). Cyrillic glyphs are contiguous (see <see cref="Code"/>); glyphs are drawn one pixel apart
 /// (matched against the original's resource counters and selection name, docs/interface.md).</summary>
 public sealed class OriginalFont
 {
@@ -50,14 +82,14 @@ public sealed class OriginalFont
         return new OriginalFont(font, GD.Load<Texture2D>(InterfaceData.Root + (atlas ?? font.Atlas)));
     }
 
-    /// <summary>CP866 code of a character (Latin, digits, Cyrillic; anything else becomes '?').</summary>
+    /// <summary>Glyph code of a character. The fonts hold А..я contiguously at 80h..BFh (unlike CP866, whose р..я are E0h..EFh;
+    /// E0h..FFh of FONT_01 are dots). Ё/ё are drawn as Е/е; anything else becomes '?'.</summary>
     public static byte Code(char c) => c switch
     {
         < (char)0x80 => (byte)c,
-        >= 'А' and <= 'п' => (byte)(c - 'А' + 0x80),
-        >= 'р' and <= 'я' => (byte)(c - 'р' + 0xe0),
-        'Ё' => 0xf0,
-        'ё' => 0xf1,
+        >= 'А' and <= 'я' => (byte)(c - 'А' + 0x80),
+        'Ё' => 0x85,
+        'ё' => 0xa5,
         _ => (byte)'?',
     };
 
