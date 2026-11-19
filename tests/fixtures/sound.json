@@ -1,0 +1,115 @@
+{
+  "format_version": 1,
+  "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "driver_defaults": [
+    {
+      "entry": 78593,
+      "sample_rate": 11025,
+      "stereo": 1
+    },
+    {
+      "entry": 78714,
+      "sample_rate": 11025,
+      "stereo": 1
+    },
+    {
+      "entry": 78835,
+      "sample_rate": 11025,
+      "stereo": 0
+    }
+  ],
+  "selection": {
+    "variant_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      7,
+      16,
+      255
+    ],
+    "case_count": 2048,
+    "sha256": "0f78649da891cb823b731db08d9cb65ff6cfb69c4a495411d727a7123f40d636"
+  },
+  "banks": [
+    {
+      "source": "WORK.FX",
+      "source_sha256": "eadab5f2c17f12e5b0c937a105d69f2f0134a9f4baca8ca4749444c4194361ee",
+      "case_count": 5120,
+      "sha256": "f85565e7c81c8fbb33195aafafebb1edf23eccf64062b0956e55b27e110a5483"
+    },
+    {
+      "source": "MENU.FX",
+      "source_sha256": "d7dafe55bae4d16668893593f619fe05f342e632c4431d9ba835a9fffc1a0c3a",
+      "case_count": 1536,
+      "sha256": "c9c37e32c162ddcf2ecf4058f9c59d70f9a05256f6ad59a72ea39471e007f55f"
+    },
+    {
+      "source": "MAP_1.FX",
+      "source_sha256": "791e70e77591963b5511a25312433afdab3b7062c14787bed13d3ffa6d9a8161",
+      "case_count": 1536,
+      "sha256": "01cc3cbf5ae25e9a9609a3906c59d1ac6681ea1e9079b3d076efb2bbb9383c10"
+    },
+    {
+      "source": "ARMY__00.FX",
+      "source_sha256": "dc49e79ab2091c651602f77d6c1dcfc60e76a8260448b81457c5a08d874e7891",
+      "case_count": 6144,
+      "sha256": "efe3c2cfcc89babba87aafa9ce6095c87aa2e3a0ffd9cf2274eab94f798735ed"
+    },
+    {
+      "source": "ARMY__01.FX",
+      "source_sha256": "3cf3f28e42e6cca9c2a33a180eacb6c2640bcced663a8b26feeb42d8284e334a",
+      "case_count": 2048,
+      "sha256": "e65da05d37fc4bf8865a3906e633b0b47234bd3171a2475bbebe41d22f405a17"
+    },
+    {
+      "source": "ARMY__02.FX",
+      "source_sha256": "d088883e8b30c78e06b34999c78258421308a46b84ff84f83efc4a956dd685a0",
+      "case_count": 3840,
+      "sha256": "5262800c1b0d6a49b4cea7faa713d28a386767acb6645be0453a85b8b564ab59"
+    },
+    {
+      "source": "ARMY__03.FX",
+      "source_sha256": "3661074a70e4c6b406d321eac6527511a073e43f2fdce4bad47901910896eb40",
+      "case_count": 2816,
+      "sha256": "ce60bb937be182ac96af164d77aef2ae365352a0b51295cf07a9bf380367e2fa"
+    },
+    {
+      "source": "ARMY__04.FX",
+      "source_sha256": "345399682bc7061b7372e40f3e037e5dce687f512936171ff93c6b62e59b3f7f",
+      "case_count": 1024,
+      "sha256": "e7f398cd9ddd5371f1ce2f9ba5a78f26ef346f3ef07414a2b3edc6fc2d9a8c9b"
+    },
+    {
+      "source": "ARMY__05.FX",
+      "source_sha256": "098d80daa90e287e64b4410f5f41133d5f73f9a09b542af14b4c6ea074f6dacf",
+      "case_count": 1536,
+      "sha256": "57baf54b6f4ede9e78317610a0ea26e5ac22a45016a67cfe0618173f1e2d4353"
+    }
+  ],
+  "gain": {
+    "case_count": 65536,
+    "sha256": "9c0a809e699facae6ef4d2dca42948fe2a71b769b7f3b97c10995a1f2441ad54"
+  },
+  "mean_level": {
+    "lengths": [
+      1,
+      2,
+      3,
+      7,
+      31,
+      257,
+      512
+    ],
+    "kinds": [
+      "silence",
+      "zero",
+      "full",
+      "ramp"
+    ],
+    "case_count": 28,
+    "sha256": "9bce8182c338f3824923fca175140a231e3d9361d3bc8840a8db289b61f572a6"
+  },
+  "preprocessor_verified": true
+}

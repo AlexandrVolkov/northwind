@@ -1,0 +1,2850 @@
+{
+  "format_version": 1,
+  "sample_rate": 11025,
+  "channels": 1,
+  "bits_per_sample": 8,
+  "pcm_encoding": "unsigned",
+  "rate_evidence": "LE:1 1331F, 13398, 13411 -> descriptor+3F; 13643 -> driver 0401h",
+  "variant_evidence": "LE:1 1416B..141B4; index = (random_byte * variant_count) >> 8",
+  "banks": [
+    {
+      "source": "WORK.FX",
+      "source_bytes": 807840,
+      "source_sha256": "eadab5f2c17f12e5b0c937a105d69f2f0134a9f4baca8ca4749444c4194361ee",
+      "sound_count": 20,
+      "sample_count": 24,
+      "sounds": [
+        {
+          "sound": 0,
+          "group_offset": 82,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/000_00.wav",
+              "header_offset": 92,
+              "pcm_offset": 96,
+              "raw_size_word": 6712,
+              "raw_high_byte": 0,
+              "mean_level": 14,
+              "frames": 6712,
+              "duration_seconds": 0.6087981859410431,
+              "pcm_sha256": "90447f71d0d1497699f2954734e5416dbcfb29dc9ab50f699170208ccf9c7466",
+              "wav_sha256": "3913447f103237348635a5fd411a8e2a202d333b060f3adac711c5ef41701f94"
+            }
+          ]
+        },
+        {
+          "sound": 1,
+          "group_offset": 6808,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/001_00.wav",
+              "header_offset": 6818,
+              "pcm_offset": 6822,
+              "raw_size_word": 7852,
+              "raw_high_byte": 0,
+              "mean_level": 14,
+              "frames": 7852,
+              "duration_seconds": 0.7121995464852607,
+              "pcm_sha256": "09aef6d82b09040e34aaacd0e6ec35a537d222b8cc927bba47df5c6790d5aa26",
+              "wav_sha256": "993f0fdacc12dec32b72eb0efe6a0f71eca865b3ed9a902d26ca98c1882c156b"
+            }
+          ]
+        },
+        {
+          "sound": 2,
+          "group_offset": 14674,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/002_00.wav",
+              "header_offset": 14684,
+              "pcm_offset": 14688,
+              "raw_size_word": 4912,
+              "raw_high_byte": 0,
+              "mean_level": 16,
+              "frames": 4912,
+              "duration_seconds": 0.44553287981859413,
+              "pcm_sha256": "4504678ab53066611b208599fbc58ffd0bc1fd11aff2aa79cb9b7f2d4c318b02",
+              "wav_sha256": "cc7f9aa4de4fd83b2d40b08b94d011005407b64793201cdc857d374d7d956e6e"
+            }
+          ]
+        },
+        {
+          "sound": 3,
+          "group_offset": 19600,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/003_00.wav",
+              "header_offset": 19610,
+              "pcm_offset": 19614,
+              "raw_size_word": 1594,
+              "raw_high_byte": 0,
+              "mean_level": 4,
+              "frames": 1594,
+              "duration_seconds": 0.14458049886621316,
+              "pcm_sha256": "b53c42355a97393df50a3e5cd8f155918f5e1fa8ec47d05c0292f48c72855559",
+              "wav_sha256": "8bf8cb548d0722906d69a8f1ab886a2c410e7de66498135ee8f89fe0224a4405"
+            }
+          ]
+        },
+        {
+          "sound": 4,
+          "group_offset": 21208,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/004_00.wav",
+              "header_offset": 21218,
+              "pcm_offset": 21222,
+              "raw_size_word": 154,
+              "raw_high_byte": 0,
+              "mean_level": 30,
+              "frames": 154,
+              "duration_seconds": 0.013968253968253968,
+              "pcm_sha256": "45e9cb1e0502633602770a8e35354d6bd796d7cab7e2fae0348768f985b69b90",
+              "wav_sha256": "c15ebc9e3138ad30498a0bb3b68f3696197efd754eca385e2c0ed0a75bea15d4"
+            }
+          ]
+        },
+        {
+          "sound": 5,
+          "group_offset": 21376,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/005_00.wav",
+              "header_offset": 21386,
+              "pcm_offset": 21390,
+              "raw_size_word": 2573,
+              "raw_high_byte": 0,
+              "mean_level": 11,
+              "frames": 2573,
+              "duration_seconds": 0.23337868480725624,
+              "pcm_sha256": "6505ec4b5f2d1fc9525279360662cef3dd5374e9bdd7c2b7bc3bfedabd6d6f20",
+              "wav_sha256": "71da20e5d8365cd752f5d9e23582c49766ad0c4cba608586ef420b53c913f663"
+            }
+          ]
+        },
+        {
+          "sound": 6,
+          "group_offset": 23963,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/006_00.wav",
+              "header_offset": 23973,
+              "pcm_offset": 23977,
+              "raw_size_word": 97217,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 97217,
+              "duration_seconds": 8.817868480725624,
+              "pcm_sha256": "4d51d5cc76cfaa8f9a72d9ea324d8420a940a950efe37aa241798cb772e634af",
+              "wav_sha256": "d6b0ff7ce25389962fe5e0032a71b96c5133afeedc27ad0b901cecf4f5623f10"
+            }
+          ]
+        },
+        {
+          "sound": 7,
+          "group_offset": 121194,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/007_00.wav",
+              "header_offset": 121204,
+              "pcm_offset": 121208,
+              "raw_size_word": 9704,
+              "raw_high_byte": 0,
+              "mean_level": 20,
+              "frames": 9704,
+              "duration_seconds": 0.8801814058956916,
+              "pcm_sha256": "4acbe9196e407f9c8d9540dd1f3c45f0288c94062bbde71d0fea5a886ca98d45",
+              "wav_sha256": "13d2f110ff468266728206e014b626d7818a3109af3596b2157de5904767724b"
+            }
+          ]
+        },
+        {
+          "sound": 8,
+          "group_offset": 130912,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/008_00.wav",
+              "header_offset": 130922,
+              "pcm_offset": 130926,
+              "raw_size_word": 14836,
+              "raw_high_byte": 0,
+              "mean_level": 10,
+              "frames": 14836,
+              "duration_seconds": 1.3456689342403627,
+              "pcm_sha256": "5b93a42a061ce0ee99b3d4293c711c2aceb737dcc5596cb3bd63b312439f823a",
+              "wav_sha256": "c457fded077530d1a1191b337434e0f9f6337a54c8700b84966e65d15a2cac27"
+            }
+          ]
+        },
+        {
+          "sound": 9,
+          "group_offset": 145762,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/009_00.wav",
+              "header_offset": 145772,
+              "pcm_offset": 145776,
+              "raw_size_word": 6086,
+              "raw_high_byte": 0,
+              "mean_level": 18,
+              "frames": 6086,
+              "duration_seconds": 0.5520181405895691,
+              "pcm_sha256": "811fd7b967bd5102ffe6e441759ea96b9666d5cb65a668cacc52f00ea006093a",
+              "wav_sha256": "0f3769da1601d178eac3ec9399fad2478805b93dc52bf9aef83d569ca4d94964"
+            }
+          ]
+        },
+        {
+          "sound": 10,
+          "group_offset": 151862,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/010_00.wav",
+              "header_offset": 151872,
+              "pcm_offset": 151876,
+              "raw_size_word": 8602,
+              "raw_high_byte": 0,
+              "mean_level": 23,
+              "frames": 8602,
+              "duration_seconds": 0.7802267573696146,
+              "pcm_sha256": "f120e95d3a2d0bce9729c120838baea23830677b15119db31a7d5ced2e80489f",
+              "wav_sha256": "3438c9a8a4427f89d2dc661fbaa64e4d5c68aa32c0742e4d0f67163e929cbcd8"
+            }
+          ]
+        },
+        {
+          "sound": 11,
+          "group_offset": 160478,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/011_00.wav",
+              "header_offset": 160488,
+              "pcm_offset": 160492,
+              "raw_size_word": 30636,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 30636,
+              "duration_seconds": 2.7787755102040816,
+              "pcm_sha256": "1fc7b33407efb5ad5ee89d6f4f0565f19661ecdca772c472adb1a10058505f7f",
+              "wav_sha256": "488a713f6906a730b3568fbd115dc46cc06dfbe629e7b64690c70dd12a75b5f7"
+            }
+          ]
+        },
+        {
+          "sound": 12,
+          "group_offset": 191128,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/012_00.wav",
+              "header_offset": 191138,
+              "pcm_offset": 191142,
+              "raw_size_word": 72376,
+              "raw_high_byte": 0,
+              "mean_level": 18,
+              "frames": 72376,
+              "duration_seconds": 6.564716553287981,
+              "pcm_sha256": "a36e186aee601e01c25a6c372525ca252f9064b381ec9375a49cfa2a0b271fe0",
+              "wav_sha256": "2977372f1461b10a11d5c0f816c27a2c9c845c0a4f4e31b9cddd1923690c7abe"
+            }
+          ]
+        },
+        {
+          "sound": 13,
+          "group_offset": 263518,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/013_00.wav",
+              "header_offset": 263528,
+              "pcm_offset": 263532,
+              "raw_size_word": 62392,
+              "raw_high_byte": 0,
+              "mean_level": 23,
+              "frames": 62392,
+              "duration_seconds": 5.6591383219954645,
+              "pcm_sha256": "f5fa0d327b53f5b7cfd6cf67ab78a7ff60f43d10fdd0fcf2a425e65287b1ab4c",
+              "wav_sha256": "e0ab464b5b7ff68748d29f3de3fb931cc2a0ca0686be22c1402a4c93d99b6dd9"
+            }
+          ]
+        },
+        {
+          "sound": 14,
+          "group_offset": 325924,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/014_00.wav",
+              "header_offset": 325934,
+              "pcm_offset": 325938,
+              "raw_size_word": 72760,
+              "raw_high_byte": 0,
+              "mean_level": 19,
+              "frames": 72760,
+              "duration_seconds": 6.599546485260771,
+              "pcm_sha256": "7a4c89a1a7b03b661187fadd6652391b4e31d1330b891c0e5a1e8b2f4f3e8ecf",
+              "wav_sha256": "4536a73e0df4137ae766aa966ece760131255c949a5c63b92e1eb2effcf29597"
+            }
+          ]
+        },
+        {
+          "sound": 15,
+          "group_offset": 398698,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/015_00.wav",
+              "header_offset": 398708,
+              "pcm_offset": 398712,
+              "raw_size_word": 17377,
+              "raw_high_byte": 0,
+              "mean_level": 12,
+              "frames": 17377,
+              "duration_seconds": 1.5761451247165532,
+              "pcm_sha256": "ebed493bb4fff63aec544256456b1042606db9aadb4775a5dd3db1dfd30880d3",
+              "wav_sha256": "3f49961bae384243e7f5e7428cac4d5bd6336f9fed6730b8e4eb461819357559"
+            }
+          ]
+        },
+        {
+          "sound": 16,
+          "group_offset": 416089,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/016_00.wav",
+              "header_offset": 416099,
+              "pcm_offset": 416103,
+              "raw_size_word": 17377,
+              "raw_high_byte": 0,
+              "mean_level": 12,
+              "frames": 17377,
+              "duration_seconds": 1.5761451247165532,
+              "pcm_sha256": "ebed493bb4fff63aec544256456b1042606db9aadb4775a5dd3db1dfd30880d3",
+              "wav_sha256": "3f49961bae384243e7f5e7428cac4d5bd6336f9fed6730b8e4eb461819357559"
+            }
+          ]
+        },
+        {
+          "sound": 17,
+          "group_offset": 433480,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/017_00.wav",
+              "header_offset": 433490,
+              "pcm_offset": 433494,
+              "raw_size_word": 47793,
+              "raw_high_byte": 0,
+              "mean_level": 12,
+              "frames": 47793,
+              "duration_seconds": 4.3349659863945575,
+              "pcm_sha256": "3fcf3e8b21adbe8f8083d07b4e64d23172528857117978dcb9c855184a549fb5",
+              "wav_sha256": "a0719c8d11da7f4faafdc84d86e43a84a28daad6de45a7bf11e3ae5b2bef0e0e"
+            }
+          ]
+        },
+        {
+          "sound": 18,
+          "group_offset": 481287,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/018_00.wav",
+              "header_offset": 481313,
+              "pcm_offset": 481317,
+              "raw_size_word": 57856,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 57856,
+              "duration_seconds": 5.2477097505668935,
+              "pcm_sha256": "aa19698f72421f2e4e0060be70b1628891064e5f1832cd069f4c13437058f58b",
+              "wav_sha256": "743c6dba2664c31f4b10d50b24cbab18071aad245a0b6e0548d606f9a5a4c1d0"
+            },
+            {
+              "variant": 1,
+              "file": "work/018_01.wav",
+              "header_offset": 539173,
+              "pcm_offset": 539177,
+              "raw_size_word": 68819,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 68819,
+              "duration_seconds": 6.242086167800453,
+              "pcm_sha256": "b5a2617b5072225bcf796f0b550cd17c009ba8709f6948226ade6fce5b896ab2",
+              "wav_sha256": "af054e49079a2a2e32091225b30a133e1d8fdee39b07ebf72c30ac693afe42f9"
+            },
+            {
+              "variant": 2,
+              "file": "work/018_02.wav",
+              "header_offset": 607996,
+              "pcm_offset": 608000,
+              "raw_size_word": 70604,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 70604,
+              "duration_seconds": 6.403990929705215,
+              "pcm_sha256": "8d65eef49319a8e5fc8867b91b23d82733353670ac685e50f086a9976edb0fac",
+              "wav_sha256": "4dc07475dafe33dcb1b5d3560c05cbda948b6e83b70a8f8691d25aa5df245400"
+            },
+            {
+              "variant": 3,
+              "file": "work/018_03.wav",
+              "header_offset": 678604,
+              "pcm_offset": 678608,
+              "raw_size_word": 58164,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 58164,
+              "duration_seconds": 5.275646258503401,
+              "pcm_sha256": "0d3c3f25a6b112c9285c2a2d8b91340aea41b4bbbcf8ffdc1f5970cbf8fbb61f",
+              "wav_sha256": "5049ae515d5e556d7bfac494565f9319475dec13966a5e5570920629c3099200"
+            },
+            {
+              "variant": 4,
+              "file": "work/018_04.wav",
+              "header_offset": 736772,
+              "pcm_offset": 736776,
+              "raw_size_word": 56173,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 56173,
+              "duration_seconds": 5.095056689342403,
+              "pcm_sha256": "1e90217e1b33944d46bbcc8fa066b2e177170c4e80a36f3c4a8c18a5d391b1e2",
+              "wav_sha256": "9c8bb50ff12e85f3cf2dbac61760c5bd99af80f7eae926f4025f89c980d733cb"
+            }
+          ]
+        },
+        {
+          "sound": 19,
+          "group_offset": 792949,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "work/019_00.wav",
+              "header_offset": 792959,
+              "pcm_offset": 792963,
+              "raw_size_word": 14877,
+              "raw_high_byte": 0,
+              "mean_level": 20,
+              "frames": 14877,
+              "duration_seconds": 1.3493877551020408,
+              "pcm_sha256": "de2748349db075f02d576251d3524f36585a813fff52e000739d0df6a55faeb5",
+              "wav_sha256": "0474f7dcb5fe917f48b7c9949d4d1b0bd666b4aa3a373415575515d0f15c0ac7"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "MENU.FX",
+      "source_bytes": 842604,
+      "source_sha256": "d7dafe55bae4d16668893593f619fe05f342e632c4431d9ba835a9fffc1a0c3a",
+      "sound_count": 6,
+      "sample_count": 6,
+      "sounds": [
+        {
+          "sound": 0,
+          "group_offset": 26,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "menu/000_00.wav",
+              "header_offset": 36,
+              "pcm_offset": 40,
+              "raw_size_word": 225775,
+              "raw_high_byte": 0,
+              "mean_level": 13,
+              "frames": 225775,
+              "duration_seconds": 20.478458049886623,
+              "pcm_sha256": "247008382189bc78e7c0bf0277a1a4c1d316419207f2208181a2e2d34a787d2e",
+              "wav_sha256": "55455a744bbd78c53b604b5309f07e6d4867138e33b1371e6f227bfea5757ade"
+            }
+          ]
+        },
+        {
+          "sound": 1,
+          "group_offset": 225815,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "menu/001_00.wav",
+              "header_offset": 225825,
+              "pcm_offset": 225829,
+              "raw_size_word": 154,
+              "raw_high_byte": 0,
+              "mean_level": 30,
+              "frames": 154,
+              "duration_seconds": 0.013968253968253968,
+              "pcm_sha256": "45e9cb1e0502633602770a8e35354d6bd796d7cab7e2fae0348768f985b69b90",
+              "wav_sha256": "c15ebc9e3138ad30498a0bb3b68f3696197efd754eca385e2c0ed0a75bea15d4"
+            }
+          ]
+        },
+        {
+          "sound": 2,
+          "group_offset": 225983,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "menu/002_00.wav",
+              "header_offset": 225993,
+              "pcm_offset": 225997,
+              "raw_size_word": 8602,
+              "raw_high_byte": 0,
+              "mean_level": 23,
+              "frames": 8602,
+              "duration_seconds": 0.7802267573696146,
+              "pcm_sha256": "f120e95d3a2d0bce9729c120838baea23830677b15119db31a7d5ced2e80489f",
+              "wav_sha256": "3438c9a8a4427f89d2dc661fbaa64e4d5c68aa32c0742e4d0f67163e929cbcd8"
+            }
+          ]
+        },
+        {
+          "sound": 3,
+          "group_offset": 234599,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "menu/003_00.wav",
+              "header_offset": 234609,
+              "pcm_offset": 234613,
+              "raw_size_word": 265062,
+              "raw_high_byte": 0,
+              "mean_level": 9,
+              "frames": 265062,
+              "duration_seconds": 24.04190476190476,
+              "pcm_sha256": "6cd805ddff71844e9d8e49ffada52091daa06547462e2ebf1af8371b1a93cc3c",
+              "wav_sha256": "ab9274dd95bdada0cd6d2ea2c1a4f420f411e8b0d6480645a50792e34cfe7842"
+            }
+          ]
+        },
+        {
+          "sound": 4,
+          "group_offset": 499675,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "menu/004_00.wav",
+              "header_offset": 499685,
+              "pcm_offset": 499689,
+              "raw_size_word": 137416,
+              "raw_high_byte": 0,
+              "mean_level": 8,
+              "frames": 137416,
+              "duration_seconds": 12.464036281179139,
+              "pcm_sha256": "a77a0c04c82c829d82703d852b86008244f5fae36c92c27cccde1555c113b4c1",
+              "wav_sha256": "3325dbdf13de47810994961bb3cd157d6523368e0a854d5a7c025de2f52df864"
+            }
+          ]
+        },
+        {
+          "sound": 5,
+          "group_offset": 637105,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "menu/005_00.wav",
+              "header_offset": 637115,
+              "pcm_offset": 637119,
+              "raw_size_word": 205485,
+              "raw_high_byte": 0,
+              "mean_level": 8,
+              "frames": 205485,
+              "duration_seconds": 18.63809523809524,
+              "pcm_sha256": "994525b8bbfcca4b388fb830ca8a2b6d9a73063d3d8a69d590d28166f6e988f8",
+              "wav_sha256": "7c39376ac9a6fba02b81cb5fa18eb80002c5900db86bb5a9440abc2c912af6b3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "MAP_1.FX",
+      "source_bytes": 1372844,
+      "source_sha256": "791e70e77591963b5511a25312433afdab3b7062c14787bed13d3ffa6d9a8161",
+      "sound_count": 6,
+      "sample_count": 6,
+      "sounds": [
+        {
+          "sound": 0,
+          "group_offset": 26,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "map_1/000_00.wav",
+              "header_offset": 36,
+              "pcm_offset": 40,
+              "raw_size_word": 113990,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 113990,
+              "duration_seconds": 10.339229024943311,
+              "pcm_sha256": "992adf5580c236f0c3fbd7505650d6039ccc07de52efa61aeca5e1f840473ddc",
+              "wav_sha256": "7636a00c3a9524596958d0995e82c09532d16177585f92faa6db71c9a5e09c39"
+            }
+          ]
+        },
+        {
+          "sound": 1,
+          "group_offset": 114030,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "map_1/001_00.wav",
+              "header_offset": 114040,
+              "pcm_offset": 114044,
+              "raw_size_word": 140672,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 140672,
+              "duration_seconds": 12.759365079365079,
+              "pcm_sha256": "5d125fbecfc8ea060c1df80c4edfcd4cfbaed2f80967d4ef84efe722560bc5d6",
+              "wav_sha256": "f56db2c2dda4320a4c6ee25095c32762fdcb3af5e9b12b1a3f9ff1404f20b7cd"
+            }
+          ]
+        },
+        {
+          "sound": 2,
+          "group_offset": 254716,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "map_1/002_00.wav",
+              "header_offset": 254726,
+              "pcm_offset": 254730,
+              "raw_size_word": 228344,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 228344,
+              "duration_seconds": 20.711473922902496,
+              "pcm_sha256": "ba70a210b21fc20eb0fd39d1e34c98d11758bddcf297d46bad25eb56dae12064",
+              "wav_sha256": "4c6eed2dc0c5de75600c527ab6334ee71741f115d2ebede9c31fa7b561b75327"
+            }
+          ]
+        },
+        {
+          "sound": 3,
+          "group_offset": 483074,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "map_1/003_00.wav",
+              "header_offset": 483084,
+              "pcm_offset": 483088,
+              "raw_size_word": 548992,
+              "raw_high_byte": 0,
+              "mean_level": 0,
+              "frames": 548992,
+              "duration_seconds": 49.795192743764176,
+              "pcm_sha256": "a95eda7e94532030f34c0f92282a02fadcff7d5639ea77fa28ef71a67a06edbf",
+              "wav_sha256": "d8c285b1be38dcd8e7f6def8f1db888670bfd92310ea11129f89ea85a2f8c915"
+            }
+          ]
+        },
+        {
+          "sound": 4,
+          "group_offset": 1032080,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "map_1/004_00.wav",
+              "header_offset": 1032090,
+              "pcm_offset": 1032094,
+              "raw_size_word": 188928,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 188928,
+              "duration_seconds": 17.136326530612244,
+              "pcm_sha256": "838cfc4c8230e20d3da3afffabd4780eb6251625e2c7e3bacb6ea3e491eb10f7",
+              "wav_sha256": "e944391e415d63c6521bad2834cc03a895ec5919b9ccbcfc8e5792050df71a6b"
+            }
+          ]
+        },
+        {
+          "sound": 5,
+          "group_offset": 1221022,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "map_1/005_00.wav",
+              "header_offset": 1221032,
+              "pcm_offset": 1221036,
+              "raw_size_word": 151808,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 151808,
+              "duration_seconds": 13.769433106575963,
+              "pcm_sha256": "0b04ae5cd645d8e7d3103dc874dcd5ee3144338568673dad7db443694d962452",
+              "wav_sha256": "d8d1ab634eb4f48e4c5b4113a8276b18d99660ab4df287c079048dab580691e0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "ARMY__00.FX",
+      "source_bytes": 540705,
+      "source_sha256": "dc49e79ab2091c651602f77d6c1dcfc60e76a8260448b81457c5a08d874e7891",
+      "sound_count": 24,
+      "sample_count": 46,
+      "sounds": [
+        {
+          "sound": 0,
+          "group_offset": 98,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/000_00.wav",
+              "header_offset": 120,
+              "pcm_offset": 124,
+              "raw_size_word": 3474,
+              "raw_high_byte": 0,
+              "mean_level": 15,
+              "frames": 3474,
+              "duration_seconds": 0.31510204081632653,
+              "pcm_sha256": "d152551d8a6361f3efe85cfd99d5784e1f10cb08c42650ba250db35d3c5563b0",
+              "wav_sha256": "25a88b679ee02f69bccd44c8c1a5d36ff1bb663b16132aeaeb301bdadf0ea7ec"
+            },
+            {
+              "variant": 1,
+              "file": "army__00/000_01.wav",
+              "header_offset": 3598,
+              "pcm_offset": 3602,
+              "raw_size_word": 4314,
+              "raw_high_byte": 0,
+              "mean_level": 13,
+              "frames": 4314,
+              "duration_seconds": 0.39129251700680273,
+              "pcm_sha256": "0ff1745e4ee8dc415606f909cc0d7722da30dbb9df39cd1d10f74e0203f13192",
+              "wav_sha256": "230ad8a83a86b2be00b3ad8c3f5f38f3187fd102688a83585972dcd9e6576cbd"
+            },
+            {
+              "variant": 2,
+              "file": "army__00/000_02.wav",
+              "header_offset": 7916,
+              "pcm_offset": 7920,
+              "raw_size_word": 4808,
+              "raw_high_byte": 0,
+              "mean_level": 15,
+              "frames": 4808,
+              "duration_seconds": 0.4360997732426304,
+              "pcm_sha256": "5f31cdb9e75a60db8dd66d461e12e5fe9923bcc3ec0ec584cbddddf550c0ba8e",
+              "wav_sha256": "a8b1e414210d65509666d5bcf397632bb25579a4fb9869a6b5e47add83f2d6a0"
+            },
+            {
+              "variant": 3,
+              "file": "army__00/000_03.wav",
+              "header_offset": 12728,
+              "pcm_offset": 12732,
+              "raw_size_word": 3448,
+              "raw_high_byte": 0,
+              "mean_level": 20,
+              "frames": 3448,
+              "duration_seconds": 0.3127437641723356,
+              "pcm_sha256": "0a658a0c924df13f8b918f4df5b0da1b6ded49bc8d19ceee7913823611845d3d",
+              "wav_sha256": "8de85a7d50528426d50413e4616f38974d4a1481cb2e8bd9ed0b3ecceb1dc52b"
+            }
+          ]
+        },
+        {
+          "sound": 1,
+          "group_offset": 16180,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/001_00.wav",
+              "header_offset": 16194,
+              "pcm_offset": 16198,
+              "raw_size_word": 2397,
+              "raw_high_byte": 0,
+              "mean_level": 17,
+              "frames": 2397,
+              "duration_seconds": 0.21741496598639456,
+              "pcm_sha256": "312db3f300b193ffa4ec2c79642cf471e0edf447bab3f678d40d48572fcbebf6",
+              "wav_sha256": "8c6733fbc4e5811f44deca9a7650cc52c39ad49f854672bcceee22c3e62d35b2"
+            },
+            {
+              "variant": 1,
+              "file": "army__00/001_01.wav",
+              "header_offset": 18595,
+              "pcm_offset": 18599,
+              "raw_size_word": 2800,
+              "raw_high_byte": 0,
+              "mean_level": 22,
+              "frames": 2800,
+              "duration_seconds": 0.25396825396825395,
+              "pcm_sha256": "5d3747f7b4e879acf1548365732b106601ade4573b2737893c40a084ded252c2",
+              "wav_sha256": "8302d991ffad14cb25181a6d02b304c698317c4fc60faff65bd722f9813a9969"
+            }
+          ]
+        },
+        {
+          "sound": 2,
+          "group_offset": 21399,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/002_00.wav",
+              "header_offset": 21413,
+              "pcm_offset": 21417,
+              "raw_size_word": 3229,
+              "raw_high_byte": 0,
+              "mean_level": 13,
+              "frames": 3229,
+              "duration_seconds": 0.29287981859410434,
+              "pcm_sha256": "76bf99055114b4bccaab04f40afdfda84b2eb124e7be8b01399c93a67569209f",
+              "wav_sha256": "42b8334676a5e30042dc99ec8cb7d12cb4471929530563cfe0a49daee9e8ea6e"
+            },
+            {
+              "variant": 1,
+              "file": "army__00/002_01.wav",
+              "header_offset": 24646,
+              "pcm_offset": 24650,
+              "raw_size_word": 4048,
+              "raw_high_byte": 0,
+              "mean_level": 6,
+              "frames": 4048,
+              "duration_seconds": 0.36716553287981857,
+              "pcm_sha256": "7beb272e761066861c44cea2a4d06ccc6b227ab6c2b71ac26dda74f3f38c483b",
+              "wav_sha256": "6a2221e47c461805bdc7d2b8b87b94cc9ac54722e6a8c6b549999a876c5d5c73"
+            }
+          ]
+        },
+        {
+          "sound": 3,
+          "group_offset": 28698,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/003_00.wav",
+              "header_offset": 28712,
+              "pcm_offset": 28716,
+              "raw_size_word": 4514,
+              "raw_high_byte": 0,
+              "mean_level": 6,
+              "frames": 4514,
+              "duration_seconds": 0.4094331065759637,
+              "pcm_sha256": "c5569bf86f368c07135a5239a669c923629a3f80e16e55a384a8c673718089d9",
+              "wav_sha256": "d7e803a0bdcd1fa85519a0a2da8f276b32c940abf0f46203b2fd9e502086d89e"
+            },
+            {
+              "variant": 1,
+              "file": "army__00/003_01.wav",
+              "header_offset": 33230,
+              "pcm_offset": 33234,
+              "raw_size_word": 4157,
+              "raw_high_byte": 0,
+              "mean_level": 9,
+              "frames": 4157,
+              "duration_seconds": 0.3770521541950113,
+              "pcm_sha256": "7d5d793e416f7e27dbbe26f586dd5f2594aa2e0870b12089429f1fb081b28dee",
+              "wav_sha256": "c66d9ed21f8509c031bd2f3dc23eaf6232324bfd1d0e950b629672ec8e848e46"
+            }
+          ]
+        },
+        {
+          "sound": 4,
+          "group_offset": 37391,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/004_00.wav",
+              "header_offset": 37401,
+              "pcm_offset": 37405,
+              "raw_size_word": 4874,
+              "raw_high_byte": 0,
+              "mean_level": 10,
+              "frames": 4874,
+              "duration_seconds": 0.4420861678004535,
+              "pcm_sha256": "0bea7e1d7c3791f1f3036eae16be4879b444713be3b2f897e61fdeef2519aa9e",
+              "wav_sha256": "0289f21556d287e1e7885a9bf8d55c3478e0894579880c014cad3e174d94ddf5"
+            }
+          ]
+        },
+        {
+          "sound": 5,
+          "group_offset": 42279,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/005_00.wav",
+              "header_offset": 42289,
+              "pcm_offset": 42293,
+              "raw_size_word": 5214,
+              "raw_high_byte": 0,
+              "mean_level": 22,
+              "frames": 5214,
+              "duration_seconds": 0.4729251700680272,
+              "pcm_sha256": "449909dd1fc06a3a86c16a7822308e972e69f677f74a725f65a61eabe13d810c",
+              "wav_sha256": "91f9b174a397cbe7ab7855b23faa26774c21b17983d019221f225be5daa093a9"
+            }
+          ]
+        },
+        {
+          "sound": 6,
+          "group_offset": 47507,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/006_00.wav",
+              "header_offset": 47521,
+              "pcm_offset": 47525,
+              "raw_size_word": 19386,
+              "raw_high_byte": 0,
+              "mean_level": 6,
+              "frames": 19386,
+              "duration_seconds": 1.7583673469387755,
+              "pcm_sha256": "21fec1cd7ea828e0c1577c0d8498f945f38ece970f81ba87266baecd25315c3f",
+              "wav_sha256": "a0981c3c5160cdb740f5d88b904cb58b087afea610a95ec3d0a2dcc5f72aad55"
+            },
+            {
+              "variant": 1,
+              "file": "army__00/006_01.wav",
+              "header_offset": 66911,
+              "pcm_offset": 66915,
+              "raw_size_word": 8647,
+              "raw_high_byte": 0,
+              "mean_level": 11,
+              "frames": 8647,
+              "duration_seconds": 0.7843083900226757,
+              "pcm_sha256": "f323a6dcbe3a6921c9bacf8e49cc5878f78d4a5a6d69d15e21470f0473f4f37a",
+              "wav_sha256": "67e5e661e5b188c371597562a64e33d8c591ab74fd7e225de30fd9b12853ea1e"
+            }
+          ]
+        },
+        {
+          "sound": 7,
+          "group_offset": 75562,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/007_00.wav",
+              "header_offset": 75576,
+              "pcm_offset": 75580,
+              "raw_size_word": 12981,
+              "raw_high_byte": 0,
+              "mean_level": 14,
+              "frames": 12981,
+              "duration_seconds": 1.1774149659863946,
+              "pcm_sha256": "584646ec05420af9b873495657173a58ddb34a4978de93fea4b07e4aed55fe7f",
+              "wav_sha256": "9f35cbb13b71225ecf3f865c35a992356e411fdc17b4cf360123305cbb0b0aa0"
+            },
+            {
+              "variant": 1,
+              "file": "army__00/007_01.wav",
+              "header_offset": 88561,
+              "pcm_offset": 88565,
+              "raw_size_word": 12181,
+              "raw_high_byte": 0,
+              "mean_level": 21,
+              "frames": 12181,
+              "duration_seconds": 1.1048526077097505,
+              "pcm_sha256": "27351d71cba9dddc8e5ff3880e6d061f2e39f3cda951f3ea7c74c7df12376e38",
+              "wav_sha256": "cb77e21e4189b644831f6df0697b859b633195e257aac4b4c939f81b2f5b6a29"
+            }
+          ]
+        },
+        {
+          "sound": 8,
+          "group_offset": 100746,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/008_00.wav",
+              "header_offset": 100756,
+              "pcm_offset": 100760,
+              "raw_size_word": 28554,
+              "raw_high_byte": 0,
+              "mean_level": 15,
+              "frames": 28554,
+              "duration_seconds": 2.5899319727891155,
+              "pcm_sha256": "c698ce21f3dec2600f9f3344e192fb0bbf02d48e9bfb30613f47e89c83d1cce3",
+              "wav_sha256": "ec2a8b720922e7e02ecd5220e54a928cbaca228912e15731b7335f8381d29b4b"
+            }
+          ]
+        },
+        {
+          "sound": 9,
+          "group_offset": 129314,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/009_00.wav",
+              "header_offset": 129324,
+              "pcm_offset": 129328,
+              "raw_size_word": 26624,
+              "raw_high_byte": 0,
+              "mean_level": 14,
+              "frames": 26624,
+              "duration_seconds": 2.414875283446712,
+              "pcm_sha256": "3f982061fe312274318e67b7e1c54d0ec58c7eed9e7a501f63275bc969636560",
+              "wav_sha256": "6794252cd1de7d73b6d46642ade8965a0581524c3878fc2f07e97206ef44ef12"
+            }
+          ]
+        },
+        {
+          "sound": 10,
+          "group_offset": 155952,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/010_00.wav",
+              "header_offset": 155962,
+              "pcm_offset": 155966,
+              "raw_size_word": 34848,
+              "raw_high_byte": 0,
+              "mean_level": 17,
+              "frames": 34848,
+              "duration_seconds": 3.1608163265306124,
+              "pcm_sha256": "07bcdcefc02cca12b72ecbdca05d692866774bfb9d762c3d0df3559e400ea5e3",
+              "wav_sha256": "2a269e60b2d6254656e838b2c36df2fbd521ccd6d55d10959432be657fa585fb"
+            }
+          ]
+        },
+        {
+          "sound": 11,
+          "group_offset": 190814,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/011_00.wav",
+              "header_offset": 190824,
+              "pcm_offset": 190828,
+              "raw_size_word": 40236,
+              "raw_high_byte": 0,
+              "mean_level": 17,
+              "frames": 40236,
+              "duration_seconds": 3.6495238095238096,
+              "pcm_sha256": "12de3dd0c395add62f5191acd7a8b259a930e5a0669172e54611f0d8ebf92137",
+              "wav_sha256": "a12f76bf600da9465756e99895b507f2ac96c8ac6ea924d89bce755d2ce620a7"
+            }
+          ]
+        },
+        {
+          "sound": 12,
+          "group_offset": 231064,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/012_00.wav",
+              "header_offset": 231074,
+              "pcm_offset": 231078,
+              "raw_size_word": 1764,
+              "raw_high_byte": 0,
+              "mean_level": 17,
+              "frames": 1764,
+              "duration_seconds": 0.16,
+              "pcm_sha256": "8e4eb84fd9fa5390fed39ae9198e3b5516c0e5ab8178078e007bfb14e143d576",
+              "wav_sha256": "7525cdc5fc4e798a29b730ad15dcd214772bdadff65eea28afa867364a0c46a7"
+            }
+          ]
+        },
+        {
+          "sound": 13,
+          "group_offset": 232842,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/013_00.wav",
+              "header_offset": 232856,
+              "pcm_offset": 232860,
+              "raw_size_word": 1052,
+              "raw_high_byte": 0,
+              "mean_level": 8,
+              "frames": 1052,
+              "duration_seconds": 0.09541950113378685,
+              "pcm_sha256": "2e73df92f90ab1438aaab3f31d2c10b21d2bf34502957c9add4b6ec8b8439d14",
+              "wav_sha256": "6a1dbae3a975551833dab5dcacbf33a31bc0e7ae1ce624a7de333a2b5dec0f05"
+            },
+            {
+              "variant": 1,
+              "file": "army__00/013_01.wav",
+              "header_offset": 233912,
+              "pcm_offset": 233916,
+              "raw_size_word": 1246,
+              "raw_high_byte": 0,
+              "mean_level": 9,
+              "frames": 1246,
+              "duration_seconds": 0.11301587301587301,
+              "pcm_sha256": "39de97df935093d4e109a603ca6d0a59afd4fc0e27427060631cc8a3463ac5b6",
+              "wav_sha256": "07480ce6413552e4ccebb67552a4167120a12d791d53fe7c136a244a790e81f9"
+            }
+          ]
+        },
+        {
+          "sound": 14,
+          "group_offset": 235162,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/014_00.wav",
+              "header_offset": 235176,
+              "pcm_offset": 235180,
+              "raw_size_word": 16128,
+              "raw_high_byte": 0,
+              "mean_level": 22,
+              "frames": 16128,
+              "duration_seconds": 1.4628571428571429,
+              "pcm_sha256": "8f488dd871203587925cb5c768a6a073af415c25effda99211ea1350b6b233cb",
+              "wav_sha256": "e362fd54775f3084ff3f7301f9f7781e129854367f16030b8db17aac4d5ddd37"
+            },
+            {
+              "variant": 1,
+              "file": "army__00/014_01.wav",
+              "header_offset": 251308,
+              "pcm_offset": 251312,
+              "raw_size_word": 17942,
+              "raw_high_byte": 0,
+              "mean_level": 25,
+              "frames": 17942,
+              "duration_seconds": 1.627392290249433,
+              "pcm_sha256": "1f473d93128776c7cf62fdb1d4861a97b2e5b86bef8a1aeb5bbbeec33ccb92a8",
+              "wav_sha256": "23ee62ad13a218309b118522afc21a679f7a97e5547728868e3e6041a8bf252c"
+            }
+          ]
+        },
+        {
+          "sound": 15,
+          "group_offset": 269254,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/015_00.wav",
+              "header_offset": 269280,
+              "pcm_offset": 269284,
+              "raw_size_word": 11393,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 11393,
+              "duration_seconds": 1.0333786848072561,
+              "pcm_sha256": "365970ed8e0910c1b3861a364d01866ab69f78d3849c0b6ea0770dd90d0170d5",
+              "wav_sha256": "f8ada2d1d86960759b09c0a2506e861f59599550b142c17d067cfa491c09c8bc"
+            },
+            {
+              "variant": 1,
+              "file": "army__00/015_01.wav",
+              "header_offset": 280677,
+              "pcm_offset": 280681,
+              "raw_size_word": 12447,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 12447,
+              "duration_seconds": 1.1289795918367347,
+              "pcm_sha256": "4e64e76165dfd6555f8490542ac51bb3dda7c7ae2223c178d4505fa53f510737",
+              "wav_sha256": "3af86628068df8a65fa9003433f377e0cce1c5a8f8843942fde3cd16cd649626"
+            },
+            {
+              "variant": 2,
+              "file": "army__00/015_02.wav",
+              "header_offset": 293128,
+              "pcm_offset": 293132,
+              "raw_size_word": 12447,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 12447,
+              "duration_seconds": 1.1289795918367347,
+              "pcm_sha256": "fcb4d4c985fac2e73a34d9aeb4e8b2f0919cf3206f797993f2c5816d10376179",
+              "wav_sha256": "5796406ee7b5102460063dd63cc6394f65ceec9018bab04c8b5b25655e2f308b"
+            },
+            {
+              "variant": 3,
+              "file": "army__00/015_03.wav",
+              "header_offset": 305579,
+              "pcm_offset": 305583,
+              "raw_size_word": 11393,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 11393,
+              "duration_seconds": 1.0333786848072561,
+              "pcm_sha256": "315623ce6fb2ccb0aa5e42b2a5c289dc7d42528552007aa1188dfa23bd81ce14",
+              "wav_sha256": "c98f1392484278bfb38195c59ae3a833a8d36f20b10e39e9362c4e63fe1ba87e"
+            },
+            {
+              "variant": 4,
+              "file": "army__00/015_04.wav",
+              "header_offset": 316976,
+              "pcm_offset": 316980,
+              "raw_size_word": 11393,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 11393,
+              "duration_seconds": 1.0333786848072561,
+              "pcm_sha256": "315623ce6fb2ccb0aa5e42b2a5c289dc7d42528552007aa1188dfa23bd81ce14",
+              "wav_sha256": "c98f1392484278bfb38195c59ae3a833a8d36f20b10e39e9362c4e63fe1ba87e"
+            }
+          ]
+        },
+        {
+          "sound": 16,
+          "group_offset": 328373,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/016_00.wav",
+              "header_offset": 328399,
+              "pcm_offset": 328403,
+              "raw_size_word": 5942,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 5942,
+              "duration_seconds": 0.5389569160997733,
+              "pcm_sha256": "e1c9c884d265a8c0e95e961c7871d64a7a4241ed989da3ef39d18e293838889a",
+              "wav_sha256": "67787747c043b929b0b53221de7193e1cd0e4074e0c50817b04bd7cc6feb0694"
+            },
+            {
+              "variant": 1,
+              "file": "army__00/016_01.wav",
+              "header_offset": 334345,
+              "pcm_offset": 334349,
+              "raw_size_word": 6286,
+              "raw_high_byte": 0,
+              "mean_level": 4,
+              "frames": 6286,
+              "duration_seconds": 0.5701587301587302,
+              "pcm_sha256": "0076c6e5b6b05791da8f68f2eed819a33c2ed665080759a4d49eebb9617fc93c",
+              "wav_sha256": "400c5f295944c902233fbe1d8967eb1a8a0cbc3f435b5d2c2589f26f2ce059e4"
+            },
+            {
+              "variant": 2,
+              "file": "army__00/016_02.wav",
+              "header_offset": 340635,
+              "pcm_offset": 340639,
+              "raw_size_word": 5803,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 5803,
+              "duration_seconds": 0.5263492063492063,
+              "pcm_sha256": "3fb9462729297740a1bfc8b2e11ad41f6ee54585747ccf35b24a0f96a06160a0",
+              "wav_sha256": "b4ba40fb8cb797a7591d48daa3678bb9a8e34917df5ceb828e7c6d57c009eef2"
+            },
+            {
+              "variant": 3,
+              "file": "army__00/016_03.wav",
+              "header_offset": 346442,
+              "pcm_offset": 346446,
+              "raw_size_word": 5942,
+              "raw_high_byte": 0,
+              "mean_level": 4,
+              "frames": 5942,
+              "duration_seconds": 0.5389569160997733,
+              "pcm_sha256": "5860f707dcc6ecd970f512e5396828195cd66741fb1b7f416a5e7ebb1d1119e1",
+              "wav_sha256": "0b9c66252e573ec6efeeb45a5699e34b417829028841754e9a53d4f103baf25d"
+            },
+            {
+              "variant": 4,
+              "file": "army__00/016_04.wav",
+              "header_offset": 352388,
+              "pcm_offset": 352392,
+              "raw_size_word": 5942,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 5942,
+              "duration_seconds": 0.5389569160997733,
+              "pcm_sha256": "4cdc92c3cbaa8bd8d2bd50eab245901fa435f16880b4da7ce3016624e65f8616",
+              "wav_sha256": "fe5899d0df85f345aa48d6e7574c04254ddecdc65f1d0f69cbc3807ce8b58255"
+            }
+          ]
+        },
+        {
+          "sound": 17,
+          "group_offset": 358334,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/017_00.wav",
+              "header_offset": 358360,
+              "pcm_offset": 358364,
+              "raw_size_word": 16513,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 16513,
+              "duration_seconds": 1.4977777777777779,
+              "pcm_sha256": "9028a90b86077a1ec4a7349e6e6eeb72e21806f3617dca2a437a1ab0708ecb86",
+              "wav_sha256": "a7b0af1a87416e4699533cd9fdd48e4a30dde578efe08ac07f761a97aa5a4992"
+            },
+            {
+              "variant": 1,
+              "file": "army__00/017_01.wav",
+              "header_offset": 374877,
+              "pcm_offset": 374881,
+              "raw_size_word": 16832,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 16832,
+              "duration_seconds": 1.5267120181405895,
+              "pcm_sha256": "d8af8623771e164517d82d316aeee0d72da5fe8c1a6156def504b5cdf069c04c",
+              "wav_sha256": "8c8c5a8c2be60fb089bcdc1f79a1c7db8ad85def43bd92889fd60dd62c5a3697"
+            },
+            {
+              "variant": 2,
+              "file": "army__00/017_02.wav",
+              "header_offset": 391713,
+              "pcm_offset": 391717,
+              "raw_size_word": 15169,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 15169,
+              "duration_seconds": 1.375873015873016,
+              "pcm_sha256": "ecd37f8ace4d85716bdb4e5ed7e00e880efecd7825dcc9d333ec6dd5b5941475",
+              "wav_sha256": "db6bb03121e825220130539c4237f3fe72231e93ec0bd51ac6a23273c486b473"
+            },
+            {
+              "variant": 3,
+              "file": "army__00/017_03.wav",
+              "header_offset": 406886,
+              "pcm_offset": 406890,
+              "raw_size_word": 15105,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 15105,
+              "duration_seconds": 1.3700680272108843,
+              "pcm_sha256": "8b6b698a0e7489d1957d35458de0e6b8e5b4c152d70b5a4c71a3ac19edfb1d24",
+              "wav_sha256": "c031fe85593e3a97ea9ed62e36c3a7e8a5e1756d205138fb3b833a18a8b27b09"
+            },
+            {
+              "variant": 4,
+              "file": "army__00/017_04.wav",
+              "header_offset": 421995,
+              "pcm_offset": 421999,
+              "raw_size_word": 15105,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 15105,
+              "duration_seconds": 1.3700680272108843,
+              "pcm_sha256": "07394eca1450b660040e016fba5068cc48d4f98375b45943c0d2bdd941d685b4",
+              "wav_sha256": "03d3f00df9787d31710688e31b8fe5dd245f71ee97a1629c6627dc857ce846c9"
+            }
+          ]
+        },
+        {
+          "sound": 18,
+          "group_offset": 437104,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/018_00.wav",
+              "header_offset": 437114,
+              "pcm_offset": 437118,
+              "raw_size_word": 18112,
+              "raw_high_byte": 0,
+              "mean_level": 14,
+              "frames": 18112,
+              "duration_seconds": 1.6428117913832199,
+              "pcm_sha256": "9b0461ca25a411daec63ecd1dcb000677934c73ab7dc60d25c5cc0230261de02",
+              "wav_sha256": "8e83cc5aedd3f1c71a7487b96dca1998e09839eaaa9bb0d3b54149375b7cc2c1"
+            }
+          ]
+        },
+        {
+          "sound": 19,
+          "group_offset": 455230,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/019_00.wav",
+              "header_offset": 455240,
+              "pcm_offset": 455244,
+              "raw_size_word": 1052,
+              "raw_high_byte": 0,
+              "mean_level": 8,
+              "frames": 1052,
+              "duration_seconds": 0.09541950113378685,
+              "pcm_sha256": "2e73df92f90ab1438aaab3f31d2c10b21d2bf34502957c9add4b6ec8b8439d14",
+              "wav_sha256": "6a1dbae3a975551833dab5dcacbf33a31bc0e7ae1ce624a7de333a2b5dec0f05"
+            }
+          ]
+        },
+        {
+          "sound": 20,
+          "group_offset": 456296,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/020_00.wav",
+              "header_offset": 456306,
+              "pcm_offset": 456310,
+              "raw_size_word": 26753,
+              "raw_high_byte": 0,
+              "mean_level": 13,
+              "frames": 26753,
+              "duration_seconds": 2.426575963718821,
+              "pcm_sha256": "eee5e3301f9d58ef45445fea532d9d0830f26b9b7a3e6f16503fa6fb81ec3261",
+              "wav_sha256": "1fd46dbd3865f6b91c2cab1ecf61754c43acfdd95dad404a583b39e811ecdce2"
+            }
+          ]
+        },
+        {
+          "sound": 21,
+          "group_offset": 483063,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/021_00.wav",
+              "header_offset": 483073,
+              "pcm_offset": 483077,
+              "raw_size_word": 30272,
+              "raw_high_byte": 0,
+              "mean_level": 13,
+              "frames": 30272,
+              "duration_seconds": 2.7457596371882085,
+              "pcm_sha256": "c58c98cdcc80850af5982889f91b1534566e39b8fcb3fe45b5fab99903ff84a7",
+              "wav_sha256": "3bc814a5b8cb960be9ade67ebc97995df354d14ec436a6e4a291217c22d9c3c5"
+            }
+          ]
+        },
+        {
+          "sound": 22,
+          "group_offset": 513349,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/022_00.wav",
+              "header_offset": 513359,
+              "pcm_offset": 513363,
+              "raw_size_word": 15872,
+              "raw_high_byte": 0,
+              "mean_level": 10,
+              "frames": 15872,
+              "duration_seconds": 1.4396371882086167,
+              "pcm_sha256": "f403648f932b1e129007585b303c1faf6ba12c683cd65d72cb8f945ee1c6c5e2",
+              "wav_sha256": "b28ac6d6c4324c661a8892df92cc54bafda6587b72ec3dde7ed40e833b8f3f00"
+            }
+          ]
+        },
+        {
+          "sound": 23,
+          "group_offset": 529235,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__00/023_00.wav",
+              "header_offset": 529245,
+              "pcm_offset": 529249,
+              "raw_size_word": 11456,
+              "raw_high_byte": 0,
+              "mean_level": 12,
+              "frames": 11456,
+              "duration_seconds": 1.039092970521542,
+              "pcm_sha256": "a8437a21da14c3d90604ecb5fe8e72592fe57bc02ee51a8c42e08ca9910aab04",
+              "wav_sha256": "f94c8bc9b360babea4bf19fb32e92c80952e8c283115f05b677b06958823d0f1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "ARMY__01.FX",
+      "source_bytes": 842881,
+      "source_sha256": "3cf3f28e42e6cca9c2a33a180eacb6c2640bcced663a8b26feeb42d8284e334a",
+      "sound_count": 8,
+      "sample_count": 23,
+      "sounds": [
+        {
+          "sound": 0,
+          "group_offset": 34,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__01/000_00.wav",
+              "header_offset": 52,
+              "pcm_offset": 56,
+              "raw_size_word": 90974,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 90974,
+              "duration_seconds": 8.251609977324263,
+              "pcm_sha256": "cf02a52fcbf1c0fdf309335255af4c3827448877e61fb7ca3ac070569ec2a49b",
+              "wav_sha256": "4553481b6578bfc025717a3e02f7b8c99844d0c1ed64acd42aa317ef3deebd5b"
+            },
+            {
+              "variant": 1,
+              "file": "army__01/000_01.wav",
+              "header_offset": 91030,
+              "pcm_offset": 91034,
+              "raw_size_word": 48549,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 48549,
+              "duration_seconds": 4.403537414965986,
+              "pcm_sha256": "d8f21cbae5bb3c1623e8c049bcc16b72bc9dcae11c104970f7c9d9ac1cc14e23",
+              "wav_sha256": "02587b383b3e5b8b36a1bb95059c6adc37ea181fddb3b63002df683f7c4cd1f2"
+            },
+            {
+              "variant": 2,
+              "file": "army__01/000_02.wav",
+              "header_offset": 139583,
+              "pcm_offset": 139587,
+              "raw_size_word": 35160,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 35160,
+              "duration_seconds": 3.1891156462585033,
+              "pcm_sha256": "273ddc12e66908e8ad4599a2877a762608ef88b94982e90ef3bcfe6a1b7f8dbd",
+              "wav_sha256": "82c37a046e0f7876451d80f957713feae356ac1e52c9b282c8aca8fc3bc632a0"
+            }
+          ]
+        },
+        {
+          "sound": 1,
+          "group_offset": 174747,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__01/001_00.wav",
+              "header_offset": 174769,
+              "pcm_offset": 174773,
+              "raw_size_word": 7772,
+              "raw_high_byte": 0,
+              "mean_level": 14,
+              "frames": 7772,
+              "duration_seconds": 0.7049433106575964,
+              "pcm_sha256": "ca485fe4ec8470470fe9d0ca0b8a3737d35909f86a2a190c2d726037c53367a3",
+              "wav_sha256": "5e6880d135472dd68397dc79e975f9f2de8bc441af219cbd02a29a5718ba04fa"
+            },
+            {
+              "variant": 1,
+              "file": "army__01/001_01.wav",
+              "header_offset": 182545,
+              "pcm_offset": 182549,
+              "raw_size_word": 4720,
+              "raw_high_byte": 0,
+              "mean_level": 11,
+              "frames": 4720,
+              "duration_seconds": 0.42811791383219955,
+              "pcm_sha256": "e4b282f6972ebcee5199245da597cee866b2c2c643ac7003d41d4de5e959e45d",
+              "wav_sha256": "36c29f6af5738e7994539bfeeac0ed08a1815969f6a9a32fc6935bdb09ad38b6"
+            },
+            {
+              "variant": 2,
+              "file": "army__01/001_02.wav",
+              "header_offset": 187269,
+              "pcm_offset": 187273,
+              "raw_size_word": 6587,
+              "raw_high_byte": 0,
+              "mean_level": 24,
+              "frames": 6587,
+              "duration_seconds": 0.5974603174603175,
+              "pcm_sha256": "780aab68b60f3edf89ad5beae4a3f8dc24e80df08412a9bc17a3d6c4dd686ea0",
+              "wav_sha256": "b4fa88bd48bc2b8f9506515b8c56f265f19a44fd031a363488d4318412d65e79"
+            },
+            {
+              "variant": 3,
+              "file": "army__01/001_03.wav",
+              "header_offset": 193860,
+              "pcm_offset": 193864,
+              "raw_size_word": 5413,
+              "raw_high_byte": 0,
+              "mean_level": 5,
+              "frames": 5413,
+              "duration_seconds": 0.4909750566893424,
+              "pcm_sha256": "88d9752afb8334a1dd529c17f53ecda98dc701c386913bb4f25ab33884e30040",
+              "wav_sha256": "67f27fa4c777b2561f21aa19c505a0ea0f282bc9f9e1619ebae20990fa826de8"
+            }
+          ]
+        },
+        {
+          "sound": 2,
+          "group_offset": 199277,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__01/002_00.wav",
+              "header_offset": 199295,
+              "pcm_offset": 199299,
+              "raw_size_word": 15872,
+              "raw_high_byte": 0,
+              "mean_level": 6,
+              "frames": 15872,
+              "duration_seconds": 1.4396371882086167,
+              "pcm_sha256": "8d18ba7291e81f9a16cf041b66206a0e99807741f8009a3d045299b57eef0026",
+              "wav_sha256": "cb7a78fdd13b9febbd2dc4fbcc88d93b6a8bbb5110f74055de94704940ec9490"
+            },
+            {
+              "variant": 1,
+              "file": "army__01/002_01.wav",
+              "header_offset": 215171,
+              "pcm_offset": 215175,
+              "raw_size_word": 14212,
+              "raw_high_byte": 0,
+              "mean_level": 7,
+              "frames": 14212,
+              "duration_seconds": 1.2890702947845805,
+              "pcm_sha256": "bbd9d92b9c664822611cded15486736559b19bf6a7d9ada38105a86b36e8cde4",
+              "wav_sha256": "33e8b4fe64696086954f6b7115ad7928701ef88d02df3d2ff66959ff6adc2d13"
+            },
+            {
+              "variant": 2,
+              "file": "army__01/002_02.wav",
+              "header_offset": 229387,
+              "pcm_offset": 229391,
+              "raw_size_word": 11022,
+              "raw_high_byte": 0,
+              "mean_level": 10,
+              "frames": 11022,
+              "duration_seconds": 0.9997278911564625,
+              "pcm_sha256": "11da3fc9644aaed1dcc90c814ec128c0c008fd8c4b8d0db99a7d3d2951a7ddb9",
+              "wav_sha256": "c8e5c7442805077296e61b01d614eacd6d0687f40994a831a8606b09fed73d08"
+            }
+          ]
+        },
+        {
+          "sound": 3,
+          "group_offset": 240413,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__01/003_00.wav",
+              "header_offset": 240427,
+              "pcm_offset": 240431,
+              "raw_size_word": 16357,
+              "raw_high_byte": 0,
+              "mean_level": 15,
+              "frames": 16357,
+              "duration_seconds": 1.4836281179138322,
+              "pcm_sha256": "5b675b7161cb1ffe312614bda9b042a7265681ad54180d07badbd6951d668986",
+              "wav_sha256": "e89e621b6a2f47d07bebb0f04abd028d461eb0ad29ae3f9a61a8cceac17bc515"
+            },
+            {
+              "variant": 1,
+              "file": "army__01/003_01.wav",
+              "header_offset": 256788,
+              "pcm_offset": 256792,
+              "raw_size_word": 22474,
+              "raw_high_byte": 0,
+              "mean_level": 11,
+              "frames": 22474,
+              "duration_seconds": 2.0384580498866214,
+              "pcm_sha256": "6f68560d55c87cbb5b965bf6c5f0de09159501723db7929277957bafdabf5793",
+              "wav_sha256": "8be702c70acc670cac29957e5ffb4136322100c998ef7b62d36257ee1a3acd75"
+            }
+          ]
+        },
+        {
+          "sound": 4,
+          "group_offset": 279266,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__01/004_00.wav",
+              "header_offset": 279280,
+              "pcm_offset": 279284,
+              "raw_size_word": 28202,
+              "raw_high_byte": 0,
+              "mean_level": 23,
+              "frames": 28202,
+              "duration_seconds": 2.558004535147392,
+              "pcm_sha256": "fad041abd0bd7955a82ff0f1c3a7ceb4ddaad6af03e184fd3da82fd3dba52a18",
+              "wav_sha256": "0c360d1ccb56d2952896069629e0dc44c679453a16f9d12500d1e39ae732ea7c"
+            },
+            {
+              "variant": 1,
+              "file": "army__01/004_01.wav",
+              "header_offset": 307486,
+              "pcm_offset": 307490,
+              "raw_size_word": 18156,
+              "raw_high_byte": 0,
+              "mean_level": 18,
+              "frames": 18156,
+              "duration_seconds": 1.6468027210884353,
+              "pcm_sha256": "44dffe8c15e9c80f14623450aefb96585a3b6dabb06e13ba42f4f5f056d1b464",
+              "wav_sha256": "23d644d58d80aea69a131aeca6ee260c5428b316ea6ce9e42ae20202c124ecfe"
+            }
+          ]
+        },
+        {
+          "sound": 5,
+          "group_offset": 325646,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__01/005_00.wav",
+              "header_offset": 325664,
+              "pcm_offset": 325668,
+              "raw_size_word": 71168,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 71168,
+              "duration_seconds": 6.455147392290249,
+              "pcm_sha256": "c690cd724af64e880dbcc9338113bb633a4e0ef6be62317b499fc93bf85666ad",
+              "wav_sha256": "716c660abd61e45f8fcb354a8c6199d5eca03932fde06c3a92ac2ac02ec7ffdb"
+            },
+            {
+              "variant": 1,
+              "file": "army__01/005_01.wav",
+              "header_offset": 396836,
+              "pcm_offset": 396840,
+              "raw_size_word": 80108,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 80108,
+              "duration_seconds": 7.266031746031746,
+              "pcm_sha256": "94e2976648538ea3d021b6eb165bef9c01a26e0065e2dd9b968b549e7765e356",
+              "wav_sha256": "6dbc89faaa8980090cf4e5b3008ecc255bdf083a37e5ae5ded59dd29d9d11f11"
+            },
+            {
+              "variant": 2,
+              "file": "army__01/005_02.wav",
+              "header_offset": 476948,
+              "pcm_offset": 476952,
+              "raw_size_word": 82803,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 82803,
+              "duration_seconds": 7.51047619047619,
+              "pcm_sha256": "0464f7d751dd959d0910895feafcf31dfa10e4950f337090722d54e681f1d84b",
+              "wav_sha256": "b38ef3647f52184fddb4831edb06901e4111b7f93f4f50bba513e7dd3380e1f3"
+            }
+          ]
+        },
+        {
+          "sound": 6,
+          "group_offset": 559755,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__01/006_00.wav",
+              "header_offset": 559773,
+              "pcm_offset": 559777,
+              "raw_size_word": 71768,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 71768,
+              "duration_seconds": 6.509569160997732,
+              "pcm_sha256": "4dafff73a6cd3db72d348f99d81537345ba0c96a9f537b3209e648f8630f33fa",
+              "wav_sha256": "456950fa3f926b35080dd86dcd297864a1238da12985957268cc4bd5de548324"
+            },
+            {
+              "variant": 1,
+              "file": "army__01/006_01.wav",
+              "header_offset": 631545,
+              "pcm_offset": 631549,
+              "raw_size_word": 58239,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 58239,
+              "duration_seconds": 5.282448979591837,
+              "pcm_sha256": "6752af83cbf3efae8079251cbbbca36a4a0119b6c1a8f8ce1d5253a0becd78ab",
+              "wav_sha256": "39d718a7c1cd9b71a25b6197e54b34f89a1342eb9c12f2ead673378c974bdf01"
+            },
+            {
+              "variant": 2,
+              "file": "army__01/006_02.wav",
+              "header_offset": 689788,
+              "pcm_offset": 689792,
+              "raw_size_word": 74367,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 74367,
+              "duration_seconds": 6.745306122448979,
+              "pcm_sha256": "e5177facdc802d10e806bf2916d67a1f29a47b7dca9de6ece67cea8a6e71da95",
+              "wav_sha256": "da230ddc784b419854b8a7a17062ac7d595140d6780ade9684d0dc7ea2831a42"
+            }
+          ]
+        },
+        {
+          "sound": 7,
+          "group_offset": 764159,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__01/007_00.wav",
+              "header_offset": 764177,
+              "pcm_offset": 764181,
+              "raw_size_word": 28788,
+              "raw_high_byte": 0,
+              "mean_level": 4,
+              "frames": 28788,
+              "duration_seconds": 2.611156462585034,
+              "pcm_sha256": "bbc16eb6783f8824dbd89a5db2c7afa51e554e3ba08e05110b680d18c1b30f99",
+              "wav_sha256": "18f70ab4b12d87228902dfb94746c9ea280f4082df308cb37be18ab75bd1bc12"
+            },
+            {
+              "variant": 1,
+              "file": "army__01/007_01.wav",
+              "header_offset": 792969,
+              "pcm_offset": 792973,
+              "raw_size_word": 28353,
+              "raw_high_byte": 0,
+              "mean_level": 5,
+              "frames": 28353,
+              "duration_seconds": 2.5717006802721087,
+              "pcm_sha256": "30d2b685cf0107ed00cdfe0ab34d264f263e911554d8d589a4496b9954ac8592",
+              "wav_sha256": "f1d0bf6ad2334485fb6ef33f27fa9d4aa5bcf333c8f082a3ae749d5b665969b9"
+            },
+            {
+              "variant": 2,
+              "file": "army__01/007_02.wav",
+              "header_offset": 821326,
+              "pcm_offset": 821330,
+              "raw_size_word": 21551,
+              "raw_high_byte": 0,
+              "mean_level": 4,
+              "frames": 21551,
+              "duration_seconds": 1.9547392290249432,
+              "pcm_sha256": "1b8216100981d6176048137a46cb93c4fbef11b09676e5741a7e656bb5a13d87",
+              "wav_sha256": "02dbd39a06b58013efa84a50f7af3845b5da332418cda9d777dcc9d64053d49c"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "ARMY__02.FX",
+      "source_bytes": 1054528,
+      "source_sha256": "d088883e8b30c78e06b34999c78258421308a46b84ff84f83efc4a956dd685a0",
+      "sound_count": 15,
+      "sample_count": 34,
+      "sounds": [
+        {
+          "sound": 0,
+          "group_offset": 62,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/000_00.wav",
+              "header_offset": 72,
+              "pcm_offset": 76,
+              "raw_size_word": 17622,
+              "raw_high_byte": 0,
+              "mean_level": 13,
+              "frames": 17622,
+              "duration_seconds": 1.5983673469387756,
+              "pcm_sha256": "10ce0e13bc2e6599b225468f820c6aad0e8b175f35cb2ffb97c529c3a57707b7",
+              "wav_sha256": "19a0edaa100719b811d68798435af888774aadb793483c29bab42ddd929ab1c0"
+            }
+          ]
+        },
+        {
+          "sound": 1,
+          "group_offset": 17698,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/001_00.wav",
+              "header_offset": 17724,
+              "pcm_offset": 17728,
+              "raw_size_word": 7772,
+              "raw_high_byte": 0,
+              "mean_level": 14,
+              "frames": 7772,
+              "duration_seconds": 0.7049433106575964,
+              "pcm_sha256": "ca485fe4ec8470470fe9d0ca0b8a3737d35909f86a2a190c2d726037c53367a3",
+              "wav_sha256": "5e6880d135472dd68397dc79e975f9f2de8bc441af219cbd02a29a5718ba04fa"
+            },
+            {
+              "variant": 1,
+              "file": "army__02/001_01.wav",
+              "header_offset": 25500,
+              "pcm_offset": 25504,
+              "raw_size_word": 4720,
+              "raw_high_byte": 0,
+              "mean_level": 11,
+              "frames": 4720,
+              "duration_seconds": 0.42811791383219955,
+              "pcm_sha256": "e4b282f6972ebcee5199245da597cee866b2c2c643ac7003d41d4de5e959e45d",
+              "wav_sha256": "36c29f6af5738e7994539bfeeac0ed08a1815969f6a9a32fc6935bdb09ad38b6"
+            },
+            {
+              "variant": 2,
+              "file": "army__02/001_02.wav",
+              "header_offset": 30224,
+              "pcm_offset": 30228,
+              "raw_size_word": 6587,
+              "raw_high_byte": 0,
+              "mean_level": 24,
+              "frames": 6587,
+              "duration_seconds": 0.5974603174603175,
+              "pcm_sha256": "780aab68b60f3edf89ad5beae4a3f8dc24e80df08412a9bc17a3d6c4dd686ea0",
+              "wav_sha256": "b4fa88bd48bc2b8f9506515b8c56f265f19a44fd031a363488d4318412d65e79"
+            },
+            {
+              "variant": 3,
+              "file": "army__02/001_03.wav",
+              "header_offset": 36815,
+              "pcm_offset": 36819,
+              "raw_size_word": 5413,
+              "raw_high_byte": 0,
+              "mean_level": 5,
+              "frames": 5413,
+              "duration_seconds": 0.4909750566893424,
+              "pcm_sha256": "88d9752afb8334a1dd529c17f53ecda98dc701c386913bb4f25ab33884e30040",
+              "wav_sha256": "67f27fa4c777b2561f21aa19c505a0ea0f282bc9f9e1619ebae20990fa826de8"
+            },
+            {
+              "variant": 4,
+              "file": "army__02/001_04.wav",
+              "header_offset": 42232,
+              "pcm_offset": 42236,
+              "raw_size_word": 5120,
+              "raw_high_byte": 0,
+              "mean_level": 9,
+              "frames": 5120,
+              "duration_seconds": 0.46439909297052157,
+              "pcm_sha256": "67932318d00193e728efeed5ce319671dbedcede2cbaafc20bf498cb230d6621",
+              "wav_sha256": "842c7db9a9fef2e7a82e370eb20f37e00c963035d6fbb9789cee2895ab3ea44b"
+            }
+          ]
+        },
+        {
+          "sound": 2,
+          "group_offset": 47356,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/002_00.wav",
+              "header_offset": 47378,
+              "pcm_offset": 47382,
+              "raw_size_word": 15872,
+              "raw_high_byte": 0,
+              "mean_level": 6,
+              "frames": 15872,
+              "duration_seconds": 1.4396371882086167,
+              "pcm_sha256": "8d18ba7291e81f9a16cf041b66206a0e99807741f8009a3d045299b57eef0026",
+              "wav_sha256": "cb7a78fdd13b9febbd2dc4fbcc88d93b6a8bbb5110f74055de94704940ec9490"
+            },
+            {
+              "variant": 1,
+              "file": "army__02/002_01.wav",
+              "header_offset": 63254,
+              "pcm_offset": 63258,
+              "raw_size_word": 14212,
+              "raw_high_byte": 0,
+              "mean_level": 7,
+              "frames": 14212,
+              "duration_seconds": 1.2890702947845805,
+              "pcm_sha256": "bbd9d92b9c664822611cded15486736559b19bf6a7d9ada38105a86b36e8cde4",
+              "wav_sha256": "33e8b4fe64696086954f6b7115ad7928701ef88d02df3d2ff66959ff6adc2d13"
+            },
+            {
+              "variant": 2,
+              "file": "army__02/002_02.wav",
+              "header_offset": 77470,
+              "pcm_offset": 77474,
+              "raw_size_word": 11022,
+              "raw_high_byte": 0,
+              "mean_level": 10,
+              "frames": 11022,
+              "duration_seconds": 0.9997278911564625,
+              "pcm_sha256": "11da3fc9644aaed1dcc90c814ec128c0c008fd8c4b8d0db99a7d3d2951a7ddb9",
+              "wav_sha256": "c8e5c7442805077296e61b01d614eacd6d0687f40994a831a8606b09fed73d08"
+            },
+            {
+              "variant": 3,
+              "file": "army__02/002_03.wav",
+              "header_offset": 88496,
+              "pcm_offset": 88500,
+              "raw_size_word": 15168,
+              "raw_high_byte": 0,
+              "mean_level": 10,
+              "frames": 15168,
+              "duration_seconds": 1.37578231292517,
+              "pcm_sha256": "8322fe05cda2cf4411f2bcc840e5060c415616e6d5baec2183eb2adee0e82033",
+              "wav_sha256": "c949a2d77ddff497b48a11592433baee7d4db706650013068e856291ed1254f4"
+            }
+          ]
+        },
+        {
+          "sound": 3,
+          "group_offset": 103668,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/003_00.wav",
+              "header_offset": 103678,
+              "pcm_offset": 103682,
+              "raw_size_word": 20894,
+              "raw_high_byte": 0,
+              "mean_level": 7,
+              "frames": 20894,
+              "duration_seconds": 1.8951473922902495,
+              "pcm_sha256": "59ad25658879dbcc2feb23f79ba5db50332ba8fbbcd5e7b216d1e3793225fd64",
+              "wav_sha256": "ebb0b70051bd589f8a0ef634c31ff86d6acd901b6bd312e4319072a8c071e565"
+            }
+          ]
+        },
+        {
+          "sound": 4,
+          "group_offset": 124576,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/004_00.wav",
+              "header_offset": 124586,
+              "pcm_offset": 124590,
+              "raw_size_word": 11746,
+              "raw_high_byte": 0,
+              "mean_level": 5,
+              "frames": 11746,
+              "duration_seconds": 1.0653968253968253,
+              "pcm_sha256": "61d7c8e2fea36c982edf15146c148960398a400d868356b51ae27964cfa4f288",
+              "wav_sha256": "6fe48117f1f97a5cd554ee5b925182783831388a191fa22f0818beaf9ae2522b"
+            }
+          ]
+        },
+        {
+          "sound": 5,
+          "group_offset": 136336,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/005_00.wav",
+              "header_offset": 136350,
+              "pcm_offset": 136354,
+              "raw_size_word": 16357,
+              "raw_high_byte": 0,
+              "mean_level": 15,
+              "frames": 16357,
+              "duration_seconds": 1.4836281179138322,
+              "pcm_sha256": "5b675b7161cb1ffe312614bda9b042a7265681ad54180d07badbd6951d668986",
+              "wav_sha256": "e89e621b6a2f47d07bebb0f04abd028d461eb0ad29ae3f9a61a8cceac17bc515"
+            },
+            {
+              "variant": 1,
+              "file": "army__02/005_01.wav",
+              "header_offset": 152711,
+              "pcm_offset": 152715,
+              "raw_size_word": 22474,
+              "raw_high_byte": 0,
+              "mean_level": 11,
+              "frames": 22474,
+              "duration_seconds": 2.0384580498866214,
+              "pcm_sha256": "6f68560d55c87cbb5b965bf6c5f0de09159501723db7929277957bafdabf5793",
+              "wav_sha256": "8be702c70acc670cac29957e5ffb4136322100c998ef7b62d36257ee1a3acd75"
+            }
+          ]
+        },
+        {
+          "sound": 6,
+          "group_offset": 175189,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/006_00.wav",
+              "header_offset": 175203,
+              "pcm_offset": 175207,
+              "raw_size_word": 28202,
+              "raw_high_byte": 0,
+              "mean_level": 23,
+              "frames": 28202,
+              "duration_seconds": 2.558004535147392,
+              "pcm_sha256": "fad041abd0bd7955a82ff0f1c3a7ceb4ddaad6af03e184fd3da82fd3dba52a18",
+              "wav_sha256": "0c360d1ccb56d2952896069629e0dc44c679453a16f9d12500d1e39ae732ea7c"
+            },
+            {
+              "variant": 1,
+              "file": "army__02/006_01.wav",
+              "header_offset": 203409,
+              "pcm_offset": 203413,
+              "raw_size_word": 18156,
+              "raw_high_byte": 0,
+              "mean_level": 18,
+              "frames": 18156,
+              "duration_seconds": 1.6468027210884353,
+              "pcm_sha256": "44dffe8c15e9c80f14623450aefb96585a3b6dabb06e13ba42f4f5f056d1b464",
+              "wav_sha256": "23d644d58d80aea69a131aeca6ee260c5428b316ea6ce9e42ae20202c124ecfe"
+            }
+          ]
+        },
+        {
+          "sound": 7,
+          "group_offset": 221569,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/007_00.wav",
+              "header_offset": 221579,
+              "pcm_offset": 221583,
+              "raw_size_word": 18112,
+              "raw_high_byte": 0,
+              "mean_level": 14,
+              "frames": 18112,
+              "duration_seconds": 1.6428117913832199,
+              "pcm_sha256": "9b0461ca25a411daec63ecd1dcb000677934c73ab7dc60d25c5cc0230261de02",
+              "wav_sha256": "8e83cc5aedd3f1c71a7487b96dca1998e09839eaaa9bb0d3b54149375b7cc2c1"
+            }
+          ]
+        },
+        {
+          "sound": 8,
+          "group_offset": 239695,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/008_00.wav",
+              "header_offset": 239705,
+              "pcm_offset": 239709,
+              "raw_size_word": 2798,
+              "raw_high_byte": 0,
+              "mean_level": 6,
+              "frames": 2798,
+              "duration_seconds": 0.25378684807256235,
+              "pcm_sha256": "24d6cd21d9022cf33cb1090363507eb6bd4d5c8a6e91b7d05d563537544d1558",
+              "wav_sha256": "db5fdfe069cf26314f74a9935301ed2a3b9a1a4baa07ba5242440045a8744310"
+            }
+          ]
+        },
+        {
+          "sound": 9,
+          "group_offset": 242507,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/009_00.wav",
+              "header_offset": 242517,
+              "pcm_offset": 242521,
+              "raw_size_word": 16001,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 16001,
+              "duration_seconds": 1.4513378684807257,
+              "pcm_sha256": "e969078fc73a38dc10d4cc153fcbef6393d8b6366e552eda8b9738969d4a6cee",
+              "wav_sha256": "bd9e95f09e4472e88e2a9744cf9086761f04fb4b6582ad7a9530c1008d0e5b52"
+            }
+          ]
+        },
+        {
+          "sound": 10,
+          "group_offset": 258522,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/010_00.wav",
+              "header_offset": 258540,
+              "pcm_offset": 258544,
+              "raw_size_word": 90974,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 90974,
+              "duration_seconds": 8.251609977324263,
+              "pcm_sha256": "cf02a52fcbf1c0fdf309335255af4c3827448877e61fb7ca3ac070569ec2a49b",
+              "wav_sha256": "4553481b6578bfc025717a3e02f7b8c99844d0c1ed64acd42aa317ef3deebd5b"
+            },
+            {
+              "variant": 1,
+              "file": "army__02/010_01.wav",
+              "header_offset": 349518,
+              "pcm_offset": 349522,
+              "raw_size_word": 48549,
+              "raw_high_byte": 0,
+              "mean_level": 1,
+              "frames": 48549,
+              "duration_seconds": 4.403537414965986,
+              "pcm_sha256": "d8f21cbae5bb3c1623e8c049bcc16b72bc9dcae11c104970f7c9d9ac1cc14e23",
+              "wav_sha256": "02587b383b3e5b8b36a1bb95059c6adc37ea181fddb3b63002df683f7c4cd1f2"
+            },
+            {
+              "variant": 2,
+              "file": "army__02/010_02.wav",
+              "header_offset": 398071,
+              "pcm_offset": 398075,
+              "raw_size_word": 35160,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 35160,
+              "duration_seconds": 3.1891156462585033,
+              "pcm_sha256": "273ddc12e66908e8ad4599a2877a762608ef88b94982e90ef3bcfe6a1b7f8dbd",
+              "wav_sha256": "82c37a046e0f7876451d80f957713feae356ac1e52c9b282c8aca8fc3bc632a0"
+            }
+          ]
+        },
+        {
+          "sound": 11,
+          "group_offset": 433235,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/011_00.wav",
+              "header_offset": 433253,
+              "pcm_offset": 433257,
+              "raw_size_word": 71168,
+              "raw_high_byte": 0,
+              "mean_level": 2,
+              "frames": 71168,
+              "duration_seconds": 6.455147392290249,
+              "pcm_sha256": "c690cd724af64e880dbcc9338113bb633a4e0ef6be62317b499fc93bf85666ad",
+              "wav_sha256": "716c660abd61e45f8fcb354a8c6199d5eca03932fde06c3a92ac2ac02ec7ffdb"
+            },
+            {
+              "variant": 1,
+              "file": "army__02/011_01.wav",
+              "header_offset": 504425,
+              "pcm_offset": 504429,
+              "raw_size_word": 80108,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 80108,
+              "duration_seconds": 7.266031746031746,
+              "pcm_sha256": "94e2976648538ea3d021b6eb165bef9c01a26e0065e2dd9b968b549e7765e356",
+              "wav_sha256": "6dbc89faaa8980090cf4e5b3008ecc255bdf083a37e5ae5ded59dd29d9d11f11"
+            },
+            {
+              "variant": 2,
+              "file": "army__02/011_02.wav",
+              "header_offset": 584537,
+              "pcm_offset": 584541,
+              "raw_size_word": 82803,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 82803,
+              "duration_seconds": 7.51047619047619,
+              "pcm_sha256": "0464f7d751dd959d0910895feafcf31dfa10e4950f337090722d54e681f1d84b",
+              "wav_sha256": "b38ef3647f52184fddb4831edb06901e4111b7f93f4f50bba513e7dd3380e1f3"
+            }
+          ]
+        },
+        {
+          "sound": 12,
+          "group_offset": 667344,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/012_00.wav",
+              "header_offset": 667362,
+              "pcm_offset": 667366,
+              "raw_size_word": 71768,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 71768,
+              "duration_seconds": 6.509569160997732,
+              "pcm_sha256": "4dafff73a6cd3db72d348f99d81537345ba0c96a9f537b3209e648f8630f33fa",
+              "wav_sha256": "456950fa3f926b35080dd86dcd297864a1238da12985957268cc4bd5de548324"
+            },
+            {
+              "variant": 1,
+              "file": "army__02/012_01.wav",
+              "header_offset": 739134,
+              "pcm_offset": 739138,
+              "raw_size_word": 58239,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 58239,
+              "duration_seconds": 5.282448979591837,
+              "pcm_sha256": "6752af83cbf3efae8079251cbbbca36a4a0119b6c1a8f8ce1d5253a0becd78ab",
+              "wav_sha256": "39d718a7c1cd9b71a25b6197e54b34f89a1342eb9c12f2ead673378c974bdf01"
+            },
+            {
+              "variant": 2,
+              "file": "army__02/012_02.wav",
+              "header_offset": 797377,
+              "pcm_offset": 797381,
+              "raw_size_word": 74367,
+              "raw_high_byte": 0,
+              "mean_level": 3,
+              "frames": 74367,
+              "duration_seconds": 6.745306122448979,
+              "pcm_sha256": "e5177facdc802d10e806bf2916d67a1f29a47b7dca9de6ece67cea8a6e71da95",
+              "wav_sha256": "da230ddc784b419854b8a7a17062ac7d595140d6780ade9684d0dc7ea2831a42"
+            }
+          ]
+        },
+        {
+          "sound": 13,
+          "group_offset": 871748,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/013_00.wav",
+              "header_offset": 871766,
+              "pcm_offset": 871770,
+              "raw_size_word": 28788,
+              "raw_high_byte": 0,
+              "mean_level": 4,
+              "frames": 28788,
+              "duration_seconds": 2.611156462585034,
+              "pcm_sha256": "bbc16eb6783f8824dbd89a5db2c7afa51e554e3ba08e05110b680d18c1b30f99",
+              "wav_sha256": "18f70ab4b12d87228902dfb94746c9ea280f4082df308cb37be18ab75bd1bc12"
+            },
+            {
+              "variant": 1,
+              "file": "army__02/013_01.wav",
+              "header_offset": 900558,
+              "pcm_offset": 900562,
+              "raw_size_word": 28353,
+              "raw_high_byte": 0,
+              "mean_level": 5,
+              "frames": 28353,
+              "duration_seconds": 2.5717006802721087,
+              "pcm_sha256": "30d2b685cf0107ed00cdfe0ab34d264f263e911554d8d589a4496b9954ac8592",
+              "wav_sha256": "f1d0bf6ad2334485fb6ef33f27fa9d4aa5bcf333c8f082a3ae749d5b665969b9"
+            },
+            {
+              "variant": 2,
+              "file": "army__02/013_02.wav",
+              "header_offset": 928915,
+              "pcm_offset": 928919,
+              "raw_size_word": 21551,
+              "raw_high_byte": 0,
+              "mean_level": 4,
+              "frames": 21551,
+              "duration_seconds": 1.9547392290249432,
+              "pcm_sha256": "1b8216100981d6176048137a46cb93c4fbef11b09676e5741a7e656bb5a13d87",
+              "wav_sha256": "02dbd39a06b58013efa84a50f7af3845b5da332418cda9d777dcc9d64053d49c"
+            }
+          ]
+        },
+        {
+          "sound": 14,
+          "group_offset": 950470,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__02/014_00.wav",
+              "header_offset": 950488,
+              "pcm_offset": 950492,
+              "raw_size_word": 34676,
+              "raw_high_byte": 0,
+              "mean_level": 8,
+              "frames": 34676,
+              "duration_seconds": 3.1452154195011337,
+              "pcm_sha256": "014485089e573b4106c56474e629f296706f8dcd6feb2106209064a0c2835611",
+              "wav_sha256": "9a3177c9ab7433e7604a3cb1302a560e926a2a17ca6f5663ae22131de4d66827"
+            },
+            {
+              "variant": 1,
+              "file": "army__02/014_01.wav",
+              "header_offset": 985168,
+              "pcm_offset": 985172,
+              "raw_size_word": 34676,
+              "raw_high_byte": 0,
+              "mean_level": 8,
+              "frames": 34676,
+              "duration_seconds": 3.1452154195011337,
+              "pcm_sha256": "014485089e573b4106c56474e629f296706f8dcd6feb2106209064a0c2835611",
+              "wav_sha256": "9a3177c9ab7433e7604a3cb1302a560e926a2a17ca6f5663ae22131de4d66827"
+            },
+            {
+              "variant": 2,
+              "file": "army__02/014_02.wav",
+              "header_offset": 1019848,
+              "pcm_offset": 1019852,
+              "raw_size_word": 34676,
+              "raw_high_byte": 0,
+              "mean_level": 8,
+              "frames": 34676,
+              "duration_seconds": 3.1452154195011337,
+              "pcm_sha256": "014485089e573b4106c56474e629f296706f8dcd6feb2106209064a0c2835611",
+              "wav_sha256": "9a3177c9ab7433e7604a3cb1302a560e926a2a17ca6f5663ae22131de4d66827"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "ARMY__03.FX",
+      "source_bytes": 670296,
+      "source_sha256": "3661074a70e4c6b406d321eac6527511a073e43f2fdce4bad47901910896eb40",
+      "sound_count": 11,
+      "sample_count": 17,
+      "sounds": [
+        {
+          "sound": 0,
+          "group_offset": 46,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__03/000_00.wav",
+              "header_offset": 56,
+              "pcm_offset": 60,
+              "raw_size_word": 26753,
+              "raw_high_byte": 0,
+              "mean_level": 13,
+              "frames": 26753,
+              "duration_seconds": 2.426575963718821,
+              "pcm_sha256": "eee5e3301f9d58ef45445fea532d9d0830f26b9b7a3e6f16503fa6fb81ec3261",
+              "wav_sha256": "1fd46dbd3865f6b91c2cab1ecf61754c43acfdd95dad404a583b39e811ecdce2"
+            }
+          ]
+        },
+        {
+          "sound": 1,
+          "group_offset": 26813,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__03/001_00.wav",
+              "header_offset": 26823,
+              "pcm_offset": 26827,
+              "raw_size_word": 26302,
+              "raw_high_byte": 0,
+              "mean_level": 10,
+              "frames": 26302,
+              "duration_seconds": 2.3856689342403627,
+              "pcm_sha256": "e8c3b525e1250709b20aa15270391598e9cabc1f1b765c9434e7a0b288d405d8",
+              "wav_sha256": "59fc858bd82abce3d2115be680f984b1e99b7dce2336432278e50c1e2c827258"
+            }
+          ]
+        },
+        {
+          "sound": 2,
+          "group_offset": 53129,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__03/002_00.wav",
+              "header_offset": 53139,
+              "pcm_offset": 53143,
+              "raw_size_word": 9957,
+              "raw_high_byte": 0,
+              "mean_level": 17,
+              "frames": 9957,
+              "duration_seconds": 0.9031292517006803,
+              "pcm_sha256": "252bf10b0d1773c7a34ef9df022e1eba903d9800c4c8f0414ae04437dbd298af",
+              "wav_sha256": "d495c381a5fedebc7f7f51aaa925567713f2187b99460687d75d6be53c6a3c3d"
+            }
+          ]
+        },
+        {
+          "sound": 3,
+          "group_offset": 63100,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__03/003_00.wav",
+              "header_offset": 63110,
+              "pcm_offset": 63114,
+              "raw_size_word": 15854,
+              "raw_high_byte": 0,
+              "mean_level": 23,
+              "frames": 15854,
+              "duration_seconds": 1.4380045351473922,
+              "pcm_sha256": "a886342bfcbaf203e7972b8840c466332ec662becef1aa02e51b1ba6c61aa0ca",
+              "wav_sha256": "5617d95ba2fab4746adc3aae21dae72d1918df620f28a8125c07058949f02dba"
+            }
+          ]
+        },
+        {
+          "sound": 4,
+          "group_offset": 78968,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__03/004_00.wav",
+              "header_offset": 78986,
+              "pcm_offset": 78990,
+              "raw_size_word": 160864,
+              "raw_high_byte": 0,
+              "mean_level": 16,
+              "frames": 160864,
+              "duration_seconds": 14.590839002267574,
+              "pcm_sha256": "99872552b66a522a1756a5a3e5944c17448ce79264e014ae8b21e2904f51bbd3",
+              "wav_sha256": "d837d636d5b7d999e668940516ed2360312bc0f7e26a333328c24ebcc22710e9"
+            },
+            {
+              "variant": 1,
+              "file": "army__03/004_01.wav",
+              "header_offset": 239854,
+              "pcm_offset": 239858,
+              "raw_size_word": 94464,
+              "raw_high_byte": 0,
+              "mean_level": 17,
+              "frames": 94464,
+              "duration_seconds": 8.568163265306122,
+              "pcm_sha256": "e0d6945ac9457d4c0cd35c802be95518e1f6455ad66edc1071296fd6cb89968c",
+              "wav_sha256": "9c69fe3e61a2d4372e257b79eb4c97e29a0c9d19d341b200a8c7df5ba2f08255"
+            },
+            {
+              "variant": 2,
+              "file": "army__03/004_02.wav",
+              "header_offset": 334322,
+              "pcm_offset": 334326,
+              "raw_size_word": 94144,
+              "raw_high_byte": 0,
+              "mean_level": 17,
+              "frames": 94144,
+              "duration_seconds": 8.539138321995464,
+              "pcm_sha256": "3ec1504a0b1f5b200d0060a3a06ec105433945b70c740ab04697c023fbd0512e",
+              "wav_sha256": "5d7110a6850bd42696fd2df21909ee7ad8fc425853aa6c18488dc5cd6cb4a98b"
+            }
+          ]
+        },
+        {
+          "sound": 5,
+          "group_offset": 428470,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__03/005_00.wav",
+              "header_offset": 428488,
+              "pcm_offset": 428492,
+              "raw_size_word": 25984,
+              "raw_high_byte": 0,
+              "mean_level": 10,
+              "frames": 25984,
+              "duration_seconds": 2.3568253968253967,
+              "pcm_sha256": "059d53b4c044f74f615330e9d87e4850af23cadca5858b1a8af7dbe4293dab09",
+              "wav_sha256": "1fce94db0552629bac2cb7d6ad0d204bb6cb32fb4cb1c0133a0e59713b327482"
+            },
+            {
+              "variant": 1,
+              "file": "army__03/005_01.wav",
+              "header_offset": 454476,
+              "pcm_offset": 454480,
+              "raw_size_word": 17280,
+              "raw_high_byte": 0,
+              "mean_level": 8,
+              "frames": 17280,
+              "duration_seconds": 1.5673469387755101,
+              "pcm_sha256": "5037af3eb7b560b6a5600b7a6c2fed998cb3fd3a4e9417cc3ef10da4fdd22201",
+              "wav_sha256": "9499efacafaabdd10956501ebf7a97f1ab8fbfb19c0e27ebc4a734f7e911aba5"
+            },
+            {
+              "variant": 2,
+              "file": "army__03/005_02.wav",
+              "header_offset": 471760,
+              "pcm_offset": 471764,
+              "raw_size_word": 21136,
+              "raw_high_byte": 0,
+              "mean_level": 10,
+              "frames": 21136,
+              "duration_seconds": 1.9170975056689343,
+              "pcm_sha256": "65bf804b545982cd436fcabb2ab82501a2ac7056c406be3f649bf66fddb8a643",
+              "wav_sha256": "3f579900962e2610eb24d19438e283d06c705c55ba5b50571ff013518d25eaaf"
+            }
+          ]
+        },
+        {
+          "sound": 6,
+          "group_offset": 492900,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__03/006_00.wav",
+              "header_offset": 492910,
+              "pcm_offset": 492914,
+              "raw_size_word": 37783,
+              "raw_high_byte": 0,
+              "mean_level": 19,
+              "frames": 37783,
+              "duration_seconds": 3.4270294784580497,
+              "pcm_sha256": "119b25050259938abe551a313483e136deee213d332c019fdea681b3e9a3b73a",
+              "wav_sha256": "bb9f76880bd12961582b4eca26fc7295ec1ee17105a46d6a367d9007d38678a9"
+            }
+          ]
+        },
+        {
+          "sound": 7,
+          "group_offset": 530697,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__03/007_00.wav",
+              "header_offset": 530707,
+              "pcm_offset": 530711,
+              "raw_size_word": 44745,
+              "raw_high_byte": 0,
+              "mean_level": 21,
+              "frames": 44745,
+              "duration_seconds": 4.058503401360544,
+              "pcm_sha256": "81181dcc388dd28ead893a1d78da91fd621706400baeaaa7e012de360ae4d1a9",
+              "wav_sha256": "7690fda9a62f6e933452974f5b2558598caedeb5b220e6f64935215110d9f75d"
+            }
+          ]
+        },
+        {
+          "sound": 8,
+          "group_offset": 575456,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__03/008_00.wav",
+              "header_offset": 575466,
+              "pcm_offset": 575470,
+              "raw_size_word": 44745,
+              "raw_high_byte": 0,
+              "mean_level": 21,
+              "frames": 44745,
+              "duration_seconds": 4.058503401360544,
+              "pcm_sha256": "81181dcc388dd28ead893a1d78da91fd621706400baeaaa7e012de360ae4d1a9",
+              "wav_sha256": "7690fda9a62f6e933452974f5b2558598caedeb5b220e6f64935215110d9f75d"
+            }
+          ]
+        },
+        {
+          "sound": 9,
+          "group_offset": 620215,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__03/009_00.wav",
+              "header_offset": 620225,
+              "pcm_offset": 620229,
+              "raw_size_word": 44745,
+              "raw_high_byte": 0,
+              "mean_level": 21,
+              "frames": 44745,
+              "duration_seconds": 4.058503401360544,
+              "pcm_sha256": "81181dcc388dd28ead893a1d78da91fd621706400baeaaa7e012de360ae4d1a9",
+              "wav_sha256": "7690fda9a62f6e933452974f5b2558598caedeb5b220e6f64935215110d9f75d"
+            }
+          ]
+        },
+        {
+          "sound": 10,
+          "group_offset": 664974,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__03/010_00.wav",
+              "header_offset": 664992,
+              "pcm_offset": 664996,
+              "raw_size_word": 1764,
+              "raw_high_byte": 0,
+              "mean_level": 40,
+              "frames": 1764,
+              "duration_seconds": 0.16,
+              "pcm_sha256": "ea92c4d9554479147d2c0d935a35088bdc4b13bb3c9c33c25b2bf778e50e2092",
+              "wav_sha256": "2eb1e092983fdb98b1764b0a688aad79e65043c1ca84b494eb68d67f040b84e3"
+            },
+            {
+              "variant": 1,
+              "file": "army__03/010_01.wav",
+              "header_offset": 666760,
+              "pcm_offset": 666764,
+              "raw_size_word": 1764,
+              "raw_high_byte": 0,
+              "mean_level": 40,
+              "frames": 1764,
+              "duration_seconds": 0.16,
+              "pcm_sha256": "ea92c4d9554479147d2c0d935a35088bdc4b13bb3c9c33c25b2bf778e50e2092",
+              "wav_sha256": "2eb1e092983fdb98b1764b0a688aad79e65043c1ca84b494eb68d67f040b84e3"
+            },
+            {
+              "variant": 2,
+              "file": "army__03/010_02.wav",
+              "header_offset": 668528,
+              "pcm_offset": 668532,
+              "raw_size_word": 1764,
+              "raw_high_byte": 0,
+              "mean_level": 40,
+              "frames": 1764,
+              "duration_seconds": 0.16,
+              "pcm_sha256": "ea92c4d9554479147d2c0d935a35088bdc4b13bb3c9c33c25b2bf778e50e2092",
+              "wav_sha256": "2eb1e092983fdb98b1764b0a688aad79e65043c1ca84b494eb68d67f040b84e3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "ARMY__04.FX",
+      "source_bytes": 78940,
+      "source_sha256": "345399682bc7061b7372e40f3e037e5dce687f512936171ff93c6b62e59b3f7f",
+      "sound_count": 4,
+      "sample_count": 4,
+      "sounds": [
+        {
+          "sound": 0,
+          "group_offset": 18,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__04/000_00.wav",
+              "header_offset": 28,
+              "pcm_offset": 32,
+              "raw_size_word": 15854,
+              "raw_high_byte": 0,
+              "mean_level": 23,
+              "frames": 15854,
+              "duration_seconds": 1.4380045351473922,
+              "pcm_sha256": "a886342bfcbaf203e7972b8840c466332ec662becef1aa02e51b1ba6c61aa0ca",
+              "wav_sha256": "5617d95ba2fab4746adc3aae21dae72d1918df620f28a8125c07058949f02dba"
+            }
+          ]
+        },
+        {
+          "sound": 1,
+          "group_offset": 15886,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__04/001_00.wav",
+              "header_offset": 15896,
+              "pcm_offset": 15900,
+              "raw_size_word": 26302,
+              "raw_high_byte": 0,
+              "mean_level": 10,
+              "frames": 26302,
+              "duration_seconds": 2.3856689342403627,
+              "pcm_sha256": "e8c3b525e1250709b20aa15270391598e9cabc1f1b765c9434e7a0b288d405d8",
+              "wav_sha256": "59fc858bd82abce3d2115be680f984b1e99b7dce2336432278e50c1e2c827258"
+            }
+          ]
+        },
+        {
+          "sound": 2,
+          "group_offset": 42202,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__04/002_00.wav",
+              "header_offset": 42212,
+              "pcm_offset": 42216,
+              "raw_size_word": 9957,
+              "raw_high_byte": 0,
+              "mean_level": 17,
+              "frames": 9957,
+              "duration_seconds": 0.9031292517006803,
+              "pcm_sha256": "252bf10b0d1773c7a34ef9df022e1eba903d9800c4c8f0414ae04437dbd298af",
+              "wav_sha256": "d495c381a5fedebc7f7f51aaa925567713f2187b99460687d75d6be53c6a3c3d"
+            }
+          ]
+        },
+        {
+          "sound": 3,
+          "group_offset": 52173,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__04/003_00.wav",
+              "header_offset": 52183,
+              "pcm_offset": 52187,
+              "raw_size_word": 26753,
+              "raw_high_byte": 0,
+              "mean_level": 13,
+              "frames": 26753,
+              "duration_seconds": 2.426575963718821,
+              "pcm_sha256": "eee5e3301f9d58ef45445fea532d9d0830f26b9b7a3e6f16503fa6fb81ec3261",
+              "wav_sha256": "1fd46dbd3865f6b91c2cab1ecf61754c43acfdd95dad404a583b39e811ecdce2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "ARMY__05.FX",
+      "source_bytes": 166356,
+      "source_sha256": "098d80daa90e287e64b4410f5f41133d5f73f9a09b542af14b4c6ea074f6dacf",
+      "sound_count": 6,
+      "sample_count": 6,
+      "sounds": [
+        {
+          "sound": 0,
+          "group_offset": 26,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__05/000_00.wav",
+              "header_offset": 36,
+              "pcm_offset": 40,
+              "raw_size_word": 11456,
+              "raw_high_byte": 0,
+              "mean_level": 12,
+              "frames": 11456,
+              "duration_seconds": 1.039092970521542,
+              "pcm_sha256": "a8437a21da14c3d90604ecb5fe8e72592fe57bc02ee51a8c42e08ca9910aab04",
+              "wav_sha256": "f94c8bc9b360babea4bf19fb32e92c80952e8c283115f05b677b06958823d0f1"
+            }
+          ]
+        },
+        {
+          "sound": 1,
+          "group_offset": 11496,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__05/001_00.wav",
+              "header_offset": 11506,
+              "pcm_offset": 11510,
+              "raw_size_word": 14822,
+              "raw_high_byte": 0,
+              "mean_level": 4,
+              "frames": 14822,
+              "duration_seconds": 1.3443990929705216,
+              "pcm_sha256": "81a1943d9032db4c0f4946f826f44f5dda0552eb91ed1d51ae0944e1172c4efe",
+              "wav_sha256": "3fa9c5763d793f6f6029765afc3c7b82c1abb1989e3c47ecd2e4b96452c2874f"
+            }
+          ]
+        },
+        {
+          "sound": 2,
+          "group_offset": 26332,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__05/002_00.wav",
+              "header_offset": 26342,
+              "pcm_offset": 26346,
+              "raw_size_word": 49536,
+              "raw_high_byte": 0,
+              "mean_level": 6,
+              "frames": 49536,
+              "duration_seconds": 4.493061224489796,
+              "pcm_sha256": "3e495b80319a3844ce6570d32a1076aa05482b3bab62a783160966b4fee2b3fc",
+              "wav_sha256": "5a0295ae8d8699903e1d4f6d3fa9cfa0027fe0cef9c298492f5f6ffdc815a7ed"
+            }
+          ]
+        },
+        {
+          "sound": 3,
+          "group_offset": 75882,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__05/003_00.wav",
+              "header_offset": 75892,
+              "pcm_offset": 75896,
+              "raw_size_word": 15872,
+              "raw_high_byte": 0,
+              "mean_level": 10,
+              "frames": 15872,
+              "duration_seconds": 1.4396371882086167,
+              "pcm_sha256": "f403648f932b1e129007585b303c1faf6ba12c683cd65d72cb8f945ee1c6c5e2",
+              "wav_sha256": "b28ac6d6c4324c661a8892df92cc54bafda6587b72ec3dde7ed40e833b8f3f00"
+            }
+          ]
+        },
+        {
+          "sound": 4,
+          "group_offset": 91768,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__05/004_00.wav",
+              "header_offset": 91778,
+              "pcm_offset": 91782,
+              "raw_size_word": 30272,
+              "raw_high_byte": 0,
+              "mean_level": 13,
+              "frames": 30272,
+              "duration_seconds": 2.7457596371882085,
+              "pcm_sha256": "c58c98cdcc80850af5982889f91b1534566e39b8fcb3fe45b5fab99903ff84a7",
+              "wav_sha256": "3bc814a5b8cb960be9ade67ebc97995df354d14ec436a6e4a291217c22d9c3c5"
+            }
+          ]
+        },
+        {
+          "sound": 5,
+          "group_offset": 122054,
+          "variants": [
+            {
+              "variant": 0,
+              "file": "army__05/005_00.wav",
+              "header_offset": 122064,
+              "pcm_offset": 122068,
+              "raw_size_word": 44288,
+              "raw_high_byte": 0,
+              "mean_level": 13,
+              "frames": 44288,
+              "duration_seconds": 4.017052154195011,
+              "pcm_sha256": "60430485c5148e9ed3327506e1099e8e55819ef2049726a5cb44ca1dd54ab2ca",
+              "wav_sha256": "97732a8b53c7c5d95983cf5d62d50454e0ba3bd7fd3924d4e80ebe07c2071593"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
