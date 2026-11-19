@@ -45,10 +45,11 @@
    - перенести и сверить под Unicorn вместе со своим участком;
    - заглушить на входе в `verify_*.py` и записать вызовы. Так сделано, например, с A4C2 в `tools/verify_ai_squad_states.py`.
 
-**Граф своего участка** (адреса — шестнадцатеричные смещения LE:1; `--root` можно повторять):
+**Граф своего участка** (адреса — шестнадцатеричные смещения LE:1; `--root` можно повторять). Корни должны лежать внутри `--start..--end`, иначе раскрывать нечего: скрипт предупредит. Пример для строя отряда (шаг 4, 1EF26 вызывает 103AF, 1037E, 10262, 10075):
 
 ```sh
-python tools/call_graph.py --game <папка с NORWIND.EXE> --start 103AF --end 10800 --root 1EF26 \
+python tools/call_graph.py --game <папка с NORWIND.EXE> --start 10000 --end 10800 \
+    --root 103AF --root 1037E --root 10262 --root 10075 \
     --title "Строй отряда (шаг 4)" --markdown build/formations-call-graph.md --html build/formations-call-graph.html
 ```
 
