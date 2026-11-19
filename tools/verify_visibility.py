@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import struct
 from unicorn.x86_const import *
 from analyze_executable import analyze
@@ -75,6 +76,13 @@ def minimap_inputs(width, height, salt):
         plane2=[1 + i % 23 if i % 7 == salt % 7 else 0 for i in range(n)],
         owners=bytes((i * 5 + salt) & 255 for i in range(24)),
         owner_colors=bytes((i * 11 + salt * 7) & 255 for i in range(16)))
+
+
+def format_fixture(fixture):
+    """Keep each numerical test vector on one line so future reviews need fewer tokens."""
+    pretty = json.dumps(fixture, indent=2)
+    return re.sub(r'\[\n(?:[ \t]+-?\d+,?\n)+[ \t]*\]',
+                  lambda match: json.dumps(json.loads(match.group())), pretty) + '\n'
 
 
 def generate(game):
@@ -164,4 +172,4 @@ if __name__ == '__main__':
     parser.add_argument('--game', type=Path, required=True)
     parser.add_argument('--fixture', type=Path, required=True)
     args = parser.parse_args()
-    args.fixture.write_text(json.dumps(generate(args.game), indent=2) + '\n', encoding='utf-8')
+    args.fixture.write_text(format_fixture(generate(args.game)), encoding='utf-8')

@@ -7,6 +7,15 @@
 
 
 
+
+## C6: компактная фикстура и точка продолжения — 19.11.2026
+Коммиты: этот коммит — `C6: compact visibility vectors without changing native evidence`.
+Сделано: каждая числовая строка visibility.json теперь на одной строке; 402516 →141540 байт, 36748 →4124 строк. verify_visibility.py воспроизводит этот формат. Параметры, SHA и JSON-значения не изменились.
+Доказательства: до/после json.loads равны; фикстура заново получена из EXE и совпала побайтно (cmp). Повторены4032 открытия,16384 угла и60 native minimap framebuffer.
+Не подтверждено / допущения: новых игровых правил этот коммит не вводит.
+Проверки: original-visibility11/11, Python97/97; предыдущие build/simulation3963/scene38/credits57 успешны на e2e5042. Компактная запись не меняет их входных значений.
+Продолжение: C6 иC7 готовы к проверке, C8 в работе — требуется снять оригинальные SCREENS8 «Ваш ход» и13 «Победа». Уже готовы авторский экран9,27 MENU-изображений/правил, их native-фикстуры и снимки; см.docs/credits-layout.md. C5 всё ещё открыта только для WORK358. Работать только codex-work, без merge вmain; занятые Claude файлы не менять. Все наработки этой сессии отправлены вorigin/codex-work.
+
 ## C8: авторский экран и правила подтверждены; 8/13 остаются открытыми — 19.11.2026
 Коммиты: этот срез — `C8: decode authors screen and verify rule pages` (C7 — 2a034d6).
 Сделано: credits_source.py, verify_credits.py, 28 PNG/манифест в assets/imported/credits, tests/fixtures/credits.json и C#/Python-проверки, docs/credits-layout.md/credits-call-graph.md, четыре снимка DOSBox. В реестр добавлены широкая RLE 19465 и шесть widget-records LE:3 DC9C..DDC2 как verified, не как полностью перенесённый UI. C8 сохраняет статус в работе.
