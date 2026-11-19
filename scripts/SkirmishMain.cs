@@ -17,7 +17,12 @@ public sealed class BattleFrame
 
 public partial class SkirmishMain : Node2D
 {
-    private const int PanelWidth = 280;
+    /// <summary>Name shown for the hero; the original only accepts the heroes Олег, Игорь and Эйрик.</summary>
+    public string HeroName { get; set; } = "Олег";
+    public OriginalHud Hud { get; } = new();
+    private readonly CanvasLayer _hudLayer = new() { Layer = 2 };
+    public Texture2D? MinimapTexture => _minimapTexture;
+    public int ScrollSpeed { get; private set; } = 700;
     public Skirmish Battle { get; private set; } = null!;
     public HashSet<uint> Selection { get; } = [];
     public Camera2D Camera { get; } = new();
@@ -50,8 +55,9 @@ public partial class SkirmishMain : Node2D
     public override void _Ready()
     {
         TextureFilter = TextureFilterEnum.Nearest;
-        AddChild(Camera); Camera.Enabled = true; Camera.Zoom = Vector2.One * 1.25f;
-        BuildUi();
+        AddChild(Camera); Camera.Enabled = true;
+        BuildUi(); _ui.Visible = false;   // the former debug panel: F1
+        AddChild(_hudLayer); Hud.Game = this; _hudLayer.AddChild(Hud); Layout(); Camera.Zoom = Vector2.One * HudScale;
         try
         {
             _terrain = GD.Load<Texture2D>("res://assets/imported/terrain.png");
@@ -134,17 +140,48 @@ public partial class SkirmishMain : Node2D
         var target = Battle.Objective.Standing ? Battle.Objective : Battle.Actors.FirstOrDefault(a => a.Team == 1 && a.Alive && !a.Structure);
         Focus(target?.Position ?? Battle.Objective.Position);
     }
-    private void Focus(Vector2 point) { Camera.Position = point - new Vector2(PanelWidth / (2 * Camera.Zoom.X), 0); ClampCamera(); }
+    private void Focus(Vector2 point) => FocusWorld(point);
+    /// <summary>Scale and origin of the 640×480 interface in the window.</summary>
+    public float HudScale { get; private set; } = 1;
+    public Vector2 HudOrigin { get; private set; }
+    private void Layout()
+    {
+        var size = GetViewportRect().Size;
+        HudScale = Math.Max(.25f, Math.Min(size.X / OriginalHud.Size.X, size.Y / OriginalHud.Size.Y));
+        HudOrigin = ((size - OriginalHud.Size * HudScale) / 2).Floor();
+        _hudLayer.Transform = new Transform2D(0, Vector2.One * HudScale, 0, HudOrigin);
+    }
+    /// <summary>Screen rectangle of the map window.</summary>
+    public Rect2 MapScreenRect => new(HudOrigin + OriginalHud.MapWindow.Position * HudScale, OriginalHud.MapWindow.Size * HudScale);
+    public Vector2 ToHud(Vector2 screen) => (screen - HudOrigin) / HudScale;
+    /// <summary>World rectangle visible through the map window.</summary>
+    public Rect2 VisibleWorld()
+    {
+        var inverse = GetViewport().GetCanvasTransform().AffineInverse(); var rect = MapScreenRect;
+        var a = inverse * rect.Position; return new Rect2(a, inverse * rect.End - a);
+    }
+    /// <summary>Center the map window on a world point.</summary>
+    public void FocusWorld(Vector2 point)
+    {
+        Camera.Position = point - (MapScreenRect.GetCenter() - GetViewportRect().Size / 2) / Camera.Zoom; ClampCamera();
+    }
     private void ClampCamera()
     {
         if (Battle == null) return;
-        var half = GetViewportRect().Size / Camera.Zoom / 2;
+        var shift = (MapScreenRect.GetCenter() - GetViewportRect().Size / 2) / Camera.Zoom;
+        var half = MapScreenRect.Size / Camera.Zoom / 2;
         var size = new Vector2(Battle.Map.Width, Battle.Map.Height) * 32;
-        Camera.Position = new Vector2(Mathf.Clamp(Camera.Position.X, half.X, size.X - half.X), Mathf.Clamp(Camera.Position.Y, half.Y, size.Y - half.Y));
+        var center = Camera.Position + shift;
+        center = new Vector2(Mathf.Clamp(center.X, half.X, Math.Max(half.X, size.X - half.X)), Mathf.Clamp(center.Y, half.Y, Math.Max(half.Y, size.Y - half.Y)));
+        Camera.Position = center - shift;
     }
+    public void ChangeSpeed(int step) { Speed = Math.Clamp(step > 0 ? Speed * 2 : Speed / 2, .5f, 4); RefreshUi(); }
+    public void ChangeScrollSpeed(int step) => ScrollSpeed = Math.Clamp(ScrollSpeed + step * 175, 175, 1400);
+    public void ExitMission() => GetTree().ChangeSceneToFile("res://scenes/main.tscn");
     public override void _Process(double delta)
     {
         if (!_ready) return;
+        Layout();
         Battle.Advance(delta * Speed); RefreshTerrain();
         Selection.RemoveWhere(id => Battle.Find(id) == null);
         Vector2 direction = Vector2.Zero;
@@ -155,9 +192,9 @@ public partial class SkirmishMain : Node2D
             if (Input.IsPhysicalKeyPressed(Key.W) || Input.IsPhysicalKeyPressed(Key.Up)) direction.Y--;
             if (Input.IsPhysicalKeyPressed(Key.S) || Input.IsPhysicalKeyPressed(Key.Down)) direction.Y++;
         }
-        Camera.Position += direction.Normalized() * (float)delta * 700 / Camera.Zoom.X; ClampCamera();
+        Camera.Position += direction.Normalized() * (float)delta * ScrollSpeed / Camera.Zoom.X; ClampCamera();
         _hover = (int)(Battle.At(GetGlobalMousePosition())?.Id ?? 0);
-        RefreshUi(); QueueRedraw(); _markers.QueueRedraw();
+        RefreshUi(); QueueRedraw(); _markers.QueueRedraw(); Hud.QueueRedraw();
     }
     public void IssueOrder(Vector2 point)
     {
@@ -179,7 +216,7 @@ public partial class SkirmishMain : Node2D
         if (e is InputEventMouseButton { ButtonIndex: MouseButton.Middle, Pressed: false }) _pan = false;
         if (_drag && e is InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: false } button)
         {
-            _dragEnd = button.Position;
+            _dragEnd = ClampToMap(button.Position);
             if (!Input.IsKeyPressed(Key.Shift)) Selection.Clear();
             if (_dragStart.DistanceTo(_dragEnd) < 6)
             {
@@ -212,12 +249,15 @@ public partial class SkirmishMain : Node2D
                 case Key.X: Battle.Stop(Selection); break;
                 case Key.Escape: if (PlacingBuilding) { PlacingMill = false; PlacingFarm = PlacingBarracks = PlacingMine = false; } else Selection.Clear(); break;
                 case Key.F10: GetTree().ChangeSceneToFile("res://scenes/main.tscn"); break;
+                case Key.F1: _ui.Visible = !_ui.Visible; break;
             }
         }
         if (e is InputEventMouseButton button)
         {
-            if (button.ButtonIndex == MouseButton.Middle) _pan = button.Pressed;
+            if (button.ButtonIndex == MouseButton.Middle) _pan = button.Pressed && MapScreenRect.HasPoint(button.Position);
             if (!button.Pressed) return;
+            if (button.ButtonIndex is MouseButton.Left or MouseButton.Right && Hud.Click(ToHud(button.Position), button.ButtonIndex)) return;
+            if (!MapScreenRect.HasPoint(button.Position)) return;
             if (PlacingBuilding && button.ButtonIndex == MouseButton.Right) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; RefreshUi(); return; }
             if (PlacingBuilding && button.ButtonIndex == MouseButton.Left)
             {
@@ -227,22 +267,17 @@ public partial class SkirmishMain : Node2D
                 if (mill != null) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; Selection.Clear(); Selection.Add(mill.Id); }
                 RefreshUi(); return;
             }
-            if (button.ButtonIndex is MouseButton.WheelUp or MouseButton.WheelDown)
-            {
-                var before = GetGlobalMousePosition();
-                Camera.Zoom = Vector2.One * Mathf.Clamp(Camera.Zoom.X * (button.ButtonIndex == MouseButton.WheelUp ? 1.15f : 1 / 1.15f), .55f, 2.5f);
-                Camera.Position += before - GetGlobalMousePosition(); ClampCamera();
-            }
-            else if (button.ButtonIndex == MouseButton.Left && !Battle.Paused && Battle.Outcome == "")
+            if (button.ButtonIndex == MouseButton.Left && !Battle.Paused && Battle.Outcome == "")
             { _drag = true; _dragStart = _dragEnd = button.Position; }
             else if (button.ButtonIndex == MouseButton.Right) IssueOrder(GetViewport().GetCanvasTransform().AffineInverse() * button.Position);
         }
         else if (e is InputEventMouseMotion motion)
         {
-            if (_drag) _dragEnd = motion.Position;
+            if (_drag) _dragEnd = ClampToMap(motion.Position);
             if (_pan) { Camera.Position -= motion.Relative / Camera.Zoom; ClampCamera(); }
         }
     }
+    private Vector2 ClampToMap(Vector2 point) { var r = MapScreenRect; return point.Clamp(r.Position, r.End); }
     public override void _Draw()
     {
         if (!_ready) return;
@@ -258,7 +293,7 @@ public partial class SkirmishMain : Node2D
         foreach (var actor in Battle.Actors.Where(a => a.Alive || a.Dying).OrderBy(a => a.Position.Y)) DrawActor(actor);
         var producer = Selection.Count == 1 && Battle.Find(Selection.Single()) is { } barracks && Skirmish.IsBarracks(barracks)
             ? barracks : Selection.Contains(Battle.PlayerCastle.Id) ? Battle.PlayerCastle : null;
-        if (!PlacingBuilding && producer is { Alive: true })
+        if (_ui.Visible && !PlacingBuilding && producer is { Alive: true })
         {
             var template = producer == Battle.PlayerCastle ? Battle.RecruitmentTemplate ?? Battle.WorkerTemplate : Battle.MilitiaTemplate;
             var exit = Battle.RecruitExit(producer, template);
@@ -266,7 +301,7 @@ public partial class SkirmishMain : Node2D
             DrawArc(point, 10, 0, Mathf.Tau, 24, color, 2);
             DrawString(ThemeDB.FallbackFont, point + new Vector2(-22, 22), "Выход", HorizontalAlignment.Left, -1, 12, color);
         }
-        if (!PlacingBuilding && Selection.Any(id => Battle.Find(id)?.Worker == true))
+        if (_ui.Visible && !PlacingBuilding && Selection.Any(id => Battle.Find(id)?.Worker == true))
         {
             var point = GetGlobalMousePosition(); var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
             if (Battle.Harvestable(cell))
@@ -309,14 +344,14 @@ public partial class SkirmishMain : Node2D
             DrawLine(effect.From - new Vector2(0, 16), effect.To - new Vector2(0, 16), new Color(effect.Team == 0 ? "f0d88a" : "f57862"), 2);
             DrawCircle(effect.To - new Vector2(0, 16), 6, new Color(1, .6f, .2f, .5f));
         }
-        foreach (uint id in Selection)
+        foreach (uint id in _ui.Visible ? Selection : [])
         {
             var actor = Battle.Find(id); if (actor == null) continue;
             var point = actor.Position;
             foreach (var cell in actor.Route)
             { var next = new Vector2(cell.X * 32 + 16, cell.Y * 32 + 16); DrawLine(point, next, new Color(.4f, 1, .7f, .45f), 1); point = next; }
         }
-        if (_orderMark is { } mark && Battle.Elapsed < _markUntil)
+        if (_ui.Visible && _orderMark is { } mark && Battle.Elapsed < _markUntil)
         { DrawArc(mark, 15, 0, Mathf.Tau, 32, new Color("f7d67e"), 2); DrawCircle(mark, 3, Colors.White); }
         if (_drag)
         {
@@ -328,7 +363,8 @@ public partial class SkirmishMain : Node2D
     private void DrawActor(SkirmishActor actor)
     {
         var point = actor.Position; var color = new Color(actor.Team == 0 ? "63e3bd" : "f37769");
-        if (!actor.Structure && !actor.Dying)
+        bool debug = _ui.Visible;
+        if (debug && !actor.Structure && !actor.Dying)
         {
             DrawSetTransform(point, 0, new Vector2(1, .45f)); DrawCircle(Vector2.Zero, 14, new Color(color, .22f));
             DrawArc(Vector2.Zero, Selection.Contains(actor.Id) ? 19 : 14, 0, Mathf.Tau, 32, color, Selection.Contains(actor.Id) ? 3 : 1);
@@ -345,6 +381,8 @@ public partial class SkirmishMain : Node2D
         }
         else if (!actor.Dying) DrawCircle(point - Vector2.Down * 12, 9, color);
         if (actor.Dying) return; // death frames only, no ring or health bar
+        if (Selection.Contains(actor.Id)) DrawCorners(actor.Structure ? Battle.Bounds(actor) : new Rect2(point - Vector2.One * 16, Vector2.One * 32));
+        if (!debug) return;   // labels, rings and bars below belong to the debug view (F1), the original has none
         float width = actor.Structure ? 72 : 30;
         if (actor.Worker && actor.Record[0x31] == 3) DrawCircle(point + new Vector2(12, -24), 5, new Color("d3ac64"));
         var bar = new Rect2(point + new Vector2(-width / 2, 20), new Vector2(width, 5));
@@ -356,10 +394,20 @@ public partial class SkirmishMain : Node2D
         if (actor.Id == Battle.Objective.Id)
         { var box = Battle.Bounds(actor).Grow(4); DrawRect(box, new Color(color, .7f), false, 1); }
     }
+    /// <summary>Selection mark of the original: four green corners, 4 px arms, around the object (measured on screenshots).</summary>
+    private void DrawCorners(Rect2 box)
+    {
+        var c = new Color(121 / 255f, 186 / 255f, 36 / 255f); var a = box.Position; var b = box.End - Vector2.One;
+        foreach (var (corner, dx, dy) in new[] { (a, 1, 1), (new Vector2(b.X, a.Y), -1, 1), (new Vector2(a.X, b.Y), 1, -1), (b, -1, -1) })
+        {
+            DrawRect(new Rect2(corner.X + (dx < 0 ? -3 : 0), corner.Y, 4, 1), c);
+            DrawRect(new Rect2(corner.X, corner.Y + (dy < 0 ? -3 : 0), 1, 4), c);
+        }
+    }
     private void BuildUi()
     {
         _ui = new CanvasLayer(); AddChild(_ui);
-        var panel = new PanelContainer(); panel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.LeftWide); panel.OffsetRight = PanelWidth;
+        var panel = new PanelContainer(); panel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.LeftWide); panel.OffsetRight = 280;
         panel.AddThemeStyleboxOverride("panel", new StyleBoxFlat { BgColor = new Color("15231f"), BorderColor = new Color("4e6855"), BorderWidthRight = 2,
             ContentMarginLeft = 16, ContentMarginRight = 16, ContentMarginTop = 16, ContentMarginBottom = 16 }); _ui.AddChild(panel);
         var scroll = new ScrollContainer { HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled }; panel.AddChild(scroll);

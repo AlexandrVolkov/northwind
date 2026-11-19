@@ -164,7 +164,7 @@ public partial class TestRunner
         Check(hired.GatherTree == forest, "Context right-click on forest assigns the selected worker");
         scene.SelectCastle(); scene.BeginMillPlacement();
         Check(scene.PlacingMill, "Castle UI enters placement mode");
-        var site = EconomyMillCell(scene.Battle, forest); scene.Camera.Zoom = Vector2.One * 2; scene.Camera.Position = (Vector2)(site * 32) - new Vector2(140, 0);
+        var site = EconomyMillCell(scene.Battle, forest); scene.Camera.Zoom = Vector2.One * 2; scene.FocusWorld((Vector2)(site * 32));
         for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         var screen = scene.GetViewport().GetCanvasTransform() * ((Vector2)(site * 32) + Vector2.One * 16);
         if (DisplayServer.GetName() != "headless")

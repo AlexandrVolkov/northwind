@@ -96,7 +96,7 @@ public partial class TestRunner
         var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
         for (int i = 0; i < 4; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         scene.SelectCastle(); scene.BeginFarmPlacement(); Check(scene.PlacingFarm && !scene.PlacingMill, "Castle UI enters farm placement independently of sawmill placement");
-        var cell = FarmSite(scene.Battle); scene.Camera.Zoom = Vector2.One * 2; scene.Camera.Position = (Vector2)(cell * 32) - new Vector2(140, 0);
+        var cell = FarmSite(scene.Battle); scene.Camera.Zoom = Vector2.One * 2; scene.FocusWorld((Vector2)(cell * 32));
         for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         var screen = scene.GetViewport().GetCanvasTransform() * (Vector2)(cell * 32 + Vector2I.One * 16);
         Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true, Position = screen });

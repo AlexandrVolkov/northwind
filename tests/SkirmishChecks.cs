@@ -119,7 +119,13 @@ public partial class TestRunner
         Check(scene.ReadyToPlay, "Default realtime scene loads bundled textures and scenario");
         scene.SelectArmy(); Check(scene.Selection.Count == 5, "Select-army UI command selects all five live combatants");
         scene.Selection.Clear();
-        var points = scene.Battle.Actors.Where(a => a.Team == 0 && !a.Structure).Select(a => scene.GetViewport().GetCanvasTransform() * a.Position).ToArray();
+        var army = scene.Battle.Actors.Where(a => a.Team == 0 && !a.Structure).ToArray();
+        scene.FocusWorld(army.Aggregate(Vector2.Zero, (sum, a) => sum + a.Position) / army.Length);
+        await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        // The original shows 448×448 world pixels through the map window; only units inside it can be framed.
+        var visible = army.Where(a => scene.VisibleWorld().Grow(-8).HasPoint(a.Position)).ToArray();
+        GD.Print($"Army spread {army.Length}, visible {visible.Length}");
+        var points = visible.Select(a => scene.GetViewport().GetCanvasTransform() * a.Position).ToArray();
         var first = new Vector2(points.Min(p => p.X) - 20, points.Min(p => p.Y) - 20);
         var last = new Vector2(points.Max(p => p.X) + 20, points.Max(p => p.Y) + 20);
         Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true, Position = first });
@@ -127,7 +133,7 @@ public partial class TestRunner
         Input.ParseInputEvent(new InputEventMouseMotion { Position = last });
         Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = false, Position = last });
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-        Check(scene.Selection.Count == 5, "Mouse drag in the world selects the actual army");
+        Check(visible.Length > 0 && scene.Selection.Count == visible.Length && visible.All(a => scene.Selection.Contains(a.Id)), "Mouse drag in the map window selects the framed army");
         scene.FocusObjective();
         for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         var targetPoint = scene.GetViewport().GetCanvasTransform() * (scene.Battle.Objective.Position - new Vector2(0, 70));
@@ -142,7 +148,30 @@ public partial class TestRunner
         Check(scene.Selection.All(id => scene.Battle.Find(id)?.Target == scene.Battle.Objective.Id), "World right-click targets the enemy castle for the selected army");
         scene.TogglePause(); double elapsed = scene.Battle.Elapsed; scene._Process(1);
         Check(scene.Battle.Paused && scene.Battle.Elapsed == elapsed, "Scene pause button stops the realtime loop");
-        scene.Restart(); scene.TogglePause(); scene.SelectArmy(); scene.FocusHero();
+        scene.Restart();
+        Check(scene.Hud.Click(OriginalHud.MenuButton.GetCenter(), MouseButton.Left) && scene.Hud.MenuOpen, "«Меню» opens the original menu panel");
+        scene.Hud.Click(OriginalHud.PauseButton.GetCenter(), MouseButton.Left);
+        Check(scene.Battle.Paused, "«Пауза» of the menu panel pauses the battle"); scene.TogglePause();
+        scene.Hud.Click(OriginalHud.BackButton.GetCenter(), MouseButton.Left);
+        Check(!scene.Hud.MenuOpen, "«Назад» closes the menu panel");
+        Check(!scene.Hud.Click(OriginalHud.MapWindow.GetCenter(), MouseButton.Left), "Clicks inside the map window reach the world");
+        scene.Hud.Click(OriginalHud.Minimap.Position + new Vector2(100, 100), MouseButton.Left);
+        for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        Check(scene.VisibleWorld().HasPoint(new Vector2(100, 100) / 128 * new Vector2(scene.Battle.Map.Width, scene.Battle.Map.Height) * 32), "A minimap click moves the map window there");
+        scene.Selection.Clear(); scene.Selection.Add(scene.Battle.Hero.Id); scene.FocusHero();
+        if (DisplayServer.GetName() != "headless")
+        {
+            for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+            GetViewport().GetTexture().GetImage().SavePng("res://build/hud-hero.png");
+            scene.Hud.MenuOpen = true; scene.Hud.QueueRedraw();
+            for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            GetViewport().GetTexture().GetImage().SavePng("res://build/hud-menu.png");
+            scene.Hud.MenuOpen = false;
+        }
+        scene.TogglePause(); scene.SelectArmy(); scene.FocusHero();
         for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         if (DisplayServer.GetName() != "headless")
         {
