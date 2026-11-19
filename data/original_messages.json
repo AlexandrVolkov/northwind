@@ -1,0 +1,1424 @@
+{
+  "format_version": 1,
+  "source": "MESSAGES.TXT",
+  "source_evidence": {
+    "executable_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "help_name_fixup": [
+      26973,
+      2,
+      7892
+    ],
+    "messages_name_fixup": [
+      87168,
+      2,
+      680
+    ]
+  },
+  "encoding": "cp866",
+  "source_sha256": "54442bd73e1fdde2c3147d450f5433a81387ea5ddfa3584d051a7485c76b2507",
+  "sections": [
+    {
+      "name": "DETECT",
+      "line": 1,
+      "source_offset": 0
+    },
+    {
+      "name": "SOUND_DETECT",
+      "line": 13,
+      "source_offset": 362
+    },
+    {
+      "name": "MAIN_MENU",
+      "line": 30,
+      "source_offset": 1137
+    },
+    {
+      "name": "SYSTEM",
+      "line": 39,
+      "source_offset": 1475
+    },
+    {
+      "name": "ERRORS",
+      "line": 59,
+      "source_offset": 2135
+    }
+  ],
+  "message_count": 82,
+  "messages": [
+    {
+      "code": 96,
+      "code_hex": "60",
+      "section": "DETECT",
+      "line": 2,
+      "source_offset": 10,
+      "original_text": " Определение звуковой карты...",
+      "text": " Определение звуковой карты...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Определение звуковой карты..."
+        }
+      ]
+    },
+    {
+      "code": 97,
+      "code_hex": "61",
+      "section": "DETECT",
+      "line": 3,
+      "source_offset": 46,
+      "original_text": " Звуковая карта не обнаружена.",
+      "text": " Звуковая карта не обнаружена.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Звуковая карта не обнаружена."
+        }
+      ]
+    },
+    {
+      "code": 98,
+      "code_hex": "62",
+      "section": "DETECT",
+      "line": 4,
+      "source_offset": 82,
+      "original_text": " Обнаружена звуковая карта.",
+      "text": " Обнаружена звуковая карта.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Обнаружена звуковая карта."
+        }
+      ]
+    },
+    {
+      "code": 99,
+      "code_hex": "63",
+      "section": "DETECT",
+      "line": 5,
+      "source_offset": 115,
+      "original_text": " Звуковой драйвер не найден !",
+      "text": " Звуковой драйвер не найден !",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Звуковой драйвер не найден !"
+        }
+      ]
+    },
+    {
+      "code": 100,
+      "code_hex": "64",
+      "section": "DETECT",
+      "line": 6,
+      "source_offset": 150,
+      "original_text": " Звуковой драйвер содержит ошибку !",
+      "text": " Звуковой драйвер содержит ошибку !",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Звуковой драйвер содержит ошибку !"
+        }
+      ]
+    },
+    {
+      "code": 101,
+      "code_hex": "65",
+      "section": "DETECT",
+      "line": 7,
+      "source_offset": 191,
+      "original_text": " Нет дос памяти для драйвера звука !",
+      "text": " Нет дос памяти для драйвера звука !",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Нет дос памяти для драйвера звука !"
+        }
+      ]
+    },
+    {
+      "code": 102,
+      "code_hex": "66",
+      "section": "DETECT",
+      "line": 8,
+      "source_offset": 233,
+      "original_text": " Нет памяти таблиц для звука !",
+      "text": " Нет памяти таблиц для звука !",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Нет памяти таблиц для звука !"
+        }
+      ]
+    },
+    {
+      "code": 103,
+      "code_hex": "67",
+      "section": "DETECT",
+      "line": 9,
+      "source_offset": 269,
+      "original_text": " Нет дос памяти для звукового буфера !",
+      "text": " Нет дос памяти для звукового буфера !",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Нет дос памяти для звукового буфера !"
+        }
+      ]
+    },
+    {
+      "code": 104,
+      "code_hex": "68",
+      "section": "DETECT",
+      "line": 10,
+      "source_offset": 313,
+      "original_text": " Эффекты включены",
+      "text": " Эффекты включены",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Эффекты включены"
+        }
+      ]
+    },
+    {
+      "code": 105,
+      "code_hex": "69",
+      "section": "DETECT",
+      "line": 11,
+      "source_offset": 336,
+      "original_text": " Эффекты отключены",
+      "text": " Эффекты отключены",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Эффекты отключены"
+        }
+      ]
+    },
+    {
+      "code": 128,
+      "code_hex": "80",
+      "section": "SOUND_DETECT",
+      "line": 14,
+      "source_offset": 378,
+      "original_text": " Поиск звуковой карты совместимой с Sound Blaster 16.",
+      "text": " Поиск звуковой карты совместимой с Sound Blaster 16.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Поиск звуковой карты совместимой с Sound Blaster 16."
+        }
+      ]
+    },
+    {
+      "code": 129,
+      "code_hex": "81",
+      "section": "SOUND_DETECT",
+      "line": 15,
+      "source_offset": 437,
+      "original_text": " Поиск звуковой карты совместимой с Sound Blaster Pro.",
+      "text": " Поиск звуковой карты совместимой с Sound Blaster Pro.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Поиск звуковой карты совместимой с Sound Blaster Pro."
+        }
+      ]
+    },
+    {
+      "code": 130,
+      "code_hex": "82",
+      "section": "SOUND_DETECT",
+      "line": 16,
+      "source_offset": 497,
+      "original_text": " Поиск звуковой карты совместимой с Sound Blaster.",
+      "text": " Поиск звуковой карты совместимой с Sound Blaster.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Поиск звуковой карты совместимой с Sound Blaster."
+        }
+      ]
+    },
+    {
+      "code": 131,
+      "code_hex": "83",
+      "section": "SOUND_DETECT",
+      "line": 17,
+      "source_offset": 553,
+      "original_text": " Проверка установок звуковой карты в конфигурации.",
+      "text": " Проверка установок звуковой карты в конфигурации.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Проверка установок звуковой карты в конфигурации."
+        }
+      ]
+    },
+    {
+      "code": 132,
+      "code_hex": "84",
+      "section": "SOUND_DETECT",
+      "line": 18,
+      "source_offset": 609,
+      "original_text": " Установки звуковой карты в конфигураци неверные.",
+      "text": " Установки звуковой карты в конфигураци неверные.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Установки звуковой карты в конфигураци неверные."
+        }
+      ]
+    },
+    {
+      "code": 133,
+      "code_hex": "85",
+      "section": "SOUND_DETECT",
+      "line": 19,
+      "source_offset": 664,
+      "original_text": " Поиск установок звуковой карты в переменных окружения.",
+      "text": " Поиск установок звуковой карты в переменных окружения.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Поиск установок звуковой карты в переменных окружения."
+        }
+      ]
+    },
+    {
+      "code": 134,
+      "code_hex": "86",
+      "section": "SOUND_DETECT",
+      "line": 20,
+      "source_offset": 725,
+      "original_text": " Установок не обнаруженно.",
+      "text": " Установок не обнаруженно.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Установок не обнаруженно."
+        }
+      ]
+    },
+    {
+      "code": 135,
+      "code_hex": "87",
+      "section": "SOUND_DETECT",
+      "line": 21,
+      "source_offset": 757,
+      "original_text": " Проверка установок звуковой карты в переменных окружения.",
+      "text": " Проверка установок звуковой карты в переменных окружения.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Проверка установок звуковой карты в переменных окружения."
+        }
+      ]
+    },
+    {
+      "code": 136,
+      "code_hex": "88",
+      "section": "SOUND_DETECT",
+      "line": 22,
+      "source_offset": 821,
+      "original_text": " Поиск установок звуковой карты \"вручную\".",
+      "text": " Поиск установок звуковой карты \"вручную\".",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Поиск установок звуковой карты \"вручную\"."
+        }
+      ]
+    },
+    {
+      "code": 137,
+      "code_hex": "89",
+      "section": "SOUND_DETECT",
+      "line": 23,
+      "source_offset": 869,
+      "original_text": " Установки звуковой карты в переменных окужения неверные.",
+      "text": " Установки звуковой карты в переменных окужения неверные.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Установки звуковой карты в переменных окужения неверные."
+        }
+      ]
+    },
+    {
+      "code": 138,
+      "code_hex": "8A",
+      "section": "SOUND_DETECT",
+      "line": 24,
+      "source_offset": 932,
+      "original_text": " Конфигурирование драйвера.",
+      "text": " Конфигурирование драйвера.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Конфигурирование драйвера."
+        }
+      ]
+    },
+    {
+      "code": 139,
+      "code_hex": "8B",
+      "section": "SOUND_DETECT",
+      "line": 25,
+      "source_offset": 965,
+      "original_text": " Нет свободной памяти под дескриптор звука.",
+      "text": " Нет свободной памяти под дескриптор звука.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Нет свободной памяти под дескриптор звука."
+        }
+      ]
+    },
+    {
+      "code": 140,
+      "code_hex": "8C",
+      "section": "SOUND_DETECT",
+      "line": 26,
+      "source_offset": 1014,
+      "original_text": " Нет свободной DOS памяти под драйвер.",
+      "text": " Нет свободной DOS памяти под драйвер.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Нет свободной DOS памяти под драйвер."
+        }
+      ]
+    },
+    {
+      "code": 141,
+      "code_hex": "8D",
+      "section": "SOUND_DETECT",
+      "line": 27,
+      "source_offset": 1058,
+      "original_text": " Невозможно инициализировать драйвер звука.",
+      "text": " Невозможно инициализировать драйвер звука.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Невозможно инициализировать драйвер звука."
+        }
+      ]
+    },
+    {
+      "code": 142,
+      "code_hex": "8E",
+      "section": "SOUND_DETECT",
+      "line": 28,
+      "source_offset": 1107,
+      "original_text": " Неподходящий драйвер.",
+      "text": " Неподходящий драйвер.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Неподходящий драйвер."
+        }
+      ]
+    },
+    {
+      "code": 144,
+      "code_hex": "90",
+      "section": "MAIN_MENU",
+      "line": 31,
+      "source_offset": 1150,
+      "original_text": " ~╨Нет файла с палитрой для первой страницы меню !",
+      "text": " Нет файла с палитрой для первой страницы меню !",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Нет файла с палитрой для первой страницы меню !"
+        }
+      ]
+    },
+    {
+      "code": 145,
+      "code_hex": "91",
+      "section": "MAIN_MENU",
+      "line": 32,
+      "source_offset": 1206,
+      "original_text": " ~╨Нет файла с палитрой для второй страницы меню !",
+      "text": " Нет файла с палитрой для второй страницы меню !",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Нет файла с палитрой для второй страницы меню !"
+        }
+      ]
+    },
+    {
+      "code": 146,
+      "code_hex": "92",
+      "section": "MAIN_MENU",
+      "line": 33,
+      "source_offset": 1262,
+      "original_text": " ~╨Нет файла с цветовой таблицей !",
+      "text": " Нет файла с цветовой таблицей !",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Нет файла с цветовой таблицей !"
+        }
+      ]
+    },
+    {
+      "code": 147,
+      "code_hex": "93",
+      "section": "MAIN_MENU",
+      "line": 34,
+      "source_offset": 1302,
+      "original_text": " ~╨Нет файла со спрайтами меню !",
+      "text": " Нет файла со спрайтами меню !",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Нет файла со спрайтами меню !"
+        }
+      ]
+    },
+    {
+      "code": 148,
+      "code_hex": "94",
+      "section": "MAIN_MENU",
+      "line": 35,
+      "source_offset": 1340,
+      "original_text": " ~╨Нет файла с шрифтом для меню !",
+      "text": " Нет файла с шрифтом для меню !",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Нет файла с шрифтом для меню !"
+        }
+      ]
+    },
+    {
+      "code": 149,
+      "code_hex": "95",
+      "section": "MAIN_MENU",
+      "line": 36,
+      "source_offset": 1379,
+      "original_text": " ~╨Нет файла с шрифтом для скроллинга !",
+      "text": " Нет файла с шрифтом для скроллинга !",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Нет файла с шрифтом для скроллинга !"
+        }
+      ]
+    },
+    {
+      "code": 150,
+      "code_hex": "96",
+      "section": "MAIN_MENU",
+      "line": 37,
+      "source_offset": 1424,
+      "original_text": " ~╨Нет файла с маленьким шрифтом для меню !",
+      "text": " Нет файла с маленьким шрифтом для меню !",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Нет файла с маленьким шрифтом для меню !"
+        }
+      ]
+    },
+    {
+      "code": 21,
+      "code_hex": "15",
+      "section": "SYSTEM",
+      "line": 40,
+      "source_offset": 1485,
+      "original_text": " Загрузка цветовых таблиц...",
+      "text": " Загрузка цветовых таблиц...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Загрузка цветовых таблиц..."
+        }
+      ]
+    },
+    {
+      "code": 22,
+      "code_hex": "16",
+      "section": "SYSTEM",
+      "line": 41,
+      "source_offset": 1519,
+      "original_text": " Загрузка cценария...",
+      "text": " Загрузка cценария...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Загрузка cценария..."
+        }
+      ]
+    },
+    {
+      "code": 48,
+      "code_hex": "30",
+      "section": "SYSTEM",
+      "line": 42,
+      "source_offset": 1546,
+      "original_text": " Загрузка карты...",
+      "text": " Загрузка карты...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Загрузка карты..."
+        }
+      ]
+    },
+    {
+      "code": 49,
+      "code_hex": "31",
+      "section": "SYSTEM",
+      "line": 43,
+      "source_offset": 1570,
+      "original_text": " Загрузка спрайтов и звуков...",
+      "text": " Загрузка спрайтов и звуков...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Загрузка спрайтов и звуков..."
+        }
+      ]
+    },
+    {
+      "code": 50,
+      "code_hex": "32",
+      "section": "SYSTEM",
+      "line": 44,
+      "source_offset": 1606,
+      "original_text": " Подготовка \"теневой\" и \"скрытой\" карты...",
+      "text": " Подготовка \"теневой\" и \"скрытой\" карты...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Подготовка \"теневой\" и \"скрытой\" карты..."
+        }
+      ]
+    },
+    {
+      "code": 51,
+      "code_hex": "33",
+      "section": "SYSTEM",
+      "line": 45,
+      "source_offset": 1654,
+      "original_text": " Выделение памяти под данные игровых компьютеров...",
+      "text": " Выделение памяти под данные игровых компьютеров...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Выделение памяти под данные игровых компьютеров..."
+        }
+      ]
+    },
+    {
+      "code": 52,
+      "code_hex": "34",
+      "section": "SYSTEM",
+      "line": 46,
+      "source_offset": 1711,
+      "original_text": " Загрузка музыки...",
+      "text": " Загрузка музыки...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Загрузка музыки..."
+        }
+      ]
+    },
+    {
+      "code": 55,
+      "code_hex": "37",
+      "section": "SYSTEM",
+      "line": 47,
+      "source_offset": 1736,
+      "original_text": " Загрузка панели экрана...",
+      "text": " Загрузка панели экрана...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Загрузка панели экрана..."
+        }
+      ]
+    },
+    {
+      "code": 53,
+      "code_hex": "35",
+      "section": "SYSTEM",
+      "line": 48,
+      "source_offset": 1768,
+      "original_text": " Загрузка эпизода...",
+      "text": " Загрузка эпизода...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Загрузка эпизода..."
+        }
+      ]
+    },
+    {
+      "code": 17,
+      "code_hex": "11",
+      "section": "SYSTEM",
+      "line": 49,
+      "source_offset": 1794,
+      "original_text": " IPX драйвер не обнаружен",
+      "text": " IPX драйвер не обнаружен",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " IPX драйвер не обнаружен"
+        }
+      ]
+    },
+    {
+      "code": 18,
+      "code_hex": "12",
+      "section": "SYSTEM",
+      "line": 50,
+      "source_offset": 1825,
+      "original_text": " обнаружен IPX драйвер",
+      "text": " обнаружен IPX драйвер",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " обнаружен IPX драйвер"
+        }
+      ]
+    },
+    {
+      "code": 71,
+      "code_hex": "47",
+      "section": "SYSTEM",
+      "line": 51,
+      "source_offset": 1853,
+      "original_text": " Загрузка сохраненной игры...",
+      "text": " Загрузка сохраненной игры...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Загрузка сохраненной игры..."
+        }
+      ]
+    },
+    {
+      "code": 75,
+      "code_hex": "4B",
+      "section": "SYSTEM",
+      "line": 52,
+      "source_offset": 1888,
+      "original_text": " Переход на новую карту...",
+      "text": " Переход на новую карту...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Переход на новую карту..."
+        }
+      ]
+    },
+    {
+      "code": 76,
+      "code_hex": "4C",
+      "section": "SYSTEM",
+      "line": 53,
+      "source_offset": 1920,
+      "original_text": " Восстановление сценария...",
+      "text": " Восстановление сценария...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Восстановление сценария..."
+        }
+      ]
+    },
+    {
+      "code": 77,
+      "code_hex": "4D",
+      "section": "SYSTEM",
+      "line": 54,
+      "source_offset": 1953,
+      "original_text": " Имитация изменений на карте...",
+      "text": " Имитация изменений на карте...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Имитация изменений на карте..."
+        }
+      ]
+    },
+    {
+      "code": 78,
+      "code_hex": "4E",
+      "section": "SYSTEM",
+      "line": 55,
+      "source_offset": 1990,
+      "original_text": " Переход хода...",
+      "text": " Переход хода...",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Переход хода..."
+        }
+      ]
+    },
+    {
+      "code": 80,
+      "code_hex": "50",
+      "section": "SYSTEM",
+      "line": 56,
+      "source_offset": 2012,
+      "original_text": " Вставте диск с игрой в CD-ROM и нажмите любую клавишу",
+      "text": " Вставте диск с игрой в CD-ROM и нажмите любую клавишу",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Вставте диск с игрой в CD-ROM и нажмите любую клавишу"
+        }
+      ]
+    },
+    {
+      "code": 254,
+      "code_hex": "FE",
+      "section": "SYSTEM",
+      "line": 57,
+      "source_offset": 2072,
+      "original_text": " Программа прервана... Нажмите любую клавишу для выхода",
+      "text": " Программа прервана... Нажмите любую клавишу для выхода",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Программа прервана... Нажмите любую клавишу для выхода"
+        }
+      ]
+    },
+    {
+      "code": 20,
+      "code_hex": "14",
+      "section": "ERRORS",
+      "line": 60,
+      "source_offset": 2145,
+      "original_text": " Файл конфигурации загружен.",
+      "text": " Файл конфигурации загружен.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Файл конфигурации загружен."
+        }
+      ]
+    },
+    {
+      "code": 6,
+      "code_hex": "06",
+      "section": "ERRORS",
+      "line": 61,
+      "source_offset": 2179,
+      "original_text": " Файл конфигурации потерян, создан новый.",
+      "text": " Файл конфигурации потерян, создан новый.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Файл конфигурации потерян, создан новый."
+        }
+      ]
+    },
+    {
+      "code": 7,
+      "code_hex": "07",
+      "section": "ERRORS",
+      "line": 62,
+      "source_offset": 2226,
+      "original_text": " Файл конфигурации испорчен, создан новый.",
+      "text": " Файл конфигурации испорчен, создан новый.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " Файл конфигурации испорчен, создан новый."
+        }
+      ]
+    },
+    {
+      "code": 8,
+      "code_hex": "08",
+      "section": "ERRORS",
+      "line": 63,
+      "source_offset": 2274,
+      "original_text": " ~╨Ошибка при выделении памяти!",
+      "text": " Ошибка при выделении памяти!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Ошибка при выделении памяти!"
+        }
+      ]
+    },
+    {
+      "code": 19,
+      "code_hex": "13",
+      "section": "ERRORS",
+      "line": 64,
+      "source_offset": 2311,
+      "original_text": " ~╨Драйвер \"мышки\" не обнаружен!",
+      "text": " Драйвер \"мышки\" не обнаружен!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Драйвер \"мышки\" не обнаружен!"
+        }
+      ]
+    },
+    {
+      "code": 70,
+      "code_hex": "46",
+      "section": "ERRORS",
+      "line": 65,
+      "source_offset": 2349,
+      "original_text": " ~╨Файл цветовых таблиц не найден!",
+      "text": " Файл цветовых таблиц не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл цветовых таблиц не найден!"
+        }
+      ]
+    },
+    {
+      "code": 23,
+      "code_hex": "17",
+      "section": "ERRORS",
+      "line": 66,
+      "source_offset": 2389,
+      "original_text": " ~╨Файл сценария не найден!",
+      "text": " Файл сценария не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл сценария не найден!"
+        }
+      ]
+    },
+    {
+      "code": 54,
+      "code_hex": "36",
+      "section": "ERRORS",
+      "line": 67,
+      "source_offset": 2422,
+      "original_text": " ~╨Файл эпизода не найден!",
+      "text": " Файл эпизода не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл эпизода не найден!"
+        }
+      ]
+    },
+    {
+      "code": 24,
+      "code_hex": "18",
+      "section": "ERRORS",
+      "line": 68,
+      "source_offset": 2454,
+      "original_text": " ~╨Файл с данными армии не найден!",
+      "text": " Файл с данными армии не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл с данными армии не найден!"
+        }
+      ]
+    },
+    {
+      "code": 25,
+      "code_hex": "19",
+      "section": "ERRORS",
+      "line": 69,
+      "source_offset": 2494,
+      "original_text": " ~╨Файл спрайтов армии не найден!",
+      "text": " Файл спрайтов армии не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл спрайтов армии не найден!"
+        }
+      ]
+    },
+    {
+      "code": 26,
+      "code_hex": "1A",
+      "section": "ERRORS",
+      "line": 70,
+      "source_offset": 2533,
+      "original_text": " ~╨Файл с деревом изобретения армии не найден!",
+      "text": " Файл с деревом изобретения армии не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл с деревом изобретения армии не найден!"
+        }
+      ]
+    },
+    {
+      "code": 27,
+      "code_hex": "1B",
+      "section": "ERRORS",
+      "line": 71,
+      "source_offset": 2585,
+      "original_text": " ~╨Файл звуковых эффектов армии не найден!",
+      "text": " Файл звуковых эффектов армии не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл звуковых эффектов армии не найден!"
+        }
+      ]
+    },
+    {
+      "code": 28,
+      "code_hex": "1C",
+      "section": "ERRORS",
+      "line": 72,
+      "source_offset": 2633,
+      "original_text": " ~╨Файл с обработчиками обьектов армии не найден!",
+      "text": " Файл с обработчиками обьектов армии не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл с обработчиками обьектов армии не найден!"
+        }
+      ]
+    },
+    {
+      "code": 29,
+      "code_hex": "1D",
+      "section": "ERRORS",
+      "line": 73,
+      "source_offset": 2688,
+      "original_text": " ~╨Не хватает памяти для инициализации сценария!",
+      "text": " Не хватает памяти для инициализации сценария!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Не хватает памяти для инициализации сценария!"
+        }
+      ]
+    },
+    {
+      "code": 30,
+      "code_hex": "1E",
+      "section": "ERRORS",
+      "line": 74,
+      "source_offset": 2742,
+      "original_text": " ~╨Файл цветовой таблицы нации не найден!",
+      "text": " Файл цветовой таблицы нации не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл цветовой таблицы нации не найден!"
+        }
+      ]
+    },
+    {
+      "code": 31,
+      "code_hex": "1F",
+      "section": "ERRORS",
+      "line": 75,
+      "source_offset": 2789,
+      "original_text": " ~╨Файл с обьектами не найден!",
+      "text": " Файл с обьектами не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл с обьектами не найден!"
+        }
+      ]
+    },
+    {
+      "code": 32,
+      "code_hex": "20",
+      "section": "ERRORS",
+      "line": 76,
+      "source_offset": 2825,
+      "original_text": " ~╨Файл с картой не найден!",
+      "text": " Файл с картой не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл с картой не найден!"
+        }
+      ]
+    },
+    {
+      "code": 33,
+      "code_hex": "21",
+      "section": "ERRORS",
+      "line": 77,
+      "source_offset": 2858,
+      "original_text": " ~╨Файл сегментов карты не найден!",
+      "text": " Файл сегментов карты не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл сегментов карты не найден!"
+        }
+      ]
+    },
+    {
+      "code": 35,
+      "code_hex": "23",
+      "section": "ERRORS",
+      "line": 78,
+      "source_offset": 2898,
+      "original_text": " ~╨Файл с рабочими спрайтами не найден!",
+      "text": " Файл с рабочими спрайтами не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл с рабочими спрайтами не найден!"
+        }
+      ]
+    },
+    {
+      "code": 36,
+      "code_hex": "24",
+      "section": "ERRORS",
+      "line": 79,
+      "source_offset": 2943,
+      "original_text": " ~╨Файл с рабочими звуками не найден!",
+      "text": " Файл с рабочими звуками не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл с рабочими звуками не найден!"
+        }
+      ]
+    },
+    {
+      "code": 37,
+      "code_hex": "25",
+      "section": "ERRORS",
+      "line": 80,
+      "source_offset": 2986,
+      "original_text": " ~╨Файл с музыкой не найден!",
+      "text": " Файл с музыкой не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл с музыкой не найден!"
+        }
+      ]
+    },
+    {
+      "code": 38,
+      "code_hex": "26",
+      "section": "ERRORS",
+      "line": 81,
+      "source_offset": 3020,
+      "original_text": " ~╨Ошибка DPMI драйвера!",
+      "text": " Ошибка DPMI драйвера!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Ошибка DPMI драйвера!"
+        }
+      ]
+    },
+    {
+      "code": 39,
+      "code_hex": "27",
+      "section": "ERRORS",
+      "line": 82,
+      "source_offset": 3050,
+      "original_text": " ~╨Нет файла со спрайтами меню!",
+      "text": " Нет файла со спрайтами меню!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Нет файла со спрайтами меню!"
+        }
+      ]
+    },
+    {
+      "code": 40,
+      "code_hex": "28",
+      "section": "ERRORS",
+      "line": 83,
+      "source_offset": 3087,
+      "original_text": " ~╨Нет файла со звуками меню!",
+      "text": " Нет файла со звуками меню!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Нет файла со звуками меню!"
+        }
+      ]
+    },
+    {
+      "code": 41,
+      "code_hex": "29",
+      "section": "ERRORS",
+      "line": 84,
+      "source_offset": 3122,
+      "original_text": " ~╨Библиотека экранов не найдена!",
+      "text": " Библиотека экранов не найдена!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Библиотека экранов не найдена!"
+        }
+      ]
+    },
+    {
+      "code": 42,
+      "code_hex": "2A",
+      "section": "ERRORS",
+      "line": 85,
+      "source_offset": 3161,
+      "original_text": " ~╨Неверный номер экрана в библиотеке!",
+      "text": " Неверный номер экрана в библиотеке!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Неверный номер экрана в библиотеке!"
+        }
+      ]
+    },
+    {
+      "code": 72,
+      "code_hex": "48",
+      "section": "ERRORS",
+      "line": 86,
+      "source_offset": 3205,
+      "original_text": " ~╨Файл сохраненной игры не найден!",
+      "text": " Файл сохраненной игры не найден!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Файл сохраненной игры не найден!"
+        }
+      ]
+    },
+    {
+      "code": 73,
+      "code_hex": "49",
+      "section": "ERRORS",
+      "line": 87,
+      "source_offset": 3246,
+      "original_text": " ~╨Несоответствие данных в сохранненой игре!",
+      "text": " Несоответствие данных в сохранненой игре!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Несоответствие данных в сохранненой игре!"
+        }
+      ]
+    },
+    {
+      "code": 74,
+      "code_hex": "4A",
+      "section": "ERRORS",
+      "line": 88,
+      "source_offset": 3296,
+      "original_text": " ~╨Срок действия бета-версии вышел!",
+      "text": " Срок действия бета-версии вышел!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Срок действия бета-версии вышел!"
+        }
+      ]
+    },
+    {
+      "code": 79,
+      "code_hex": "4F",
+      "section": "ERRORS",
+      "line": 89,
+      "source_offset": 3337,
+      "original_text": " ~╨Недостаточно памяти для инициализации программы!",
+      "text": " Недостаточно памяти для инициализации программы!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Недостаточно памяти для инициализации программы!"
+        }
+      ]
+    },
+    {
+      "code": 81,
+      "code_hex": "51",
+      "section": "ERRORS",
+      "line": 90,
+      "source_offset": 3394,
+      "original_text": " ~╨Ошибка инициализации, инсталлируйте игру еще раз!",
+      "text": " Ошибка инициализации, инсталлируйте игру еще раз!",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Ошибка инициализации, инсталлируйте игру еще раз!"
+        }
+      ]
+    },
+    {
+      "code": 255,
+      "code_hex": "FF",
+      "section": "ERRORS",
+      "line": 91,
+      "source_offset": 3452,
+      "original_text": " ~╨Загрузка игры прервана. Нажмите любую клавишу для выхода.",
+      "text": " Загрузка игры прервана. Нажмите любую клавишу для выхода.",
+      "runs": [
+        {
+          "palette_offset": 0,
+          "text": " "
+        },
+        {
+          "palette_offset": 208,
+          "text": "Загрузка игры прервана. Нажмите любую клавишу для выхода."
+        }
+      ]
+    }
+  ],
+  "unparsed_lines": []
+}
