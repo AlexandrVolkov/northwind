@@ -1,0 +1,361 @@
+{
+  "format_version": 1,
+  "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "first_record_le3": 56796,
+  "record_stride": 36,
+  "terminator_le3": 57588,
+  "records": [
+    {
+      "index": 0,
+      "le3": 56796,
+      "x": 50,
+      "y": 480,
+      "initial_x": 50,
+      "initial_y": 480,
+      "text_le3": 57624,
+      "text": "    Вы встали на землю драконов, огнем и железом",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 1,
+      "le3": 56832,
+      "x": 50,
+      "y": 500,
+      "initial_x": 50,
+      "initial_y": 500,
+      "text_le3": 57673,
+      "text": " прокладывая себе путь.",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 2,
+      "le3": 56868,
+      "x": 50,
+      "y": 520,
+      "initial_x": 50,
+      "initial_y": 520,
+      "text_le3": 57697,
+      "text": "    Многие воины Ваши лежат недвижимы под солнцем",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 3,
+      "le3": 56904,
+      "x": 50,
+      "y": 540,
+      "initial_x": 50,
+      "initial_y": 540,
+      "text_le3": 57747,
+      "text": "Семиречия, враги Ваши залечивают раны и готовятся",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 4,
+      "le3": 56940,
+      "x": 50,
+      "y": 560,
+      "initial_x": 50,
+      "initial_y": 560,
+      "text_le3": 57797,
+      "text": "к новым битвам,колдуны семи рек пристально следят",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 5,
+      "le3": 56976,
+      "x": 50,
+      "y": 580,
+      "initial_x": 50,
+      "initial_y": 580,
+      "text_le3": 57847,
+      "text": "за Вами.",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 6,
+      "le3": 57012,
+      "x": 50,
+      "y": 600,
+      "initial_x": 50,
+      "initial_y": 600,
+      "text_le3": 57856,
+      "text": "    Вы уже сильны, но еще победимы.",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 7,
+      "le3": 57048,
+      "x": 50,
+      "y": 620,
+      "initial_x": 50,
+      "initial_y": 620,
+      "text_le3": 57892,
+      "text": " Готовы ли Вы идти дальше ?",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 8,
+      "le3": 57084,
+      "x": 50,
+      "y": 900,
+      "initial_x": 50,
+      "initial_y": 900,
+      "text_le3": 57920,
+      "text": "Ваши успехи и неудачи.",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 9,
+      "le3": 57120,
+      "x": 50,
+      "y": 940,
+      "initial_x": 50,
+      "initial_y": 940,
+      "text_le3": 57943,
+      "text": "Добыто",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 10,
+      "le3": 57156,
+      "x": 50,
+      "y": 960,
+      "initial_x": 50,
+      "initial_y": 960,
+      "text_le3": 57950,
+      "text": "НЕТ ДАННЫХ !",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 11,
+      "le3": 57192,
+      "x": 50,
+      "y": 980,
+      "initial_x": 50,
+      "initial_y": 980,
+      "text_le3": 58218,
+      "text": "",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 12,
+      "le3": 57228,
+      "x": 50,
+      "y": 1000,
+      "initial_x": 50,
+      "initial_y": 1000,
+      "text_le3": 58474,
+      "text": "",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 13,
+      "le3": 57264,
+      "x": 50,
+      "y": 1040,
+      "initial_x": 50,
+      "initial_y": 1040,
+      "text_le3": 58730,
+      "text": "Ваши потери",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 14,
+      "le3": 57300,
+      "x": 50,
+      "y": 1060,
+      "initial_x": 50,
+      "initial_y": 1060,
+      "text_le3": 58742,
+      "text": "",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 15,
+      "le3": 57336,
+      "x": 50,
+      "y": 1080,
+      "initial_x": 50,
+      "initial_y": 1080,
+      "text_le3": 58998,
+      "text": "",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 16,
+      "le3": 57372,
+      "x": 50,
+      "y": 1120,
+      "initial_x": 50,
+      "initial_y": 1120,
+      "text_le3": 59254,
+      "text": "Потери врага",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 17,
+      "le3": 57408,
+      "x": 50,
+      "y": 1140,
+      "initial_x": 50,
+      "initial_y": 1140,
+      "text_le3": 59267,
+      "text": "нет данных",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 18,
+      "le3": 57444,
+      "x": 50,
+      "y": 1160,
+      "initial_x": 50,
+      "initial_y": 1160,
+      "text_le3": 59533,
+      "text": "",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 19,
+      "le3": 57480,
+      "x": 50,
+      "y": 1180,
+      "initial_x": 50,
+      "initial_y": 1180,
+      "text_le3": 60301,
+      "text": "",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 20,
+      "le3": 57516,
+      "x": 50,
+      "y": 1200,
+      "initial_x": 50,
+      "initial_y": 1200,
+      "text_le3": 60045,
+      "text": "",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "index": 21,
+      "le3": 57552,
+      "x": 50,
+      "y": 1220,
+      "initial_x": 50,
+      "initial_y": 1220,
+      "text_le3": 59789,
+      "text": "",
+      "runtime_initial": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}
