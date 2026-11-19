@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 130031 | 5326 | 97 | 11428 | 44 |
+| LE:1 | 146882 | 129589 | 5512 | 97 | 11684 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -42,6 +42,7 @@
 | LE:1 `0x2F03..0x2F1B` | Copy four initial resource stocks from SCN | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json) | Только извлечение четырёх dword SCN +15..24; прочие поля владельца, DOS-загрузка и цикл всех слотов вне перенесённого участка. |
 | LE:1 `0x3593..0x35A8` | DAT header and record stride | partial | [executable-analysis.md](../docs/executable-analysis.md) | Статически подтверждён участок чтения заголовка и шага 171; полный загрузчик, ошибки и релокации не перенесены. |
 | LE:1 `0x35B9..0x35C2` | WRK base assignment | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждено сохранение адреса WRK; это не весь загрузчик. |
+| LE:1 `0x3DB5..0x3DF2` | Advance cursor frame on a four-tick byte timer interval | ported | [interface.md](../docs/interface.md); [cursor-animation.json](../tests/fixtures/cursor-animation.json) | Числовой шаг проверен на 35840 входах. Выбор семейства, DOS-мышь, фоновый буфер и полный цикл отрисовки курсора не включены; HUD использует только диапазон обычной стрелки. |
 | LE:1 `0x418A..0x41C6` | Program PIT channel 0 to 72.8 Hz and hook INT 8 | verified | [game-timing.md](../docs/game-timing.md) | Установлено чтением инструкций; частота в схватке задана данными. |
 | LE:1 `0x41C6..0x41EB` | Timer interrupt: tick counter and chained BIOS handler | verified | [game-timing.md](../docs/game-timing.md) | Установлено чтением инструкций; частота в схватке задана данными. |
 | LE:1 `0x42BB..0x430E` | Object update gate every second world step and global tick | partial | [game-timing.md](../docs/game-timing.md) | Обход цепочек объектов по участникам не перенесён. |
@@ -53,6 +54,9 @@
 | LE:1 `0x4409..0x4473` | Occupancy rectangle writer | ported | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Только корректные ненулевые прямоугольники внутри сетки; нативный писатель сам не проверяет границы. |
 | LE:1 `0x62FE..0x6304` | Check fifth queue slot | ported | [recruitment-production.md](../docs/recruitment-production.md); [production.json](../tests/fixtures/production.json) | Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора. |
 | LE:1 `0x6330..0x6342` | Append a template to the first unused queue slot | ported | [recruitment-production.md](../docs/recruitment-production.md); [production.json](../tests/fixtures/production.json) | Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора. |
+| LE:1 `0x63CB..0x63F7` | Update health gauge value and threshold color | partial | [interface.md](../docs/interface.md); [status-bars.json](../tests/fixtures/status-bars.json) | Перенесён выбор цвета по половине и четверти исходного предела. Runtime-буфер виджета и его dirty-флаг не воспроизводятся. |
+| LE:1 `0x6DEF..0x6EB2` | Rasterize a column-filled status gauge | ported | [interface.md](../docs/interface.md); [status-bars.json](../tests/fixtures/status-bars.json) | Сверены индексы всех пикселей 1314 изображений в трёх размерах, current<=maximum и особый нулевой предел. DOS framebuffer и dirty-cache заменены отрисовкой Godot; опасные размеры и DIV за пределами контракта не перенесены. |
+| LE:1 `0x6EC1..0x6F18` | Single selection command panel filtered by WorkFlags | partial | [interface.md](../docs/interface.md); [command-panel.json](../tests/fixtures/command-panel.json) | Маски одиночной панели проверены для пяти DAT-шаблонов и всех 256 WorkFlags. Исходный runtime-буфер указателей, группа выделения и полный диспетчер кликов не перенесены. |
 | LE:1 `0x7165..0x7180` | Pending turn and motion entry | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Связка с поворотом и подготовкой движения, до анимации/эффектов; полный диспетчер состояний 70B0 не переносится этим статусом. |
 | LE:1 `0x7180..0x71F5` | DAT and SEG movement accumulator | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Координаты внутри карты, свойства SEG присутствуют; назначение всех DAT/SEG полей вне операции ещё не установлено. |
 | LE:1 `0x71F5..0x725C` | Fractional motion step | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Граница 725C до анимации, эффектов и завершения действия; специальные варианты движения не включены. |
@@ -117,6 +121,7 @@
 | LE:1 `0xB3F7..0xB47F` | Count source ore subtype in clipped three-by-three neighborhood | ported | [mine-deposits.md](../docs/mine-deposits.md); [mine-deposits.json](../tests/fixtures/mine-deposits.json) | Проверены 108 координат первой карты и оба типа руды по настоящему коду. Остальные карты и необычные размеры требуют отдельных проверок. |
 | LE:1 `0xB47F..0xB502` | Mine update: visitor handoff, stock debit and wear | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Проверен целиком с C4CD, 123D3 и B502 на первой карте. Разрушение шахты после износа +19 не подключено. |
 | LE:1 `0xB502..0xB5AB` | Remove one random ore mark and replace its surface | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Пометка грязной области экрана (B565..B5A4) не переносится. |
+| LE:1 `0xB72D..0xB764` | Intersect command slots across selected group members | partial | [interface.md](../docs/interface.md); [command-panel.json](../tests/fixtures/command-panel.json) | Фильтрация шести слотов по WorkFlags и ненулевому совпадающему raw_group проверена на 1600 парах. Исходный обход цепочки выделения и запись runtime-указателей не перенесены. |
 | LE:1 `0xBE04..0xBE2E` | Apply damage to one prepared target | ported | [building-condition-kernel.md](../docs/building-condition-kernel.md); [building-kernel.json](../tests/fixtures/building-kernel.json) | Хвост после подготовки шаблона и силы; выбор цели, генерация силы, площадное действие и смерть с эффектами вне контракта. |
 | LE:1 `0xBFC9..0xC010` | Apply a hit: attack minus defence or a small chance of one point | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
 | LE:1 `0xC344..0xC35F` | Chebyshev distance between object centres | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |

@@ -17,7 +17,7 @@ public partial class OriginalHud : Node2D
     public static readonly Rect2 GameSlower = new(470, 124, 18, 20), GameFaster = new(624, 124, 18, 20);
     public static readonly Rect2 PauseButton = new(494, 402, 124, 24), ExitButton = new(494, 428, 124, 24);
     private static readonly int[] CounterX = [66, 159, 260, 365];
-    private static readonly Color BarBorder = new(146 / 255f, 85 / 255f, 0), BarFill = new(65 / 255f, 93 / 255f, 48 / 255f);
+    private readonly Dictionary<int, Color> _uiColors = [];
     private static readonly Rect2 HealthBar = new(572, 176, 9, 50), ExperienceBar = new(587, 176, 9, 50);
 
     public SkirmishMain Game { get; set; } = null!;
@@ -30,16 +30,45 @@ public partial class OriginalHud : Node2D
     private Texture2D _portraits = null!, _buttons = null!, _heroAtlas = null!;
     private Texture2D _frame = null!, _menuPanel = null!;
     private OriginalFont _font = null!, _red = null!;
+    private InterfaceAtlas? _cursor;
+    private Texture2D? _cursorTexture;
+    private Input.MouseModeEnum? _previousMouseMode;
+    private CursorAnimation _cursorAnimation;
+    private double _cursorTime;
+    public uint CursorFrame => _cursorAnimation.Frame;
 
     public override void _Ready()
     {
         TextureFilter = TextureFilterEnum.Nearest;
         var data = InterfaceData.Load();
+        foreach (var (index, rgb) in data.UiColors) _uiColors[index] = new Color(rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f);
+        _cursor = data.ArrowCursor;
+        if (_cursor != null)
+        {
+            _cursorTexture = GD.Load<Texture2D>(InterfaceData.Root + _cursor.Atlas);
+            if (DisplayServer.GetName() != "headless")
+            { _previousMouseMode = Input.MouseMode; Input.MouseMode = Input.MouseModeEnum.Hidden; }
+        }
         _frame = InterfaceData.Screen("game_frame"); _menuPanel = InterfaceData.Screen("panel_menu");
         Army = data.Armies.Single(a => a.Army == 2); _heroes = data.HeroPortraits;
         _portraits = GD.Load<Texture2D>(InterfaceData.Root + Army.Portraits.Atlas); _buttons = GD.Load<Texture2D>(InterfaceData.Root + Army.Buttons.Atlas);
         _heroAtlas = GD.Load<Texture2D>(InterfaceData.Root + _heroes.Atlas);
         _font = OriginalFont.Load(data, "FONT_01.FNT"); _red = OriginalFont.Load(data, "FONT_01.FNT", "font_font_01_red.png");
+    }
+
+    public override void _Process(double delta)
+    {
+        if (_cursor == null || Game?.Battle == null) return;
+        _cursorTime += Math.Max(0, delta) * OriginalCursorRules.TimerHz;
+        if (!Game.Battle.Paused)
+            _cursorAnimation = OriginalCursorRules.Step(_cursorAnimation, unchecked((byte)(ulong)_cursorTime),
+                (ushort)_cursor.FirstSprite, (ushort)(_cursor.FirstSprite + _cursor.Sprites.Count - 1));
+        QueueRedraw();
+    }
+
+    public override void _ExitTree()
+    {
+        if (_previousMouseMode is { } previous && Input.MouseMode == Input.MouseModeEnum.Hidden) Input.MouseMode = previous;
     }
 
     public override void _Draw()
@@ -54,9 +83,16 @@ public partial class OriginalHud : Node2D
         _font.Draw(this, new Vector2(CounterX[1], 0), b.Gold.ToString());
         _font.Draw(this, new Vector2(CounterX[2], 0), b.Wood.ToString());
         _red.Draw(this, new Vector2(CounterX[3], 0), b.FreePeople.ToString());
-        if (MenuOpen) { DrawTexture(_menuPanel, new Vector2(464, 0)); return; }
-        DrawMinimap();
-        DrawSelection();
+        if (MenuOpen) DrawTexture(_menuPanel, new Vector2(464, 0));
+        else { DrawMinimap(); DrawSelection(); }
+        if (b.Paused)
+        {
+            DrawRect(new Rect2(161, 224, 158, 24), new Color(0, 0, 0, .85f));
+            _font.Draw(this, new Vector2(169, 228), "ПАУЗА (Esc)");
+        }
+        if (_cursor != null && _cursorTexture != null && GetViewport().GetVisibleRect().HasPoint(GetViewport().GetMousePosition()))
+            DrawTextureRectRegion(_cursorTexture, new Rect2(GetLocalMousePosition(), new Vector2(32, 32)),
+                _cursor.Region((int)CursorFrame - _cursor.FirstSprite));
     }
 
     private void DrawMinimap()
@@ -78,35 +114,102 @@ public partial class OriginalHud : Node2D
 
     private void DrawSelection()
     {
-        if (SingleUnit() is not { } unit) return;
-        _font.Draw(this, new Vector2(482, 160), unit.Hero ? Game.HeroName : unit.Source.TemplateName);
-        if (unit.Hero && _heroes.Known.TryGetValue(Game.HeroName, out int hero))
-            DrawTextureRectRegion(_heroAtlas, new Rect2(PortraitAt, 64, 70), _heroes.Region(hero - _heroes.FirstSprite));
-        else if (Template(unit) is { } template)
-            DrawTextureRectRegion(_portraits, new Rect2(PortraitAt, 80, 50), Army.Portraits.Region(template.Portrait));
-        if (Template(unit) is { } t && unit.Team == 0)
-            for (int k = 0; k < t.Slots.Count; k++)
-                if (t.Slots[k].Button is { } button)
-                    DrawTextureRectRegion(_buttons, Slot(k), Army.Buttons.Region(button));
-        DrawBar(HealthBar, unit.MaxHealth > 0 ? Math.Clamp(unit.Health / (float)unit.MaxHealth, 0, 1) : 0);
-        DrawBar(ExperienceBar, 0);
+        if (SingleUnit() is { } unit)
+        {
+            _font.Draw(this, new Vector2(482, 160), unit.Hero ? Game.HeroName : unit.Source.TemplateName);
+            if (unit.Hero && _heroes.Known.TryGetValue(Game.HeroName, out int hero))
+                DrawTextureRectRegion(_heroAtlas, new Rect2(PortraitAt, 64, 70), _heroes.Region(hero - _heroes.FirstSprite));
+            else if (Template(unit) is { } template)
+                DrawTextureRectRegion(_portraits, new Rect2(PortraitAt, 80, 50), Army.Portraits.Region(template.Portrait));
+            byte maximum = unit.Parameters[0x45], condition = (byte)Math.Clamp(unit.Health, 0, maximum);
+            DrawBar(HealthBar, condition, maximum, OriginalStatusBarRules.HealthColor(condition, maximum));
+            // +16 is experience for living units; buildings use it as a maintenance counter.
+            DrawBar(ExperienceBar, unit.Structure ? (byte)0 : (byte)Math.Min(127, (int)unit.Record[0x16]), 127, 0x94);
+        }
+        else if (Game.Selection.Count > 1) _font.Draw(this, new Vector2(482, 160), $"Выбрано: {Game.Selection.Count}");
+        var commands = Commands();
+        for (int k = 0; k < commands.Length; k++)
+            if (commands[k] is { Present: true, Button: { } button } command)
+            {
+                DrawTextureRectRegion(_buttons, Slot(k), Army.Buttons.Region(button));
+                if ((Game.PendingOrder, command.Mode, command.RawGroup) is (2, 1, 2) or (3, 2, 3) or (4, 4, 4) or (8, 8, 7))
+                    DrawRect(Slot(k).Grow(-1), new Color("d5b85c"), false, 1);
+            }
+        var hover = CommandAt(GetLocalMousePosition());
+        string hint = hover != null ? OriginalCommandKeys.Hint(hover) : Game.PendingOrder switch
+        {
+            2 => "Укажите место", 3 => "Укажите врага", 4 => "Укажите лес", 8 => "Укажите шахту", _ => "",
+        };
+        DrawHint(hint);
+    }
+
+    // Placement and pending-order outlines are UI feedback of the port, not a recovered DOS drawing routine.
+    private void DrawHint(string hint)
+    {
+        string line = ""; int y = 256;
+        foreach (string word in hint.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (y >= 304) break;
+            string next = line.Length == 0 ? word : line + " " + word;
+            if (_font.Width(next) > 142 && line.Length != 0)
+            { _font.Draw(this, new Vector2(482, y), line); y += 16; line = word; }
+            else line = next;
+        }
+        if (line.Length != 0 && y < 304) _font.Draw(this, new Vector2(482, y), line);
+    }
+
+    public InterfaceSlot? CommandAt(Vector2 point)
+    {
+        if (MenuOpen) return null;
+        var commands = Commands();
+        for (int k = 0; k < commands.Length; k++)
+            if (Slot(k).HasPoint(point) && commands[k] is { Present: true, Button: not null } command) return command;
+        return null;
+    }
+
+    public bool Hotkey(Key key)
+    {
+        if (MenuOpen || Game.Battle.Paused || Game.Battle.Outcome != "") return false;
+        int scan = OriginalCommandKeys.Scan(key);
+        if (scan < 0) return false;
+        var command = Commands().FirstOrDefault(c => c is { Present: true, Button: not null } && c.HotkeyScanCode == scan);
+        var unit = Game.Battle.Actors.FirstOrDefault(a => Game.Selection.Contains(a.Id));
+        if (command == null || unit == null) return false;
+        Game.OrderSlot(unit, command); QueueRedraw(); return true;
+    }
+
+    /// <summary>Selection order follows the scene's owner/object list, rather than mouse insertion order.</summary>
+    public InterfaceSlot?[] Commands()
+    {
+        var members = new List<CommandPanelMember>();
+        foreach (var unit in Game.Battle.Actors.Where(a => Game.Selection.Contains(a.Id)))
+        {
+            if (!unit.Alive || unit.Team != 0 || Template(unit) is not { } template) return new InterfaceSlot?[6];
+            members.Add(new(unit.Record[0x0f], template));
+        }
+        return OriginalCommandPanel.Compose(members);
     }
 
     /// <summary>Order slots of the unit's DAT template (ARMY__02 only for now).</summary>
     public InterfaceTemplate? Template(SkirmishActor unit) =>
         unit.Source.TemplateFile == "ARMY__02.DAT" && unit.Source.TemplateIndex < Army.Templates.Count ? Army.Templates[unit.Source.TemplateIndex] : null;
 
-    private void DrawBar(Rect2 rect, float fill)
+    private void DrawBar(Rect2 rect, byte current, byte maximum, byte color)
     {
-        DrawRect(rect, Colors.Black);
-        int height = (int)MathF.Round((rect.Size.Y - 2) * fill);
-        if (height > 0) DrawRect(new Rect2(rect.Position.X + 1, rect.End.Y - 1 - height, rect.Size.X - 2, height), BarFill);
-        DrawRect(new Rect2(rect.Position + new Vector2(.5f, .5f), rect.Size - Vector2.One), BarBorder, false, 1);
+        int filled = OriginalStatusBarRules.FilledColumns((int)rect.Size.X, current, maximum);
+        DrawRect(rect, _uiColors[0]);
+        if (filled > 0) DrawRect(new Rect2(rect.Position + Vector2.One, new Vector2(filled, rect.Size.Y - 2)), _uiColors[color]);
+        var border = _uiColors[0x44];
+        DrawRect(new Rect2(rect.Position, new Vector2(rect.Size.X, 1)), border);
+        DrawRect(new Rect2(rect.Position.X, rect.End.Y - 1, rect.Size.X, 1), border);
+        DrawRect(new Rect2(rect.Position, new Vector2(1, rect.Size.Y)), border);
+        DrawRect(new Rect2(rect.End.X - 1, rect.Position.Y, 1, rect.Size.Y), border);
     }
 
     /// <summary>Handles a click in screen coordinates of the 640×480 frame; returns true when the interface consumed it.</summary>
     public bool Click(Vector2 point, MouseButton button)
     {
+        if (Game.Battle.Paused) return true;
         if (MapWindow.HasPoint(point)) return false;
         if (button != MouseButton.Left) return true;
         if (MenuOpen)
@@ -120,11 +223,12 @@ public partial class OriginalHud : Node2D
             else if (ScrollFaster.HasPoint(point)) Game.ChangeScrollSpeed(+1);
         }
         else if (MenuButton.HasPoint(point)) MenuOpen = true;
-        else if (SingleUnit() is { } unit && Template(unit) is { } template)
-            for (int k = 0; k < template.Slots.Count; k++)
-                if (template.Slots[k].Sprite != 0 && Slot(k).HasPoint(point)) Game.Order(template.Slots[k].Sprite);
         else if (Minimap.HasPoint(point))
             Game.FocusWorld((point - Minimap.Position) / Minimap.Size * new Vector2(Game.Battle.Map.Width, Game.Battle.Map.Height) * 32);
+        else if (Game.Battle.Actors.FirstOrDefault(a => Game.Selection.Contains(a.Id)) is { } unit)
+        {
+            if (CommandAt(point) is { } command) Game.OrderSlot(unit, command);
+        }
         QueueRedraw();
         return true;
     }

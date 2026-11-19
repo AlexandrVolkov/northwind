@@ -80,6 +80,7 @@ public partial class SkirmishMain : Node2D
             GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), GameData.Read<SkirmishRules>("res://data/skirmish.json"));
         Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false;
+        PendingOrder = 0; Hud.MenuOpen = false;
         _terrainRevision = -1; RefreshTerrain(); FocusHero(); RefreshUi(); QueueRedraw();
     }
     public void SelectArmy()
@@ -132,7 +133,14 @@ public partial class SkirmishMain : Node2D
         if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
         PlacingMill = true; PlacingFarm = PlacingBarracks = PlacingMine = false; RefreshUi();
     }
-    public void TogglePause() { if (!_ready || Battle.Outcome != "") return; Battle.Paused = !Battle.Paused; RefreshUi(); }
+    private Vector2 _pausePointer;
+    public void TogglePause()
+    {
+        if (!_ready || Battle.Outcome != "") return;
+        Battle.Paused = !Battle.Paused;
+        if (Battle.Paused) { _drag = _pan = false; _pausePointer = GetViewport().GetMousePosition(); }
+        RefreshUi(); Hud.QueueRedraw();
+    }
     public void ChangeSpeed() { Speed = Speed == 1 ? 2 : Speed == 2 ? 4 : 1; RefreshUi(); }
     public void FocusHero() => Focus(Battle.Hero.Position - new Vector2(0, 100));
     public void FocusObjective()
@@ -177,25 +185,43 @@ public partial class SkirmishMain : Node2D
     }
     public void ChangeSpeed(int step) { Speed = Math.Clamp(step > 0 ? Speed * 2 : Speed / 2, .5f, 4); RefreshUi(); }
     public void ChangeScrollSpeed(int step) => ScrollSpeed = Math.Clamp(ScrollSpeed + step * 175, 175, 1400);
-    /// <summary>Pending order of a panel button (button sprite); applied by the next left click in the map window.</summary>
+    /// <summary>Pending targeting: 2 move, 3 attack, 4 forestry, 8 mine; UI adapter to the supported world commands.</summary>
     public int PendingOrder { get; private set; }
-    /// <summary>Order button pressed (ARMY__02.SPR sprite of the slot). Meanings follow the pictures, the WRK handlers are not ported:
-    /// 1 shield — stop, 2 arrows — move, 3 skull — attack; others are reported as not yet ported.</summary>
-    public void Order(int sprite)
+    /// <summary>Use the decoded DAT mode/group pair, shared by differently drawn worker and soldier buttons.</summary>
+    public void OrderSlot(SkirmishActor unit, InterfaceSlot slot)
+    {
+        if (Battle.Paused || Battle.Outcome != "" || unit.Team != 0 || !unit.Alive || !Selection.Contains(unit.Id)) return;
+        switch (slot.Mode, slot.RawGroup)
+        {
+            case (0, 1): Battle.Stop(Selection); PendingOrder = 0; break;
+            case (1, 2): PendingOrder = 2; break;
+            case (2, 3): PendingOrder = 3; break;
+            case (4, 4) when unit.Worker: PendingOrder = 4; break;
+            case (8, 7) when unit.Worker: PendingOrder = 8; break;
+            default: Battle.Log($"Приказ «{slot.Label}» ещё не перенесён."); break;
+        }
+    }
+    private void ApplyPanelOrder(Vector2 point)
     {
         if (Battle.Paused || Battle.Outcome != "") return;
-        switch (sprite)
+        var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
+        var target = Battle.At(point);
+        bool accepted = PendingOrder switch
         {
-            case 1: Battle.Stop(Selection); PendingOrder = 0; break;
-            case 2 or 3: PendingOrder = sprite; break;
-            default: Battle.Log("Этот приказ ещё не перенесён."); break;
-        }
+            2 => Battle.Move(Selection, cell) > 0,
+            3 => target is { Team: 1 } && Battle.Attack(Selection, target.Id),
+            4 => Battle.GatherTimber(Selection, cell) > 0,
+            8 => target?.Source.TemplateName == "Шахта" && Battle.WorkMine(Selection, target.Id),
+            _ => false,
+        };
+        if (accepted) { PendingOrder = 0; _orderMark = point; _markUntil = Battle.Elapsed + 2; }
     }
     public void ExitMission() => GetTree().ChangeSceneToFile("res://scenes/main.tscn");
     public override void _Process(double delta)
     {
         if (!_ready) return;
         Layout();
+        if (Battle.Paused) { RefreshUi(); QueueRedraw(); _markers.QueueRedraw(); Hud.QueueRedraw(); return; }
         Battle.Advance(delta * Speed); RefreshTerrain();
         Selection.RemoveWhere(id => Battle.Find(id) == null);
         Vector2 direction = Vector2.Zero;
@@ -226,6 +252,13 @@ public partial class SkirmishMain : Node2D
     public override void _Input(InputEvent e)
     {
         if (!_ready) return;
+        if (Battle.Paused)
+        {
+            if (e is InputEventMouseMotion motion && DisplayServer.GetName() != "headless"
+                && GetViewportRect().HasPoint(motion.Position) && motion.Position.DistanceSquaredTo(_pausePointer) > 1)
+                Input.WarpMouse(_pausePointer);
+            return;
+        }
         // Release a drag even when the pointer finishes over a UI control.
         if (e is InputEventMouseButton { ButtonIndex: MouseButton.Middle, Pressed: false }) _pan = false;
         if (_drag && e is InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: false } button)
@@ -250,18 +283,31 @@ public partial class SkirmishMain : Node2D
     public override void _UnhandledInput(InputEvent e)
     {
         if (!_ready) return;
+        if (Battle.Paused)
+        {
+            if (e is InputEventKey { Pressed: true, Echo: false } resume && resume.PhysicalKeycode is Key.Escape or Key.Space) TogglePause();
+            return;
+        }
         if (e is InputEventKey { Pressed: true, Echo: false } key)
         {
+            if (!key.CtrlPressed && !key.AltPressed && !key.MetaPressed && !key.ShiftPressed && Hud.Hotkey(key.PhysicalKeycode)) return;
             if (key.CtrlPressed && key.PhysicalKeycode == Key.A) SelectArmy();
             else switch (key.PhysicalKeycode)
             {
                 case Key.Space: TogglePause(); break;
                 case Key.F: FocusHero(); break;
+                case Key.End: FocusHero(); break;
                 case Key.T: FocusObjective(); break;
                 case Key.C: SelectCastle(); break;
+                case Key.Home: SelectCastle(); break;
                 case Key.R: Restart(); break;
                 case Key.X: Battle.Stop(Selection); break;
-                case Key.Escape: if (PlacingBuilding) { PlacingMill = false; PlacingFarm = PlacingBarracks = PlacingMine = false; } else Selection.Clear(); break;
+                case Key.Escape:
+                    if (PendingOrder != 0) PendingOrder = 0;
+                    else if (PlacingBuilding) { PlacingMill = false; PlacingFarm = PlacingBarracks = PlacingMine = false; }
+                    else if (Hud.MenuOpen) Hud.MenuOpen = false;
+                    else Selection.Clear();
+                    break;
                 case Key.F10: GetTree().ChangeSceneToFile("res://scenes/main.tscn"); break;
                 case Key.F1: _ui.Visible = !_ui.Visible; break;
             }
@@ -272,6 +318,7 @@ public partial class SkirmishMain : Node2D
             if (!button.Pressed) return;
             if (button.ButtonIndex is MouseButton.Left or MouseButton.Right && Hud.Click(ToHud(button.Position), button.ButtonIndex)) return;
             if (!MapScreenRect.HasPoint(button.Position)) return;
+            if (button.ButtonIndex == MouseButton.Right && PendingOrder != 0) { PendingOrder = 0; return; }
             if (PlacingBuilding && button.ButtonIndex == MouseButton.Right) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; RefreshUi(); return; }
             if (PlacingBuilding && button.ButtonIndex == MouseButton.Left)
             {
@@ -282,7 +329,7 @@ public partial class SkirmishMain : Node2D
                 RefreshUi(); return;
             }
             if (button.ButtonIndex == MouseButton.Left && PendingOrder != 0)
-            { IssueOrder(GetViewport().GetCanvasTransform().AffineInverse() * button.Position); PendingOrder = 0; }
+                ApplyPanelOrder(GetViewport().GetCanvasTransform().AffineInverse() * button.Position);
             else if (button.ButtonIndex == MouseButton.Left && !Battle.Paused && Battle.Outcome == "")
             { _drag = true; _dragStart = _dragEnd = button.Position; }
             else if (button.ButtonIndex == MouseButton.Right) IssueOrder(GetViewport().GetCanvasTransform().AffineInverse() * button.Position);
@@ -453,7 +500,7 @@ public partial class SkirmishMain : Node2D
             if (!_ready || e is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } b) return;
             var rect = MiniRect(); if (rect.HasPoint(b.Position)) Focus((b.Position - rect.Position) / rect.Size * new Vector2(Battle.Map.Width, Battle.Map.Height) * 32);
         };
-        Row("ПРЕДВОДИТЕЛЬ [F]", FocusHero, "ЦЕЛЬ [T]", FocusObjective);
+        Row("ПРЕДВОДИТЕЛЬ [End]", FocusHero, "ЦЕЛЬ [T]", FocusObjective);
         _status = Text("Загрузка…", 16); _selection = Text("", 13);
         _economy = Text("", 13);
         (_hire, _hireMilitia) = Row("", HireWorker, "", HireMilitia);
@@ -466,7 +513,7 @@ public partial class SkirmishMain : Node2D
         Row("ВОЙСКО [Ctrl+A]", SelectArmy, "СТОП [X]", () => Battle.Stop(Selection));
         (_pause, _speed) = Row("ПАУЗА [ПРОБЕЛ]", TogglePause, "СКОРОСТЬ ×1", ChangeSpeed);
         Button("НАЧАТЬ ЗАНОВО  [R]", Restart);
-        Text("ЛКМ / рамка — выделить\nПКМ — идти / атаковать / рубить\nShift — добавить · C — замок\nWASD, стрелки, СКМ — камера\nКолесо — масштаб", 12);
+        Text("ЛКМ / рамка — выделить\nПКМ — идти / атаковать / рубить\nShift — добавить · Home — замок\nWASD, стрелки, СКМ — камера", 12);
         _events = Text("", 12);
         Button("ЛАБОРАТОРИЯ  [F10]", () => GetTree().ChangeSceneToFile("res://scenes/main.tscn"));
         Text("Ранняя версия: бой и ИИ временные. Кампания ещё в работе.", 11);
@@ -496,7 +543,7 @@ public partial class SkirmishMain : Node2D
     private void RefreshUi()
     {
         if (Battle == null) return;
-        _status.Text = Battle.Outcome != "" ? Battle.Outcome + "\nR — повторить" : Battle.Paused ? "ПАУЗА · Пробел — продолжить" :
+        _status.Text = Battle.Outcome != "" ? Battle.Outcome + "\nR — повторить" : Battle.Paused ? "ПАУЗА · Esc — продолжить" :
             !Battle.Objective.Standing ? $"Замок разрушен\nОсталось защитников: {Battle.Actors.Count(a => a.Team == 1 && !a.Structure && a.Alive)} · T — найти" :
             $"Время {TimeSpan.FromSeconds(Battle.Elapsed):mm\\:ss} · ×{Speed}";
         var units = Selection.Select(Battle.Find).OfType<SkirmishActor>().ToArray();
