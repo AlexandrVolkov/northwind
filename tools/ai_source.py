@@ -13,6 +13,16 @@ TABLE, SIZE, COUNT = 0xed43, 0x53, 9
 FIELDS = {'u32_%02x' % at: at for at in [0x31, 0x35, 0x39, 0x3d, 0x41, 0x45, 0x49, 0x4d, 0x51]}
 
 
+def fortifications(payload):
+    """LE:3 F0F0: pointers (until 0) to lists of 5-byte entries (DAT class byte, dx0, dy0, dx1, dy1; FFh ends)."""
+    out, at = [], 0xf0f0
+    while (pointer := struct.unpack_from('<I', payload, at)[0]) != 0:
+        end = pointer
+        while payload[end] != 0xff: end += 5
+        out.append(payload[pointer:end + 1].hex()); at += 4
+    return out
+
+
 def extract(game):
     data = (game / 'NORWIND.EXE').read_bytes()
     if hashlib.sha256(data).hexdigest() != EXE_SHA256: raise ValueError('Unknown EXE version')
@@ -31,7 +41,8 @@ def extract(game):
     # Tables used by the squad states (6996 direction, 20071 messages) and military requests (20DD0 mode 7 army classes).
     tables = {'arctangent_hex': objects[1]['payload'][0x287e:0x297e].hex(),        # DS:287E (LE:2), 256 bytes
               'squad_messages_hex': payload[0xf02e:0xf06a].hex(),                    # LE:3 F02E, 5 rows of three text ids
-              'army_classes_hex': payload[0xf0e6:0xf0eb].hex()}                      # LE:3 F0E6, mode-8 class bytes
+              'army_classes_hex': payload[0xf0e6:0xf0eb].hex(),                      # LE:3 F0E6, mode-8 class bytes
+              'fortifications': fortifications(payload)}                               # LE:3 F0F0, order mode 7
     return {'format_version': 1, 'source_sha256': EXE_SHA256, 'fixup': {'source_operand': source, 'target_object': 3, 'target_offset': TABLE},
             'block_offset': 5, 'characters': characters, **tables}
 

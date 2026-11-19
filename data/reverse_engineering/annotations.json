@@ -2888,6 +2888,66 @@
       "evidence": ["docs/ai.md", "tests/fixtures/ai-garrison.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
       "limitations": ""
+    },
+    {
+      "id": "ai-order-executor",
+      "module": "LE:1",
+      "start": 141255,
+      "end": 142918,
+      "name": "AI order executor (list +34F, modes 1..10)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-orders.json", "data/original_producers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "order mode 5 leaves [ED39]/[ED3D] = 68h/8, as the original"
+    },
+    {
+      "id": "ai-find-producer",
+      "module": "LE:1",
+      "start": 142981,
+      "end": 143222,
+      "name": "Producer of a template (WRK AH=6 tables)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-orders.json", "data/original_producers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-produce-build",
+      "module": "LE:1",
+      "start": 143222,
+      "end": 143332,
+      "name": "Produce (60h) and build (58h) commands",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-orders.json", "data/original_producers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-site-check",
+      "module": "LE:1",
+      "start": 143332,
+      "end": 143597,
+      "name": "Building site check around a cell",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-orders.json", "data/original_producers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "AF07 permission is a hook"
+    },
+    {
+      "id": "ai-area-has-class",
+      "module": "LE:1",
+      "start": 143873,
+      "end": 143930,
+      "name": "Object of a class in an area",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-orders.json", "data/original_producers.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
     }
   ]
 }

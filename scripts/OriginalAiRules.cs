@@ -17,6 +17,8 @@ public sealed class OriginalAiData
     public string SquadMessagesHex { get; set; } = "";
     /// <summary>LE:3 F0E6: class bytes of the armies gathered by military request 7.</summary>
     public string ArmyClassesHex { get; set; } = "";
+    /// <summary>LE:3 F0F0: fortification patterns of order mode 7 (5-byte entries: class byte, dx0, dy0, dx1, dy1; FFh ends).</summary>
+    public List<string> Fortifications { get; set; } = [];
     public byte[] Table() => Characters.OrderBy(c => c.Index).SelectMany(c => Convert.FromHexString(c.RawHex)).ToArray();
 }
 

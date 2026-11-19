@@ -1554,3 +1554,307 @@ public sealed class OriginalAiGarrison(IAiGarrisonWorld world, OriginalAiMilitar
         public void Contacted(FirstContact contact) => throw new NotSupportedException();
     }
 }
+
+/// <summary>World of the AI order executor 227C7: what each template makes (WRK AH=6, data/original_producers.json), the
+/// building permission AF07 (hook: needs WRK AH=4 and the placement rules of the port), terrain classes of map cells
+/// (SEG &amp; 7) and the fortification patterns (LE:3 F0F0).</summary>
+public interface IAiOrdersWorld : IAiMilitaryWorld
+{
+    byte Random2();
+    IReadOnlyList<byte> Makes(byte template);
+    byte TemplateCount { get; }
+    bool PlacementAllowed(byte template, byte army, byte participant, uint x, uint y);
+    byte TileClass(int cell);
+    byte[]? Fortification(uint index);
+    /// <summary>A673: the development tree of the participant has the template with no unmet conditions.</summary>
+    bool TreeAllows(byte participant, byte template);
+}
+
+/// <summary>AI order executor LE:1 227C7 over list +34F (docs/ai.md, «Заказы»): only the orders of the highest priority +3
+/// run. Units are ordered from a producer (command 60h, template in +22), buildings from their maker with a site
+/// (command 58h, area +29..+2F); sites are chosen at random in an area (mode 4), near a building (5), around the home
+/// (8), for fortifications (6, 7) and across water (10). A missing producer is ordered as a building (mode 5).</summary>
+public sealed class OriginalAiOrders(IAiOrdersWorld world, OriginalAiMilitary military)
+{
+    public const int List = 0x34f, Size = 0x15;
+    private static uint U32(ReadOnlySpan<byte> raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw[offset..]);
+    private static void W32(Span<byte> raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw[offset..], value);
+    private byte _x0, _y0, _x1, _y1;   // [1F41..1F44] of mode 10: kept between calls
+
+    public void Run(Span<byte> ai)
+    {
+        if ((ai[0x1a15] & 1) == 0) return;
+        byte top = 0;
+        for (int k = 0; k < 20; k++) if (ai[List + k * Size] != 0xff && ai[List + k * Size + 3] > top) top = ai[List + k * Size + 3];
+        for (int k = 0; k < 20; k++)
+        {
+            int at = List + k * Size;
+            if (ai[at + 3] >= top && !Process(ai, at)) ai[at] = 0xff;
+            W32(ai, at + 0x10, U32(ai, at + 0x10) + 1);
+        }
+    }
+
+    /// <summary>22E85: the first object of a producing type (makes the template) alive or under construction (+14 = 1)
+    /// and allowed to work (WorkFlags bit 2). Otherwise: 1 — producers exist but none can work; 0 — a random producer
+    /// type the tree allows (to be built); 2 — none allowed. Returns the producer type in either case.</summary>
+    public (byte[]? Producer, byte Status, byte Type) Producer(ReadOnlySpan<byte> ai, byte template, byte army)
+    {
+        var types = new List<byte>();
+        for (int t = 0; t < world.TemplateCount; t++)
+            foreach (byte made in world.Makes((byte)t)) if (made == template) types.Add((byte)t);
+        if (types.Count == 0) return (null, 2, 0xff);
+        byte status = 0, type = 0;
+        foreach (var (r, tm) in world.Chain(ai[0]))
+        {
+            if (r[0] != army || !types.Contains(r[0x0e])) continue;
+            if (r[0x14] != 1 && (sbyte)r[0x19] <= (sbyte)tm[0x46]) continue;
+            status = 1; type = r[0x0e];
+            if ((r[0x0f] & 4) != 0) return (r, 0, type);
+        }
+        if (status == 1) return (null, 1, type);
+        type = types[(world.Random() * types.Count) >> 8];
+        return (null, world.TreeAllows(ai[0], type) ? (byte)0 : (byte)2, type);   // A673
+    }
+
+    /// <summary>22FE4: the site for a template at a cell: AF07 allows it, the footprint grown by one cell on every side lies
+    /// on the map, has no building in plane 1 and only terrain the template accepts (DAT[58 + class]).</summary>
+    public bool Site(byte template, byte army, byte participant, byte x, byte y)
+    {
+        var t = world.Template(participant, template);
+        uint px = x * 32u + (uint)((t[3] & 1) << 4), py = y * 32u + (uint)((t[4] & 1) << 4);
+        if (!world.PlacementAllowed(template, army, participant, px, py)) return false;
+        byte w = (byte)(t[3] + 2), h = (byte)(t[4] + 2);
+        byte left = (byte)(x - (w >> 1)), top = (byte)(y - (h >> 1));
+        if (left > (byte)(world.MapWidth - w) || top > (byte)(world.MapHeight - h)) return false;
+        for (int row = 0; row < h; row++)
+            for (int column = 0; column < w; column++)
+            {
+                int cell = (top + row) * world.MapWidth + left + column;
+                uint reference = world.Occupant(1, cell);
+                if (reference != 0 && (U32(world.Resolve(reference).Template, 0x40) & 8) != 0) return false;
+                if (t[0x58 + (world.TileClass(cell) & 7)] == 0) return false;
+            }
+        return true;
+    }
+
+    private static void Produce(byte[] producer, byte template) { producer[0x22] = template; producer[0x14] = (byte)((producer[0x14] & 7) | 0x60); } // 22F76
+
+    /// <summary>22F82: the builder gets template +22, command 58h and the site +29..+2F (fixed point, centred for odd sizes).</summary>
+    private void Build(byte[] builder, byte template, byte x0, byte y0, byte x1, byte y1)
+    {
+        builder[0x22] = template; builder[0x14] = (byte)((builder[0x14] & 7) | 0x58);
+        var t = world.Template(0, template);
+        ushort ox = (ushort)((t[3] & 1) << 4), oy = (ushort)((t[4] & 1) << 4);
+        BinaryPrimitives.WriteUInt16LittleEndian(builder.AsSpan(0x29), (ushort)(x0 * 32 + ox));
+        BinaryPrimitives.WriteUInt16LittleEndian(builder.AsSpan(0x2d), (ushort)(x1 * 32 + ox));
+        BinaryPrimitives.WriteUInt16LittleEndian(builder.AsSpan(0x2b), (ushort)(y0 * 32 + oy));
+        BinaryPrimitives.WriteUInt16LittleEndian(builder.AsSpan(0x2f), (ushort)(y1 * 32 + oy));
+    }
+
+    private void OrderProducer(Span<byte> ai, Span<byte> r, byte type, byte army) =>
+        OriginalAiMilitary.Request(ai, List, 5, 0x10, r[3], 0, 0, 0, 0, (uint)(type | army << 8));
+
+    private bool Process(Span<byte> ai, int at)
+    {
+        var r = ai.Slice(at, Size);
+        while (true)
+            switch (r[0])
+            {
+                case 1:
+                    {
+                        if ((U32(r, 0x10) & 0x3f) != 0) return true;
+                        uint mask = (uint)(8 | (r[6] >> 4) << 8), value = (uint)((r[6] & 0xf) << 8);
+                        var open = world.Buildable(ai[0], mask, value);
+                        if (open.Count == 0) return false;
+                        byte t = open[(world.Random() * open.Count) >> 8];
+                        byte army = world.Participant(ai[0])[0];
+                        var (producer, status, type) = Producer(ai, t, army);
+                        if (producer != null)
+                        {
+                            Produce(producer, t);
+                            uint before = U32(r, 8), strength = world.Template(ai[0], t)[0x76];
+                            W32(r, 8, before - strength);
+                            return before > strength;   // SUB, JA
+                        }
+                        if (++r[0x14] >= 0x14) return false;
+                        if (status == 0) OrderProducer(ai, r, type, army);
+                        return true;
+                    }
+                case 2:
+                    {
+                        if ((U32(r, 0x10) & 0x3f) != 0) return true;
+                        var (producer, status, type) = Producer(ai, r[4], r[5]);
+                        if (producer != null) { Produce(producer, r[4]); W32(r, 8, U32(r, 8) - 1); return U32(r, 8) != 0; }
+                        if (status == 0) OrderProducer(ai, r, type, r[5]);
+                        return true;
+                    }
+                case 3:
+                    {
+                        if ((U32(r, 0x10) & 0x3f) != 0) return true;
+                        if (++r[0x14] > 0x28) return false;
+                        var t = world.Template(ai[0], r[8]);
+                        byte n = t[3];
+                        if ((U32(t, 0x40) & 0x80) != 0)
+                        {
+                            byte dx = (byte)(r[4] - r[6]); if ((sbyte)dx < 0) dx = (byte)-dx;
+                            byte dy = (byte)(r[5] - r[7]); if ((sbyte)dy < 0) dy = (byte)-dy;
+                            n = Math.Max(dx, dy);
+                        }
+                        uint count = (byte)(n / t[3]);   // DIV r/m8
+                        var p = world.Participant(ai[0]);
+                        for (int i = 0; i < 4; i++)
+                        {
+                            uint cost = U32(t, 0x7c + 4 * i);
+                            uint total = (cost & 0xffff0000) | (((cost & 0xffff) * count) & 0xffff);   // MUL BX
+                            if (total > U32(p, 0x18 + 4 * i)) return true;
+                        }
+                        var (builder, status, type) = Producer(ai, r[8], r[9]);
+                        if (builder == null) { if (status == 0) OrderProducer(ai, r, type, r[9]); return true; }
+                        Build(builder, r[8], r[4], r[5], r[6], r[7]);
+                        return false;
+                    }
+                case 4:
+                    {
+                        if ((U32(r, 0x10) & 0x1f) != 0) return true;
+                        if (++r[0x14] > 0x14) return false;
+                        uint span = unchecked((uint)(r[6] | r[7] << 8) + 0x101 - (uint)(r[4] | r[5] << 8));
+                        byte x = (byte)(r[4] + (world.Random() * (byte)span >> 8));
+                        byte y = (byte)(r[5] + (world.Random2() * (byte)(span >> 8) >> 8));
+                        if (!Site(r[8], r[9], ai[0], x, y)) return true;
+                        Convert(r, x, y);
+                        continue;
+                    }
+                case 5:
+                    {
+                        if ((U32(r, 0x10) & 0x1f) != 0) return true;
+                        if (++r[0x14] > 0x14) return false;
+                        uint px = (uint)(world.Random() * world.MapWidth >> 8) << 5, py = (uint)(world.Random2() * world.MapHeight >> 8) << 5;
+                        military.ClassMask = 0x68; military.ClassValue = 8;
+                        if (OriginalAiRecruitment.NearestFree(world.Chain(ai[0]), px, py, 0x68, 8) is { } near)
+                        {
+                            byte x = (byte)(U32(near.Record, 4) >> 5), y = (byte)(U32(near.Record, 8) >> 5);
+                            byte bx = 5, by = 0;
+                            byte coin = world.Random();
+                            if ((coin & 1) != 0) bx = unchecked((byte)-5);
+                            if ((coin & 2) != 0) (bx, by) = (by, bx);
+                            x += bx; y += by;
+                            if (!Site(r[8], r[9], ai[0], x, y)) return true;
+                            Convert(r, x, y);
+                            continue;
+                        }
+                        byte size = (byte)((ai[0x5c] << 2) + 0x0e);
+                        (r[4], r[5], r[6], r[7]) = OriginalTargetRules.Clip(ai[0x61], ai[0x62], size, size, world.MapWidth, world.MapHeight);
+                        r[0] = 4; r[2] = 0; W32(r, 0x10, 0); r[0x14] = 0;
+                        continue;
+                    }
+                case 6:
+                    OriginalAiMilitary.Request(ai, List, 7, 0x46, 0x80, ai[0x61], ai[0x62], 0, 0, 0);
+                    return false;
+                case 7:
+                    {
+                        if ((U32(r, 0x10) & 0xf) != 0) return true;
+                        var pattern = world.Fortification(U32(r, 8));
+                        int e = 5 * r[0x14];
+                        if (pattern == null || pattern[e] == 0xff) return false;
+                        var open = world.Buildable(ai[0], 0xf08, (uint)(8 | pattern[e] << 8));
+                        if (open.Count == 0) { r[0x14]++; return true; }
+                        byte t = open[(world.Random() * open.Count) >> 8];
+                        if (!AddFree(ai, 3, 0x47, r[3], (byte)(r[4] + pattern[e + 1]), (byte)(r[5] + pattern[e + 2]),
+                            (byte)(r[4] + pattern[e + 3]), (byte)(r[5] + pattern[e + 4]), (uint)(t | world.Participant(ai[0])[0] << 8))) return true;
+                        r[0x14]++; return true;
+                    }
+                case 8:
+                    {
+                        if ((U32(r, 0x10) & 0x1f) != 0) return true;
+                        if (++r[0x14] > 0x14) return false;
+                        byte a = (byte)((world.Random() * 10 >> 8) - 5);
+                        byte x = (byte)(((sbyte)a < 0 ? unchecked((byte)-10) : (byte)10) + a);
+                        byte y = (byte)((world.Random2() * 0x3c >> 8) - 0x1e);
+                        if ((world.Random() & 1) == 0) (x, y) = (y, x);
+                        x += ai[0x61]; y += ai[0x62];
+                        if (!Site(r[8], r[9], ai[0], x, y)) return true;
+                        Convert(r, x, y);
+                        continue;
+                    }
+                case 10: return Crossing(ai, r);
+                default: return false;
+            }
+    }
+
+    private static void Convert(Span<byte> r, byte x, byte y) { r[4] = x; r[5] = y; r[0] = 3; r[2] = 0; W32(r, 0x10, 0); r[0x14] = 0; } // 22A2B
+
+    /// <summary>1EAED: the first free record of list +34F, without the duplicate check of 1EB5C. False when the list is full.</summary>
+    private static bool AddFree(Span<byte> ai, byte mode, byte first, byte third, byte cl, byte ch, byte dl, byte dh, uint parameter)
+    {
+        for (int k = 0; k < 20; k++)
+        {
+            var q = ai.Slice(List + k * Size, Size);
+            if (q[0] != 0xff) continue;
+            q[0] = mode; q[1] = first; q[2] = 0; q[3] = third; q[4] = cl; q[5] = ch; q[6] = dl; q[7] = dh;
+            W32(q, 8, parameter); W32(q, 0x0c, 0); W32(q, 0x10, 0); q[0x14] = 0;
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>Mode 10 (22C53): unless a bridge-class object (DAT[40] &amp; 0Ah = 0Ah) is in the area +4..+7, find the
+    /// narrowest water crossing (terrain class 2) along rows and then columns, and order a class-0Ah template there.</summary>
+    private bool Crossing(Span<byte> ai, Span<byte> r)
+    {
+        uint size = unchecked((uint)(r[6] | r[7] << 8) - (uint)(r[4] | r[5] << 8) + 0x101);
+        foreach (uint reference in OriginalTargetRules.Collect(new Grid(world), r[4], r[5], (byte)size, (byte)(size >> 8)))
+            if ((U32(world.Resolve(reference).Template, 0x40) & 0xa) == 0xa) return false;
+        byte best = 0xff, counter = 0, mark = 0;
+        byte y = r[5];
+        do   // rows: INC DH / CMP DH,[+7] / JBE, bytes wrap
+        {
+            byte state = 0xff, x = r[4];
+            do { Step(world.TileClass(y * world.MapWidth + x), x, ref state, ref counter, ref mark); x++; } while (x <= r[6]);
+            if (state == 2 && counter < best) { best = counter; _x0 = (byte)(mark - counter); _y0 = y; _x1 = (byte)(mark + 1); _y1 = y; }
+            y++;
+        } while (y <= r[7]);
+        byte cx = r[4];
+        do   // columns
+        {
+            byte state = 0xff; y = r[5];
+            do { Step(world.TileClass(y * world.MapWidth + cx), y, ref state, ref counter, ref mark); y++; } while (y <= r[7]);
+            if (state == 2 && counter < best) { best = counter; _x0 = cx; _y0 = (byte)(mark - counter); _x1 = cx; _y1 = (byte)(mark + 1); }
+            cx++;
+        } while (cx <= r[6]);
+        if (best == 0xff) return false;
+        (r[4], r[5], r[6], r[7]) = (_x0, _y0, _x1, _y1);
+        var open = world.Buildable(ai[0], 0xa, 0xa);
+        if (open.Count == 0) return false;
+        byte t = open[(world.Random() * open.Count) >> 8];
+        r[8] = t; r[9] = world.Participant(ai[0])[0]; r[0] = 3;
+        return true;
+    }
+
+    /// <summary>One cell of the crossing scan: land (state 0) → water run (1, counted) → land after it (2, marked);
+    /// water again joins the land gap to the run.</summary>
+    private static void Step(byte terrain, byte position, ref byte state, ref byte counter, ref byte mark)
+    {
+        bool water = (terrain & 7) == 2;
+        if (state == 0xff) { if (!water) state = 0; return; }
+        if (state == 0) { if (!water) return; state = 1; counter = 0; }
+        if (state == 1)
+        {
+            counter++;
+            if (water) return;
+            state = 2; mark = position;
+        }
+        if (water) { state--; counter = (byte)(counter + position - mark); }
+    }
+
+    private sealed class Grid(IAiSquadWorld world) : IEnemySearchWorld
+    {
+        public byte MapWidth => world.MapWidth;
+        public byte MapHeight => world.MapHeight;
+        public uint HostileMask => throw new NotSupportedException();
+        public uint Occupant(int plane, int cell) => world.Occupant(plane, cell);
+        public (byte[] Record, byte[] Template) Resolve(uint reference) => world.Resolve(reference);
+        public bool Contact(byte owner) => throw new NotSupportedException();
+        public byte TerrainClass(ReadOnlySpan<byte> record) => throw new NotSupportedException();
+        public void Contacted(FirstContact contact) => throw new NotSupportedException();
+    }
+}
