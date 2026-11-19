@@ -191,7 +191,7 @@ public sealed partial class Skirmish
     }
     private void TickBuildings()
     {
-        foreach (var building in Actors.Where(a => a.Alive && (a.Source.TemplateName is "Лесопилка" or "Ферма" or "Казарма" or "Шахта")))
+        foreach (var building in Actors.Where(a => a.Alive && a.Structure && (a.ConstructionRemaining > 0 || a.Source.TemplateName is "Лесопилка" or "Ферма" or "Казарма" or "Шахта")).ToArray())
         {
             if (building.Team != 0 && building.ConstructionRemaining <= 0) continue;   // the enemy's economy is not simulated yet
             if (building.ConstructionRemaining > 0)
@@ -214,7 +214,7 @@ public sealed partial class Skirmish
                 building.Record[0x14] = completed.EncodedState; building.Record[0x15] = completed.Auxiliary; building.Record[0x0f] = completed.WorkFlags;
                 BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(building.Template.InitialFrame + building.Parameters[0x4a]));
                 if (building.Team == 0) Log(building.Source.TemplateName + " готова.");
-                if (building.Team != 0) continue;
+                if (building.Team != 0) { EnemyBuildingFinished(building); continue; }
             }
             if (building.Source.TemplateName != "Лесопилка") continue;
             var state = OriginalLumbermillRules.Process(new(building.Record[0x23], building.Record[0x24], Wood, ProducedWood), building.Parameters[0x79]);

@@ -20,13 +20,15 @@ public sealed partial class Skirmish
             _soldierSeeds.TryAdd(o.TemplateIndex, o);
         RecountPopulation();
     }
-    private void RecountPopulation()
+    private void RecountPopulation() => Population = PopulationOf((byte)Rules.PlayerSlot);
+    /// <summary>Population totals of one settlement (the player's, or the enemy's for its AI).</summary>
+    private PopulationTotals PopulationOf(byte owner)
     {
         var objects = new List<PopulationObject>();
         var visible = Actors.ToDictionary(a => a.Id);
         void Add(byte[] record, byte[] template, bool alive)
         {
-            if (record[3] != Rules.PlayerSlot) return;
+            if (record[3] != owner) return;
             objects.Add(new(alive ? record[0x19] : (byte)0, template[0x46], BinaryPrimitives.ReadUInt32LittleEndian(template.AsSpan(0x40)),
                 BinaryPrimitives.ReadUInt32LittleEndian(template.AsSpan(0x88)), BinaryPrimitives.ReadUInt32LittleEndian(template.AsSpan(0x78)),
                 BinaryPrimitives.ReadUInt32LittleEndian(record.AsSpan(4)), BinaryPrimitives.ReadUInt32LittleEndian(record.AsSpan(8))));
@@ -34,13 +36,14 @@ public sealed partial class Skirmish
         foreach (var (id, obj) in _sourceMovementObjects)
             if (!visible.ContainsKey(id)) Add(obj.Record, obj.Template, true);
         foreach (var actor in Actors) Add(actor.Record, actor.Parameters, actor.Alive);
-        Population = OriginalPopulationRules.Recount(Occupancy.Width, Occupancy.Height, objects);
+        return OriginalPopulationRules.Recount(Occupancy.Width, Occupancy.Height, objects);
     }
     private void TickPopulation()
     {
         _populationTick = unchecked(_populationTick + 1);
         if ((_populationTick & 31) == 0) RecountPopulation();
         FreePeople = OriginalPopulationRules.Grow(_populationTick, FreePeople, Population.Used, Population.FarmSupport, Population.Limit);
+        TickEnemyPopulation();
     }
     public ConstructionPlacement ProbeFarm(Vector2I cell) => ProbeEconomyBuilding(cell, FarmTemplate);
     public SkirmishActor? BuildFarm(Vector2I cell)
