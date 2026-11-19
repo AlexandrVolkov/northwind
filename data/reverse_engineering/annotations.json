@@ -1841,6 +1841,96 @@
         "data/skirmish.json"
       ],
       "limitations": "Обход цепочек объектов по участникам не перенесён."
+    },
+    {
+      "id": "search-d895",
+      "module": "LE:1",
+      "start": 55445,
+      "end": 55877,
+      "name": "Enemy search: radius, filters, nearest with tie on attacker",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/enemy-search.json"
+      ],
+      "implementation": [
+        "scripts/OriginalTargetRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": "Видимость, контакт и враждебность в схватке задаёт мост."
+    },
+    {
+      "id": "search-d85e",
+      "module": "LE:1",
+      "start": 55390,
+      "end": 55445,
+      "name": "Search area around the unit",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/enemy-search.json"
+      ],
+      "implementation": [
+        "scripts/OriginalTargetRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "search-d7b1",
+      "module": "LE:1",
+      "start": 55217,
+      "end": 55390,
+      "name": "Collect unique occupants of an area",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/enemy-search.json"
+      ],
+      "implementation": [
+        "scripts/OriginalTargetRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "search-219c3",
+      "module": "LE:1",
+      "start": 137667,
+      "end": 137728,
+      "name": "Clip a centred area to the map",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/enemy-search.json"
+      ],
+      "implementation": [
+        "scripts/OriginalTargetRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "search-c344",
+      "module": "LE:1",
+      "start": 49988,
+      "end": 50015,
+      "name": "Chebyshev distance between object centres",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/enemy-search.json"
+      ],
+      "implementation": [
+        "scripts/OriginalTargetRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
     }
   ]
 }
