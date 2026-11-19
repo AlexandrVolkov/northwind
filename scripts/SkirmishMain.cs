@@ -194,7 +194,15 @@ public partial class SkirmishMain : Node2D
         center = new Vector2(Mathf.Clamp(center.X, half.X, Math.Max(half.X, size.X - half.X)), Mathf.Clamp(center.Y, half.Y, Math.Max(half.Y, size.Y - half.Y)));
         Camera.Position = center - shift;
     }
-    public void ChangeSpeed(int step) { Speed = Math.Clamp(step > 0 ? Speed * 2 : Speed / 2, .5f, 4); RefreshUi(); }
+    /// <summary>«Игра» [908E]: F0h..FEh, default FDh; the world steps every FFh − [908E] timer ticks (A10B), so the multiplier of the
+    /// default pace (2 ticks) is 2 / (FFh − [908E]). −/+ change it by one (LE:1 11364).</summary>
+    public byte GameSpeed { get; private set; } = 0xfd;
+    public void ChangeSpeed(int step)
+    {
+        int next = GameSpeed + step;
+        if (next is >= 0xf0 and <= 0xfe) GameSpeed = (byte)next;
+        Speed = 2f / (0xff - GameSpeed); RefreshUi();
+    }
     public void ChangeScrollSpeed(int step) => Pan = OriginalScrollRules.ChangePan(Pan, step);
     /// <summary>Pending targeting: 2 move, 3 attack, 4 forestry, 8 mine; UI adapter to the supported world commands.</summary>
     public int PendingOrder { get; private set; }

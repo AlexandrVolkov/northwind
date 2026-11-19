@@ -152,6 +152,12 @@ public partial class TestRunner
         Check(scene.Hud.Click(scene.Hud.FromClassic(OriginalHud.MenuButton.GetCenter()), MouseButton.Left) && scene.Hud.MenuOpen, "«Меню» opens the original menu panel");
         scene.Hud.Click(scene.Hud.FromClassic(OriginalHud.PauseButton.GetCenter()), MouseButton.Left);
         Check(scene.Battle.Paused, "«Пауза» of the menu panel pauses the battle"); scene.TogglePause();
+        scene.Hud.Click(scene.Hud.FromClassic(OriginalHud.GameFaster.GetCenter()), MouseButton.Left);
+        scene.Hud.Click(scene.Hud.FromClassic(OriginalHud.GameFaster.GetCenter()), MouseButton.Left);
+        Check(scene.GameSpeed == 0xfe && scene.Speed == 2, "«Игра» + raises [908E] up to FEh: a world step every tick (11364, A10B)");
+        for (int i = 0; i < 20; i++) scene.Hud.Click(scene.Hud.FromClassic(OriginalHud.GameSlower.GetCenter()), MouseButton.Left);
+        Check(scene.GameSpeed == 0xf0 && Math.Abs(scene.Speed - 2f / 15) < 1e-6, "«Игра» − stops at F0h: a step every 15 ticks");
+        while (scene.GameSpeed < 0xfd) scene.ChangeSpeed(1);
         scene.Hud.Click(scene.Hud.FromClassic(OriginalHud.BackButton.GetCenter()), MouseButton.Left);
         Check(!scene.Hud.MenuOpen, "«Назад» closes the menu panel");
         Check(!scene.Hud.Click(scene.Hud.MapRect.GetCenter(), MouseButton.Left), "Clicks inside the map window reach the world");
