@@ -4,9 +4,9 @@
 
 | Статус | Процедур | Инструкций |
 |---|---|---|
-| not ported | 20 | 535 |
+| not ported | 12 | 162 |
 | partial | 2 | 421 |
-| ported | 105 | 4831 |
+| ported | 113 | 5204 |
 
 | Процедура | Инстр. | Статус | Имя | Вызывает (✓ перенесено, ~ частично, · нет) |
 |---|---|---|---|---|
@@ -40,7 +40,7 @@
 | 1F03B | 9 | not ported |  |  |
 | 1F054 | 9 | not ported |  |  |
 | 1F06D | 5 | not ported |  |  |
-| 1F078 | 30 | ported | AI squad states 0..3 and the state loop | 1F0D5✓, 1F1DF✓, 1F31E✓, 1F3F5✓, 1F476·, 1F653·, 1F72C✓, 1F7CA✓, 1F8CF✓, 1FA01✓, 1FAD9✓ |
+| 1F078 | 30 | ported | AI squad states 0..3 and the state loop | 1F0D5✓, 1F1DF✓, 1F31E✓, 1F3F5✓, 1F476✓, 1F653✓, 1F72C✓, 1F7CA✓, 1F8CF✓, 1FA01✓, 1FAD9✓ |
 | 1F0D5 | 71 | ported | AI squad states 0..3 and the state loop | 1EB5C✓, 1ECF8·, 1EDFD✓, 1EF21✓, 1F004·, 1F03B·, 1F06D·, 1FCED✓, 1FE78✓, 1FECE✓, 1FF74✓, 201B8✓, 20458✓, 215F1✓ |
 | 1F1DF | 90 | ported | AI squad states 0..3 and the state loop | 1EB5C✓, 1ED0F·, 1F3E9✓, 1FBB1✓, 1FC28✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FF00✓, 1FFB7✓, 20071✓, 201B8✓, 205E7✓, 219C3✓ |
 | 1F306 | 8 | ported | AI squad states 0..3 and the state loop |  |
@@ -48,9 +48,9 @@
 | 1F3E9 | 4 | ported | AI squad states 0..3 and the state loop |  |
 | 1F3F5 | 32 | ported | AI squad states 0..3 and the state loop | 1ECF8·, 1F3E9✓, 1FC6B✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FFB7✓, 205E7✓ |
 | 1F464 | 6 | ported | AI squad states 0..3 and the state loop |  |
-| 1F476 | 106 | not ported |  | 6885✓, C439✓, 1EB5C✓, 1EDFD✓, 1F004·, 1F06D·, 1FE97✓, 201B8✓, 205E7✓, 206D5·, 20730·, 219C3✓, 224D1·, 2258F· |
+| 1F476 | 106 | ported | AI squad state 9: timber workers | 6885✓, C439✓, 1EB5C✓, 1EDFD✓, 1F004·, 1F06D·, 1FE97✓, 201B8✓, 205E7✓, 206D5✓, 20730✓, 219C3✓, 224D1✓, 2258F✓ |
 | 1F5F1 | 16 | ported | Set worker squad state 9 with its target area | 1EDFD✓, 1F004·, 219C3✓ |
-| 1F653 | 56 | not ported |  | 6885✓, C439✓, 1EB5C✓, 201B8✓, 205E7✓, 206D5·, 219C3✓ |
+| 1F653 | 56 | ported | AI squad state 10: mine workers | 6885✓, C439✓, 1EB5C✓, 201B8✓, 205E7✓, 206D5✓, 219C3✓ |
 | 1F71A | 5 | ported | Set worker squad state 10 |  |
 | 1F72C | 45 | ported | AI squad states 4..8 | 1FBB1✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FFB7✓, 201B8✓, 205E7✓ |
 | 1F7CA | 69 | ported | AI squad states 4..8 | 1F3E9✓, 1FC6B✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FF19✓, 201B8✓, 201F6✓, 20232✓, 205E7✓ |
@@ -95,10 +95,10 @@
 | 2055C | 41 | ported | Nearest visible hostile object in a cell area |  |
 | 205E7 | 6 | ported | Nearest visible hostile object in a cell area | 1F011·, 20458✓ |
 | 205FB | 70 | ported | AI squad census from its members |  |
-| 206D5 | 31 | not ported |  | 9E41✓ |
-| 20730 | 22 | not ported |  |  |
+| 206D5 | 31 | ported | Random idle member of a squad | 9E41✓ |
+| 20730 | 22 | ported | Squad member with an activity code |  |
 | 207CB | 51 | ported | Squad stands; members outside the area return |  |
-| 2095D | 20 | not ported |  |  |
+| 2095D | 20 | ported | Squad of a state whose area holds a cell |  |
 | 2098B | 15 | ported | Find AI squad by state and target object |  |
 | 209B0 | 277 | ported | AI garrison: unit orders, building guards, hostile buildings, patrols, wandering | 68BD✓, 9E41✓, 9E55✓, 9E69✓, D7B1✓, 1EB5C✓, 1FACD✓, 202FB✓, 20408✓, 2098B✓, 2160B✓, 21696✓, 216DF✓, 219C3✓, 21CA0✓ |
 | 20DD0 | 420 | ported | AI military requests (list +1AB, modes 1..10) | 9E41✓, 1EB40✓, 1EB5C✓, 1EC6E✓, 1F306✓, 1F464✓, 1F8C0✓, 1F9EC✓, 1FB9C✓, 20232✓, 2029F✓, 214C3✓, 21555✓, 215F1✓, 2160B✓, 21660✓, 216DF✓, 22E46✓ |
@@ -118,10 +118,10 @@
 | 221AE | 131 | ported | AI economy executor over list +4F3 (workers, mines, lumbermill) | D363·, 1EB5C✓, 1F5F1✓, 1F71A✓, 22435✓, 22613✓, 22E46✓ |
 | 223B4 | 34 | ported | List templates of a DAT class | A673✓ |
 | 22435 | 47 | ported | Gather free workers into a squad | 200B5✓, 201B8✓ |
-| 224D1 | 56 | not ported |  |  |
-| 2258F | 49 | not ported |  | 9E41✓, 9E55✓, 2095D·, 219C3✓, 2268E· |
+| 224D1 | 56 | ported | Nearest terrain cell of a class in the squad area |  |
+| 2258F | 49 | ported | Random seen grove cell around the squad centre | 9E41✓, 9E55✓, 2095D✓, 219C3✓, 2268E✓ |
 | 22613 | 38 | ported | Random seen ore cell around the home for a mine | 9E41✓, 9E55✓, 219C3✓ |
-| 2268E | 33 | not ported |  |  |
+| 2268E | 33 | ported | Terrain class present in an area |  |
 | 226F1 | 57 | ported | AI upkeep: repair requests and decay | 68BD✓ |
 | 227C7 | 469 | ported | AI order executor (list +34F, modes 1..10) | 68A0✓, 9E41✓, 9E55✓, 1EAED✓, 1EB5C✓, 2035A✓, 219C3✓, 22E46✓, 22E85✓, 22F76✓, 22F82✓, 22FE4✓, 23201✓ |
 | 22E46 | 26 | ported | Random open template of a DAT class | 68A0✓, 9E41✓, 223B4✓ |

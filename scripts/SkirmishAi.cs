@@ -34,6 +34,7 @@ public sealed partial class Skirmish
     private OriginalAiGarrison? _aiGarrison;
     private OriginalAiOrders? _aiOrders;
     private OriginalAiEconomy? _aiEconomy;
+    private OriginalAiWorkers? _aiWorkers;
     private Dictionary<byte, byte[]> _aiMakes = [];
     private readonly Dictionary<(byte Producer, byte Made), byte> _aiIntervals = [];
     private byte[] _aiFortification = [];
@@ -93,6 +94,7 @@ public sealed partial class Skirmish
         _aiGarrison = new OriginalAiGarrison(_aiSquadWorld, _aiMilitary, _aiStates);
         _aiOrders = new OriginalAiOrders(_aiSquadWorld, _aiMilitary);
         _aiEconomy = new OriginalAiEconomy(_aiSquadWorld, _aiMilitary);
+        _aiWorkers = new OriginalAiWorkers(_aiSquadWorld);
         _aiRandom = GameData.Read<OriginalTerrainData>("res://data/original_terrain.json").RandomValues.ToArray();
         var characters = data.Table();
         foreach (byte p in new[] { (byte)Rules.PlayerSlot, (byte)Rules.EnemySlot })
@@ -186,6 +188,7 @@ public sealed partial class Skirmish
             if ((order & 0xf8) == 0x60) building.Record[0x14] = 4;              // produce: the queue head +22 is the template
             else if ((order & 0xf8) == 0x58) { EnemyBuild(building); building.Record[0x14] = 0; }
         }
+        foreach (var worker in Actors.Where(a => a.Team == 1 && a.Alive && a.Worker)) EnemyWorkerCommand(worker);
         foreach (var actor in Actors.Where(a => a.Team == 1 && a.Alive && !a.Structure && !a.Worker))
         {
             byte value = actor.Record[0x14];
@@ -216,6 +219,51 @@ public sealed partial class Skirmish
                 case 2 or 3 when actor.Target == 0 || Find(actor.Target) == null: actor.Record[0x14] = 0; break;
             }
         }
+    }
+
+    /// <summary>Commands in +14 of an enemy worker, from the AI (1F476/1F653) or from the worker's own WRK steps (123D3 gives
+    /// 60h with a load, the return to the empty worker gives 58h), are handed to the port's worker jobs (adapter):
+    /// 58h — chop the tree +32/+33; 60h — with timber, deliver to the nearest own lumbermill; with ore, carry it to the
+    /// castle; empty, work the mine +1C; 40h — stand; 48h — go to +22/+23. The activity left in +14 is 3 for timber work,
+    /// 4 for mine work, 1 while walking and 0 (with +15 = 0) when the worker has no job; 206D5 takes members with 1 or 0/0.</summary>
+    private void EnemyWorkerCommand(SkirmishActor worker)
+    {
+        byte value = worker.Record[0x14];
+        if ((value & 0x40) != 0)
+        {
+            byte cargo = worker.Record[0x31];
+            switch (value & 0xf8)
+            {
+                case 0x40: worker.GatherTree = null; worker.PreferredMill = 0; worker.MineJob = false; worker.Goal = null; break;
+                case 0x48: worker.GatherTree = null; worker.PreferredMill = 0; worker.MineJob = false;
+                    OrderMove(worker, new Vector2I(worker.Record[0x22], worker.Record[0x23])); break;
+                case 0x58:
+                    var tree = new Vector2I(worker.Record[0x32], worker.Record[0x33]);
+                    if (cargo == 0 && Harvestable(tree)) { worker.GatherTree = tree; worker.MineJob = false; worker.Goal = null; worker.HarvestPrepared = false; worker.Route.Clear(); }
+                    break;
+                case 0x60 when cargo == 3:
+                    var mill = Find(OriginalWorkerDelivery.FindReceiver((uint)worker.Position.X, (uint)worker.Position.Y,
+                        Actors.Where(a => a.Team == worker.Team).Select(ReceiverCandidate)));
+                    if (mill != null) { worker.PreferredMill = mill.Id; worker.MineJob = false; worker.Goal = null; }
+                    break;
+                case 0x60 when worker.MineJob: break;   // 123D3's 60h on a loaded carrier: the carrier phases go on
+                case 0x60:
+                    uint mine = BinaryPrimitives.ReadUInt32LittleEndian(worker.Record.AsSpan(0x1c));
+                    if (cargo is 1 or 2 || Find(mine) is { Team: 1, Alive: true } m && m.Source.TemplateName == "Шахта")
+                    {
+                        if (cargo == 0) { BinaryPrimitives.WriteUInt32LittleEndian(worker.Record.AsSpan(0x32), 0); worker.Record[0x30] = 0; }
+                        worker.GatherTree = null; worker.PreferredMill = 0; worker.Goal = null; worker.Route.Clear(); worker.ReplanTimer = 0;
+                        worker.Record[0x15] = 0; worker.Record[0x17] &= 0xbf; worker.MineJob = true;
+                    }
+                    break;
+            }
+        }
+        // A walk whose route could not be planned (TickWorker set the replan delay, no route) ends there, as a soldier's does.
+        if (worker.Goal != null && worker.Route.Count == 0 && !worker.Stepping && worker.ReplanTimer > 0) worker.Goal = null;
+        if (worker.MineJob) worker.Record[0x14] = 4;
+        else if (worker.GatherTree != null || worker.PreferredMill != 0) worker.Record[0x14] = 3;
+        else if (worker.Goal != null || worker.Route.Count > 0 || worker.Stepping) worker.Record[0x14] = 1;
+        else { worker.Record[0x14] = 0; worker.Record[0x15] = 0; }
     }
 
     private PopulationTotals _enemyPopulation;
@@ -332,7 +380,7 @@ public sealed partial class Skirmish
         return false;
     }
 
-    private sealed class AiSquadWorld(Skirmish battle) : IAiGarrisonWorld, IAiSquadStateWorld, IAiOrdersWorld, IAiEconomyWorld
+    private sealed class AiSquadWorld(Skirmish battle) : IAiGarrisonWorld, IAiSquadStateWorld, IAiOrdersWorld, IAiEconomyWorld, IAiWorkerWorld
     {
         private readonly SearchWorld _search = new(battle, (byte)battle.Rules.EnemySlot);
         public IReadOnlyList<(byte[] Record, byte[] Template)> Chain(byte participant) => battle.AiChain(participant);
@@ -367,7 +415,9 @@ public sealed partial class Skirmish
         public void Send(byte type, byte other, byte owner, byte bh, uint parameter) => battle._aiTurnWorld!.Send(type, other, owner, bh, parameter);
         public void Message(ReadOnlySpan<byte> squad, uint text) { }
         public void Rescue(Span<byte> squad) { }
-        public void WorkerState(Span<byte> squad) { }
+        public void WorkerState(Span<byte> ai, int at) => battle._aiWorkers!.Run(ai, at);
+        public uint TileProperty(int cell) => cell >= 0 && cell < battle.Map.Cells.Length
+            ? BinaryPrimitives.ReadUInt32LittleEndian(battle._properties.AsSpan((int)(battle.Map.Cells[cell] & 0xffff) * 8)) : 0;
         public Span<byte> Block(byte participant) => battle._aiBlocks[participant];
         public ReadOnlySpan<byte> Participant(byte participant) => battle._participants[participant];
         public byte ParticipantCount => battle._participantCount;
