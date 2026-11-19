@@ -5,15 +5,16 @@ namespace Northwind;
 /// <summary>The settlement AI of the original (LE:1 1E7EA, docs/ai.md) driving the enemy settlement of the skirmish.
 ///
 /// Ported and verified parts run as in the original, once per game tick after the object update (LE:1 31D6): census
-/// (1E87A, every 32 turns), squad steps (1ED26), squad states (1F078), military requests (20DD0), upkeep (226F1), the turn
+/// (1E87A, every 32 turns), squad steps (1ED26), squad states (1F078), garrison (209B0), military requests (20DD0), upkeep (226F1), the turn
 /// with its decisions (2323A), the plan executor (23667) and research (23C11). Adapters of the port, not the original:
 /// <list type="bullet">
-/// <item>Not yet ported steps are skipped: 209B0 (reaction to attacked buildings), 227C7, 21E99/221AE (economy), the
+/// <item>Not yet ported steps are skipped: 227C7, 21E99/221AE (economy), the
 /// construction stage 23551, worker states 9/10, the formation table of step 4, messages A4C2, the rescue 20001.</item>
 /// <item>Step 4 (formation march) sends the members to the target cell with command 48h instead of a formation.</item>
 /// <item>Commands the AI writes into OBE +14 (48h move to +22/+23, 50h/58h attack +1C, 40h stand) are carried out by
-/// <see cref="ExecuteAiCommands"/> through the port's movement and attack, as the player's orders are; the original WRK
-/// command handlers are not ported.</item>
+/// <see cref="ExecuteAiCommands"/> through the port's movement and attack, as the player's orders are, and replaced by
+/// activity codes (0 idle, 1 moving, 2/3 attacking) inferred from what the AI reads back; the original WRK command
+/// handlers are not ported.</item>
 /// <item>Fog of war is not ported: every cell counts as explored ([18DA]), objects keep their scenario visibility FFh.</item>
 /// <item>Only the enemy settlement thinks; the player's block is initialised and counted (census) so that the enemy can
 /// weigh it, but it gives no orders. Participant records (F5h) are rebuilt from the diplomacy state around each turn.</item>
@@ -29,9 +30,11 @@ public sealed partial class Skirmish
     private byte _aiArmy, _participantCount;
     private OriginalAiSquadStates? _aiStates;
     private OriginalAiMilitary? _aiMilitary;
+    private OriginalAiGarrison? _aiGarrison;
+    private byte[] _aiRandom = [];
+    private byte _aiRandom3;
     private AiSquadWorld? _aiSquadWorld;
     private AiTurnWorld? _aiTurnWorld;
-    private readonly Dictionary<uint, (byte Command, int X, int Y, uint Target)> _aiCommands = [];
 
     /// <summary>When false the enemy keeps the old experimental behaviour (tests that need a passive enemy).</summary>
     public bool AiEnabled { get; set; } = true;
@@ -57,6 +60,8 @@ public sealed partial class Skirmish
         _aiTurnWorld = new AiTurnWorld(this);
         _aiStates = new OriginalAiSquadStates(_aiSquadWorld, Convert.FromHexString(data.ArctangentHex), Convert.FromHexString(data.SquadMessagesHex));
         _aiMilitary = new OriginalAiMilitary(_aiSquadWorld, Convert.FromHexString(data.ArmyClassesHex));
+        _aiGarrison = new OriginalAiGarrison(_aiSquadWorld, _aiMilitary, _aiStates);
+        _aiRandom = GameData.Read<OriginalTerrainData>("res://data/original_terrain.json").RandomValues.ToArray();
         var characters = data.Table();
         foreach (byte p in new[] { (byte)Rules.PlayerSlot, (byte)Rules.EnemySlot })
         {
@@ -112,6 +117,7 @@ public sealed partial class Skirmish
             OriginalAiRules.Census(ai, _participants[me], chain, (byte)Map.Width, (byte)Map.Height);
         OriginalAiSquadSteps.Tick(ai, _aiSquadWorld!);
         _aiStates.Run(ai);
+        _aiGarrison!.Run(ai);
         _aiMilitary.Run(ai);
         OriginalAiRules.Upkeep(ai, chain);
         if (OriginalAiTurn.Decide(_aiTurnWorld!, me, 0, (uint)Map.Width, _aiThreat))
@@ -122,33 +128,42 @@ public sealed partial class Skirmish
         ExecuteAiCommands();
     }
 
-    /// <summary>Carries out the commands the AI wrote into OBE +14 of the enemy's units (adapter, see the class summary).</summary>
+    /// <summary>Carries out the commands the AI wrote into OBE +14 of the enemy's units (adapter, see the class summary). A
+    /// command (bit 40h: 40h stand, 48h move to +22/+23, 50h/58h attack +1C) is replaced by the activity the original's
+    /// command handlers leave in +14 — 0 idle, 1 moving, 2/3 attacking — as read by 1EE02 (retarget of idle, moving and
+    /// out-of-area attackers) and by the squad census (205FB counts +14 &amp; 7 when bit 40h is clear). Moving ends in 0 on
+    /// arrival, attacking when the target is gone.</summary>
     private void ExecuteAiCommands()
     {
         foreach (var actor in Actors.Where(a => a.Team == 1 && a.Alive && !a.Structure && !a.Worker))
         {
-            byte command = (byte)(actor.Record[0x14] & 0xf8);
-            int x = actor.Record[0x22], y = actor.Record[0x23];
+            byte value = actor.Record[0x14];
             uint target = BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(0x1c));
-            _aiCommands.TryGetValue(actor.Id, out var last);
-            switch (command)
+            if ((value & 0x40) != 0)
             {
-                case 0x48:
-                    var goal = new Vector2I(x, y);
-                    if (actor.Cell == goal || (last.Command == 0x48 && last.X == x && last.Y == y && actor.Goal == null && actor.Route.Count == 0 && !actor.Stepping))
-                    { actor.Record[0x14] = (byte)((actor.Record[0x14] & 7) | 0x40); break; }
-                    if (last.Command != 0x48 || last.X != x || last.Y != y) OrderMove(actor, goal);
-                    break;
-                case 0x50: case 0x58:
-                    if (Find(target) is not { } foe || !AtWar(actor, foe))
-                    { actor.Record[0x14] = (byte)((actor.Record[0x14] & 7) | 0x40); break; }
-                    if (actor.Target != foe.Id) { actor.Target = foe.Id; actor.Goal = null; actor.Route.Clear(); actor.ReplanTimer = 0; }
-                    break;
-                case 0x40:
-                    if (last.Command == 0x48) { actor.Goal = null; if (!actor.Stepping) actor.Route.Clear(); }
-                    break;
+                switch (value & 0xf8)
+                {
+                    case 0x40:
+                        actor.Goal = null; if (!actor.Stepping) actor.Route.Clear();
+                        actor.Record[0x14] = 0; break;
+                    case 0x48:
+                        actor.Record[0x14] = OrderMove(actor, new Vector2I(actor.Record[0x22], actor.Record[0x23])) ? (byte)1 : (byte)0; break;
+                    case 0x50: case 0x58:
+                        if (Find(target) is { } foe && AtWar(actor, foe))
+                        {
+                            actor.Target = foe.Id; actor.Goal = null; actor.Route.Clear(); actor.ReplanTimer = 0;
+                            actor.Record[0x14] = (byte)((value >> 3) & 7);
+                        }
+                        else actor.Record[0x14] = 0;
+                        break;
+                }
+                continue;
             }
-            _aiCommands[actor.Id] = ((byte)(actor.Record[0x14] & 0xf8), x, y, target);
+            switch (value & 7)
+            {
+                case 1 when actor.Goal == null && actor.Route.Count == 0 && !actor.Stepping: actor.Record[0x14] = 0; break;
+                case 2 or 3 when actor.Target == 0 || Find(actor.Target) == null: actor.Record[0x14] = 0; break;
+            }
         }
     }
 
@@ -170,7 +185,7 @@ public sealed partial class Skirmish
         return false;
     }
 
-    private sealed class AiSquadWorld(Skirmish battle) : IAiMilitaryWorld, IAiSquadStateWorld
+    private sealed class AiSquadWorld(Skirmish battle) : IAiGarrisonWorld, IAiSquadStateWorld
     {
         private readonly SearchWorld _search = new(battle, (byte)battle.Rules.EnemySlot);
         public IReadOnlyList<(byte[] Record, byte[] Template)> Chain(byte participant) => battle.AiChain(participant);
@@ -189,6 +204,7 @@ public sealed partial class Skirmish
         public byte Global19E9 => 0xff;
         public byte Random() => battle._terrainCatalog.NextRandomByte();
         public byte Random2() => battle._terrainCatalog.NextSecondaryByte();
+        public byte Random3() => battle._aiRandom[battle._aiRandom3++];   // 9E69: third index [19ED] into the same table
         public byte Explored(int cell) => 0xff;
         public void Message(ReadOnlySpan<byte> squad, uint text) { }
         public void Rescue(Span<byte> squad) { }

@@ -4,14 +4,14 @@
 
 | Статус | Процедур | Инструкций |
 |---|---|---|
-| not ported | 34 | 1992 |
+| not ported | 32 | 1685 |
 | partial | 2 | 421 |
-| ported | 91 | 3374 |
+| ported | 93 | 3681 |
 
 | Процедура | Инстр. | Статус | Имя | Вызывает (✓ перенесено, ~ частично, · нет) |
 |---|---|---|---|---|
 | 1E53A | 99 | ported | AI block initialisation from character table | 1EB33✓, 1ECA0✓, 219C3✓ |
-| 1E7EA | 34 | not ported |  | 1E87A~, 1ED26✓, 1F078✓, 209B0·, 20DD0✓, 21E99·, 221AE·, 226F1✓, 227C7·, 2323A~, 23667✓, 23C11✓ |
+| 1E7EA | 34 | not ported |  | 1E87A~, 1ED26✓, 1F078✓, 209B0✓, 20DD0✓, 21E99·, 221AE·, 226F1✓, 227C7·, 2323A~, 23667✓, 23C11✓ |
 | 1E87A | 154 | partial | AI settlement census | 68BD✓, 1EC3F·, 219C3✓ |
 | 1EAD8 | 6 | ported | AI block of participant |  |
 | 1EAED | 24 | ported | Add AI plan record |  |
@@ -88,7 +88,7 @@
 | 20232 | 13 | ported | AI squad registry: numbers, create, remove, disband, transfer, lookups |  |
 | 20275 | 18 | ported | AI squad registry: numbers, create, remove, disband, transfer, lookups |  |
 | 2029F | 22 | ported | Free units join a squad up to a strength | 2035A✓ |
-| 202FB | 30 | not ported |  |  |
+| 202FB | 30 | ported | Squad members leave up to a strength |  |
 | 2035A | 49 | ported | Nearest free object of a class |  |
 | 20408 | 73 | ported | Nearest visible hostile object in a cell area | 6877✓, 2055C✓ |
 | 20458 | 74 | ported | Nearest visible hostile object in a cell area | 2055C✓ |
@@ -100,7 +100,7 @@
 | 207CB | 51 | ported | Squad stands; members outside the area return |  |
 | 2095D | 20 | not ported |  |  |
 | 2098B | 15 | ported | Find AI squad by state and target object |  |
-| 209B0 | 277 | not ported |  | 68BD✓, 9E41✓, 9E55✓, 9E69·, D7B1✓, 1EB5C✓, 1FACD✓, 202FB·, 20408✓, 2098B✓, 2160B✓, 21696✓, 216DF✓, 219C3✓, 21CA0✓ |
+| 209B0 | 277 | ported | AI garrison: unit orders, building guards, hostile buildings, patrols, wandering | 68BD✓, 9E41✓, 9E55✓, 9E69✓, D7B1✓, 1EB5C✓, 1FACD✓, 202FB✓, 20408✓, 2098B✓, 2160B✓, 21696✓, 216DF✓, 219C3✓, 21CA0✓ |
 | 20DD0 | 420 | ported | AI military requests (list +1AB, modes 1..10) | 9E41✓, 1EB40✓, 1EB5C✓, 1EC6E✓, 1F306✓, 1F464✓, 1F8C0✓, 1F9EC✓, 1FB9C✓, 20232✓, 2029F✓, 214C3✓, 21555✓, 215F1✓, 2160B✓, 21660✓, 216DF✓, 22E46✓ |
 | 214C3 | 39 | ported | AI raid targets: random building, nearest mine | 68BD✓, 9E41✓, C331· |
 | 21555 | 42 | ported | AI raid targets: random building, nearest mine | 68BD✓, C331· |
@@ -150,7 +150,7 @@
 | 6996 | ported | Direction byte between two points (arctangent table DS:287E) | 1EF26, 1FBB1 |
 | 9E41 | ported | Random byte streams [19EB]/[19EC] over table DS:297E | 1EBEF, 1F31E, 206D5, 209B0, 20DD0, 214C3, 2258F, 22613, 227C7, 22E46, 22E85, 2323A, 23C11 |
 | 9E55 | ported | Random byte streams [19EB]/[19EC] over table DS:297E | 1EBEF, 209B0, 2258F, 22613, 227C7, 2323A |
-| 9E69 | unknown |  | 209B0 |
+| 9E69 | ported | Random byte stream [19ED] over table DS:297E | 209B0 |
 | A4C2 | unknown |  | 1EF26 |
 | A673 | ported | Template open in development tree | 223B4, 22E85 |
 | A758 | partial | Allocate and initialize object record | 2323A |

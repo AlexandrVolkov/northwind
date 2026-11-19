@@ -122,7 +122,7 @@ public partial class TestRunner
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(), "AI military requests 20DD0 match original x86");
     }
 
-    private sealed class MilitaryProbe(byte[][] dat, byte[] tree, byte[] random, byte index, byte count) : IAiMilitaryWorld
+    private sealed class MilitaryProbe(byte[][] dat, byte[] tree, byte[] random, byte index, byte count) : IAiGarrisonWorld, IAiSquadStateWorld
     {
         private readonly uint[] _grid = new uint[3 * 1024];
         private readonly Dictionary<uint, (byte[], byte[])> _objects = [];
@@ -148,6 +148,14 @@ public partial class TestRunner
         public (uint X, uint Y) BoundsLimit => (0x400, 0x400);
         public bool StepFour(Span<byte> squad, bool started) => throw new NotSupportedException();
         public byte Random() => random[RandomIndex++];
+        public byte RandomIndex2, RandomIndex3;
+        public byte Random2() => random[RandomIndex2++];
+        public byte Random3() => random[RandomIndex3++];
+        public byte Global19E9 => 0xff;
+        public byte Explored(int cell) => 0xff;
+        public void Message(ReadOnlySpan<byte> squad, uint text) { }
+        public void Rescue(Span<byte> squad) { }
+        public void WorkerState(Span<byte> squad) { }
         public Span<byte> Block(byte participant) => Blocks[participant];
         public ReadOnlySpan<byte> Participant(byte participant) => Participants[participant];
         public byte ParticipantCount => count;

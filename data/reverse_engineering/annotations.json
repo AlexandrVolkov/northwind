@@ -2852,6 +2852,42 @@
       "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
       "limitations": ""
+    },
+    {
+      "id": "ai-garrison",
+      "module": "LE:1",
+      "start": 133552,
+      "end": 134608,
+      "name": "AI garrison: unit orders, building guards, hostile buildings, patrols, wandering",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-garrison.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-release-members",
+      "module": "LE:1",
+      "start": 131835,
+      "end": 131930,
+      "name": "Squad members leave up to a strength",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-garrison.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "random-third-stream",
+      "module": "LE:1",
+      "start": 40553,
+      "end": 40573,
+      "name": "Random byte stream [19ED] over table DS:297E",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-garrison.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
     }
   ]
 }
