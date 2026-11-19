@@ -1,0 +1,40 @@
+{
+  "format_version": 1,
+  "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "menu": {
+    "previous": [
+      4294967295,
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "requested": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "case_count": 42,
+    "sha256": "aa870d85ba4eb5110e85a19ca0613abe66549a9d2686e1dfff5b4f60a2f0f7f4"
+  },
+  "ambient_start": {
+    "case_count": 6,
+    "sha256": "da629f1f620286f1fd7af8da727cd77ce16301aaa2c6d73a5309d5dbf2d92457"
+  },
+  "repeat_end": {
+    "repeats": [
+      0,
+      1,
+      2,
+      3,
+      255
+    ],
+    "case_count": 5,
+    "sha256": "4af8a0994cea2f6368fc3917dd62b4741a3b0e8740d039f4f60644920a02476d"
+  }
+}

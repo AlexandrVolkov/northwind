@@ -9,6 +9,7 @@ public partial class SoundPreview : Control
     private readonly OptionButton _banks = new();
     private readonly ItemList _samples = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
     private readonly Label _info = new();
+    private readonly CheckButton _loop = new() { Text = "Повторять запись" };
     private SoundVariant[] _clips = [];
     private AudioStreamWav? _stream;
 
@@ -18,7 +19,7 @@ public partial class SoundPreview : Control
         var panel = new VBoxContainer { OffsetLeft = 20, OffsetTop = 20, OffsetRight = -20, OffsetBottom = -20 };
         panel.SetAnchorsPreset(LayoutPreset.FullRect); AddChild(panel);
         panel.AddChild(new Label { Text = "Звуки оригинала — 11025 Гц, 8 бит, моно" });
-        panel.AddChild(_banks); panel.AddChild(_samples); panel.AddChild(_info);
+        panel.AddChild(_banks); panel.AddChild(_samples); panel.AddChild(_loop); panel.AddChild(_info);
         var play = new Button { Text = "Слушать выбранный звук (или двойной щелчок)" };
         var stop = new Button { Text = "Остановить" };
         panel.AddChild(play); panel.AddChild(stop);
@@ -45,7 +46,13 @@ public partial class SoundPreview : Control
     private void Play(int index)
     {
         _player.Stop(); _player.Stream = null; _stream?.Dispose();
-        _stream = OriginalSoundBank.Stream(_clips[index]);
+        using (var original = OriginalSoundBank.Stream(_clips[index]))
+            _stream = (AudioStreamWav)original.Duplicate();
+        if (_loop.ButtonPressed)
+        {
+            _stream.LoopMode = AudioStreamWav.LoopModeEnum.Forward;
+            _stream.LoopBegin = 0; _stream.LoopEnd = _clips[index].Frames;
+        }
         _player.Stream = _stream; _player.Play();
         _info.Text = $"{_clips[index].File} — {_clips[index].Frames} отсчётов";
     }

@@ -8,6 +8,7 @@ public partial class TestRunner
 {
     private void OriginalSoundChecks()
     {
+        OriginalMusicChecks();
         using var fixture = GameData.Read<JsonDocument>("res://tests/fixtures/sound.json");
         var root = fixture.RootElement;
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
@@ -92,6 +93,18 @@ public partial class TestRunner
             }
         }
         Check(total == 166, "All 166 original FX variants are bundled");
+        var shortClip = catalog.Choose("MENU.FX", 1, 0)!;
+        using (var original = OriginalSoundBank.Stream(shortClip))
+        using (var loop = (AudioStreamWav)original.Duplicate())
+        {
+            loop.LoopMode = AudioStreamWav.LoopModeEnum.Forward;
+            loop.LoopBegin = 0; loop.LoopEnd = shortClip.Frames;
+            player.Stream = loop; player.Play();
+            await ToSignal(GetTree().CreateTimer(.1), SceneTreeTimer.SignalName.Timeout);
+            Check(player.Playing && player.GetPlaybackPosition() >= 0, "Prepared PCM loops beyond the 14 ms source duration");
+            Check(original.LoopMode == AudioStreamWav.LoopModeEnum.Disabled, "Loop preview leaves shared one-shot resource unchanged");
+            player.Stop(); player.Stream = null;
+        }
         using (var selection = OriginalSoundBank.Stream(catalog.Choose("WORK.FX", 0, 0)!))
         {
             player.Stream = selection; player.Play();
