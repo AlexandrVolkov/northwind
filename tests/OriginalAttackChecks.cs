@@ -91,5 +91,26 @@ public partial class TestRunner
             digest.AppendData(unit); count++;
         }
         Finish("swing");
+
+        using var tail = GameData.Read<JsonDocument>("res://tests/fixtures/update-tail.json");
+        var t = tail.RootElement.GetProperty("tail");
+        foreach (byte hp in Bytes(t.GetProperty("health")))
+        foreach (byte previous in Bytes(t.GetProperty("previous")))
+        foreach (byte hasTarget in Bytes(t.GetProperty("targets")))
+        foreach (var tflags in t.GetProperty("target_flags").EnumerateArray())
+        foreach (byte thp in Bytes(t.GetProperty("target_health")))
+        foreach (var flags in t.GetProperty("flags").EnumerateArray())
+        foreach (byte tick in Bytes(t.GetProperty("ticks")))
+        {
+            var unit = CombatUnit(0, 0, hp, (ushort)flags.GetInt32(), 80, 80, 1); unit[0x1a] = previous;
+            BinaryPrimitives.WriteUInt32LittleEndian(unit.AsSpan(0x1c), hasTarget != 0 ? 0x100u : 0);
+            var target = CombatUnit(0, 3, thp, (ushort)tflags.GetInt32(), 80, 80, 1);
+            OriginalCombatRules.AfterUpdate(unit, target, tick);
+            digest.AppendData(unit); count++;
+        }
+        var expected = tail.RootElement.GetProperty("results").GetProperty("tail");
+        Check(count == expected.GetProperty("case_count").GetInt32() && Convert.ToHexStringLower(digest.GetHashAndReset()) == expected.GetProperty("sha256").GetString(),
+            "Object update tail 434D..4384 matches original x86");
+        count = 0;
     }
 }

@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "cf43823e13cf69fd05dd05b24dc19084562cf7c48a1bef6df61c8988a1401e21",
+  "annotation_sha256": "8946018b02be1a2f0cb55bdee6f1aae88a04dfe40803d812987bb7f18eb0d98a",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,9 +32,9 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 5281,
-        "ported": 6360,
-        "unreviewed": 135144,
+        "partial": 5326,
+        "ported": 6415,
+        "unreviewed": 135044,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -127,7 +127,7 @@
         },
         {
           "start": 17083,
-          "end": 17166,
+          "end": 17127,
           "status": "partial",
           "classification": "code",
           "claims": [
@@ -135,11 +135,23 @@
           ]
         },
         {
+          "start": 17127,
+          "end": 17166,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "timing-42bb",
+            "update-traversal"
+          ]
+        },
+        {
           "start": 17166,
           "end": 17210,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "update-traversal"
+          ]
         },
         {
           "start": 17210,
@@ -147,11 +159,30 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "wrk-callback-dispatch"
+            "wrk-callback-dispatch",
+            "update-traversal"
           ]
         },
         {
           "start": 17228,
+          "end": 17229,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "update-traversal"
+          ]
+        },
+        {
+          "start": 17229,
+          "end": 17284,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "update-tail"
+          ]
+        },
+        {
+          "start": 17284,
           "end": 17328,
           "status": "unreviewed",
           "classification": "unknown",

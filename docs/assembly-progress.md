@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 135144 | 5281 | 97 | 6360 | 44 |
+| LE:1 | 146882 | 135044 | 5326 | 97 | 6415 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61833 | 0 | 0 | 0 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -45,7 +45,9 @@
 | LE:1 `0x418A..0x41C6` | Program PIT channel 0 to 72.8 Hz and hook INT 8 | verified | [game-timing.md](../docs/game-timing.md) | Установлено чтением инструкций; частота в схватке задана данными. |
 | LE:1 `0x41C6..0x41EB` | Timer interrupt: tick counter and chained BIOS handler | verified | [game-timing.md](../docs/game-timing.md) | Установлено чтением инструкций; частота в схватке задана данными. |
 | LE:1 `0x42BB..0x430E` | Object update gate every second world step and global tick | partial | [game-timing.md](../docs/game-timing.md) | Обход цепочек объектов по участникам не перенесён. |
+| LE:1 `0x42E7..0x434D` | Traverse settlements and object chains, dispatch AH=1 | partial | [game-timing.md](../docs/game-timing.md) | Юниты обходятся по владельцу; здания и юниты не в одной цепочке пула. |
 | LE:1 `0x433A..0x434C` | DAT to WRK callback dispatch | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждены выбор DAT[3B], AH=1 и косвенный вызов; общий цикл обновления не перенесён. |
+| LE:1 `0x434D..0x4384` | Object update tail: previous condition, stale target, periodic mark reset | ported | [combat.md](../docs/combat.md); [update-tail.json](../tests/fixtures/update-tail.json) |  |
 | LE:1 `0x43B0..0x43E5` | Occupancy rectangle coordinate preparation | ported | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Корректные размеры области и ссылки; запись вне карты отклоняется C# до изменения сетки. |
 | LE:1 `0x43E5..0x4409` | Occupancy footprint writer wrapper | ported | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Область полностью внутри карты, слои 0..2; исходное поведение вне этой области не заявляется совместимым. |
 | LE:1 `0x4409..0x4473` | Occupancy rectangle writer | ported | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Только корректные ненулевые прямоугольники внутри сетки; нативный писатель сам не проверяет границы. |
