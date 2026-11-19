@@ -54,7 +54,6 @@ public partial class TestRunner : Node
                 case "original-diplomacy": OriginalDiplomacyChecks(); break;
                 case "original-tech": OriginalTechChecks(); break;
                 case "ai-workers": OriginalAiWorkerChecks(); break;
-                case "ai-worker-probe": AiWorkerProbe(); break;
                 case "original-ai": OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); OriginalAiResearchChecks(); OriginalAiSquadChecks(); OriginalAiSquadStepChecks(); OriginalAiSquadStateChecks(); OriginalAiMilitaryChecks(); OriginalAiGarrisonChecks(); OriginalAiOrderChecks(); OriginalAiEconomyChecks(); OriginalAiWorkerChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
                 case "skirmish-ai": SkirmishAiChecks(); break;

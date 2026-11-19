@@ -258,6 +258,8 @@ public sealed partial class Skirmish
                     break;
             }
         }
+        // A walk whose route could not be planned (TickWorker set the replan delay, no route) ends there, as a soldier's does.
+        if (worker.Goal != null && worker.Route.Count == 0 && !worker.Stepping && worker.ReplanTimer > 0) worker.Goal = null;
         if (worker.MineJob) worker.Record[0x14] = 4;
         else if (worker.GatherTree != null || worker.PreferredMill != 0) worker.Record[0x14] = 3;
         else if (worker.Goal != null || worker.Route.Count > 0 || worker.Stepping) worker.Record[0x14] = 1;
