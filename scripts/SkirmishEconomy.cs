@@ -81,12 +81,12 @@ public sealed partial class Skirmish
         worker.GatherTree = null; worker.Route.Clear(); worker.JobText = "Поблизости нет леса";
         Log("Поблизости нет подходящего леса. Укажите рабочему другой участок."); return false;
     }
-    private SkirmishActor NewEconomyActor(int templateIndex, Vector2I cell, bool worker, bool soldier = false)
+    private SkirmishActor NewEconomyActor(int templateIndex, Vector2I cell, bool worker, bool soldier = false, int team = 0)
     {
         var template = _templates.Armies["ARMY__02.DAT"].Templates[templateIndex];
         var parameters = Convert.FromHexString(template.RawRecordHex);
-        var raw = worker ? Convert.FromHexString(_workerSeed.RawRecordHex) : soldier ? Convert.FromHexString(_militiaSeed.RawRecordHex).AsSpan(0, template.RuntimeRecordBytes).ToArray() : new byte[template.RuntimeRecordBytes];
-        raw[0] = 2; raw[3] = (byte)Rules.PlayerSlot; raw[0x0d] = 1; raw[0x0e] = (byte)templateIndex;
+        var raw = worker ? Convert.FromHexString(_workerSeed.RawRecordHex) : soldier ? Convert.FromHexString((_soldierSeeds.GetValueOrDefault(templateIndex) ?? _militiaSeed).RawRecordHex).AsSpan(0, template.RuntimeRecordBytes).ToArray() : new byte[template.RuntimeRecordBytes];
+        raw[0] = 2; raw[3] = (byte)(team == 0 ? Rules.PlayerSlot : Rules.EnemySlot); raw[0x0d] = 1; raw[0x0e] = (byte)templateIndex;
         raw[0x14] = 0x80; raw[0x19] = raw[0x1a] = template.InitialCondition; raw[0x20] = 0xff; // A855: visible to every owner
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(1), template.InitialFrame);
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(0x17), 0);
@@ -97,7 +97,7 @@ public sealed partial class Skirmish
         return new SkirmishActor { Source = new ObjectRecord { RuntimeReference = _nextEconomyId++, TemplateName = template.Name,
                 TemplateFile = "ARMY__02.DAT", TemplateIndex = templateIndex, RecordBytes = raw.Length,
                 RawX = BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(4)), RawY = BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(8)), RawLayer = 1 },
-            Template = template, Parameters = parameters, Record = raw, Rules = Rules.Units[template.Name], Team = 0 };
+            Template = template, Parameters = parameters, Record = raw, Rules = Rules.Units[template.Name], Team = team };
     }
     public DeliveryPoint MillEntry(Vector2I cell)
     {
@@ -191,8 +191,9 @@ public sealed partial class Skirmish
     }
     private void TickBuildings()
     {
-        foreach (var building in Actors.Where(a => a.Alive && a.Team == 0 && (a.Source.TemplateName is "Лесопилка" or "Ферма" or "Казарма" or "Шахта")))
+        foreach (var building in Actors.Where(a => a.Alive && (a.Source.TemplateName is "Лесопилка" or "Ферма" or "Казарма" or "Шахта")))
         {
+            if (building.Team != 0 && building.ConstructionRemaining <= 0) continue;   // the enemy's economy is not simulated yet
             if (building.ConstructionRemaining > 0)
             {
                 var maintenance = OriginalBuildingRules.StepMaintenance(new(building.Record[0x19], building.Record[0x16], building.Record[0x0f],
@@ -212,7 +213,8 @@ public sealed partial class Skirmish
                 var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(building.Record[0x14], building.Record[0x15], building.Record[0x0f]));
                 building.Record[0x14] = completed.EncodedState; building.Record[0x15] = completed.Auxiliary; building.Record[0x0f] = completed.WorkFlags;
                 BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(building.Template.InitialFrame + building.Parameters[0x4a]));
-                Log(building.Source.TemplateName + " готова.");
+                if (building.Team == 0) Log(building.Source.TemplateName + " готова.");
+                if (building.Team != 0) continue;
             }
             if (building.Source.TemplateName != "Лесопилка") continue;
             var state = OriginalLumbermillRules.Process(new(building.Record[0x23], building.Record[0x24], Wood, ProducedWood), building.Parameters[0x79]);

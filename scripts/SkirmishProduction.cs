@@ -5,7 +5,17 @@ namespace Northwind;
 public sealed class ProductionData
 {
     public Dictionary<int, byte> RecruitmentIntervals { get; set; } = [];
+    public Dictionary<string, ProductionTable> Tables { get; set; } = [];
+    /// <summary>Interval of a template in the producer's WRK table (castle or barracks), else the supported recruits.</summary>
+    public byte Interval(string producer, byte template)
+    {
+        string key = producer == "Казарма" ? "barracks" : "castle";
+        if (Tables.TryGetValue(key, out var table) && table.Entries.FirstOrDefault(e => e.Template == template) is { } entry) return entry.Interval;
+        return RecruitmentIntervals[template];
+    }
 }
+public sealed class ProductionTable { public List<ProductionEntry> Entries { get; set; } = []; }
+public sealed class ProductionEntry { public byte Template { get; set; } public byte Interval { get; set; } }
 
 public sealed partial class Skirmish
 {
@@ -65,23 +75,28 @@ public sealed partial class Skirmish
         SetBlocked(producer, false); Log("Очередь найма очищена. Люди текущего заказа возвращены; материалы — по исходной формуле прогресса."); return true;
     }
     private void SetBlocked(SkirmishActor producer, bool blocked)
-    { if (producer == PlayerCastle) RecruitmentBlocked = blocked; else if (blocked) _blockedBarracks.Add(producer.Id); else _blockedBarracks.Remove(producer.Id); }
+    { if (producer.Team != 0) return; if (producer == PlayerCastle) RecruitmentBlocked = blocked; else if (blocked) _blockedBarracks.Add(producer.Id); else _blockedBarracks.Remove(producer.Id); }
     private void TickProduction()
     {
         TickProduction(PlayerCastle);
         foreach (var barracks in Actors.Where(IsBarracks).ToArray()) TickProduction(barracks);
+        foreach (var producer in Actors.Where(a => a.Alive && a.Team == 1 && a.Source.TemplateName is "Замок" or "Казарма").ToArray()) TickProduction(producer);
     }
+    private ResourceQuad Wallet(int team) => team == 0 ? Resources : EnemyResources;
+    private void SetWallet(int team, ResourceQuad value) { if (team == 0) SetResources(value); else EnemyResources = value; }
     private void TickProduction(SkirmishActor producer)
     {
         if (!producer.Alive || producer.ConstructionRemaining > 0 || QueuedTemplate(producer) is not { } template) return;
         var record = producer.Record;
+        if (producer.Team != 0 && (!Rules.Units.ContainsKey(template.Name) || template.TemplateIndex == 10 || !_soldierSeeds.ContainsKey(template.TemplateIndex)))
+        { OriginalProductionRules.Complete(record); return; }   // no rules, no seed record, or a worker (the enemy economy is not simulated): dropped
         if (record[0x15] == 0)
         {
-            var payment = OriginalConstructionRules.TryDebitUpfront(Resources, Price(template));
+            var payment = OriginalConstructionRules.TryDebitUpfront(Wallet(producer.Team), Price(template));
             if (!payment.Accepted) return;
-            SetResources(payment.Balances); OriginalProductionRules.StartPaid(record); SetBlocked(producer, false); return;
+            SetWallet(producer.Team, payment.Balances); OriginalProductionRules.StartPaid(record); SetBlocked(producer, false); return;
         }
-        if (!OriginalProductionRules.Tick(record, _production.RecruitmentIntervals[record[0x22]], ProductionSpeedShift, template.InitialCondition)) return;
+        if (!OriginalProductionRules.Tick(record, _production.Interval(producer.Source.TemplateName, record[0x22]), ProductionSpeedShift, template.InitialCondition)) return;
         if (!ReleaseRecruit(producer, template)) { SetBlocked(producer, true); return; }
         OriginalProductionRules.Complete(record); SetBlocked(producer, false);
     }
@@ -90,7 +105,7 @@ public sealed partial class Skirmish
         var exit = RecruitExit(producer, template); var cell = new Vector2I((int)(exit.X >> 5), (int)(exit.Y >> 5));
         if (!Inside(cell)) return false;
         bool worker = template.TemplateIndex == 10;
-        var recruit = NewEconomyActor(template.TemplateIndex, cell, worker, !worker);
+        var recruit = NewEconomyActor(template.TemplateIndex, cell, worker, !worker, producer.Team);
         recruit.Record[0x0d] = exit.Layer;
         BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(4), exit.X);
         BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(8), exit.Y);
@@ -100,6 +115,7 @@ public sealed partial class Skirmish
         recruit.Record[0x17] |= 0x20;
         recruit.Route.Attach(_routes, recruit.Record); Actors.Add(recruit);
         Occupancy.WriteFootprint(recruit.Parameters[3], recruit.Parameters[4], exit.Layer, exit.X, exit.Y, recruit.Id);
+        if (producer.Team != 0) { EnemyRecruitLeaves(recruit); return true; }
         LastRecruitId = recruit.Id; RecountPopulation(); Log(template.Name + " готов у выхода из " + producer.Source.TemplateName + "."); return true;
     }
 }

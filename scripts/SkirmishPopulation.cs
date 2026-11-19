@@ -8,12 +8,16 @@ public sealed partial class Skirmish
     public PopulationTotals Population { get; private set; }
     private uint _populationTick;
     private ObjectRecord _militiaSeed = null!;
+    private readonly Dictionary<int, ObjectRecord> _soldierSeeds = [];
     public TemplateEntry FarmTemplate => _templates.Armies["ARMY__02.DAT"].Templates[9];
     public double? PopulationGrowthSeconds => unchecked(FreePeople + Population.Used) < Population.Limit
         ? (OriginalPopulationRules.GrowthPeriod(Population.FarmSupport) - _populationTick % OriginalPopulationRules.GrowthPeriod(Population.FarmSupport)) / (double)Rules.TicksPerSecond : null;
     private void InitializePopulation(ScenarioData scenario)
     {
         _militiaSeed = scenario.Slots.SelectMany(s => s.Objects).First(o => o.TemplateFile == "ARMY__02.DAT" && o.TemplateIndex == 0);
+        // A recruit copies a scenario object of its own template (militia, archer…); the militia record is the fallback.
+        foreach (var o in scenario.Slots.SelectMany(s => s.Objects).Where(o => o.TemplateFile == "ARMY__02.DAT"))
+            _soldierSeeds.TryAdd(o.TemplateIndex, o);
         RecountPopulation();
     }
     private void RecountPopulation()
