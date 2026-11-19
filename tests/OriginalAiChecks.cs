@@ -311,3 +311,43 @@ public partial class TestRunner
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(), "AI plan executor 23667 matches original x86");
     }
 }
+
+public partial class TestRunner
+{
+    private void OriginalAiUpkeepChecks()
+    {
+        using var reference = GameData.Read<JsonDocument>("res://tests/fixtures/ai-upkeep.json");
+        var root = reference.RootElement;
+        var templates = GameData.Read<TemplatesData>("res://assets/imported/templates.json").Armies["ARMY__02.DAT"].Templates;
+        int templateCount = root.GetProperty("template_count").GetInt32();
+        Check(templates.Length >= templateCount, $"AI upkeep templates bundled ({templates.Length})");
+        var all = templates.Take(templateCount).SelectMany(t => Convert.FromHexString(t.RawRecordHex)).ToArray();
+        Check(Convert.ToHexStringLower(SHA256.HashData(all)) == root.GetProperty("templates_sha256").GetString(), "AI upkeep templates match DAT");
+        using var digest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        int count = 0, changed = 0;
+        foreach (var c in root.GetProperty("cases").EnumerateArray())
+        {
+            var ai = new byte[OriginalAiRules.BlockSize];
+            BinaryPrimitives.WriteUInt32LittleEndian(ai.AsSpan(1), c.GetProperty("turn").GetUInt32()); ai[0x1a14] = (byte)c.GetProperty("flags").GetInt32();
+            var chain = new List<(byte[] Record, byte[] Template)>();
+            foreach (var o in c.GetProperty("objects").EnumerateArray())
+            {
+                int t = o[0].GetInt32();
+                var rec = CombatUnit((byte)t, 0, (byte)o[1].GetInt32(), 0, 48, 48, 1);
+                rec[0x0f] = (byte)o[2].GetInt32(); rec[0x14] = (byte)o[3].GetInt32(); BinaryPrimitives.WriteUInt32LittleEndian(rec.AsSpan(0x24), o[4].GetUInt32());
+                BinaryPrimitives.WriteUInt32LittleEndian(rec.AsSpan(0x10), 0x40);
+                var padded = new byte[0x40]; rec.CopyTo(padded, 0);
+                chain.Add((padded, Convert.FromHexString(templates[t].RawRecordHex)));
+            }
+            var before = chain.SelectMany(x => x.Record).ToArray();
+            OriginalAiRules.Upkeep(ai, chain);
+            var after = chain.SelectMany(x => x.Record).ToArray();
+            if (!before.SequenceEqual(after)) changed++;
+            digest.AppendData(ai.AsSpan(0, 8)); digest.AppendData(after);
+            count++;
+        }
+        var result = root.GetProperty("results").GetProperty("upkeep");
+        Check(count == result.GetProperty("case_count").GetInt32() && changed > 50, $"AI upkeep reference coverage ({count}, changed {changed})");
+        Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(), "AI upkeep 226F1 matches original x86");
+    }
+}

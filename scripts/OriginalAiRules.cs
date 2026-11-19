@@ -114,6 +114,30 @@ public static class OriginalAiRules
         return new(maxX, maxY, minX, minY);
     }
 
+    /// <summary>226F1..227C6 (step counter + 63h during the call): with +1A14 bit 2 every 128 steps living objects with
+    /// DAT[40] &amp; 4800Ch = 8 lose a point of condition; otherwise with bit 1 every 64 steps damaged buildings
+    /// (DAT[40] &amp; 28h = 8, not an empty mine, DAT[45] − condition ≥ 5 as a byte, record +0F bit 2) get +14 = (+14 &amp; 7) | 48h.</summary>
+    public static void Upkeep(ReadOnlySpan<byte> ai, IEnumerable<(byte[] Record, byte[] Template)> chain)
+    {
+        uint step = U32(ai, 1) + 0x63;
+        if ((ai[0x1a14] & 2) != 0)
+        {
+            if ((step & 0x7f) != 0) return;
+            foreach (var (record, template) in chain)
+                if ((sbyte)record[0x19] > 0 && (U32(template, 0x40) & 0x4800c) == 8) record[0x19]--;
+            return;
+        }
+        if ((ai[0x1a14] & 1) == 0 || (step & 0x3f) != 0) return;
+        foreach (var (record, template) in chain)
+        {
+            uint flags = U32(template, 0x40);
+            if ((flags & 0x28) != 8) continue;
+            if (((flags >> 8) & 0xf) == 4 && U32(record, 0x24) == 0) continue;
+            if ((byte)(template[0x45] - record[0x19]) < 5 || (record[0x0f] & 2) == 0) continue;
+            record[0x14] = (byte)((record[0x14] & 7) | 0x48);
+        }
+    }
+
     /// <summary>23B10: value DAT[76] of living objects (above DAT[46]) inside the territory +63..+66, per owner (16 dwords at F149).</summary>
     public static uint[] Threat(ReadOnlySpan<byte> ai, IEnemySearchWorld world)
     {

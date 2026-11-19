@@ -2351,6 +2351,23 @@
         "scripts/OriginalAiRules.cs"
       ],
       "limitations": ""
+    },
+    {
+      "id": "ai-226f1",
+      "module": "LE:1",
+      "start": 141041,
+      "end": 141255,
+      "name": "AI upkeep: repair requests and decay",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-upkeep.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": ""
     }
   ]
 }
