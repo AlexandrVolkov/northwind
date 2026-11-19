@@ -205,6 +205,8 @@ def main():
     args = parser.parse_args()
     code, data = load(args.game)
     lo, hi = int(args.start, 16), int(args.end, 16); roots = [int(r, 16) for r in args.root]
+    outside = [r for r in roots if not lo <= r < hi]
+    if outside: print('warning: roots outside --start..--end are not expanded: ' + ', '.join(f'{r:X}' for r in outside))
     functions = discover(code, data, roots, lo, hi)
     regions = annotations()
     info = {}
