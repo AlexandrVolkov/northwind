@@ -2600,6 +2600,54 @@
       "evidence": ["docs/ai.md", "tests/fixtures/ai-squads.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
       "limitations": "the order primitives write the OBE command fields only; their execution by WRK is a separate system"
+    },
+    {
+      "id": "ai-squad-steps",
+      "module": "LE:1",
+      "start": 126246,
+      "end": 126758,
+      "name": "AI squad step loop and steps 0..3",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-steps.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "step 4 (1EF26) is a hook"
+    },
+    {
+      "id": "ai-squad-step-march",
+      "module": "LE:1",
+      "start": 126924,
+      "end": 126969,
+      "name": "AI squad step 5: formation march",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-steps.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-enemy-search",
+      "module": "LE:1",
+      "start": 132104,
+      "end": 132603,
+      "name": "Nearest visible hostile object in a cell area",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-steps.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "object visibility OBE[20] is not maintained by the skirmish yet"
+    },
+    {
+      "id": "ai-squad-hold-area",
+      "module": "LE:1",
+      "start": 133067,
+      "end": 133244,
+      "name": "Squad stands; members outside the area return",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-steps.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
     }
   ]
 }

@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 128166 | 5512 | 97 | 13107 | 44 |
+| LE:1 | 146882 | 126933 | 5512 | 97 | 14340 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -158,8 +158,12 @@
 | LE:1 `0x1EB33..0x1EB40` | Clear AI plan list | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
 | LE:1 `0x1EB40..0x1EB68` | Find or add AI plan | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
 | LE:1 `0x1ECA0..0x1ECF8` | First living object of a DAT class | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) | inlined for mask 38h value 0 |
+| LE:1 `0x1ED26..0x1EF26` | AI squad step loop and steps 0..3 | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) | step 4 (1EF26) is a hook |
+| LE:1 `0x1EFCC..0x1EFF9` | AI squad step 5: formation march | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) |  |
 | LE:1 `0x20095..0x2029F` | AI squad registry: numbers, create, remove, disband, transfer, lookups | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) | on overflow 200B5 releases pool byte «participant» instead of the new number, as in the original |
+| LE:1 `0x20408..0x205FB` | Nearest visible hostile object in a cell area | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) | object visibility OBE[20] is not maintained by the skirmish yet |
 | LE:1 `0x205FB..0x206D5` | AI squad census from its members | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) |  |
+| LE:1 `0x207CB..0x2087C` | Squad stands; members outside the area return | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) |  |
 | LE:1 `0x2098B..0x209B0` | Find AI squad by state and target object | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) |  |
 | LE:1 `0x21459..0x21490` | Set mutual war bits | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0x219C3..0x21A00` | Clip a centred area to the map | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
