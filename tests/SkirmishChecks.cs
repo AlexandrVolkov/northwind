@@ -85,7 +85,10 @@ public partial class TestRunner
         using (var battle = CreateSkirmish())
         {
             uint[] ids = battle.Actors.Where(a => a.Team == 0 && !a.Structure).Select(a => a.Id).ToArray();
-            Check(battle.Attack(ids, battle.Objective.Id), "Attack order accepts a distant enemy building and plans an approach");
+            Check(!battle.AtWar(battle.Hero, battle.Objective) && !battle.Attack(ids, battle.Objective.Id),
+                "Settlements start without war; the first attack order on them only warns (4F04)");
+            Check(battle.Attack(ids, battle.Objective.Id) && battle.AtWar(battle.Hero, battle.Objective),
+                "Repeating the order declares war (message 5, F000) and plans an approach");
             // Up to 12 minutes of game time (about 13 100 object updates at the original 18.2 per second).
             for (int i = 0; i < 7200 && battle.Outcome == ""; i++)
             {
@@ -128,9 +131,14 @@ public partial class TestRunner
         scene.FocusObjective();
         for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         var targetPoint = scene.GetViewport().GetCanvasTransform() * (scene.Battle.Objective.Position - new Vector2(0, 70));
-        Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Right, Pressed = true, Position = targetPoint });
-        Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Right, Pressed = false, Position = targetPoint });
-        await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        // Without war the first right-click only warns (4F04); the repeated order declares war.
+        for (int click = 0; click < 2; click++)
+        {
+            Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Right, Pressed = true, Position = targetPoint });
+            Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Right, Pressed = false, Position = targetPoint });
+            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            if (click == 0) Check(scene.Selection.All(id => scene.Battle.Find(id)?.Target == 0), "First right-click on a settlement not at war only warns");
+        }
         Check(scene.Selection.All(id => scene.Battle.Find(id)?.Target == scene.Battle.Objective.Id), "World right-click targets the enemy castle for the selected army");
         scene.TogglePause(); double elapsed = scene.Battle.Elapsed; scene._Process(1);
         Check(scene.Battle.Paused && scene.Battle.Elapsed == elapsed, "Scene pause button stops the realtime loop");

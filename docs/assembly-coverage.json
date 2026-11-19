@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "8946018b02be1a2f0cb55bdee6f1aae88a04dfe40803d812987bb7f18eb0d98a",
+  "annotation_sha256": "8a4438203f56f516cab26e70a4ba117c4c75b2e60b132b22efd8ee4c88aa10ac",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 5326,
-        "ported": 6415,
-        "unreviewed": 135044,
+        "ported": 7082,
+        "unreviewed": 134377,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -1214,6 +1214,95 @@
         },
         {
           "start": 55877,
+          "end": 60885,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 60885,
+          "end": 60984,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "diplomacy-edd5"
+          ]
+        },
+        {
+          "start": 60984,
+          "end": 61033,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 61033,
+          "end": 61074,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "diplomacy-ee69"
+          ]
+        },
+        {
+          "start": 61074,
+          "end": 61178,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 61178,
+          "end": 61247,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "diplomacy-eefa"
+          ]
+        },
+        {
+          "start": 61247,
+          "end": 61438,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "diplomacy-ef3f"
+          ]
+        },
+        {
+          "start": 61438,
+          "end": 61440,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 61440,
+          "end": 61554,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "diplomacy-f000"
+          ]
+        },
+        {
+          "start": 61554,
+          "end": 62032,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 62032,
+          "end": 62091,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "diplomacy-f250"
+          ]
+        },
+        {
+          "start": 62091,
           "end": 73392,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1271,6 +1360,22 @@
         },
         {
           "start": 74917,
+          "end": 136281,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 136281,
+          "end": 136336,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "diplomacy-21459"
+          ]
+        },
+        {
+          "start": 136336,
           "end": 137667,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1287,6 +1392,22 @@
         },
         {
           "start": 137728,
+          "end": 146030,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 146030,
+          "end": 146069,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "diplomacy-23a6e"
+          ]
+        },
+        {
+          "start": 146069,
           "end": 146882,
           "status": "unreviewed",
           "classification": "unknown",

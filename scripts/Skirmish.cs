@@ -123,6 +123,7 @@ public sealed partial class Skirmish : IDisposable
         foreach (var actor in Actors.Where(a => !a.Structure)) actor.Route.Attach(_routes, actor.Record);
         InitializeEconomy(scenario, templates);
         InitializePopulation(scenario);
+        InitializeDiplomacy(scenario);
         InitializeProduction();
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
     }
@@ -265,12 +266,47 @@ public sealed partial class Skirmish : IDisposable
     }
     public bool Attack(IEnumerable<uint> ids, uint targetId)
     {
-        if (Paused || Outcome != "" || Find(targetId) is not { Team: 1 }) return false;
+        if (Paused || Outcome != "" || Find(targetId) is not { Team: 1 } foe) return false;
+        if (ids.Distinct().Select(Find).OfType<SkirmishActor>().Any(a => a.Team == 0 && !a.Structure && !a.Worker) && !DeclareWarByOrder(foe)) return false;
         bool accepted = false;
         foreach (var actor in ids.Distinct().Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && !a.Structure && !a.Worker))
         { actor.Target = targetId; actor.Goal = null; actor.Route.Clear(); actor.ReplanTimer = 0; accepted = true; }
         if (accepted) Log($"Атаковать: {Find(targetId)!.Source.TemplateName}. Отряды сами сблизятся.");
         return accepted;
+    }
+    /// <summary>Settlement relations, war masks and message queues (docs/diplomacy.md).</summary>
+    public DiplomacyState Diplomacy { get; private set; } = new(8);
+    private OriginalDiplomacyRules _diplomacyRules = null!;
+    private uint _warWarning;
+    public bool AtWar(SkirmishActor a, SkirmishActor b) => Diplomacy.AtWar(a.Record[3], b.Record[3]);
+    private void InitializeDiplomacy(ScenarioData scenario)
+    {
+        Diplomacy = new DiplomacyState(8);
+        // 2EF1/2F60: participant +12 from SCN +0F and relations +B9 from SCN +3A (all zero on the first map).
+        foreach (var slot in scenario.Slots.Where(s => s.SlotIndex < 8))
+        {
+            var raw = Convert.FromHexString(slot.RawRecordHex);
+            Diplomacy.Hostile[slot.SlotIndex] = BitConverter.ToUInt32(raw, 0x0f);
+            for (int q = 0; q < 8; q++) Diplomacy.Relations[slot.SlotIndex, q] = raw[0x3a + q];
+        }
+        _diplomacyRules = new OriginalDiplomacyRules(GameData.Read<OriginalDiplomacyData>("res://data/original_diplomacy.json"));
+    }
+    /// <summary>4F04..4F3B: an attack order on another settlement that is not at war first warns, a repeated order on the same
+    /// object sends message 5 «Объявляю тебе войну» (F000 sets war both ways and lets third parties react).</summary>
+    private bool DeclareWarByOrder(SkirmishActor foe)
+    {
+        byte me = (byte)Rules.PlayerSlot, them = foe.Record[3];
+        if (Diplomacy.AtWar(me, them)) return true;
+        if (_warWarning != foe.Id)
+        {
+            _warWarning = foe.Id;
+            Log("Этот народ с вами не воюет. Повторите приказ атаки, чтобы объявить войну.");
+            return false;
+        }
+        Diplomacy.Time = (uint)(Elapsed * 72.8165);
+        _diplomacyRules.Send(Diplomacy, 5, them, me, them, 0);
+        Log("Вы объявили войну.");
+        return Diplomacy.AtWar(me, them);
     }
     public void Stop(IEnumerable<uint> ids)
     {
@@ -334,7 +370,7 @@ public sealed partial class Skirmish : IDisposable
                 if ((idle && (actor.Record[0x2e] & 7) == 0) || struck)
                 {
                     if (struck) actor.Record[0x17] &= 0xfd;
-                    var found = OriginalTargetRules.FindEnemy(actor.Id, actor.Record, actor.Parameters, struck, _searchWorld ??= new(this));
+                    var found = OriginalTargetRules.FindEnemy(actor.Id, actor.Record, actor.Parameters, struck, new SearchWorld(this, actor.Record[3]));
                     target = Find(found.Target);
                     if (target != null) { actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); }
                 }
@@ -516,9 +552,8 @@ public sealed partial class Skirmish : IDisposable
         return false;
     }
     private VitalsWorld? _vitalsWorld;
-    private SearchWorld? _searchWorld;
-    /// <summary>World inputs of D895. Bridge: contact (+B9) and hostility (+12) — the scenario starts with neither; the diplomacy events (EDD5) are not ported.</summary>
-    private sealed class SearchWorld(Skirmish battle) : IEnemySearchWorld
+    /// <summary>World inputs of D895 for one searching settlement: war mask and relations from the diplomacy state.</summary>
+    private sealed class SearchWorld(Skirmish battle, byte owner) : IEnemySearchWorld
     {
         public byte MapWidth => (byte)battle.Map.Width;
         public byte MapHeight => (byte)battle.Map.Height;
@@ -530,14 +565,22 @@ public sealed partial class Skirmish : IDisposable
             if (battle._sourceMovementObjects.TryGetValue(reference, out var source)) return (source.Record, source.Template);
             var none = new byte[54]; none[0x19] = 0x80; return (none, new byte[171]);
         }
-        public uint HostileMask => (1u << battle.Rules.PlayerSlot) | (1u << battle.Rules.EnemySlot);
-        public bool Contact(byte owner) => true;
+        public uint HostileMask => owner < battle.Diplomacy.Count ? battle.Diplomacy.Hostile[owner] : 0;
+        public bool Contact(byte their) => owner < battle.Diplomacy.Count && their < 16 && battle.Diplomacy.Relations[owner, their] != 0;
         public byte TerrainClass(ReadOnlySpan<byte> record)
         {
             int index = (int)(BinaryPrimitives.ReadUInt32LittleEndian(record[8..]) >> 5) * battle.Map.Width + (int)(BinaryPrimitives.ReadUInt32LittleEndian(record[4..]) >> 5);
             return (byte)(battle._properties[(int)(battle.Map.Cells[index] & 0xffff) * 8] & 7);
         }
-        public void Contacted(FirstContact contact) { }
+        public void Contacted(FirstContact contact)
+        {
+            if (contact.Owner >= battle.Diplomacy.Count || contact.TheirOwner >= battle.Diplomacy.Count) return;
+            battle.Diplomacy.Time = (uint)(battle.Elapsed * 72.8165);
+            // D98F..D997: message 3 to the searcher's own queue; F250 marks contact both ways.
+            battle._diplomacyRules.Send(battle.Diplomacy, 3, contact.Owner, contact.Owner, contact.TheirOwner,
+                ((uint)contact.TheirOwner << 16) | ((uint)contact.CellY << 8) | contact.CellX);
+            if (contact.Owner == battle.Rules.PlayerSlot || contact.TheirOwner == battle.Rules.PlayerSlot) battle.Log("Обнаружен неизвестный народ!");
+        }
     }
     private sealed class VitalsWorld(Skirmish battle) : IVitalsWorld
     {

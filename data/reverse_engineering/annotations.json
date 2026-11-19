@@ -1965,6 +1965,150 @@
         "scripts/Skirmish.cs"
       ],
       "limitations": "Юниты обходятся по владельцу; здания и юниты не в одной цепочке пула."
+    },
+    {
+      "id": "diplomacy-edd5",
+      "module": "LE:1",
+      "start": 60885,
+      "end": 60984,
+      "name": "Queue and dispatch a message",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/diplomacy.md",
+        "tests/fixtures/diplomacy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalDiplomacyRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "diplomacy-ee69",
+      "module": "LE:1",
+      "start": 61033,
+      "end": 61074,
+      "name": "Find a queued message by type and party",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/diplomacy.md",
+        "tests/fixtures/diplomacy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalDiplomacyRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "diplomacy-f250",
+      "module": "LE:1",
+      "start": 62032,
+      "end": 62091,
+      "name": "First contact, mutual",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/diplomacy.md",
+        "tests/fixtures/diplomacy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalDiplomacyRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "diplomacy-f000",
+      "module": "LE:1",
+      "start": 61440,
+      "end": 61554,
+      "name": "War declaration with reputation and reactions",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/diplomacy.md",
+        "tests/fixtures/diplomacy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalDiplomacyRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "diplomacy-eefa",
+      "module": "LE:1",
+      "start": 61178,
+      "end": 61247,
+      "name": "Drop messages between two settlements",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/diplomacy.md",
+        "tests/fixtures/diplomacy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalDiplomacyRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "diplomacy-ef3f",
+      "module": "LE:1",
+      "start": 61247,
+      "end": 61438,
+      "name": "Third-party reactions with deferred re-entry",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/diplomacy.md",
+        "tests/fixtures/diplomacy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalDiplomacyRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "diplomacy-21459",
+      "module": "LE:1",
+      "start": 136281,
+      "end": 136336,
+      "name": "Set mutual war bits",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/diplomacy.md",
+        "tests/fixtures/diplomacy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalDiplomacyRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "diplomacy-23a6e",
+      "module": "LE:1",
+      "start": 146030,
+      "end": 146069,
+      "name": "Set mutual relation",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/diplomacy.md",
+        "tests/fixtures/diplomacy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalDiplomacyRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": ""
     }
   ]
 }
