@@ -19,6 +19,7 @@ public partial class TestRunner : Node
             {
                 case "scene": await SceneChecks(); break;
                 case "hud": await HudChecks(); break;
+                case "pause": await PauseChecks(); break;
                 case "skirmish": await SkirmishChecks(); break;
                 case "original-route-search": OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); break;
                 case "original-route-pool": OriginalRoutePoolChecks(); PackedRouteIntegrationChecks(); break;

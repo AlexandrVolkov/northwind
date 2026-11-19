@@ -54,9 +54,13 @@ public partial class OriginalHud : Node2D
         _font.Draw(this, new Vector2(CounterX[1], 0), b.Gold.ToString());
         _font.Draw(this, new Vector2(CounterX[2], 0), b.Wood.ToString());
         _red.Draw(this, new Vector2(CounterX[3], 0), b.FreePeople.ToString());
-        if (MenuOpen) { DrawTexture(_menuPanel, new Vector2(464, 0)); return; }
-        DrawMinimap();
-        DrawSelection();
+        if (MenuOpen) DrawTexture(_menuPanel, new Vector2(464, 0));
+        else { DrawMinimap(); DrawSelection(); }
+        if (b.Paused)
+        {
+            DrawRect(new Rect2(161, 224, 158, 24), new Color(0, 0, 0, .85f));
+            _font.Draw(this, new Vector2(169, 228), "ПАУЗА (Esc)");
+        }
     }
 
     private void DrawMinimap()
@@ -167,6 +171,7 @@ public partial class OriginalHud : Node2D
     /// <summary>Handles a click in screen coordinates of the 640×480 frame; returns true when the interface consumed it.</summary>
     public bool Click(Vector2 point, MouseButton button)
     {
+        if (Game.Battle.Paused) return true;
         if (MapWindow.HasPoint(point)) return false;
         if (button != MouseButton.Left) return true;
         if (MenuOpen)

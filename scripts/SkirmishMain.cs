@@ -133,7 +133,14 @@ public partial class SkirmishMain : Node2D
         if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
         PlacingMill = true; PlacingFarm = PlacingBarracks = PlacingMine = false; RefreshUi();
     }
-    public void TogglePause() { if (!_ready || Battle.Outcome != "") return; Battle.Paused = !Battle.Paused; RefreshUi(); }
+    private Vector2 _pausePointer;
+    public void TogglePause()
+    {
+        if (!_ready || Battle.Outcome != "") return;
+        Battle.Paused = !Battle.Paused;
+        if (Battle.Paused) { _drag = _pan = false; _pausePointer = GetViewport().GetMousePosition(); }
+        RefreshUi(); Hud.QueueRedraw();
+    }
     public void ChangeSpeed() { Speed = Speed == 1 ? 2 : Speed == 2 ? 4 : 1; RefreshUi(); }
     public void FocusHero() => Focus(Battle.Hero.Position - new Vector2(0, 100));
     public void FocusObjective()
@@ -214,6 +221,7 @@ public partial class SkirmishMain : Node2D
     {
         if (!_ready) return;
         Layout();
+        if (Battle.Paused) { RefreshUi(); QueueRedraw(); _markers.QueueRedraw(); Hud.QueueRedraw(); return; }
         Battle.Advance(delta * Speed); RefreshTerrain();
         Selection.RemoveWhere(id => Battle.Find(id) == null);
         Vector2 direction = Vector2.Zero;
@@ -244,6 +252,13 @@ public partial class SkirmishMain : Node2D
     public override void _Input(InputEvent e)
     {
         if (!_ready) return;
+        if (Battle.Paused)
+        {
+            if (e is InputEventMouseMotion motion && DisplayServer.GetName() != "headless"
+                && GetViewportRect().HasPoint(motion.Position) && motion.Position.DistanceSquaredTo(_pausePointer) > 1)
+                Input.WarpMouse(_pausePointer);
+            return;
+        }
         // Release a drag even when the pointer finishes over a UI control.
         if (e is InputEventMouseButton { ButtonIndex: MouseButton.Middle, Pressed: false }) _pan = false;
         if (_drag && e is InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: false } button)
@@ -268,6 +283,11 @@ public partial class SkirmishMain : Node2D
     public override void _UnhandledInput(InputEvent e)
     {
         if (!_ready) return;
+        if (Battle.Paused)
+        {
+            if (e is InputEventKey { Pressed: true, Echo: false } resume && resume.PhysicalKeycode is Key.Escape or Key.Space) TogglePause();
+            return;
+        }
         if (e is InputEventKey { Pressed: true, Echo: false } key)
         {
             if (!key.CtrlPressed && !key.AltPressed && !key.MetaPressed && !key.ShiftPressed && Hud.Hotkey(key.PhysicalKeycode)) return;
@@ -523,7 +543,7 @@ public partial class SkirmishMain : Node2D
     private void RefreshUi()
     {
         if (Battle == null) return;
-        _status.Text = Battle.Outcome != "" ? Battle.Outcome + "\nR — повторить" : Battle.Paused ? "ПАУЗА · Пробел — продолжить" :
+        _status.Text = Battle.Outcome != "" ? Battle.Outcome + "\nR — повторить" : Battle.Paused ? "ПАУЗА · Esc — продолжить" :
             !Battle.Objective.Standing ? $"Замок разрушен\nОсталось защитников: {Battle.Actors.Count(a => a.Team == 1 && !a.Structure && a.Alive)} · T — найти" :
             $"Время {TimeSpan.FromSeconds(Battle.Elapsed):mm\\:ss} · ×{Speed}";
         var units = Selection.Select(Battle.Find).OfType<SkirmishActor>().ToArray();
