@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "ca833fba4fd79ee4d94f0210c91825bb213d537d9e93703a9b18abf4b6dfa746",
+  "annotation_sha256": "b05b85be9f4b227bd5027c5c8288828032e2133c07914f2e5957fd68e4af5a25",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,9 +32,9 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 5512,
-        "ported": 24954,
-        "unreviewed": 116319,
+        "partial": 6314,
+        "ported": 25143,
+        "unreviewed": 115328,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -474,6 +474,15 @@
         },
         {
           "start": 33086,
+          "end": 33241,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "exploration-reveal"
+          ]
+        },
+        {
+          "start": 33241,
           "end": 33319,
           "status": "unreviewed",
           "classification": "unknown",
@@ -874,10 +883,19 @@
         },
         {
           "start": 40573,
-          "end": 41227,
+          "end": 40760,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 40760,
+          "end": 41227,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "fog-corner-selection"
+          ]
         },
         {
           "start": 41227,
@@ -890,6 +908,15 @@
         },
         {
           "start": 41425,
+          "end": 41760,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "exploration-minimap"
+          ]
+        },
+        {
+          "start": 41760,
           "end": 42207,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1517,6 +1544,22 @@
         },
         {
           "start": 73446,
+          "end": 74176,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 74176,
+          "end": 74210,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "scenario-reveal-map"
+          ]
+        },
+        {
+          "start": 74210,
           "end": 74707,
           "status": "unreviewed",
           "classification": "unknown",

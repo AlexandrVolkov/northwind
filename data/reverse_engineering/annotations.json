@@ -2948,6 +2948,74 @@
       "evidence": ["docs/ai.md", "tests/fixtures/ai-orders.json", "data/original_producers.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
       "limitations": ""
+    },
+    {
+      "id": "exploration-reveal",
+      "module": "LE:1",
+      "start": 33086,
+      "end": 33241,
+      "name": "Reveal a clipped square by persistent owner-bit clearing",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/fog-of-war.md",
+        "tests/fixtures/visibility.json"
+      ],
+      "implementation": [
+        "scripts/OriginalVisibilityRules.cs"
+      ],
+      "limitations": "4032 случаев, исходный 6885 исполняется. Без повреждающих память переполнений геометрии; C# явно отвергает их. OBE[20] и интеграция в мир не входят."
+    },
+    {
+      "id": "scenario-reveal-map",
+      "module": "LE:1",
+      "start": 74176,
+      "end": 74210,
+      "name": "Scenario whole-map exploration writer",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/fog-of-war.md",
+        "tests/fixtures/visibility.json"
+      ],
+      "implementation": [
+        "scripts/OriginalVisibilityRules.cs"
+      ],
+      "limitations": "Вход после успешного 124D8, исходное поведение SHL FE сохранено для 256 владельцев; сценарный диспетчер не входит."
+    },
+    {
+      "id": "fog-corner-selection",
+      "module": "LE:1",
+      "start": 40760,
+      "end": 41227,
+      "name": "Fog viewport scratch and weighted corner shading",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/fog-of-war.md",
+        "tests/fixtures/visibility.json"
+      ],
+      "implementation": [
+        "scripts/OriginalVisibilityRules.cs"
+      ],
+      "limitations": "Сверены 16384 маски углов и 28 номеров WORK; копирование viewport scratch и цветовые пиксели пока не перенесены."
+    },
+    {
+      "id": "exploration-minimap",
+      "module": "LE:1",
+      "start": 41425,
+      "end": 41760,
+      "name": "Explored minimap pixels and camera outline",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/fog-of-war.md",
+        "tests/fixtures/visibility.json"
+      ],
+      "implementation": [
+        "scripts/OriginalVisibilityRules.cs"
+      ],
+      "limitations": "60 полных native framebuffer совпали с C#. Расписание перерисовки 1C4E/1C60, dirty-учёт и DOS-адреса не входят; 3EEA заглушён."
     }
   ]
 }

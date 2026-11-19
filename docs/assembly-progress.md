@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 116319 | 5512 | 97 | 24954 | 44 |
+| LE:1 | 146882 | 115328 | 6314 | 97 | 25143 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -71,6 +71,7 @@
 | LE:1 `0x802C..0x809D` | Allocate and pack owner route block | ported | [native-route-storage.md](../docs/native-route-storage.md); [route-pool.json](../tests/fixtures/route-pool.json) | Выделение, упаковка, старое содержимое последнего полубайта и полный пул; вызывающая сторона отвечает за освобождение прежней ссылки. Адаптер ограничивает вход 125 шагами. |
 | LE:1 `0x809D..0x8120` | Movement wait and contact handling | partial | [native-route-storage.md](../docs/native-route-storage.md); [movement-admission.json](../tests/fixtures/movement-admission.json) | Исходные ветви ожидания, разрушения контакта, повторного поиска и резервирования ещё не перенесены целиком; поведение прототипа не является доказательством этих ветвей. |
 | LE:1 `0x8120..0x813E` | Release packed route block | ported | [native-route-storage.md](../docs/native-route-storage.md); [route-pool.json](../tests/fixtures/route-pool.json) | Только действительный курсор пути либо FFFFFFFF; поле +28 используется другими состояниями рабочего, поэтому адаптер освобождает только свою живую аренду. |
+| LE:1 `0x813E..0x81D9` | Reveal a clipped square by persistent owner-bit clearing | ported | [fog-of-war.md](../docs/fog-of-war.md); [visibility.json](../tests/fixtures/visibility.json) | 4032 случаев, исходный 6885 исполняется. Без повреждающих память переполнений геометрии; C# явно отвергает их. OBE[20] и интеграция в мир не входят. |
 | LE:1 `0x8227..0x824F` | Worker action dispatcher | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md) | Статически установлены чтение адреса встроенной таблицы, шестисловный пропуск возврата и выбор по действию; полный диспетчер с обработчиками не перенесён. |
 | LE:1 `0x8542..0x8554` | Initialize worker harvest counter | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Изолированная подготовка счётчика; переход увеличения действия 84E1 учитывается отдельно реализацией, координаты цели принадлежат вызывающей стороне. |
 | LE:1 `0x8585..0x85CC` | Worker strike requests and timber-load counter | partial | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Проверены ожидание/запрос взмаха и завершение младшего счётчика. Нужны внешние 8AF4/8C89, завершение анимации и вызовы изменения леса/выдачи груза; весь внешний автомат рабочего не перенесён. |
@@ -101,7 +102,9 @@
 | LE:1 `0x9B86..0x9BF9` | Gap between object footprints | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Сохранены байтовые сдвиги размеров и u32-переполнения; игровое использование включает лишь проверенные ветви подхода. |
 | LE:1 `0x9E41..0x9E69` | Random byte streams [19EB]/[19EC] over table DS:297E | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | third stream 9E69 ([19ED]) is not covered |
 | LE:1 `0x9E69..0x9E7D` | Random byte stream [19ED] over table DS:297E | ported | [ai.md](../docs/ai.md); [ai-garrison.json](../tests/fixtures/ai-garrison.json) |  |
+| LE:1 `0x9F38..0xA10B` | Fog viewport scratch and weighted corner shading | partial | [fog-of-war.md](../docs/fog-of-war.md); [visibility.json](../tests/fixtures/visibility.json) | Сверены 16384 маски углов и 28 номеров WORK; копирование viewport scratch и цветовые пиксели пока не перенесены. |
 | LE:1 `0xA10B..0xA1D1` | Game speed gate and slow-tick flags | partial | [game-timing.md](../docs/game-timing.md) | Перенесены частота и шаг по умолчанию; клавиши смены скорости и флаги [19E7] не подключены. |
+| LE:1 `0xA1D1..0xA320` | Explored minimap pixels and camera outline | partial | [fog-of-war.md](../docs/fog-of-war.md); [visibility.json](../tests/fixtures/visibility.json) | 60 полных native framebuffer совпали с C#. Расписание перерисовки 1C4E/1C60, dirty-учёт и DOS-адреса не входят; 3EEA заглушён. |
 | LE:1 `0xA4DF..0xA5B8` | Death frames by hit kind, corpse object and removal | ported | [combat.md](../docs/combat.md); [death.json](../tests/fixtures/death.json) | Объект-труп (9727) и удаление 98DB исполняет мост схватки. |
 | LE:1 `0xA5B8..0xA5F4` | Sixteen-way missile direction frame | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) |  |
 | LE:1 `0xA673..0xA6AE` | Template open in development tree | ported | [tech.md](../docs/tech.md); [tech.json](../tests/fixtures/tech.json); [original_tech.json](../data/original_tech.json) |  |
@@ -153,6 +156,7 @@
 | LE:1 `0xF250..0xF28B` | First contact, mutual | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0x11EB0..0x11ECB` | Goods code 1: +100 gold and statistics | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Только AH=2. |
 | LE:1 `0x11ECB..0x11EE6` | Goods code 2: +100 metal and statistics | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Только AH=2. |
+| LE:1 `0x121C0..0x121E2` | Scenario whole-map exploration writer | ported | [fog-of-war.md](../docs/fog-of-war.md); [visibility.json](../tests/fixtures/visibility.json) | Вход после успешного 124D8, исходное поведение SHL FE сохранено для 256 владельцев; сценарный диспетчер не входит. |
 | LE:1 `0x123D3..0x12404` | Grant timber through worker callback | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Живой рабочий, флаг 20000, пустой груз и AL=3. Другие грузы, непустой груз и все WRK-получатели не перенесены. |
 | LE:1 `0x1243A..0x124A5` | Goods handler dispatch and item slots | partial | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Перенесены коды 0..2. Слоты +CD, UI/звук для локального игрока (5593/A4A9) не перенесены. |
 | LE:1 `0x1E53A..0x1E6C2` | AI block initialisation from character table | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
