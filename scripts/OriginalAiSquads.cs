@@ -398,7 +398,7 @@ public static class OriginalAiSquadSteps
     }
 }
 
-/// <summary>World of the squad states (1F078): random streams 9E41/9E55, the explored-cells map [18DA], the global byte
+/// <summary>World of the squad states (1F078): random streams 9E41/9E55, the fog map [18DA], the global byte
 /// [19E9] read by state 6, and hooks for what is not ported yet: messages A4C2, the stuck-member rescue 20001 and the
 /// worker states 9 and 10.</summary>
 public interface IAiSquadStateWorld : IAiSquadWorld
@@ -406,7 +406,9 @@ public interface IAiSquadStateWorld : IAiSquadWorld
     byte Global19E9 { get; }
     byte Random();
     byte Random2();
-    byte Explored(int cell);
+    /// <summary>[18DA]: per cell, bit n set while participant n has not seen the cell (1EBEF patrols there; 22613 sites
+    /// mines only where the bit is clear).</summary>
+    byte Fog(int cell);
     /// <summary>A4C2 at the squad centre with the text id from table LE:3 F02E.</summary>
     void Message(ReadOnlySpan<byte> squad, uint text);
     void Rescue(Span<byte> squad);
@@ -957,10 +959,10 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
         if (s[5] == 0)
         {
             if ((U32(s, 0x1b) & 0x1f) != 0) return;
-            // 1EBEF: a random cell; when the participant has explored it ([18DA] bit), an area of 20×20 around it.
+            // 1EBEF: a random cell; when the participant has not seen it yet ([18DA] bit set), an area of 20×20 around it.
             byte x = (byte)(world.Random() * world.MapWidth >> 8), y = (byte)(world.Random2() * world.MapHeight >> 8);
             byte bit = (byte)(s[0] < 8 ? 1 << s[0] : 0);
-            if ((world.Explored(world.MapWidth * y + x) & bit) == 0) return;
+            if ((world.Fog(world.MapWidth * y + x) & bit) == 0) return;
             (s[0x17], s[0x18], s[0x19], s[0x1a]) = Clip(x, y, 0x14, 0x14);
             s[6] = 0; s[5] = 1;
         }
@@ -1856,5 +1858,206 @@ public sealed class OriginalAiOrders(IAiOrdersWorld world, OriginalAiMilitary mi
         public bool Contact(byte owner) => throw new NotSupportedException();
         public byte TerrainClass(ReadOnlySpan<byte> record) => throw new NotSupportedException();
         public void Contacted(FirstContact contact) => throw new NotSupportedException();
+    }
+}
+
+/// <summary>World of the AI economy (21E99, 221AE): the turn world for messages, the participant record to change, the
+/// fog map [18DA] (bit set = cell not yet seen by the participant), map tile bytes and the mine placement check D363.</summary>
+public interface IAiEconomyWorld : IAiMilitaryWorld
+{
+    byte Random2();
+    Span<byte> ParticipantRecord(byte participant);
+    /// <summary>[18DA]: bit n set while participant n has not seen the cell.</summary>
+    byte Fog(int cell);
+    /// <summary>Byte 2 of the map tile word ([18EE] + 4·cell + 2): the ore kind of the cell.</summary>
+    byte TileOre(int cell);
+    /// <summary>D363: the template may be placed at the cell (WRK AH=4 and occupancy; hook).</summary>
+    bool SiteAllowed(byte template, byte army, byte participant, byte x, byte y);
+    /// <summary>EDD5: message type, other, owner, BH, parameter.</summary>
+    void Send(byte type, byte other, byte owner, byte bh, uint parameter);
+}
+
+/// <summary>AI economy LE:1 21E99 (income, upkeep, economic requests in list +4F3, farm and building orders) and 221AE
+/// (worker squads for mines and lumbermills, mine sites, lumbermill orders). See docs/ai.md, «Экономика».</summary>
+public sealed class OriginalAiEconomy(IAiEconomyWorld world, OriginalAiMilitary military)
+{
+    public const int Economy = 0x4f3, Orders = 0x34f, Military = 0x1ab, Size = 0x15;
+    private static uint U32(ReadOnlySpan<byte> raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw[offset..]);
+    private static void W32(Span<byte> raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw[offset..], value);
+    private static void Request(Span<byte> ai, int list, byte mode, byte first, byte third, uint parameter, byte cl = 0, byte ch = 0) =>
+        OriginalAiMilitary.Request(ai, list, mode, first, third, cl, ch, 0, 0, parameter);
+
+    /// <summary>21E99 (the turn counter is +0Dh for the duration of the step).</summary>
+    public void Plan(Span<byte> ai)
+    {
+        W32(ai, 1, U32(ai, 1) + 0xd);
+        uint turn = U32(ai, 1);
+        var p = world.ParticipantRecord(ai[0]);
+        if ((turn & 0x1fff) == 0)
+        {
+            uint income = U32(p, 0x24) << 1;
+            W32(p, 0x18, U32(p, 0x18) + income); W32(p, 0x1c, U32(p, 0x1c) + income);
+            income <<= 2; W32(p, 0x20, U32(p, 0x20) + income);
+            world.Send(9, ai[0], ai[0], 0, income);
+            uint upkeep = U32(ai, 0x19ed) << 4;
+            if (U32(p, 0x20) < upkeep)
+            {
+                W32(p, 0x20, 0);
+                if ((ai[0x1a27] & 2) == 0 && U32(ai, 0x19ed) > 0x1e) W32(ai, 0x73, 0x2711);
+            }
+            else W32(p, 0x20, U32(p, 0x20) - upkeep);
+        }
+        if ((ai[0x19ff] & 1) != 0)
+        {
+            if ((turn & 0xff) == 0)
+            {
+                if ((byte)((byte)U32(ai, 0x5d) * ai[0x1b] >> 8) + 1 is var wanted && (byte)wanted > ai[0x1a00])
+                    Request(ai, Economy, 4, 0x38, 0xc8, 0);
+                if (ai[0x1a02] < ai[0x27] >> 4) Request(ai, Economy, 2, 0x39, Urgency(ai[0x1a02], U32(p, 0x20)), 1);
+                if (ai[0x1a03] < ai[0x28] >> 4) Request(ai, Economy, 2, 0x3a, Urgency(ai[0x1a03], U32(p, 0x18)), 2);
+            }
+            if ((turn & 0x1ff) == 0)
+                foreach (var (r, t) in world.Chain(ai[0]))
+                    if ((sbyte)r[0x19] > 0 && (U32(t, 0x40) & 0xf08) == 0x408 && U32(r, 0x24) != 0
+                        && OriginalAiSquads.FindByState(ai, 0x0a, world.Reference(r)) < 0)
+                        Request(ai, Economy, 3, 0x3b, 0xc0, world.Reference(r));
+            if ((turn & 0x1ff) == 0 && U32(ai, 0x4e) > U32(p, 0x2c))
+            {
+                byte urgency = (byte)((ulong)(U32(ai, 0x4e) - U32(p, 0x2c)) * 200 / U32(ai, 0x4e));
+                if (Random(ai, 0xf08, 0x108) is { } farm) Request(ai, Orders, 8, 0x3c, urgency, farm);
+            }
+            if (((turn + 0x100) & 0x1ff) == 0)
+                foreach (var (r, t) in world.Chain(ai[0]))
+                    if ((sbyte)r[0x19] > 0 && (U32(t, 0x40) & 0xf08) == 0x208 && OriginalAiSquads.FindByState(ai, 9, world.Reference(r)) < 0)
+                        Request(ai, Economy, 5, 0x3d, 0xc0, world.Reference(r));
+            if ((turn & 0x1ff) == 0 && ai[0x20] > ai[0x1a26])
+            {
+                byte urgency = (byte)((ai[0x20] - ai[0x1a26]) * 0x96 / ai[0x20]);
+                if (Random(ai, 0xf08, 0xb08) is { } building) Request(ai, Orders, 5, 0x3e, urgency, building);
+            }
+        }
+        W32(ai, 1, U32(ai, 1) - 0xd);
+    }
+
+    private static byte Urgency(byte count, uint stock) => (byte)(0x82 + (count == 0 ? 0x50 : 0) + (stock <= 0x96 ? 0x1e : 0));
+
+    /// <summary>22E46: a random open template of the class as template | army &lt;&lt; 8.</summary>
+    private uint? Random(ReadOnlySpan<byte> ai, uint mask, uint value)
+    {
+        var open = world.Buildable(ai[0], mask, value);
+        if (open.Count == 0) return null;
+        byte t = open[(world.Random() * open.Count) >> 8];
+        return (uint)(t | world.Participant(ai[0])[0] << 8);
+    }
+
+    /// <summary>221AE over list +4F3: mode 5 — workers (class F08h/300h) for a lumbermill (state 9), 3 — for a mine
+    /// (state 10), 2 — a mine site near the home on seen ore of kind +8, 4 — a lumbermill order.</summary>
+    public void Execute(Span<byte> ai)
+    {
+        if ((ai[0x19ff] & 1) == 0) return;
+        military.ClassMask = 0xf08; military.ClassValue = 0x300;
+        for (int k = 0; k < 20; k++)
+        {
+            int at = Economy + k * Size;
+            if (!Process(ai, at)) ai[at] = 0xff;
+            W32(ai, at + 0x10, U32(ai, at + 0x10) + 1);
+        }
+    }
+
+    private bool Process(Span<byte> ai, int at)
+    {
+        var r = ai.Slice(at, Size);
+        switch (r[0])
+        {
+            case 5:
+            case 3:
+                {
+                    bool lumber = r[0] == 5;
+                    uint reference = U32(r, 8);
+                    int squad = Workers(ai, lumber ? U32(ai, 0x1c) : 0x1e);
+                    if (squad >= 0)
+                    {
+                        var s = ai.Slice(squad, OriginalAiSquads.Size);
+                        W32(s, 0x0f, reference);
+                        if (lumber)
+                        {
+                            var o = world.Resolve(reference).Record;
+                            (s[0x4d], s[0x4e], s[0x4f], s[0x50]) = OriginalTargetRules.Clip((byte)(U32(o, 4) >> 5), (byte)(U32(o, 8) >> 5), 10, 10, world.MapWidth, world.MapHeight);
+                            s[0x4b] = 2; s[2] = 9; s[5] = 1; s[0x1f] = 0;   // 1F5F1
+                        }
+                        else { s[2] = 10; s[5] = 0; }                        // 1F71A
+                        return false;
+                    }
+                    var open = world.Buildable(ai[0], 0xf08, 0x300);
+                    if (open.Count == 0) return false;
+                    byte t = open[(world.Random() * open.Count) >> 8];
+                    byte capacity = world.Template(ai[0], t)[0x9d];
+                    uint quotient = (U32(ai, 0x1c) & 0xffff) / capacity;   // DIV r/m8
+                    if (quotient > 0xff) throw new OverflowException("221AE: the original faults on DIV overflow");
+                    Request(ai, Orders, 2, lumber ? (byte)0x35 : (byte)0x33, lumber ? (byte)0xc0 : (byte)0xf0, (byte)quotient, t, world.Participant(ai[0])[0]);
+                    return false;
+                }
+            case 2:
+                {
+                    if (r[2] == 0)
+                    {
+                        r[2]++;
+                        var open = world.Buildable(ai[0], 0xf08, 0x408);
+                        if (open.Count == 0) return false;
+                        r[9] = open[(world.Random() * open.Count) >> 8]; r[0x0a] = world.Participant(ai[0])[0];
+                    }
+                    if ((U32(r, 0x10) & 0x1f) != 0) return true;
+                    byte radius = (byte)(++r[0x14] + 0x0f);
+                    if (radius > 0x40)
+                    {
+                        if (r[3] > 0x80) Request(ai, Military, 0x0a, 0x32, r[3], U32(r, 8));
+                        return false;
+                    }
+                    if (Site(r[8], ai[0], ai[0x61], ai[0x62], radius) is not { } cell) return true;
+                    if (!world.SiteAllowed(r[9], r[0x0a], ai[0], cell.X, cell.Y)) return true;
+                    Request(ai, Orders, 3, 0x32, r[3], (uint)(r[9] | r[0x0a] << 8), cell.X, cell.Y);
+                    return false;
+                }
+            case 4:
+                if (Random(ai, 0xf08, 0x208) is { } mill) Request(ai, Orders, 8, 0x34, r[3], mill);
+                return false;
+            default: return false;
+        }
+    }
+
+    /// <summary>22435: a new squad takes free workers (class [ED39]/[ED3D]) until their DAT[9D] cover the wanted amount;
+    /// otherwise it is disbanded. Returns the squad offset or −1.</summary>
+    private int Workers(Span<byte> ai, uint wanted)
+    {
+        var chain = world.Chain(ai[0]);
+        int at = OriginalAiSquads.Create(ai, chain.Select(m => m.Record));
+        if (at < 0) return -1;
+        uint left = wanted;
+        foreach (var (r, t) in chain)
+        {
+            if (r[0x1b] != 0 || (U32(t, 0x40) & military.ClassMask) != military.ClassValue) continue;
+            r[0x1b] = ai[at + 1];
+            if (left <= t[0x9d]) return at;
+            left -= t[0x9d];
+        }
+        OriginalAiSquads.Disband(ai, chain.Select(m => m.Record), ai[at + 1]);
+        return -1;
+    }
+
+    /// <summary>22613: up to five random cells around the home (radius grows with the attempts) that the participant has
+    /// seen ([18DA] bit clear) and whose tile carries ore of the kind.</summary>
+    private (byte X, byte Y)? Site(byte kind, byte participant, byte x, byte y, byte radius)
+    {
+        byte bit = (byte)(participant < 8 ? 1 << participant : 0);
+        var (x0, y0, x1, y1) = OriginalTargetRules.Clip(x, y, radius, radius, world.MapWidth, world.MapHeight);
+        uint size = unchecked((uint)(x1 | y1 << 8) + 0x101 - (uint)(x0 | y0 << 8));
+        for (int tries = 5; tries > 0; tries--)
+        {
+            byte cx = (byte)(x0 + (world.Random() * (byte)size >> 8)), cy = (byte)(y0 + (world.Random2() * (byte)(size >> 8) >> 8));
+            int cell = world.MapWidth * cy + cx;
+            if ((world.Fog(cell) & bit) != 0) continue;
+            if (world.TileOre(cell) == kind) return (cx, cy);
+        }
+        return null;
     }
 }

@@ -123,7 +123,7 @@ public partial class TestRunner
         public byte Global19E9 => global;
         public byte Random() => random[RandomIndex++];
         public byte Random2() => random[RandomIndex2++];
-        public byte Explored(int cell) => explored[cell];
+        public byte Fog(int cell) => explored[cell];
         public void Message(ReadOnlySpan<byte> squad, uint text) { Log.Add(1); Log.AddRange(BitConverter.GetBytes(text)); }
         public void Rescue(Span<byte> squad) { Log.Add(2); Log.Add(squad[1]); }
         public void WorkerState(Span<byte> squad) { Log.Add(3); Log.Add(squad[1]); }

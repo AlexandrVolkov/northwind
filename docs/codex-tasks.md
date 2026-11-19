@@ -6,7 +6,7 @@
 
 ## Заняты Claude (не трогать)
 
-Сцены и код интерфейса: `scripts/OriginalHud.cs`, `scripts/OriginalInterface.cs`, `scripts/SkirmishMain.cs`, `scripts/OriginalMenus.cs`, `scripts/DisplaySettings.cs`, `scripts/GameSession.cs`, `scenes/`, `tests/MenuChecks.cs`, `tests/DisplayChecks.cs`, `tools/interface_source.py`, `assets/imported/interface/`, `docs/interface.md`, `tests/SkirmishChecks.cs`, а также `project.godot`, `AGENTS.md`, `docs/continuation.md`.
+Сцены и код интерфейса: `scripts/OriginalHud.cs`, `scripts/OriginalInterface.cs`, `scripts/SkirmishMain.cs`, `scripts/OriginalMenus.cs`, `scripts/DisplaySettings.cs`, `scripts/GameSession.cs`, `scenes/`, `tests/MenuChecks.cs`, `tests/DisplayChecks.cs`, `tools/interface_source.py`, `assets/imported/interface/`, `docs/interface.md`, `tests/SkirmishChecks.cs`, код ИИ (`scripts/OriginalAi*.cs`, `scripts/SkirmishAi.cs`, `scripts/SkirmishProduction.cs`, `tests/OriginalAi*Checks.cs`, `tools/verify_ai_*.py`, `docs/ai.md`), а также `project.godot`, `AGENTS.md`, `docs/continuation.md`.
 
 ## Принятые работы вне очереди
 
@@ -25,6 +25,8 @@
   - страница справки 6 совпала со снимком оригинала по всем пикселям.
 
   Конфликт в `tests/TestRunner.cs` (новые проверки Codex в режиме simulation и мои проверки ИИ) разрешён объединением. Подключение звука, музыки, видео, справки и крупных спрайтов к игровым экранам сделает Claude.
+
+- **Срез экономики ИИ (21E99/221AE), 19.11:** в `codex-work` нет коммитов вне main — переносить нечего.
 
 ## Задачи
 
@@ -66,6 +68,9 @@ LE:1 1AA12..1AC2B рисует окно поселения на карте по�
 
 ### C13. Таблица строёв ИИ `[3D45]` — открыта
 Шаг отряда 4 (LE:1 1EF26, см. docs/ai.md «Шаг 4 — поход в строю») берёт строй из таблицы указателей `[3D45 + 4·i]`. Записи строя: байт `+0` — вид, `+1` — флаги масштаба, слово `+12` — размер, `+16` — число мест, места по 15h байт с `+17`. Найти, кто и откуда заполняет таблицу (файл ресурсов или данные EXE), выгрузить все строи в `data/original_formations.json` конвертером `tools/formation_source.py` (с тестом), описать поля мест (смещения, слой, направление) по коду 103AF, 1037E, 1030B, 10262, 10075..101B3. Итог — `docs/formations.md`; C#-перенос шага 4 сделает Claude. Начни с графа вызовов от `1EF26` (см. [codex.md](codex.md), «Граф вызовов оригинала»).
+
+### C14. Выручка ИИ 20001 и сообщения A4C2 — открыта
+Только разведка, без C#. Разобрать LE:1 20001 (выручка/доход участника, вызывается из главного цикла ИИ) и A4C2 (очередь сообщений участника `+34`): какие поля записи участника (`0x97A + 0xF5·p`) и блока ИИ меняются, когда вызываются, какие сообщения ставятся. Итог — раздел в `docs/ai-revenue.md` с адресами и доказательствами и, если получится, сверка под Unicorn по образцу `tools/verify_ai_economy.py` (новый файл `tools/verify_ai_revenue.py` и фикстура). Граф вызовов — от `20001` и `A4C2`.
 
 ## Идеи (брать, когда очередь пуста)
 
