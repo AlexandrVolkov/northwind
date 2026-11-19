@@ -188,6 +188,10 @@ def convert(game, output):
     arrow, cell = make_atlas([spr_image(work[i], 32, 32, colour) for i in range(15)], 8)
     arrow.save(output / 'arrow_cursor.png')
     manifest['arrow_cursor'] = {'atlas': 'arrow_cursor.png', 'cell': cell, 'first_sprite': 0, 'sprites': list(range(15))}
+    # All cursor families of WORK.SPR 0..165 (scroll directions from LE:1 3FA1, other modes are not ported yet).
+    cursors, cell = make_atlas([spr_image(work[i], 32, 32, colour) for i in range(166)], 8)
+    cursors.save(output / 'work_cursors.png')
+    manifest['work_cursors'] = {'atlas': 'work_cursors.png', 'cell': cell, 'first_sprite': 0, 'sprites': list(range(166))}
     heroes, cell = make_atlas([spr_image(work[i], 64, 70, colour) for i in range(195, 227)], 8)
     heroes.save(output / 'hero_portraits.png')
     manifest['hero_portraits'] = {'atlas': 'hero_portraits.png', 'cell': cell, 'first_sprite': 195, 'source': 'WORK.SPR',

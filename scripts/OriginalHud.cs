@@ -51,7 +51,7 @@ public partial class OriginalHud : Node2D
         TextureFilter = TextureFilterEnum.Nearest;
         var data = InterfaceData.Load();
         foreach (var (index, rgb) in data.UiColors) _uiColors[index] = new Color(rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f);
-        _cursor = data.ArrowCursor;
+        _cursor = data.WorkCursors ?? data.ArrowCursor;
         if (_cursor != null)
         {
             _cursorTexture = GD.Load<Texture2D>(InterfaceData.Root + _cursor.Atlas);
@@ -71,7 +71,7 @@ public partial class OriginalHud : Node2D
         _cursorTime += Math.Max(0, delta) * OriginalCursorRules.TimerHz;
         if (!Game.Battle.Paused)
             _cursorAnimation = OriginalCursorRules.Step(_cursorAnimation, unchecked((byte)(ulong)_cursorTime),
-                (ushort)_cursor.FirstSprite, (ushort)(_cursor.FirstSprite + _cursor.Sprites.Count - 1));
+                Game.CursorFamily.First, Game.CursorFamily.Last);
         QueueRedraw();
     }
 

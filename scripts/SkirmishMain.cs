@@ -22,7 +22,10 @@ public partial class SkirmishMain : Node2D
     public OriginalHud Hud { get; } = new();
     private readonly CanvasLayer _hudLayer = new() { Layer = 2 };
     public Texture2D? MinimapTexture => _minimapTexture;
-    public int ScrollSpeed { get; private set; } = 700;
+    /// <summary>«Панорама» [908F] (1..16).</summary>
+    public byte Pan { get; private set; } = OriginalScrollRules.DefaultPan;
+    public (ushort First, ushort Last) CursorFamily { get; private set; } = OriginalScrollRules.Arrow;
+    private double _scrollTicks; private byte _scrollLast;
     public Skirmish Battle { get; private set; } = null!;
     public HashSet<uint> Selection { get; } = [];
     public Camera2D Camera { get; } = new();
@@ -191,7 +194,7 @@ public partial class SkirmishMain : Node2D
         Camera.Position = center - shift;
     }
     public void ChangeSpeed(int step) { Speed = Math.Clamp(step > 0 ? Speed * 2 : Speed / 2, .5f, 4); RefreshUi(); }
-    public void ChangeScrollSpeed(int step) => ScrollSpeed = Math.Clamp(ScrollSpeed + step * 175, 175, 1400);
+    public void ChangeScrollSpeed(int step) => Pan = OriginalScrollRules.ChangePan(Pan, step);
     /// <summary>Pending targeting: 2 move, 3 attack, 4 forestry, 8 mine; UI adapter to the supported world commands.</summary>
     public int PendingOrder { get; private set; }
     /// <summary>Use the decoded DAT mode/group pair, shared by differently drawn worker and soldier buttons.</summary>
@@ -223,18 +226,21 @@ public partial class SkirmishMain : Node2D
         };
         if (accepted) { PendingOrder = 0; _orderMark = point; _markUntil = Battle.Elapsed + 2; }
     }
-    /// <summary>Scroll the map when the pointer reaches an edge of the window or screen (port setting; the original scrolled at the
-    /// screen edge with direction cursors of WORK.SPR, the cursor change is not ported yet).</summary>
-    public bool EdgeScrolling { get; set; } = true;
-    public const float EdgeMargin = 6;
-    public static Vector2 EdgeDirection(Vector2 mouse, Vector2 size, float margin)
+    /// <summary>LE:1 3FA1 (OriginalScrollRules): whole-cell steps at the screen edge or with the arrow keys.</summary>
+    public void ScrollMap(double delta)
     {
-        if (mouse.X < 0 || mouse.Y < 0 || mouse.X > size.X || mouse.Y > size.Y) return Vector2.Zero;   // pointer outside the window
-        var d = Vector2.Zero;
-        if (mouse.X <= margin) d.X--; else if (mouse.X >= size.X - 1 - margin) d.X++;
-        if (mouse.Y <= margin) d.Y--; else if (mouse.Y >= size.Y - 1 - margin) d.Y++;
-        return d;
+        _scrollTicks += Math.Max(0, delta) * OriginalCursorRules.TimerHz;
+        bool keys = !Input.IsKeyPressed(Key.Ctrl);
+        var mouse = ToHud(GetViewport().GetMousePosition());
+        bool pointer = EdgeScrolling && DisplayServer.GetName() != "headless" && DisplayServer.WindowIsFocused();
+        var input = new ScrollInput(pointer ? Math.Clamp(mouse.X, 0, Hud.Width - 1) : Hud.Width / 2, pointer ? Math.Clamp(mouse.Y, 0, 479) : 240, Hud.Width, 480,
+            keys && Input.IsKeyPressed(Key.Left), keys && Input.IsKeyPressed(Key.Right), keys && Input.IsKeyPressed(Key.Up), keys && Input.IsKeyPressed(Key.Down));
+        var step = OriginalScrollRules.Step(input, unchecked((byte)(ulong)_scrollTicks), _scrollLast, Pan);
+        _scrollLast = step.LastTimer; CursorFamily = (step.CursorFirst, step.CursorLast);
+        if (step.Dx != 0 || step.Dy != 0) { Camera.Position += new Vector2(step.Dx, step.Dy) * 32; ClampCamera(); }
     }
+    /// <summary>Pointer scrolling at the screen edge (can be turned off for tests).</summary>
+    public bool EdgeScrolling { get; set; } = true;
     public void ExitMission() => GetTree().ChangeSceneToFile("res://scenes/main.tscn");
     public override void _Process(double delta)
     {
@@ -243,17 +249,7 @@ public partial class SkirmishMain : Node2D
         if (Battle.Paused) { RefreshUi(); QueueRedraw(); _markers.QueueRedraw(); Hud.QueueRedraw(); return; }
         Battle.Advance(delta * Speed); RefreshTerrain();
         Selection.RemoveWhere(id => Battle.Find(id) == null);
-        Vector2 direction = Vector2.Zero;
-        if (!Input.IsKeyPressed(Key.Ctrl))
-        {
-            if (Input.IsPhysicalKeyPressed(Key.A) || Input.IsPhysicalKeyPressed(Key.Left)) direction.X--;
-            if (Input.IsPhysicalKeyPressed(Key.D) || Input.IsPhysicalKeyPressed(Key.Right)) direction.X++;
-            if (Input.IsPhysicalKeyPressed(Key.W) || Input.IsPhysicalKeyPressed(Key.Up)) direction.Y--;
-            if (Input.IsPhysicalKeyPressed(Key.S) || Input.IsPhysicalKeyPressed(Key.Down)) direction.Y++;
-        }
-        if (EdgeScrolling && DisplayServer.GetName() != "headless" && DisplayServer.WindowIsFocused())
-            direction += EdgeDirection(GetViewport().GetMousePosition(), GetViewportRect().Size, EdgeMargin);
-        Camera.Position += direction.Normalized() * (float)delta * ScrollSpeed / Camera.Zoom.X; ClampCamera();
+        ScrollMap(delta);
         _hover = (int)(Battle.At(GetGlobalMousePosition())?.Id ?? 0);
         RefreshUi(); QueueRedraw(); _markers.QueueRedraw(); Hud.QueueRedraw();
     }

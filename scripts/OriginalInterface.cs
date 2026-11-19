@@ -125,6 +125,7 @@ public sealed class InterfaceData
     public int FormatVersion { get; set; }
     public InterfaceAtlas HeroPortraits { get; set; } = new();
     public InterfaceAtlas? ArrowCursor { get; set; }
+    public InterfaceAtlas? WorkCursors { get; set; }
     public Dictionary<int, int[]> UiColors { get; set; } = [];
     public List<InterfaceArmy> Armies { get; set; } = [];
     public Dictionary<string, InterfaceSpriteGroup> MenuSprites { get; set; } = [];

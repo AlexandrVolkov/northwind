@@ -5,10 +5,9 @@ public partial class TestRunner
 {
     private async Task DisplayChecks()
     {
-        Check(SkirmishMain.EdgeDirection(new Vector2(0, 300), new Vector2(1280, 720), 6) == new Vector2(-1, 0), "Left edge scrolls left");
-        Check(SkirmishMain.EdgeDirection(new Vector2(1279, 719), new Vector2(1280, 720), 6) == new Vector2(1, 1), "Bottom-right corner scrolls diagonally");
-        Check(SkirmishMain.EdgeDirection(new Vector2(640, 360), new Vector2(1280, 720), 6) == Vector2.Zero, "The middle of the screen does not scroll");
-        Check(SkirmishMain.EdgeDirection(new Vector2(-5, 300), new Vector2(1280, 720), 6) == Vector2.Zero, "A pointer outside the window does not scroll");
+        Check(OriginalScrollRules.Step(new ScrollInput(0, 300, 853, 480, false, false, false, false), 3, 0, 13).Dx == -1, "The left screen edge scrolls one cell left");
+        Check(OriginalScrollRules.Step(new ScrollInput(852, 300, 853, 480, false, false, false, false), 3, 0, 13).Dx == 1, "The right edge of a wide screen scrolls right");
+        Check(OriginalScrollRules.Step(new ScrollInput(400, 240, 853, 480, false, false, false, false), 3, 0, 13) is { Dx: 0, Dy: 0, CursorFirst: 0 }, "The middle of the screen does not scroll");
         Check(DisplaySettings.Resolutions.Length == 8 && DisplaySettings.Resolutions.Min(r => r.Y) == 720 && DisplaySettings.Resolutions.Max(r => r.X) == 3840,
             "Resolutions span 720p to 4K");
         var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
@@ -35,6 +34,18 @@ public partial class TestRunner
                 DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
                 GetViewport().GetTexture().GetImage().SavePng($"res://build/display-{size.X}x{size.Y}.png");
             }
+        }
+        if (DisplayServer.GetName() != "headless" && DisplayServer.WindowIsFocused())
+        {
+            GetTree().Root.Size = new Vector2I(1280, 720);
+            for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            scene.FocusWorld(new Vector2(2048, 2048)); var before = scene.Camera.Position;
+            Input.WarpMouse(new Vector2(0, 360));
+            for (int i = 0; i < 20; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            Check(scene.CursorFamily == OriginalScrollRules.Left && scene.Camera.Position.X < before.X, "The pointer at the left screen edge shows the left scroll cursor and scrolls");
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            GetViewport().GetTexture().GetImage().SavePng("res://build/display-scroll-left.png");
+            Input.WarpMouse(new Vector2(640, 360));
         }
         RemoveChild(scene); scene.Free();
         GetTree().Root.Size = new Vector2I(1280, 800);
