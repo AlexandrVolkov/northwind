@@ -200,6 +200,16 @@ def convert(game, output):
     manifest['menu_sprites'] = sprite_groups(spr_records((game / 'MENU.SPR').read_bytes()), MENU_GROUPS, output, lambda p: pal(p))
     manifest['campaign_sprites'] = sprite_groups(spr_records((game / 'HISTORY.SPR').read_bytes()), HISTORY_GROUPS, output, lambda p: colour)
     manifest['intro_text'], manifest['hero_names'] = exe_texts(game)
+    # Port addition: a blank button for the «Экран» entry, cut from «Пауза» of SCREENS.SCR #2 (columns 66..112 under the baked
+    # text replaced by column 60 of the same bar); the label is drawn with FONT_01.
+    panel = Image.open(output / 'panel_menu.png').convert('RGBA'); button = panel.crop((24, 402, 152, 430))
+    column = button.crop((60 - 24, 0, 61 - 24, 28))
+    for x in range(66 - 24, 113 - 24): button.paste(column, (x, 0))
+    button.save(output / 'button_blank.png')
+    manifest['button_blank'] = {'atlas': 'button_blank.png', 'size': [128, 28], 'source': 'SCREENS.SCR #2 «Пауза» without its text'}
+    window = spr_records((game / 'HISTORY.SPR').read_bytes())[51]
+    spr_image(window, 250, 200, colour).save(output / 'window_scroll.png')
+    manifest['window_scroll'] = {'atlas': 'window_scroll.png', 'size': [250, 200], 'source': 'HISTORY.SPR 51'}
     manifest['source_sha256'] = {n: hashlib.sha256((game / n).read_bytes()).hexdigest() for n in ['SCREENS.SCR', 'WORK.SPR', 'ARMY__02.SPR', 'ARMY__02.DAT', 'MENU.SPR', 'HISTORY.SPR', 'NORWIND.EXE', 'COLOR1.PAL', *FONTS]}
     (output / 'interface.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
 

@@ -5,7 +5,7 @@ namespace Northwind;
 
 /// <summary>Screen settings of the port (not part of the original game, which ran at 640×480): window resolution from 720p to 4K
 /// in 16:9 and 16:10, fullscreen, and the classic 4:3 layout. Autoload «Display»; saved in user://display.json.
-/// F11 or Alt+Enter toggles fullscreen, F9 opens the settings overlay.</summary>
+/// F11 or Alt+Enter toggles fullscreen; F9, «Экран» on the menu panel or the main menu opens <see cref="DisplaySettingsWindow"/>.</summary>
 public partial class DisplaySettings : CanvasLayer
 {
     public static readonly Vector2I[] Resolutions =
@@ -29,14 +29,19 @@ public partial class DisplaySettings : CanvasLayer
         public bool ClassicLayout { get; set; }
     }
 
-    private PanelContainer _panel = null!;
-    private Label _state = null!;
+    private DisplaySettingsWindow _window = null!;
+    public static DisplaySettings? Instance { get; private set; }
+    public static bool WindowOpen => Instance?._window.Visible == true;
+    /// <summary>Opens the settings scroll (F9, «Экран» on the menu panel or the main menu).</summary>
+    public static void Open() { if (Instance != null) Instance._window.Visible = true; }
+    public static void Close() { if (Instance != null) Instance._window.Visible = false; }
+    public static DisplaySettingsWindow? Window => Instance?._window;
 
     public override void _Ready()
     {
-        Layer = 100; ProcessMode = ProcessModeEnum.Always;
+        Layer = 100; ProcessMode = ProcessModeEnum.Always; Instance = this;
         Load();
-        BuildOverlay();
+        _window = new DisplaySettingsWindow { Visible = false }; AddChild(_window);
         if (DisplayServer.GetName() != "headless") Apply();
     }
 
@@ -90,40 +95,7 @@ public partial class DisplaySettings : CanvasLayer
     public override void _Input(InputEvent e)
     {
         if (e is not InputEventKey { Pressed: true, Echo: false } key) return;
-        if (key.Keycode == Key.F11 || (key.Keycode == Key.Enter && key.AltPressed)) { Set(fullscreen: !Fullscreen); Refresh(); GetViewport().SetInputAsHandled(); }
-        else if (key.Keycode == Key.F9) { _panel.Visible = !_panel.Visible; Refresh(); GetViewport().SetInputAsHandled(); }
-        else if (key.Keycode == Key.Escape && _panel.Visible) { _panel.Visible = false; GetViewport().SetInputAsHandled(); }
-    }
-
-    private void BuildOverlay()
-    {
-        _panel = new PanelContainer { Visible = false };
-        _panel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.Center);
-        _panel.AddThemeStyleboxOverride("panel", new StyleBoxFlat { BgColor = new Color(0.08f, 0.05f, 0.03f, 0.95f), BorderColor = new Color("8a5a20"),
-            BorderWidthLeft = 2, BorderWidthRight = 2, BorderWidthTop = 2, BorderWidthBottom = 2,
-            ContentMarginLeft = 16, ContentMarginRight = 16, ContentMarginTop = 12, ContentMarginBottom = 12 });
-        AddChild(_panel);
-        var column = new VBoxContainer(); _panel.AddChild(column);
-        column.AddChild(new Label { Text = "Экран (F9) — настройки переноса" });
-        var grid = new GridContainer { Columns = 4 }; column.AddChild(grid);
-        foreach (var r in Resolutions)
-        {
-            var button = new Button { Text = $"{r.X}×{r.Y}", FocusMode = Control.FocusModeEnum.None };
-            button.Pressed += () => { Set(resolution: r, fullscreen: false); Refresh(); };
-            grid.AddChild(button);
-        }
-        var full = new Button { Text = "Полный экран (F11, Alt+Enter)", FocusMode = Control.FocusModeEnum.None };
-        full.Pressed += () => { Set(fullscreen: !Fullscreen); Refresh(); }; column.AddChild(full);
-        var classic = new Button { Text = "Рамка оригинала 4:3 / широкий экран", FocusMode = Control.FocusModeEnum.None };
-        classic.Pressed += () => { Set(classic: !ClassicLayout); Refresh(); }; column.AddChild(classic);
-        _state = new Label(); column.AddChild(_state);
-        Refresh();
-    }
-
-    private void Refresh()
-    {
-        if (_state == null) return;
-        _state.Text = $"Окно: {Resolution.X}×{Resolution.Y} · {(Fullscreen ? "полный экран" : "в окне")} · {(ClassicLayout ? "4:3" : "широкий")}";
-        _panel.ResetSize(); _panel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.Center);
+        if (key.Keycode == Key.F11 || (key.Keycode == Key.Enter && key.AltPressed)) { Set(fullscreen: !Fullscreen); GetViewport().SetInputAsHandled(); }
+        else if (key.Keycode == Key.F9) { _window.Visible = !_window.Visible; GetViewport().SetInputAsHandled(); }
     }
 }

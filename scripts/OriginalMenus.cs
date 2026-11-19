@@ -12,6 +12,8 @@ public partial class OriginalMenus : Node2D
     public static readonly Rect2 SignGame = new(288, 149, 105, 33), SignExit = new(238, 177, 105, 31), SignAuthors = new(260, 268, 117, 43);
     public static Rect2 SlotRow(int k) => new(152, 175 + 25 * k, 334, 24);
     public static readonly Rect2 Ball = new(196, 40, 97, 89);
+    /// <summary>Port addition: «Экран» on the main menu (screen settings).</summary>
+    public static readonly Rect2 ScreenButton = new(504, 444, 128, 28);
     public static readonly Rect2 CampaignStart = new(0, 0, 90, 25), CampaignExit = new(0, 30, 90, 25);
     public const double LoadingSeconds = 0.8;
 
@@ -98,6 +100,8 @@ public partial class OriginalMenus : Node2D
                 if (SignGame.HasPoint(_mouse)) DrawGroup("menu_sign_game", 1);
                 else if (SignExit.HasPoint(_mouse)) DrawGroup("menu_sign_exit", 1);
                 else if (SignAuthors.HasPoint(_mouse)) DrawGroup("menu_sign_authors", 1);
+                DrawTexture(Tex("button_blank.png"), ScreenButton.Position);
+                _hudFont.Draw(this, new Vector2(ScreenButton.GetCenter().X - _hudFont.Width("Экран") / 2f, ScreenButton.Position.Y + 7), "Экран");
                 break;
             case Screen.Slots:
                 DrawTexture(InterfaceData.Screen("save_slots"), Vector2.Zero);
@@ -126,7 +130,7 @@ public partial class OriginalMenus : Node2D
                 break;
         }
         var cursor = Group("menu_cursor");
-        if (Current != Screen.History && DisplayServer.GetName() != "headless")
+        if (Current != Screen.History && !DisplaySettings.WindowOpen && DisplayServer.GetName() != "headless")
             DrawTextureRectRegion(Tex(cursor.Atlas), new Rect2(_mouse, 32, 32), cursor.Region(0));
     }
 
@@ -160,7 +164,8 @@ public partial class OriginalMenus : Node2D
             case Screen.Main:
                 if (SignGame.HasPoint(p)) Show(Screen.Slots);
                 else if (SignExit.HasPoint(p)) GetTree().Quit();
-                else if (SignAuthors.HasPoint(p)) { }   // «От авторов» (SCREENS.SCR #9, FROM.SMK) is not ported yet
+                else if (SignAuthors.HasPoint(p)) { }
+                else if (ScreenButton.HasPoint(p)) DisplaySettings.Open();   // «От авторов» (SCREENS.SCR #9, FROM.SMK) is not ported yet
                 break;
             case Screen.Slots:
                 if (Ball.HasPoint(p)) { Show(Screen.Main); break; }
