@@ -33,6 +33,7 @@ public sealed partial class Skirmish
     private OriginalAiGarrison? _aiGarrison;
     private OriginalAiOrders? _aiOrders;
     private Dictionary<byte, byte[]> _aiMakes = [];
+    private readonly Dictionary<(byte Producer, byte Made), byte> _aiIntervals = [];
     private byte[] _aiFortification = [];
     private byte[] _aiRandom = [];
     private byte _aiRandom3;
@@ -73,8 +74,16 @@ public sealed partial class Skirmish
         foreach (var castle in Actors.Where(a => a.Team == 1 && a.Source.TemplateName == "Замок" && a.Record[0x0f] == 0)) castle.Record[0x0f] = 0x24;
         using (var producers = GameData.Read<System.Text.Json.JsonDocument>("res://data/original_producers.json"))
             foreach (var item in producers.RootElement.GetProperty("producers").EnumerateObject())
-                _aiMakes[byte.Parse(item.Name)] = item.Value.GetProperty("makes").EnumerateArray().Select(v => (byte)v.GetInt32()).ToArray();
+            {
+                byte producer = byte.Parse(item.Name);
+                _aiMakes[producer] = item.Value.GetProperty("makes").EnumerateArray().Select(v => (byte)v.GetInt32()).ToArray();
+                var intervals = item.Value.GetProperty("intervals").EnumerateArray().Select(v => (byte)v.GetInt32()).ToArray();
+                for (int i = 0; i < intervals.Length; i++) _aiIntervals.TryAdd((producer, _aiMakes[producer][i]), intervals[i]);
+            }
         _aiFortification = data.Fortifications.Count > 0 ? Convert.FromHexString(data.Fortifications[0]) : [];
+        // A6AE marks a finished building in the development tree; the buildings standing at the start count as finished
+        // (assumption: the scenario load path is not ported).
+        foreach (var built in Actors.Where(a => a.Team == 1 && a.Structure)) OriginalTechRules.Complete(_aiTree, 1, (byte)built.Source.TemplateIndex);
         _aiSquadWorld = new AiSquadWorld(this);
         _aiTurnWorld = new AiTurnWorld(this);
         _aiStates = new OriginalAiSquadStates(_aiSquadWorld, Convert.FromHexString(data.ArctangentHex), Convert.FromHexString(data.SquadMessagesHex));
@@ -160,11 +169,14 @@ public sealed partial class Skirmish
         {
             // An idle producer can take work (WorkFlags bit 2, as the idle castle's 24h observed in DOSBox); the WRK that sets
             // WorkFlags after construction and production is not ported (adapter).
-            if (building.Source.TemplateName is "Замок" or "Казарма" && building.ConstructionRemaining <= 0 && building.Record.Length >= 0x27)
+            if (IsEnemyProducer(building) && building.ConstructionRemaining <= 0 && building.Record.Length >= 0x27)
             {
                 bool idle = building.Record[0x22] == 0xff && building.Record[0x15] == 0;
                 building.Record[0x0f] = idle ? (byte)(building.Record[0x0f] | 0x24) : (byte)(building.Record[0x0f] & ~4);
             }
+            // A building under construction carries 81h (command 80h, activity 1); the handled command leaves activity 1, which
+            // 22E85 reads as «producer under construction». Completion (C80D path) gives the same next state for 81h and 1.
+            if (building.ConstructionRemaining > 0 && (building.Record[0x14] & 0x80) != 0) building.Record[0x14] &= 7;
             byte order = building.Record[0x14];
             if ((order & 0xf8) == 0x60) building.Record[0x14] = 4;              // produce: the queue head +22 is the template
             else if ((order & 0xf8) == 0x58) { EnemyBuild(building); building.Record[0x14] = 0; }
@@ -201,6 +213,31 @@ public sealed partial class Skirmish
         }
     }
 
+    private PopulationTotals _enemyPopulation;
+    /// <summary>The enemy's free people (participant +24) grow by the ported population rules, as the player's do.</summary>
+    private void TickEnemyPopulation()
+    {
+        if (!AiEnabled || _aiBlocks[Rules.EnemySlot] == null) return;
+        if ((_populationTick & 31) == 0 || _enemyPopulation.Limit == 0) _enemyPopulation = PopulationOf((byte)Rules.EnemySlot);
+        var r = EnemyResources;
+        uint people = OriginalPopulationRules.Grow(_populationTick, r.Fourth, _enemyPopulation.Used, _enemyPopulation.FarmSupport, _enemyPopulation.Limit);
+        if (people != r.Fourth) EnemyResources = r with { Fourth = people };
+    }
+
+    /// <summary>A6AE when an enemy building is finished: kind 1 «after building template N» in the AI's tree.</summary>
+    private void EnemyBuildingFinished(SkirmishActor building)
+    {
+        if (_aiTree.Length > 0) OriginalTechRules.Complete(_aiTree, 1, (byte)building.Source.TemplateIndex);
+    }
+
+    /// <summary>Enemy objects that make something (WRK AH=6 table with rows): castle, barracks, factory, stable…</summary>
+    private bool IsEnemyProducer(SkirmishActor actor) =>
+        actor.Team == 1 && actor.Structure && _aiMakes.TryGetValue((byte)actor.Source.TemplateIndex, out var makes) && makes.Length > 0;
+
+    /// <summary>Production interval of the producer's WRK row for the template (data/original_producers.json).</summary>
+    private byte EnemyInterval(SkirmishActor producer, byte template) =>
+        _aiIntervals.TryGetValue(((byte)producer.Source.TemplateIndex, template), out var interval) ? interval : (byte)40;
+
     /// <summary>An enemy recruit walks from the producer's exit to the settlement's home cell (AI block +61/+62), so the exit
     /// is free for the next one (adapter: the player clears the exit by hand, the original's WRK release is not ported).</summary>
     private void EnemyRecruitLeaves(SkirmishActor recruit)
@@ -228,6 +265,7 @@ public sealed partial class Skirmish
         var building = NewEconomyActor(index, cell, false, false, 1);
         building.ConstructionDuration = building.ConstructionRemaining = template.InitialCondition * Math.Max(1, (int)building.Parameters[0x57]) / (double)Rules.TicksPerSecond;
         OriginalBuildingLifecycle.MarkConstruction(building.Record);
+        building.Record[0x14] &= 7;   // the handled construction command leaves activity 1 at once (see ExecuteAiCommands)
         building.Record.AsSpan(0x22, 5).Fill(0xff); building.Record[0x20] = 0xff; building.Record[0x27] = 0xff;
         if (template.Name == "Шахта")
         {

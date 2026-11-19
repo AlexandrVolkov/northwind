@@ -2,7 +2,7 @@
 """Export what each ARMY__02 template can make (its WRK answer to AH=6, LE:1 D19C) into data/original_producers.json.
 
 D19C jumps into the template's WRK callback with AH=6; a producer returns EDX = its table (seven-byte header, then
-four-byte rows template, frame u16, interval, FFh). 22E85 (AI order executor) lists the producers of a template from
+four-byte rows template, frame u16, interval, FFh; the interval paces production, docs/recruitment-production.md). 22E85 (AI order executor) lists the producers of a template from
 these rows, duplicates included. The callbacks are executed under Unicorn from the original NORWIND.EXE and WRK."""
 import argparse
 import hashlib
@@ -32,9 +32,10 @@ def extract(game):
         o.run(o.CODE + 0xd19c)
         edx = o.cpu.reg_read(UC_X86_REG_EDX)
         if edx == 0: continue
-        rows, at = [], edx + 7
-        while bytes(o.cpu.mem_read(at, 1))[0] != 0xff: rows.append(bytes(o.cpu.mem_read(at, 1))[0]); at += 4
-        producers[str(t)] = {'wrk_table_offset': edx - o.WRK, 'makes': rows}
+        rows, intervals, at = [], [], edx + 7
+        while bytes(o.cpu.mem_read(at, 1))[0] != 0xff:
+            row = bytes(o.cpu.mem_read(at, 4)); rows.append(row[0]); intervals.append(row[3]); at += 4
+        producers[str(t)] = {'wrk_table_offset': edx - o.WRK, 'makes': rows, 'intervals': intervals}
     return {'format_version': 1, 'source_sha256': {'NORWIND.EXE': report['source_sha256']['NORWIND.EXE'],
             'ARMY__02.WRK': hashlib.sha256(wrk).hexdigest(), 'ARMY__02.DAT': hashlib.sha256(dat).hexdigest()},
             'army': 'ARMY__02', 'producers': producers}

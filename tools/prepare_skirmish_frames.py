@@ -42,7 +42,13 @@ def prepare(source, output):
                 frames.update(range(base,base+8*raw[0x4a]))
                 frames.update(action_frames(raw, base))
     # Runtime economy objects are not initially present in the player's source slot.
-    for index in [3,4,6,9,10,11]:
+    # 12, 15, 22, 23, 24: buildings the enemy AI orders (227C7); 17, 18, 21: units their producers make.
+    for index in [17,18,21]:
+        key=('ARMY__02.DAT',index);raw=bytes.fromhex(tables[key[0]]['templates'][index]['raw_record_hex'])
+        base=struct.unpack_from('<H',raw,0x48)[0]
+        wanted.setdefault(key,set()).update(range(base,base+8*raw[0x4a]))
+        wanted[key].update(action_frames(raw, base)); wanted[key].update(death_frames(raw, base))
+    for index in [3,4,6,9,10,11,12,15,22,23,24]:
         key=('ARMY__02.DAT',index);entry=tables[key[0]]['templates'][index]
         raw=bytes.fromhex(entry['raw_record_hex']);base=struct.unpack_from('<H',raw,0x48)[0]
         wanted.setdefault(key,set()).update(range(base,base+(8*raw[0x4a] if index in [10,11] else raw[0x4a]+1)))
@@ -61,8 +67,8 @@ def prepare(source, output):
             image.putdata([tuple((c&252)|(c>>6) for c in palette[table[v]*3:table[v]*3+3])+(255,) if v>=0 else (0,0,0,0) for v in pixels])
             slot=len(images);images.append(image)
             entries.append({'template_file':filename,'template_index':index,'frame':frame,
-                            'x':slot%16*128,'y':slot//16*128,'width':image.width,'height':image.height})
-    atlas=Image.new('RGBA',(2048,((len(images)+15)//16)*128))
+                            'x':slot%32*128,'y':slot//32*128,'width':image.width,'height':image.height})
+    atlas=Image.new('RGBA',(4096,((len(images)+31)//32)*128))   # 32 columns keep the height under 16384
     for entry,image in zip(entries,images):atlas.paste(image,(entry['x'],entry['y']))
     atlas.save(output/'battle_frames.png')
     (output/'battle_frames.json').write_text(json.dumps({'format_version':1,'source_sha256':hashes,'frames':entries},indent=2)+'\n',encoding='utf-8')

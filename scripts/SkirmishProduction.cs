@@ -80,7 +80,7 @@ public sealed partial class Skirmish
     {
         TickProduction(PlayerCastle);
         foreach (var barracks in Actors.Where(IsBarracks).ToArray()) TickProduction(barracks);
-        foreach (var producer in Actors.Where(a => a.Alive && a.Team == 1 && a.Source.TemplateName is "Замок" or "Казарма").ToArray()) TickProduction(producer);
+        foreach (var producer in Actors.Where(a => a.Alive && a.Team == 1 && IsEnemyProducer(a)).ToArray()) TickProduction(producer);
     }
     private ResourceQuad Wallet(int team) => team == 0 ? Resources : EnemyResources;
     private void SetWallet(int team, ResourceQuad value) { if (team == 0) SetResources(value); else EnemyResources = value; }
@@ -88,15 +88,17 @@ public sealed partial class Skirmish
     {
         if (!producer.Alive || producer.ConstructionRemaining > 0 || QueuedTemplate(producer) is not { } template) return;
         var record = producer.Record;
-        if (producer.Team != 0 && (!Rules.Units.ContainsKey(template.Name) || template.TemplateIndex == 10 || !_soldierSeeds.ContainsKey(template.TemplateIndex)))
-        { OriginalProductionRules.Complete(record); return; }   // no rules, no seed record, or a worker (the enemy economy is not simulated): dropped
+        if (producer.Team != 0 && (!Rules.Units.TryGetValue(template.Name, out var unitRules) || template.TemplateIndex == 10 || unitRules.Damage == 0
+            || (!_soldierSeeds.ContainsKey(template.TemplateIndex) && unitRules.Range > 48)))
+        { OriginalProductionRules.Complete(record); return; }   // no rules, a worker (no enemy economy), or a ranged unit without a seed record: dropped
         if (record[0x15] == 0)
         {
             var payment = OriginalConstructionRules.TryDebitUpfront(Wallet(producer.Team), Price(template));
             if (!payment.Accepted) return;
             SetWallet(producer.Team, payment.Balances); OriginalProductionRules.StartPaid(record); SetBlocked(producer, false); return;
         }
-        if (!OriginalProductionRules.Tick(record, _production.Interval(producer.Source.TemplateName, record[0x22]), ProductionSpeedShift, template.InitialCondition)) return;
+        byte interval = producer.Team == 0 ? _production.Interval(producer.Source.TemplateName, record[0x22]) : EnemyInterval(producer, record[0x22]);
+        if (!OriginalProductionRules.Tick(record, interval, ProductionSpeedShift, template.InitialCondition)) return;
         if (!ReleaseRecruit(producer, template)) { SetBlocked(producer, true); return; }
         OriginalProductionRules.Complete(record); SetBlocked(producer, false);
     }
