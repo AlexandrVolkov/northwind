@@ -97,6 +97,28 @@ public sealed class InterfaceArmy
     public InterfaceAtlas Buttons { get; set; } = new();
     public List<InterfaceTemplate> Templates { get; set; } = [];
 }
+public sealed class InterfaceSpriteGroup
+{
+    public string Atlas { get; set; } = "";
+    public int[] Cell { get; set; } = [];
+    public int FirstSprite { get; set; }
+    public int Frames { get; set; }
+    public int[]? Position { get; set; }
+    public Rect2 Region(int frame) => new(frame % 8 * Cell[0], frame / 8 * Cell[1], Cell[0], Cell[1]);
+}
+public sealed class IntroLine
+{
+    public int X { get; set; }
+    public int Y { get; set; }
+    public string Text { get; set; } = "";
+}
+public sealed class IntroText
+{
+    public int StepTicks { get; set; }
+    public double TimerHz { get; set; }
+    public int ClipBottom { get; set; }
+    public List<IntroLine> Lines { get; set; } = [];
+}
 /// <summary>assets/imported/interface/interface.json from tools/interface_source.py.</summary>
 public sealed class InterfaceData
 {
@@ -105,6 +127,10 @@ public sealed class InterfaceData
     public InterfaceAtlas? ArrowCursor { get; set; }
     public Dictionary<int, int[]> UiColors { get; set; } = [];
     public List<InterfaceArmy> Armies { get; set; } = [];
+    public Dictionary<string, InterfaceSpriteGroup> MenuSprites { get; set; } = [];
+    public Dictionary<string, InterfaceSpriteGroup> CampaignSprites { get; set; } = [];
+    public IntroText IntroText { get; set; } = new();
+    public List<string> HeroNames { get; set; } = [];
     public List<InterfaceScreen> Screens { get; set; } = [];
     public List<InterfaceFont> Fonts { get; set; } = [];
     public const string Root = "res://assets/imported/interface/";

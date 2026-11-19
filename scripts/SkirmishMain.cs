@@ -18,7 +18,7 @@ public sealed class BattleFrame
 public partial class SkirmishMain : Node2D
 {
     /// <summary>Name shown for the hero; the original only accepts the heroes Олег, Игорь and Эйрик.</summary>
-    public string HeroName { get; set; } = "Олег";
+    public string HeroName { get; set; } = GameSession.HeroName;
     public OriginalHud Hud { get; } = new();
     private readonly CanvasLayer _hudLayer = new() { Layer = 2 };
     public Texture2D? MinimapTexture => _minimapTexture;
