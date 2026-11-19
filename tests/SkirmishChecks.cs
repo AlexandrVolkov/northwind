@@ -193,6 +193,15 @@ public partial class TestRunner
             for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
             GetViewport().GetTexture().GetImage().SavePng("res://build/hud-menu.png");
+            var shot = GetViewport().GetTexture().GetImage(); var original = Image.LoadFromFile(ProjectSettings.GlobalizePath("res://docs/reference/original-menu-panel.png"));
+            double sum = 0; int n = 0;
+            foreach (int row in new[] { 103, 108, 151, 156 })
+                for (int x = 491; x < 615; x++)
+                {
+                    var p = shot.GetPixelv((Vector2I)scene.ClassicToScreen(new Vector2(x + .5f, row + .5f))); var q = original.GetPixel(x, row);
+                    sum += Math.Abs(p.R - q.R) + Math.Abs(p.G - q.G) + Math.Abs(p.B - q.B); n++;
+                }
+            Check(sum / n * 255 < 30, $"Menu sliders «Панорама» 0Dh and «Игра» FDh look like the original ({sum / n * 255:0.0})");
             scene.Hud.MenuOpen = false;
         }
         scene.TogglePause(); scene.SelectArmy(); scene.FocusHero();
