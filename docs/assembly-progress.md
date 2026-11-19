@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 122842 | 5512 | 97 | 18431 | 44 |
+| LE:1 | 146882 | 119826 | 5512 | 97 | 21447 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -161,6 +161,7 @@
 | LE:1 `0x1EB33..0x1EB40` | Clear AI plan list | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
 | LE:1 `0x1EB40..0x1EB68` | Find or add AI plan | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
 | LE:1 `0x1EBEF..0x1EC3F` | Random explored cell for AI patrol | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
+| LE:1 `0x1EC6E..0x1ECA0` | Area in sight of an object | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x1ECA0..0x1ECF8` | First living object of a DAT class | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) | inlined for mask 38h value 0 |
 | LE:1 `0x1ED26..0x1EF26` | AI squad step loop and steps 0..3 | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) | step 4 (1EF26) is a hook |
 | LE:1 `0x1EFCC..0x1EFF9` | AI squad step 5: formation march | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) |  |
@@ -168,14 +169,21 @@
 | LE:1 `0x1F72C..0x1FBB1` | AI squad states 4..8 | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0x1FBB1..0x20095` | AI squad retreat, march, fight and strength helpers | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | 20001 (stuck-member rescue) and the A4C2 message display are hooks |
 | LE:1 `0x20095..0x2029F` | AI squad registry: numbers, create, remove, disband, transfer, lookups | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) | on overflow 200B5 releases pool byte «participant» instead of the new number, as in the original |
+| LE:1 `0x2029F..0x202D0` | Free units join a squad up to a strength | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
+| LE:1 `0x2035A..0x20408` | Nearest free object of a class | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x20408..0x205FB` | Nearest visible hostile object in a cell area | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) | object visibility OBE[20] is not maintained by the skirmish yet |
 | LE:1 `0x205FB..0x206D5` | AI squad census from its members | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) |  |
 | LE:1 `0x207CB..0x2087C` | Squad stands; members outside the area return | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) |  |
 | LE:1 `0x2098B..0x209B0` | Find AI squad by state and target object | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) |  |
+| LE:1 `0x20DD0..0x21459` | AI military requests (list +1AB, modes 1..10) | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) | bytes filled from register leftovers are written as zero |
 | LE:1 `0x21459..0x21490` | Set mutual war bits | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
+| LE:1 `0x214C3..0x215F1` | AI raid targets: random building, nearest mine | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x215F1..0x21660` | AI strength wanted for an area (215F1) and against an object (2160B) | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | implemented inside the squad states; the dead branch 21646..2165D is not used |
+| LE:1 `0x21660..0x21780` | AI squad recruitment (21660/21696 free units, 216DF nearest with lower-priority squads) | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
+| LE:1 `0x218A8..0x219C3` | Friendly and hostile strength in an area | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x219C3..0x21A00` | Clip a centred area to the map | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 | LE:1 `0x21CA0..0x21D84` | Hostile objects of an area for AI squads | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
+| LE:1 `0x21DD4..0x21E99` | Nearest object for a squad of a priority | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x223B4..0x22435` | List templates of a DAT class | ported | [tech.md](../docs/tech.md); [tech.json](../tests/fixtures/tech.json); [original_tech.json](../data/original_tech.json) |  |
 | LE:1 `0x226F1..0x227C7` | AI upkeep: repair requests and decay | ported | [ai.md](../docs/ai.md); [ai-upkeep.json](../tests/fixtures/ai-upkeep.json) |  |
 | LE:1 `0x22E46..0x22E85` | Random open template of a DAT class | ported | [ai.md](../docs/ai.md); [ai-research.json](../tests/fixtures/ai-research.json) |  |

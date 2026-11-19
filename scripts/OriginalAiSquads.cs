@@ -980,3 +980,425 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
         if (!Retreat(ai, s)) s[5] = 0;
     }
 }
+
+/// <summary>World of the military requests 20DD0: AI blocks and participant records of every settlement, the 9E41 random
+/// stream, the participant count [6C6] and the templates a settlement may build now (22E46).</summary>
+public interface IAiMilitaryWorld : IAiSquadWorld
+{
+    byte Random();
+    Span<byte> Block(byte participant);
+    ReadOnlySpan<byte> Participant(byte participant);
+    byte ParticipantCount { get; }
+    /// <summary>223B4 for the settlement: open templates of the class (DAT[40] &amp; mask = value, DAT[9C] ≠ FFh, tree allows).</summary>
+    IReadOnlyList<byte> Buildable(byte participant, uint mask, uint value);
+    byte[] Template(byte participant, byte template);
+    /// <summary>Pool reference (offset from [6AA]) of an object record.</summary>
+    uint Reference(byte[] record);
+}
+
+/// <summary>Recruitment of squad members (LE:1 2029F, 2035A, 21660/21696, 216DF, 21DD4) and target choice (214C3, 21555, 1EC6E).</summary>
+public static class OriginalAiRecruitment
+{
+    private static uint U32(ReadOnlySpan<byte> raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw[offset..]);
+    private static void W32(Span<byte> raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw[offset..], value);
+    private static uint Chebyshev(uint x1, uint y1, uint x2, uint y2)
+    {
+        int dx = unchecked((int)(x1 - x2)), dy = unchecked((int)(y1 - y2));
+        return Math.Max(unchecked((uint)(dx < 0 ? -dx : dx)), unchecked((uint)(dy < 0 ? -dy : dy)));
+    }
+
+    /// <summary>2035A: the nearest object without a squad whose DAT class matches; ties keep the later object.</summary>
+    public static (byte[] Record, byte[] Template)? NearestFree(IEnumerable<(byte[] Record, byte[] Template)> chain, uint x, uint y, uint mask, uint value)
+    {
+        (byte[], byte[])? found = null; uint best = uint.MaxValue;
+        foreach (var (r, t) in chain)
+        {
+            if (r[0x1b] != 0 || (U32(t, 0x40) & mask) != value) continue;
+            uint d = Chebyshev(x, y, U32(r, 4), U32(r, 8));
+            if (d <= best) { best = d; found = (r, t); }
+        }
+        return found;
+    }
+
+    /// <summary>2029F: free objects nearest to the point join squad <paramref name="id"/> until their DAT[76] reach the wanted
+    /// strength (at least one is taken). Returns the strength gathered.</summary>
+    public static uint ByStrength(IEnumerable<(byte[] Record, byte[] Template)> chain, byte id, uint x, uint y, uint wanted, uint mask, uint value)
+    {
+        uint sum = 0;
+        while (NearestFree(chain, x, y, mask, value) is { } m)
+        {
+            m.Record[0x1b] = id; sum += m.Template[0x76];
+            if (sum >= wanted) break;
+        }
+        return sum;
+    }
+
+    /// <summary>21DD4: the nearest own object of the class that has no squad, or whose squad is weaker in priority than
+    /// <paramref name="priority"/> (or not found); ties keep the later object.</summary>
+    public static (byte[] Record, byte[] Template)? NearestForSquad(ReadOnlySpan<byte> ai, IEnumerable<(byte[] Record, byte[] Template)> chain,
+        uint x, uint y, byte priority, uint mask, uint value)
+    {
+        (byte[], byte[])? found = null; uint best = uint.MaxValue;
+        foreach (var (r, t) in chain)
+        {
+            if ((U32(t, 0x40) & mask) != value) continue;
+            if (r[0x1b] != 0) { int s = OriginalAiSquads.Find(ai, r[0x1b]); if (s >= 0 && ai[s + 4] >= priority) continue; }
+            uint d = Chebyshev(x, y, U32(r, 4), U32(r, 8));
+            if (d <= best) { best = d; found = (r, t); }
+        }
+        return found;
+    }
+
+    /// <summary>216DF: a new squad of priority <paramref name="priority"/> takes the nearest suitable objects (also from
+    /// lower-priority squads, whose counts are not updated) until its strength +36 reaches the wanted value. A squad
+    /// that got nothing is disbanded. Returns the squad offset or −1.</summary>
+    public static int Gather(Span<byte> ai, IReadOnlyList<(byte[] Record, byte[] Template)> chain, byte x, byte y, byte priority, uint wanted, uint mask, uint value)
+    {
+        int at = OriginalAiSquads.Create(ai, chain.Select(m => m.Record));
+        if (at < 0) return -1;
+        ai[at + 4] = priority;
+        while (NearestForSquad(ai, chain, x * 32u, y * 32u, priority, mask, value) is { } m)
+        {
+            W32(ai, at + 0x36, U32(ai, at + 0x36) + m.Template[0x76]);
+            m.Record[0x1b] = ai[at + 1];
+            if (U32(ai, at + 0x36) >= wanted) break;
+        }
+        if (U32(ai, at + 0x36) != 0) return at;
+        OriginalAiSquads.Disband(ai, chain.Select(m => m.Record), ai[at + 1]);
+        return -1;
+    }
+
+    /// <summary>21660/21696: a new squad takes free objects of the class nearest to the cell (2029F); when they do not
+    /// reach the wanted strength the squad is disbanded. Returns the squad offset or −1.</summary>
+    /// <remarks>EBX on return: the wanted strength when no squad could be created, otherwise the strength gathered.</remarks>
+    public static (int Squad, uint Ebx) GatherFree(Span<byte> ai, IReadOnlyList<(byte[] Record, byte[] Template)> chain, byte x, byte y, uint wanted, uint mask, uint value)
+    {
+        int at = OriginalAiSquads.Create(ai, chain.Select(m => m.Record));
+        if (at < 0) return (-1, wanted);
+        uint got = ByStrength(chain, ai[at + 1], x * 32u, y * 32u, wanted, mask, value);
+        if (got >= wanted) return (at, got);
+        OriginalAiSquads.Disband(ai, chain.Select(m => m.Record), ai[at + 1]);
+        return (-1, got);
+    }
+
+    /// <summary>214C3: a building (DAT[40] bit 3, not 20h) alive above DAT[46] nearest to the home cell; each candidate
+    /// passes a coin toss (9E41 bit 0) first.</summary>
+    public static (byte[] Record, byte[] Template)? Building(IEnumerable<(byte[] Record, byte[] Template)> chain, ReadOnlySpan<byte> ai, Func<byte> random)
+    {
+        (byte[], byte[])? found = null; uint best = uint.MaxValue;
+        foreach (var (r, t) in chain)
+        {
+            uint f = U32(t, 0x40);
+            if ((f & 8) == 0 || (f & 0x20) != 0 || (sbyte)r[0x19] <= (sbyte)t[0x46] || (random() & 1) == 0) continue;
+            uint d = Chebyshev(U32(r, 4), U32(r, 8), ai[0x61] * 32u, ai[0x62] * 32u);
+            if (d < best) { best = d; found = (r, t); }
+        }
+        return found;
+    }
+
+    /// <summary>21555: a mine (DAT[40] &amp; F01h = 401h) with ore left of the kind, alive above DAT[46], nearest to the home cell.</summary>
+    public static (byte[] Record, byte[] Template)? Mine(IEnumerable<(byte[] Record, byte[] Template)> chain, ReadOnlySpan<byte> ai, byte kind)
+    {
+        (byte[], byte[])? found = null; uint best = uint.MaxValue;
+        foreach (var (r, t) in chain)
+        {
+            if ((U32(t, 0x40) & 0xf01) != 0x401 || U32(r, 0x24) == 0 || r[0x23] != kind || (sbyte)r[0x19] <= (sbyte)t[0x46]) continue;
+            uint d = Chebyshev(U32(r, 4), U32(r, 8), ai[0x61] * 32u, ai[0x62] * 32u);
+            if (d < best) { best = d; found = (r, t); }
+        }
+        return found;
+    }
+
+    /// <summary>1EC6E + 218A8: objects in sight of an object (its footprint DAT[3]×DAT[4] grown by 2·DAT[47]), every grid
+    /// occurrence counted, without DAT[40] 20h and the dead: friends and enemies of its owner with their DAT[76].</summary>
+    public static (uint Friends, uint FriendStrength, uint Enemies, uint EnemyStrength) Sight(IAiSquadWorld world, byte[] record, byte[] template)
+    {
+        byte grow = (byte)(template[0x47] * 2);
+        var (x0, y0, x1, y1) = OriginalTargetRules.Clip((byte)(U32(record, 4) >> 5), (byte)(U32(record, 8) >> 5),
+            (byte)(template[3] + grow), (byte)(template[4] + grow), world.MapWidth, world.MapHeight);
+        uint hostile = world.HostileMask(record[3]);
+        uint fc = 0, fs = 0, ec = 0, es = 0;
+        byte rows = (byte)(y1 - y0 + 1), columns = (byte)(x1 - x0 + 1);
+        int cell = world.MapWidth * y0 + x0;
+        do
+        {
+            byte left = columns;
+            do
+            {
+                for (int plane = 0; plane < 3; plane++)
+                {
+                    uint reference = world.Occupant(plane, cell);
+                    if (reference == 0) continue;
+                    var (r, t) = world.Resolve(reference);
+                    if ((U32(t, 0x40) & 0x20) != 0 || (sbyte)r[0x19] <= (sbyte)t[0x46]) continue;
+                    if ((hostile >> (r[3] & 31) & 1) != 0) { ec++; es += t[0x76]; } else { fc++; fs += t[0x76]; }
+                }
+                cell++;
+            } while (--left != 0);
+            cell += world.MapWidth - columns;
+        } while (--rows != 0);
+        return (fc, fs, ec, es);
+    }
+}
+
+/// <summary>Military requests of LE:1 20DD0 (list +1AB, 20 records of 15h; see docs/ai.md, «Военные заявки»).</summary>
+public sealed class OriginalAiMilitary(IAiMilitaryWorld world, byte[] gatherClasses)
+{
+    public const int List = 0x1ab, Orders = 0x34f, Size = 0x15;
+    /// <summary>[ED39]/[ED3D]: the class filter of 2029F for mode 2, left by 209B0 (units: 808h/800h).</summary>
+    public uint ClassMask = 0x808, ClassValue = 0x800;
+    private static uint U32(ReadOnlySpan<byte> raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw[offset..]);
+    private static void W32(Span<byte> raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw[offset..], value);
+
+    /// <summary>1EB5C with every byte the call site passes (+4..+7 = CL, CH, DL, DH; +8 = EBP).</summary>
+    public static void Request(Span<byte> ai, int list, byte mode, byte first, byte third, byte cl, byte ch, byte dl, byte dh, uint parameter)
+    {
+        for (int k = 0; k < 20; k++)
+            if (ai[list + k * Size] == mode && ai[list + k * Size + 1] == first && mode != 0xff) return;
+        for (int k = 0; k < 20; k++)
+        {
+            var r = ai.Slice(list + k * Size, Size);
+            if (r[0] != 0xff) continue;
+            r[0] = mode; r[1] = first; r[2] = 0; r[3] = third; r[4] = cl; r[5] = ch; r[6] = dl; r[7] = dh;
+            W32(r, 8, parameter); W32(r, 0x0c, 0); W32(r, 0x10, 0); r[0x14] = 0;
+            return;
+        }
+    }
+
+    private IReadOnlyList<(byte[] Record, byte[] Template)> Own(ReadOnlySpan<byte> ai) => world.Chain(ai[0]);
+
+    public void Run(Span<byte> ai)
+    {
+        if ((ai[0x19e4] & 1) == 0) return;
+        for (int k = 0; k < 20; k++)
+        {
+            int at = List + k * Size;
+            if (!Process(ai, at)) ai[at] = 0xff;
+            W32(ai, at + 0x10, U32(ai, at + 0x10) + 1);
+        }
+    }
+
+    /// <summary>One request; false drops it (+0 = FFh).</summary>
+    private bool Process(Span<byte> ai, int at)
+    {
+        var r = ai.Slice(at, Size);
+        switch (r[0])
+        {
+            case 1: return DefendArea(ai, r);
+            case 2: return Reinforce(ai, r);
+            case 3: return Support(ai, r);
+            case 4: return AttackObject(ai, r);
+            case 5: return War(ai, r);
+            case 6:
+                if ((U32(r, 0x10) & 0xff) != 0) return true;
+                if (++r[0x14] > 10) return false;
+                if (OriginalAiRecruitment.Building(world.Chain(r[4]), ai, world.Random) is not { } building) return true;
+                return BecomeChase(ai, r, building.Record);
+            case 7: return Campaign(ai, r);
+            case 8: return Army(ai, r);
+            case 9: return Chase(ai, r);
+            case 10: return Plunder(ai, r);
+            default: return false;
+        }
+    }
+
+    /// <summary>Mode 1: a new squad (priority 80h) holds the area +4..+7 (state 2); the strength still missing is ordered
+    /// as units (+34F mode 1).</summary>
+    private bool DefendArea(Span<byte> ai, Span<byte> r)
+    {
+        uint wanted = (uint)(byte)((byte)(r[6] - r[4] + 1) * (byte)(r[7] - r[5] + 1) >> 4) * ai[0x2a]; // 215F1
+        int s = OriginalAiRecruitment.Gather(ai, Own(ai), r[4], r[5], 0x80, wanted, 0x808, 0x800);
+        if (s < 0) return false;
+        ai[s + 4] = 0x80; ai[s + 0x13] = r[4]; ai[s + 0x14] = r[5]; ai[s + 0x15] = r[6]; ai[s + 0x16] = r[7]; ai[s + 2] = 2; ai[s + 5] = 0; // 1F306
+        int shortfall = unchecked((int)(wanted - U32(ai, s + 0x36)));
+        if (shortfall > 0) Request(ai, Orders, 1, 0x11, 0x40, r[4], r[5], 0x88, r[7], (uint)shortfall);
+        return false;
+    }
+
+    /// <summary>Mode 2: squad +4 takes free units near its centre up to +8; the rest is ordered as units.</summary>
+    private bool Reinforce(Span<byte> ai, Span<byte> r)
+    {
+        int s = OriginalAiSquads.Find(ai, r[4]);
+        if (s < 0) return false;
+        uint wanted = U32(r, 8);
+        uint got = OriginalAiRecruitment.ByStrength(Own(ai), ai[s + 1], ai[s + 0x20] * 32u, ai[s + 0x21] * 32u, wanted, ClassMask, ClassValue);
+        if (got >= wanted) return false;
+        uint shortfall = wanted - got;
+        Request(ai, Orders, 1, 0x11, 0x40, (byte)shortfall, (byte)(shortfall >> 8), 0x88, 0, shortfall);
+        return false;
+    }
+
+    /// <summary>Mode 3: a new squad gathered at squad +4 (its priority, strength +8) walks to it and merges (state 7).</summary>
+    private bool Support(Span<byte> ai, Span<byte> r)
+    {
+        int old = OriginalAiSquads.Find(ai, r[4]);
+        if (old < 0) return false;
+        int s = OriginalAiRecruitment.Gather(ai, Own(ai), ai[old + 0x20], ai[old + 0x21], ai[old + 4], U32(r, 8), 0x808, 0x800);
+        if (s < 0) return false;
+        ai[s + 4] = ai[old + 4]; ai[s + 0x13] = ai[old + 1]; ai[s + 2] = 7; ai[s + 5] = 0; // 1F8C0 (old offset re-read, as the original)
+        return false;
+    }
+
+    /// <summary>Mode 4: a squad (priority 2·DAT[45], strength DAT[45] − DAT[45]/4) attacks object +8 (state 4).</summary>
+    private bool AttackObject(Span<byte> ai, Span<byte> r)
+    {
+        var (target, template) = world.Resolve(U32(r, 8));
+        if ((sbyte)target[0x19] <= 0) return false;
+        if (r[2] != 0)
+        {
+            if ((U32(r, 0x10) & 7) != 0) return true;
+            int q = OriginalAiSquads.Find(ai, r[0x0c]);
+            return q >= 0 && ai[q + 2] == 4 && ai[q + 5] <= 1;
+        }
+        uint wanted = (uint)(template[0x45] - (template[0x45] >> 2));
+        if (wanted == 0) return false;
+        byte priority = (byte)(template[0x45] << 1);
+        int s = OriginalAiRecruitment.Gather(ai, Own(ai), r[4], r[5], priority, wanted, 0xa08, 0x800);
+        if (s < 0) return false;
+        r[2] = 1; r[0x0c] = ai[s + 1];
+        ai[s + 4] = priority; W32(ai, s + 0x0f, U32(r, 8)); ai[s + 2] = 4; ai[s + 5] = 0; // 1F9EC
+        int shortfall = unchecked((int)(wanted - U32(ai, s + 0x36)));
+        if (shortfall > 0) Request(ai, Orders, 1, 0x11, 0x40, (byte)(r[4] << 5), 0, 0x88, 0, (uint)shortfall);
+        return false;
+    }
+
+    /// <summary>Mode 5: war on settlement +4 unless allied (+B9 relation 2) or much weaker; every 2048 turns asks for
+    /// raids (mode 6), every 4096 orders a random building of class 108h (+34F mode 8).</summary>
+    private bool War(Span<byte> ai, Span<byte> r)
+    {
+        if (world.Participant(ai[0])[0xb9 + r[4]] == 2) return false;
+        if (U32(ai, 0x19e9) > unchecked(2 * U32(world.Block(r[4]), 0x19e9))) return false;
+        if ((U32(r, 0x10) & 0x7ff) == 0) Request(ai, List, 6, 0x15, 0x96, r[4], 0, 0, 0, 0);
+        if ((U32(r, 0x10) & 0xfff) == 0)
+        {
+            var open = world.Buildable(ai[0], 0xf08, 0x108);
+            if (open.Count > 0)
+            {
+                byte t = open[(world.Random() * open.Count) >> 8];
+                Request(ai, Orders, 8, 0x15, 0x50, 0, 0, 0, 0, (uint)(t | world.Participant(ai[0])[0] << 8));
+            }
+        }
+        return true;
+    }
+
+    /// <summary>Mode 7: campaign against settlement +4: raids (mode 6) and an army gathered half-way between the homes
+    /// (mode 8, class from LE:3 F0E6); when the army is ready it holds the enemy territory +63..+66 (state 2).</summary>
+    private bool Campaign(Span<byte> ai, Span<byte> r)
+    {
+        if (r[2] == 0)
+        {
+            if ((U32(r, 0x10) & 0x7ff) != 0) return true;
+            r[2]++;
+            Request(ai, List, 6, 0x17, 0x96, r[4], 0, 0, 0, 0);
+            return AddArmy(ai, r);
+        }
+        int army = -1;
+        for (int k = 0; k < 20; k++)
+            if (ai[List + k * Size] == 8 && ai[List + k * Size + 1] == 0x17) { army = List + k * Size; break; }
+        if (army < 0) return AddArmy(ai, r);
+        if (ai[army + 2] != 1) return true;
+        ai[army] = 0xff;
+        int s = OriginalAiSquads.Find(ai, ai[army + 0x14]);
+        if (s < 0) return AddArmy(ai, r);
+        r[2] = 0;
+        var enemy = world.Block(r[4]);
+        ai[s + 4] = 0xa0; ai[s + 0x13] = enemy[0x63]; ai[s + 0x14] = enemy[0x64]; ai[s + 0x15] = enemy[0x65]; ai[s + 0x16] = enemy[0x66];
+        ai[s + 2] = 2; ai[s + 5] = 0; // 1F306
+        return true;
+    }
+
+    private bool AddArmy(Span<byte> ai, Span<byte> r)
+    {
+        var enemy = world.Block(r[4]);
+        byte x = (byte)((byte)(enemy[0x61] + ai[0x61]) >> 1), y = (byte)((byte)(enemy[0x62] + ai[0x62]) >> 1);
+        byte kind = gatherClasses[(world.Random() * 5) >> 8];
+        Request(ai, List, 8, 0x17, 0xa0, x, y, kind, 0, U32(ai, 0x45));
+        return true;
+    }
+
+    /// <summary>Mode 8: gather an army of strength +8 at the cell +4/+5 (priority +3, class from +6: mask 08h | high
+    /// nibble·100h, value low nibble·100h). New squads march there (state 1) or join the army squad +14 (state 7); the
+    /// missing strength is ordered as units of a random open template (+34F mode 2). Ready: +2 = 1.</summary>
+    private bool Army(Span<byte> ai, Span<byte> r)
+    {
+        if (r[2] != 0) return U32(r, 0x10) <= 1000;
+        if ((U32(r, 0x10) & 0x3ff) != 0) return true;
+        uint wanted = U32(r, 8);
+        int existing = OriginalAiSquads.Find(ai, r[0x14]);
+        if (existing < 0) r[0x14] = 0;
+        else
+        {
+            ai[existing + 4] = r[3];
+            if (wanted <= U32(ai, existing + 0x36)) { r[2] = 1; W32(r, 0x10, 0); return true; }
+            wanted -= U32(ai, existing + 0x36);
+        }
+        uint mask = (uint)(8 | (r[6] >> 4) << 8), value = (uint)((r[6] & 0xf) << 8);
+        int s = OriginalAiRecruitment.Gather(ai, Own(ai), r[4], r[5], r[3], wanted, mask, value);
+        if (s < 0) return true;
+        if (wanted > U32(ai, s + 0x36))
+        {
+            uint shortfall = wanted - U32(ai, s + 0x36);
+            var open = world.Buildable(ai[0], mask, value);
+            if (open.Count == 0) return false;
+            byte t = open[(world.Random() * open.Count) >> 8];
+            byte strength = world.Template(ai[0], t)[0x76];
+            uint quotient = (shortfall & 0xffff) / strength;   // DIV r/m8: AX / DAT[76]
+            if (quotient > 0xff) throw new OverflowException("20DD0 mode 8: the original faults on DIV overflow");
+            Request(ai, Orders, 2, 0x18, 0x81, t, world.Participant(ai[0])[0], 0, 0, (byte)(quotient + 1));
+        }
+        if (r[0x14] == 0) { r[0x14] = ai[s + 1]; ai[s + 4] = r[3]; ai[s + 0x0d] = r[4]; ai[s + 0x0e] = r[5]; ai[s + 2] = 1; ai[s + 5] = 0; } // 1F464
+        else { ai[s + 4] = r[3]; ai[s + 0x13] = r[0x14]; ai[s + 2] = 7; ai[s + 5] = 0; } // 1F8C0
+        return true;
+    }
+
+    private bool BecomeChase(Span<byte> ai, Span<byte> r, byte[] target)
+    {
+        W32(r, 8, world.Reference(target)); r[0x14] = 0; r[0] = 9;
+        return Chase(ai, r);
+    }
+
+    /// <summary>Mode 9: a squad strong enough for what guards object +8 (enemies in its sight, block +13, +0E, +14·32)
+    /// chases it (state 5, priority C8h); without enough free units the strength is ordered (+34F mode 1).
+    /// The chase is retried up to block +52 times.</summary>
+    private bool Chase(Span<byte> ai, Span<byte> r)
+    {
+        var (target, template) = world.Resolve(U32(r, 8));
+        if ((sbyte)target[0x19] <= 0) return false;
+        if (r[2] != 0)
+        {
+            if ((U32(r, 0x10) & 7) != 0) return true;
+            int q = OriginalAiSquads.Find(ai, r[0x0c]);
+            if (q >= 0 && ai[q + 2] == 5) return true;
+            if (++r[0x14] >= ai[0x52]) return false;
+            r[2] = 0; return true;
+        }
+        if ((U32(r, 0x10) & 0xff) != 0) return true;
+        var sight = OriginalAiRecruitment.Sight(world, target, template);
+        uint wanted = unchecked((sight.EnemyStrength + U32(ai, 0x13)) * U32(ai, 0x0e) >> 5) + (uint)(r[0x14] << 5);
+        byte x = (byte)(U32(target, 4) >> 5), y = (byte)(U32(target, 8) >> 5);
+        var (s, ebx) = OriginalAiRecruitment.GatherFree(ai, Own(ai), x, y, wanted, 0xa08, 0x800);
+        if (s < 0) { Request(ai, Orders, 1, 0x16, 0x40, (byte)(x << 5), 0, 0xa8, 0, ebx); return true; } // EBP = EBX left by 21696
+        r[2] = 1; r[0x0c] = ai[s + 1];
+        ai[s + 4] = 0xc8; W32(ai, s + 0x0f, U32(r, 8)); ai[s + 2] = 5; ai[s + 5] = 0; // 1FB9C
+        return true;
+    }
+
+    /// <summary>Mode 10: when the block's +1A01 reaches C0h, up to five times pick a random settlement in relation 1 or 2
+    /// and chase its nearest mine of ore +8 (becomes mode 9).</summary>
+    private bool Plunder(Span<byte> ai, Span<byte> r)
+    {
+        if (r[2] == 0) { if (ai[0x1a01] < 0xc0) return false; r[2] = 1; }
+        if ((U32(r, 0x10) & 0xff) != 0) return true;
+        if (++r[0x14] > 5) return false;
+        byte other = 0;
+        for (int tries = 10; tries > 0; tries--)
+        {
+            other = (byte)(world.Random() * world.ParticipantCount >> 8);
+            if (other == ai[0]) continue;
+            byte relation = world.Participant(ai[0])[0xb9 + other];
+            if (relation is 1 or 2) break;
+        }
+        if (OriginalAiRecruitment.Mine(world.Chain(other), ai, r[8]) is not { } mine) return true;  // home of this block (ESI)
+        return BecomeChase(ai, r, mine.Record);
+    }
+}
