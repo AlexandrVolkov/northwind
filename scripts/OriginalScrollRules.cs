@@ -34,3 +34,32 @@ public static class OriginalScrollRules
     /// <summary>LE:1 1132F: «Панорама» −/+ changes [908F] by one within 1..16.</summary>
     public static byte ChangePan(byte pan, int step) { int next = pan + step; return next is >= MinPan and <= MaxPan ? (byte)next : pan; }
 }
+
+/// <summary>LE:1 4580..4818: cursor of a pending order over the map window (hot spot 15,15 = [1965] 0F000Fh). Mode 1 (move target):
+/// cross 8Ah–93h; mode 2 (object target): skull 64h–6Dh over the ground, 78h–81h over an object, 6Eh–77h when the object's class
+/// byte [0D] has both low bits set (another owner at war, 4633..464F). Confirmed on DOSBox screenshots for move and attack.</summary>
+public static class OriginalOrderCursor
+{
+    public static readonly (ushort First, ushort Last) Move = (0x8a, 0x93), Target = (0x64, 0x6d), TargetObject = (0x78, 0x81), TargetEnemy = (0x6e, 0x77);
+    public const int HotSpot = 15;
+    /// <summary>[0D] for an object of <paramref name="owner"/> seen by <paramref name="player"/>: base (DAT[40] &amp; 18004h, with the 10000h
+    /// bit folded down) + 1, +1 for another owner unless DAT[40] has 20020h or the owner is [1971], +1 if at war (bit test of the war mask).</summary>
+    public static byte ObjectClass(uint flags, byte owner, byte player, byte neutral, bool atWar)
+    {
+        uint masked = flags & 0x18004;
+        byte cl = unchecked((byte)((byte)masked | (byte)(masked >> 12)));
+        cl++;
+        if (owner == player || (flags & 0x20020) == 0x20020 || owner == neutral) return cl;
+        cl++;
+        if (atWar) cl++;
+        return cl;
+    }
+    public static (ushort First, ushort Last) For(int mode, byte? objectClass) => mode switch
+    {
+        1 => Move,
+        2 when objectClass is null => Target,
+        2 when (objectClass & 3) == 3 => TargetEnemy,
+        2 => TargetObject,
+        _ => OriginalScrollRules.Arrow,
+    };
+}

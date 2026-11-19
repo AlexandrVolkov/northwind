@@ -25,6 +25,7 @@ public partial class SkirmishMain : Node2D
     /// <summary>«Панорама» [908F] (1..16).</summary>
     public byte Pan { get; private set; } = OriginalScrollRules.DefaultPan;
     public (ushort First, ushort Last) CursorFamily { get; private set; } = OriginalScrollRules.Arrow;
+    public int CursorHotSpot { get; private set; }
     private double _scrollTicks; private byte _scrollLast;
     public Skirmish Battle { get; private set; } = null!;
     public HashSet<uint> Selection { get; } = [];
@@ -197,6 +198,7 @@ public partial class SkirmishMain : Node2D
     public void ChangeScrollSpeed(int step) => Pan = OriginalScrollRules.ChangePan(Pan, step);
     /// <summary>Pending targeting: 2 move, 3 attack, 4 forestry, 8 mine; UI adapter to the supported world commands.</summary>
     public int PendingOrder { get; private set; }
+    public void CancelOrder() => PendingOrder = 0;
     /// <summary>Use the decoded DAT mode/group pair, shared by differently drawn worker and soldier buttons.</summary>
     public void OrderSlot(SkirmishActor unit, InterfaceSlot slot)
     {
@@ -236,7 +238,15 @@ public partial class SkirmishMain : Node2D
         var input = new ScrollInput(pointer ? Math.Clamp(mouse.X, 0, Hud.Width - 1) : Hud.Width / 2, pointer ? Math.Clamp(mouse.Y, 0, 479) : 240, Hud.Width, 480,
             keys && Input.IsKeyPressed(Key.Left), keys && Input.IsKeyPressed(Key.Right), keys && Input.IsKeyPressed(Key.Up), keys && Input.IsKeyPressed(Key.Down));
         var step = OriginalScrollRules.Step(input, unchecked((byte)(ulong)_scrollTicks), _scrollLast, Pan);
-        _scrollLast = step.LastTimer; CursorFamily = (step.CursorFirst, step.CursorLast);
+        _scrollLast = step.LastTimer; CursorFamily = (step.CursorFirst, step.CursorLast); CursorHotSpot = 0;
+        if (CursorFamily == OriginalScrollRules.Arrow && PendingOrder is 2 or 3 && MapScreenRect.HasPoint(GetViewport().GetMousePosition()))
+        {
+            // Port pending orders 2 (move) and 3 (attack) correspond to the original modes 1 and 2; gather/mine cursors are not confirmed.
+            var hovered = Battle.At(GetGlobalMousePosition());
+            byte? cls = hovered == null ? null : OriginalOrderCursor.ObjectClass(BinaryPrimitives.ReadUInt32LittleEndian(hovered.Parameters.AsSpan(0x40)),
+                hovered.Record[3], (byte)Battle.Rules.PlayerSlot, 0xff, hovered.Record[3] != Battle.Rules.PlayerSlot && Battle.Diplomacy.AtWar(Battle.Rules.PlayerSlot, hovered.Record[3]));
+            CursorFamily = OriginalOrderCursor.For(PendingOrder == 2 ? 1 : 2, cls); CursorHotSpot = OriginalOrderCursor.HotSpot;
+        }
         if (step.Dx != 0 || step.Dy != 0) { Camera.Position += new Vector2(step.Dx, step.Dy) * 32; ClampCamera(); }
     }
     /// <summary>Pointer scrolling at the screen edge (can be turned off for tests).</summary>
