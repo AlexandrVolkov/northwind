@@ -155,12 +155,19 @@ public partial class SkirmishMain : Node2D
     private void Layout()
     {
         var size = GetViewportRect().Size;
-        HudScale = Math.Max(.25f, Math.Min(size.X / OriginalHud.Size.X, size.Y / OriginalHud.Size.Y));
-        HudOrigin = ((size - OriginalHud.Size * HudScale) / 2).Floor();
+        // 4:3 keeps the original 640 width; 16:10 gives 768, 16:9 about 853; wider screens are pillarboxed at 16:9.
+        float width = DisplaySettings.ClassicLayout ? 640 : Mathf.Clamp(MathF.Floor(480 * size.X / size.Y), 640, MathF.Floor(480 * 16 / 9f));
+        Hud.Width = width;
+        float old = HudScale;
+        HudScale = Math.Max(.25f, Math.Min(size.X / width, size.Y / OriginalHud.Size.Y));
+        HudOrigin = ((size - new Vector2(width, OriginalHud.Size.Y) * HudScale) / 2).Floor();
         _hudLayer.Transform = new Transform2D(0, Vector2.One * HudScale, 0, HudOrigin);
+        if (Camera.Zoom.X == old && old != HudScale) Camera.Zoom = Vector2.One * HudScale;   // window resized: keep 1 original pixel per HUD pixel
     }
     /// <summary>Screen rectangle of the map window.</summary>
-    public Rect2 MapScreenRect => new(HudOrigin + OriginalHud.MapWindow.Position * HudScale, OriginalHud.MapWindow.Size * HudScale);
+    public Rect2 MapScreenRect => new(HudOrigin + Hud.MapRect.Position * HudScale, Hud.MapRect.Size * HudScale);
+    /// <summary>Screen point of a point given in the original 640×480 frame (panel points follow the panel to the right edge).</summary>
+    public Vector2 ClassicToScreen(Vector2 point) => HudOrigin + Hud.FromClassic(point) * HudScale;
     public Vector2 ToHud(Vector2 screen) => (screen - HudOrigin) / HudScale;
     /// <summary>World rectangle visible through the map window.</summary>
     public Rect2 VisibleWorld()
@@ -216,6 +223,18 @@ public partial class SkirmishMain : Node2D
         };
         if (accepted) { PendingOrder = 0; _orderMark = point; _markUntil = Battle.Elapsed + 2; }
     }
+    /// <summary>Scroll the map when the pointer reaches an edge of the window or screen (port setting; the original scrolled at the
+    /// screen edge with direction cursors of WORK.SPR, the cursor change is not ported yet).</summary>
+    public bool EdgeScrolling { get; set; } = true;
+    public const float EdgeMargin = 6;
+    public static Vector2 EdgeDirection(Vector2 mouse, Vector2 size, float margin)
+    {
+        if (mouse.X < 0 || mouse.Y < 0 || mouse.X > size.X || mouse.Y > size.Y) return Vector2.Zero;   // pointer outside the window
+        var d = Vector2.Zero;
+        if (mouse.X <= margin) d.X--; else if (mouse.X >= size.X - 1 - margin) d.X++;
+        if (mouse.Y <= margin) d.Y--; else if (mouse.Y >= size.Y - 1 - margin) d.Y++;
+        return d;
+    }
     public void ExitMission() => GetTree().ChangeSceneToFile("res://scenes/main.tscn");
     public override void _Process(double delta)
     {
@@ -232,6 +251,8 @@ public partial class SkirmishMain : Node2D
             if (Input.IsPhysicalKeyPressed(Key.W) || Input.IsPhysicalKeyPressed(Key.Up)) direction.Y--;
             if (Input.IsPhysicalKeyPressed(Key.S) || Input.IsPhysicalKeyPressed(Key.Down)) direction.Y++;
         }
+        if (EdgeScrolling && DisplayServer.GetName() != "headless" && DisplayServer.WindowIsFocused())
+            direction += EdgeDirection(GetViewport().GetMousePosition(), GetViewportRect().Size, EdgeMargin);
         Camera.Position += direction.Normalized() * (float)delta * ScrollSpeed / Camera.Zoom.X; ClampCamera();
         _hover = (int)(Battle.At(GetGlobalMousePosition())?.Id ?? 0);
         RefreshUi(); QueueRedraw(); _markers.QueueRedraw(); Hud.QueueRedraw();

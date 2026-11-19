@@ -35,7 +35,7 @@ public partial class TestRunner
             var palette = InterfaceData.Load().UiColors;
             void Pixel(Image image, Vector2 at, int index)
             {
-                var p = scene.HudOrigin + (at + Vector2.One * .5f) * scene.HudScale;
+                var p = scene.ClassicToScreen(at + Vector2.One * .5f);
                 var rgb = palette[index]; var expected = new Color(rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f);
                 Check(image.GetPixel((int)p.X, (int)p.Y).IsEqualApprox(expected), $"HUD gauge pixel {at} uses native palette index {index:X}");
             }
