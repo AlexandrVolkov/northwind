@@ -2215,6 +2215,108 @@
         "data/original_ai.json"
       ],
       "limitations": ""
+    },
+    {
+      "id": "ai-2323a",
+      "module": "LE:1",
+      "start": 143930,
+      "end": 144721,
+      "name": "AI turn: tribute, collapse, relation decisions",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-turn.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": "plan bytes +5..+7 are register leftovers, written as zero"
+    },
+    {
+      "id": "ai-23a95",
+      "module": "LE:1",
+      "start": 146069,
+      "end": 146107,
+      "name": "AI has plan for target",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-turn.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-23b6a",
+      "module": "LE:1",
+      "start": 146282,
+      "end": 146318,
+      "name": "Territories overlap",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-turn.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-1eb40",
+      "module": "LE:1",
+      "start": 125760,
+      "end": 125800,
+      "name": "Find or add AI plan",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-turn.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-1eaed",
+      "module": "LE:1",
+      "start": 125677,
+      "end": 125747,
+      "name": "Add AI plan record",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-turn.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": "plan bytes +5..+7 are register leftovers, written as zero"
+    },
+    {
+      "id": "ai-1ead8",
+      "module": "LE:1",
+      "start": 125656,
+      "end": 125677,
+      "name": "AI block of participant",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-turn.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": ""
     }
   ]
 }
