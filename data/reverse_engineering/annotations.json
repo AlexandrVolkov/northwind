@@ -2458,6 +2458,40 @@
         "scripts/OriginalTechRules.cs"
       ],
       "limitations": ""
+    },
+    {
+      "id": "ai-23c11",
+      "module": "LE:1",
+      "start": 146449,
+      "end": 146882,
+      "name": "AI development step: laboratory and request list",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-research.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": "register leftovers in list records not modelled"
+    },
+    {
+      "id": "ai-22e46",
+      "module": "LE:1",
+      "start": 142918,
+      "end": 142981,
+      "name": "Random open template of a DAT class",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-research.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": ""
     }
   ]
 }

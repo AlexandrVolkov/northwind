@@ -351,3 +351,69 @@ public partial class TestRunner
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(), "AI upkeep 226F1 matches original x86");
     }
 }
+
+public partial class TestRunner
+{
+    private void OriginalAiResearchChecks()
+    {
+        using var reference = GameData.Read<JsonDocument>("res://tests/fixtures/ai-research.json");
+        var root = reference.RootElement;
+        var dat = GameData.Read<TemplatesData>("res://assets/imported/templates.json").Armies["ARMY__02.DAT"].Templates
+            .Select(t => Convert.FromHexString(t.RawRecordHex)).ToArray();
+        var tech = GameData.Read<OriginalTechData>("res://data/original_tech.json").Armies[2];
+        var baseTree = tech.Build();
+        Check(Convert.ToHexStringLower(SHA256.HashData(baseTree)) == root.GetProperty("tree_sha256").GetString(), "AI research tree matches ARMY__02.TRE");
+        using var terrain = GameData.Read<JsonDocument>("res://data/original_terrain.json");
+        var table = terrain.RootElement.GetProperty("random_values").EnumerateArray().Select(x => (byte)x.GetInt32()).ToArray();
+        using var digest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        int count = 0, orders = 0, requests = 0, started = 0;
+        const int Orders = OriginalAiResearch.Orders, Requests = OriginalAiResearch.Requests;
+        foreach (var c in root.GetProperty("cases").EnumerateArray())
+        {
+            byte me = (byte)c.GetProperty("me").GetInt32();
+            var tree = (byte[])baseTree.Clone(); int r = 0;
+            foreach (var m in c.GetProperty("mutations").EnumerateArray())
+            {
+                if (m[0].GetInt32() != 0) tree[tech.Records[r].Offset] ^= 0x80;
+                if (m[1].ValueKind == JsonValueKind.Number) tree[tech.Records[r].Offset + 2] = (byte)m[1].GetInt32();
+                r++;
+            }
+            var ai = new byte[OriginalAiRules.BlockSize]; ai[0] = me;
+            BinaryPrimitives.WriteUInt32LittleEndian(ai.AsSpan(1), c.GetProperty("turn").GetUInt32());
+            ai[0x1a34] = (byte)c.GetProperty("flags").GetInt32(); ai[0x53] = (byte)c.GetProperty("b53").GetInt32();
+            for (int k = 0; k < 20; k++) { ai[Orders + k * 0x15] = 0xff; ai[Requests + k * 0x15] = 0xff; }
+            int slot = 0;
+            foreach (var o in c.GetProperty("orders").EnumerateArray()) { ai[Orders + slot * 0x15] = (byte)o[0].GetInt32(); ai[Orders + slot * 0x15 + 1] = (byte)o[1].GetInt32(); slot++; }
+            slot = 0;
+            foreach (var q in c.GetProperty("requests").EnumerateArray())
+            {
+                int at = Requests + slot++ * 0x15;
+                ai[at] = (byte)q[0].GetInt32(); ai[at + 8] = (byte)q[1].GetInt32(); ai[at + 9] = (byte)q[2].GetInt32(); ai[at + 10] = 2;
+                BinaryPrimitives.WriteUInt32LittleEndian(ai.AsSpan(at + 0x10), q[3].GetUInt32());
+            }
+            var chain = new List<(byte[] Record, byte[] Template)>();
+            foreach (var o in c.GetProperty("objects").EnumerateArray())
+            {
+                int t = o[0].GetInt32();
+                var rec = new byte[0x40]; CombatUnit((byte)t, me, (byte)o[1].GetInt32(), 0, 48, 48, 1).CopyTo(rec, 0); rec[0x14] = (byte)o[2].GetInt32();
+                BinaryPrimitives.WriteUInt32LittleEndian(rec.AsSpan(0x10), 0x40);
+                chain.Add((rec, dat[t]));
+            }
+            byte index = (byte)c.GetProperty("random").GetInt32();
+            int ordersBefore = Enumerable.Range(0, 20).Count(k => ai[Orders + k * 0x15] != 0xff);
+            OriginalAiResearch.Step(ai, me, 2, tree, dat, chain, () => table[index++]);
+            orders += Enumerable.Range(0, 20).Count(k => ai[Orders + k * 0x15] != 0xff) - ordersBefore;
+            requests += Enumerable.Range(0, 20).Count(k => ai[Requests + k * 0x15] == 2);
+            if (chain.Any(x => x.Record[0x22] == 5)) started++;
+            var block = (byte[])ai.Clone();
+            for (int k = 0; k < 20; k++) { block.AsSpan(Orders + k * 0x15 + 4, 4).Clear(); block.AsSpan(Orders + k * 0x15 + 0xa, 2).Clear(); block.AsSpan(Requests + k * 0x15 + 4, 4).Clear(); }
+            digest.AppendData(block); digest.AppendData(tree);
+            foreach (var (record, _) in chain) digest.AppendData(record);
+            digest.AppendData([index]);
+            count++;
+        }
+        var res = root.GetProperty("results").GetProperty("research");
+        Check(count == res.GetProperty("case_count").GetInt32() && orders > 20 && requests > 0 && started > 0, $"AI research coverage ({count}, orders {orders}, requests {requests}, laboratories started {started})");
+        Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == res.GetProperty("sha256").GetString(), "AI development step 23C11 matches original x86");
+    }
+}

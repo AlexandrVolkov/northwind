@@ -471,3 +471,108 @@ public static class OriginalAiPlans
         }
     }
 }
+
+/// <summary>AI development step LE:1 23C11..23DC1 (docs/ai.md): laboratory start/order and the request list +83B resolved
+/// through the settlement's development tree. Bytes the original fills from register leftovers are written as zero
+/// (+34F records +4..+7, +0A/+0B of building orders; +83B records +4..+7).</summary>
+public static class OriginalAiResearch
+{
+    public const int Orders = 0x34f, Requests = 0x83b, Size = 0x15, Count = 20;
+    public const uint LaboratoryMask = 0xf08, LaboratoryClass = 0x808;
+    private static uint U32(ReadOnlySpan<byte> raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw[offset..]);
+    private static void W32(Span<byte> raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw[offset..], value);
+
+    /// <summary>1ECA0: first living object of the chain (under construction: above DAT[46]) with DAT[40] &amp; mask = value.</summary>
+    public static byte[]? FirstObject(IEnumerable<(byte[] Record, byte[] Template)> chain, uint mask, uint value)
+    {
+        foreach (var (record, template) in chain)
+        {
+            if ((sbyte)record[0x19] <= 0) continue;
+            if (record[0x14] == 0 && (sbyte)record[0x19] <= (sbyte)template[0x46]) continue;
+            if ((U32(template, 0x40) & mask) == value) return record;
+        }
+        return null;
+    }
+
+    /// <summary>1EB5C: add a record unless one with this mode and +1 exists.</summary>
+    public static void Add(Span<byte> ai, int list, byte mode, byte first, byte third, uint parameter)
+    {
+        for (int k = 0; k < Count; k++)
+            if (ai[list + k * Size] == mode && ai[list + k * Size + 1] == first) return;
+        for (int k = 0; k < Count; k++)
+        {
+            var record = ai.Slice(list + k * Size, Size);
+            if (record[0] != 0xff) continue;
+            record.Clear(); record[0] = mode; record[1] = first; record[3] = third; W32(record, 8, parameter);
+            return;
+        }
+    }
+
+    /// <summary>23C11 for the settlement <paramref name="me"/> of army <paramref name="army"/>; <paramref name="random"/> is 9E41.</summary>
+    public static void Step(Span<byte> ai, byte me, byte army, Span<byte> tree, IReadOnlyList<byte[]> templates,
+        IEnumerable<(byte[] Record, byte[] Template)> chain, Func<byte> random)
+    {
+        uint step = U32(ai, 1) + 0x85;
+        if ((ai[0x1a34] & 1) == 0) return;
+        if ((step & 0xff) == 0 && ai[0x53] != 0)
+        {
+            var laboratory = FirstObject(chain, LaboratoryMask, LaboratoryClass);
+            if (laboratory != null) { laboratory[0x22] = 5; laboratory[0x23] = 5; }
+            else
+            {
+                var open = OriginalTechRules.Buildable(templates, tree, true, LaboratoryMask, LaboratoryClass);   // 22E46
+                if (open.Count > 0)
+                {
+                    byte template = open[(random() * open.Count) >> 8];
+                    Add(ai, Orders, 5, 0x6a, 0x50, (uint)(template | army << 8));
+                }
+                else
+                {
+                    var known = OriginalTechRules.Buildable(templates, tree, false, LaboratoryMask, LaboratoryClass);
+                    if (known.Count > 0) Add(ai, Requests, 2, 0x6a, 0x80, (uint)(0x80 | known[0] << 8 | army << 16));
+                }
+            }
+        }
+        for (int k = 0; k < Count; k++)
+        {
+            var request = ai.Slice(Requests + k * Size, Size);
+        Again:   // 23CE3
+            if (request[0] == 1)
+            {
+                if (request[8] == 1) Add(ai, Orders, 5, 0x61, 0x80, (uint)(request[9] | request[10] << 8));
+            }
+            else if (request[0] == 2 && Unlock(request, tree, random)) goto Again;
+            request[0] = 0xff;
+            W32(request, 0x10, U32(request, 0x10) + 1);
+        }
+    }
+
+    /// <summary>23D12..23D88: find the wanted item (+8 kind, +9 id); if it still has unmet conditions, pick a random parent
+    /// listing it as a child ((9E41 · unmet) >> 8 -th occurrence); a parent with no unmet conditions becomes the request (mode 1).</summary>
+    private static bool Unlock(Span<byte> request, Span<byte> tree, Func<byte> random)
+    {
+        byte kind = request[8], id = request[9];
+        int at = 0;
+        while (true)
+        {
+            if (tree[at] == 0xff) return false;
+            if (tree[at] == kind && tree[at + 1] == id) break;
+            at += 0x10 + 2 * tree[at + 0xf];
+        }
+        if (tree[at + 2] == 0) return false;
+        byte pick = (byte)((random() * tree[at + 2]) >> 8);
+        at = 0;
+        while (tree[at] != 0xff)
+        {
+            for (int c = 0; c < tree[at + 0xf]; c++)
+                if (tree[at + 0x10 + 2 * c] == kind && tree[at + 0x11 + 2 * c] == id && (sbyte)--pick < 0)
+                {
+                    if (tree[at + 2] != 0) return false;
+                    request[8] = tree[at]; request[9] = tree[at + 1]; request[0] = 1;
+                    return true;
+                }
+            at += 0x10 + 2 * tree[at + 0xf];
+        }
+        return false;
+    }
+}
