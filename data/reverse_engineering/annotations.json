@@ -2948,6 +2948,78 @@
       "evidence": ["docs/ai.md", "tests/fixtures/ai-orders.json", "data/original_producers.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
       "limitations": ""
+    },
+    {
+      "id": "ai-economy-plan",
+      "module": "LE:1",
+      "start": 138905,
+      "end": 139694,
+      "name": "AI economy planning: income, upkeep, economy requests, farm and building orders",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-economy-execute",
+      "module": "LE:1",
+      "start": 139694,
+      "end": 140212,
+      "name": "AI economy executor over list +4F3 (workers, mines, lumbermill)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "D363 occupancy check is a hook"
+    },
+    {
+      "id": "ai-gather-workers",
+      "module": "LE:1",
+      "start": 140341,
+      "end": 140497,
+      "name": "Gather free workers into a squad",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-mine-site",
+      "module": "LE:1",
+      "start": 140819,
+      "end": 140942,
+      "name": "Random seen ore cell around the home for a mine",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-worker-state-9-init",
+      "module": "LE:1",
+      "start": 128497,
+      "end": 128555,
+      "name": "Set worker squad state 9 with its target area",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-worker-state-10-init",
+      "module": "LE:1",
+      "start": 128794,
+      "end": 128812,
+      "name": "Set worker squad state 10",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
     }
   ]
 }
