@@ -55,6 +55,7 @@ public partial class TestRunner : Node
                 case "original-tech": OriginalTechChecks(); break;
                 case "original-ai": OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); OriginalAiResearchChecks(); OriginalAiSquadChecks(); OriginalAiSquadStepChecks(); OriginalAiSquadStateChecks(); OriginalAiMilitaryChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
+                case "skirmish-ai": SkirmishAiChecks(); break;
                 default: throw new ArgumentException($"Unknown test mode: {mode}");
             }
             GD.Print($"C# {mode}: PASS ({_checks} checks)"); GetTree().Quit();

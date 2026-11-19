@@ -125,6 +125,7 @@ public sealed partial class Skirmish : IDisposable
         InitializePopulation(scenario);
         InitializeDiplomacy(scenario);
         InitializeProduction();
+        InitializeAi(scenario, templates);
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
     }
     public SkirmishActor? Find(uint id) => Actors.FirstOrDefault(a => a.Id == id && a.Alive);
@@ -345,6 +346,7 @@ public sealed partial class Skirmish : IDisposable
             var engaged = Find(BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(0x1c)));
             OriginalCombatRules.AfterUpdate(actor.Record, engaged != null ? engaged.Record : ReadOnlySpan<byte>.Empty, _globalTick);
         }
+        TickAi(); // 1E7EA follows the object update (LE:1 31D6)
         if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";
         else if (!Objective.Standing && !Actors.Any(a => a.Team == 1 && !a.Structure && a.Alive)) Outcome = "Победа — вражеское поселение разбито";
     }

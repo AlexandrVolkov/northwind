@@ -11,6 +11,12 @@ public sealed class OriginalAiData
 {
     public int FormatVersion { get; set; }
     public List<OriginalAiCharacter> Characters { get; set; } = [];
+    /// <summary>DS:287E arctangent table of 6996 (squad retreat direction).</summary>
+    public string ArctangentHex { get; set; } = "";
+    /// <summary>LE:3 F02E: squad message text ids, three per row; the row is AI block +29.</summary>
+    public string SquadMessagesHex { get; set; } = "";
+    /// <summary>LE:3 F0E6: class bytes of the armies gathered by military request 7.</summary>
+    public string ArmyClassesHex { get; set; } = "";
     public byte[] Table() => Characters.OrderBy(c => c.Index).SelectMany(c => Convert.FromHexString(c.RawHex)).ToArray();
 }
 
