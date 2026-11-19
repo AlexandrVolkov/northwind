@@ -2659,7 +2659,7 @@
       "status": "ported",
       "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
-      "limitations": ""
+      "limitations": "the state setters 1F1C7, 1F306 and 1F464 are field writes made by the military requests, not ported yet"
     },
     {
       "id": "ai-squad-states-4-8",
@@ -2720,6 +2720,42 @@
       "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
       "limitations": ""
+    },
+    {
+      "id": "random-streams",
+      "module": "LE:1",
+      "start": 40513,
+      "end": 40553,
+      "name": "Random byte streams [19EB]/[19EC] over table DS:297E",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalForestryRules.cs", "scripts/OriginalAiSquads.cs"],
+      "limitations": "third stream 9E69 ([19ED]) is not covered"
+    },
+    {
+      "id": "dat-template-lookup",
+      "module": "LE:1",
+      "start": 26743,
+      "end": 26840,
+      "name": "Participant record and DAT template of an object",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formats.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "implicit: the port passes template records alongside objects"
+    },
+    {
+      "id": "ai-area-strength",
+      "module": "LE:1",
+      "start": 136689,
+      "end": 136800,
+      "name": "AI strength wanted for an area (215F1) and against an object (2160B)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "implemented inside the squad states; the dead branch 21646..2165D is not used"
     }
   ]
 }
