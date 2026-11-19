@@ -28,8 +28,12 @@ def extract(game):
         item = {'index': k, 'raw_hex': raw.hex(), 'mode': raw[0]}
         item.update({name: struct.unpack_from('<I', raw, at - 5)[0] for name, at in FIELDS.items()})
         characters.append(item)
+    # Tables used by the squad states (6996 direction, 20071 messages) and military requests (20DD0 mode 7 army classes).
+    tables = {'arctangent_hex': objects[1]['payload'][0x287e:0x297e].hex(),        # DS:287E (LE:2), 256 bytes
+              'squad_messages_hex': payload[0xf02e:0xf06a].hex(),                    # LE:3 F02E, 5 rows of three text ids
+              'army_classes_hex': payload[0xf0e6:0xf0eb].hex()}                      # LE:3 F0E6, mode-8 class bytes
     return {'format_version': 1, 'source_sha256': EXE_SHA256, 'fixup': {'source_operand': source, 'target_object': 3, 'target_offset': TABLE},
-            'block_offset': 5, 'characters': characters}
+            'block_offset': 5, 'characters': characters, **tables}
 
 
 if __name__ == '__main__':
