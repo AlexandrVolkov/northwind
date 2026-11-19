@@ -2,7 +2,7 @@
   "status": "experimental_skirmish_not_original_campaign",
   "player_slot": 0,
   "enemy_slot": 3,
-  "ticks_per_second": 30,
+  "ticks_per_second": 18.2065,
   "aggro_range": 360,
   "units": {
     "Предводитель": {

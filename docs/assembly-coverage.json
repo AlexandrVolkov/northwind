@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "7f05e2f672060b31a125d09b689bd5a8455d378f121df70acdb32ebc472ec094",
+  "annotation_sha256": "9e73ad6680a536f4b56e29b9c145de917dcbd2260c95730bb2ac90940b54a519",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,9 +32,10 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 5000,
+        "partial": 5281,
         "ported": 5612,
-        "unreviewed": 136270
+        "unreviewed": 135892,
+        "verified": 97
       },
       "linear_rows": 45008,
       "flow_candidate_instructions": 30465,
@@ -94,6 +95,47 @@
         },
         {
           "start": 13762,
+          "end": 16778,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 16778,
+          "end": 16838,
+          "status": "verified",
+          "classification": "code",
+          "claims": [
+            "timing-418a"
+          ]
+        },
+        {
+          "start": 16838,
+          "end": 16875,
+          "status": "verified",
+          "classification": "code",
+          "claims": [
+            "timing-41c6"
+          ]
+        },
+        {
+          "start": 16875,
+          "end": 17083,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 17083,
+          "end": 17166,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "timing-42bb"
+          ]
+        },
+        {
+          "start": 17166,
           "end": 17210,
           "status": "unreviewed",
           "classification": "unknown",
@@ -680,6 +722,22 @@
         },
         {
           "start": 39929,
+          "end": 41227,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 41227,
+          "end": 41425,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "timing-a10b"
+          ]
+        },
+        {
+          "start": 41425,
           "end": 42207,
           "status": "unreviewed",
           "classification": "unknown",

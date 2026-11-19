@@ -6,7 +6,8 @@ public sealed class SkirmishRules
 {
     public int PlayerSlot { get; set; }
     public int EnemySlot { get; set; } = 3;
-    public int TicksPerSecond { get; set; } = 30;
+    /// <summary>Object updates per second. Original: PIT 1193182/16384 Hz, world step every 2 ticks at speed FDh, objects every 2nd step.</summary>
+    public double TicksPerSecond { get; set; } = 1193182.0 / 16384 / 4;
     public float AggroRange { get; set; } = 360;
     public Dictionary<string, SkirmishUnitRules> Units { get; set; } = [];
     public EconomyRules Economy { get; set; } = new();
@@ -92,6 +93,8 @@ public sealed partial class Skirmish : IDisposable
     private readonly Func<uint, MovementObject> _resolveMovement;
     private readonly Dictionary<(Vector2I Cell, int Layer), uint> _reservations = [];
     private double _accumulator;
+    /// <summary>Bridge-only route replanning delay: 21 object updates (0.7 s at the former experimental 30/s).</summary>
+    private double ReplanDelay => 21 / Rules.TicksPerSecond;
     public SkirmishActor Hero => Actors.Single(a => a.Team == 0 && a.Hero);
     public SkirmishActor Objective => Actors.Single(a => a.Team == 1 && a.Source.TemplateName == "Замок");
 
@@ -282,13 +285,15 @@ public sealed partial class Skirmish : IDisposable
         double step = 1.0 / Rules.TicksPerSecond;
         // Retain time rather than discarding it when frame rate drops.
         int budget = 240;
-        while (_accumulator >= step && budget-- > 0 && Outcome == "") { Tick(step); _accumulator -= step; }
+        // A small tolerance keeps whole-tick requests (n / TicksPerSecond) from losing a tick to rounding.
+        while (_accumulator >= step - 1e-9 && budget-- > 0 && Outcome == "") { Tick(step); _accumulator -= step; }
     }
     private void Tick(double dt)
     {
         Elapsed += dt;
         foreach (var effect in Effects) effect.Remaining -= dt;
         Effects.RemoveAll(e => e.Remaining <= 0);
+        TickArrows(); // 96CD runs on every world step: twice per object update at the default speed
         TickArrows();
         TickDeaths();
         TickBuildings();
@@ -318,12 +323,12 @@ public sealed partial class Skirmish : IDisposable
             if (target != null && actor.Target == 0) target = null;
             if (!actor.Stepping && target != null && actor.ReplanTimer <= 0)
             {
-                PlanAttack(actor, target); actor.ReplanTimer = .7;
+                PlanAttack(actor, target); actor.ReplanTimer = ReplanDelay;
             }
             else if (!actor.Stepping && actor.Goal is { } goal && actor.Route.Count == 0 && actor.ReplanTimer <= 0)
             {
                 if (actor.Cell == goal) actor.Goal = null;
-                else { Plan(actor, goal); actor.ReplanTimer = .7; }
+                else { Plan(actor, goal); actor.ReplanTimer = ReplanDelay; }
             }
             MoveTick(actor);
         }

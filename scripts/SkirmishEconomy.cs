@@ -304,7 +304,7 @@ public sealed partial class Skirmish
         {
             worker.JobText = worker.Record[0x31] == 3 ? "Несёт древесину · укажите лесопилку" : "Без задания · ПКМ по лесу";
             if (worker.Goal is { } goal && worker.Route.Count == 0 && worker.ReplanTimer <= 0)
-            { if (worker.Cell == goal) worker.Goal = null; else { Plan(worker, goal); worker.ReplanTimer = .7; } }
+            { if (worker.Cell == goal) worker.Goal = null; else { Plan(worker, goal); worker.ReplanTimer = ReplanDelay; } }
             MoveTick(worker); return;
         }
         if (worker.Record[0x31] == 3) { TickDelivery(worker); return; }
@@ -352,7 +352,7 @@ public sealed partial class Skirmish
         {
             var candidates = new[] { Vector2I.Up, Vector2I.Down, Vector2I.Left, Vector2I.Right }.Select(d => tree + d).OrderBy(c => ((Vector2)c).DistanceSquaredTo(worker.Cell));
             foreach (var cell in candidates) if (Plan(worker, cell)) break;
-            worker.ReplanTimer = .7;
+            worker.ReplanTimer = ReplanDelay;
         }
         MoveTick(worker);
     }
