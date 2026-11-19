@@ -517,7 +517,7 @@ public sealed partial class Skirmish : IDisposable
     }
     private VitalsWorld? _vitalsWorld;
     private SearchWorld? _searchWorld;
-    /// <summary>World inputs of D895. Bridge: every object counts as visible (+20) and contacted, settlements of the two teams are hostile.</summary>
+    /// <summary>World inputs of D895. Bridge: contact (+B9) and hostility (+12) — the scenario starts with neither; the diplomacy events (EDD5) are not ported.</summary>
     private sealed class SearchWorld(Skirmish battle) : IEnemySearchWorld
     {
         public byte MapWidth => (byte)battle.Map.Width;
@@ -525,8 +525,9 @@ public sealed partial class Skirmish : IDisposable
         public uint Occupant(int plane, int cell) => battle.Occupancy.Cells[plane * battle.Occupancy.Width * battle.Occupancy.Height + cell];
         public (byte[] Record, byte[] Template) Resolve(uint reference)
         {
-            if (battle.Find(reference) is { } actor) { var copy = (byte[])actor.Record.Clone(); copy[0x20] = 0xff; return (copy, actor.Parameters); }
-            if (battle._sourceMovementObjects.TryGetValue(reference, out var source)) { var copy = (byte[])source.Record.Clone(); copy[0x20] = 0; return (copy, source.Template); }
+            // OBE[20] is the record's own visibility mask: creation (A855/8815) and every scenario object use FFh; hidden traps (DC91) differ.
+            if (battle.Find(reference) is { } actor) return (actor.Record, actor.Parameters);
+            if (battle._sourceMovementObjects.TryGetValue(reference, out var source)) return (source.Record, source.Template);
             var none = new byte[54]; none[0x19] = 0x80; return (none, new byte[171]);
         }
         public uint HostileMask => (1u << battle.Rules.PlayerSlot) | (1u << battle.Rules.EnemySlot);
