@@ -26,6 +26,7 @@ public partial class TestRunner : Node
                 case "cursor": await CursorChecks(); break;
                 case "status-bars": await StatusBarChecks(); break;
                 case "sound": await SoundChecks(); break;
+                case "video": await VideoChecks(); break;
                 case "original-sound": OriginalSoundChecks(); break;
                 case "skirmish": await SkirmishChecks(); break;
                 case "original-route-search": OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); break;
