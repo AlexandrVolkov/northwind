@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "44e4b2ce7ecfce30fad49eb0085d9afd732105690c169dd5630345c6b3b1a8f4",
+  "annotation_sha256": "6807cde42a190ad3d8225df252522393799398720f032ccedd677178989f32bc",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 5512,
-        "ported": 11684,
-        "unreviewed": 129589,
+        "ported": 13107,
+        "unreviewed": 128166,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -1105,6 +1105,22 @@
         },
         {
           "start": 46948,
+          "end": 46949,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 46949,
+          "end": 47595,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "group-orders"
+          ]
+        },
+        {
+          "start": 47595,
           "end": 48644,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1567,6 +1583,54 @@
         },
         {
           "start": 126200,
+          "end": 131221,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 131221,
+          "end": 131743,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-squad-registry"
+          ]
+        },
+        {
+          "start": 131743,
+          "end": 132603,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 132603,
+          "end": 132821,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-squad-census"
+          ]
+        },
+        {
+          "start": 132821,
+          "end": 133515,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 133515,
+          "end": 133552,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-squad-find-state"
+          ]
+        },
+        {
+          "start": 133552,
           "end": 136281,
           "status": "unreviewed",
           "classification": "unknown",

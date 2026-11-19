@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 129589 | 5512 | 97 | 11684 | 44 |
+| LE:1 | 146882 | 128166 | 5512 | 97 | 13107 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -122,6 +122,7 @@
 | LE:1 `0xB47F..0xB502` | Mine update: visitor handoff, stock debit and wear | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Проверен целиком с C4CD, 123D3 и B502 на первой карте. Разрушение шахты после износа +19 не подключено. |
 | LE:1 `0xB502..0xB5AB` | Remove one random ore mark and replace its surface | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Пометка грязной области экрана (B565..B5A4) не переносится. |
 | LE:1 `0xB72D..0xB764` | Intersect command slots across selected group members | partial | [interface.md](../docs/interface.md); [command-panel.json](../tests/fixtures/command-panel.json) | Фильтрация шести слотов по WorkFlags и ненулевому совпадающему raw_group проверена на 1600 парах. Исходный обход цепочки выделения и запись runtime-указателей не перенесены. |
+| LE:1 `0xB765..0xB9EB` | Group orders to squad members and squad bounds | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) | the order primitives write the OBE command fields only; their execution by WRK is a separate system |
 | LE:1 `0xBE04..0xBE2E` | Apply damage to one prepared target | ported | [building-condition-kernel.md](../docs/building-condition-kernel.md); [building-kernel.json](../tests/fixtures/building-kernel.json) | Хвост после подготовки шаблона и силы; выбор цели, генерация силы, площадное действие и смерть с эффектами вне контракта. |
 | LE:1 `0xBFC9..0xC010` | Apply a hit: attack minus defence or a small chance of one point | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
 | LE:1 `0xC344..0xC35F` | Chebyshev distance between object centres | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
@@ -157,6 +158,9 @@
 | LE:1 `0x1EB33..0x1EB40` | Clear AI plan list | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
 | LE:1 `0x1EB40..0x1EB68` | Find or add AI plan | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
 | LE:1 `0x1ECA0..0x1ECF8` | First living object of a DAT class | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) | inlined for mask 38h value 0 |
+| LE:1 `0x20095..0x2029F` | AI squad registry: numbers, create, remove, disband, transfer, lookups | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) | on overflow 200B5 releases pool byte «participant» instead of the new number, as in the original |
+| LE:1 `0x205FB..0x206D5` | AI squad census from its members | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) |  |
+| LE:1 `0x2098B..0x209B0` | Find AI squad by state and target object | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) |  |
 | LE:1 `0x21459..0x21490` | Set mutual war bits | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0x219C3..0x21A00` | Clip a centred area to the map | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 | LE:1 `0x223B4..0x22435` | List templates of a DAT class | ported | [tech.md](../docs/tech.md); [tech.json](../tests/fixtures/tech.json); [original_tech.json](../data/original_tech.json) |  |
