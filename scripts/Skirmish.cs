@@ -59,6 +59,8 @@ public sealed class SkirmishActor
     public bool HarvestPrepared { get; set; }
     /// <summary>Bridge flag for WRK action 4 (86B6, mine work).</summary>
     public bool MineJob { get; set; }
+    /// <summary>Dead unit still running the original death animation (A4DF); false once 98DB would remove it.</summary>
+    public bool Dying { get; set; }
     public string JobText { get; set; } = "Без задания";
 }
 public sealed class BattleEffect
@@ -288,6 +290,7 @@ public sealed partial class Skirmish : IDisposable
         foreach (var effect in Effects) effect.Remaining -= dt;
         Effects.RemoveAll(e => e.Remaining <= 0);
         TickArrows();
+        TickDeaths();
         TickBuildings();
         TickMining();
         TickProduction();
@@ -459,7 +462,25 @@ public sealed partial class Skirmish : IDisposable
         for (int i = 0; i < cells.Length; i++) if (cells[i] == target.Id) cells[i] = 0;
         Occupancy.LoadCells(cells);
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
+        target.Dying = !target.Structure;
         Log($"{target.Source.TemplateName} {(target.Team == 0 ? "потерян" : "уничтожен")}.");
+    }
+    /// <summary>95D3/A4DF for dead units: death frames by hit kind, then removal. Occupancy was already cleared by Kill.</summary>
+    private void TickDeaths()
+    {
+        foreach (var actor in Actors.Where(a => a.Dying))
+        {
+            var (special, _) = OriginalDeathRules.Dispatch(actor.Record, actor.Parameters);
+            if (special) { actor.Dying = false; continue; } // 12D08 is not ported
+            OriginalDeathRules.Step(actor.Record, actor.Parameters, new DeathWorld(this, actor));
+        }
+    }
+    private sealed class DeathWorld(Skirmish battle, SkirmishActor actor) : IDeathWorld
+    {
+        public void ClearOccupancy() { }
+        public void Corpse(byte army, byte code, uint x, uint y) { } // corpse effect objects are not ported
+        public void Remove() => actor.Dying = false;
+        public byte TerrainClass() => (byte)(battle._properties[(int)(battle.Map.Cells[actor.Cell.Y * battle.Map.Width + actor.Cell.X] & 0xffff) * 8] & 7);
     }
     /// <summary>90E9 unit prefix; returns true when the unit died this update.</summary>
     private bool TickVitals(SkirmishActor actor)

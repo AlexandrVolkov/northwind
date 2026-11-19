@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 136543 | 5000 | 0 | 5339 | 44 |
+| LE:1 | 146882 | 136270 | 5000 | 0 | 5612 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61833 | 0 | 0 | 0 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -79,6 +79,7 @@
 | LE:1 `0x93DF..0x9406` | Swing start with an object target | ported | [combat.md](../docs/combat.md); [attack.json](../tests/fixtures/attack.json) | Ветка без цели (9275) не перенесена. |
 | LE:1 `0x9429..0x945C` | Advance worker strike frames | ported | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Стационарный взмах состояния 3, включая байтовые/словные переполнения; внешняя обработка эффекта отдельна. |
 | LE:1 `0x945C..0x9498` | Prepare worker strike effect arguments | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Возвращаются аргументы на границе вызова 9727; сам полный обработчик эффекта и его дальнейшие действия не перенесены. |
+| LE:1 `0x95D3..0x960B` | Death dispatch: special path, death voice, animation | ported | [combat.md](../docs/combat.md); [death.json](../tests/fixtures/death.json) | 12D08 не перенесена. |
 | LE:1 `0x9653..0x9688` | Turn one heading sector | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Включает исходный ZF от расчёта кадра; общий таймер обновлений задаётся вызывающей стороной. |
 | LE:1 `0x9688..0x96CD` | Direction toward world coordinates | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Исходная u32-арифметика и переполнения; правило отличается от направления локального поиска 79C0. |
 | LE:1 `0x982B..0x98CC` | Object under an effect point with footprint containment | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Схватка пока бьёт явную цель вместо точки удара. |
@@ -87,6 +88,7 @@
 | LE:1 `0x9A1B..0x9A8E` | Missile aim scatter by distance and experience | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) |  |
 | LE:1 `0x9B0D..0x9B86` | Transfer occupancy at step midpoint | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Области и плоскости корректны; особый соседний вариант 9A97..9B0C не покрыт. Полное исходное размещение крупных движущихся объектов ещё не подключено в схватке. |
 | LE:1 `0x9B86..0x9BF9` | Gap between object footprints | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Сохранены байтовые сдвиги размеров и u32-переполнения; игровое использование включает лишь проверенные ветви подхода. |
+| LE:1 `0xA4DF..0xA5B8` | Death frames by hit kind, corpse object and removal | ported | [combat.md](../docs/combat.md); [death.json](../tests/fixtures/death.json) | Объект-труп (9727) и удаление 98DB исполняет мост схватки. |
 | LE:1 `0xA5B8..0xA5F4` | Sixteen-way missile direction frame | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) |  |
 | LE:1 `0xA758..0xA870` | Allocate and initialize object record | partial | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [building-lifecycle.json](../tests/fixtures/building-lifecycle.json) | Перенесён лишь путь новой пустой цепочки для 49-байтового замка; поиск дыр, универсальный аллокатор и ошибки не покрыты. |
 | LE:1 `0xA8BB..0xA90F` | Check and debit all four recruitment prices | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json); [recruitment-production.md](../docs/recruitment-production.md) | Только проверка и списание запасов до изменения фазы производителя. Оплата первого заказа и ожидание выхода подключены через отдельные проверенные операции; полный исходный диспетчер и аллокатор не перенесены. |

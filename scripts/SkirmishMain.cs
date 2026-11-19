@@ -255,7 +255,7 @@ public partial class SkirmishMain : Node2D
             int tile = (int)(Battle.Map.Cells[y * Battle.Map.Width + x] & 65535);
             DrawTextureRectRegion(_terrain, new Rect2(x * 32, y * 32, 32, 32), new Rect2(tile % 32 * 32, tile / 32 * 32, 32, 32));
         }
-        foreach (var actor in Battle.Actors.Where(a => a.Alive).OrderBy(a => a.Position.Y)) DrawActor(actor);
+        foreach (var actor in Battle.Actors.Where(a => a.Alive || a.Dying).OrderBy(a => a.Position.Y)) DrawActor(actor);
         var producer = Selection.Count == 1 && Battle.Find(Selection.Single()) is { } barracks && Skirmish.IsBarracks(barracks)
             ? barracks : Selection.Contains(Battle.PlayerCastle.Id) ? Battle.PlayerCastle : null;
         if (!PlacingBuilding && producer is { Alive: true })
@@ -328,7 +328,7 @@ public partial class SkirmishMain : Node2D
     private void DrawActor(SkirmishActor actor)
     {
         var point = actor.Position; var color = new Color(actor.Team == 0 ? "63e3bd" : "f37769");
-        if (!actor.Structure)
+        if (!actor.Structure && !actor.Dying)
         {
             DrawSetTransform(point, 0, new Vector2(1, .45f)); DrawCircle(Vector2.Zero, 14, new Color(color, .22f));
             DrawArc(Vector2.Zero, Selection.Contains(actor.Id) ? 19 : 14, 0, Mathf.Tau, 32, color, Selection.Contains(actor.Id) ? 3 : 1);
@@ -343,7 +343,8 @@ public partial class SkirmishMain : Node2D
             var size = new Vector2(frame.Width, frame.Height);
             DrawTextureRectRegion(_sprites, new Rect2(point - new Vector2(size.X / 2, size.Y - 16), size), new Rect2(frame.X, frame.Y, frame.Width, frame.Height));
         }
-        else DrawCircle(point - Vector2.Down * 12, 9, color);
+        else if (!actor.Dying) DrawCircle(point - Vector2.Down * 12, 9, color);
+        if (actor.Dying) return; // death frames only, no ring or health bar
         float width = actor.Structure ? 72 : 30;
         if (actor.Worker && actor.Record[0x31] == 3) DrawCircle(point + new Vector2(12, -24), 5, new Color("d3ac64"));
         var bar = new Rect2(point + new Vector2(-width / 2, 20), new Vector2(width, 5));

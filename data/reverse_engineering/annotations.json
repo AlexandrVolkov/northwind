@@ -1743,6 +1743,42 @@
         "scripts/Skirmish.cs"
       ],
       "limitations": "Обработчики 7FE/AEB не перенесены."
+    },
+    {
+      "id": "death-dispatch",
+      "module": "LE:1",
+      "start": 38355,
+      "end": 38411,
+      "name": "Death dispatch: special path, death voice, animation",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/death.json"
+      ],
+      "implementation": [
+        "scripts/OriginalDeathRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": "12D08 не перенесена."
+    },
+    {
+      "id": "death-animation",
+      "module": "LE:1",
+      "start": 42207,
+      "end": 42424,
+      "name": "Death frames by hit kind, corpse object and removal",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/death.json"
+      ],
+      "implementation": [
+        "scripts/OriginalDeathRules.cs",
+        "scripts/Skirmish.cs"
+      ],
+      "limitations": "Объект-труп (9727) и удаление 98DB исполняет мост схватки."
     }
   ]
 }
