@@ -122,7 +122,7 @@ public partial class TestRunner
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(), "AI military requests 20DD0 match original x86");
     }
 
-    private sealed class MilitaryProbe(byte[][] dat, byte[] tree, byte[] random, byte index, byte count) : IAiGarrisonWorld, IAiSquadStateWorld
+    private sealed class MilitaryProbe(byte[][] dat, byte[] tree, byte[] random, byte index, byte count) : IAiGarrisonWorld, IAiSquadStateWorld, IAiOrdersWorld
     {
         private readonly uint[] _grid = new uint[3 * 1024];
         private readonly Dictionary<uint, (byte[], byte[])> _objects = [];
@@ -162,5 +162,21 @@ public partial class TestRunner
         public IReadOnlyList<byte> Buildable(byte participant, uint mask, uint value) => OriginalTechRules.Buildable(dat, tree, true, mask, value);
         public byte[] Template(byte participant, byte template) => dat[template];
         public uint Reference(byte[] record) => _references[record];
+        public Dictionary<byte, byte[]> Producers = [];
+        public Func<int, byte> Terrain = _ => 1;
+        public byte[]? Pattern;
+        public byte Seed;
+        public readonly List<byte> PlacementLog = [];
+        public IReadOnlyList<byte> Makes(byte template) => Producers.TryGetValue(template, out var m) ? m : [];
+        public byte TemplateCount => (byte)dat.Length;
+        public bool PlacementAllowed(byte template, byte army, byte participant, uint x, uint y)
+        {
+            PlacementLog.Add(template); PlacementLog.AddRange(BitConverter.GetBytes((ushort)(template | army << 8)));
+            PlacementLog.AddRange(BitConverter.GetBytes(x)); PlacementLog.AddRange(BitConverter.GetBytes(y));
+            return ((x ^ y ^ template ^ Seed) & 3) != 0;
+        }
+        public byte TileClass(int cell) => Terrain(cell);
+        public byte[]? Fortification(uint index) => index == 0 ? Pattern : null;
+        public bool TreeAllows(byte participant, byte template) => OriginalTechRules.Available(tree, template);
     }
 }

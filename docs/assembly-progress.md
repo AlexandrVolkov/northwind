@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 118655 | 5512 | 97 | 22618 | 44 |
+| LE:1 | 146882 | 116319 | 5512 | 97 | 24954 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -189,7 +189,12 @@
 | LE:1 `0x21DD4..0x21E99` | Nearest object for a squad of a priority | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x223B4..0x22435` | List templates of a DAT class | ported | [tech.md](../docs/tech.md); [tech.json](../tests/fixtures/tech.json); [original_tech.json](../data/original_tech.json) |  |
 | LE:1 `0x226F1..0x227C7` | AI upkeep: repair requests and decay | ported | [ai.md](../docs/ai.md); [ai-upkeep.json](../tests/fixtures/ai-upkeep.json) |  |
+| LE:1 `0x227C7..0x22E46` | AI order executor (list +34F, modes 1..10) | ported | [ai.md](../docs/ai.md); [ai-orders.json](../tests/fixtures/ai-orders.json); [original_producers.json](../data/original_producers.json) | order mode 5 leaves [ED39]/[ED3D] = 68h/8, as the original |
 | LE:1 `0x22E46..0x22E85` | Random open template of a DAT class | ported | [ai.md](../docs/ai.md); [ai-research.json](../tests/fixtures/ai-research.json) |  |
+| LE:1 `0x22E85..0x22F76` | Producer of a template (WRK AH=6 tables) | ported | [ai.md](../docs/ai.md); [ai-orders.json](../tests/fixtures/ai-orders.json); [original_producers.json](../data/original_producers.json) |  |
+| LE:1 `0x22F76..0x22FE4` | Produce (60h) and build (58h) commands | ported | [ai.md](../docs/ai.md); [ai-orders.json](../tests/fixtures/ai-orders.json); [original_producers.json](../data/original_producers.json) |  |
+| LE:1 `0x22FE4..0x230ED` | Building site check around a cell | ported | [ai.md](../docs/ai.md); [ai-orders.json](../tests/fixtures/ai-orders.json); [original_producers.json](../data/original_producers.json) | AF07 permission is a hook |
+| LE:1 `0x23201..0x2323A` | Object of a class in an area | ported | [ai.md](../docs/ai.md); [ai-orders.json](../tests/fixtures/ai-orders.json); [original_producers.json](../data/original_producers.json) |  |
 | LE:1 `0x2323A..0x23551` | AI turn: tribute, collapse, relation decisions | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) | plan bytes +5..+7 are register leftovers, written as zero |
 | LE:1 `0x23667..0x23A6E` | AI plan executor | ported | [ai.md](../docs/ai.md); [ai-plans.json](../tests/fixtures/ai-plans.json) | message parameters and +1AB register bytes not modelled |
 | LE:1 `0x23A6E..0x23A95` | Set mutual relation | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
