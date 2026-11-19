@@ -103,6 +103,7 @@ public partial class OriginalHud : Node2D
         }
         else { DrawMinimap(); DrawSelection(); }
         DrawSetTransform(Vector2.Zero);
+        DrawBuildList();
         if (b.Paused)
         {
             var at = new Vector2(MapRect.GetCenter().X - 79, 224);
@@ -138,6 +139,42 @@ public partial class OriginalHud : Node2D
         {
             DrawRect(new Rect2(491, row, 124, 1), Colors.Black);
             if (lit > 0) DrawRect(new Rect2(491, row, lit, 1), gold);
+        }
+    }
+
+    /// <summary>Castle build list: 80×50 portraits at x = 380 (at the right edge of the map window), y = 105 + 50·k (DOSBox screenshots).</summary>
+    public Rect2 BuildItemRect(int k) => new(380 + Shift, 105 + 50 * k, 80, 50);
+    public SkirmishMain.BuildItem? BuildItemAt(Vector2 logical)
+    {
+        if (Game?.Battle == null || !Game.BuildMenuVisible || MenuOpen) return null;
+        var items = Game.CastleBuildItems();
+        for (int k = 0; k < items.Length; k++) if (BuildItemRect(k).HasPoint(logical)) return items[k];
+        return null;
+    }
+
+    private void DrawBuildList()
+    {
+        if (!Game.BuildMenuVisible || MenuOpen) return;
+        var items = Game.CastleBuildItems();
+        for (int k = 0; k < items.Length; k++)
+        {
+            var tint = Game.Battle.CanAfford(items[k].Template) ? Colors.White : new Color(.45f, .45f, .45f);
+            DrawTextureRectRegion(_portraits, BuildItemRect(k), Army.Portraits.Region(Army.Templates[items[k].TemplateIndex].Portrait), tint);
+        }
+        if (BuildItemAt(GetLocalMousePosition()) is { } hover) DrawPrice(hover.Template);
+    }
+
+    /// <summary>Name and price on the bottom border (DOSBox screenshot of the hovered barracks): name at x = 20, the resource icons of the
+    /// top bar at 172/243/306/376 with numbers at 210/280/350/420.</summary>
+    private void DrawPrice(TemplateEntry template)
+    {
+        var price = Skirmish.Price(template);
+        _font.Draw(this, new Vector2(20, 464), template.Name);
+        foreach (var (src, at, text, value) in new[] { (38, 172, 210, price.First), (132, 243, 280, price.Third), (224, 306, 350, price.Second), (326, 376, 420, price.Fourth) })
+        {
+            int width = src is 38 or 132 ? 28 : 38;
+            DrawTextureRectRegion(_frame, new Rect2(at, 464, width, 16), new Rect2(src, 0, width, 16));
+            _font.Draw(this, new Vector2(text, 464), value.ToString());
         }
     }
 
@@ -186,7 +223,14 @@ public partial class OriginalHud : Node2D
         {
             2 => "Укажите место", 3 => "Укажите врага", 4 => "Укажите лес", 8 => "Укажите шахту", _ => "",
         };
-        DrawHint(hint);
+        if (Game.PlacingTemplate is { } placing)
+        {
+            // Placement: the chosen building under the castle (name y = 232, portrait y = 248), measured on the screenshot.
+            _font.Draw(this, new Vector2(482, 232), placing.Name);
+            int index = placing.TemplateIndex;
+            if (index >= 0 && index < Army.Templates.Count) DrawTextureRectRegion(_portraits, new Rect2(482, 248, 80, 50), Army.Portraits.Region(Army.Templates[index].Portrait));
+        }
+        else DrawHint(hint);
     }
 
     // Placement and pending-order outlines are UI feedback of the port, not a recovered DOS drawing routine.
@@ -256,6 +300,7 @@ public partial class OriginalHud : Node2D
     public bool Click(Vector2 point, MouseButton button)
     {
         if (Game.Battle.Paused) return true;
+        if (button == MouseButton.Left && BuildItemAt(point) is { } item) { item.Start(); QueueRedraw(); return true; }
         if (MapRect.HasPoint(point)) return false;
         point = ToClassic(point);
         if (button != MouseButton.Left) return true;

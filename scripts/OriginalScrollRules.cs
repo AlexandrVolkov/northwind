@@ -40,6 +40,8 @@ public static class OriginalScrollRules
 /// byte [0D] has both low bits set (another owner at war, 4633..464F). Confirmed on DOSBox screenshots for move and attack.</summary>
 public static class OriginalOrderCursor
 {
+    /// <summary>Seen on DOSBox screenshots of the castle build list: sickle over a list item, silver frame while placing (hot spot 15,15).</summary>
+    public static readonly (ushort First, ushort Last) Select = (0x9c, 0xa5), Place = (0x37, 0x40);
     public static readonly (ushort First, ushort Last) Move = (0x8a, 0x93), Target = (0x64, 0x6d), TargetObject = (0x78, 0x81), TargetEnemy = (0x6e, 0x77);
     public const int HotSpot = 15;
     /// <summary>[0D] for an object of <paramref name="owner"/> seen by <paramref name="player"/>: base (DAT[40] &amp; 18004h, with the 10000h
