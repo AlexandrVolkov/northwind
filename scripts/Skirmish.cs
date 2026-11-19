@@ -312,12 +312,20 @@ public sealed partial class Skirmish : IDisposable
             if (actor.Team == 0 && target is { Structure: true })
                 target = Actors.Where(a => a.Alive && a.Team == 1 && !a.Structure && Distance(actor.Position, a) <= Rules.AggroRange)
                     .OrderBy(a => Distance(actor.Position, a)).FirstOrDefault() ?? target;
-            if (target == null && actor.Goal == null && actor.Route.Count == 0)
+            actor.Record[0x2e]++; // 8227 counts every update of a living unit
+            if (target == null && !actor.Stepping)
             {
-                float range = actor.Team == 1 ? Rules.AggroRange : Math.Max(160, actor.Rules.Range);
-                target = Actors.Where(a => a.Alive && a.Team != actor.Team && Distance(actor.Position, a) <= range)
-                    .OrderBy(a => Distance(actor.Position, a)).FirstOrDefault();
-                if (target != null) actor.Target = target.Id;
+                // 82C3/8D3E: an idle unit searches its sight radius every eighth update; 8273/8E81: a walking unit that was
+                // hit (OBE[17] bit 2) answers the nearest enemy within its attack range.
+                bool idle = actor.Goal == null && actor.Route.Count == 0;
+                bool struck = !idle && (actor.Record[0x17] & 2) != 0;
+                if ((idle && (actor.Record[0x2e] & 7) == 0) || struck)
+                {
+                    if (struck) actor.Record[0x17] &= 0xfd;
+                    var found = OriginalTargetRules.FindEnemy(actor.Id, actor.Record, actor.Parameters, struck, _searchWorld ??= new(this));
+                    target = Find(found.Target);
+                    if (target != null) { actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); }
+                }
             }
             if (target != null && !actor.Stepping && AttackStep(actor, target)) continue;
             if (target != null && actor.Target == 0) target = null;
@@ -499,6 +507,28 @@ public sealed partial class Skirmish : IDisposable
         return false;
     }
     private VitalsWorld? _vitalsWorld;
+    private SearchWorld? _searchWorld;
+    /// <summary>World inputs of D895. Bridge: every object counts as visible (+20) and contacted, settlements of the two teams are hostile.</summary>
+    private sealed class SearchWorld(Skirmish battle) : IEnemySearchWorld
+    {
+        public byte MapWidth => (byte)battle.Map.Width;
+        public byte MapHeight => (byte)battle.Map.Height;
+        public uint Occupant(int plane, int cell) => battle.Occupancy.Cells[plane * battle.Occupancy.Width * battle.Occupancy.Height + cell];
+        public (byte[] Record, byte[] Template) Resolve(uint reference)
+        {
+            if (battle.Find(reference) is { } actor) { var copy = (byte[])actor.Record.Clone(); copy[0x20] = 0xff; return (copy, actor.Parameters); }
+            if (battle._sourceMovementObjects.TryGetValue(reference, out var source)) { var copy = (byte[])source.Record.Clone(); copy[0x20] = 0; return (copy, source.Template); }
+            var none = new byte[54]; none[0x19] = 0x80; return (none, new byte[171]);
+        }
+        public uint HostileMask => (1u << battle.Rules.PlayerSlot) | (1u << battle.Rules.EnemySlot);
+        public bool Contact(byte owner) => true;
+        public byte TerrainClass(ReadOnlySpan<byte> record)
+        {
+            int index = (int)(BinaryPrimitives.ReadUInt32LittleEndian(record[8..]) >> 5) * battle.Map.Width + (int)(BinaryPrimitives.ReadUInt32LittleEndian(record[4..]) >> 5);
+            return (byte)(battle._properties[(int)(battle.Map.Cells[index] & 0xffff) * 8] & 7);
+        }
+        public void Contacted(FirstContact contact) { }
+    }
     private sealed class VitalsWorld(Skirmish battle) : IVitalsWorld
     {
         public void Sound(uint reference) { } // Sound banks (*.FX) are not ported yet.

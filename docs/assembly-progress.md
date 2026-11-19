@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 135892 | 5281 | 97 | 5612 | 44 |
+| LE:1 | 146882 | 135144 | 5281 | 97 | 6360 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61833 | 0 | 0 | 0 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -113,6 +113,7 @@
 | LE:1 `0xB502..0xB5AB` | Remove one random ore mark and replace its surface | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Пометка грязной области экрана (B565..B5A4) не переносится. |
 | LE:1 `0xBE04..0xBE2E` | Apply damage to one prepared target | ported | [building-condition-kernel.md](../docs/building-condition-kernel.md); [building-kernel.json](../tests/fixtures/building-kernel.json) | Хвост после подготовки шаблона и силы; выбор цели, генерация силы, площадное действие и смерть с эффектами вне контракта. |
 | LE:1 `0xBFC9..0xC010` | Apply a hit: attack minus defence or a small chance of one point | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
+| LE:1 `0xC344..0xC35F` | Chebyshev distance between object centres | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 | LE:1 `0xC35F..0xC439` | Find harvestable forest footprint | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Непустая область внутри карты и поисковый прямоугольник без переполнения правого/нижнего конца; поведение для выходящих областей не включено. |
 | LE:1 `0xC439..0xC4CD` | Find worker cargo receiver | ported | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Порядок цепочки передан вызывающей стороной; выбирается последний при равном расстоянии. Полный пул владельца схватки ещё не используется как хранилище. |
 | LE:1 `0xC4CD..0xC5D7` | Find waiting worker at building | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Только фиксированный вход через DAT[53]/[54] и C591; общий обход периметра здания не включён. |
@@ -125,9 +126,13 @@
 | LE:1 `0xD2D1..0xD363` | Conditional occupancy registration | partial | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Перенесена ветвь CL=0 с заменой совпавших ячеек и подсчётом конфликтов. Ветка повреждения чужих объектов не перенесена. |
 | LE:1 `0xD40C..0xD453` | Owner free population growth | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |
 | LE:1 `0xD453..0xD5B1` | Owner population demand, support and limit recount | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |
+| LE:1 `0xD7B1..0xD85E` | Collect unique occupants of an area | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
+| LE:1 `0xD85E..0xD895` | Search area around the unit | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
+| LE:1 `0xD895..0xDA45` | Enemy search: radius, filters, nearest with tie on attacker | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) | Видимость, контакт и враждебность в схватке задаёт мост. |
 | LE:1 `0x11EB0..0x11ECB` | Goods code 1: +100 gold and statistics | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Только AH=2. |
 | LE:1 `0x11ECB..0x11EE6` | Goods code 2: +100 metal and statistics | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Только AH=2. |
 | LE:1 `0x123D3..0x12404` | Grant timber through worker callback | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Живой рабочий, флаг 20000, пустой груз и AL=3. Другие грузы, непустой груз и все WRK-получатели не перенесены. |
 | LE:1 `0x1243A..0x124A5` | Goods handler dispatch and item slots | partial | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Перенесены коды 0..2. Слоты +CD, UI/звук для локального игрока (5593/A4A9) не перенесены. |
+| LE:1 `0x219C3..0x21A00` | Clip a centred area to the map | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 
 Порядок работы и определения статусов: [assembly-database.md](assembly-database.md).
