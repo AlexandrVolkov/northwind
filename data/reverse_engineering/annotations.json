@@ -2109,6 +2109,40 @@
         "scripts/Skirmish.cs"
       ],
       "limitations": ""
+    },
+    {
+      "id": "ai-census-1e87a",
+      "module": "LE:1",
+      "start": 125050,
+      "end": 125633,
+      "name": "AI settlement census",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-census.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": "1EC3F (every 256 turns) not included"
+    },
+    {
+      "id": "ai-threat-23b10",
+      "module": "LE:1",
+      "start": 146192,
+      "end": 146282,
+      "name": "AI territory threat by owner",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-census.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": ""
     }
   ]
 }
