@@ -2317,6 +2317,40 @@
         "scripts/OriginalAiRules.cs"
       ],
       "limitations": ""
+    },
+    {
+      "id": "ai-23667",
+      "module": "LE:1",
+      "start": 144999,
+      "end": 146030,
+      "name": "AI plan executor",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-plans.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": "message parameters and +1AB register bytes not modelled"
+    },
+    {
+      "id": "ai-23abb",
+      "module": "LE:1",
+      "start": 146107,
+      "end": 146192,
+      "name": "Cancel military requests against target",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-plans.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": ""
     }
   ]
 }

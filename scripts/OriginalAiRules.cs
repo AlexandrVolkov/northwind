@@ -279,3 +279,171 @@ public static class OriginalAiTurn
         }
     }
 }
+
+/// <summary>AI plan executor LE:1 23667..23A6D over list +697 (docs/ai.md). Control flow follows the original labels.
+/// Military requests go to list +1AB (1EB5C); bytes the original fills from register leftovers are written as zero
+/// (BH of mode 7, +5..+0B), and message parameters are passed as zero.</summary>
+public static class OriginalAiPlans
+{
+    public const int Military = 0x1ab, Plans = 0x697, Size = 0x15, Count = 20;
+    private static uint U32(ReadOnlySpan<byte> raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw[offset..]);
+    private static void W32(Span<byte> raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw[offset..], value);
+
+    public static void Execute(IAiTurnWorld world, byte me, uint[] threat)
+    {
+        var ai = world.Block(me);
+        if ((ai[0x1a27] & 1) == 0) return;
+        for (int k = 0; k < Count; k++)
+        {
+            var plan = world.Block(me).Slice(Plans + k * Size, Size);
+            byte target = plan[4];
+            byte Relation() => world.Participant(me)[0xb9 + target];
+            uint Strength() => U32(world.Block(me), 0x19f1);
+            bool Queued(byte type) => OriginalAiTurn.Queued(world.Participant(target), type, me);
+            void Send(byte type) => world.Send(type, target, me, 0, 0);
+            void Survey() { var values = OriginalAiRules.Threat(world.Block(me), world); Array.Copy(values, threat, 16); }
+            bool Strongest()
+            {
+                uint value = threat[target];
+                for (int c = 0; c < world.Count; c++) if (threat[c] > value) return false;
+                return true;
+            }
+            switch (plan[0])
+            {
+                case 1: goto Campaign;
+                case 2: if (plan[2] != 2) goto Campaign; goto Surrendered;
+                case 3: if (plan[2] != 2) goto Campaign; goto AllianceOffered;
+                case 0xa: goto Truce;
+                default: goto Drop;
+            }
+        Campaign:   // 23690
+            if (plan[2] == 0)
+            {
+                plan[2]++;
+                Request(ai, 5, target, 0x96);
+                goto Next;
+            }
+            if (plan[2] != 1) goto AtWar;
+            if (Relation() == 2) goto March;
+            if ((U32(plan, 0x10) & 0x1f) == 0)
+            {
+                Survey();
+                if (threat[target] >= OriginalAiTurn.ThreatLimit) goto March;
+            }
+            if (!Find(ai, 5, target)) goto March;
+            if (Strength() > U32(ai, 0x41)) goto Next;
+            goto Cancel;
+        March:   // 23727
+            plan[2]++;
+            Request(ai, 7, target, 0);
+            W32(plan, 8, unchecked((U32(ai, 0x49) * U32(ai, 0x5d) >> 5) + U32(ai, 0x19f9)));
+            if (Relation() != 2) Send(5);
+            goto Next;
+        AtWar:   // 23778
+            if (Relation() != 2) goto Cancel;
+            if (Strength() <= U32(ai, 0x41)) goto ToTruce;
+            if (U32(plan, 8) <= U32(ai, 0x19f9))
+            {
+                if (plan[0] == 3) goto ToTruce;
+                plan[0]++; plan[2] = 0;
+                world.Send(4, target, me, 0, 0);
+                goto Next;
+            }
+            // 237B0..237F3: EE69 leaves EDI on the found message, so the FFh store consumes the target's message (the plan stays).
+            if (Consume(world.Participant(target), 0, me)) Send(2);
+            if (Consume(world.Participant(target), 6, me)) Send(8);
+        EnemyAlive:   // 237F8
+            if (U32(world.Block(target), 0x19f1) <= OriginalAiTurn.WeakStrength) goto Cancel;
+            goto Next;
+        ToTruce:   // 23826
+            plan[0] = 0xa; plan[2] = 0;
+            goto Next;
+        Surrendered:   // 2386D
+            if (!Queued(0)) goto AtWar;
+            Send(1);
+            goto Cancel;
+        AllianceOffered:   // 238A6
+            if (!Queued(6)) goto Surrendered;
+            Send(7);
+            goto Cancel;
+        Truce:   // 238CC
+            if (plan[2] == 0) { W32(plan, 8, 1); plan[2]++; }
+            if (Relation() != 2) goto Cancel;
+            if (plan[2] == 1)
+            {
+                if (Strength() <= U32(ai, 0x31)) { plan[2] = 2; W32(plan, 8, 1); goto Next; }
+                W32(plan, 8, U32(plan, 8) - 1);
+                if (U32(plan, 8) != 0) goto Answer;
+                W32(plan, 8, 2000);
+                Survey();
+                if (threat[target] < 100 || !Strongest()) goto Answer;
+                Send(6);
+                W32(world.Block(me), 0x3d, Strength() + 3000);
+                goto Answer;
+            }
+            if (Strength() > U32(ai, 0x31)) { plan[2] = 1; W32(plan, 8, 1); goto Next; }
+            W32(plan, 8, U32(plan, 8) - 1);
+            if (U32(plan, 8) != 0) goto Answer;
+            W32(plan, 8, 2000);
+            Survey();
+            if (threat[target] < 100 || !Strongest()) goto Answer;
+            Send(0);
+        Answer:   // 23974
+            if (Queued(6)) { Send(7); goto Cancel; }
+            if (Queued(0)) { Send(1); goto Cancel; }
+            goto EnemyAlive;
+        Cancel:   // 23714
+            CancelMilitary(world, ai, target);
+        Drop:   // 23A40
+            plan[0] = 0xff;
+        Next:   // 23A49
+            W32(plan, 0x10, U32(plan, 0x10) + 1);
+        }
+    }
+
+    /// <summary>EE69 followed by <c>mov [edi], FFh</c>: mark the first queued message of <paramref name="type"/> about <paramref name="other"/> as read.</summary>
+    public static bool Consume(Span<byte> participant, byte type, byte other)
+    {
+        for (int s = 0; s < 8; s++)
+            if (participant[0x34 + s * 14] == type && participant[0x34 + s * 14 + 9] == other) { participant[0x34 + s * 14] = 0xff; return true; }
+        return false;
+    }
+
+    /// <summary>1EB40 in list +1AB: a record with this mode and +1.</summary>
+    public static bool Find(ReadOnlySpan<byte> ai, byte mode, byte first)
+    {
+        for (int k = 0; k < Count; k++)
+            if (ai[Military + k * Size] == mode && ai[Military + k * Size + 1] == first) return true;
+        return false;
+    }
+
+    /// <summary>1EB5C in list +1AB with BL = CL = target.</summary>
+    public static void Request(Span<byte> ai, byte mode, byte target, byte bh)
+    {
+        if (Find(ai, mode, target)) return;
+        for (int k = 0; k < Count; k++)
+        {
+            var record = ai.Slice(Military + k * Size, Size);
+            if (record[0] != 0xff) continue;
+            record.Clear(); record[0] = mode; record[1] = target; record[3] = bh; record[4] = target;
+            return;
+        }
+    }
+
+    /// <summary>23ABB: drop military records against <paramref name="target"/>: modes 5 and 7 by +1, 6 by +4, 9 by the owner of object +8.</summary>
+    public static void CancelMilitary(IAiTurnWorld world, Span<byte> ai, byte target)
+    {
+        for (int k = 0; k < Count; k++)
+        {
+            var record = ai.Slice(Military + k * Size, Size);
+            bool drop = record[0] switch
+            {
+                5 or 7 => record[1] == target,
+                6 => record[4] == target,
+                9 => world.Resolve(U32(record, 8)).Record[3] == target,
+                _ => false,
+            };
+            if (drop) record[0] = 0xff;
+        }
+    }
+}

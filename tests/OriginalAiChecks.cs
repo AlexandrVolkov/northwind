@@ -58,6 +58,7 @@ public partial class TestRunner
         public byte MapWidth => 32;
         public byte MapHeight => 32;
         public uint HostileMask => 0;
+        public void Register(uint reference, byte[] record, byte[] template) => _objects[reference] = (record, template);
         public void Add(uint reference, byte[] record, byte[] template)
         {
             _objects[reference] = (record, template);
@@ -209,6 +210,7 @@ public partial class TestRunner
         public Span<byte> Block(int participant) => _blocks[participant];
         public Span<byte> Participant(int participant) => _participants[participant];
         public void Send(byte type, byte other, byte owner, byte bh, uint parameter) => Calls.Add((type, other, owner, bh, parameter));
+        public void Register(uint reference, byte[] record, byte[] template) => _objects[reference] = (record, template);
         public void Add(uint reference, byte[] record, byte[] template)
         {
             _objects[reference] = (record, template);
@@ -222,5 +224,90 @@ public partial class TestRunner
         public bool Contact(byte owner) => true;
         public byte TerrainClass(ReadOnlySpan<byte> record) => 0;
         public void Contacted(FirstContact contact) { }
+    }
+}
+
+public partial class TestRunner
+{
+    private void OriginalAiPlanChecks()
+    {
+        using var reference = GameData.Read<JsonDocument>("res://tests/fixtures/ai-plans.json");
+        var root = reference.RootElement;
+        var templates = GameData.Read<TemplatesData>("res://assets/imported/templates.json").Armies["ARMY__02.DAT"].Templates;
+        byte[] Dat(int index) => Convert.FromHexString(templates[index].RawRecordHex);
+        using var digest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        int count = 0; var sent = new Dictionary<byte, int>(); var finalModes = new HashSet<byte>();
+        const int Plans = OriginalAiPlans.Plans, Military = OriginalAiPlans.Military;
+        foreach (var c in root.GetProperty("cases").EnumerateArray())
+        {
+            byte me = (byte)c.GetProperty("me").GetInt32();
+            var parts = c.GetProperty("participants").EnumerateArray().ToArray();
+            var world = new AiTurnProbe(parts.Length);
+            for (int p = 0; p < parts.Length; p++)
+            {
+                var part = parts[p]; var b = world.Block(p); b[0] = (byte)p;
+                var t = part.GetProperty("territory");
+                b[0x63] = (byte)t[0].GetInt32(); b[0x64] = (byte)t[2].GetInt32(); b[0x65] = (byte)t[1].GetInt32(); b[0x66] = (byte)t[3].GetInt32();
+                BinaryPrimitives.WriteUInt32LittleEndian(b[0x19f1..], part.GetProperty("strength").GetUInt32());
+                for (int k = 0; k < 20; k++) { b[Plans + k * 0x15] = 0xff; b[Military + k * 0x15] = 0xff; }
+                var r = world.Participant(p);
+                int q = 0; foreach (var rel in part.GetProperty("relations").EnumerateArray()) r[0xb9 + q++] = (byte)rel.GetInt32();
+                for (int s = 0; s < 8; s++) r[0x34 + s * 14] = 0xff;
+                int m = 0;
+                foreach (var msg in part.GetProperty("queue").EnumerateArray()) { r[0x34 + m * 14] = (byte)msg[0].GetInt32(); r[0x34 + m * 14 + 9] = (byte)msg[1].GetInt32(); m++; }
+            }
+            var ai = world.Block(me);
+            ai[0x1a27] = (byte)c.GetProperty("flags").GetInt32();
+            BinaryPrimitives.WriteUInt32LittleEndian(ai[0x31..], c.GetProperty("limits")[0].GetUInt32());
+            BinaryPrimitives.WriteUInt32LittleEndian(ai[0x41..], c.GetProperty("limits")[1].GetUInt32());
+            BinaryPrimitives.WriteUInt32LittleEndian(ai[0x49..], c.GetProperty("factor")[0].GetUInt32());
+            BinaryPrimitives.WriteUInt32LittleEndian(ai[0x5d..], c.GetProperty("factor")[1].GetUInt32());
+            BinaryPrimitives.WriteUInt32LittleEndian(ai[0x19f9..], c.GetProperty("base").GetUInt32());
+            int slot = 0;
+            foreach (var plan in c.GetProperty("plans").EnumerateArray())
+            {
+                int at = Plans + slot++ * 0x15;
+                ai[at] = (byte)plan[0].GetInt32(); ai[at + 1] = (byte)plan[1].GetInt32(); ai[at + 2] = (byte)plan[2].GetInt32(); ai[at + 4] = (byte)plan[1].GetInt32();
+                BinaryPrimitives.WriteUInt32LittleEndian(ai[(at + 8)..], plan[3].GetUInt32()); BinaryPrimitives.WriteUInt32LittleEndian(ai[(at + 0x10)..], plan[4].GetUInt32());
+            }
+            slot = 0;
+            foreach (var record in c.GetProperty("military").EnumerateArray())
+            {
+                int at = Military + slot++ * 0x15;
+                ai[at] = (byte)record[0].GetInt32(); ai[at + 1] = (byte)record[1].GetInt32(); ai[at + 4] = (byte)record[2].GetInt32();
+                BinaryPrimitives.WriteUInt32LittleEndian(ai[(at + 8)..], 0x100 + 0x40 * record[3].GetUInt32());
+            }
+            uint reference0 = 0x100; var objects = c.GetProperty("objects").EnumerateArray().ToArray();
+            foreach (var o in objects)
+            {
+                int t = o[0].GetInt32();
+                world.Add(reference0, CombatUnit((byte)t, (byte)o[1].GetInt32(), (byte)o[4].GetInt32(), 0, o[2].GetUInt32(), o[3].GetUInt32(), 1), Dat(t));
+                reference0 += 0x40;
+            }
+            for (int k = objects.Length; k < 8; k++) world.Register(0x100 + 0x40 * (uint)k, CombatUnit(0, (byte)(k % parts.Length), 0, 0, 16, 16, 1), Dat(0));
+            var threat = Enumerable.Repeat(0x55555555u, 16).ToArray();
+            OriginalAiPlans.Execute(world, me, threat);
+            for (int p = 0; p < parts.Length; p++)
+            {
+                var block = world.Block(p).ToArray();
+                if (p == me)
+                    for (int k = 0; k < 20; k++)
+                    {
+                        int at = Military + k * 0x15; block.AsSpan(at + 5, 7).Clear(); block[at + 3] = 0;
+                        finalModes.Add(block[Plans + k * 0x15]);
+                    }
+                digest.AppendData(block); digest.AppendData(world.Participant(p));
+            }
+            var encoded = new byte[64]; for (int i = 0; i < 16; i++) BinaryPrimitives.WriteUInt32LittleEndian(encoded.AsSpan(i * 4), threat[i]);
+            digest.AppendData(encoded);
+            digest.AppendData(System.Text.Encoding.UTF8.GetBytes("[" + string.Join(", ", world.Calls.Select(x => $"[{x.Type}, {x.Other}, {x.Owner}]")) + "]"));
+            foreach (var x in world.Calls) sent[x.Type] = sent.GetValueOrDefault(x.Type) + 1;
+            count++;
+        }
+        var result = root.GetProperty("results").GetProperty("plans");
+        Godot.GD.Print($"AI plans: messages {string.Join(" ", sent.OrderBy(kv => kv.Key).Select(kv => $"{kv.Key:X}:{kv.Value}"))}, final modes {string.Join(" ", finalModes.Order().Select(m => $"{m:X}"))}");
+        Check(count == result.GetProperty("case_count").GetInt32(), $"AI plan reference coverage ({count})");
+        Check(new byte[] { 0, 1, 2, 4, 5, 6, 7, 8 }.All(sent.ContainsKey), "AI plan cases send every executor message");
+        Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(), "AI plan executor 23667 matches original x86");
     }
 }

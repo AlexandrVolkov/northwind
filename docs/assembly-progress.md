@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 132215 | 5326 | 97 | 9244 | 44 |
+| LE:1 | 146882 | 131099 | 5326 | 97 | 10360 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -151,8 +151,10 @@
 | LE:1 `0x21459..0x21490` | Set mutual war bits | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0x219C3..0x21A00` | Clip a centred area to the map | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 | LE:1 `0x2323A..0x23551` | AI turn: tribute, collapse, relation decisions | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) | plan bytes +5..+7 are register leftovers, written as zero |
+| LE:1 `0x23667..0x23A6E` | AI plan executor | ported | [ai.md](../docs/ai.md); [ai-plans.json](../tests/fixtures/ai-plans.json) | message parameters and +1AB register bytes not modelled |
 | LE:1 `0x23A6E..0x23A95` | Set mutual relation | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0x23A95..0x23ABB` | AI has plan for target | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
+| LE:1 `0x23ABB..0x23B10` | Cancel military requests against target | ported | [ai.md](../docs/ai.md); [ai-plans.json](../tests/fixtures/ai-plans.json) |  |
 | LE:1 `0x23B10..0x23B6A` | AI territory threat by owner | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) |  |
 | LE:1 `0x23B6A..0x23B8E` | Territories overlap | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
 | LE:3 `0xED43..0xF02E` | AI character table | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
