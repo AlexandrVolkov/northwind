@@ -1,0 +1,220 @@
+{
+  "format_version": 1,
+  "executable_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "source_pointers": [
+    {
+      "source": "INTRO.SMK",
+      "le1_operand": 87828,
+      "target_object": 3,
+      "target_offset": 39218
+    },
+    {
+      "source": "FROM.SMK",
+      "le1_operand": 117079,
+      "target_object": 3,
+      "target_offset": 41025
+    }
+  ],
+  "encoder": {
+    "video": "libtheora",
+    "video_quality": 8,
+    "pixel_format": "yuv420p",
+    "audio": "libvorbis",
+    "audio_quality": 6,
+    "lossy": true,
+    "resized": false,
+    "palette_override": false,
+    "version": "ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers"
+  },
+  "videos": [
+    {
+      "source": "INTRO.SMK",
+      "source_bytes": 1794596,
+      "source_sha256": "777311a0d0d2e9e4ccb9c2efa90176ad30f7d6325d33675a4b00397ca7873d2a",
+      "file": "intro.ogv",
+      "role": "startup_buka",
+      "header": {
+        "version": "SMK2",
+        "width": 640,
+        "height": 480,
+        "frames": 350,
+        "raw_frame_delay": -3333,
+        "raw_flags": 0,
+        "ring_frame": false,
+        "frame_rate": "100000/3333",
+        "duration_seconds": 11.6655,
+        "audio_tracks": [
+          {
+            "track": 0,
+            "raw_rate_word": 3489682978,
+            "sample_rate": 22050,
+            "channels": 2,
+            "bits_per_sample": 8,
+            "packed": true
+          }
+        ]
+      },
+      "source_probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "smackvideo",
+            "codec_type": "video",
+            "width": 640,
+            "height": 480,
+            "r_frame_rate": "100000/3333",
+            "nb_read_frames": "350"
+          },
+          {
+            "index": 1,
+            "codec_name": "smackaudio",
+            "codec_type": "audio",
+            "sample_rate": "22050",
+            "channels": 2,
+            "r_frame_rate": "0/0",
+            "nb_read_frames": "320"
+          }
+        ],
+        "format": {
+          "duration": "11.665500"
+        }
+      },
+      "output_probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "theora",
+            "codec_type": "video",
+            "width": 640,
+            "height": 480,
+            "r_frame_rate": "100000/3333",
+            "nb_read_frames": "302"
+          },
+          {
+            "index": 1,
+            "codec_name": "vorbis",
+            "codec_type": "audio",
+            "sample_rate": "22050",
+            "channels": 2,
+            "r_frame_rate": "0/0",
+            "nb_read_frames": "525"
+          }
+        ],
+        "format": {
+          "duration": "11.665500"
+        }
+      },
+      "presentation_frames": 350,
+      "playback": {
+        "setup_entry": 87826,
+        "requested_position": [
+          -1,
+          -1
+        ],
+        "canvas_width": 640,
+        "canvas_height": 480,
+        "skip_on_key": true,
+        "repeat_count": 1,
+        "display_rect": [
+          0,
+          0,
+          640,
+          480
+        ]
+      },
+      "reference": {
+        "frame": 150,
+        "time_seconds": 4.9995,
+        "file": "intro_reference.png",
+        "sha256": "9399fa77eae6195b0346b2f026a2364b2b479331dc8b7719fc1d4de5b78d041a"
+      },
+      "output_bytes": 593846,
+      "output_sha256": "8af0b6f00b9d6d2bd5eec300df5f6749aa99f835b5628b61417b71de5e9f4bb1"
+    },
+    {
+      "source": "FROM.SMK",
+      "source_bytes": 4239800,
+      "source_sha256": "527d705d2f586ac4c4174ded8d912004a9b460d8b22019aaa4b5ddf7733570bc",
+      "file": "authors.ogv",
+      "role": "authors_video",
+      "header": {
+        "version": "SMK2",
+        "width": 320,
+        "height": 180,
+        "frames": 795,
+        "raw_frame_delay": -6666,
+        "raw_flags": 0,
+        "ring_frame": false,
+        "frame_rate": "50000/3333",
+        "duration_seconds": 52.9947,
+        "audio_tracks": []
+      },
+      "source_probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "smackvideo",
+            "codec_type": "video",
+            "width": 320,
+            "height": 180,
+            "r_frame_rate": "50000/3333",
+            "nb_read_frames": "795"
+          }
+        ],
+        "format": {
+          "duration": "52.994700"
+        }
+      },
+      "output_probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "theora",
+            "codec_type": "video",
+            "width": 320,
+            "height": 180,
+            "r_frame_rate": "50000/3333",
+            "nb_read_frames": "568"
+          }
+        ],
+        "format": {
+          "duration": "52.994700"
+        }
+      },
+      "presentation_frames": 795,
+      "playback": {
+        "setup_entry": 117054,
+        "requested_position": [
+          224,
+          90
+        ],
+        "canvas_width": 640,
+        "canvas_height": 480,
+        "skip_on_key": true,
+        "repeat_count": 1,
+        "display_rect": [
+          224,
+          90,
+          320,
+          180
+        ]
+      },
+      "reference": {
+        "frame": 75,
+        "time_seconds": 4.9995,
+        "file": "authors_reference.png",
+        "sha256": "6c0501ed0264d480f2e444ceb0c29496a314e4bf5c6725f6357e8bca1c420dd2"
+      },
+      "output_bytes": 1892406,
+      "output_sha256": "7b5c0d947d6f2cc97aab7d852d3212f4275583ff77c7dccf8483e90a0259f3d9"
+    }
+  ]
+}

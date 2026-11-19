@@ -1,0 +1,250 @@
+{
+  "format_version": 1,
+  "executable_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "sample_rate": 11025,
+  "menu_profiles": [
+    {
+      "role": "intro_history",
+      "bank": "MENU.FX",
+      "sound": 0,
+      "loop_forever": true,
+      "mixer_mode": 1,
+      "source_call": 105860
+    },
+    {
+      "role": "main_menu",
+      "bank": "MENU.FX",
+      "sound": 5,
+      "loop_forever": true,
+      "mixer_mode": 1,
+      "source_call": 100257
+    },
+    {
+      "role": "handler_19c6e",
+      "bank": "MENU.FX",
+      "sound": 3,
+      "loop_forever": true,
+      "mixer_mode": 1,
+      "source_call": 105661
+    },
+    {
+      "role": "handler_1ce9a",
+      "bank": "MENU.FX",
+      "sound": 4,
+      "loop_forever": true,
+      "mixer_mode": 1,
+      "source_call": 118597
+    }
+  ],
+  "ambient_channels": [
+    {
+      "bank": "MAP_1.FX",
+      "sound": 3,
+      "loop_forever": true,
+      "mixer_mode": 3,
+      "source_call": 84205
+    },
+    {
+      "bank": "MAP_1.FX",
+      "sound": 1,
+      "loop_forever": true,
+      "mixer_mode": 3,
+      "source_call": 84226
+    },
+    {
+      "bank": "MAP_1.FX",
+      "sound": 0,
+      "loop_forever": true,
+      "mixer_mode": 3,
+      "source_call": 84247
+    },
+    {
+      "bank": "MAP_1.FX",
+      "sound": 4,
+      "loop_forever": true,
+      "mixer_mode": 3,
+      "source_call": 84268
+    },
+    {
+      "bank": "MAP_1.FX",
+      "sound": 5,
+      "loop_forever": true,
+      "mixer_mode": 3,
+      "source_call": 84289
+    },
+    {
+      "bank": "MAP_1.FX",
+      "sound": 2,
+      "loop_forever": true,
+      "mixer_mode": 3,
+      "source_call": 84310
+    }
+  ],
+  "banks": [
+    {
+      "source": "MENU.FX",
+      "source_sha256": "d7dafe55bae4d16668893593f619fe05f342e632c4431d9ba835a9fffc1a0c3a",
+      "sounds": [
+        {
+          "sound": 0,
+          "variants": [
+            {
+              "file": "menu/000_00.wav",
+              "frames": 225775,
+              "pcm_sha256": "247008382189bc78e7c0bf0277a1a4c1d316419207f2208181a2e2d34a787d2e"
+            }
+          ]
+        },
+        {
+          "sound": 1,
+          "variants": [
+            {
+              "file": "menu/001_00.wav",
+              "frames": 154,
+              "pcm_sha256": "45e9cb1e0502633602770a8e35354d6bd796d7cab7e2fae0348768f985b69b90"
+            }
+          ]
+        },
+        {
+          "sound": 2,
+          "variants": [
+            {
+              "file": "menu/002_00.wav",
+              "frames": 8602,
+              "pcm_sha256": "f120e95d3a2d0bce9729c120838baea23830677b15119db31a7d5ced2e80489f"
+            }
+          ]
+        },
+        {
+          "sound": 3,
+          "variants": [
+            {
+              "file": "menu/003_00.wav",
+              "frames": 265062,
+              "pcm_sha256": "6cd805ddff71844e9d8e49ffada52091daa06547462e2ebf1af8371b1a93cc3c"
+            }
+          ]
+        },
+        {
+          "sound": 4,
+          "variants": [
+            {
+              "file": "menu/004_00.wav",
+              "frames": 137416,
+              "pcm_sha256": "a77a0c04c82c829d82703d852b86008244f5fae36c92c27cccde1555c113b4c1"
+            }
+          ]
+        },
+        {
+          "sound": 5,
+          "variants": [
+            {
+              "file": "menu/005_00.wav",
+              "frames": 205485,
+              "pcm_sha256": "994525b8bbfcca4b388fb830ca8a2b6d9a73063d3d8a69d590d28166f6e988f8"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "MAP_1.FX",
+      "source_sha256": "791e70e77591963b5511a25312433afdab3b7062c14787bed13d3ffa6d9a8161",
+      "sounds": [
+        {
+          "sound": 0,
+          "variants": [
+            {
+              "file": "map_1/000_00.wav",
+              "frames": 113990,
+              "pcm_sha256": "992adf5580c236f0c3fbd7505650d6039ccc07de52efa61aeca5e1f840473ddc"
+            }
+          ]
+        },
+        {
+          "sound": 1,
+          "variants": [
+            {
+              "file": "map_1/001_00.wav",
+              "frames": 140672,
+              "pcm_sha256": "5d125fbecfc8ea060c1df80c4edfcd4cfbaed2f80967d4ef84efe722560bc5d6"
+            }
+          ]
+        },
+        {
+          "sound": 2,
+          "variants": [
+            {
+              "file": "map_1/002_00.wav",
+              "frames": 228344,
+              "pcm_sha256": "ba70a210b21fc20eb0fd39d1e34c98d11758bddcf297d46bad25eb56dae12064"
+            }
+          ]
+        },
+        {
+          "sound": 3,
+          "variants": [
+            {
+              "file": "map_1/003_00.wav",
+              "frames": 548992,
+              "pcm_sha256": "a95eda7e94532030f34c0f92282a02fadcff7d5639ea77fa28ef71a67a06edbf"
+            }
+          ]
+        },
+        {
+          "sound": 4,
+          "variants": [
+            {
+              "file": "map_1/004_00.wav",
+              "frames": 188928,
+              "pcm_sha256": "838cfc4c8230e20d3da3afffabd4780eb6251625e2c7e3bacb6ea3e491eb10f7"
+            }
+          ]
+        },
+        {
+          "sound": 5,
+          "variants": [
+            {
+              "file": "map_1/005_00.wav",
+              "frames": 151808,
+              "pcm_sha256": "0b04ae5cd645d8e7d3103dc874dcd5ee3144338568673dad7db443694d962452"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "legacy_mus_string": {
+    "name": "xmi_lib.mus",
+    "le_object": 2,
+    "offset": 620,
+    "present_in_game": false,
+    "direct_u32_code_references": 0
+  },
+  "inventory": {
+    "file_count": 209,
+    "sha256": "bab71288d2be5a6ec1a55d6ce94ebadc05befb03dacb5bb6f4728db97bea2b0f",
+    "midi_family_candidates": []
+  },
+  "videos": [
+    {
+      "source": "INTRO.SMK",
+      "source_sha256": "777311a0d0d2e9e4ccb9c2efa90176ad30f7d6325d33675a4b00397ca7873d2a",
+      "audio_tracks": [
+        {
+          "track": 0,
+          "raw_rate_word": 3489682978,
+          "sample_rate": 22050,
+          "channels": 2,
+          "bits_per_sample": 8,
+          "packed": true
+        }
+      ]
+    },
+    {
+      "source": "FROM.SMK",
+      "source_sha256": "527d705d2f586ac4c4174ded8d912004a9b460d8b22019aaa4b5ddf7733570bc",
+      "audio_tracks": []
+    }
+  ]
+}
