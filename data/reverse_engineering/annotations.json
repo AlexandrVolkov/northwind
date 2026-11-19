@@ -3019,6 +3019,431 @@
         "scripts/OriginalVisibilityRules.cs"
       ],
       "limitations": "60 полных native framebuffer совпали с C#. Расписание перерисовки 1C4E/1C60, dirty-учёт и DOS-адреса не входят; 3EEA заглушён."
+    },
+    {
+      "id": "command-button-mode-router",
+      "module": "LE:1",
+      "start": 25027,
+      "end": 25135,
+      "name": "Activate command widget and route DAT mode",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "scripts/OriginalOrderDispatchRules.cs"
+      ],
+      "limitations": "1536 сочетаний slot/mode, сравниваются виджет, queued command и адрес назначения. Вход после UI-фильтров; выбранные обработчики не выполняются, а возвращаются как адрес. Кодировка слота переиспользует предыдущий перенос."
+    },
+    {
+      "id": "army02-action-table-4c",
+      "module": "ARMY__02.WRK",
+      "start": 76,
+      "end": 100,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-cb",
+      "module": "ARMY__02.WRK",
+      "start": 203,
+      "end": 227,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-17f",
+      "module": "ARMY__02.WRK",
+      "start": 383,
+      "end": 407,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-2b7",
+      "module": "ARMY__02.WRK",
+      "start": 695,
+      "end": 719,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-3a4",
+      "module": "ARMY__02.WRK",
+      "start": 932,
+      "end": 956,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-501",
+      "module": "ARMY__02.WRK",
+      "start": 1281,
+      "end": 1305,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-62a",
+      "module": "ARMY__02.WRK",
+      "start": 1578,
+      "end": 1602,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-701",
+      "module": "ARMY__02.WRK",
+      "start": 1793,
+      "end": 1817,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-783",
+      "module": "ARMY__02.WRK",
+      "start": 1923,
+      "end": 1947,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-88f",
+      "module": "ARMY__02.WRK",
+      "start": 2191,
+      "end": 2215,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-965",
+      "module": "ARMY__02.WRK",
+      "start": 2405,
+      "end": 2429,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-a54",
+      "module": "ARMY__02.WRK",
+      "start": 2644,
+      "end": 2668,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-c66",
+      "module": "ARMY__02.WRK",
+      "start": 3174,
+      "end": 3198,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-d03",
+      "module": "ARMY__02.WRK",
+      "start": 3331,
+      "end": 3355,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-ecf",
+      "module": "ARMY__02.WRK",
+      "start": 3791,
+      "end": 3815,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-104b",
+      "module": "ARMY__02.WRK",
+      "start": 4171,
+      "end": 4195,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-1156",
+      "module": "ARMY__02.WRK",
+      "start": 4438,
+      "end": 4462,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-1200",
+      "module": "ARMY__02.WRK",
+      "start": 4608,
+      "end": 4632,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-127b",
+      "module": "ARMY__02.WRK",
+      "start": 4731,
+      "end": 4755,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-133f",
+      "module": "ARMY__02.WRK",
+      "start": 4927,
+      "end": 4951,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-139b",
+      "module": "ARMY__02.WRK",
+      "start": 5019,
+      "end": 5043,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-143f",
+      "module": "ARMY__02.WRK",
+      "start": 5183,
+      "end": 5207,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-1521",
+      "module": "ARMY__02.WRK",
+      "start": 5409,
+      "end": 5433,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
+    },
+    {
+      "id": "army02-action-table-15f0",
+      "module": "ARMY__02.WRK",
+      "start": 5616,
+      "end": 5640,
+      "name": "Six relative action targets after inline FS dispatcher",
+      "classification": "data",
+      "status": "verified",
+      "evidence": [
+        "docs/order-buttons.md",
+        "tests/fixtures/order-dispatch.json"
+      ],
+      "implementation": [
+        "data/original_order_buttons.json"
+      ],
+      "limitations": "Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит."
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "12374f9de0c7de36ff3cc257935abf6fbc49157ee71c830ea0a6f07e85190623",
+  "annotation_sha256": "6bae10c535fc9f63148317a0d1d6a93d3d79b964f4a081a6425d4da1d1783f22",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 5847,
-        "ported": 25610,
-        "unreviewed": 115328,
+        "ported": 25718,
+        "unreviewed": 115220,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -233,6 +233,22 @@
         },
         {
           "start": 17523,
+          "end": 25027,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 25027,
+          "end": 25135,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "command-button-mode-router"
+          ]
+        },
+        {
+          "start": 25135,
           "end": 25342,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2361,7 +2377,8 @@
       "byte_status": {
         "partial": 609,
         "ported": 212,
-        "unreviewed": 6109
+        "unreviewed": 5581,
+        "verified": 528
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -2373,6 +2390,38 @@
       "regions": [
         {
           "start": 0,
+          "end": 76,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 76,
+          "end": 100,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-4c"
+          ]
+        },
+        {
+          "start": 100,
+          "end": 203,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 203,
+          "end": 227,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-cb"
+          ]
+        },
+        {
+          "start": 227,
           "end": 315,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2389,6 +2438,22 @@
         },
         {
           "start": 343,
+          "end": 383,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 383,
+          "end": 407,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-17f"
+          ]
+        },
+        {
+          "start": 407,
           "end": 545,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2405,6 +2470,22 @@
         },
         {
           "start": 593,
+          "end": 695,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 695,
+          "end": 719,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-2b7"
+          ]
+        },
+        {
+          "start": 719,
           "end": 822,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2437,6 +2518,22 @@
         },
         {
           "start": 899,
+          "end": 932,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 932,
+          "end": 956,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-3a4"
+          ]
+        },
+        {
+          "start": 956,
           "end": 996,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2469,6 +2566,22 @@
         },
         {
           "start": 1102,
+          "end": 1281,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1281,
+          "end": 1305,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-501"
+          ]
+        },
+        {
+          "start": 1305,
           "end": 1316,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2517,6 +2630,38 @@
         },
         {
           "start": 1566,
+          "end": 1578,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1578,
+          "end": 1602,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-62a"
+          ]
+        },
+        {
+          "start": 1602,
+          "end": 1793,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1793,
+          "end": 1817,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-701"
+          ]
+        },
+        {
+          "start": 1817,
           "end": 1878,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2533,6 +2678,15 @@
         },
         {
           "start": 1923,
+          "end": 1947,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-783"
+          ]
+        },
+        {
+          "start": 1947,
           "end": 1949,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2556,12 +2710,23 @@
         },
         {
           "start": 2129,
-          "end": 2215,
+          "end": 2191,
           "status": "partial",
           "classification": "code",
           "claims": [
             "worker-wrk-grant",
             "worker-ore-grant"
+          ]
+        },
+        {
+          "start": 2191,
+          "end": 2215,
+          "status": "partial",
+          "classification": "unknown",
+          "claims": [
+            "worker-wrk-grant",
+            "worker-ore-grant",
+            "army02-action-table-88f"
           ]
         },
         {
@@ -2575,6 +2740,22 @@
         },
         {
           "start": 2281,
+          "end": 2405,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 2405,
+          "end": 2429,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-965"
+          ]
+        },
+        {
+          "start": 2429,
           "end": 2482,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2598,6 +2779,25 @@
         },
         {
           "start": 2541,
+          "end": 2644,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "ore-worker-dispatch"
+          ]
+        },
+        {
+          "start": 2644,
+          "end": 2668,
+          "status": "partial",
+          "classification": "unknown",
+          "claims": [
+            "ore-worker-dispatch",
+            "army02-action-table-a54"
+          ]
+        },
+        {
+          "start": 2668,
           "end": 2715,
           "status": "partial",
           "classification": "code",
@@ -2616,6 +2816,198 @@
         },
         {
           "start": 2739,
+          "end": 3174,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 3174,
+          "end": 3198,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-c66"
+          ]
+        },
+        {
+          "start": 3198,
+          "end": 3331,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 3331,
+          "end": 3355,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-d03"
+          ]
+        },
+        {
+          "start": 3355,
+          "end": 3791,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 3791,
+          "end": 3815,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-ecf"
+          ]
+        },
+        {
+          "start": 3815,
+          "end": 4171,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 4171,
+          "end": 4195,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-104b"
+          ]
+        },
+        {
+          "start": 4195,
+          "end": 4438,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 4438,
+          "end": 4462,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-1156"
+          ]
+        },
+        {
+          "start": 4462,
+          "end": 4608,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 4608,
+          "end": 4632,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-1200"
+          ]
+        },
+        {
+          "start": 4632,
+          "end": 4731,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 4731,
+          "end": 4755,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-127b"
+          ]
+        },
+        {
+          "start": 4755,
+          "end": 4927,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 4927,
+          "end": 4951,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-133f"
+          ]
+        },
+        {
+          "start": 4951,
+          "end": 5019,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 5019,
+          "end": 5043,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-139b"
+          ]
+        },
+        {
+          "start": 5043,
+          "end": 5183,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 5183,
+          "end": 5207,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-143f"
+          ]
+        },
+        {
+          "start": 5207,
+          "end": 5409,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 5409,
+          "end": 5433,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-1521"
+          ]
+        },
+        {
+          "start": 5433,
+          "end": 5616,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 5616,
+          "end": 5640,
+          "status": "verified",
+          "classification": "data",
+          "claims": [
+            "army02-action-table-15f0"
+          ]
+        },
+        {
+          "start": 5640,
           "end": 6930,
           "status": "unreviewed",
           "classification": "unknown",

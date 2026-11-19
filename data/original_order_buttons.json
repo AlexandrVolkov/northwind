@@ -1,0 +1,3444 @@
+{
+  "format_version": 1,
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475",
+    "ARMY__02.WRK": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b"
+  },
+  "mode_targets": {
+    "0": 25135,
+    "1": 19777,
+    "2": 20007,
+    "3": 20430,
+    "4": 20709,
+    "5": 20908,
+    "6": 21143,
+    "7": 21389,
+    "8": 21444,
+    "9": 21684,
+    "11": 21907
+  },
+  "templates": [
+    {
+      "template_index": 0,
+      "name": "Ополченец",
+      "wrk_entry": 0,
+      "dispatcher": {
+        "wrk_call": 70,
+        "wrk_table": 76,
+        "fs_slot": 225,
+        "le1": 33319
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 109,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 237,
+            "le1": 33475
+          }
+        },
+        {
+          "state": 1,
+          "wrk_target": 103,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 233,
+            "le1": 33395
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 115,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 241,
+            "le1": 33695
+          }
+        },
+        {
+          "state": 3,
+          "wrk_target": 121,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 245,
+            "le1": 33854
+          }
+        },
+        {
+          "state": 4,
+          "wrk_target": 100
+        },
+        {
+          "state": 5,
+          "wrk_target": 100
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 1,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 2,
+          "mode": 1,
+          "raw_group": 2,
+          "present": true,
+          "label": "Идти",
+          "hotkey_scan_code": 48,
+          "tooltip_offset": 5288,
+          "mode_target": 19777,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 3,
+          "mode": 2,
+          "raw_group": 3,
+          "present": true,
+          "label": "Атаковать",
+          "hotkey_scan_code": 33,
+          "tooltip_offset": 5312,
+          "mode_target": 20007,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 4,
+          "mode": 6,
+          "raw_group": 6,
+          "present": true,
+          "label": "Захватить",
+          "hotkey_scan_code": 25,
+          "tooltip_offset": 5506,
+          "mode_target": 21143,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 1,
+      "name": "Лучник",
+      "wrk_entry": 127,
+      "dispatcher": {
+        "wrk_call": 197,
+        "wrk_table": 203,
+        "fs_slot": 225,
+        "le1": 33319
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 236,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 237,
+            "le1": 33475
+          }
+        },
+        {
+          "state": 1,
+          "wrk_target": 230,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 233,
+            "le1": 33395
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 242,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 241,
+            "le1": 33695
+          }
+        },
+        {
+          "state": 3,
+          "wrk_target": 248,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 245,
+            "le1": 33854
+          }
+        },
+        {
+          "state": 4,
+          "wrk_target": 227
+        },
+        {
+          "state": 5,
+          "wrk_target": 227
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 1,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 2,
+          "mode": 1,
+          "raw_group": 2,
+          "present": true,
+          "label": "Идти",
+          "hotkey_scan_code": 48,
+          "tooltip_offset": 5288,
+          "mode_target": 19777,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 3,
+          "mode": 2,
+          "raw_group": 3,
+          "present": true,
+          "label": "Атаковать",
+          "hotkey_scan_code": 33,
+          "tooltip_offset": 5312,
+          "mode_target": 20007,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 4,
+          "mode": 6,
+          "raw_group": 6,
+          "present": true,
+          "label": "Захватить",
+          "hotkey_scan_code": 25,
+          "tooltip_offset": 5506,
+          "mode_target": 21143,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 2,
+      "name": "Замок",
+      "wrk_entry": 254,
+      "dispatcher": {
+        "wrk_call": 377,
+        "wrk_table": 383,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 501
+        },
+        {
+          "state": 1,
+          "wrk_target": 443,
+          "first_transfer": {
+            "kind": "call",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 440
+        },
+        {
+          "state": 3,
+          "wrk_target": 521
+        },
+        {
+          "state": 4,
+          "wrk_target": 593
+        },
+        {
+          "state": 5,
+          "wrk_target": 605,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 301,
+            "le1": 52420
+          }
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 872,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Отмена",
+          "hotkey_scan_code": 36,
+          "tooltip_offset": 5328,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 873,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Ремонт",
+          "hotkey_scan_code": 35,
+          "tooltip_offset": 5341,
+          "mode_target": 25135,
+          "queued_state": 1
+        },
+        {
+          "slot": 2,
+          "icon_frame": 874,
+          "mode": 7,
+          "raw_group": 0,
+          "present": true,
+          "label": "Выбор",
+          "hotkey_scan_code": 32,
+          "tooltip_offset": 5366,
+          "mode_target": 21389,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 875,
+          "mode": 3,
+          "raw_group": 0,
+          "present": true,
+          "label": "Построить",
+          "hotkey_scan_code": 34,
+          "tooltip_offset": 5378,
+          "mode_target": 20430,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 875,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Построить",
+          "hotkey_scan_code": 34,
+          "tooltip_offset": 5378,
+          "mode_target": 25135,
+          "queued_state": 4
+        },
+        {
+          "slot": 5,
+          "icon_frame": 2865,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Разрушить",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5354,
+          "mode_target": 25135,
+          "queued_state": 5
+        }
+      ]
+    },
+    {
+      "template_index": 3,
+      "name": "Казарма",
+      "wrk_entry": 611,
+      "dispatcher": {
+        "wrk_call": 689,
+        "wrk_table": 695,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 790
+        },
+        {
+          "state": 1,
+          "wrk_target": 732,
+          "first_transfer": {
+            "kind": "call",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 729
+        },
+        {
+          "state": 3,
+          "wrk_target": 729
+        },
+        {
+          "state": 4,
+          "wrk_target": 810
+        },
+        {
+          "state": 5,
+          "wrk_target": 846,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 301,
+            "le1": 52420
+          }
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 872,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Отмена",
+          "hotkey_scan_code": 36,
+          "tooltip_offset": 5328,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 873,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Ремонт",
+          "hotkey_scan_code": 35,
+          "tooltip_offset": 5341,
+          "mode_target": 25135,
+          "queued_state": 1
+        },
+        {
+          "slot": 2,
+          "icon_frame": 874,
+          "mode": 7,
+          "raw_group": 0,
+          "present": true,
+          "label": "Выбор",
+          "hotkey_scan_code": 32,
+          "tooltip_offset": 5366,
+          "mode_target": 21389,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 875,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Построить",
+          "hotkey_scan_code": 34,
+          "tooltip_offset": 5378,
+          "mode_target": 25135,
+          "queued_state": 4
+        },
+        {
+          "slot": 5,
+          "icon_frame": 2865,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Разрушить",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5354,
+          "mode_target": 25135,
+          "queued_state": 5
+        }
+      ]
+    },
+    {
+      "template_index": 4,
+      "name": "Лесопилка",
+      "wrk_entry": 852,
+      "dispatcher": {
+        "wrk_call": 926,
+        "wrk_table": 932,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 967
+        },
+        {
+          "state": 1,
+          "wrk_target": 961,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 958
+        },
+        {
+          "state": 3,
+          "wrk_target": 958
+        },
+        {
+          "state": 4,
+          "wrk_target": 958
+        },
+        {
+          "state": 5,
+          "wrk_target": 1102,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 301,
+            "le1": 52420
+          }
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 872,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Отмена",
+          "hotkey_scan_code": 36,
+          "tooltip_offset": 5328,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 873,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Ремонт",
+          "hotkey_scan_code": 35,
+          "tooltip_offset": 5341,
+          "mode_target": 25135,
+          "queued_state": 1
+        },
+        {
+          "slot": 2,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 2865,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Разрушить",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5354,
+          "mode_target": 25135,
+          "queued_state": 5
+        }
+      ]
+    },
+    {
+      "template_index": 5,
+      "name": "Забор",
+      "wrk_entry": 1108,
+      "dispatcher": {
+        "wrk_call": 1275,
+        "wrk_table": 1281,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 1307
+        },
+        {
+          "state": 1,
+          "wrk_target": 1310,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 1307
+        },
+        {
+          "state": 3,
+          "wrk_target": 1307
+        },
+        {
+          "state": 4,
+          "wrk_target": 1307
+        },
+        {
+          "state": 5,
+          "wrk_target": 1307
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 1,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 6,
+      "name": "Шахта",
+      "wrk_entry": 1316,
+      "dispatcher": {
+        "wrk_call": 1572,
+        "wrk_table": 1578,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 1661
+        },
+        {
+          "state": 1,
+          "wrk_target": 1607,
+          "first_transfer": {
+            "kind": "call",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 1604
+        },
+        {
+          "state": 3,
+          "wrk_target": 1604
+        },
+        {
+          "state": 4,
+          "wrk_target": 1604
+        },
+        {
+          "state": 5,
+          "wrk_target": 1691,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 301,
+            "le1": 52420
+          }
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 872,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Отмена",
+          "hotkey_scan_code": 36,
+          "tooltip_offset": 5328,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 873,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Ремонт",
+          "hotkey_scan_code": 35,
+          "tooltip_offset": 5341,
+          "mode_target": 25135,
+          "queued_state": 1
+        },
+        {
+          "slot": 2,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 2865,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Разрушить",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5354,
+          "mode_target": 25135,
+          "queued_state": 5
+        }
+      ]
+    },
+    {
+      "template_index": 7,
+      "name": "Мост",
+      "wrk_entry": 1697,
+      "dispatcher": {
+        "wrk_call": 1787,
+        "wrk_table": 1793,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 1828
+        },
+        {
+          "state": 1,
+          "wrk_target": 1822,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 1819
+        },
+        {
+          "state": 3,
+          "wrk_target": 1819
+        },
+        {
+          "state": 4,
+          "wrk_target": 1819
+        },
+        {
+          "state": 5,
+          "wrk_target": 1819
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 1,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 8,
+      "name": "Рабочий",
+      "wrk_entry": 2541,
+      "dispatcher": {
+        "wrk_call": 2638,
+        "wrk_table": 2644,
+        "fs_slot": 225,
+        "le1": 33319
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 2677
+        },
+        {
+          "state": 1,
+          "wrk_target": 2671,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 233,
+            "le1": 33395
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 2668
+        },
+        {
+          "state": 3,
+          "wrk_target": 2668
+        },
+        {
+          "state": 4,
+          "wrk_target": 2709,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 285,
+            "le1": 34486
+          }
+        },
+        {
+          "state": 5,
+          "wrk_target": 2668
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 1170,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 1171,
+          "mode": 1,
+          "raw_group": 2,
+          "present": true,
+          "label": "Идти",
+          "hotkey_scan_code": 48,
+          "tooltip_offset": 5288,
+          "mode_target": 19777,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 1455,
+          "mode": 0,
+          "raw_group": 5,
+          "present": true,
+          "label": "Отнести мешок",
+          "hotkey_scan_code": 21,
+          "tooltip_offset": 5456,
+          "mode_target": 25135,
+          "queued_state": 4
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 9,
+      "name": "Ферма",
+      "wrk_entry": 1878,
+      "dispatcher": {
+        "wrk_call": 1917,
+        "wrk_table": 1923,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 1987
+        },
+        {
+          "state": 1,
+          "wrk_target": 1981,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 1978
+        },
+        {
+          "state": 3,
+          "wrk_target": 1978
+        },
+        {
+          "state": 4,
+          "wrk_target": 1978
+        },
+        {
+          "state": 5,
+          "wrk_target": 2031,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 301,
+            "le1": 52420
+          }
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 872,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Отмена",
+          "hotkey_scan_code": 36,
+          "tooltip_offset": 5328,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 873,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Ремонт",
+          "hotkey_scan_code": 35,
+          "tooltip_offset": 5341,
+          "mode_target": 25135,
+          "queued_state": 1
+        },
+        {
+          "slot": 2,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 2865,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Разрушить",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5354,
+          "mode_target": 25135,
+          "queued_state": 5
+        }
+      ]
+    },
+    {
+      "template_index": 10,
+      "name": "Рабочий",
+      "wrk_entry": 2037,
+      "dispatcher": {
+        "wrk_call": 2185,
+        "wrk_table": 2191,
+        "fs_slot": 225,
+        "le1": 33319
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 2224,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 237,
+            "le1": 33475
+          }
+        },
+        {
+          "state": 1,
+          "wrk_target": 2218,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 233,
+            "le1": 33395
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 2230,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 241,
+            "le1": 33695
+          }
+        },
+        {
+          "state": 3,
+          "wrk_target": 2236,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 249,
+            "le1": 33962
+          }
+        },
+        {
+          "state": 4,
+          "wrk_target": 2242,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 285,
+            "le1": 34486
+          }
+        },
+        {
+          "state": 5,
+          "wrk_target": 2248,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 257,
+            "le1": 34687
+          }
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 1170,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 1171,
+          "mode": 1,
+          "raw_group": 2,
+          "present": true,
+          "label": "Идти",
+          "hotkey_scan_code": 48,
+          "tooltip_offset": 5288,
+          "mode_target": 19777,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 3,
+          "mode": 2,
+          "raw_group": 3,
+          "present": true,
+          "label": "Атаковать",
+          "hotkey_scan_code": 33,
+          "tooltip_offset": 5312,
+          "mode_target": 20007,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 1172,
+          "mode": 4,
+          "raw_group": 4,
+          "present": true,
+          "label": "Рубить лес",
+          "hotkey_scan_code": 35,
+          "tooltip_offset": 5394,
+          "mode_target": 20709,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 1455,
+          "mode": 8,
+          "raw_group": 7,
+          "present": true,
+          "label": "Обслуживать шахту",
+          "hotkey_scan_code": 36,
+          "tooltip_offset": 5411,
+          "mode_target": 21444,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 1173,
+          "mode": 5,
+          "raw_group": 0,
+          "present": true,
+          "label": "Вырыть яму",
+          "hotkey_scan_code": 32,
+          "tooltip_offset": 5533,
+          "mode_target": 20908,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 11,
+      "name": "Рабочий",
+      "wrk_entry": 2302,
+      "dispatcher": {
+        "wrk_call": 2399,
+        "wrk_table": 2405,
+        "fs_slot": 225,
+        "le1": 33319
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 2438
+        },
+        {
+          "state": 1,
+          "wrk_target": 2432,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 233,
+            "le1": 33395
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 2470,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 241,
+            "le1": 33695
+          }
+        },
+        {
+          "state": 3,
+          "wrk_target": 2429
+        },
+        {
+          "state": 4,
+          "wrk_target": 2476,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 253,
+            "le1": 34393
+          }
+        },
+        {
+          "state": 5,
+          "wrk_target": 2429
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 1170,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 1171,
+          "mode": 1,
+          "raw_group": 2,
+          "present": true,
+          "label": "Идти",
+          "hotkey_scan_code": 48,
+          "tooltip_offset": 5288,
+          "mode_target": 19777,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 1172,
+          "mode": 0,
+          "raw_group": 5,
+          "present": true,
+          "label": "Отнести бревно",
+          "hotkey_scan_code": 21,
+          "tooltip_offset": 5435,
+          "mode_target": 25135,
+          "queued_state": 4
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 12,
+      "name": "Лаборатория",
+      "wrk_entry": 2766,
+      "dispatcher": {
+        "wrk_call": 3168,
+        "wrk_table": 3174,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 3217
+        },
+        {
+          "state": 1,
+          "wrk_target": 3203,
+          "first_transfer": {
+            "kind": "call",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 3200
+        },
+        {
+          "state": 3,
+          "wrk_target": 3200
+        },
+        {
+          "state": 4,
+          "wrk_target": 3200
+        },
+        {
+          "state": 5,
+          "wrk_target": 3251,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 301,
+            "le1": 52420
+          }
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 872,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Отмена",
+          "hotkey_scan_code": 36,
+          "tooltip_offset": 5328,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 873,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Ремонт",
+          "hotkey_scan_code": 35,
+          "tooltip_offset": 5341,
+          "mode_target": 25135,
+          "queued_state": 1
+        },
+        {
+          "slot": 2,
+          "icon_frame": 874,
+          "mode": 9,
+          "raw_group": 0,
+          "present": true,
+          "label": "Вход",
+          "hotkey_scan_code": 32,
+          "tooltip_offset": 5522,
+          "mode_target": 21684,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 2865,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Разрушить",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5354,
+          "mode_target": 25135,
+          "queued_state": 5
+        }
+      ]
+    },
+    {
+      "template_index": 13,
+      "name": "Башня",
+      "wrk_entry": 3257,
+      "dispatcher": {
+        "wrk_call": 3325,
+        "wrk_table": 3331,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 3414
+        },
+        {
+          "state": 1,
+          "wrk_target": 3360,
+          "first_transfer": {
+            "kind": "call",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 3357
+        },
+        {
+          "state": 3,
+          "wrk_target": 3357
+        },
+        {
+          "state": 4,
+          "wrk_target": 3357
+        },
+        {
+          "state": 5,
+          "wrk_target": 3455,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 301,
+            "le1": 52420
+          }
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 872,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Отмена",
+          "hotkey_scan_code": 36,
+          "tooltip_offset": 5328,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 873,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Ремонт",
+          "hotkey_scan_code": 35,
+          "tooltip_offset": 5341,
+          "mode_target": 25135,
+          "queued_state": 1
+        },
+        {
+          "slot": 2,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 2865,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Разрушить",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5354,
+          "mode_target": 25135,
+          "queued_state": 5
+        }
+      ]
+    },
+    {
+      "template_index": 14,
+      "name": "Ворота",
+      "wrk_entry": 3461,
+      "dispatcher": {
+        "kind": "custom_gate",
+        "le1": null,
+        "wrk_entry": 3484
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 3617
+        },
+        {
+          "state": 1,
+          "wrk_target": 3556
+        },
+        {
+          "state": 2,
+          "wrk_target": 3618
+        },
+        {
+          "state": 3,
+          "wrk_target": 3636
+        },
+        {
+          "state": 4,
+          "wrk_target": 3660,
+          "first_transfer": {
+            "kind": "call",
+            "fs_slot": 193,
+            "le1": 54921
+          }
+        },
+        {
+          "state": 5,
+          "wrk_target": 3556
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 1,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 1627,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Открыть",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5476,
+          "mode_target": 25135,
+          "queued_state": 2
+        },
+        {
+          "slot": 3,
+          "icon_frame": 1628,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Закрыть",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5486,
+          "mode_target": 25135,
+          "queued_state": 3
+        },
+        {
+          "slot": 4,
+          "icon_frame": 1625,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Автомат",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5496,
+          "mode_target": 25135,
+          "queued_state": 4
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 15,
+      "name": "Завод",
+      "wrk_entry": 3707,
+      "dispatcher": {
+        "wrk_call": 3785,
+        "wrk_table": 3791,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 3842
+        },
+        {
+          "state": 1,
+          "wrk_target": 3828,
+          "first_transfer": {
+            "kind": "call",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 3825
+        },
+        {
+          "state": 3,
+          "wrk_target": 3900
+        },
+        {
+          "state": 4,
+          "wrk_target": 3956
+        },
+        {
+          "state": 5,
+          "wrk_target": 3968,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 301,
+            "le1": 52420
+          }
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 872,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Отмена",
+          "hotkey_scan_code": 36,
+          "tooltip_offset": 5328,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 873,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Ремонт",
+          "hotkey_scan_code": 35,
+          "tooltip_offset": 5341,
+          "mode_target": 25135,
+          "queued_state": 1
+        },
+        {
+          "slot": 2,
+          "icon_frame": 874,
+          "mode": 7,
+          "raw_group": 0,
+          "present": true,
+          "label": "Выбор",
+          "hotkey_scan_code": 32,
+          "tooltip_offset": 5366,
+          "mode_target": 21389,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 875,
+          "mode": 3,
+          "raw_group": 0,
+          "present": true,
+          "label": "Построить",
+          "hotkey_scan_code": 34,
+          "tooltip_offset": 5378,
+          "mode_target": 20430,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 875,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Построить",
+          "hotkey_scan_code": 34,
+          "tooltip_offset": 5378,
+          "mode_target": 25135,
+          "queued_state": 4
+        },
+        {
+          "slot": 5,
+          "icon_frame": 2865,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Разрушить",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5354,
+          "mode_target": 25135,
+          "queued_state": 5
+        }
+      ]
+    },
+    {
+      "template_index": 16,
+      "name": "Катапульта",
+      "wrk_entry": 3974,
+      "dispatcher": {
+        "wrk_call": 4165,
+        "wrk_table": 4171,
+        "fs_slot": 225,
+        "le1": 33319
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 4204,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 237,
+            "le1": 33475
+          }
+        },
+        {
+          "state": 1,
+          "wrk_target": 4198,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 233,
+            "le1": 33395
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 4210,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 241,
+            "le1": 33695
+          }
+        },
+        {
+          "state": 3,
+          "wrk_target": 4195
+        },
+        {
+          "state": 4,
+          "wrk_target": 4195
+        },
+        {
+          "state": 5,
+          "wrk_target": 4195
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 1,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 2,
+          "mode": 1,
+          "raw_group": 2,
+          "present": true,
+          "label": "Идти",
+          "hotkey_scan_code": 48,
+          "tooltip_offset": 5288,
+          "mode_target": 19777,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 3,
+          "mode": 2,
+          "raw_group": 3,
+          "present": true,
+          "label": "Атаковать",
+          "hotkey_scan_code": 33,
+          "tooltip_offset": 5312,
+          "mode_target": 20007,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 17,
+      "name": "Поджигатель",
+      "wrk_entry": 127,
+      "dispatcher": {
+        "wrk_call": 197,
+        "wrk_table": 203,
+        "fs_slot": 225,
+        "le1": 33319
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 236,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 237,
+            "le1": 33475
+          }
+        },
+        {
+          "state": 1,
+          "wrk_target": 230,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 233,
+            "le1": 33395
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 242,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 241,
+            "le1": 33695
+          }
+        },
+        {
+          "state": 3,
+          "wrk_target": 248,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 245,
+            "le1": 33854
+          }
+        },
+        {
+          "state": 4,
+          "wrk_target": 227
+        },
+        {
+          "state": 5,
+          "wrk_target": 227
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 1,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 2,
+          "mode": 1,
+          "raw_group": 2,
+          "present": true,
+          "label": "Идти",
+          "hotkey_scan_code": 48,
+          "tooltip_offset": 5288,
+          "mode_target": 19777,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 3,
+          "mode": 2,
+          "raw_group": 3,
+          "present": true,
+          "label": "Атаковать",
+          "hotkey_scan_code": 33,
+          "tooltip_offset": 5312,
+          "mode_target": 20007,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 4,
+          "mode": 6,
+          "raw_group": 6,
+          "present": true,
+          "label": "Захватить",
+          "hotkey_scan_code": 25,
+          "tooltip_offset": 5506,
+          "mode_target": 21143,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 18,
+      "name": "Рыцарь",
+      "wrk_entry": 0,
+      "dispatcher": {
+        "wrk_call": 70,
+        "wrk_table": 76,
+        "fs_slot": 225,
+        "le1": 33319
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 109,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 237,
+            "le1": 33475
+          }
+        },
+        {
+          "state": 1,
+          "wrk_target": 103,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 233,
+            "le1": 33395
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 115,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 241,
+            "le1": 33695
+          }
+        },
+        {
+          "state": 3,
+          "wrk_target": 121,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 245,
+            "le1": 33854
+          }
+        },
+        {
+          "state": 4,
+          "wrk_target": 100
+        },
+        {
+          "state": 5,
+          "wrk_target": 100
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 1,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 2,
+          "mode": 1,
+          "raw_group": 2,
+          "present": true,
+          "label": "Идти",
+          "hotkey_scan_code": 48,
+          "tooltip_offset": 5288,
+          "mode_target": 19777,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 3,
+          "mode": 2,
+          "raw_group": 3,
+          "present": true,
+          "label": "Атаковать",
+          "hotkey_scan_code": 33,
+          "tooltip_offset": 5312,
+          "mode_target": 20007,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 4,
+          "mode": 6,
+          "raw_group": 6,
+          "present": true,
+          "label": "Захватить",
+          "hotkey_scan_code": 25,
+          "tooltip_offset": 5506,
+          "mode_target": 21143,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 19,
+      "name": "Яма-Ловушка",
+      "wrk_entry": 4216,
+      "dispatcher": null,
+      "states": [],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 1,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 20,
+      "name": "Предводитель",
+      "wrk_entry": 4337,
+      "dispatcher": {
+        "wrk_call": 4432,
+        "wrk_table": 4438,
+        "fs_slot": 225,
+        "le1": 33319
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 4491,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 237,
+            "le1": 33475
+          }
+        },
+        {
+          "state": 1,
+          "wrk_target": 4485,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 233,
+            "le1": 33395
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 4497,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 241,
+            "le1": 33695
+          }
+        },
+        {
+          "state": 3,
+          "wrk_target": 4482
+        },
+        {
+          "state": 4,
+          "wrk_target": 4503
+        },
+        {
+          "state": 5,
+          "wrk_target": 4482
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 1,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 2,
+          "mode": 1,
+          "raw_group": 2,
+          "present": true,
+          "label": "Идти",
+          "hotkey_scan_code": 48,
+          "tooltip_offset": 5288,
+          "mode_target": 19777,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 3,
+          "mode": 2,
+          "raw_group": 3,
+          "present": true,
+          "label": "Атаковать",
+          "hotkey_scan_code": 33,
+          "tooltip_offset": 5312,
+          "mode_target": 20007,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 1,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 3
+        },
+        {
+          "slot": 4,
+          "icon_frame": 875,
+          "mode": 5,
+          "raw_group": 0,
+          "present": true,
+          "label": "Построить",
+          "hotkey_scan_code": 34,
+          "tooltip_offset": 5378,
+          "mode_target": 20908,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 874,
+          "mode": 11,
+          "raw_group": 0,
+          "present": true,
+          "label": "Выбор",
+          "hotkey_scan_code": 32,
+          "tooltip_offset": 5366,
+          "mode_target": 21907,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 21,
+      "name": "Всадник",
+      "wrk_entry": 4532,
+      "dispatcher": {
+        "wrk_call": 4602,
+        "wrk_table": 4608,
+        "fs_slot": 225,
+        "le1": 33319
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 4641,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 237,
+            "le1": 33475
+          }
+        },
+        {
+          "state": 1,
+          "wrk_target": 4635,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 233,
+            "le1": 33395
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 4647,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 241,
+            "le1": 33695
+          }
+        },
+        {
+          "state": 3,
+          "wrk_target": 4632
+        },
+        {
+          "state": 4,
+          "wrk_target": 4632
+        },
+        {
+          "state": 5,
+          "wrk_target": 4632
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 1,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 2,
+          "mode": 1,
+          "raw_group": 2,
+          "present": true,
+          "label": "Идти",
+          "hotkey_scan_code": 48,
+          "tooltip_offset": 5288,
+          "mode_target": 19777,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 3,
+          "mode": 2,
+          "raw_group": 3,
+          "present": true,
+          "label": "Атаковать",
+          "hotkey_scan_code": 33,
+          "tooltip_offset": 5312,
+          "mode_target": 20007,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 22,
+      "name": "Конюшня",
+      "wrk_entry": 4653,
+      "dispatcher": {
+        "wrk_call": 4725,
+        "wrk_table": 4731,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 4826
+        },
+        {
+          "state": 1,
+          "wrk_target": 4768,
+          "first_transfer": {
+            "kind": "call",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 4765
+        },
+        {
+          "state": 3,
+          "wrk_target": 4765
+        },
+        {
+          "state": 4,
+          "wrk_target": 4864
+        },
+        {
+          "state": 5,
+          "wrk_target": 4888,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 301,
+            "le1": 52420
+          }
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 872,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Отмена",
+          "hotkey_scan_code": 36,
+          "tooltip_offset": 5328,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 873,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Ремонт",
+          "hotkey_scan_code": 35,
+          "tooltip_offset": 5341,
+          "mode_target": 25135,
+          "queued_state": 1
+        },
+        {
+          "slot": 2,
+          "icon_frame": 874,
+          "mode": 7,
+          "raw_group": 0,
+          "present": true,
+          "label": "Выбор",
+          "hotkey_scan_code": 32,
+          "tooltip_offset": 5366,
+          "mode_target": 21389,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 875,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Построить",
+          "hotkey_scan_code": 34,
+          "tooltip_offset": 5378,
+          "mode_target": 25135,
+          "queued_state": 4
+        },
+        {
+          "slot": 5,
+          "icon_frame": 2865,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Разрушить",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5354,
+          "mode_target": 25135,
+          "queued_state": 5
+        }
+      ]
+    },
+    {
+      "template_index": 23,
+      "name": "Мельница",
+      "wrk_entry": 4894,
+      "dispatcher": {
+        "wrk_call": 4921,
+        "wrk_table": 4927,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 4956
+        },
+        {
+          "state": 1,
+          "wrk_target": 4974,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 4953
+        },
+        {
+          "state": 3,
+          "wrk_target": 4953
+        },
+        {
+          "state": 4,
+          "wrk_target": 4953
+        },
+        {
+          "state": 5,
+          "wrk_target": 4980,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 301,
+            "le1": 52420
+          }
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 872,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Отмена",
+          "hotkey_scan_code": 36,
+          "tooltip_offset": 5328,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 873,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Ремонт",
+          "hotkey_scan_code": 35,
+          "tooltip_offset": 5341,
+          "mode_target": 25135,
+          "queued_state": 1
+        },
+        {
+          "slot": 2,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 2865,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Разрушить",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5354,
+          "mode_target": 25135,
+          "queued_state": 5
+        }
+      ]
+    },
+    {
+      "template_index": 24,
+      "name": "Церковь",
+      "wrk_entry": 4986,
+      "dispatcher": {
+        "wrk_call": 5013,
+        "wrk_table": 5019,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 5048
+        },
+        {
+          "state": 1,
+          "wrk_target": 5066,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 5045
+        },
+        {
+          "state": 3,
+          "wrk_target": 5045
+        },
+        {
+          "state": 4,
+          "wrk_target": 5045
+        },
+        {
+          "state": 5,
+          "wrk_target": 5072,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 301,
+            "le1": 52420
+          }
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 872,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Отмена",
+          "hotkey_scan_code": 36,
+          "tooltip_offset": 5328,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 873,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Ремонт",
+          "hotkey_scan_code": 35,
+          "tooltip_offset": 5341,
+          "mode_target": 25135,
+          "queued_state": 1
+        },
+        {
+          "slot": 2,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 2865,
+          "mode": 0,
+          "raw_group": 0,
+          "present": true,
+          "label": "Разрушить",
+          "hotkey_scan_code": 255,
+          "tooltip_offset": 5354,
+          "mode_target": 25135,
+          "queued_state": 5
+        }
+      ]
+    },
+    {
+      "template_index": 25,
+      "name": "Забор",
+      "wrk_entry": 5078,
+      "dispatcher": {
+        "wrk_call": 5177,
+        "wrk_table": 5183,
+        "fs_slot": 65,
+        "le1": 51340
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 5209
+        },
+        {
+          "state": 1,
+          "wrk_target": 5212,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 61,
+            "le1": 51213
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 5209
+        },
+        {
+          "state": 3,
+          "wrk_target": 5209
+        },
+        {
+          "state": 4,
+          "wrk_target": 5209
+        },
+        {
+          "state": 5,
+          "wrk_target": 5209
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 1,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 26,
+      "name": "Балиста",
+      "wrk_entry": 5218,
+      "dispatcher": {
+        "wrk_call": 5403,
+        "wrk_table": 5409,
+        "fs_slot": 225,
+        "le1": 33319
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 5442,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 237,
+            "le1": 33475
+          }
+        },
+        {
+          "state": 1,
+          "wrk_target": 5436,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 233,
+            "le1": 33395
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 5448,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 241,
+            "le1": 33695
+          }
+        },
+        {
+          "state": 3,
+          "wrk_target": 5433
+        },
+        {
+          "state": 4,
+          "wrk_target": 5433
+        },
+        {
+          "state": 5,
+          "wrk_target": 5433
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 1,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 2,
+          "mode": 1,
+          "raw_group": 2,
+          "present": true,
+          "label": "Идти",
+          "hotkey_scan_code": 48,
+          "tooltip_offset": 5288,
+          "mode_target": 19777,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 3,
+          "mode": 2,
+          "raw_group": 3,
+          "present": true,
+          "label": "Атаковать",
+          "hotkey_scan_code": 33,
+          "tooltip_offset": 5312,
+          "mode_target": 20007,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    },
+    {
+      "template_index": 27,
+      "name": "Непобедимый",
+      "wrk_entry": 5454,
+      "dispatcher": {
+        "wrk_call": 5610,
+        "wrk_table": 5616,
+        "fs_slot": 225,
+        "le1": 33319
+      },
+      "states": [
+        {
+          "state": 0,
+          "wrk_target": 5649,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 237,
+            "le1": 33475
+          }
+        },
+        {
+          "state": 1,
+          "wrk_target": 5643,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 233,
+            "le1": 33395
+          }
+        },
+        {
+          "state": 2,
+          "wrk_target": 5655,
+          "first_transfer": {
+            "kind": "jmp",
+            "fs_slot": 241,
+            "le1": 33695
+          }
+        },
+        {
+          "state": 3,
+          "wrk_target": 5640
+        },
+        {
+          "state": 4,
+          "wrk_target": 5640
+        },
+        {
+          "state": 5,
+          "wrk_target": 5640
+        }
+      ],
+      "commands": [
+        {
+          "slot": 0,
+          "icon_frame": 1,
+          "mode": 0,
+          "raw_group": 1,
+          "present": true,
+          "label": "Стоять",
+          "hotkey_scan_code": 46,
+          "tooltip_offset": 5299,
+          "mode_target": 25135,
+          "queued_state": 0
+        },
+        {
+          "slot": 1,
+          "icon_frame": 2,
+          "mode": 1,
+          "raw_group": 2,
+          "present": true,
+          "label": "Идти",
+          "hotkey_scan_code": 48,
+          "tooltip_offset": 5288,
+          "mode_target": 19777,
+          "queued_state": null
+        },
+        {
+          "slot": 2,
+          "icon_frame": 3,
+          "mode": 2,
+          "raw_group": 3,
+          "present": true,
+          "label": "Атаковать",
+          "hotkey_scan_code": 33,
+          "tooltip_offset": 5312,
+          "mode_target": 20007,
+          "queued_state": null
+        },
+        {
+          "slot": 3,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 4,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        },
+        {
+          "slot": 5,
+          "icon_frame": 0,
+          "mode": 0,
+          "raw_group": 0,
+          "present": false,
+          "label": "",
+          "hotkey_scan_code": null,
+          "tooltip_offset": null,
+          "mode_target": 25135,
+          "queued_state": null
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "State targets are entry addresses, not a claim that their complete handlers have been ported.",
+    "A command icon is not a handler ID. DAT mode routing happens before WRK state dispatch."
+  ]
+}
