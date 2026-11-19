@@ -116,4 +116,41 @@ public static class OriginalCombatRules
         unit[0x23] = (byte)((random.NextSecondaryByte() * mapHeight) >> 8);
         unit[0x2d] = (byte)((unit[0x2d] & 15) | 0x20);
     }
+
+    /// <summary>8B5E: 0 in reach, 1 too far (or across water), 2 too close, 3 cannot attack this target.</summary>
+    public static byte Reach(ReadOnlySpan<byte> attacker, ReadOnlySpan<byte> attackerTemplate, ReadOnlySpan<byte> target, ReadOnlySpan<byte> targetTemplate, byte targetTerrainClass)
+    {
+        if (attackerTemplate[0x71] <= targetTemplate[0x44]) return 3;
+        if (((U32(attackerTemplate, 0x74) >> (target[0x0d] & 3)) & 1) == 0) return 3;
+        uint gap = OriginalWorkerApproach.FootprintGap(attacker, target, attackerTemplate, targetTemplate);
+        if (targetTerrainClass == 1 && gap >= 0x30) return 1;
+        byte cells = (byte)(((gap + 15) >> 5) + 1);
+        if (cells > attackerTemplate[0x72]) return 1;
+        if ((byte)(cells - 1) < attackerTemplate[0x73]) return 2;
+        return 0;
+    }
+
+    /// <summary>8AF4: true when the swing delay OBE[2F] has reached DAT[75] - hi8(DAT[75] * experience).</summary>
+    public static bool SwingReady(Span<byte> attacker, ReadOnlySpan<byte> attackerTemplate)
+    {
+        byte delay = attackerTemplate[0x75];
+        byte limit = (byte)(delay - ((delay * attacker[0x16]) >> 8));
+        if (attacker[0x2f] >= limit) return true;
+        attacker[0x2f]++; return false;
+    }
+
+    /// <summary>8ABF: false while the target in OBE[1C] lives; a dead target is forgotten and rewards experience DAT[76] / 4.</summary>
+    public static bool TargetAlive(Span<byte> attacker, ReadOnlySpan<byte> target, ReadOnlySpan<byte> targetTemplate)
+    {
+        if (U32(attacker, 0x1c) == 0) return false;
+        if ((sbyte)target[0x19] > (sbyte)targetTemplate[0x46]) return true;
+        if (attacker[0x16] < 0x40)
+        {
+            byte grown = (byte)(attacker[0x16] + (targetTemplate[0x76] >> 2));
+            attacker[0x16] = (sbyte)grown < 0 ? (byte)0x7f : grown;
+        }
+        BinaryPrimitives.WriteUInt32LittleEndian(attacker[0x1c..], 0);
+        return false;
+    }
+
 }
