@@ -30,7 +30,7 @@ public partial class TestRunner : Node
                 case "mine": await MineChecks(); break;
                 case "population": await PopulationChecks(); break;
                 case "economy": await EconomyChecks(); break;
-                case "simulation": SimulationChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); OriginalSpatialChecks(); OriginalMotionPreparationChecks(); OriginalLumbermillChecks(); OriginalForestryChecks(); OriginalWorkerAnimationChecks(); OriginalWorkerDeliveryChecks(); OriginalWorkerApproachChecks(); OriginalMovementAdmissionChecks(); MovementBridgeChecks(); OriginalRoutePoolChecks(); PackedRouteIntegrationChecks(); OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); OriginalPopulationChecks(); OriginalResourceChecks(); OriginalProductionChecks(); OriginalOreChecks(); OriginalCombatChecks(); OriginalAttackChecks(); OriginalArrowChecks(); OriginalDeathChecks(); OriginalTargetChecks(); OriginalDiplomacyChecks(); OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); break;
+                case "simulation": SimulationChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); OriginalSpatialChecks(); OriginalMotionPreparationChecks(); OriginalLumbermillChecks(); OriginalForestryChecks(); OriginalWorkerAnimationChecks(); OriginalWorkerDeliveryChecks(); OriginalWorkerApproachChecks(); OriginalMovementAdmissionChecks(); MovementBridgeChecks(); OriginalRoutePoolChecks(); PackedRouteIntegrationChecks(); OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); OriginalPopulationChecks(); OriginalResourceChecks(); OriginalProductionChecks(); OriginalOreChecks(); OriginalCombatChecks(); OriginalAttackChecks(); OriginalArrowChecks(); OriginalDeathChecks(); OriginalTargetChecks(); OriginalDiplomacyChecks(); OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); OriginalTechChecks(); break;
                 case "original-buildings": OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); break;
                 case "imported-occupancy": ImportedOccupancyChecks(); break;
                 case "original-spatial": OriginalSpatialChecks(); break;
@@ -39,6 +39,7 @@ public partial class TestRunner : Node
                 case "original-ore": OriginalOreChecks(); break;
                 case "original-combat": OriginalCombatChecks(); OriginalAttackChecks(); OriginalArrowChecks(); OriginalDeathChecks(); OriginalTargetChecks(); break;
                 case "original-diplomacy": OriginalDiplomacyChecks(); break;
+                case "original-tech": OriginalTechChecks(); break;
                 case "original-ai": OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
                 default: throw new ArgumentException($"Unknown test mode: {mode}");
