@@ -287,6 +287,7 @@ public sealed partial class Skirmish : IDisposable
         Elapsed += dt;
         foreach (var effect in Effects) effect.Remaining -= dt;
         Effects.RemoveAll(e => e.Remaining <= 0);
+        TickArrows();
         TickBuildings();
         TickMining();
         TickProduction();
@@ -404,6 +405,26 @@ public sealed partial class Skirmish : IDisposable
         actor.Record[0x22] = 0xff; actor.Record[0x2d] = (byte)((actor.Record[0x2d] & 15) | 0x30); // 8C7C
         return true;
     }
+    /// <summary>Live arrow effect records (22h bytes, ARMY__00.WRK type 2).</summary>
+    public List<byte[]> Arrows { get; } = [];
+    /// <summary>Effect loop 96CD for arrows: one AH=1 update per tick.</summary>
+    private void TickArrows()
+    {
+        int plane = Occupancy.Width * Occupancy.Height;
+        foreach (var arrow in Arrows.ToArray())
+        {
+            uint x = BinaryPrimitives.ReadUInt32LittleEndian(arrow.AsSpan(7)), y = BinaryPrimitives.ReadUInt32LittleEndian(arrow.AsSpan(0xc));
+            var found = OriginalCombatRules.FindStruck(x, y, arrow[5], (byte)Map.Width, Map.Cells, _properties,
+                (p, cell) => Occupancy.Cells[p * plane + cell], r => Find(r) is { } a ? (a.Record, a.Parameters) : null);
+            var victim = Find(found.Reference);
+            var (state, _, _) = OriginalArrowRules.Step(arrow, victim != null ? victim.Record : new byte[54], victim != null ? victim.Parameters : new byte[171],
+                victim != null, (uint)(Map.Width * 32), (uint)(Map.Height * 32), _terrainCatalog.NextRandomByte);
+            if (state == ArrowState.Flying) continue;
+            Arrows.Remove(arrow);
+            if (state is ArrowState.Spark or ArrowState.HardSpark) Effects.Add(new BattleEffect { From = new Vector2(x, y) - new Vector2(8, 8), To = new Vector2(x, y), Team = 0, Remaining = .15 });
+            if (victim is { Alive: false }) Kill(victim);
+        }
+    }
     private void ResolveImpact(SkirmishActor actor, SkirmishActor target, WorkerImpact impact)
     {
         if (impact.X >= Map.Width * 32 || impact.Y >= Map.Height * 32) return; // 9727 rejects points outside the map
@@ -419,7 +440,16 @@ public sealed partial class Skirmish : IDisposable
             if (victim is { Alive: false }) Kill(victim);
             return;
         }
-        // Missile effects (ARMY__00.WRK 762 and others) are not ported: the hit lands on the engaged target with the same attack.
+        if (impact.Code >= 128 && (impact.Code & 0x7f) == 2)
+        {
+            // 9727 places effect type 2 (army 0) at the strike point; WRK 593 aims and launches the arrow.
+            var arrow = new byte[0x22]; arrow[0] = 2; arrow[1] = 0; arrow[5] = impact.Layer;
+            BinaryPrimitives.WriteUInt32LittleEndian(arrow.AsSpan(7), impact.X); BinaryPrimitives.WriteUInt32LittleEndian(arrow.AsSpan(0xc), impact.Y);
+            OriginalArrowRules.Create(arrow, actor.Record, impact.TargetX, impact.TargetY, (uint)(Map.Width * 32), (uint)(Map.Height * 32),
+                _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
+            Arrows.Add(arrow); return;
+        }
+        // Other missile types (catapult, ballista, fire) are not ported: the hit lands on the engaged target with the same attack.
         OriginalCombatRules.Hit(target.Record, target.Parameters, OriginalCombatRules.StrikeAttack(actor.Record[0x16]), (byte)(actor.Record[0x14] & 7), _terrainCatalog.NextRandomByte);
         if (!target.Alive) Kill(target);
     }

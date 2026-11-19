@@ -297,6 +297,13 @@ public partial class SkirmishMain : Node2D
                 DrawString(ThemeDB.FallbackFont, pointOfEntry + new Vector2(-24, -10), "Приём груза", HorizontalAlignment.Left, -1, 12, new Color("e7cd82"));
             }
         }
+        foreach (var arrow in Battle.Arrows)
+        {
+            // Effect record: position +7/+0C, 24.8 velocity +18/+1C, height above ground +10 (8.8).
+            var at = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(arrow.AsSpan(7)), BinaryPrimitives.ReadUInt32LittleEndian(arrow.AsSpan(0xc)) - BinaryPrimitives.ReadUInt16LittleEndian(arrow.AsSpan(0x10)) / 256f);
+            var velocity = new Vector2(BinaryPrimitives.ReadInt32LittleEndian(arrow.AsSpan(0x18)), BinaryPrimitives.ReadInt32LittleEndian(arrow.AsSpan(0x1c))).Normalized();
+            DrawLine(at - velocity * 9 - new Vector2(0, 16), at - new Vector2(0, 16), new Color("e8dcc0"), 2);
+        }
         foreach (var effect in Battle.Effects)
         {
             DrawLine(effect.From - new Vector2(0, 16), effect.To - new Vector2(0, 16), new Color(effect.Team == 0 ? "f0d88a" : "f57862"), 2);

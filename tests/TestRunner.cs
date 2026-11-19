@@ -30,14 +30,14 @@ public partial class TestRunner : Node
                 case "mine": await MineChecks(); break;
                 case "population": await PopulationChecks(); break;
                 case "economy": await EconomyChecks(); break;
-                case "simulation": SimulationChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); OriginalSpatialChecks(); OriginalMotionPreparationChecks(); OriginalLumbermillChecks(); OriginalForestryChecks(); OriginalWorkerAnimationChecks(); OriginalWorkerDeliveryChecks(); OriginalWorkerApproachChecks(); OriginalMovementAdmissionChecks(); MovementBridgeChecks(); OriginalRoutePoolChecks(); PackedRouteIntegrationChecks(); OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); OriginalPopulationChecks(); OriginalResourceChecks(); OriginalProductionChecks(); OriginalOreChecks(); OriginalCombatChecks(); OriginalAttackChecks(); break;
+                case "simulation": SimulationChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); OriginalSpatialChecks(); OriginalMotionPreparationChecks(); OriginalLumbermillChecks(); OriginalForestryChecks(); OriginalWorkerAnimationChecks(); OriginalWorkerDeliveryChecks(); OriginalWorkerApproachChecks(); OriginalMovementAdmissionChecks(); MovementBridgeChecks(); OriginalRoutePoolChecks(); PackedRouteIntegrationChecks(); OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); OriginalPopulationChecks(); OriginalResourceChecks(); OriginalProductionChecks(); OriginalOreChecks(); OriginalCombatChecks(); OriginalAttackChecks(); OriginalArrowChecks(); break;
                 case "original-buildings": OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); break;
                 case "imported-occupancy": ImportedOccupancyChecks(); break;
                 case "original-spatial": OriginalSpatialChecks(); break;
                 case "original-motion": OriginalMotionPreparationChecks(); break;
                 case "original-lumbermill": OriginalLumbermillChecks(); break;
                 case "original-ore": OriginalOreChecks(); break;
-                case "original-combat": OriginalCombatChecks(); OriginalAttackChecks(); break;
+                case "original-combat": OriginalCombatChecks(); OriginalAttackChecks(); OriginalArrowChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
                 default: throw new ArgumentException($"Unknown test mode: {mode}");
             }
