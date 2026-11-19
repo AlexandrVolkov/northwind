@@ -46,6 +46,56 @@ def glyphs(data):
     return out
 
 
+def spr_records(data):
+    """SPR: u16 count, u24 offsets from 2 + 3*count; RLE token >= 80h: (b & 7Fh) literal pixels, else b transparent ones.
+    Runs never cross a row (LE:1 1E098); trailing transparency may be omitted, so the width comes from the caller."""
+    count = struct.unpack_from('<H', data)[0]
+    offsets = [int.from_bytes(data[2 + 3 * i:5 + 3 * i], 'little') for i in range(count)]
+    base = 2 + 3 * count; ends = offsets[1:] + [len(data) - base]
+    return [data[base + a:base + b] for a, b in zip(offsets, ends)]
+
+
+def spr_image(record, width, height, palette):
+    pixels = bytearray(); mask = bytearray(); j = 0
+    while j < len(record):
+        b = record[j]; j += 1
+        if b & 0x80: k = b & 0x7f; pixels += record[j:j + k]; mask += b'\xff' * k; j += k
+        else: pixels += bytes(b); mask += bytes(b)
+    if len(pixels) > width * height: raise ValueError('Sprite larger than its size')
+    pixels = bytes(pixels.ljust(width * height, b'\0')); mask = bytes(mask.ljust(width * height, b'\0'))
+    im = Image.frombytes('P', (width, height), pixels); im.putpalette(palette); im = im.convert('RGBA')
+    im.putalpha(Image.frombytes('L', (width, height), mask)); return im
+
+
+def make_atlas(images, columns):
+    w = max(i.width for i in images); h = max(i.height for i in images)
+    sheet = Image.new('RGBA', (columns * w, -(-len(images) // columns) * h), (0, 0, 0, 0))
+    for k, im in enumerate(images): sheet.paste(im, ((k % columns) * w, (k // columns) * h))
+    return sheet, [w, h]
+
+
+def army_panel(game, army, palette, output):
+    """Portraits (DAT +5, 80x50) and order buttons (six 8-byte slots from DAT +9: two bytes, u16 sprite, u32 WRK handler; 69x35)."""
+    dat = (game / f'ARMY__0{army}.DAT').read_bytes(); records = spr_records((game / f'ARMY__0{army}.SPR').read_bytes())
+    count = struct.unpack_from('<H', dat)[0] // 171; portraits = []; buttons = []; templates = []
+    for t in range(count):
+        r = dat[2 + 171 * t:2 + 171 * (t + 1)]
+        portrait = struct.unpack_from('<H', r, 5)[0]
+        if portrait not in portraits: portraits.append(portrait)
+        slots = []
+        for k in range(6):
+            a, b, sprite, handler = struct.unpack_from('<BBHI', r, 9 + 8 * k)
+            if sprite and sprite not in buttons: buttons.append(sprite)
+            slots.append({'bytes': [a, b], 'sprite': sprite, 'button': buttons.index(sprite) if sprite else None, 'handler': handler})
+        templates.append({'template': t, 'portrait': portraits.index(portrait), 'slots': slots})
+    sheet, cell = make_atlas([spr_image(records[i], 80, 50, palette) for i in portraits], 8)
+    sheet.save(output / f'army{army:02d}_portraits.png')
+    bsheet, bcell = make_atlas([spr_image(records[i], 69, 35, palette) for i in buttons], 8)
+    bsheet.save(output / f'army{army:02d}_buttons.png')
+    return {'army': army, 'portraits': {'atlas': f'army{army:02d}_portraits.png', 'cell': cell, 'sprites': portraits},
+            'buttons': {'atlas': f'army{army:02d}_buttons.png', 'cell': bcell, 'sprites': buttons}, 'templates': templates}
+
+
 def image(width, height, pixels, palette, transparent=False):
     im = Image.frombytes('P', (width, height), pixels); im.putpalette(palette)
     if transparent: im.info['transparency'] = 0
@@ -80,7 +130,13 @@ def convert(game, output):
                     red.paste(image(width, height, shifted, pal(palette), True), ((code % 16) * span, (code // 16) * cell + top))
             red.save(output / f'font_{stem}_red.png')
         manifest['fonts'].append({'file': font, 'atlas': f'font_{stem}.png', 'palette': palette, 'cell': [span, cell], 'glyphs': entries})
-    manifest['source_sha256'] = {n: hashlib.sha256((game / n).read_bytes()).hexdigest() for n in ['SCREENS.SCR', *FONTS]}
+    work = spr_records((game / 'WORK.SPR').read_bytes()); colour = pal('COLOR1.PAL')
+    heroes, cell = make_atlas([spr_image(work[i], 64, 70, colour) for i in range(195, 227)], 8)
+    heroes.save(output / 'hero_portraits.png')
+    manifest['hero_portraits'] = {'atlas': 'hero_portraits.png', 'cell': cell, 'first_sprite': 195, 'source': 'WORK.SPR',
+                                  'known': {'Олег': 196}}
+    manifest['armies'] = [army_panel(game, 2, colour, output)]
+    manifest['source_sha256'] = {n: hashlib.sha256((game / n).read_bytes()).hexdigest() for n in ['SCREENS.SCR', 'WORK.SPR', 'ARMY__02.SPR', 'ARMY__02.DAT', *FONTS]}
     (output / 'interface.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
 
 

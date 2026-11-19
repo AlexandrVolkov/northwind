@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
-from interface_source import unpack_screen, glyphs  # noqa: E402
+from interface_source import unpack_screen, glyphs, spr_records, spr_image  # noqa: E402
 
 
 class InterfaceSourceTest(unittest.TestCase):
@@ -16,6 +16,14 @@ class InterfaceSourceTest(unittest.TestCase):
     def test_short_screen_is_rejected(self):
         with self.assertRaises(ValueError):
             unpack_screen(struct.pack('<IHH', 1, 4, 4) + b'\x05', 0)
+
+    def test_spr_with_omitted_trailing_transparency(self):
+        record = bytes([1, 0x82, 5, 6, 0x81, 7])   # 1 clear, 2 pixels, then 1 pixel; the rest of 2x3 is omitted
+        data = struct.pack('<H', 1) + (0).to_bytes(3, 'little') + record
+        [only] = spr_records(data)
+        im = spr_image(only, 2, 3, bytes(range(256)) * 3)
+        self.assertEqual([im.getpixel((x, y))[3] for y in range(3) for x in range(2)], [0, 255, 255, 255, 0, 0])
+        self.assertEqual(im.getpixel((0, 1))[0], 6)
 
     def test_glyphs(self):
         table = bytearray(512); body = bytearray()

@@ -177,6 +177,20 @@ public partial class SkirmishMain : Node2D
     }
     public void ChangeSpeed(int step) { Speed = Math.Clamp(step > 0 ? Speed * 2 : Speed / 2, .5f, 4); RefreshUi(); }
     public void ChangeScrollSpeed(int step) => ScrollSpeed = Math.Clamp(ScrollSpeed + step * 175, 175, 1400);
+    /// <summary>Pending order of a panel button (button sprite); applied by the next left click in the map window.</summary>
+    public int PendingOrder { get; private set; }
+    /// <summary>Order button pressed (ARMY__02.SPR sprite of the slot). Meanings follow the pictures, the WRK handlers are not ported:
+    /// 1 shield — stop, 2 arrows — move, 3 skull — attack; others are reported as not yet ported.</summary>
+    public void Order(int sprite)
+    {
+        if (Battle.Paused || Battle.Outcome != "") return;
+        switch (sprite)
+        {
+            case 1: Battle.Stop(Selection); PendingOrder = 0; break;
+            case 2 or 3: PendingOrder = sprite; break;
+            default: Battle.Log("Этот приказ ещё не перенесён."); break;
+        }
+    }
     public void ExitMission() => GetTree().ChangeSceneToFile("res://scenes/main.tscn");
     public override void _Process(double delta)
     {
@@ -267,7 +281,9 @@ public partial class SkirmishMain : Node2D
                 if (mill != null) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; Selection.Clear(); Selection.Add(mill.Id); }
                 RefreshUi(); return;
             }
-            if (button.ButtonIndex == MouseButton.Left && !Battle.Paused && Battle.Outcome == "")
+            if (button.ButtonIndex == MouseButton.Left && PendingOrder != 0)
+            { IssueOrder(GetViewport().GetCanvasTransform().AffineInverse() * button.Position); PendingOrder = 0; }
+            else if (button.ButtonIndex == MouseButton.Left && !Battle.Paused && Battle.Outcome == "")
             { _drag = true; _dragStart = _dragEnd = button.Position; }
             else if (button.ButtonIndex == MouseButton.Right) IssueOrder(GetViewport().GetCanvasTransform().AffineInverse() * button.Position);
         }

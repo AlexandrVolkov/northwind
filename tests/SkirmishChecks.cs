@@ -158,6 +158,24 @@ public partial class TestRunner
         scene.Hud.Click(OriginalHud.Minimap.Position + new Vector2(100, 100), MouseButton.Left);
         for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         Check(scene.VisibleWorld().HasPoint(new Vector2(100, 100) / 128 * new Vector2(scene.Battle.Map.Width, scene.Battle.Map.Height) * 32), "A minimap click moves the map window there");
+        var archer = scene.Battle.Actors.First(a => a.Team == 0 && a.Source.TemplateName == "Лучник");
+        scene.Selection.Clear(); scene.Selection.Add(archer.Id);
+        Check(scene.Hud.Template(archer)?.Slots.Count(s => s.Sprite != 0) == 4, "The archer panel has the four order buttons of its DAT template");
+        scene.Hud.Click(OriginalHud.Slot(1).GetCenter(), MouseButton.Left);
+        Check(scene.PendingOrder == 2, "The arrows button waits for a move target");
+        scene.FocusWorld(archer.Position); for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        var moveTo = scene.GetViewport().GetCanvasTransform() * (archer.Position + new Vector2(96, 0));
+        Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true, Position = moveTo });
+        Input.ParseInputEvent(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = false, Position = moveTo });
+        await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        Check(scene.PendingOrder == 0 && archer.Route.Count > 0, "The next map click gives the move order");
+        if (DisplayServer.GetName() != "headless")
+        {
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+            GetViewport().GetTexture().GetImage().SavePng("res://build/hud-archer.png");
+        }
+        scene.Battle.Stop(scene.Selection);
         scene.Selection.Clear(); scene.Selection.Add(scene.Battle.Hero.Id); scene.FocusHero();
         if (DisplayServer.GetName() != "headless")
         {

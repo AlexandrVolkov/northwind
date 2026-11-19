@@ -4006,8 +4006,1770 @@
    }
   }
  ],
+ "hero_portraits": {
+  "atlas": "hero_portraits.png",
+  "cell": [
+   64,
+   70
+  ],
+  "first_sprite": 195,
+  "source": "WORK.SPR",
+  "known": {
+   "Олег": 196
+  }
+ },
+ "armies": [
+  {
+   "army": 2,
+   "portraits": {
+    "atlas": "army02_portraits.png",
+    "cell": [
+     80,
+     50
+    ],
+    "sprites": [
+     0,
+     590,
+     871,
+     893,
+     920,
+     947,
+     1018,
+     1045,
+     3120,
+     1151,
+     1169,
+     1454,
+     1663,
+     1608,
+     1624,
+     1636,
+     1745,
+     2864,
+     285,
+     2212,
+     2781,
+     2797,
+     2824,
+     2842,
+     2867
+    ]
+   },
+   "buttons": {
+    "atlas": "army02_buttons.png",
+    "cell": [
+     69,
+     35
+    ],
+    "sprites": [
+     1,
+     2,
+     3,
+     4,
+     872,
+     873,
+     874,
+     875,
+     2865,
+     1170,
+     1171,
+     1455,
+     1172,
+     1173,
+     1627,
+     1628,
+     1625
+    ]
+   },
+   "templates": [
+    {
+     "template": 0,
+     "portrait": 0,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1,
+       "button": 0,
+       "handler": 5284
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 2,
+       "button": 1,
+       "handler": 5265
+      },
+      {
+       "bytes": [
+        1,
+        2
+       ],
+       "sprite": 3,
+       "button": 2,
+       "handler": 5281
+      },
+      {
+       "bytes": [
+        2,
+        3
+       ],
+       "sprite": 4,
+       "button": 3,
+       "handler": 5467
+      },
+      {
+       "bytes": [
+        6,
+        6
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 1,
+     "portrait": 1,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1,
+       "button": 0,
+       "handler": 5113
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 2,
+       "button": 1,
+       "handler": 5094
+      },
+      {
+       "bytes": [
+        1,
+        2
+       ],
+       "sprite": 3,
+       "button": 2,
+       "handler": 5110
+      },
+      {
+       "bytes": [
+        2,
+        3
+       ],
+       "sprite": 4,
+       "button": 3,
+       "handler": 5296
+      },
+      {
+       "bytes": [
+        6,
+        6
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 2,
+     "portrait": 2,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 872,
+       "button": 4,
+       "handler": 4971
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 873,
+       "button": 5,
+       "handler": 4976
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 874,
+       "button": 6,
+       "handler": 4993
+      },
+      {
+       "bytes": [
+        7,
+        0
+       ],
+       "sprite": 875,
+       "button": 7,
+       "handler": 4997
+      },
+      {
+       "bytes": [
+        3,
+        0
+       ],
+       "sprite": 875,
+       "button": 7,
+       "handler": 4989
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 2865,
+       "button": 8,
+       "handler": 4957
+      }
+     ]
+    },
+    {
+     "template": 3,
+     "portrait": 3,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 872,
+       "button": 4,
+       "handler": 4800
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 873,
+       "button": 5,
+       "handler": 4805
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 874,
+       "button": 6,
+       "handler": 4822
+      },
+      {
+       "bytes": [
+        7,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 875,
+       "button": 7,
+       "handler": 4818
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 2865,
+       "button": 8,
+       "handler": 4786
+      }
+     ]
+    },
+    {
+     "template": 4,
+     "portrait": 4,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 872,
+       "button": 4,
+       "handler": 4629
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 873,
+       "button": 5,
+       "handler": 4634
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 2865,
+       "button": 8,
+       "handler": 4615
+      }
+     ]
+    },
+    {
+     "template": 5,
+     "portrait": 5,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 6,
+     "portrait": 6,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 872,
+       "button": 4,
+       "handler": 4287
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 873,
+       "button": 5,
+       "handler": 4292
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 2865,
+       "button": 8,
+       "handler": 4273
+      }
+     ]
+    },
+    {
+     "template": 7,
+     "portrait": 7,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 8,
+     "portrait": 8,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1170,
+       "button": 9,
+       "handler": 3916
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 1171,
+       "button": 10,
+       "handler": 3897
+      },
+      {
+       "bytes": [
+        1,
+        2
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1455,
+       "button": 11,
+       "handler": 4041
+      },
+      {
+       "bytes": [
+        0,
+        5
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 9,
+     "portrait": 9,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 872,
+       "button": 4,
+       "handler": 3774
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 873,
+       "button": 5,
+       "handler": 3779
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 2865,
+       "button": 8,
+       "handler": 3760
+      }
+     ]
+    },
+    {
+     "template": 10,
+     "portrait": 10,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1170,
+       "button": 9,
+       "handler": 3574
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 1171,
+       "button": 10,
+       "handler": 3555
+      },
+      {
+       "bytes": [
+        1,
+        2
+       ],
+       "sprite": 3,
+       "button": 2,
+       "handler": 3571
+      },
+      {
+       "bytes": [
+        2,
+        3
+       ],
+       "sprite": 1172,
+       "button": 12,
+       "handler": 3645
+      },
+      {
+       "bytes": [
+        4,
+        4
+       ],
+       "sprite": 1455,
+       "button": 11,
+       "handler": 3654
+      },
+      {
+       "bytes": [
+        8,
+        7
+       ],
+       "sprite": 1173,
+       "button": 13,
+       "handler": 3768
+      }
+     ]
+    },
+    {
+     "template": 11,
+     "portrait": 11,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1170,
+       "button": 9,
+       "handler": 3403
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 1171,
+       "button": 10,
+       "handler": 3384
+      },
+      {
+       "bytes": [
+        1,
+        2
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1172,
+       "button": 12,
+       "handler": 3507
+      },
+      {
+       "bytes": [
+        0,
+        5
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 12,
+     "portrait": 12,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 872,
+       "button": 4,
+       "handler": 3261
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 873,
+       "button": 5,
+       "handler": 3266
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 874,
+       "button": 6,
+       "handler": 3439
+      },
+      {
+       "bytes": [
+        9,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 2865,
+       "button": 8,
+       "handler": 3247
+      }
+     ]
+    },
+    {
+     "template": 13,
+     "portrait": 13,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 872,
+       "button": 4,
+       "handler": 3090
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 873,
+       "button": 5,
+       "handler": 3095
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 2865,
+       "button": 8,
+       "handler": 3076
+      }
+     ]
+    },
+    {
+     "template": 14,
+     "portrait": 14,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1627,
+       "button": 14,
+       "handler": 3051
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1628,
+       "button": 15,
+       "handler": 3053
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1625,
+       "button": 16,
+       "handler": 3055
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 15,
+     "portrait": 15,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 872,
+       "button": 4,
+       "handler": 2748
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 873,
+       "button": 5,
+       "handler": 2753
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 874,
+       "button": 6,
+       "handler": 2770
+      },
+      {
+       "bytes": [
+        7,
+        0
+       ],
+       "sprite": 875,
+       "button": 7,
+       "handler": 2774
+      },
+      {
+       "bytes": [
+        3,
+        0
+       ],
+       "sprite": 875,
+       "button": 7,
+       "handler": 2766
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 2865,
+       "button": 8,
+       "handler": 2734
+      }
+     ]
+    },
+    {
+     "template": 16,
+     "portrait": 16,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1,
+       "button": 0,
+       "handler": 2548
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 2,
+       "button": 1,
+       "handler": 2529
+      },
+      {
+       "bytes": [
+        1,
+        2
+       ],
+       "sprite": 3,
+       "button": 2,
+       "handler": 2545
+      },
+      {
+       "bytes": [
+        2,
+        3
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 17,
+     "portrait": 17,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1,
+       "button": 0,
+       "handler": 2377
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 2,
+       "button": 1,
+       "handler": 2358
+      },
+      {
+       "bytes": [
+        1,
+        2
+       ],
+       "sprite": 3,
+       "button": 2,
+       "handler": 2374
+      },
+      {
+       "bytes": [
+        2,
+        3
+       ],
+       "sprite": 4,
+       "button": 3,
+       "handler": 2560
+      },
+      {
+       "bytes": [
+        6,
+        6
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 18,
+     "portrait": 18,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1,
+       "button": 0,
+       "handler": 2206
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 2,
+       "button": 1,
+       "handler": 2187
+      },
+      {
+       "bytes": [
+        1,
+        2
+       ],
+       "sprite": 3,
+       "button": 2,
+       "handler": 2203
+      },
+      {
+       "bytes": [
+        2,
+        3
+       ],
+       "sprite": 4,
+       "button": 3,
+       "handler": 2389
+      },
+      {
+       "bytes": [
+        6,
+        6
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 19,
+     "portrait": 7,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 20,
+     "portrait": 18,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1,
+       "button": 0,
+       "handler": 1864
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 2,
+       "button": 1,
+       "handler": 1845
+      },
+      {
+       "bytes": [
+        1,
+        2
+       ],
+       "sprite": 3,
+       "button": 2,
+       "handler": 1861
+      },
+      {
+       "bytes": [
+        2,
+        3
+       ],
+       "sprite": 1,
+       "button": 0,
+       "handler": 1840
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 875,
+       "button": 7,
+       "handler": 1911
+      },
+      {
+       "bytes": [
+        5,
+        0
+       ],
+       "sprite": 874,
+       "button": 6,
+       "handler": 1891
+      }
+     ]
+    },
+    {
+     "template": 21,
+     "portrait": 19,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1,
+       "button": 0,
+       "handler": 1693
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 2,
+       "button": 1,
+       "handler": 1674
+      },
+      {
+       "bytes": [
+        1,
+        2
+       ],
+       "sprite": 3,
+       "button": 2,
+       "handler": 1690
+      },
+      {
+       "bytes": [
+        2,
+        3
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 22,
+     "portrait": 20,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 872,
+       "button": 4,
+       "handler": 1551
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 873,
+       "button": 5,
+       "handler": 1556
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 874,
+       "button": 6,
+       "handler": 1573
+      },
+      {
+       "bytes": [
+        7,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 875,
+       "button": 7,
+       "handler": 1569
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 2865,
+       "button": 8,
+       "handler": 1537
+      }
+     ]
+    },
+    {
+     "template": 23,
+     "portrait": 21,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 872,
+       "button": 4,
+       "handler": 1380
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 873,
+       "button": 5,
+       "handler": 1385
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 2865,
+       "button": 8,
+       "handler": 1366
+      }
+     ]
+    },
+    {
+     "template": 24,
+     "portrait": 22,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 872,
+       "button": 4,
+       "handler": 1209
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 873,
+       "button": 5,
+       "handler": 1214
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 2865,
+       "button": 8,
+       "handler": 1195
+      }
+     ]
+    },
+    {
+     "template": 25,
+     "portrait": 23,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 26,
+     "portrait": 24,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1,
+       "button": 0,
+       "handler": 838
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 2,
+       "button": 1,
+       "handler": 819
+      },
+      {
+       "bytes": [
+        1,
+        2
+       ],
+       "sprite": 3,
+       "button": 2,
+       "handler": 835
+      },
+      {
+       "bytes": [
+        2,
+        3
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    },
+    {
+     "template": 27,
+     "portrait": 18,
+     "slots": [
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 1,
+       "button": 0,
+       "handler": 667
+      },
+      {
+       "bytes": [
+        0,
+        1
+       ],
+       "sprite": 2,
+       "button": 1,
+       "handler": 648
+      },
+      {
+       "bytes": [
+        1,
+        2
+       ],
+       "sprite": 3,
+       "button": 2,
+       "handler": 664
+      },
+      {
+       "bytes": [
+        2,
+        3
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      },
+      {
+       "bytes": [
+        0,
+        0
+       ],
+       "sprite": 0,
+       "button": null,
+       "handler": 0
+      }
+     ]
+    }
+   ]
+  }
+ ],
  "source_sha256": {
   "SCREENS.SCR": "1625a8088cb61a51bea2d7f449b7026625813e950fad38e2b396b406a3f6e1fc",
+  "WORK.SPR": "27d8d82fb49a41e6ec8786af996ba1fe24e15090202a1588dea117b538e22e0d",
+  "ARMY__02.SPR": "a684ad0474ad9272ab08b0997753305f9a1297103ba83e054e736542dc00302f",
+  "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475",
   "FONT_01.FNT": "fdf78bb6045797667ccbe78b8a231cf47e8291cf24d9f3b31151bf8520040011",
   "MENU.FNT": "b71198c1507e34e6c53de44dc7dd308ddf835bae3c5052b8512edfe8ae4958d7",
   "MENU2.FNT": "4bd54da77a433b69647707b0d71904a2630b40c0af5e2d00d1a696fada30a9ca"
