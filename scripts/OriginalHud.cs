@@ -93,7 +93,7 @@ public partial class OriginalHud : Node2D
         _font.Draw(this, new Vector2(CounterX[2], 0), b.Wood.ToString());
         _red.Draw(this, new Vector2(CounterX[3], 0), b.FreePeople.ToString());
         DrawSetTransform(new Vector2(Shift, 0));
-        if (MenuOpen) DrawTexture(_menuPanel, new Vector2(464, 0));
+        if (MenuOpen) { DrawTexture(_menuPanel, new Vector2(464, 0)); DrawSlider(103, Game.Pan, 16); DrawSlider(151, Game.GameSpeed - 0xef, 15); }
         else { DrawMinimap(); DrawSelection(); }
         DrawSetTransform(Vector2.Zero);
         if (b.Paused)
@@ -119,6 +119,19 @@ public partial class OriginalHud : Node2D
             DrawTextureRectRegion(_frame, new Rect2(x, 464, w, 16), new Rect2(384, 464, w, 16));
         }
         DrawTextureRectRegion(_frame, new Rect2(464 + Shift, 0, 176, 480), new Rect2(464, 0, 176, 480));
+    }
+
+    /// <summary>Slider of the menu panel as seen on DOSBox screenshots: two 1-px lines at y and y + 5 from x = 491 over a 124-px track,
+    /// gold (186,146,12) for round(value · 124 / max) pixels, black for the rest (measured; the drawing routine is not found yet).</summary>
+    private void DrawSlider(int y, int value, int maximum)
+    {
+        int lit = (int)Math.Round(Math.Clamp(value, 0, maximum) * 124.0 / maximum, MidpointRounding.AwayFromZero);
+        var gold = new Color(186 / 255f, 146 / 255f, 12 / 255f);
+        foreach (int row in new[] { y, y + 5 })
+        {
+            DrawRect(new Rect2(491, row, 124, 1), Colors.Black);
+            if (lit > 0) DrawRect(new Rect2(491, row, lit, 1), gold);
+        }
     }
 
     private void DrawMinimap()
