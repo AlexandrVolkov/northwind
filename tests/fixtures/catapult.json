@@ -8,7 +8,8 @@
   "templates_sha256": {
     "0": "096dcc81394f05943ea0ff4d5df154bc0c4cbc071b81f7bf3ecbcebb789e5b5f",
     "2": "5418e774623844bdb25f39db4ced48728de222976752c30e0db232021c5ea208",
-    "16": "7ab56b110556a33fbe9efb479f73d9af2c1e5dfadbf0e5798e930f9ab39d98fc"
+    "16": "7ab56b110556a33fbe9efb479f73d9af2c1e5dfadbf0e5798e930f9ab39d98fc",
+    "26": "3a5850d40dff0b1230a20f5f6d2dd8659d3357a7566d6504970ee1fa94415dea"
   },
   "results": {
     "create": {
@@ -22,6 +23,18 @@
     "smoke": {
       "case_count": 15,
       "sha256": "0822c4ed09229ca00601764f3c4497c3e5b8278301748d99925425d41c3ae145"
+    },
+    "bolt_create": {
+      "case_count": 96,
+      "sha256": "b699053e4fb21d84e2aa3f79551e94ef84594f2befef8a6cdb338e95305435ed"
+    },
+    "bolt_step": {
+      "case_count": 360,
+      "sha256": "0428b5c196c14ba40a732250cfb95a66e072dddd2eb0b8af74a7534a1fc67278"
+    },
+    "big": {
+      "case_count": 8,
+      "sha256": "385f7f00140d79551b1f32bf45d0bd053f4a1b270a44fa17537d1e1cf448e00b"
     }
   },
   "create": {
@@ -233,6 +246,132 @@
         1,
         2
       ]
+    ]
+  },
+  "bolt_create": {
+    "origins": [
+      [
+        48,
+        48
+      ],
+      [
+        250,
+        260
+      ],
+      [
+        500,
+        16
+      ]
+    ],
+    "targets": [
+      [
+        48,
+        48
+      ],
+      [
+        300,
+        301
+      ],
+      [
+        511,
+        511
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "experience": [
+      0,
+      127
+    ],
+    "random_indices": [
+      0,
+      1,
+      99,
+      255
+    ]
+  },
+  "bolt_step": {
+    "positions": [
+      [
+        200,
+        200
+      ],
+      [
+        5,
+        7
+      ],
+      [
+        500,
+        500
+      ],
+      [
+        509,
+        40
+      ]
+    ],
+    "remaining": [
+      -3,
+      0,
+      40
+    ],
+    "objects": [
+      [],
+      [
+        [
+          1,
+          10,
+          0
+        ]
+      ],
+      [
+        [
+          1,
+          10,
+          4
+        ],
+        [
+          0,
+          3,
+          0
+        ]
+      ]
+    ],
+    "random_indices": [
+      0,
+      1,
+      128,
+      200,
+      255
+    ],
+    "refuse": [
+      0,
+      1
+    ]
+  },
+  "big": {
+    "frames": [
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        1,
+        18
+      ],
+      [
+        2,
+        18
+      ]
+    ],
+    "ah": [
+      0,
+      1
     ]
   }
 }

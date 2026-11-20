@@ -3416,6 +3416,42 @@
       "evidence": ["docs/combat.md", "tests/fixtures/wind.json"],
       "implementation": ["scripts/OriginalWindRules.cs"],
       "limitations": ""
+    },
+    {
+      "id": "ballista-bolt",
+      "module": "ARMY__00.WRK",
+      "start": 4844,
+      "end": 5027,
+      "name": "Ballista bolt effect (type 1Dh)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
+      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "big-explosion",
+      "module": "ARMY__00.WRK",
+      "start": 2628,
+      "end": 2668,
+      "name": "Big explosion effect (type 0Ch)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
+      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "frame-loop-2",
+      "module": "ARMY__00.WRK",
+      "start": 2773,
+      "end": 2795,
+      "name": "Two-tick frame loop of explosions",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
+      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "limitations": ""
     }
   ]
 }

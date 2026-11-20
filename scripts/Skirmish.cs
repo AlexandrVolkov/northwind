@@ -517,6 +517,29 @@ public sealed partial class Skirmish : IDisposable
                 OriginalCatapultRules.Explode(stone);
             }
             else if (stone[0] == OriginalCatapultRules.Explosion) OriginalCatapultRules.Smoke(stone, Wind.X, Wind.Y);
+            else if (stone[0] == OriginalCatapultRules.Bolt)
+            {
+                uint width = (uint)(Map.Width * 32), height = (uint)(Map.Height * 32);
+                var landed = OriginalCatapultRules.StepBolt(stone, width, height, _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte, (tx, ty) =>
+                {
+                    uint sx = BinaryPrimitives.ReadUInt32LittleEndian(stone.AsSpan(7)), sy = BinaryPrimitives.ReadUInt32LittleEndian(stone.AsSpan(0xc));
+                    if (sx >= width || sy >= height) return null;   // 9727 rejects points outside the map
+                    var shot = new byte[0x22]; shot[5] = 1;
+                    BinaryPrimitives.WriteUInt32LittleEndian(shot.AsSpan(7), sx); BinaryPrimitives.WriteUInt32LittleEndian(shot.AsSpan(0xc), sy);
+                    OriginalFireRules.Create(shot, ReadOnlySpan<byte>.Empty, tx, ty, width, height, _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
+                    Stones.Add(shot); return shot;
+                });
+                if (landed is var (bx, by))
+                {
+                    var struck = new List<SkirmishActor>();
+                    OriginalCatapultRules.Hit(OriginalCatapultRules.Attack, 3, 3, bx, by, 1, 1, (byte)Map.Width, (byte)Map.Height,
+                        (p, cell) => p * plane + cell < Occupancy.Cells.Length ? Occupancy.Cells[p * plane + cell] : 0,
+                        r => { if (Find(r) is not { } a) return (new byte[0x40], new byte[171]); struck.Add(a); return (a.Record, a.Parameters); });
+                    foreach (var victim in struck) if (!victim.Alive) Kill(victim);
+                    OriginalCatapultRules.CreateBigExplosion(stone);
+                }
+            }
+            else if (stone[0] == OriginalCatapultRules.BigExplosion) OriginalCatapultRules.StepBigExplosion(stone);
             else if (stone[0] == OriginalFireRules.Shot)
             {
                 SkirmishActor? hit = null;
@@ -629,7 +652,16 @@ public sealed partial class Skirmish : IDisposable
                 _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
             Stones.Add(shot); return;
         }
-        // Other missile types (ballista) are not ported: the hit lands on the engaged target with the same attack.
+        if (impact.Code >= 128 && (impact.Code & 0x7f) == OriginalCatapultRules.Bolt)
+        {
+            // 9727 places effect type 1Dh at the strike point; WRK 12EC aims and launches the bolt.
+            var bolt = new byte[0x22]; bolt[0] = OriginalCatapultRules.Bolt; bolt[5] = impact.Layer;
+            BinaryPrimitives.WriteUInt32LittleEndian(bolt.AsSpan(7), impact.X); BinaryPrimitives.WriteUInt32LittleEndian(bolt.AsSpan(0xc), impact.Y);
+            OriginalCatapultRules.CreateBolt(bolt, actor.Record, impact.TargetX, impact.TargetY, (uint)(Map.Width * 32), (uint)(Map.Height * 32),
+                _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
+            Stones.Add(bolt); return;
+        }
+        // Other missile types are not ported: the hit lands on the engaged target with the same attack.
         OriginalCombatRules.Hit(target.Record, target.Parameters, OriginalCombatRules.StrikeAttack(actor.Record[0x16]), (byte)(actor.Record[0x14] & 7), _terrainCatalog.NextRandomByte);
         if (!target.Alive) Kill(target);
     }

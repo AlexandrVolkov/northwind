@@ -25,6 +25,9 @@ class CatapultOracle(CombatOracle):
         'create': ([(0x9a1b, 0x9a8e), (0x996f, 0x9a1b), (0x9e41, 0x9e69)], [(0x85a, 0x88e)]),
         'step': ([(0xd6e6, 0xd740), (0xbd0f, 0xbe2e), (0x219c3, 0x21a00)], [(0x85a, 0x8da), (0x986, 0x9ae)]),
         'smoke': ([], [(0x986, 0x9d5)]),
+        'bolt_create': ([(0x9a1b, 0x9a8e), (0x996f, 0x9a1b), (0xa5b8, 0xa5f4), (0x9e41, 0x9e69)], [(0x12ec, 0x1319)]),
+        'bolt_step': ([(0xd6e6, 0xd740), (0xbd0f, 0xbe2e), (0x219c3, 0x21a00), (0x9e41, 0x9e69)], [(0x12ec, 0x13a3), (0xa44, 0xa6c), (0xad5, 0xaeb)]),
+        'big': ([], [(0xa44, 0xa6c), (0xad5, 0xaeb)]),
     }
 
 
@@ -41,7 +44,7 @@ def generate(game):
     o.cpu.mem_write(0x6ca + 2 * 0x56 + 4, struct.pack('<I', o.DAT + 2))
     template = lambda i: dat[2 + i * STRIDE:2 + (i + 1) * STRIDE]
     fixture = {'format_version': 1, 'source_sha256': {k: report['source_sha256'][k] for k in ['NORWIND.EXE', 'ARMY__02.DAT', 'ARMY__00.WRK']},
-               'templates_sha256': {str(i): hashlib.sha256(template(i)).hexdigest() for i in [0, 2, 16]}, 'results': {}}
+               'templates_sha256': {str(i): hashlib.sha256(template(i)).hexdigest() for i in [0, 2, 16, 26]}, 'results': {}}
     sounds = []; craters = []
 
     def save(name, digest, count):
@@ -102,6 +105,57 @@ def generate(game):
         o.run(o.WRK + 0x986)
         digest.update(bytes(o.cpu.mem_read(o.POOL + 1, 0x22))); count += 1
     save('smoke', digest, count)
+
+    # Ballista bolt (type 1Dh, 12EC) and the big explosion (type 0Ch, A44/AD5).
+    spec = {'origins': [[48, 48], [250, 260], [500, 16]], 'targets': [[48, 48], [300, 301], [511, 511], [0, 0]],
+            'experience': [0, 127], 'random_indices': [0, 1, 99, 255]}
+    fixture['bolt_create'] = spec; digest = hashlib.sha256(); count = 0; o.mode = 'bolt_create'
+    for (ax, ay), (tx, ty), experience, index in product(*(spec[k] for k in ['origins', 'targets', 'experience', 'random_indices'])):
+        shooter = unit(26, 3, 10, 0, ax, ay, 1); shooter[0x16] = experience; o.cpu.mem_write(o.POOL + 0x200, bytes(shooter))
+        effect = effect_record(ax + 8, ay - 8, 1); o.cpu.mem_write(o.POOL + 1, bytes(effect))
+        o.cpu.mem_write(0x19eb, bytes([index, (index * 7) & 255]))
+        o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 1); o.cpu.reg_write(UC_X86_REG_EBX, o.POOL + 0x200)
+        o.cpu.reg_write(UC_X86_REG_ECX, tx); o.cpu.reg_write(UC_X86_REG_EDX, ty); o.cpu.reg_write(UC_X86_REG_EAX, 0)
+        o.run(o.WRK + 0x12ec)
+        digest.update(bytes(o.cpu.mem_read(o.POOL + 1, 0x22)) + bytes(o.cpu.mem_read(0x19eb, 2))); count += 1
+    save('bolt_create', digest, count)
+
+    spawned = []; refuse = [False]
+    def spawn():
+        r = o.cpu.reg_read; esp = r(UC_X86_REG_ESP)
+        shooter, tx, ty = struct.unpack('<III', bytes(o.cpu.mem_read(esp + 4, 12)))
+        spawned.append([r(UC_X86_REG_EAX) & 255, r(UC_X86_REG_EBX) & 0xffff, r(UC_X86_REG_ECX), r(UC_X86_REG_EDX), shooter, tx, ty])
+        o.cpu.mem_write(o.POOL + 0x3000, bytes(0x22)); o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 0x3000)
+        o.cpu.reg_write(UC_X86_REG_EFLAGS, (o.cpu.reg_read(UC_X86_REG_EFLAGS) & ~0x40) | (0 if refuse[0] else 0x40)); o.ret()
+    o.stubs[0x9727] = spawn
+    spec = {'positions': [[200, 200], [5, 7], [500, 500], [16 * 32 - 3, 40]], 'remaining': [-3, 0, 40],
+            'objects': [[], [[1, 10, 0]], [[1, 10, 4], [0, 3, 0]]], 'random_indices': [0, 1, 128, 200, 255], 'refuse': [0, 1]}
+    fixture['bolt_step'] = spec; digest = hashlib.sha256(); count = 0; o.mode = 'bolt_step'
+    for (x, y), remaining, objects, index, refused in product(*(spec[k] for k in ['positions', 'remaining', 'objects', 'random_indices', 'refuse'])):
+        sounds.clear(); spawned.clear(); refuse[0] = bool(refused)
+        effect = effect_record(x, y, 1); effect[0] = 0x1d; effect[2] = 3; struct.pack_into('<i', effect, 0x12, remaining)
+        struct.pack_into('<ii', effect, 0x18, 0x900, -0x300); struct.pack_into('<HH', effect, 0x10, 0, 0); struct.pack_into('<H', effect, 0x20, 0x200)
+        o.cpu.mem_write(o.POOL + 1, bytes(effect)); o.cpu.mem_write(o.GRID, bytes(W * H * 12)); o.cpu.mem_write(o.POOL + 0x3000, bytes(0x22))
+        cell = min(H - 1, y >> 5) * W + min(W - 1, x >> 5); at = 0x100; refs = []
+        for plane, hp, defence in objects:
+            rec = unit(0, 1, hp, 0x1f, x, y, 1); rec[0x0e] = 0 if defence == 0 else 2
+            o.cpu.mem_write(o.POOL + at, bytes(rec)); o.cpu.mem_write(o.GRID + (plane * W * H + cell) * 4, struct.pack('<I', at)); refs.append(at); at += 0x40
+        o.cpu.mem_write(0x19eb, bytes([index, (index * 3 + 1) & 255]))
+        o.cpu.reg_write(UC_X86_REG_ESI, o.POOL + 1); o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 1); o.cpu.reg_write(UC_X86_REG_EAX, 0x100)
+        o.run(o.WRK + 0x12ec)
+        digest.update(bytes(o.cpu.mem_read(o.POOL + 1, 0x22)) + b''.join(bytes(o.cpu.mem_read(o.POOL + r, 0x36)) for r in refs)
+                      + bytes(o.cpu.mem_read(o.POOL + 0x3000 + 2, 1)) + bytes(o.cpu.mem_read(0x19eb, 2)) + json.dumps([sounds, spawned]).encode()); count += 1
+    save('bolt_step', digest, count)
+
+    spec = {'frames': [[1, 1], [2, 1], [1, 18], [2, 18]], 'ah': [0, 1]}
+    fixture['big'] = spec; digest = hashlib.sha256(); count = 0; o.mode = 'big'
+    for (timer, left), ah in product(*(spec[k] for k in ['frames', 'ah'])):
+        sounds.clear(); effect = effect_record(300, 200, 1); effect[0] = 0xc; effect[0x16] = timer; effect[0x17] = left
+        o.cpu.mem_write(o.POOL + 1, bytes(effect))
+        o.cpu.reg_write(UC_X86_REG_ESI, o.POOL + 1); o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 1); o.cpu.reg_write(UC_X86_REG_EAX, ah << 8)
+        o.run(o.WRK + 0xa44)
+        digest.update(bytes(o.cpu.mem_read(o.POOL + 1, 0x22)) + json.dumps(sounds).encode()); count += 1
+    save('big', digest, count)
     return fixture
 
 
