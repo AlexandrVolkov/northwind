@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "acffed1204ae39b5278a5b756d5747c6987efabe489f6baca9c19b75336626eb",
+  "annotation_sha256": "79d446ecbede739d7d680b32ffa51f93bf3c188c679194c353ecaa496bb9bcdd",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,9 +32,9 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 9357,
+        "partial": 9814,
         "ported": 30978,
-        "unreviewed": 105753,
+        "unreviewed": 105296,
         "verified": 794
       },
       "linear_rows": 45008,
@@ -1843,6 +1843,22 @@
         },
         {
           "start": 67054,
+          "end": 67481,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 67481,
+          "end": 67561,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "campaign-border-transfer-coordinate"
+          ]
+        },
+        {
+          "start": 67561,
           "end": 67586,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1859,6 +1875,22 @@
         },
         {
           "start": 67632,
+          "end": 68768,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 68768,
+          "end": 69145,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "campaign-world-record-update"
+          ]
+        },
+        {
+          "start": 69145,
           "end": 73392,
           "status": "unreviewed",
           "classification": "unknown",
