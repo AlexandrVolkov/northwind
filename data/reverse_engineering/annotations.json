@@ -4405,6 +4405,23 @@
         "tools/save_source.py"
       ],
       "limitations": "Контейнер 0F50h+40h+8×2000h подтверждён инструкциями и реальным файлом; внутренние объекты и DOS I/O не перенесены."
+    },
+    {
+      "id": "save-scenario11-prefix",
+      "module": "LE:1",
+      "start": 64180,
+      "end": 64452,
+      "name": "Scenario 11h prefix and exploration block writer",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/save-format.md",
+        "data/original_save_layout.json"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Заголовок 0F9Dh и квадратный блок разведки сверены по коду и реальному файлу; последующие массивы payload, DOS I/O и C# сохранение не перенесены."
     }
   ]
 }

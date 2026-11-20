@@ -2,18 +2,32 @@ import json
 from pathlib import Path
 import struct
 import unittest
-from tools.save_source import parse, parse_area22
+from tools.save_source import parse, parse_area22, parse_scenario11
 
 
 class SaveSourceChecks(unittest.TestCase):
     def test_tagged_records_and_payload_bounds(self):
-        file = struct.pack('<I', 3) + struct.pack('<II', 3, 0x11) + b'abc' + \
+        file = struct.pack('<I', 3) + struct.pack('<II', 3, 0x33) + b'abc' + \
                struct.pack('<II', 0, 0x55) + struct.pack('<II', 4, 0x44) + b'xyz!'
         result = parse(file)
         self.assertEqual([(r['header_offset'], r['payload_offset'], r['length'], r['tag']) for r in result['records']],
-                         [(4, 12, 3, 0x11), (15, 23, 0, 0x55), (23, 31, 4, 0x44)])
+                         [(4, 12, 3, 0x33), (15, 23, 0, 0x55), (23, 31, 4, 0x44)])
         for invalid in (file[:-1], file + b'!', b'\0\0\0', struct.pack('<I', 4097)):
             with self.assertRaises(ValueError): parse(invalid)
+
+    def test_scenario11_header_and_square_exploration_boundary(self):
+        body = bytearray(0xF9D + 16 + 3)
+        body[0x14:0x21] = b'game    .epi\0'
+        body[0x22] = 4
+        body[0x23] = 5
+        body[0x2c:0x2f] = bytes((8, 5, 8))
+        body[0xF9D:0xF9D+16] = bytes(range(16))
+        result = parse_scenario11(body)
+        self.assertEqual((result['episode_filename'], result['width'], result['height']),
+                         ('game    .epi', 4, 5))
+        self.assertEqual((result['visibility_length'], result['remaining_length']), (16, 3))
+        for invalid in (body[:0xF9C], body[:0xF9D+15]):
+            with self.assertRaises(ValueError): parse_scenario11(invalid)
 
     def test_area22_descriptor_and_bucket_bounds(self):
         descriptor = struct.pack('<16I', 0, 0, 0, 0, 80, *([0] * 11))
@@ -29,6 +43,9 @@ class SaveSourceChecks(unittest.TestCase):
         data = json.loads((root / 'data/original_save_layout.json').read_text())
         records = data['records']
         self.assertEqual([r['tag'] for r in records], [0x11, 0x99, 0x01000022, 0x00010022])
+        self.assertEqual(records[0]['scenario11']['episode_filename'], 'game    .epi')
+        self.assertEqual((records[0]['scenario11']['width'], records[0]['scenario11']['height']), (128, 128))
+        self.assertEqual(records[0]['scenario11']['visibility_length'], 16384)
         self.assertEqual([r['length'] for r in records], [988085, 25893, 69520, 69520])
         self.assertEqual(records[0]['header_offset'], 4)
         self.assertEqual([r['payload_offset'] + r['length'] for r in records[:-1]],

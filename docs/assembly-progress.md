@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 108323 | 7215 | 654 | 30690 | 44 |
+| LE:1 | 146882 | 108051 | 7487 | 654 | 30690 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4701 | 100 | 0 | 602 | 0 |
@@ -187,6 +187,7 @@
 | LE:1 `0xF000..0xF072` | War declaration with reputation and reactions | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xF250..0xF28B` | First contact, mutual | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xF8E1..0xFA79` | Tagged SAV record lookup, append and header rewrite | partial | [save-format.md](../docs/save-format.md); [original_save_layout.json](../data/original_save_layout.json) | Проверены инструкции и реальный четырёхраздельный файл, Python читает только внешний контейнер; DOS INT 21h не исполнялся под Unicorn, запись SAV и payload не перенесены. |
+| LE:1 `0xFAB4..0xFBC4` | Scenario 11h prefix and exploration block writer | partial | [save-format.md](../docs/save-format.md); [original_save_layout.json](../data/original_save_layout.json) | Заголовок 0F9Dh и квадратный блок разведки сверены по коду и реальному файлу; последующие массивы payload, DOS I/O и C# сохранение не перенесены. |
 | LE:1 `0xFEC6..0xFF3A` | Write 99h campaign session record | partial | [save-format.md](../docs/save-format.md); [original_save_layout.json](../data/original_save_layout.json) | Сверена структурная длина 25+512+12×841h на реальном файле и поля заголовка; внутренние блоки, DOS I/O и игровая семантика не перенесены. |
 | LE:1 `0xFF3A..0xFFD6` | Read 99h campaign session record | partial | [save-format.md](../docs/save-format.md); [original_save_layout.json](../data/original_save_layout.json) | Сверена структурная длина 25+512+12×841h на реальном файле и поля заголовка; внутренние блоки, DOS I/O и игровая семантика не перенесены. |
 | LE:1 `0x10075..0x100FA` | Lay a formation out around a goal | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |

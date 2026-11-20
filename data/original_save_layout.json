@@ -11,7 +11,23 @@
       "length": 988085,
       "tag": 17,
       "tag_hex": "00000011",
-      "payload_sha256": "8659f590b2b6c1c9f738a6593212406776d750ef0ef643447bcb15b87894f834"
+      "payload_sha256": "8659f590b2b6c1c9f738a6593212406776d750ef0ef643447bcb15b87894f834",
+      "scenario11": {
+        "episode_filename": "game    .epi",
+        "width": 128,
+        "height": 128,
+        "byte_1ec5": 1,
+        "byte_6c6": 8,
+        "byte_6c7": 5,
+        "byte_6c8": 8,
+        "participant_records_offset": 77,
+        "participant_records_length": 3920,
+        "participant_records_sha256": "77854c0717925350714779feafaa68e3c61bfc545ea4fb82b021bbb03f6663c0",
+        "header_length": 3997,
+        "visibility_length": 16384,
+        "visibility_sha256": "020ce316745ebc2c8a620dfb7bdb142fc657004932640f10ae0a9f7b9553b14b",
+        "remaining_length": 967704
+      }
     },
     {
       "index": 1,

@@ -8,6 +8,27 @@ import struct
 
 
 
+
+def parse_scenario11(payload):
+    """Only the known FAB4..FBC4 prefix and exploration block."""
+    header_length = 0xF9D
+    if len(payload) < header_length: raise ValueError('Truncated 11h scenario header')
+    width, height = payload[0x22], payload[0x23]
+    # FBB2/FBB7 multiply the low width byte by [18DE] again, not by height.
+    visibility_length = width * width
+    if not width or not height or len(payload) < header_length + visibility_length:
+        raise ValueError('Truncated 11h exploration block')
+    filename = payload[0x14:0x21].split(b'\0', 1)[0].decode('cp866')
+    visibility = payload[header_length:header_length + visibility_length]
+    return dict(episode_filename=filename, width=width, height=height,
+                byte_1ec5=payload[0x21], byte_6c6=payload[0x2c],
+                byte_6c7=payload[0x2d], byte_6c8=payload[0x2e],
+                participant_records_offset=0x4D, participant_records_length=0xF50,
+                participant_records_sha256=hashlib.sha256(payload[0x4D:header_length]).hexdigest(),
+                header_length=header_length, visibility_length=visibility_length,
+                visibility_sha256=hashlib.sha256(visibility).hexdigest(),
+                remaining_length=len(payload) - header_length - visibility_length)
+
 def parse_session99(payload):
     """Fields written by FEC6..FF39; record body blocks remain opaque."""
     if len(payload) < 25 + 512 or (len(payload) - 25 - 512) % 0x841:
@@ -59,6 +80,7 @@ def parse(data):
         record = dict(index=index, header_offset=offset, payload_offset=payload_offset,
                       length=size, tag=tag, tag_hex=f'{tag:08X}',
                       payload_sha256=hashlib.sha256(payload).hexdigest())
+        if tag & 0xFFFF == 0x11: record['scenario11'] = parse_scenario11(payload)
         if tag == 0x99: record['campaign99'] = parse_session99(payload)
         if tag & 0xFFFF == 0x22: record['area22'] = parse_area22(payload)
         records.append(record)
