@@ -4,10 +4,10 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 111748 | 5512 | 97 | 29525 | 44 |
+| LE:1 | 146882 | 111413 | 5512 | 97 | 29860 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
+| ARMY__00.WRK | 5403 | 4701 | 100 | 0 | 602 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
 | ARMY__02.WRK | 6930 | 6109 | 609 | 0 | 212 | 7 |
 | ARMY__03.WRK | 13412 | 13412 | 0 | 0 | 0 | 1 |
@@ -23,6 +23,8 @@
 | ARMY__00.WRK `0x4F3..0x54A` | Melee strike effect: experience attack, lookup, hit, sound | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Объект-эффект и его анимация в схватке не создаются. |
 | ARMY__00.WRK `0x593..0x6C7` | Arrow effect: launch, flight, early and arrival hits | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) | Обработчики 7FE/AEB не перенесены. |
 | ARMY__00.WRK `0x6FE..0x762` | Spark effect types 4/5 creation and countdown | partial | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Перенесено создание (AH=0); обновление кадров не подключено. |
+| ARMY__00.WRK `0x85A..0x8DA` | Catapult stone effect (type 8) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | CFAC crater is a hook |
+| ARMY__00.WRK `0x986..0x9D5` | Explosion effect (type 10) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | drift vector 9E7D not ported |
 | ARMY__02.WRK `0x13B..0x157` | Castle AH=5 visitor validator | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Принимающая ветка 1B8 общая с хвостом обработчика. |
 | ARMY__02.WRK `0x221..0x251` | Castle seven-byte header and production rows | partial | [recruitment-production.md](../docs/recruitment-production.md); [original_production.json](../data/original_production.json) | Заголовок сохранён без выдуманных назначений. Разобраны строки index/frame/interval. Ополченца в таблице замка нет. |
 | ARMY__02.WRK `0x336..0x34E` | Barracks seven-byte header and production rows | partial | [recruitment-production.md](../docs/recruitment-production.md); [original_production.json](../data/original_production.json) | Разобраны строки лучника, ополченца, поджигателя и рыцаря. Строительство казармы и отдельная очередь ополченца подключены; полный WRK-диспетчер остаётся задачей. |
@@ -129,6 +131,7 @@
 | LE:1 `0xB765..0xB9EB` | Group orders to squad members and squad bounds | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) | the order primitives write the OBE command fields only; their execution by WRK is a separate system |
 | LE:1 `0xB942..0xB977` | Squad members drop their commands | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0xBA60..0xBADF` | Nearest living squad member to a point | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
+| LE:1 `0xBD0F..0xBE2E` | Hit objects in an area with a fixed attack | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | LE:1 `0xBE04..0xBE2E` | Apply damage to one prepared target | ported | [building-condition-kernel.md](../docs/building-condition-kernel.md); [building-kernel.json](../tests/fixtures/building-kernel.json) | Хвост после подготовки шаблона и силы; выбор цели, генерация силы, площадное действие и смерть с эффектами вне контракта. |
 | LE:1 `0xBFC9..0xC010` | Apply a hit: attack minus defence or a small chance of one point | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
 | LE:1 `0xC344..0xC35F` | Chebyshev distance between object centres | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
@@ -144,6 +147,7 @@
 | LE:1 `0xD2D1..0xD363` | Conditional occupancy registration | partial | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Перенесена ветвь CL=0 с заменой совпавших ячеек и подсчётом конфликтов. Ветка повреждения чужих объектов не перенесена. |
 | LE:1 `0xD40C..0xD453` | Owner free population growth | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |
 | LE:1 `0xD453..0xD5B1` | Owner population demand, support and limit recount | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |
+| LE:1 `0xD6E6..0xD740` | Effect flight step with arc height | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | LE:1 `0xD7B1..0xD85E` | Collect unique occupants of an area | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 | LE:1 `0xD85E..0xD895` | Search area around the unit | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 | LE:1 `0xD895..0xDA45` | Enemy search: radius, filters, nearest with tie on attacker | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) | Видимость, контакт и враждебность в схватке задаёт мост. |
