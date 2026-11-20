@@ -72,6 +72,7 @@
       "range": 48,
       "cooldown": 1.0
     },
+    "Катапульта": {"health": 60, "damage": 10, "range": 192, "cooldown": 3.3},
     "Всадник": {
       "health": 80,
       "damage": 9,

@@ -448,6 +448,9 @@ public sealed partial class Skirmish : IDisposable
     /// animation impact (945E) resolved by the strike effect. Returns true while the unit stays engaged in place.</summary>
     private bool AttackStep(SkirmishActor actor, SkirmishActor target)
     {
+        // A move request (8E0E flight, high nibble 2) during a swing: the original ends the swing and starts moving
+        // (9275 → 939A, not ported). Here the unit disengages and the flight route moves it (adapter).
+        if ((actor.Record[0x2d] >> 4) == 2 && (actor.Record[0x2d] & 15) != 2) { actor.Target = 0; actor.Record[0x2d] &= 0xf0; return false; }
         if (OriginalWorkerAnimation.Pending(actor.Record))
         {
             if (OriginalWorkerAnimation.Step(actor.Record, actor.Parameters, target.Record) is { } impact) ResolveImpact(actor, target, impact);
