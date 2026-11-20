@@ -1,0 +1,14 @@
+{
+  "format_version": 1,
+  "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "action_le1": 103478,
+  "widget_le3": 44758,
+  "pressed_latch": 0,
+  "frame": 264,
+  "phase": 3,
+  "external_calls": [
+    1,
+    1,
+    1
+  ]
+}

@@ -3901,7 +3901,7 @@
       "limitations": ""
     },
     {
-"id": "menu-frame-forward",
+      "id": "menu-frame-forward",
       "module": "LE:1",
       "start": 102100,
       "end": 102133,
@@ -4001,31 +4001,20 @@
       "limitations": "Только событие AL=1; в Unicorn 1CC1B заглушён RET после записи флага/очистки ввода. Остальные события и внешний переход не перенесены."
     },
     {
-      "id": "menu-plaque-pressed-state",
-      "module": "LE:1",
-      "start": 102166,
-      "end": 102499,
-      "name": "Menu plaque hover and pressed callback",
-      "classification": "code",
-      "status": "partial",
-      "evidence": [
-        "docs/menu-widgets.md",
-        "tests/fixtures/menu-button-press.json",
-        "tests/fixtures/menu-button-hover.json"
-      ],
-      "implementation": [
-        "scripts/OriginalMenuPlaqueRules.cs"
-      ],
-      "limitations": "Только AL=1: latch=0/1 сверены, но реальный hit-test 18699 заменён управляемым CF, действие заменено счётчиком/RET. События 0/2/3, растеризация и реальные действия не перенесены.",
-    "id": "ai-construction",
+      "id": "ai-construction",
       "module": "LE:1",
       "start": 144721,
       "end": 144999,
       "name": "AI turn tail: castle rebuild and class C08h order",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "10AD2, 22FE4, A758 and 43E5 are hooks"
     },
     {
@@ -4036,8 +4025,13 @@
       "name": "AI squad sends a member to nearby loot",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4048,8 +4042,13 @@
       "name": "Nearest loaded loot object of another army",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4060,8 +4059,13 @@
       "name": "Nearest living squad member to a point",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4072,8 +4076,13 @@
       "name": "Explored share of the map for a participant",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-census.json"],
-      "implementation": ["scripts/OriginalAiRules.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-census.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4084,8 +4093,13 @@
       "name": "AI squad step 4: march in formation",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4096,8 +4110,13 @@
       "name": "Lay a formation out around a goal",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4108,8 +4127,13 @@
       "name": "Spread members along a formation segment",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4120,8 +4144,13 @@
       "name": "Nearest free member of a class to a formation point",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4132,8 +4161,13 @@
       "name": "Rotate a formation by the sine table",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4144,8 +4178,13 @@
       "name": "Scale a formation (16-bit IMUL)",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4156,8 +4195,13 @@
       "name": "Formation scale factor from the member count",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4168,8 +4212,13 @@
       "name": "Formation of a kind nearest the member count",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4180,8 +4229,13 @@
       "name": "Squad members drop their commands",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4192,8 +4246,13 @@
       "name": "Catapult stone effect (type 8)",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
-      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/catapult.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCatapultRules.cs"
+      ],
       "limitations": "CFAC crater is a hook"
     },
     {
@@ -4204,8 +4263,13 @@
       "name": "Explosion effect (type 10)",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
-      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/catapult.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCatapultRules.cs"
+      ],
       "limitations": "drift vector 9E7D not ported"
     },
     {
@@ -4216,8 +4280,13 @@
       "name": "Effect flight step with arc height",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
-      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/catapult.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCatapultRules.cs"
+      ],
       "limitations": ""
     },
     {
@@ -4228,9 +4297,29 @@
       "name": "Hit objects in an area with a fixed attack",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
-      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/catapult.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCatapultRules.cs"
+      ],
       "limitations": ""
+    },
+    {
+      "id": "menu-orb-action",
+      "module": "LE:1",
+      "start": 103478,
+      "end": 103525,
+      "name": "Cabinet orb action returns to menu transition phase",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/menu-widgets.md",
+        "tests/fixtures/menu-orb.json"
+      ],
+      "implementation": [],
+      "limitations": "19436 исполнен под Unicorn, но внешние 19294, 1CC4E, 1CC71 заглушены на входе; исходный экран и последующие эффекты не перенесены."
     }
   ]
 }
