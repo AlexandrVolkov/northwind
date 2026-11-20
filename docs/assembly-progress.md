@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 112214 | 5847 | 174 | 28647 | 44 |
+| LE:1 | 146882 | 111734 | 5847 | 654 | 28647 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -184,6 +184,7 @@
 | LE:1 `0x121C0..0x121E2` | Scenario whole-map exploration writer | ported | [fog-of-war.md](../docs/fog-of-war.md); [visibility.json](../tests/fixtures/visibility.json) | Вход после успешного 124D8, исходное поведение SHL FE сохранено для 256 владельцев; сценарный диспетчер не входит. |
 | LE:1 `0x123D3..0x12404` | Grant timber through worker callback | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Живой рабочий, флаг 20000, пустой груз и AL=3. Другие грузы, непустой груз и все WRK-получатели не перенесены. |
 | LE:1 `0x1243A..0x124A5` | Goods handler dispatch and item slots | partial | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Перенесены коды 0..2. Слоты +CD, UI/звук для локального игрока (5593/A4A9) не перенесены. |
+| LE:1 `0x18CE5..0x18EC5` | Five menu cursor family initializers | verified | [menu-widgets.md](../docs/menu-widgets.md); [menu-cursor.json](../tests/fixtures/menu-cursor.json) | Пять инициализаторов исполнены под Unicorn; шаг курсора и рисование не перенесены. |
 | LE:1 `0x18ED4..0x18EF5` | Advance menu widget frame by byte timer | ported | [menu-widgets.md](../docs/menu-widgets.md); [menu-animation.json](../tests/fixtures/menu-animation.json) | Сверены 4374 вызова двух helpers; внешние callbacks виджетов и отрисовка не входят. |
 | LE:1 `0x18EF5..0x18F16` | Reverse menu widget frame by byte timer | ported | [menu-widgets.md](../docs/menu-widgets.md); [menu-animation.json](../tests/fixtures/menu-animation.json) | Сверены 4374 вызова двух helpers; внешние callbacks виджетов и отрисовка не входят. |
 | LE:1 `0x19465..0x194B2` | Render MENU RLE with dword width, including 320px rule pages | verified | [credits-layout.md](../docs/credits-layout.md); [credits.json](../tests/fixtures/credits.json) | 27 исходных изображений совпали по RGBA с исполнением 19465. Это подготовленные PNG для Godot, не C#-дубликат RLE-рисовальщика. Заглушён dirty-helper 3EEA. |

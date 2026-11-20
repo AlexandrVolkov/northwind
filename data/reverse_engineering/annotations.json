@@ -3933,6 +3933,21 @@
         "scripts/OriginalMenuAnimationRules.cs"
       ],
       "limitations": "Сверены 4374 вызова двух helpers; внешние callbacks виджетов и отрисовка не входят."
+    },
+    {
+      "id": "menu-cursor-families",
+      "module": "LE:1",
+      "start": 101605,
+      "end": 102085,
+      "name": "Five menu cursor family initializers",
+      "classification": "code",
+      "status": "verified",
+      "evidence": [
+        "docs/menu-widgets.md",
+        "tests/fixtures/menu-cursor.json"
+      ],
+      "implementation": [],
+      "limitations": "Пять инициализаторов исполнены под Unicorn; шаг курсора и рисование не перенесены."
     }
   ]
 }

@@ -1,0 +1,46 @@
+{
+  "format_version": 1,
+  "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "cursor_families": [
+    {
+      "name": "main",
+      "entry_le1": 101605,
+      "first_sprite": 0,
+      "last_sprite": 14,
+      "center_x": 320,
+      "center_y": 240
+    },
+    {
+      "name": "cabinet",
+      "entry_le1": 101701,
+      "first_sprite": 15,
+      "last_sprite": 29,
+      "center_x": 320,
+      "center_y": 240
+    },
+    {
+      "name": "campaign",
+      "entry_le1": 101797,
+      "first_sprite": 30,
+      "last_sprite": 44,
+      "center_x": 320,
+      "center_y": 240
+    },
+    {
+      "name": "victory",
+      "entry_le1": 101893,
+      "first_sprite": 45,
+      "last_sprite": 59,
+      "center_x": 320,
+      "center_y": 240
+    },
+    {
+      "name": "authors",
+      "entry_le1": 101989,
+      "first_sprite": 307,
+      "last_sprite": 321,
+      "center_x": 320,
+      "center_y": 240
+    }
+  ]
+}
