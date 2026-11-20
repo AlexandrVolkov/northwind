@@ -55,11 +55,10 @@ public sealed class OriginalEpisode
         return Contains(destination);
     }
 
-    /// <summary>LE:1 107AA..107D7: arrival position for a cardinal border transition.</summary>
+    /// <summary>LE:1 107AA..107D7: arrival position; diagonal input follows the source's horizontal branch.</summary>
     public static Vector2I ArrivalPixel(Vector2I previousPixel, int direction)
     {
         var delta = DirectionOffset(direction);
-        if (delta.X != 0 && delta.Y != 0) throw new ArgumentOutOfRangeException(nameof(direction), "Border arrival uses a cardinal direction");
         if (delta.X == 0)
             return new(previousPixel.X, (previousPixel.Y & 0x10) + 0x20 + (delta.Y == 1 ? 0 : 0xfa0));
         return new((previousPixel.X & 0x10) + 0x20 + (delta.X == 1 ? 0 : 0xfa0), previousPixel.Y);

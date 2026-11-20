@@ -1,5 +1,7 @@
 using Godot;
 using Northwind;
+using System.Text.Json;
+using System.Security.Cryptography;
 
 public partial class TestRunner
 {
@@ -32,5 +34,27 @@ public partial class TestRunner
         Check(demo.Width == 1 && demo.Height == 2 && demo.AreaId(new(0, 0)) == 21 && demo.AreaId(new(0, 1)) == 22,
             "Original demo topology");
         Check(catalog.Episodes["DEMO2.EPI"].AreaId(Vector2I.Zero) == 22, "Second demo area ID");
+        using var oracle = GameData.Read<JsonDocument>("res://tests/fixtures/campaign-arrival.json");
+        var root = oracle.RootElement;
+        int compared = 0;
+        using var digest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        foreach (var item in root.GetProperty("cases").EnumerateArray())
+        {
+            int direction = item.GetProperty("direction").GetInt32();
+            var from = item.GetProperty("current");
+            var previous = item.GetProperty("previous");
+            var area = new Vector2I(from[0].GetInt32(), from[1].GetInt32());
+            var pixel = new Vector2I(previous[0].GetInt32(), previous[1].GetInt32());
+            var destination = area + OriginalEpisode.DirectionOffset(direction);
+            var arrival = OriginalEpisode.ArrivalPixel(pixel, direction);
+            digest.AppendData(BitConverter.GetBytes(destination.X));
+            digest.AppendData(BitConverter.GetBytes(destination.Y));
+            digest.AppendData(BitConverter.GetBytes(arrival.X));
+            digest.AppendData(BitConverter.GetBytes(arrival.Y));
+            compared++;
+        }
+        Check(compared == root.GetProperty("case_count").GetInt32() && compared == 160, "Original arrival oracle case count");
+        Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == root.GetProperty("result_sha256").GetString(),
+            "LE:1 10799 destination and arrival match 160 original x86 cases");
     }
 }

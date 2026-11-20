@@ -4800,9 +4800,9 @@
       "name": "Select adjacent campaign area and destination edge coordinate",
       "classification": "code",
       "status": "partial",
-      "evidence": ["docs/campaign.md", "data/original_episodes.json"],
-      "implementation": [],
-      "limitations": "Направления и координаты подтверждены дизассемблированием; загрузка области и перенос объекта не сверены исполнением или C#."
+      "evidence": ["docs/campaign.md", "data/original_episodes.json", "tests/fixtures/campaign-arrival.json"],
+      "implementation": ["scripts/OriginalCampaignTopology.cs"],
+      "limitations": "Направления и координаты сверены с 160 запусками оригинального 10799 под Unicorn; вызов 103EC заглушён, загрузка области и перенос объекта не перенесены."
     },
     {
       "id": "campaign-world-record-update",
