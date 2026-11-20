@@ -3356,6 +3356,54 @@
       "evidence": ["docs/combat.md", "tests/fixtures/fire.json"],
       "implementation": ["scripts/OriginalFireRules.cs"],
       "limitations": ""
+    },
+    {
+      "id": "fire-burn",
+      "module": "ARMY__00.WRK",
+      "start": 3299,
+      "end": 4004,
+      "name": "Fire effect (types 13h..15h)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/burn.json"],
+      "implementation": ["scripts/OriginalBurnRules.cs"],
+      "limitations": "9727, A47E and CFAC are hooks"
+    },
+    {
+      "id": "embers",
+      "module": "ARMY__00.WRK",
+      "start": 4004,
+      "end": 4049,
+      "name": "Embers effect (type 16h)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/burn.json"],
+      "implementation": ["scripts/OriginalBurnRules.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "smoke-column",
+      "module": "ARMY__00.WRK",
+      "start": 2517,
+      "end": 2628,
+      "name": "Smoke column effect (type 0Bh)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/burn.json"],
+      "implementation": ["scripts/OriginalBurnRules.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "object-in-cell",
+      "module": "LE:1",
+      "start": 38854,
+      "end": 38955,
+      "name": "Object in an effect's cell and the terrain class",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/burn.json"],
+      "implementation": ["scripts/OriginalBurnRules.cs"],
+      "limitations": ""
     }
   ]
 }

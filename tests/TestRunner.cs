@@ -31,7 +31,7 @@ public partial class TestRunner : Node
                 case "original-texts": OriginalTextsChecks(); break;
                 case "work-sprites": OriginalWorkSpriteChecks(); break;
                 case "original-sound": OriginalSoundChecks(); break;
-                case "skirmish": await SkirmishChecks(); break;
+                case "skirmish": await SkirmishChecks(); SkirmishFireChecks(); break;
                 case "original-route-search": OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); break;
                 case "original-route-pool": OriginalRoutePoolChecks(); PackedRouteIntegrationChecks(); break;
                 case "original-movement-admission": OriginalMovementAdmissionChecks(); MovementBridgeChecks(); break;
@@ -43,14 +43,14 @@ public partial class TestRunner : Node
                 case "mine": await MineChecks(); break;
                 case "population": await PopulationChecks(); break;
                 case "economy": await EconomyChecks(); break;
-                case "simulation": OriginalWorkSpriteChecks(); OriginalTextsChecks(); OriginalSoundChecks(); SimulationChecks(); OriginalCommandPanelChecks(); OriginalCursorChecks(); OriginalScrollChecks(); OriginalStatusBarChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); OriginalSpatialChecks(); OriginalMotionPreparationChecks(); OriginalLumbermillChecks(); OriginalForestryChecks(); OriginalWorkerAnimationChecks(); OriginalWorkerDeliveryChecks(); OriginalWorkerApproachChecks(); OriginalMovementAdmissionChecks(); MovementBridgeChecks(); OriginalRoutePoolChecks(); PackedRouteIntegrationChecks(); OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); OriginalPopulationChecks(); OriginalResourceChecks(); OriginalProductionChecks(); OriginalOreChecks(); OriginalCombatChecks(); OriginalAttackChecks(); OriginalArrowChecks(); OriginalCatapultChecks(); OriginalFireChecks(); OriginalDeathChecks(); OriginalTargetChecks(); OriginalDiplomacyChecks(); OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); OriginalTechChecks(); OriginalAiResearchChecks(); OriginalAiSquadChecks(); OriginalAiSquadStepChecks(); OriginalAiSquadStateChecks(); OriginalAiMilitaryChecks(); OriginalAiGarrisonChecks(); OriginalAiOrderChecks(); OriginalAiEconomyChecks(); OriginalAiWorkerChecks(); OriginalAiFormationChecks(); break;
+                case "simulation": OriginalWorkSpriteChecks(); OriginalTextsChecks(); OriginalSoundChecks(); SimulationChecks(); OriginalCommandPanelChecks(); OriginalCursorChecks(); OriginalScrollChecks(); OriginalStatusBarChecks(); OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); OriginalSpatialChecks(); OriginalMotionPreparationChecks(); OriginalLumbermillChecks(); OriginalForestryChecks(); OriginalWorkerAnimationChecks(); OriginalWorkerDeliveryChecks(); OriginalWorkerApproachChecks(); OriginalMovementAdmissionChecks(); MovementBridgeChecks(); OriginalRoutePoolChecks(); PackedRouteIntegrationChecks(); OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); OriginalPopulationChecks(); OriginalResourceChecks(); OriginalProductionChecks(); OriginalOreChecks(); OriginalCombatChecks(); OriginalAttackChecks(); OriginalArrowChecks(); OriginalCatapultChecks(); OriginalFireChecks(); OriginalBurnChecks(); OriginalDeathChecks(); OriginalTargetChecks(); OriginalDiplomacyChecks(); OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); OriginalTechChecks(); OriginalAiResearchChecks(); OriginalAiSquadChecks(); OriginalAiSquadStepChecks(); OriginalAiSquadStateChecks(); OriginalAiMilitaryChecks(); OriginalAiGarrisonChecks(); OriginalAiOrderChecks(); OriginalAiEconomyChecks(); OriginalAiWorkerChecks(); OriginalAiFormationChecks(); break;
                 case "original-buildings": OriginalBuildingChecks(); OriginalLifecycleChecks(); OriginalConstructionChecks(); OriginalOccupancyChecks(); break;
                 case "imported-occupancy": ImportedOccupancyChecks(); break;
                 case "original-spatial": OriginalSpatialChecks(); break;
                 case "original-motion": OriginalMotionPreparationChecks(); break;
                 case "original-lumbermill": OriginalLumbermillChecks(); break;
                 case "original-ore": OriginalOreChecks(); break;
-                case "original-combat": OriginalCombatChecks(); OriginalAttackChecks(); OriginalArrowChecks(); OriginalCatapultChecks(); OriginalFireChecks(); OriginalDeathChecks(); OriginalTargetChecks(); break;
+                case "original-combat": OriginalCombatChecks(); OriginalAttackChecks(); OriginalArrowChecks(); OriginalCatapultChecks(); OriginalFireChecks(); OriginalBurnChecks(); OriginalDeathChecks(); OriginalTargetChecks(); break;
                 case "original-diplomacy": OriginalDiplomacyChecks(); break;
                 case "original-tech": OriginalTechChecks(); break;
                 case "ai-workers": OriginalAiWorkerChecks(); break;

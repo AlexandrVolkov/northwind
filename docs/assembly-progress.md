@@ -4,10 +4,10 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 111413 | 5512 | 97 | 29860 | 44 |
+| LE:1 | 146882 | 111312 | 5512 | 97 | 29961 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 4389 | 100 | 0 | 914 | 0 |
+| ARMY__00.WRK | 5403 | 3528 | 100 | 0 | 1775 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
 | ARMY__02.WRK | 6930 | 6109 | 609 | 0 | 212 | 7 |
 | ARMY__03.WRK | 13412 | 13412 | 0 | 0 | 0 | 1 |
@@ -25,8 +25,11 @@
 | ARMY__00.WRK `0x6FE..0x762` | Spark effect types 4/5 creation and countdown | partial | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Перенесено создание (AH=0); обновление кадров не подключено. |
 | ARMY__00.WRK `0x85A..0x8DA` | Catapult stone effect (type 8) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | CFAC crater is a hook |
 | ARMY__00.WRK `0x986..0x9D5` | Explosion effect (type 10) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | drift vector 9E7D not ported |
+| ARMY__00.WRK `0x9D5..0xA44` | Smoke column effect (type 0Bh) | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) |  |
 | ARMY__00.WRK `0xBAB..0xC8A` | Fire shot effect (type 11h) | ported | [combat.md](../docs/combat.md); [fire.json](../tests/fixtures/fire.json) | CE3 fire and FA4 deflection are continuations |
 | ARMY__00.WRK `0xC8A..0xCE3` | Smoke trail effect (type 12h) | ported | [combat.md](../docs/combat.md); [fire.json](../tests/fixtures/fire.json) |  |
+| ARMY__00.WRK `0xCE3..0xFA4` | Fire effect (types 13h..15h) | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) | 9727, A47E and CFAC are hooks |
+| ARMY__00.WRK `0xFA4..0xFD1` | Embers effect (type 16h) | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) |  |
 | ARMY__02.WRK `0x13B..0x157` | Castle AH=5 visitor validator | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Принимающая ветка 1B8 общая с хвостом обработчика. |
 | ARMY__02.WRK `0x221..0x251` | Castle seven-byte header and production rows | partial | [recruitment-production.md](../docs/recruitment-production.md); [original_production.json](../data/original_production.json) | Заголовок сохранён без выдуманных назначений. Разобраны строки index/frame/interval. Ополченца в таблице замка нет. |
 | ARMY__02.WRK `0x336..0x34E` | Barracks seven-byte header and production rows | partial | [recruitment-production.md](../docs/recruitment-production.md); [original_production.json](../data/original_production.json) | Разобраны строки лучника, ополченца, поджигателя и рыцаря. Строительство казармы и отдельная очередь ополченца подключены; полный WRK-диспетчер остаётся задачей. |
@@ -97,6 +100,7 @@
 | LE:1 `0x95D3..0x960B` | Death dispatch: special path, death voice, animation | ported | [combat.md](../docs/combat.md); [death.json](../tests/fixtures/death.json) | 12D08 не перенесена. |
 | LE:1 `0x9653..0x9688` | Turn one heading sector | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Включает исходный ZF от расчёта кадра; общий таймер обновлений задаётся вызывающей стороной. |
 | LE:1 `0x9688..0x96CD` | Direction toward world coordinates | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Исходная u32-арифметика и переполнения; правило отличается от направления локального поиска 79C0. |
+| LE:1 `0x97C6..0x982B` | Object in an effect's cell and the terrain class | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) |  |
 | LE:1 `0x982B..0x98CC` | Object under an effect point with footprint containment | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Схватка пока бьёт явную цель вместо точки удара. |
 | LE:1 `0x98CC..0x996F` | Detach object from owner chain | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Корректная монотонная цепочка с достижимым объектом; момент смерти, порождение эффекта и повторное выделение записи не включены. |
 | LE:1 `0x996F..0x9A1B` | Missile distance, 24.8 velocity and arc speed | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) | Деление на ноль/переполнение DIV при вырожденных расстояниях не воспроизводится. |
