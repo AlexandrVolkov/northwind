@@ -13,7 +13,7 @@ public partial class TestRunner
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         Span<byte> output = stackalloc byte[7];
         int count = 0;
-        for (int index = 0; index < 3; index++)
+        foreach (int index in new[] { 0, 1, 2, 6 })
         foreach (bool inside in new[] { false, true })
         foreach (bool mouse in new[] { false, true })
         foreach (bool key in new[] { false, true })

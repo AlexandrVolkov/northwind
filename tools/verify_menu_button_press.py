@@ -22,7 +22,7 @@ class PlaqueOracle(TextsOracle):
 
 
 def cases():
-    for index in range(3):
+    for index in (0,1,2,6):
         for tick,last in ((0,0),(2,0),(3,0),(5,0),(0,254),(255,250)):
             for offset in (0,1,2,3):
                 yield index,tick,last,offset
@@ -36,12 +36,12 @@ def generate(game):
     data=objects[2]['payload']; widget=o.FRAME+0x2000
     digest=hashlib.sha256();count=0
     for index,tick,last,offset in cases():
-        source=0xADBC+49*index
+        source=0xAED6 if index==6 else 0xADBC+49*index
         record=bytearray(data[source:source+49]);base=struct.unpack_from('<I',record,0x24)[0]
         struct.pack_into('<I',record,0x0A,o.CODE+0x19279)
         c.mem_write(widget,bytes(record));c.mem_write(widget+0x12,b'\x01')
         c.mem_write(widget+0x13,bytes([last]));c.mem_write(widget+0x28,struct.pack('<I',base+offset))
-        c.mem_write(0xA0AA,b'\x00');c.mem_write(0x19E4,bytes([tick]));c.mem_write(0x9000,b'\x00')
+        c.mem_write(0xA0AA,b'\x02' if index==6 else b'\x00');c.mem_write(0x19E4,bytes([tick]));c.mem_write(0x9000,b'\x00')
         c.reg_write(UC_X86_REG_EDI,widget);c.reg_write(UC_X86_REG_EAX,1)
         o.run('plaque',0x18F16)
         outlast=c.mem_read(widget+0x13,1)[0]

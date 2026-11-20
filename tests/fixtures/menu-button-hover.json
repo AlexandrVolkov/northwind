@@ -1,8 +1,8 @@
 {
   "format_version": 1,
   "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
-  "cases": 288,
-  "output_sha256": "90e472c9a16d9489fea4ee662e199ce11ed04be08a954401ac65435b4c955211",
+  "cases": 384,
+  "output_sha256": "1c61acc5b1c43eb15e5cf40d1535d9dc7555e3ac83bffb1fa170cebef5c671ee",
   "stubbed_calls": [
     "18699 hit-test replaced with CMP flag plus RET",
     "widget action replaced with counter/RET"

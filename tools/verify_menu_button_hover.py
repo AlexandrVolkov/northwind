@@ -23,7 +23,7 @@ class HoverOracle(TextsOracle):
 
 
 def cases():
-    for index in range(3):
+    for index in (0,1,2,6):
         for inside in (False,True):
             for mouse in (False,True):
                 for key in (False,True):
@@ -42,13 +42,14 @@ def generate(game):
     digest=hashlib.sha256();count=0
     for index,inside,mouse,key,tick,last,offset in cases():
         c.mem_write(0x9001,b'\x01' if inside else b'\x00')
-        record=bytearray(data[0xADBC+49*index:0xADBC+49*(index+1)])
+        source=0xAED6 if index==6 else 0xADBC+49*index
+        record=bytearray(data[source:source+49])
         base=struct.unpack_from('<I',record,0x24)[0]
         struct.pack_into('<I',record,0x0A,o.CODE+0x19279)
         struct.pack_into('<H',record,0x0E,0x1234)
         c.mem_write(widget,bytes(record));c.mem_write(widget+0x12,b'\x00')
         c.mem_write(widget+0x13,bytes([last]));c.mem_write(widget+0x28,struct.pack('<I',base+offset))
-        c.mem_write(0xA0AA,b'\x00');c.mem_write(0x19E4,bytes([tick]));c.mem_write(0x9000,b'\x00')
+        c.mem_write(0xA0AA,b'\x02' if index==6 else b'\x00');c.mem_write(0x19E4,bytes([tick]));c.mem_write(0x9000,b'\x00')
         c.mem_write(0x194B,b'\x01' if mouse else b'\x00')
         c.mem_write(0x1C35,struct.pack('<H',0x1234 if key else 0x4321))
         c.reg_write(UC_X86_REG_EDI,widget);c.reg_write(UC_X86_REG_EAX,1)
