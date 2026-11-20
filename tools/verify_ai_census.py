@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Execute the AI settlement census LE:1 1E87A..1EAC1 and the territory threat 23B10 under Unicorn.
+"""Execute the AI settlement census LE:1 1E87A..1EAD7 and the territory threat 23B10 under Unicorn.
 
-Settlements are generated deterministically and stored in the fixture for C# replay. 1EC3F (called every
-256 turns after the census) is outside the boundary. LE:3 operands of 23B10 (F149, ED20) are relocated.
+Settlements are generated deterministically and stored in the fixture for C# replay. 1EC3F (the explored share +1A01 from the
+fog map [18DA], every 256 turns after the census) runs for real. LE:3 operands of 23B10 (F149, ED20) are relocated.
 """
 import argparse
 import hashlib
@@ -20,7 +20,7 @@ STATS = 0x1a35
 
 
 class CensusOracle(CombatOracle):
-    RANGES = {'census': ([(0x1e87a, 0x1eac1), (0x68bd, 0x68d8), (0x6885, 0x68a0), (0x219c3, 0x21a00)], []),
+    RANGES = {'census': ([(0x1e87a, 0x1ead8), (0x1ec3f, 0x1ec6e), (0x68bd, 0x68d8), (0x6885, 0x68a0), (0x219c3, 0x21a00)], []),
               'threat': ([(0x23b10, 0x23b6a), (0xd7b1, 0xd85e), (0x68bd, 0x68d8), (0x6885, 0x68a0)], [])}
 
 
@@ -36,7 +36,19 @@ def cases():
         out.append({'turn': rng.choice([0, 1, 0x100, 0x2ff]), 'mode': rng.choice([0, 0, 2]), 'previous_gold': rng.choice([0, 500, 2000]),
                     'resources': [rng.choice([0, 7, 1000, 60000]) for _ in range(4)], 'support': [rng.randrange(1 << 16), rng.randrange(1 << 16)],
                     'objects': objs})
+    extra = random.Random(1988)   # separate stream: the fog of 1EC3F
+    for case in out: case['fog'] = [extra.choice([0, 1, 1, 2]), extra.randrange(1 << 16)]
     return out
+
+
+FOG = 0x7000
+
+
+def fog_map(case):
+    mode, seed = case['fog']
+    if mode == 0: return bytes(1024)
+    if mode == 2: return b'\xff' * 1024
+    return bytes(((c * 167 + seed) ^ (c >> 3) ^ (seed >> 8)) & 255 for c in range(1024))
 
 
 def generate(game):
@@ -67,8 +79,8 @@ def generate(game):
             struct.pack_into('<I', rec, 0x10, 0x40); o.cpu.mem_write(o.POOL + at, bytes(rec)); refs.append(at)
             o.cpu.mem_write(o.GRID + (256 * 0 + 1024 * 1 + (y >> 5) * 32 + (x >> 5)) * 4, struct.pack('<I', at)); at += 0x40
         o.cpu.mem_write(participant + 0xe, struct.pack('<I', 0x100)); o.cpu.mem_write(participant + 9, struct.pack('<I', at))
-        o.mode = 'census'; o.boundary = 0x1eac1; o.cpu.reg_write(UC_X86_REG_ESI, stats); o.run(o.CODE + 0x1e87a)
-        if not o.stopped: raise ValueError('Census did not reach 1EAC1')
+        o.cpu.mem_write(0x18da, struct.pack('<I', FOG)); o.cpu.mem_write(FOG, fog_map(case))
+        o.mode = 'census'; o.boundary = None; o.cpu.reg_write(UC_X86_REG_ESI, stats); o.run(o.CODE + 0x1e87a)
         census.update(bytes(o.cpu.mem_read(stats, 0x80)) + bytes(o.cpu.mem_read(stats + 0x19e0, 0x50)) + bytes(o.cpu.mem_read(0x1c6e, 16)))
         o.mode = 'threat'; o.boundary = None
         o.cpu.mem_write(OBJ3 + 0xed20 - 0xe000, struct.pack('<I', stats)); o.cpu.mem_write(OBJ3 + 0xf149 - 0xe000, b'\x55' * 0x40)

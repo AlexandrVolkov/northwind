@@ -2174,7 +2174,7 @@
       "id": "ai-census-1e87a",
       "module": "LE:1",
       "start": 125050,
-      "end": 125633,
+      "end": 125656,
       "name": "AI settlement census",
       "classification": "code",
       "status": "ported",
@@ -2185,7 +2185,7 @@
       "implementation": [
         "scripts/OriginalAiRules.cs"
       ],
-      "limitations": "1EC3F (every 256 turns) not included"
+      "limitations": ""
     },
     {
       "id": "ai-threat-23b10",
@@ -3163,6 +3163,18 @@
       "status": "ported",
       "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-explored-share",
+      "module": "LE:1",
+      "start": 126015,
+      "end": 126062,
+      "name": "Explored share of the map for a participant",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-census.json"],
+      "implementation": ["scripts/OriginalAiRules.cs"],
       "limitations": ""
     }
   ]
