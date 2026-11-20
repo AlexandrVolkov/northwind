@@ -501,7 +501,7 @@ public sealed partial class Skirmish : IDisposable
     /// and their smoke (12h).</summary>
     public List<byte[]> Stones { get; } = [];
     /// <summary>Effect loop 96CD for stones: flight D6E6; on landing BD0F hits the cell (planes 0 and 1) and the stone
-    /// becomes an explosion. The crater CFAC is not ported.</summary>
+    /// becomes an explosion; the cell gets a crater (CFAC AX=300h).</summary>
     private void TickStones()
     {
         int plane = Occupancy.Width * Occupancy.Height;
@@ -514,6 +514,7 @@ public sealed partial class Skirmish : IDisposable
                     (p, cell) => p * plane + cell < Occupancy.Cells.Length ? Occupancy.Cells[p * plane + cell] : 0,
                     r => { if (Find(r) is not { } a) return (new byte[0x40], new byte[171]); struck.Add(a); return (a.Record, a.Parameters); });
                 foreach (var victim in struck) if (!victim.Alive) Kill(victim);
+                if (_terrainCatalog.Crater(Map.Cells, (byte)Map.Width, (byte)Map.Height, x, y, 3) > 0) TerrainRevision++;   // CFAC AX=300h
                 OriginalCatapultRules.Explode(stone);
             }
             else if (stone[0] == OriginalCatapultRules.Explosion) OriginalCatapultRules.Smoke(stone, Wind.X, Wind.Y);
@@ -572,8 +573,8 @@ public sealed partial class Skirmish : IDisposable
     }
     private FireWorldBridge? _fireWorld;
     private FireWorldBridge FireWorld => _fireWorld ??= new(this);
-    /// <summary>World of the fire (CE3) in the skirmish, with the ported wind. The scorched ground (CFAC) is not ported: the
-    /// ground keeps its trees. Sounds are not played.</summary>
+    /// <summary>World of the fire (CE3) in the skirmish, with the ported wind and burnt ground (CFAC AX=101h). Sounds are
+    /// not played.</summary>
     private sealed class FireWorldBridge(Skirmish battle) : IFireWorld
     {
         public readonly HashSet<SkirmishActor> Touched = [];
@@ -607,7 +608,10 @@ public sealed partial class Skirmish : IDisposable
             if (effect[0] != 0xff) battle.Stones.Add(effect);
         }
         public void Sound(int id) { }
-        public void Scorch(byte x, byte y) { }
+        public void Scorch(byte x, byte y)
+        {
+            if (battle._terrainCatalog.Scorch(battle.Map.Cells, (byte)battle.Map.Width, (byte)battle.Map.Height, x, y, 1) > 0) battle.TerrainRevision++;   // CFAC AX=101h
+        }
         public (int X, int Y) Drift => (battle.Wind.X, battle.Wind.Y);
     }
     private void ResolveImpact(SkirmishActor actor, SkirmishActor target, WorkerImpact impact)

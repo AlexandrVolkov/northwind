@@ -1007,7 +1007,7 @@
       "implementation": [
         "scripts/OriginalForestryRules.cs"
       ],
-      "limitations": "Перенесены логические правила смены тайлов и масок для проверенных операций; отрисовка, dirty-cache и исходные глобальные эффекты не объявляются полностью перенесёнными."
+      "limitations": "Перенесены логические правила смены тайлов и масок; CFAC сверен для AX=201h (лесоруб), 101h (огонь) и 300h (воронка катапульты). Отрисовка, dirty-cache и исходные глобальные эффекты не объявляются полностью перенесёнными."
     },
     {
       "id": "forestry-tile",
@@ -3295,7 +3295,7 @@
       "status": "ported",
       "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
       "implementation": ["scripts/OriginalCatapultRules.cs"],
-      "limitations": "CFAC crater is a hook"
+      "limitations": ""
     },
     {
       "id": "explosion-effect",
@@ -3367,7 +3367,7 @@
       "status": "ported",
       "evidence": ["docs/combat.md", "tests/fixtures/burn.json"],
       "implementation": ["scripts/OriginalBurnRules.cs"],
-      "limitations": "9727, A47E and CFAC are hooks"
+      "limitations": "9727, A47E and CFAC are calls of the caller"
     },
     {
       "id": "embers",

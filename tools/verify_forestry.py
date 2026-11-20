@@ -47,8 +47,8 @@ class ForestryOracle(OccupancyOracle):
         self.cpu.reg_write(UC_X86_REG_ESP,self.STACK+0xf00);self.cpu.reg_write(UC_X86_REG_EFLAGS,2)
         self.cpu.emu_start(address,self.STOP,count=2000000)
 
-    def clear(self,x,y):
-        self.mode='clear';self.cpu.reg_write(UC_X86_REG_EAX,0x201)
+    def clear(self,x,y,ax=0x201):
+        self.mode='clear';self.cpu.reg_write(UC_X86_REG_EAX,ax)
         self.cpu.reg_write(UC_X86_REG_ECX,0x101);self.cpu.reg_write(UC_X86_REG_EDX,x|(y<<8))
         self.start(self.CODE+0xcfac)
         if self.cpu.reg_read(UC_X86_REG_EIP)!=self.STOP:raise ValueError('Terrain replacement did not return')
@@ -72,6 +72,8 @@ def synthetic_catalog(kind):
     if kind==1:descriptors[10]=0x44440300 # force some atomic blend failures
     if kind==2:
         while len(descriptors)<260:descriptors.append(0x11110300)
+    if kind==3:   # burnt (subtype 1) and crater (subtype 3) surfaces for CFAC with AX=101h and AX=300h
+        descriptors.extend([0x44440110,0x66660110,0x66440110,0x44440300,0x66660300,0x44440300])
     descriptors.extend([0x44440210,0x44440210])
     return b''.join(struct.pack('<II',d,0) for d in descriptors)
 
@@ -150,6 +152,13 @@ def generate(game):
         for random_index in fixture['clear']['random_indices']:
             oracle.terrain(m['width'],m['height'],cells,properties,random_index);digest.update(oracle.clear(x,y));count+=1
     save('source_map',digest,count)
+    # CFAC as the fire (AX=101h: burnt ground) and the catapult (AX=300h: crater) call it.
+    fixture['scorch']={'catalogs':[0,1,3],'modes':[0x101,0x300],'random_indices':[0,1,127,255]}
+    digest=hashlib.sha256();count=0
+    for kind,ax,random_index,y,x in product(fixture['scorch']['catalogs'],fixture['scorch']['modes'],fixture['scorch']['random_indices'],range(8),range(8)):
+        oracle.terrain(8,8,[0xabc00000|((i*7+5)%16) for i in range(64)],synthetic_catalog(kind),random_index)
+        digest.update(oracle.clear(x,y,ax));count+=1
+    save('scorch',digest,count)
     return fixture
 
 
