@@ -6,7 +6,7 @@
 
 ## Заняты Claude (не трогать)
 
-Сцены и код интерфейса: `scripts/OriginalHud.cs`, `scripts/OriginalInterface.cs`, `scripts/SkirmishMain.cs`, `scripts/OriginalMenus.cs`, `scripts/DisplaySettings.cs`, `scripts/GameSession.cs`, `scenes/`, `tests/MenuChecks.cs`, `tests/DisplayChecks.cs`, `tools/interface_source.py`, `scripts/OriginalCatapultRules.cs`, `tools/verify_catapult.py`, `scripts/OriginalFireRules.cs`, `tools/verify_fire.py`, `assets/imported/interface/`, `docs/interface.md`, `tests/SkirmishChecks.cs`, код ИИ (`scripts/OriginalAi*.cs`, `scripts/SkirmishAi.cs`, `scripts/SkirmishProduction.cs`, `tests/OriginalAi*Checks.cs`, `tools/verify_ai_*.py`, `docs/ai.md`), а также `project.godot`, `AGENTS.md`, `docs/continuation.md`.
+Сцены и код интерфейса: `scripts/OriginalHud.cs`, `scripts/OriginalInterface.cs`, `scripts/SkirmishMain.cs`, `scripts/OriginalMenus.cs`, `scripts/DisplaySettings.cs`, `scripts/GameSession.cs`, `scenes/`, `tests/MenuChecks.cs`, `tests/DisplayChecks.cs`, `tools/interface_source.py`, `scripts/OriginalCatapultRules.cs`, `tools/verify_catapult.py`, `scripts/OriginalFireRules.cs`, `tools/verify_fire.py`, `scripts/OriginalBurnRules.cs`, `tools/verify_burn.py`, `assets/imported/interface/`, `docs/interface.md`, `tests/SkirmishChecks.cs`, код ИИ (`scripts/OriginalAi*.cs`, `scripts/SkirmishAi.cs`, `scripts/SkirmishProduction.cs`, `tests/OriginalAi*Checks.cs`, `tools/verify_ai_*.py`, `docs/ai.md`), а также `project.godot`, `AGENTS.md`, `docs/continuation.md`.
 
 ## Принятые работы вне очереди
 
@@ -36,6 +36,7 @@
 - **Срез камней катапульт, 20.11:** в `codex-work` нет коммитов вне main.
 - **Катапульта в схватке и бегство во время замаха, 20.11:** в `codex-work` нет коммитов вне main.
 - **Огненные снаряды, 20.11:** в `codex-work` нет коммитов вне main.
+- **Огонь CE3, 20.11:** в `codex-work` нет коммитов вне main.
 
 ## Задачи
 
