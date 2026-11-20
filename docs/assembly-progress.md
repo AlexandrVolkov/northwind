@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 109172 | 6366 | 654 | 30690 | 44 |
+| LE:1 | 146882 | 108764 | 6774 | 654 | 30690 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4701 | 100 | 0 | 602 | 0 |
@@ -186,6 +186,7 @@
 | LE:1 `0xEF3F..0xEFFE` | Third-party reactions with deferred re-entry | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xF000..0xF072` | War declaration with reputation and reactions | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xF250..0xF28B` | First contact, mutual | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
+| LE:1 `0xF8E1..0xFA79` | Tagged SAV record lookup, append and header rewrite | partial | [save-format.md](../docs/save-format.md); [original_save_layout.json](../data/original_save_layout.json) | Проверены инструкции и реальный четырёхраздельный файл, Python читает только внешний контейнер; DOS INT 21h не исполнялся под Unicorn, запись SAV и payload не перенесены. |
 | LE:1 `0x10075..0x100FA` | Lay a formation out around a goal | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x100FA..0x101B4` | Spread members along a formation segment | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x101B4..0x10262` | Nearest free member of a class to a formation point | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |

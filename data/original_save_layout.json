@@ -1,0 +1,44 @@
+{
+  "format_version": 1,
+  "file_size": 1153054,
+  "file_sha256": "f56ca434fb1ca25aae191bb1b0dd9cbedb838065ba3ae3774070071910fe0922",
+  "record_count": 4,
+  "records": [
+    {
+      "index": 0,
+      "header_offset": 4,
+      "payload_offset": 12,
+      "length": 988085,
+      "tag": 17,
+      "tag_hex": "00000011",
+      "payload_sha256": "8659f590b2b6c1c9f738a6593212406776d750ef0ef643447bcb15b87894f834"
+    },
+    {
+      "index": 1,
+      "header_offset": 988097,
+      "payload_offset": 988105,
+      "length": 25893,
+      "tag": 153,
+      "tag_hex": "00000099",
+      "payload_sha256": "e1a185a89a1303152511eb291aa6cb2a8bbf3bb0192c1afa898ad0b4480960a3"
+    },
+    {
+      "index": 2,
+      "header_offset": 1013998,
+      "payload_offset": 1014006,
+      "length": 69520,
+      "tag": 16777250,
+      "tag_hex": "01000022",
+      "payload_sha256": "b43d5e8c0df05efba25277a992922e34f509268b94aee2ed111256ae6b481c0d"
+    },
+    {
+      "index": 3,
+      "header_offset": 1083526,
+      "payload_offset": 1083534,
+      "length": 69520,
+      "tag": 65570,
+      "tag_hex": "00010022",
+      "payload_sha256": "d43a1a249dec8e467dd1876c36902b8769fa05fa492922484b4ca971d7a3dc1e"
+    }
+  ]
+}

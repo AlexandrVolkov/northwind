@@ -4320,6 +4320,23 @@
       ],
       "implementation": [],
       "limitations": "19436 исполнен под Unicorn, но внешние 19294, 1CC4E, 1CC71 заглушены на входе; исходный экран и последующие эффекты не перенесены."
+    },
+    {
+      "id": "save-tagged-container-io",
+      "module": "LE:1",
+      "start": 63713,
+      "end": 64121,
+      "name": "Tagged SAV record lookup, append and header rewrite",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/save-format.md",
+        "data/original_save_layout.json"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Проверены инструкции и реальный четырёхраздельный файл, Python читает только внешний контейнер; DOS INT 21h не исполнялся под Unicorn, запись SAV и payload не перенесены."
     }
   ]
 }
