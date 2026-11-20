@@ -4005,17 +4005,18 @@
       "module": "LE:1",
       "start": 102166,
       "end": 102499,
-      "name": "Menu plaque callback including pressed completion",
+      "name": "Menu plaque hover and pressed callback",
       "classification": "code",
       "status": "partial",
       "evidence": [
         "docs/menu-widgets.md",
-        "tests/fixtures/menu-button-press.json"
+        "tests/fixtures/menu-button-press.json",
+        "tests/fixtures/menu-button-hover.json"
       ],
       "implementation": [
         "scripts/OriginalMenuPlaqueRules.cs"
       ],
-      "limitations": "Только AL=1 с уже установленным widget[12h]=1; наведение 18699, другие события и реальные действия не перенесены. В Unicorn указатель действия заменён счётчиком/RET."
+      "limitations": "Только AL=1: latch=0/1 сверены, но реальный hit-test 18699 заменён управляемым CF, действие заменено счётчиком/RET. События 0/2/3, растеризация и реальные действия не перенесены."
     }
   ]
 }
