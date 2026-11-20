@@ -4439,6 +4439,24 @@
         "tools/save_source.py"
       ],
       "limitations": "Фиксированные длины и общий хвост сверены с кодом и SAV; границы пяти отдельных списков, поля массивов и DOS запись не перенесены."
+    },
+    {
+      "id": "save-cabinet-slot-scan",
+      "module": "LE:1",
+      "start": 104040,
+      "end": 104320,
+      "name": "Scan eight save files and fill cabinet slot records",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/save-format.md",
+        "data/original_save_layout.json",
+        "docs/reference/original-save-slots.png"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Форма восьми путей и копирование 352байт доказаны кодом; DOS-файловые вызовы, проверка слов 90C9/2C2 и внутренняя разметка сводки не перенесены."
     }
   ]
 }

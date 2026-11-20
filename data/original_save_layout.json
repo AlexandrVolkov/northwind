@@ -108,6 +108,9 @@
         ],
         "table_length": 512,
         "table_sha256": "a45dd2d222d4cad5ced325704e13a86d71beee3123656358f28002253c4d2344",
+        "cabinet_summary_offset_in_table": 6,
+        "cabinet_summary_length": 352,
+        "cabinet_summary_sha256": "bf855e55a673bd43d6aebc28f04a82a99a1d11acbf0666f502aaef814e4da122",
         "region_record_size": 2113,
         "region_count": 12,
         "region_sha256": [

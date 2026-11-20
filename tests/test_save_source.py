@@ -57,6 +57,7 @@ class SaveSourceChecks(unittest.TestCase):
         self.assertEqual(records[-1]['payload_offset'] + records[-1]['length'], data['file_size'])
         section = records[1]['campaign99']
         self.assertEqual(section['region_count'], 12)
+        self.assertEqual((section['cabinet_summary_offset_in_table'], section['cabinet_summary_length']), (6, 0x160))
         self.assertEqual(section['region_record_size'], 0x841)
         self.assertEqual(len(section['region_sha256']), 12)
         self.assertEqual(25 + section['table_length'] + section['region_count'] * 0x841, records[1]['length'])

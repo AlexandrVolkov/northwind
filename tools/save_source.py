@@ -56,6 +56,8 @@ def parse_session99(payload):
     return dict(current_participant=current_participant, field_1cad=field_1cad,
                 field_1cb1=field_1cb1, field_1cb5=field_1cb5,
                 table_length=512, table_sha256=hashlib.sha256(table).hexdigest(),
+                cabinet_summary_offset_in_table=6, cabinet_summary_length=0x160,
+                cabinet_summary_sha256=hashlib.sha256(table[6:6 + 0x160]).hexdigest(),
                 region_record_size=0x841, region_count=len(regions) // 0x841,
                 region_sha256=[hashlib.sha256(regions[i:i + 0x841]).hexdigest()
                                for i in range(0, len(regions), 0x841)])
