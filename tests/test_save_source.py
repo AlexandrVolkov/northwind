@@ -15,6 +15,12 @@ class SaveSourceChecks(unittest.TestCase):
         for invalid in (file[:-1], file + b'!', b'\0\0\0', struct.pack('<I', 4097)):
             with self.assertRaises(ValueError): parse(invalid)
 
+    def test_empty_victory_marker_is_a_distinct_tag(self):
+        file = struct.pack('<I', 1) + struct.pack('<II', 0, 0x66)
+        record = parse(file)['records'][0]
+        self.assertEqual(record['length'], 0)
+        self.assertTrue(record['victory_path_marker'])
+
     def test_scenario11_header_and_square_exploration_boundary(self):
         body = bytearray(0xF9D + 16 + 4*16 + 12*16 + 0x10000 + 0x2000 + 0x8000 + 0x1A35 + 3)
         body[0x14:0x21] = b'game    .epi\0'

@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 107612 | 7926 | 654 | 30690 | 44 |
+| LE:1 | 146882 | 107596 | 7926 | 670 | 30690 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4701 | 100 | 0 | 602 | 0 |
@@ -66,6 +66,7 @@
 | ARMY__02.WRK `0x1521..0x1539` | Six relative action targets after inline FS dispatcher | verified | [order-buttons.md](../docs/order-buttons.md); [order-dispatch.json](../tests/fixtures/order-dispatch.json) | Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит. |
 | ARMY__02.WRK `0x15F0..0x1608` | Six relative action targets after inline FS dispatcher | verified | [order-buttons.md](../docs/order-buttons.md); [order-dispatch.json](../tests/fixtures/order-dispatch.json) | Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит. |
 | LE:1 `0x2F03..0x2F1B` | Copy four initial resource stocks from SCN | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json) | Только извлечение четырёх dword SCN +15..24; прочие поля владельца, DOS-загрузка и цикл всех слотов вне перенесённого участка. |
+| LE:1 `0x32AA..0x32BA` | Write completion marker tag 66h | verified | [save-format.md](../docs/save-format.md); [test_save_source.py](../tests/test_save_source.py) | Ветвь при 1EC6=3 пишет tag66h через FA79/F967 без payload; реальный победный SAV отсутствует, DOS путь не исполнен в этом срезе. |
 | LE:1 `0x3593..0x35A8` | DAT header and record stride | partial | [executable-analysis.md](../docs/executable-analysis.md) | Статически подтверждён участок чтения заголовка и шага 171; полный загрузчик, ошибки и релокации не перенесены. |
 | LE:1 `0x35B9..0x35C2` | WRK base assignment | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждено сохранение адреса WRK; это не весь загрузчик. |
 | LE:1 `0x3DB5..0x3DF2` | Advance cursor frame on a four-tick byte timer interval | ported | [interface.md](../docs/interface.md); [cursor-animation.json](../tests/fixtures/cursor-animation.json) | Числовой шаг проверен на 35840 входах. Выбор семейства, DOS-мышь, фоновый буфер и полный цикл отрисовки курсора не включены; HUD использует только диапазон обычной стрелки. |

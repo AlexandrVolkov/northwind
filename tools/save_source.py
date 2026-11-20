@@ -104,6 +104,7 @@ def parse(data):
         record = dict(index=index, header_offset=offset, payload_offset=payload_offset,
                       length=size, tag=tag, tag_hex=f'{tag:08X}',
                       payload_sha256=hashlib.sha256(payload).hexdigest())
+        if tag == 0x66: record['victory_path_marker'] = True
         if tag & 0xFFFF == 0x11: record['scenario11'] = parse_scenario11(payload)
         if tag == 0x99: record['campaign99'] = parse_session99(payload)
         if tag & 0xFFFF == 0x22: record['area22'] = parse_area22(payload)

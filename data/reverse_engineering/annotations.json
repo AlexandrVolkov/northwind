@@ -4457,6 +4457,23 @@
         "tools/save_source.py"
       ],
       "limitations": "Форма восьми путей и копирование 352байт доказаны кодом; DOS-файловые вызовы, проверка слов 90C9/2C2 и внутренняя разметка сводки не перенесены."
+    },
+    {
+      "id": "save-victory-marker",
+      "module": "LE:1",
+      "start": 12970,
+      "end": 12986,
+      "name": "Write completion marker tag 66h",
+      "classification": "code",
+      "status": "verified",
+      "evidence": [
+        "docs/save-format.md",
+        "tests/test_save_source.py"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Ветвь при 1EC6=3 пишет tag66h через FA79/F967 без payload; реальный победный SAV отсутствует, DOS путь не исполнен в этом срезе."
     }
   ]
 }
