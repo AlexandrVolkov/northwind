@@ -12,7 +12,8 @@ def parse_episode(raw: bytes) -> dict:
     width, height = raw[0], raw[1]
     if not 1 <= width <= 16 or not 1 <= height <= 16:
         raise ValueError('EPI world dimensions are invalid')
-    expected = 6 + 16 * 22 + width * height + 5
+    preload_count = raw[4]
+    expected = 6 + 16 * 22 + width * height + preload_count
     if len(raw) != expected:
         raise ValueError(f'EPI length {len(raw)} differs from {expected}')
     people = []
@@ -22,8 +23,9 @@ def parse_episode(raw: bytes) -> dict:
         people.append(dict(index=index, name=name, position=list(entry[20:22])))
     grid = raw[358:358 + width * height]
     return dict(width=width, height=height, header_tail=list(raw[2:6]),
+                preload_count=preload_count, participant_count=raw[5],
                 people=people, area_ids=[list(grid[row * width:(row + 1) * width]) for row in range(height)],
-                trailer=list(raw[-5:]))
+                preload_ids=list(raw[358 + width * height:]))
 
 
 def export(game: Path, output: Path) -> dict:

@@ -14,12 +14,14 @@ class EpisodeSourceTests(unittest.TestCase):
         game = episodes['GAME.EPI']
         self.assertEqual((game['width'], game['height']), (4, 3))
         self.assertEqual(game['area_ids'], [[1, 2, 3, 10], [4, 5, 6, 10], [7, 8, 9, 10]])
+        self.assertEqual(game['preload_ids'], [0, 1, 2, 3, 5])
+        self.assertEqual(game['preload_count'], len(game['preload_ids']))
         self.assertEqual([p['name'] for p in game['people'][:3]], ['Олег', 'Игорь', 'Эйрик'])
         self.assertEqual(episodes['DEMO.EPI']['area_ids'], [[21], [22]])
         self.assertEqual(episodes['DEMO2.EPI']['area_ids'], [[22]])
 
     def test_rejects_length_mismatch(self):
-        raw = bytearray([1, 1, 0, 0, 0, 0] + [255] * (16 * 22) + [22, 0, 1, 2, 3, 5])
+        raw = bytearray([1, 1, 0, 0, 5, 0] + [255] * (16 * 22) + [22, 0, 1, 2, 3, 5])
         self.assertEqual(parse_episode(bytes(raw))['area_ids'], [[22]])
         with self.assertRaises(ValueError):
             parse_episode(bytes(raw[:-1]))

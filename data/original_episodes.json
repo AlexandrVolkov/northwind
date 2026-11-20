@@ -12,6 +12,8 @@
         5,
         7
       ],
+      "preload_count": 5,
+      "participant_count": 7,
       "people": [
         {
           "index": 0,
@@ -162,7 +164,7 @@
           10
         ]
       ],
-      "trailer": [
+      "preload_ids": [
         0,
         1,
         2,
@@ -180,6 +182,8 @@
         5,
         7
       ],
+      "preload_count": 5,
+      "participant_count": 7,
       "people": [
         {
           "index": 0,
@@ -318,7 +322,7 @@
           22
         ]
       ],
-      "trailer": [
+      "preload_ids": [
         0,
         1,
         2,
@@ -336,6 +340,8 @@
         5,
         8
       ],
+      "preload_count": 5,
+      "participant_count": 8,
       "people": [
         {
           "index": 0,
@@ -471,7 +477,7 @@
           22
         ]
       ],
-      "trailer": [
+      "preload_ids": [
         0,
         1,
         2,
