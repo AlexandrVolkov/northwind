@@ -111,6 +111,136 @@
         "cabinet_summary_offset_in_table": 6,
         "cabinet_summary_length": 352,
         "cabinet_summary_sha256": "bf855e55a673bd43d6aebc28f04a82a99a1d11acbf0666f502aaef814e4da122",
+        "cabinet_participants": [
+          {
+            "index": 0,
+            "name": "\u041e\u043b\u0435\u0433",
+            "trailing_bytes": [
+              0,
+              0
+            ]
+          },
+          {
+            "index": 1,
+            "name": "\u0418\u0433\u043e\u0440\u044c",
+            "trailing_bytes": [
+              0,
+              2
+            ]
+          },
+          {
+            "index": 2,
+            "name": "\u042d\u0439\u0440\u0438\u043a",
+            "trailing_bytes": [
+              2,
+              2
+            ]
+          },
+          {
+            "index": 3,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          },
+          {
+            "index": 4,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          },
+          {
+            "index": 5,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          },
+          {
+            "index": 6,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          },
+          {
+            "index": 7,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          },
+          {
+            "index": 8,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          },
+          {
+            "index": 9,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          },
+          {
+            "index": 10,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          },
+          {
+            "index": 11,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          },
+          {
+            "index": 12,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          },
+          {
+            "index": 13,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          },
+          {
+            "index": 14,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          },
+          {
+            "index": 15,
+            "name": "",
+            "trailing_bytes": [
+              255,
+              255
+            ]
+          }
+        ],
         "region_record_size": 2113,
         "region_count": 12,
         "region_sha256": [

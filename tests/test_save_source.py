@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 import struct
 import unittest
-from tools.save_source import parse, parse_area22, parse_scenario11
+from tools.save_source import parse, parse_area22, parse_scenario11, parse_session99
 
 
 class SaveSourceChecks(unittest.TestCase):
@@ -29,6 +29,16 @@ class SaveSourceChecks(unittest.TestCase):
         self.assertEqual(len(result['fixed_segments']), 7)
         for invalid in (body[:0xF9C], body[:0xF9D+15]):
             with self.assertRaises(ValueError): parse_scenario11(invalid)
+
+    def test_campaign99_cabinet_name_records_keep_raw_tail_bytes(self):
+        body = bytearray(25 + 512 + 0x841)
+        body[25 + 6:25 + 6 + 20] = 'Олег'.encode('cp866') + bytes([0xff] * 16)
+        body[25 + 6 + 20:25 + 6 + 22] = b'\x02\x03'
+        result = parse_session99(body)
+        self.assertEqual((result['cabinet_participants'][0]['name'],
+                          result['cabinet_participants'][0]['trailing_bytes']), ('Олег', [2, 3]))
+        self.assertEqual(len(result['cabinet_participants']), 16)
+
 
     def test_area22_descriptor_and_bucket_bounds(self):
         descriptor = struct.pack('<16I', 0, 0, 0, 0, 80, *([0] * 11))
@@ -58,6 +68,8 @@ class SaveSourceChecks(unittest.TestCase):
         section = records[1]['campaign99']
         self.assertEqual(section['region_count'], 12)
         self.assertEqual((section['cabinet_summary_offset_in_table'], section['cabinet_summary_length']), (6, 0x160))
+        self.assertEqual([x['name'] for x in section['cabinet_participants'][:4]], ['Олег', 'Игорь', 'Эйрик', ''])
+        self.assertEqual(section['cabinet_participants'][2]['trailing_bytes'], [2, 2])
         self.assertEqual(section['region_record_size'], 0x841)
         self.assertEqual(len(section['region_sha256']), 12)
         self.assertEqual(25 + section['table_length'] + section['region_count'] * 0x841, records[1]['length'])

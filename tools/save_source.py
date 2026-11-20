@@ -53,11 +53,18 @@ def parse_session99(payload):
     field_1cb5 = list(payload[9:25])
     table = payload[25:537]
     regions = payload[537:]
+    cabinet = table[6:6 + 0x160]
+    names = []
+    for index in range(16):
+        row = cabinet[index * 22:(index + 1) * 22]
+        name = row[:20].split(b'\xff', 1)[0].split(b'\0', 1)[0].decode('cp866')
+        names.append(dict(index=index, name=name, trailing_bytes=list(row[20:22])))
     return dict(current_participant=current_participant, field_1cad=field_1cad,
                 field_1cb1=field_1cb1, field_1cb5=field_1cb5,
                 table_length=512, table_sha256=hashlib.sha256(table).hexdigest(),
                 cabinet_summary_offset_in_table=6, cabinet_summary_length=0x160,
-                cabinet_summary_sha256=hashlib.sha256(table[6:6 + 0x160]).hexdigest(),
+                cabinet_summary_sha256=hashlib.sha256(cabinet).hexdigest(),
+                cabinet_participants=names,
                 region_record_size=0x841, region_count=len(regions) // 0x841,
                 region_sha256=[hashlib.sha256(regions[i:i + 0x841]).hexdigest()
                                for i in range(0, len(regions), 0x841)])
