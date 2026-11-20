@@ -55,6 +55,8 @@ public partial class TestRunner
             marched = battle.Actors.Count(a => a.Team == 1 && a.Alive && !a.Structure && !a.Worker && (a.Cell - home).Length() < 20) >= 3;
         }
         Check(marched, "At war the enemy gathers an army and marches on the player's settlement");
+        for (int second = 0; second < 600 && !battle.Corpses.Any(c => c[1] == 2); second += 10) Run(10);
+        Check(battle.Corpses.Any(c => c[1] == 2), "The fallen leave corpses (A4DF → 9727, ARMY__02 type 1)");
         GD.Print($"Skirmish AI: squads {battle.EnemySquadCount}, enemy units {battle.Actors.Count(a => a.Team == 1 && a.Alive && !a.Structure)}, resources {battle.EnemyResources}");
     }
 }

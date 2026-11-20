@@ -502,6 +502,12 @@ public partial class SkirmishMain : Node2D
                 DrawString(ThemeDB.FallbackFont, pointOfEntry + new Vector2(-24, -10), "Приём груза", HorizontalAlignment.Left, -1, 12, new Color("e7cd82"));
             }
         }
+        foreach (var corpse in Battle.Corpses)
+        {
+            var at = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(corpse.AsSpan(7)), BinaryPrimitives.ReadUInt32LittleEndian(corpse.AsSpan(0xc)));
+            if (corpse[1] == 2) DrawRect(new Rect2(at - new Vector2(9, 4), new Vector2(18, 8)), new Color(.25f, .18f, .12f, .35f + corpse[0x17] * .1f));
+            else DrawCircle(at, 3, new Color(.5f, .05f, .05f, .5f));
+        }
         foreach (var arrow in Battle.Arrows)
         {
             // Effect record: position +7/+0C, 24.8 velocity +18/+1C, height above ground +10 (8.8).
