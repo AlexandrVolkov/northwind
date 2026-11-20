@@ -7,7 +7,7 @@
 | LE:1 | 146882 | 111413 | 5512 | 97 | 29860 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 4701 | 100 | 0 | 602 | 0 |
+| ARMY__00.WRK | 5403 | 4389 | 100 | 0 | 914 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
 | ARMY__02.WRK | 6930 | 6109 | 609 | 0 | 212 | 7 |
 | ARMY__03.WRK | 13412 | 13412 | 0 | 0 | 0 | 1 |
@@ -25,6 +25,8 @@
 | ARMY__00.WRK `0x6FE..0x762` | Spark effect types 4/5 creation and countdown | partial | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Перенесено создание (AH=0); обновление кадров не подключено. |
 | ARMY__00.WRK `0x85A..0x8DA` | Catapult stone effect (type 8) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | CFAC crater is a hook |
 | ARMY__00.WRK `0x986..0x9D5` | Explosion effect (type 10) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | drift vector 9E7D not ported |
+| ARMY__00.WRK `0xBAB..0xC8A` | Fire shot effect (type 11h) | ported | [combat.md](../docs/combat.md); [fire.json](../tests/fixtures/fire.json) | CE3 fire and FA4 deflection are continuations |
+| ARMY__00.WRK `0xC8A..0xCE3` | Smoke trail effect (type 12h) | ported | [combat.md](../docs/combat.md); [fire.json](../tests/fixtures/fire.json) |  |
 | ARMY__02.WRK `0x13B..0x157` | Castle AH=5 visitor validator | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Принимающая ветка 1B8 общая с хвостом обработчика. |
 | ARMY__02.WRK `0x221..0x251` | Castle seven-byte header and production rows | partial | [recruitment-production.md](../docs/recruitment-production.md); [original_production.json](../data/original_production.json) | Заголовок сохранён без выдуманных назначений. Разобраны строки index/frame/interval. Ополченца в таблице замка нет. |
 | ARMY__02.WRK `0x336..0x34E` | Barracks seven-byte header and production rows | partial | [recruitment-production.md](../docs/recruitment-production.md); [original_production.json](../data/original_production.json) | Разобраны строки лучника, ополченца, поджигателя и рыцаря. Строительство казармы и отдельная очередь ополченца подключены; полный WRK-диспетчер остаётся задачей. |
