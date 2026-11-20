@@ -30,6 +30,7 @@ public partial class TestRunner
         }
         if (kind == 1) descriptors[10] = 0x44440300;
         if (kind == 2) while (descriptors.Count < 260) descriptors.Add(0x11110300);
+        if (kind == 3) descriptors.AddRange(new uint[] { 0x44440110, 0x66660110, 0x66440110, 0x44440300, 0x66660300, 0x44440300 });
         descriptors.AddRange(new uint[] { 0x44440210, 0x44440210 });
         return ForestryProperties(descriptors);
     }
@@ -156,5 +157,20 @@ public partial class TestRunner
         var result = fixture.GetProperty("results").GetProperty("source_map");
         Check(count == result.GetProperty("case_count").GetInt32() && Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(),
             "Real forest edges, RNG consumption and atomic failure match original x86");
+        var scorch = fixture.GetProperty("scorch"); int craters = 0, burnt = 0;
+        foreach (int kind in Numbers(scorch.GetProperty("catalogs")))
+        foreach (int ax in Numbers(scorch.GetProperty("modes")))
+        foreach (int random in Numbers(scorch.GetProperty("random_indices")))
+        for (int y = 0; y < 8; y++) for (int x = 0; x < 8; x++)
+        {
+            var cells = Enumerable.Range(0, 64).Select(i => 0xabc00000u | (uint)((i * 7 + 5) % 16)).ToArray();
+            var catalog = new OriginalTerrainCatalog(ForestryCatalog(kind), constants) { RandomIndex = (byte)random };
+            int changed = (ax & 0xff) == 0 ? catalog.Crater(cells, 8, 8, x, y, (byte)(ax >> 8)) : catalog.Scorch(cells, 8, 8, x, y, (byte)(ax >> 8));
+            if (changed > 0) { if ((ax & 0xff) == 0) craters++; else burnt++; }
+            digest.AppendData(EncodeCells(cells)); digest.AppendData(new byte[] { catalog.RandomIndex }); count++;
+        }
+        result = fixture.GetProperty("results").GetProperty("scorch");
+        Check(count - 76 == result.GetProperty("case_count").GetInt32() && craters > 10 && burnt > 10, $"CFAC crater and burnt-ground coverage ({craters}, {burnt})");
+        Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(), "CFAC with AX=101h and AX=300h matches original x86");
     }
 }
