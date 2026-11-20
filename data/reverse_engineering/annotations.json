@@ -4422,6 +4422,23 @@
         "tools/save_source.py"
       ],
       "limitations": "Заголовок 0F9Dh и квадратный блок разведки сверены по коду и реальному файлу; последующие массивы payload, DOS I/O и C# сохранение не перенесены."
+    },
+    {
+      "id": "save-scenario11-arrays",
+      "module": "LE:1",
+      "start": 64452,
+      "end": 64611,
+      "name": "Write fixed scenario arrays and five variable lists",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/save-format.md",
+        "data/original_save_layout.json"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Фиксированные длины и общий хвост сверены с кодом и SAV; границы пяти отдельных списков, поля массивов и DOS запись не перенесены."
     }
   ]
 }

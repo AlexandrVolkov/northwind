@@ -16,16 +16,17 @@ class SaveSourceChecks(unittest.TestCase):
             with self.assertRaises(ValueError): parse(invalid)
 
     def test_scenario11_header_and_square_exploration_boundary(self):
-        body = bytearray(0xF9D + 16 + 3)
+        body = bytearray(0xF9D + 16 + 4*16 + 12*16 + 0x10000 + 0x2000 + 0x8000 + 0x1A35 + 3)
         body[0x14:0x21] = b'game    .epi\0'
         body[0x22] = 4
         body[0x23] = 5
-        body[0x2c:0x2f] = bytes((8, 5, 8))
+        body[0x2c:0x2f] = bytes((1, 1, 1))
         body[0xF9D:0xF9D+16] = bytes(range(16))
         result = parse_scenario11(body)
         self.assertEqual((result['episode_filename'], result['width'], result['height']),
                          ('game    .epi', 4, 5))
-        self.assertEqual((result['visibility_length'], result['remaining_length']), (16, 3))
+        self.assertEqual((result['visibility_length'], result['variable_lists_length']), (16, 3))
+        self.assertEqual(len(result['fixed_segments']), 7)
         for invalid in (body[:0xF9C], body[:0xF9D+15]):
             with self.assertRaises(ValueError): parse_scenario11(invalid)
 
@@ -45,7 +46,10 @@ class SaveSourceChecks(unittest.TestCase):
         self.assertEqual([r['tag'] for r in records], [0x11, 0x99, 0x01000022, 0x00010022])
         self.assertEqual(records[0]['scenario11']['episode_filename'], 'game    .epi')
         self.assertEqual((records[0]['scenario11']['width'], records[0]['scenario11']['height']), (128, 128))
-        self.assertEqual(records[0]['scenario11']['visibility_length'], 16384)
+        scenario = records[0]['scenario11']
+        self.assertEqual(scenario['visibility_length'], 16384)
+        self.assertEqual((scenario['variable_list_count'], scenario['variable_lists_length']), (5, 29296))
+        self.assertEqual(scenario['variable_lists_offset'] + scenario['variable_lists_length'], records[0]['length'])
         self.assertEqual([r['length'] for r in records], [988085, 25893, 69520, 69520])
         self.assertEqual(records[0]['header_offset'], 4)
         self.assertEqual([r['payload_offset'] + r['length'] for r in records[:-1]],

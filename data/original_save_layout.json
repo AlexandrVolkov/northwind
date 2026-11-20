@@ -26,7 +26,54 @@
         "header_length": 3997,
         "visibility_length": 16384,
         "visibility_sha256": "020ce316745ebc2c8a620dfb7bdb142fc657004932640f10ae0a9f7b9553b14b",
-        "remaining_length": 967704
+        "fixed_segments": [
+          {
+            "source": "_18da_exploration",
+            "offset": 3997,
+            "length": 16384,
+            "sha256": "020ce316745ebc2c8a620dfb7bdb142fc657004932640f10ae0a9f7b9553b14b"
+          },
+          {
+            "source": "_18ee",
+            "offset": 20381,
+            "length": 65536,
+            "sha256": "8dc1e9d6b9cbf488415e1f6788c481d9e241adf819a0ea1f02df161fe07afb0c"
+          },
+          {
+            "source": "_18ce",
+            "offset": 85917,
+            "length": 196608,
+            "sha256": "b5da334099c1f2bed4580d332cbd866bd3862581bbe2614fca18aa0b61157284"
+          },
+          {
+            "source": "_6aa",
+            "offset": 282525,
+            "length": 524288,
+            "sha256": "7f06e0a544920f1dc7c77a8112910e9e7594b024dca4ca057015b2be43f159b9"
+          },
+          {
+            "source": "_6b6",
+            "offset": 806813,
+            "length": 65536,
+            "sha256": "17ad65d8e90f70955b382cd0782ae9c094a004a3a0dc7c171ca60b89d94ef7d0"
+          },
+          {
+            "source": "_6b2",
+            "offset": 872349,
+            "length": 32768,
+            "sha256": "ba79495abf6519ef688640f0457397c188e309240b7ae00ae2877ea9342cceb8"
+          },
+          {
+            "source": "_6ba",
+            "offset": 905117,
+            "length": 53672,
+            "sha256": "3114d206987f9624def07fddebec843cb0721281a616507b0e622b9c08a5e48a"
+          }
+        ],
+        "variable_list_count": 5,
+        "variable_lists_offset": 958789,
+        "variable_lists_length": 29296,
+        "variable_lists_sha256": "8812f8cf6cc384e159387157d7b2525f22c4c9a3a88e0393ae96e2be1ac9ebb5"
       }
     },
     {

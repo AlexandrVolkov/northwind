@@ -10,24 +10,39 @@ import struct
 
 
 def parse_scenario11(payload):
-    """Only the known FAB4..FBC4 prefix and exploration block."""
+    """Known FAB4..FC62 write sequence; the final variable lists stay opaque."""
     header_length = 0xF9D
     if len(payload) < header_length: raise ValueError('Truncated 11h scenario header')
     width, height = payload[0x22], payload[0x23]
     # FBB2/FBB7 multiply the low width byte by [18DE] again, not by height.
-    visibility_length = width * width
-    if not width or not height or len(payload) < header_length + visibility_length:
-        raise ValueError('Truncated 11h exploration block')
+    cells = width * width
+    count_6c6, count_6c7, count_6c8 = payload[0x2c:0x2f]
+    if not width or not height or not count_6c6 or not count_6c7 or not count_6c8:
+        raise ValueError('Invalid 11h scenario dimensions or counts')
+    lengths = [('_18da_exploration', cells), ('_18ee', 4 * cells),
+               ('_18ce', 12 * cells), ('_6aa', count_6c6 * 0x10000),
+               ('_6b6', count_6c6 * 0x2000), ('_6b2', 0x8000),
+               ('_6ba', count_6c8 * 0x1A35)]
+    offset = header_length
+    segments = []
+    for name, length in lengths:
+        end = offset + length
+        if end > len(payload): raise ValueError(f'Truncated 11h {name} block')
+        segments.append(dict(source=name, offset=offset, length=length,
+                             sha256=hashlib.sha256(payload[offset:end]).hexdigest()))
+        offset = end
     filename = payload[0x14:0x21].split(b'\0', 1)[0].decode('cp866')
-    visibility = payload[header_length:header_length + visibility_length]
     return dict(episode_filename=filename, width=width, height=height,
-                byte_1ec5=payload[0x21], byte_6c6=payload[0x2c],
-                byte_6c7=payload[0x2d], byte_6c8=payload[0x2e],
+                byte_1ec5=payload[0x21], byte_6c6=count_6c6,
+                byte_6c7=count_6c7, byte_6c8=count_6c8,
                 participant_records_offset=0x4D, participant_records_length=0xF50,
                 participant_records_sha256=hashlib.sha256(payload[0x4D:header_length]).hexdigest(),
-                header_length=header_length, visibility_length=visibility_length,
-                visibility_sha256=hashlib.sha256(visibility).hexdigest(),
-                remaining_length=len(payload) - header_length - visibility_length)
+                header_length=header_length, visibility_length=cells,
+                visibility_sha256=segments[0]['sha256'], fixed_segments=segments,
+                variable_list_count=count_6c7, variable_lists_offset=offset,
+                variable_lists_length=len(payload) - offset,
+                variable_lists_sha256=hashlib.sha256(payload[offset:]).hexdigest())
+
 
 def parse_session99(payload):
     """Fields written by FEC6..FF39; record body blocks remain opaque."""
