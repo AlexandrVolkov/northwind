@@ -148,7 +148,7 @@ public sealed partial class Skirmish
         BinaryPrimitives.WriteUInt32LittleEndian(ai.AsSpan(1), BinaryPrimitives.ReadUInt32LittleEndian(ai.AsSpan(1)) + 1);
         var chain = AiChain(me);
         if ((BinaryPrimitives.ReadUInt32LittleEndian(ai.AsSpan(1)) & 0x1f) == 0)
-            OriginalAiRules.Census(ai, _participants[me], chain, (byte)Map.Width, (byte)Map.Height);
+            OriginalAiRules.Census(ai, _participants[me], chain, (byte)Map.Width, (byte)Map.Height, _aiSquadWorld!.Fog);
         OriginalAiSquadSteps.Tick(ai, _aiSquadWorld!);
         _aiStates.Run(ai);
         _aiGarrison!.Run(ai);

@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 112851 | 5512 | 97 | 28422 | 44 |
+| LE:1 | 146882 | 112781 | 5512 | 97 | 28492 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -158,12 +158,13 @@
 | LE:1 `0x123D3..0x12404` | Grant timber through worker callback | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Живой рабочий, флаг 20000, пустой груз и AL=3. Другие грузы, непустой груз и все WRK-получатели не перенесены. |
 | LE:1 `0x1243A..0x124A5` | Goods handler dispatch and item slots | partial | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Перенесены коды 0..2. Слоты +CD, UI/звук для локального игрока (5593/A4A9) не перенесены. |
 | LE:1 `0x1E53A..0x1E6C2` | AI block initialisation from character table | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
-| LE:1 `0x1E87A..0x1EAC1` | AI settlement census | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) | 1EC3F (every 256 turns) not included |
+| LE:1 `0x1E87A..0x1EAD8` | AI settlement census | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) |  |
 | LE:1 `0x1EAD8..0x1EAED` | AI block of participant | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
 | LE:1 `0x1EAED..0x1EB33` | Add AI plan record | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) | plan bytes +5..+7 are register leftovers, written as zero |
 | LE:1 `0x1EB33..0x1EB40` | Clear AI plan list | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
 | LE:1 `0x1EB40..0x1EB68` | Find or add AI plan | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
 | LE:1 `0x1EBEF..0x1EC3F` | Random explored cell for AI patrol | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
+| LE:1 `0x1EC3F..0x1EC6E` | Explored share of the map for a participant | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) |  |
 | LE:1 `0x1EC6E..0x1ECA0` | Area in sight of an object | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x1ECA0..0x1ECF8` | First living object of a DAT class | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) | inlined for mask 38h value 0 |
 | LE:1 `0x1ED26..0x1EF26` | AI squad step loop and steps 0..3 | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) | step 4 (1EF26) is a hook |

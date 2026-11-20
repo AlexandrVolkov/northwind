@@ -36,7 +36,9 @@ public partial class TestRunner
                 BinaryPrimitives.WriteUInt32LittleEndian(rec.AsSpan(0x10), 0x40);
                 chain.Add((rec, Dat(t))); world.Add(at, rec, Dat(t)); at += 0x40;
             }
-            var bounds = OriginalAiRules.Census(ai, participant, chain, 32, 32);
+            var fogCase = c.GetProperty("fog"); int fogMode = fogCase[0].GetInt32(), fogSeed = fogCase[1].GetInt32();
+            Func<int, byte> fog = cell => fogMode == 0 ? (byte)0 : fogMode == 2 ? (byte)0xff : (byte)((cell * 167 + fogSeed) ^ (cell >> 3) ^ (fogSeed >> 8));
+            var bounds = OriginalAiRules.Census(ai, participant, chain, 32, 32, fog);
             census.AppendData(ai.AsSpan(0, 0x80)); census.AppendData(ai.AsSpan(0x19e0, 0x50));
             var globals = new byte[16];
             BinaryPrimitives.WriteUInt32LittleEndian(globals, bounds.MaxX); BinaryPrimitives.WriteUInt32LittleEndian(globals.AsSpan(4), bounds.MaxY);

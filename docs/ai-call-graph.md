@@ -4,22 +4,21 @@
 
 | Статус | Процедур | Инструкций |
 |---|---|---|
-| not ported | 12 | 162 |
-| partial | 1 | 154 |
-| ported | 114 | 5471 |
+| not ported | 11 | 142 |
+| ported | 116 | 5645 |
 
 | Процедура | Инстр. | Статус | Имя | Вызывает (✓ перенесено, ~ частично, · нет) |
 |---|---|---|---|---|
 | 1E53A | 99 | ported | AI block initialisation from character table | 1EB33✓, 1ECA0✓, 219C3✓ |
-| 1E7EA | 34 | not ported |  | 1E87A~, 1ED26✓, 1F078✓, 209B0✓, 20DD0✓, 21E99✓, 221AE✓, 226F1✓, 227C7✓, 2323A✓, 23667✓, 23C11✓ |
-| 1E87A | 154 | partial | AI settlement census | 68BD✓, 1EC3F·, 219C3✓ |
+| 1E7EA | 34 | not ported |  | 1E87A✓, 1ED26✓, 1F078✓, 209B0✓, 20DD0✓, 21E99✓, 221AE✓, 226F1✓, 227C7✓, 2323A✓, 23667✓, 23C11✓ |
+| 1E87A | 154 | ported | AI settlement census | 68BD✓, 1EC3F✓, 219C3✓ |
 | 1EAD8 | 6 | ported | AI block of participant |  |
 | 1EAED | 24 | ported | Add AI plan record |  |
 | 1EB33 | 6 | ported | Clear AI plan list |  |
 | 1EB40 | 13 | ported | Find or add AI plan |  |
 | 1EB5C | 6 | ported | Find or add AI plan | 1EB40✓ |
 | 1EBEF | 24 | ported | Random explored cell for AI patrol | 9E41✓, 9E55✓, 219C3✓ |
-| 1EC3F | 20 | not ported |  |  |
+| 1EC3F | 20 | ported | Explored share of the map for a participant |  |
 | 1EC6E | 18 | ported | Area in sight of an object | 6885✓, 218A8✓, 219C3✓ |
 | 1ECA0 | 30 | ported | First living object of a DAT class | 68BD✓ |
 | 1ECF8 | 7 | not ported |  |  |
