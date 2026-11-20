@@ -1,0 +1,483 @@
+{
+  "format_version": 1,
+  "source": "original EPI",
+  "episodes": {
+    "GAME.EPI": {
+      "source_sha256": "274bc2243285061422152759d0f36718aeda196699c486bc07eaa5f14358a5e6",
+      "width": 4,
+      "height": 3,
+      "header_tail": [
+        0,
+        1,
+        5,
+        7
+      ],
+      "people": [
+        {
+          "index": 0,
+          "name": "Олег",
+          "position": [
+            0,
+            0
+          ]
+        },
+        {
+          "index": 1,
+          "name": "Игорь",
+          "position": [
+            0,
+            2
+          ]
+        },
+        {
+          "index": 2,
+          "name": "Эйрик",
+          "position": [
+            2,
+            2
+          ]
+        },
+        {
+          "index": 3,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 4,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 5,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 6,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 7,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 8,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 9,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 10,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 11,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 12,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 13,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 14,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 15,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        }
+      ],
+      "area_ids": [
+        [
+          1,
+          2,
+          3,
+          10
+        ],
+        [
+          4,
+          5,
+          6,
+          10
+        ],
+        [
+          7,
+          8,
+          9,
+          10
+        ]
+      ],
+      "trailer": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ]
+    },
+    "DEMO.EPI": {
+      "source_sha256": "eedf408d5f9d23b994fd93e16dcc4415da7f61cd716457a29e5e7d49c0fa35a0",
+      "width": 1,
+      "height": 2,
+      "header_tail": [
+        0,
+        1,
+        5,
+        7
+      ],
+      "people": [
+        {
+          "index": 0,
+          "name": "Илья",
+          "position": [
+            0,
+            0
+          ]
+        },
+        {
+          "index": 1,
+          "name": "Александр",
+          "position": [
+            0,
+            2
+          ]
+        },
+        {
+          "index": 2,
+          "name": "Эрик",
+          "position": [
+            2,
+            2
+          ]
+        },
+        {
+          "index": 3,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 4,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 5,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 6,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 7,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 8,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 9,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 10,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 11,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 12,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 13,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 14,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 15,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        }
+      ],
+      "area_ids": [
+        [
+          21
+        ],
+        [
+          22
+        ]
+      ],
+      "trailer": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ]
+    },
+    "DEMO2.EPI": {
+      "source_sha256": "7c99ffe487f8c07d773609075bfbcaf081c75fc708ed8ef529f5c1eafd6883a3",
+      "width": 1,
+      "height": 1,
+      "header_tail": [
+        0,
+        0,
+        5,
+        8
+      ],
+      "people": [
+        {
+          "index": 0,
+          "name": "Олег",
+          "position": [
+            0,
+            0
+          ]
+        },
+        {
+          "index": 1,
+          "name": "Игорь",
+          "position": [
+            0,
+            0
+          ]
+        },
+        {
+          "index": 2,
+          "name": "Эйрик",
+          "position": [
+            0,
+            0
+          ]
+        },
+        {
+          "index": 3,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 4,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 5,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 6,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 7,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 8,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 9,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 10,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 11,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 12,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 13,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 14,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        },
+        {
+          "index": 15,
+          "name": "",
+          "position": [
+            255,
+            255
+          ]
+        }
+      ],
+      "area_ids": [
+        [
+          22
+        ]
+      ],
+      "trailer": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ]
+    }
+  }
+}
