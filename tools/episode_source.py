@@ -20,7 +20,7 @@ def parse_episode(raw: bytes) -> dict:
     for index in range(16):
         entry = raw[6 + index * 22:6 + (index + 1) * 22]
         name = entry[:20].split(b'\xff')[0].split(b'\x00')[0].decode('cp866')
-        people.append(dict(index=index, name=name, position=list(entry[20:22])))
+        people.append(dict(index=index, name=name, start_area=list(entry[20:22])))
     grid = raw[358:358 + width * height]
     return dict(width=width, height=height, header_tail=list(raw[2:6]),
                 preload_count=preload_count, participant_count=raw[5],

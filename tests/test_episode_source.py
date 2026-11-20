@@ -17,6 +17,7 @@ class EpisodeSourceTests(unittest.TestCase):
         self.assertEqual(game['preload_ids'], [0, 1, 2, 3, 5])
         self.assertEqual(game['preload_count'], len(game['preload_ids']))
         self.assertEqual([p['name'] for p in game['people'][:3]], ['Олег', 'Игорь', 'Эйрик'])
+        self.assertEqual([p['start_area'] for p in game['people'][:3]], [[0, 0], [0, 2], [2, 2]])
         self.assertEqual(episodes['DEMO.EPI']['area_ids'], [[21], [22]])
         self.assertEqual(episodes['DEMO2.EPI']['area_ids'], [[22]])
 
