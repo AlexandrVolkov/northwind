@@ -6,7 +6,7 @@
 
 ## Заняты Claude (не трогать)
 
-Сцены и код интерфейса: `scripts/OriginalHud.cs`, `scripts/OriginalInterface.cs`, `scripts/SkirmishMain.cs`, `scripts/OriginalMenus.cs`, `scripts/DisplaySettings.cs`, `scripts/GameSession.cs`, `scenes/`, `tests/MenuChecks.cs`, `tests/DisplayChecks.cs`, `tools/interface_source.py`, `assets/imported/interface/`, `docs/interface.md`, `tests/SkirmishChecks.cs`, код ИИ (`scripts/OriginalAi*.cs`, `scripts/SkirmishAi.cs`, `scripts/SkirmishProduction.cs`, `tests/OriginalAi*Checks.cs`, `tools/verify_ai_*.py`, `docs/ai.md`), а также `project.godot`, `AGENTS.md`, `docs/continuation.md`.
+Сцены и код интерфейса: `scripts/OriginalHud.cs`, `scripts/OriginalInterface.cs`, `scripts/SkirmishMain.cs`, `scripts/OriginalMenus.cs`, `scripts/DisplaySettings.cs`, `scripts/GameSession.cs`, `scenes/`, `tests/MenuChecks.cs`, `tests/DisplayChecks.cs`, `tools/interface_source.py`, `scripts/OriginalCatapultRules.cs`, `tools/verify_catapult.py`, `assets/imported/interface/`, `docs/interface.md`, `tests/SkirmishChecks.cs`, код ИИ (`scripts/OriginalAi*.cs`, `scripts/SkirmishAi.cs`, `scripts/SkirmishProduction.cs`, `tests/OriginalAi*Checks.cs`, `tools/verify_ai_*.py`, `docs/ai.md`), а также `project.godot`, `AGENTS.md`, `docs/continuation.md`.
 
 ## Принятые работы вне очереди
 
@@ -33,6 +33,7 @@
 - **Срез добычи ИИ 20001, 20.11:** в `codex-work` нет коммитов вне main; C14 сужена до A4C2.
 - **Срез разведанной доли 1EC3F, 20.11:** в `codex-work` нет коммитов вне main.
 - **Срез строёв (шаг 4, 1EF26), 20.11:** в `codex-work` нет коммитов вне main; C13 выполнена Claude.
+- **Срез камней катапульт, 20.11:** в `codex-work` нет коммитов вне main.
 
 ## Задачи
 

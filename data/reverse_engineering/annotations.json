@@ -3284,6 +3284,54 @@
       "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
       "limitations": ""
+    },
+    {
+      "id": "catapult-stone",
+      "module": "ARMY__00.WRK",
+      "start": 2138,
+      "end": 2266,
+      "name": "Catapult stone effect (type 8)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
+      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "limitations": "CFAC crater is a hook"
+    },
+    {
+      "id": "explosion-effect",
+      "module": "ARMY__00.WRK",
+      "start": 2438,
+      "end": 2517,
+      "name": "Explosion effect (type 10)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
+      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "limitations": "drift vector 9E7D not ported"
+    },
+    {
+      "id": "effect-flight",
+      "module": "LE:1",
+      "start": 55014,
+      "end": 55104,
+      "name": "Effect flight step with arc height",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
+      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "area-hit",
+      "module": "LE:1",
+      "start": 48399,
+      "end": 48686,
+      "name": "Hit objects in an area with a fixed attack",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
+      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "limitations": ""
     }
   ]
 }
