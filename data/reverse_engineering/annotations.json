@@ -3404,6 +3404,18 @@
       "evidence": ["docs/combat.md", "tests/fixtures/burn.json"],
       "implementation": ["scripts/OriginalBurnRules.cs"],
       "limitations": ""
+    },
+    {
+      "id": "wind",
+      "module": "LE:1",
+      "start": 40573,
+      "end": 40760,
+      "name": "Wind vector, direction and random acceleration",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/wind.json"],
+      "implementation": ["scripts/OriginalWindRules.cs"],
+      "limitations": ""
     }
   ]
 }
