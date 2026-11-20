@@ -1592,49 +1592,74 @@
             "index": 0,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           },
           {
             "index": 1,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           },
           {
             "index": 2,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           },
           {
             "index": 3,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           },
           {
             "index": 4,
             "length": 80,
             "sha256": "fb5489de3218babc868234a9e710d01980936c91766e06af7579b7f5e98eae65",
-            "nonzero_bytes": 25
+            "nonzero_bytes": 25,
+            "object_records": [
+              {
+                "offset_in_suffix": 0,
+                "size": 40,
+                "army": 0,
+                "template": 0,
+                "owner_byte": 4,
+                "sha256": "6cdfacd5af1cb9795389f07dd06dd4035e0da8f51a9ed52732635db20452ec3b"
+              },
+              {
+                "offset_in_suffix": 40,
+                "size": 40,
+                "army": 0,
+                "template": 0,
+                "owner_byte": 4,
+                "sha256": "a9f42efe405fd3c3e0eb4795f76963172deb92549dbc97ec5a1d187bb359b47e"
+              }
+            ]
           },
           {
             "index": 5,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           },
           {
             "index": 6,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           },
           {
             "index": 7,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           }
         ],
         "bucket_sha256": [
@@ -1848,49 +1873,74 @@
             "index": 0,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           },
           {
             "index": 1,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           },
           {
             "index": 2,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           },
           {
             "index": 3,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           },
           {
             "index": 4,
             "length": 80,
             "sha256": "aa930e4463b78999bfde9110daf146922f2404affde9e53e68a116c08b3dc5a7",
-            "nonzero_bytes": 27
+            "nonzero_bytes": 27,
+            "object_records": [
+              {
+                "offset_in_suffix": 0,
+                "size": 40,
+                "army": 0,
+                "template": 0,
+                "owner_byte": 4,
+                "sha256": "5ce3a503d15245985584519dab9a31e17cddd8172271f1037f467dde6e6d5a3d"
+              },
+              {
+                "offset_in_suffix": 40,
+                "size": 40,
+                "army": 0,
+                "template": 0,
+                "owner_byte": 4,
+                "sha256": "c97baa62374079621d0d825d08366592e7fe8caed50579deb443ae4a2aab09e4"
+              }
+            ]
           },
           {
             "index": 5,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           },
           {
             "index": 6,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           },
           {
             "index": 7,
             "length": 0,
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "nonzero_bytes": 0
+            "nonzero_bytes": 0,
+            "object_records": []
           }
         ],
         "bucket_sha256": [

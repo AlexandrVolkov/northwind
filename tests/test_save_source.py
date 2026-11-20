@@ -108,6 +108,10 @@ class SaveSourceChecks(unittest.TestCase):
                                 entry['token_slots_nonzero'] == 0 for entry in block['participant_transfers']))
             self.assertEqual(block['descriptor_counts'][4], 80)
             self.assertEqual([x['length'] for x in block['allocated_suffixes']], [0, 0, 0, 0, 80, 0, 0, 0])
+            objects = block['allocated_suffixes'][4]['object_records']
+            self.assertEqual([(x['offset_in_suffix'], x['size'], x['army'], x['template'], x['owner_byte'])
+                              for x in objects], [(0, 40, 0, 0, 4), (40, 40, 0, 0, 4)])
+            self.assertNotIn('unparsed_reason', block['allocated_suffixes'][4])
             self.assertEqual(0xF50 + 0x40 + 8 * 0x2000, area['length'])
         self.assertEqual([area['area22']['allocated_suffixes'][4]['nonzero_bytes'] for area in records[2:]],
                          [25, 27])

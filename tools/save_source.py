@@ -147,7 +147,7 @@ def parse_session99(payload):
                                for i in range(0, len(regions), 0x841)])
 
 
-def parse_area22(payload):
+def parse_area22(payload, dat_sources=None):
     """Structure created by 1058F..105E7; opaque blocks remain hashed."""
     prefix = 0xF50
     descriptor = 0x40
@@ -171,9 +171,33 @@ def parse_area22(payload):
     for index in range(bucket_count):
         chunk = buckets[index * bucket_size:(index + 1) * bucket_size]
         used = chunk[bucket_size - counts[index]:] if counts[index] else b''
-        allocated_suffixes.append(dict(index=index, length=counts[index],
-                                       sha256=hashlib.sha256(used).hexdigest(),
-                                       nonzero_bytes=sum(value != 0 for value in used)))
+        suffix = dict(index=index, length=counts[index],
+                      sha256=hashlib.sha256(used).hexdigest(),
+                      nonzero_bytes=sum(value != 0 for value in used))
+        if dat_sources is not None:
+            records = []
+            at = 0
+            while at < len(used):
+                if at + 0xF > len(used):
+                    suffix['unparsed_reason'] = 'Truncated object prefix'
+                    break
+                army, template = used[at], used[at + 0xE]
+                dat = dat_sources.get(army)
+                template_offset = 2 + template * 0xAB
+                if dat is None or template_offset >= len(dat):
+                    suffix['unparsed_reason'] = f'Missing DAT template {army}:{template}'
+                    break
+                size = dat[template_offset]
+                if not size or at + size > len(used):
+                    suffix['unparsed_reason'] = f'Invalid DAT record size {army}:{template}:{size}'
+                    break
+                record = used[at:at + size]
+                records.append(dict(offset_in_suffix=at, size=size, army=army,
+                                    template=template, owner_byte=record[3] if size > 3 else None,
+                                    sha256=hashlib.sha256(record).hexdigest()))
+                at += size
+            suffix['object_records'] = records
+        allocated_suffixes.append(suffix)
     return dict(prefix_length=prefix, prefix_sha256=hashlib.sha256(payload[:prefix]).hexdigest(),
                 participant_transfers=participant_transfers,
                 descriptor_offset=prefix, descriptor_counts=counts,
@@ -182,7 +206,7 @@ def parse_area22(payload):
                 bucket_sha256=[hashlib.sha256(buckets[i:i + bucket_size]).hexdigest()
                                for i in range(0, len(buckets), bucket_size)])
 
-def parse(data, tree_sizes=None, tree_sources=None):
+def parse(data, tree_sizes=None, tree_sources=None, dat_sources=None):
     if len(data) < 4: raise ValueError('Truncated save header')
     count = struct.unpack_from('<I', data)[0]
     if count > 4096: raise ValueError('Unreasonable save record count')
@@ -201,7 +225,7 @@ def parse(data, tree_sizes=None, tree_sources=None):
         if tag == 0x66: record['victory_path_marker'] = True
         if tag & 0xFFFF == 0x11: record['scenario11'] = parse_scenario11(payload, tree_sizes, tree_sources)
         if tag == 0x99: record['campaign99'] = parse_session99(payload)
-        if tag & 0xFFFF == 0x22: record['area22'] = parse_area22(payload)
+        if tag & 0xFFFF == 0x22: record['area22'] = parse_area22(payload, dat_sources)
         records.append(record)
         offset = end
     if offset != len(data): raise ValueError('Trailing bytes after declared records')
@@ -215,6 +239,7 @@ if __name__ == '__main__':
     ap.add_argument('--output', type=Path, default=Path('data/original_save_layout.json'))
     ap.add_argument('--tree-sizes', type=str, help='Comma-separated original TRE file sizes for each bank')
     ap.add_argument('--tree-dir', type=Path, help='Directory with original ARMY__NN.TRE files for copy comparison')
+    ap.add_argument('--dat-dir', type=Path, help='Directory with original ARMY__NN.DAT templates for area objects')
     args = ap.parse_args()
     if args.tree_sizes and args.tree_dir: ap.error('Use either --tree-sizes or --tree-dir')
     sizes = [int(x) for x in args.tree_sizes.split(',')] if args.tree_sizes else None
@@ -226,7 +251,9 @@ if __name__ == '__main__':
         if not scenarios: ap.error('No scenario 11h record for TRE bank count')
         count = scenarios[0]['byte_6c7']
         sources = [(args.tree_dir / f'ARMY__{i:02}.TRE').read_bytes() for i in range(count)]
-    report = parse(save_data, sizes, sources)
+    dat_sources = ({int(path.stem.split('__')[1]): path.read_bytes()
+                    for path in args.dat_dir.glob('ARMY__*.DAT')} if args.dat_dir else None)
+    report = parse(save_data, sizes, sources, dat_sources)
     args.output.write_text(json.dumps(report, indent=2) + '\n')
     print(f'{report["record_count"]} records in {report["file_size"]} bytes: '+
           ', '.join(f'{x["tag_hex"]}:{x["length"]}' for x in report['records']))
