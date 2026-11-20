@@ -3176,6 +3176,114 @@
       "evidence": ["docs/ai.md", "tests/fixtures/ai-census.json"],
       "implementation": ["scripts/OriginalAiRules.cs"],
       "limitations": ""
+    },
+    {
+      "id": "ai-step-formation",
+      "module": "LE:1",
+      "start": 126758,
+      "end": 126904,
+      "name": "AI squad step 4: march in formation",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-place",
+      "module": "LE:1",
+      "start": 65653,
+      "end": 65786,
+      "name": "Lay a formation out around a goal",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-segment",
+      "module": "LE:1",
+      "start": 65786,
+      "end": 65972,
+      "name": "Spread members along a formation segment",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-nearest-member",
+      "module": "LE:1",
+      "start": 65972,
+      "end": 66146,
+      "name": "Nearest free member of a class to a formation point",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-rotate",
+      "module": "LE:1",
+      "start": 66146,
+      "end": 66315,
+      "name": "Rotate a formation by the sine table",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-scale",
+      "module": "LE:1",
+      "start": 66315,
+      "end": 66430,
+      "name": "Scale a formation (16-bit IMUL)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-scale-factor",
+      "module": "LE:1",
+      "start": 66430,
+      "end": 66479,
+      "name": "Formation scale factor from the member count",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-pick",
+      "module": "LE:1",
+      "start": 66479,
+      "end": 66540,
+      "name": "Formation of a kind nearest the member count",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "squad-clear-commands",
+      "module": "LE:1",
+      "start": 47426,
+      "end": 47479,
+      "name": "Squad members drop their commands",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
     }
   ]
 }

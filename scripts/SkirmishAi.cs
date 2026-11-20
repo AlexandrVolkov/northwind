@@ -405,12 +405,9 @@ public sealed partial class Skirmish
         public byte MapHeight => (byte)battle.Map.Height;
         public uint HostileMask(byte participant) => participant < battle.Diplomacy.Count ? battle.Diplomacy.Hostile[participant] : 0;
         public (uint X, uint Y) BoundsLimit => ((uint)battle.Map.Width * 32, (uint)battle.Map.Height * 32);
-        public bool StepFour(Span<byte> squad, bool started)
-        {
-            if (!started) return squad[0x43] != 0;
-            OriginalAiSquads.Order(Chain(squad[0]).Select(m => m.Record), 0x48, squad[1], squad[9], squad[0x0a]);
-            return true;
-        }
+        private readonly OriginalAiFormations _formations = OriginalAiFormations.From(GameData.Read<OriginalAiData>("res://data/original_ai.json"));
+        /// <summary>Step 4 (1EF26, ported); the squad message A4C2 is not shown.</summary>
+        public bool StepFour(Span<byte> squad, bool started) => _formations.Step(squad, Chain(squad[0]), _ => { }, MapWidth, MapHeight);
         public byte Global19E9 => 0xff;
         public byte Random() => battle._terrainCatalog.NextRandomByte();
         public byte Random2() => battle._terrainCatalog.NextSecondaryByte();

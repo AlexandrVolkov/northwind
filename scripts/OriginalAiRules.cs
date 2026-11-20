@@ -19,6 +19,10 @@ public sealed class OriginalAiData
     public string ArmyClassesHex { get; set; } = "";
     /// <summary>LE:3 F0F0: fortification patterns of order mode 7 (5-byte entries: class byte, dx0, dy0, dx1, dy1; FFh ends).</summary>
     public List<string> Fortifications { get; set; } = [];
+    /// <summary>DS:2A7E: half sine table of 10262, 32 words (formation rotation).</summary>
+    public string SineHex { get; set; } = "";
+    /// <summary>LE:3 3D45: formation records of squad step 4 (1EF26).</summary>
+    public List<string> Formations { get; set; } = [];
     public byte[] Table() => Characters.OrderBy(c => c.Index).SelectMany(c => Convert.FromHexString(c.RawHex)).ToArray();
 }
 

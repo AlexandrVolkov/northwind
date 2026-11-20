@@ -4,8 +4,8 @@
 
 | Статус | Процедур | Инструкций |
 |---|---|---|
-| not ported | 11 | 142 |
-| ported | 116 | 5645 |
+| not ported | 10 | 102 |
+| ported | 117 | 5685 |
 
 | Процедура | Инстр. | Статус | Имя | Вызывает (✓ перенесено, ~ частично, · нет) |
 |---|---|---|---|---|
@@ -23,14 +23,14 @@
 | 1ECA0 | 30 | ported | First living object of a DAT class | 68BD✓ |
 | 1ECF8 | 7 | not ported |  |  |
 | 1ED0F | 7 | not ported |  |  |
-| 1ED26 | 29 | ported | AI squad step loop and steps 0..3 | 1ED77✓, 1ED78✓, 1ED87✓, 1EE02✓, 1EF26·, 1EFCC✓, 205FB✓ |
+| 1ED26 | 29 | ported | AI squad step loop and steps 0..3 | 1ED77✓, 1ED78✓, 1ED87✓, 1EE02✓, 1EF26✓, 1EFCC✓, 205FB✓ |
 | 1ED77 | 1 | ported | AI squad step loop and steps 0..3 |  |
 | 1ED78 | 6 | ported | AI squad step loop and steps 0..3 | B8A2✓ |
 | 1ED87 | 44 | ported | AI squad step loop and steps 0..3 | B765✓, B977✓ |
 | 1EDFD | 2 | ported | AI squad step loop and steps 0..3 |  |
 | 1EE02 | 82 | ported | AI squad step loop and steps 0..3 | 6885✓, 68BD✓, 20408✓, 20458✓, 207CB✓ |
 | 1EF21 | 2 | ported | AI squad step loop and steps 0..3 |  |
-| 1EF26 | 40 | not ported |  | 6996✓, A4C2·, 10075·, 10262·, 1037E·, 103AF· |
+| 1EF26 | 40 | ported | AI squad step 4: march in formation | 6996✓, A4C2·, 10075✓, 10262✓, 1037E✓, 103AF✓ |
 | 1EFB8 | 7 | not ported |  |  |
 | 1EFCC | 16 | ported | AI squad step 5: formation march | B7B9✓ |
 | 1EFF9 | 4 | not ported |  |  |
@@ -167,8 +167,8 @@
 | DA7F | ported | Nearest loaded loot object of another army | 20001 |
 | EDD5 | ported | Queue and dispatch a message | 21E99, 2323A, 23667 |
 | EE69 | ported | Find a queued message by type and party | 2323A, 23667 |
-| 10075 | unknown |  | 1EF26 |
-| 10262 | unknown |  | 1EF26 |
-| 1037E | unknown |  | 1EF26 |
-| 103AF | unknown |  | 1EF26 |
+| 10075 | ported | Lay a formation out around a goal | 1EF26 |
+| 10262 | ported | Rotate a formation by the sine table | 1EF26 |
+| 1037E | ported | Formation scale factor from the member count | 1EF26 |
+| 103AF | ported | Formation of a kind nearest the member count | 1EF26 |
 | 10AD2 | unknown |  | 2323A |
