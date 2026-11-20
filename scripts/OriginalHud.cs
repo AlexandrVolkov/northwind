@@ -184,7 +184,7 @@ public partial class OriginalHud : Node2D
         var world = new Vector2(Game.Battle.Map.Width, Game.Battle.Map.Height) * 32;
         foreach (var actor in Game.Battle.Actors.Where(a => a.Alive))
             DrawRect(new Rect2(Minimap.Position + (actor.Position / world * Minimap.Size).Floor(), Vector2.One),
-                actor.Team == 0 ? new Color("63e3bd") : new Color("f37769"));
+                SkirmishMain.TeamColor(actor.Team));
         var view = Game.VisibleWorld();
         DrawRect(new Rect2(Minimap.Position + view.Position / world * Minimap.Size, view.Size / world * Minimap.Size), Colors.White, false, 1);
     }

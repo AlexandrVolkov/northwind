@@ -86,7 +86,7 @@ public sealed partial class Skirmish
         var template = _templates.Armies["ARMY__02.DAT"].Templates[templateIndex];
         var parameters = Convert.FromHexString(template.RawRecordHex);
         var raw = worker ? Convert.FromHexString(_workerSeed.RawRecordHex) : soldier ? Convert.FromHexString((_soldierSeeds.GetValueOrDefault(templateIndex) ?? _militiaSeed).RawRecordHex).AsSpan(0, template.RuntimeRecordBytes).ToArray() : new byte[template.RuntimeRecordBytes];
-        raw[0] = 2; raw[3] = (byte)(team == 0 ? Rules.PlayerSlot : Rules.EnemySlot); raw[0x0d] = 1; raw[0x0e] = (byte)templateIndex;
+        raw[0] = 2; raw[3] = (byte)SlotOfTeam(team); raw[0x0d] = 1; raw[0x0e] = (byte)templateIndex;
         raw[0x14] = 0x80; raw[0x19] = raw[0x1a] = template.InitialCondition; raw[0x20] = 0xff; // A855: visible to every owner
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(1), template.InitialFrame);
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(0x17), 0);
@@ -221,7 +221,7 @@ public sealed partial class Skirmish
             var wallet = Wallet(building.Team);
             var state = OriginalLumbermillRules.Process(new(building.Record[0x23], building.Record[0x24], wallet.Second, building.Team == 0 ? ProducedWood : 0), building.Parameters[0x79]);
             building.Record[0x23] = state.Countdown; building.Record[0x24] = state.QueuedLoads;
-            if (building.Team == 0) { Wood = state.Stock; ProducedWood = state.Statistics; } else EnemyResources = wallet with { Second = state.Stock };
+            if (building.Team == 0) { Wood = state.Stock; ProducedWood = state.Statistics; } else SetWallet(building.Team, wallet with { Second = state.Stock });
             uint visitorId = OriginalWorkerDelivery.WaitingWorker(Occupancy.Width, Occupancy.Height, Occupancy.Cells, building.Record[0x0d],
                 (uint)building.Position.X, (uint)building.Position.Y, building.Parameters);
             if (Find(visitorId) is { } visitor)

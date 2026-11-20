@@ -80,10 +80,10 @@ public sealed partial class Skirmish
     {
         TickProduction(PlayerCastle);
         foreach (var barracks in Actors.Where(IsBarracks).ToArray()) TickProduction(barracks);
-        foreach (var producer in Actors.Where(a => a.Alive && a.Team == 1 && IsEnemyProducer(a)).ToArray()) TickProduction(producer);
+        foreach (var producer in Actors.Where(a => a.Alive && a.Team != 0 && IsEnemyProducer(a)).ToArray()) TickProduction(producer);
     }
-    private ResourceQuad Wallet(int team) => team == 0 ? Resources : EnemyResources;
-    private void SetWallet(int team, ResourceQuad value) { if (team == 0) SetResources(value); else EnemyResources = value; }
+    private ResourceQuad Wallet(int team) => team == 0 ? Resources : AiResources(SlotOfTeam(team));
+    private void SetWallet(int team, ResourceQuad value) { if (team == 0) SetResources(value); else SetAiResources(SlotOfTeam(team), value); }
     private void TickProduction(SkirmishActor producer)
     {
         if (!producer.Alive || producer.ConstructionRemaining > 0 || QueuedTemplate(producer) is not { } template) return;

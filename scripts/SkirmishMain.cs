@@ -84,9 +84,11 @@ public partial class SkirmishMain : Node2D
     public void Restart()
     {
         if (Battle != null) Battle.Dispose();
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        rules.RivalSlot = 1;   // observation: a second AI settlement in the east, at war with the red one
         Battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"),
             GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
-            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), GameData.Read<SkirmishRules>("res://data/skirmish.json"));
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
         Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false;
         PendingOrder = 0; Hud.MenuOpen = false;
         // DOSBox screenshots: the idle castle shows «Выбор» and «Разрушить» (WorkFlags bits 2 and 5 = 24h) although its OBE record holds 0;
@@ -293,6 +295,8 @@ public partial class SkirmishMain : Node2D
     /// <summary>Pointer scrolling at the screen edge (can be turned off for tests).</summary>
     public bool EdgeScrolling { get; set; } = true;
     public void ExitMission() => GetTree().ChangeSceneToFile("res://scenes/menus.tscn");
+    /// <summary>Colours of the sides: the player green, the red settlement red, the observed rival blue.</summary>
+    public static Color TeamColor(int team) => new(team switch { 0 => "63e3bd", 2 => "6fa8f5", _ => "f37769" });
     private OriginalSoundBank? _soundBank;
     private readonly List<(AudioStreamPlayer2D Player, string File)> _voices = [];
     /// <summary>Plays the simulation's sounds (A416/A47E) from the original banks. As the mixer does (1414D), a sample that
@@ -552,7 +556,7 @@ public partial class SkirmishMain : Node2D
     }
     private void DrawActor(SkirmishActor actor)
     {
-        var point = actor.Position; var color = new Color(actor.Team == 0 ? "63e3bd" : "f37769");
+        var point = actor.Position; var color = TeamColor(actor.Team);
         bool debug = _ui.Visible;
         if (debug && !actor.Structure && !actor.Dying)
         {
@@ -663,7 +667,7 @@ public partial class SkirmishMain : Node2D
         if (!_ready) return;
         var rect = MiniRect(); var world = new Vector2(Battle.Map.Width, Battle.Map.Height) * 32;
         foreach (var actor in Battle.Actors.Where(a => a.Alive))
-            _markers.DrawCircle(rect.Position + actor.Position / world * rect.Size, actor.Structure ? 3 : 2, new Color(actor.Team == 0 ? "63e3bd" : "f37769"));
+            _markers.DrawCircle(rect.Position + actor.Position / world * rect.Size, actor.Structure ? 3 : 2, TeamColor(actor.Team));
         var view = GetViewportRect().Size / Camera.Zoom;
         _markers.DrawRect(new Rect2(rect.Position + (Camera.Position - view / 2) / world * rect.Size, view / world * rect.Size), new Color("f1da93"), false);
     }
