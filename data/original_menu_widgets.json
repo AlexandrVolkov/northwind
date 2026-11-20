@@ -1,0 +1,212 @@
+{
+  "format_version": 1,
+  "exe_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "first_record_le3": 44476,
+  "terminator_le3": 44901,
+  "widgets": [
+    {
+      "le3": 44476,
+      "length": 49,
+      "type": 11,
+      "flags": 9,
+      "callback_le1": 102166,
+      "action_le1": 103033,
+      "scan_code": 48,
+      "position": [
+        288,
+        149
+      ],
+      "size": [
+        105,
+        33
+      ],
+      "sprite_base": 254,
+      "parameters": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "le3": 44525,
+      "length": 49,
+      "type": 11,
+      "flags": 9,
+      "callback_le1": 102166,
+      "action_le1": 103461,
+      "scan_code": 32,
+      "position": [
+        238,
+        177
+      ],
+      "size": [
+        105,
+        31
+      ],
+      "sprite_base": 257,
+      "parameters": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "le3": 44574,
+      "length": 49,
+      "type": 11,
+      "flags": 9,
+      "callback_le1": 102166,
+      "action_le1": 103403,
+      "scan_code": 36,
+      "position": [
+        260,
+        268
+      ],
+      "size": [
+        117,
+        43
+      ],
+      "sprite_base": 260,
+      "parameters": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "le3": 44623,
+      "length": 45,
+      "type": 11,
+      "flags": 11,
+      "callback_le1": 102499,
+      "action_le1": 0,
+      "scan_code": 0,
+      "position": [
+        1,
+        269
+      ],
+      "size": [
+        247,
+        120
+      ],
+      "sprite_base": 60,
+      "parameters": [
+        30
+      ]
+    },
+    {
+      "le3": 44668,
+      "length": 45,
+      "type": 11,
+      "flags": 2,
+      "callback_le1": 102637,
+      "action_le1": 0,
+      "scan_code": 0,
+      "position": [
+        232,
+        93
+      ],
+      "size": [
+        409,
+        387
+      ],
+      "sprite_base": 122,
+      "parameters": [
+        51
+      ]
+    },
+    {
+      "le3": 44713,
+      "length": 45,
+      "type": 4,
+      "flags": 4,
+      "callback_le1": 102499,
+      "action_le1": 0,
+      "scan_code": 0,
+      "position": [
+        0,
+        0
+      ],
+      "size": [
+        640,
+        125
+      ],
+      "sprite_base": 173,
+      "parameters": [
+        30
+      ]
+    },
+    {
+      "le3": 44758,
+      "length": 49,
+      "type": 4,
+      "flags": 4,
+      "callback_le1": 102166,
+      "action_le1": 103478,
+      "scan_code": 65535,
+      "position": [
+        196,
+        40
+      ],
+      "size": [
+        97,
+        89
+      ],
+      "sprite_base": 264,
+      "parameters": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "le3": 44807,
+      "length": 49,
+      "type": 4,
+      "flags": 4,
+      "callback_le1": 102971,
+      "action_le1": 0,
+      "scan_code": 0,
+      "position": [
+        184,
+        38
+      ],
+      "size": [
+        123,
+        111
+      ],
+      "sprite_base": 150,
+      "parameters": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "le3": 44856,
+      "length": 45,
+      "type": 8,
+      "flags": 8,
+      "callback_le1": 102789,
+      "action_le1": 0,
+      "scan_code": 0,
+      "position": [
+        0,
+        0
+      ],
+      "size": [
+        64,
+        108
+      ],
+      "sprite_base": 204,
+      "parameters": [
+        50
+      ]
+    }
+  ]
+}
