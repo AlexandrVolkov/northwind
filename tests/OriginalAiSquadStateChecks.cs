@@ -13,6 +13,9 @@ public partial class TestRunner
         var root = reference.RootElement;
         var templates = GameData.Read<TemplatesData>("res://assets/imported/templates.json").Armies["ARMY__02.DAT"].Templates;
         byte[] Dat(int index) => Convert.FromHexString(templates[index].RawRecordHex);
+        var lootTemplates = GameData.Read<TemplatesData>("res://assets/imported/templates.json").Armies["ARMY__00.DAT"].Templates;
+        byte[] Loot(int index) => Convert.FromHexString(lootTemplates[index].RawRecordHex);
+        int loot = 0, pickups = 0;
         foreach (var item in root.GetProperty("templates_sha256").EnumerateObject())
             Check(Convert.ToHexStringLower(SHA256.HashData(Dat(int.Parse(item.Name)))) == item.Value.GetString(), $"AI squad state template {item.Name} matches bundled DAT");
         var random = GameData.Read<OriginalTerrainData>("res://data/original_terrain.json").RandomValues.ToArray();
@@ -28,6 +31,7 @@ public partial class TestRunner
             var b = c.GetProperty("block");
             BinaryPrimitives.WriteUInt32LittleEndian(ai.AsSpan(0x0a), b.GetProperty("0a").GetUInt32());
             BinaryPrimitives.WriteUInt32LittleEndian(ai.AsSpan(0x0e), b.GetProperty("0e").GetUInt32());
+            BinaryPrimitives.WriteUInt32LittleEndian(ai.AsSpan(0x19f1), c.GetProperty("b19f1").GetUInt32());
             ai[0x77] = (byte)b.GetProperty("77").GetInt32(); ai[0x2a] = (byte)b.GetProperty("2a").GetInt32(); ai[0x29] = (byte)b.GetProperty("29").GetInt32();
             int li = 0;
             foreach (var l in c.GetProperty("lists").EnumerateArray())
@@ -70,8 +74,20 @@ public partial class TestRunner
                 rec[0x20] = (byte)o[2].GetInt32();
                 world.Add(p, at2, rec, Dat(t), o[5].GetInt32(), cell, own: false); at2 += 0x40;
             }
+            foreach (var o in c.GetProperty("loot").EnumerateArray())
+            {
+                int t = o[0].GetInt32(), cell = o[2].GetInt32();
+                var rec = Make(t, 0, 10, 0, (uint)((cell & 31) * 32 + 11), (uint)((cell >> 5) * 32 + 21));
+                rec[0] = 0; rec[0x31] = (byte)o[1].GetInt32();
+                world.Add(p, at2, rec, Loot(t), o[3].GetInt32(), cell, own: false); at2 += 0x40; loot++;
+            }
             while (at2 < 0x100 + 0x40 * 3) { world.Add(p, at2, Make(0, 7, 0, 0, 40, 40), Dat(0), -1, 0, own: false); at2 += 0x40; }
             var own = new List<byte[]>();
+            if (c.GetProperty("seat").GetInt32() != 0)
+            {
+                var rec = Make(2, p, 100, 0, 7 * 32, 7 * 32); rec[0x14] = 1; rec[0x1b] = 0;
+                world.Add(p, at2, rec, Dat(2), -1, 0, own: true); own.Add(rec); at2 += 0x40;
+            }
             foreach (var o in c.GetProperty("own").EnumerateArray())
             {
                 int t = o[0].GetInt32(), cell = o[6].GetInt32();
@@ -80,7 +96,9 @@ public partial class TestRunner
                 world.Add(p, at2, rec, Dat(t), -1, cell, own: true); own.Add(rec); at2 += 0x40;
             }
             var machine = new OriginalAiSquadStates(world, arctangent, messages) { EnemyY = (byte)c.GetProperty("stale_y").GetInt32() };
+            var before = own.Select(r => r[0x14]).ToArray();
             for (int tick = 0; tick < c.GetProperty("ticks").GetInt32(); tick++) machine.Run(ai);
+            if (c.GetProperty("loot").GetArrayLength() > 0) pickups += own.Where((r, i) => (r[0x14] & 0xf8) == 0x48 && before[i] != r[0x14]).Count();
             var masked = new List<byte>();
             foreach (int list in new[] { 0x1ab, 0x34f })
                 for (int i = 0; i < 20; i++) { var r = ai.AsSpan(list + i * 0x15, 0x15).ToArray(); r[3] = 0; Array.Clear(r, 5, 7); masked.AddRange(r); }
@@ -91,7 +109,8 @@ public partial class TestRunner
             { firstMismatch = count; GD.Print("MISMATCH " + Convert.ToHexStringLower(output)); }
             count++;
         }
-        GD.Print($"AI squad states: squads per state {string.Join(' ', states)}; first mismatch {firstMismatch}");
+        GD.Print($"AI squad states: squads per state {string.Join(' ', states)}; loot {loot}, 48h with loot {pickups}; first mismatch {firstMismatch}");
+        Check(pickups > 20, $"AI squad cases reach the loot pickup 20001 ({pickups})");
         var result = root.GetProperty("results").GetProperty("states");
         Check(count == result.GetProperty("case_count").GetInt32(), $"AI squad state reference coverage ({count})");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(), "AI squad states 1F078 (F083 0..8) match original x86");
@@ -125,7 +144,7 @@ public partial class TestRunner
         public byte Random2() => random[RandomIndex2++];
         public byte Fog(int cell) => explored[cell];
         public void Message(ReadOnlySpan<byte> squad, uint text) { Log.Add(1); Log.AddRange(BitConverter.GetBytes(text)); }
-        public void Rescue(Span<byte> squad) { Log.Add(2); Log.Add(squad[1]); }
+        public byte Army(byte participant) => 2;   // record +0 (the loot army is 0)
         public OriginalAiWorkers? Workers;
         public Func<int, uint> Property = _ => 0;
         public uint TileProperty(int cell) => Property(cell);

@@ -4,10 +4,10 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 110929 | 6652 | 654 | 28647 | 44 |
+| LE:1 | 146882 | 109219 | 6319 | 654 | 30690 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
+| ARMY__00.WRK | 5403 | 4701 | 100 | 0 | 602 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
 | ARMY__02.WRK | 6930 | 5581 | 609 | 528 | 212 | 7 |
 | ARMY__03.WRK | 13412 | 13412 | 0 | 0 | 0 | 1 |
@@ -23,6 +23,8 @@
 | ARMY__00.WRK `0x4F3..0x54A` | Melee strike effect: experience attack, lookup, hit, sound | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Объект-эффект и его анимация в схватке не создаются. |
 | ARMY__00.WRK `0x593..0x6C7` | Arrow effect: launch, flight, early and arrival hits | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) | Обработчики 7FE/AEB не перенесены. |
 | ARMY__00.WRK `0x6FE..0x762` | Spark effect types 4/5 creation and countdown | partial | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Перенесено создание (AH=0); обновление кадров не подключено. |
+| ARMY__00.WRK `0x85A..0x8DA` | Catapult stone effect (type 8) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | CFAC crater is a hook |
+| ARMY__00.WRK `0x986..0x9D5` | Explosion effect (type 10) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | drift vector 9E7D not ported |
 | ARMY__02.WRK `0x4C..0x64` | Six relative action targets after inline FS dispatcher | verified | [order-buttons.md](../docs/order-buttons.md); [order-dispatch.json](../tests/fixtures/order-dispatch.json) | Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит. |
 | ARMY__02.WRK `0xCB..0xE3` | Six relative action targets after inline FS dispatcher | verified | [order-buttons.md](../docs/order-buttons.md); [order-dispatch.json](../tests/fixtures/order-dispatch.json) | Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит. |
 | ARMY__02.WRK `0x13B..0x157` | Castle AH=5 visitor validator | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Принимающая ветка 1B8 общая с хвостом обработчика. |
@@ -155,6 +157,9 @@
 | LE:1 `0xB502..0xB5AB` | Remove one random ore mark and replace its surface | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Пометка грязной области экрана (B565..B5A4) не переносится. |
 | LE:1 `0xB72D..0xB764` | Intersect command slots across selected group members | partial | [interface.md](../docs/interface.md); [command-panel.json](../tests/fixtures/command-panel.json) | Фильтрация шести слотов по WorkFlags и ненулевому совпадающему raw_group проверена на 1600 парах. Исходный обход цепочки выделения и запись runtime-указателей не перенесены. |
 | LE:1 `0xB765..0xB9EB` | Group orders to squad members and squad bounds | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) | the order primitives write the OBE command fields only; their execution by WRK is a separate system |
+| LE:1 `0xB942..0xB977` | Squad members drop their commands | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
+| LE:1 `0xBA60..0xBADF` | Nearest living squad member to a point | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
+| LE:1 `0xBD0F..0xBE2E` | Hit objects in an area with a fixed attack | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | LE:1 `0xBE04..0xBE2E` | Apply damage to one prepared target | ported | [building-condition-kernel.md](../docs/building-condition-kernel.md); [building-kernel.json](../tests/fixtures/building-kernel.json) | Хвост после подготовки шаблона и силы; выбор цели, генерация силы, площадное действие и смерть с эффектами вне контракта. |
 | LE:1 `0xBFC9..0xC010` | Apply a hit: attack minus defence or a small chance of one point | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
 | LE:1 `0xC344..0xC35F` | Chebyshev distance between object centres | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
@@ -170,15 +175,24 @@
 | LE:1 `0xD2D1..0xD363` | Conditional occupancy registration | partial | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Перенесена ветвь CL=0 с заменой совпавших ячеек и подсчётом конфликтов. Ветка повреждения чужих объектов не перенесена. |
 | LE:1 `0xD40C..0xD453` | Owner free population growth | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |
 | LE:1 `0xD453..0xD5B1` | Owner population demand, support and limit recount | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |
+| LE:1 `0xD6E6..0xD740` | Effect flight step with arc height | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | LE:1 `0xD7B1..0xD85E` | Collect unique occupants of an area | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 | LE:1 `0xD85E..0xD895` | Search area around the unit | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 | LE:1 `0xD895..0xDA45` | Enemy search: radius, filters, nearest with tie on attacker | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) | Видимость, контакт и враждебность в схватке задаёт мост. |
+| LE:1 `0xDA7F..0xDB47` | Nearest loaded loot object of another army | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0xEDD5..0xEE38` | Queue and dispatch a message | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xEE69..0xEE92` | Find a queued message by type and party | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xEEFA..0xEF3F` | Drop messages between two settlements | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xEF3F..0xEFFE` | Third-party reactions with deferred re-entry | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xF000..0xF072` | War declaration with reputation and reactions | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xF250..0xF28B` | First contact, mutual | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
+| LE:1 `0x10075..0x100FA` | Lay a formation out around a goal | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
+| LE:1 `0x100FA..0x101B4` | Spread members along a formation segment | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
+| LE:1 `0x101B4..0x10262` | Nearest free member of a class to a formation point | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
+| LE:1 `0x10262..0x1030B` | Rotate a formation by the sine table | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
+| LE:1 `0x1030B..0x1037E` | Scale a formation (16-bit IMUL) | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
+| LE:1 `0x1037E..0x103AF` | Formation scale factor from the member count | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
+| LE:1 `0x103AF..0x103EC` | Formation of a kind nearest the member count | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x11EB0..0x11ECB` | Goods code 1: +100 gold and statistics | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Только AH=2. |
 | LE:1 `0x11ECB..0x11EE6` | Goods code 2: +100 metal and statistics | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Только AH=2. |
 | LE:1 `0x121C0..0x121E2` | Scenario whole-map exploration writer | ported | [fog-of-war.md](../docs/fog-of-war.md); [visibility.json](../tests/fixtures/visibility.json) | Вход после успешного 124D8, исходное поведение SHL FE сохранено для 256 владельцев; сценарный диспетчер не входит. |
@@ -187,21 +201,22 @@
 | LE:1 `0x18CE5..0x18EC5` | Five menu cursor family initializers | verified | [menu-widgets.md](../docs/menu-widgets.md); [menu-cursor.json](../tests/fixtures/menu-cursor.json) | Пять инициализаторов исполнены под Unicorn; шаг курсора и рисование не перенесены. |
 | LE:1 `0x18ED4..0x18EF5` | Advance menu widget frame by byte timer | ported | [menu-widgets.md](../docs/menu-widgets.md); [menu-animation.json](../tests/fixtures/menu-animation.json) | Сверены 4374 вызова двух helpers; внешние callbacks виджетов и отрисовка не входят. |
 | LE:1 `0x18EF5..0x18F16` | Reverse menu widget frame by byte timer | ported | [menu-widgets.md](../docs/menu-widgets.md); [menu-animation.json](../tests/fixtures/menu-animation.json) | Сверены 4374 вызова двух helpers; внешние callbacks виджетов и отрисовка не входят. |
-| LE:1 `0x18F16..0x19063` | Menu plaque hover and pressed callback | partial | [menu-widgets.md](../docs/menu-widgets.md); [menu-button-press.json](../tests/fixtures/menu-button-press.json); [menu-button-hover.json](../tests/fixtures/menu-button-hover.json) | Только AL=1: latch=0/1 сверены, но реальный hit-test 18699 заменён управляемым CF, действие заменено счётчиком/RET. События 0/2/3, растеризация и реальные действия не перенесены. |
 | LE:1 `0x19063..0x190ED` | Bush and candle idle widget callbacks | partial | [menu-widgets.md](../docs/menu-widgets.md); [menu-widgets.json](../tests/fixtures/menu-widgets.json) | Только событие AL=1 (шаг кадров) перенесено и сверено; события 0/2/3, растеризация и полные побочные эффекты 192EA не входят. В Unicorn 192EA заглушён RET на входе. |
 | LE:1 `0x190ED..0x19185` | Owl idle callback and phase switch | partial | [menu-widgets.md](../docs/menu-widgets.md); [menu-widgets.json](../tests/fixtures/menu-widgets.json) | Только событие AL=1 (шаг кадров) перенесено и сверено; события 0/2/3, растеризация и полные побочные эффекты 192EA не входят. В Unicorn 192EA заглушён RET на входе. |
 | LE:1 `0x19185..0x1923B` | Hourglass widget timer and launch flag | partial | [menu-widgets.md](../docs/menu-widgets.md); [menu-hourglass.json](../tests/fixtures/menu-hourglass.json) | Только событие AL=1; в Unicorn 1CC1B заглушён RET после записи флага/очистки ввода. Остальные события и внешний переход не перенесены. |
 | LE:1 `0x19465..0x194B2` | Render MENU RLE with dword width, including 320px rule pages | verified | [credits-layout.md](../docs/credits-layout.md); [credits.json](../tests/fixtures/credits.json) | 27 исходных изображений совпали по RGBA с исполнением 19465. Это подготовленные PNG для Godot, не C#-дубликат RLE-рисовальщика. Заглушён dirty-helper 3EEA. |
 | LE:1 `0x1E53A..0x1E6C2` | AI block initialisation from character table | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
-| LE:1 `0x1E87A..0x1EAC1` | AI settlement census | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) | 1EC3F (every 256 turns) not included |
+| LE:1 `0x1E87A..0x1EAD8` | AI settlement census | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) |  |
 | LE:1 `0x1EAD8..0x1EAED` | AI block of participant | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
 | LE:1 `0x1EAED..0x1EB33` | Add AI plan record | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) | plan bytes +5..+7 are register leftovers, written as zero |
 | LE:1 `0x1EB33..0x1EB40` | Clear AI plan list | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
 | LE:1 `0x1EB40..0x1EB68` | Find or add AI plan | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
 | LE:1 `0x1EBEF..0x1EC3F` | Random explored cell for AI patrol | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
+| LE:1 `0x1EC3F..0x1EC6E` | Explored share of the map for a participant | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) |  |
 | LE:1 `0x1EC6E..0x1ECA0` | Area in sight of an object | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x1ECA0..0x1ECF8` | First living object of a DAT class | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) | inlined for mask 38h value 0 |
 | LE:1 `0x1ED26..0x1EF26` | AI squad step loop and steps 0..3 | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) | step 4 (1EF26) is a hook |
+| LE:1 `0x1EF26..0x1EFB8` | AI squad step 4: march in formation | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x1EFCC..0x1EFF9` | AI squad step 5: formation march | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) |  |
 | LE:1 `0x1F078..0x1F476` | AI squad states 0..3 and the state loop | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | the state setters 1F1C7, 1F306 and 1F464 are field writes made by the military requests, not ported yet |
 | LE:1 `0x1F476..0x1F5F1` | AI squad state 9: timber workers | ported | [ai.md](../docs/ai.md); [ai-workers.json](../tests/fixtures/ai-workers.json) |  |
@@ -210,6 +225,7 @@
 | LE:1 `0x1F71A..0x1F72C` | Set worker squad state 10 | ported | [ai.md](../docs/ai.md); [ai-economy.json](../tests/fixtures/ai-economy.json) |  |
 | LE:1 `0x1F72C..0x1FBB1` | AI squad states 4..8 | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0x1FBB1..0x20095` | AI squad retreat, march, fight and strength helpers | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | 20001 (stuck-member rescue) and the A4C2 message display are hooks |
+| LE:1 `0x20001..0x20071` | AI squad sends a member to nearby loot | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0x20095..0x2029F` | AI squad registry: numbers, create, remove, disband, transfer, lookups | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) | on overflow 200B5 releases pool byte «participant» instead of the new number, as in the original |
 | LE:1 `0x2029F..0x202D0` | Free units join a squad up to a strength | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x202FB..0x2035A` | Squad members leave up to a strength | ported | [ai.md](../docs/ai.md); [ai-garrison.json](../tests/fixtures/ai-garrison.json) |  |
@@ -247,6 +263,7 @@
 | LE:1 `0x22FE4..0x230ED` | Building site check around a cell | ported | [ai.md](../docs/ai.md); [ai-orders.json](../tests/fixtures/ai-orders.json); [original_producers.json](../data/original_producers.json) | AF07 permission is a hook |
 | LE:1 `0x23201..0x2323A` | Object of a class in an area | ported | [ai.md](../docs/ai.md); [ai-orders.json](../tests/fixtures/ai-orders.json); [original_producers.json](../data/original_producers.json) |  |
 | LE:1 `0x2323A..0x23551` | AI turn: tribute, collapse, relation decisions | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) | plan bytes +5..+7 are register leftovers, written as zero |
+| LE:1 `0x23551..0x23667` | AI turn tail: castle rebuild and class C08h order | ported | [ai.md](../docs/ai.md); [ai-economy.json](../tests/fixtures/ai-economy.json) | 10AD2, 22FE4, A758 and 43E5 are hooks |
 | LE:1 `0x23667..0x23A6E` | AI plan executor | ported | [ai.md](../docs/ai.md); [ai-plans.json](../tests/fixtures/ai-plans.json) | message parameters and +1AB register bytes not modelled |
 | LE:1 `0x23A6E..0x23A95` | Set mutual relation | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0x23A95..0x23ABB` | AI has plan for target | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |

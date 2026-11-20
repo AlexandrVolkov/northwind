@@ -332,6 +332,7 @@ public sealed partial class Skirmish : IDisposable
         Effects.RemoveAll(e => e.Remaining <= 0);
         TickArrows(); // 96CD runs on every world step: twice per object update at the default speed
         TickArrows();
+        TickStones(); TickStones();
         TickDeaths();
         TickBuildings();
         TickMining();
@@ -447,6 +448,9 @@ public sealed partial class Skirmish : IDisposable
     /// animation impact (945E) resolved by the strike effect. Returns true while the unit stays engaged in place.</summary>
     private bool AttackStep(SkirmishActor actor, SkirmishActor target)
     {
+        // A move request (8E0E flight, high nibble 2) during a swing: the original ends the swing and starts moving
+        // (9275 → 939A, not ported). Here the unit disengages and the flight route moves it (adapter).
+        if ((actor.Record[0x2d] >> 4) == 2 && (actor.Record[0x2d] & 15) != 2) { actor.Target = 0; actor.Record[0x2d] &= 0xf0; return false; }
         if (OriginalWorkerAnimation.Pending(actor.Record))
         {
             if (OriginalWorkerAnimation.Step(actor.Record, actor.Parameters, target.Record) is { } impact) ResolveImpact(actor, target, impact);
@@ -488,6 +492,28 @@ public sealed partial class Skirmish : IDisposable
             if (victim is { Alive: false }) Kill(victim);
         }
     }
+    /// <summary>Live catapult stones (type 8) and their explosions (type 10), 22h-byte effect records.</summary>
+    public List<byte[]> Stones { get; } = [];
+    /// <summary>Effect loop 96CD for stones: flight D6E6; on landing BD0F hits the cell (planes 0 and 1) and the stone
+    /// becomes an explosion. The crater CFAC and the drift vector [1C8E] (9E7D) are not ported: no crater, no drift.</summary>
+    private void TickStones()
+    {
+        int plane = Occupancy.Width * Occupancy.Height;
+        foreach (var stone in Stones.ToArray())
+        {
+            if (stone[0] == OriginalCatapultRules.Stone && OriginalCatapultRules.Step(stone, (uint)(Map.Width * 32), (uint)(Map.Height * 32)) is var (x, y))
+            {
+                var struck = new List<SkirmishActor>();
+                OriginalCatapultRules.Hit(OriginalCatapultRules.Attack, 2, 3, x, y, 1, 1, (byte)Map.Width, (byte)Map.Height,
+                    (p, cell) => p * plane + cell < Occupancy.Cells.Length ? Occupancy.Cells[p * plane + cell] : 0,
+                    r => { if (Find(r) is not { } a) return (new byte[0x40], new byte[171]); struck.Add(a); return (a.Record, a.Parameters); });
+                foreach (var victim in struck) if (!victim.Alive) Kill(victim);
+                OriginalCatapultRules.Explode(stone);
+            }
+            else if (stone[0] == OriginalCatapultRules.Explosion) OriginalCatapultRules.Smoke(stone, 0, 0);
+            if (stone[0] == 0xff) Stones.Remove(stone);
+        }
+    }
     private void ResolveImpact(SkirmishActor actor, SkirmishActor target, WorkerImpact impact)
     {
         if (impact.X >= Map.Width * 32 || impact.Y >= Map.Height * 32) return; // 9727 rejects points outside the map
@@ -512,7 +538,16 @@ public sealed partial class Skirmish : IDisposable
                 _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
             Arrows.Add(arrow); return;
         }
-        // Other missile types (catapult, ballista, fire) are not ported: the hit lands on the engaged target with the same attack.
+        if (impact.Code >= 128 && (impact.Code & 0x7f) == OriginalCatapultRules.Stone)
+        {
+            // 9727 places effect type 8 at the strike point; WRK 85A aims and launches the stone.
+            var stone = new byte[0x22]; stone[0] = OriginalCatapultRules.Stone; stone[5] = impact.Layer;
+            BinaryPrimitives.WriteUInt32LittleEndian(stone.AsSpan(7), impact.X); BinaryPrimitives.WriteUInt32LittleEndian(stone.AsSpan(0xc), impact.Y);
+            OriginalCatapultRules.Create(stone, actor.Record, impact.TargetX, impact.TargetY, (uint)(Map.Width * 32), (uint)(Map.Height * 32),
+                _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
+            Stones.Add(stone); return;
+        }
+        // Other missile types (ballista, fire) are not ported: the hit lands on the engaged target with the same attack.
         OriginalCombatRules.Hit(target.Record, target.Parameters, OriginalCombatRules.StrikeAttack(actor.Record[0x16]), (byte)(actor.Record[0x14] & 7), _terrainCatalog.NextRandomByte);
         if (!target.Alive) Kill(target);
     }

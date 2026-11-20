@@ -6,7 +6,7 @@
 
 ## Заняты Claude (не трогать)
 
-Сцены и код интерфейса: `scripts/OriginalHud.cs`, `scripts/OriginalInterface.cs`, `scripts/SkirmishMain.cs`, `scripts/OriginalMenus.cs`, `scripts/DisplaySettings.cs`, `scripts/GameSession.cs`, `scenes/`, `tests/MenuChecks.cs`, `tests/DisplayChecks.cs`, `tools/interface_source.py`, `assets/imported/interface/`, `docs/interface.md`, `tests/SkirmishChecks.cs`, код ИИ (`scripts/OriginalAi*.cs`, `scripts/SkirmishAi.cs`, `scripts/SkirmishProduction.cs`, `tests/OriginalAi*Checks.cs`, `tools/verify_ai_*.py`, `docs/ai.md`), а также `project.godot`, `AGENTS.md`, `docs/continuation.md`.
+Сцены и код интерфейса: `scripts/OriginalHud.cs`, `scripts/OriginalInterface.cs`, `scripts/SkirmishMain.cs`, `scripts/OriginalMenus.cs`, `scripts/DisplaySettings.cs`, `scripts/GameSession.cs`, `scenes/`, `tests/MenuChecks.cs`, `tests/DisplayChecks.cs`, `tools/interface_source.py`, `scripts/OriginalCatapultRules.cs`, `tools/verify_catapult.py`, `assets/imported/interface/`, `docs/interface.md`, `tests/SkirmishChecks.cs`, код ИИ (`scripts/OriginalAi*.cs`, `scripts/SkirmishAi.cs`, `scripts/SkirmishProduction.cs`, `tests/OriginalAi*Checks.cs`, `tools/verify_ai_*.py`, `docs/ai.md`), а также `project.godot`, `AGENTS.md`, `docs/continuation.md`.
 
 ## Принятые работы вне очереди
 
@@ -29,6 +29,12 @@
 - **Срез экономики ИИ (21E99/221AE), 19.11:** в `codex-work` нет коммитов вне main — переносить нечего.
 - **Срез рабочих ИИ (1F476/1F653), 19.11:** в `codex-work` нет коммитов вне main — переносить нечего.
 - **Срез похода ИИ, 20.11:** в `codex-work` нет коммитов вне main — переносить нечего.
+- **Срез строительства ИИ 23551, 20.11:** в `codex-work` нет коммитов вне main — переносить нечего.
+- **Срез добычи ИИ 20001, 20.11:** в `codex-work` нет коммитов вне main; C14 сужена до A4C2.
+- **Срез разведанной доли 1EC3F, 20.11:** в `codex-work` нет коммитов вне main.
+- **Срез строёв (шаг 4, 1EF26), 20.11:** в `codex-work` нет коммитов вне main; C13 выполнена Claude.
+- **Срез камней катапульт, 20.11:** в `codex-work` нет коммитов вне main.
+- **Катапульта в схватке и бегство во время замаха, 20.11:** в `codex-work` нет коммитов вне main.
 
 ## Задачи
 
@@ -68,11 +74,11 @@
 ### C12. Карта похода: поселения и окна — открыта
 LE:1 1AA12..1AC2B рисует окно поселения на карте похода: HISTORY.SPR 50 (250×150) или 51 (250×200, бит 80h в +21), заголовок +18 по центру, портрет предводителя WORK.SPR `0C3h + [+20]` в (+0A2h, +28h/+40h), имя +1C, «Население : » [+22] и «Постройки : » [+26] (строки LE:3 C953/C960); щелчок по флажку (бит 1 в +21) открывает окно, выбранное — в `[C94F]`. Найти, откуда берутся записи флажков (кандидат — GAME.EPI), полный формат записи, положение поселений, переходы между картами (около 10 карт, 3 стартовые, к пройденным можно вернуться, брошенное поселение живёт под управлением компьютера). Строки LE:3 C96D..C9C4 («Ваши потери», «Потери врага», «Добыто», «Уничтожено», «Наций», «Варварских поселений», «Порабощено наций», «Предметы») — экран итогов миссии: найти его код и раскладку. Итог — `docs/campaign.md`.
 
-### C13. Таблица строёв ИИ `[3D45]` — открыта
-Шаг отряда 4 (LE:1 1EF26, см. docs/ai.md «Шаг 4 — поход в строю») берёт строй из таблицы указателей `[3D45 + 4·i]`. Записи строя: байт `+0` — вид, `+1` — флаги масштаба, слово `+12` — размер, `+16` — число мест, места по 15h байт с `+17`. Найти, кто и откуда заполняет таблицу (файл ресурсов или данные EXE), выгрузить все строи в `data/original_formations.json` конвертером `tools/formation_source.py` (с тестом), описать поля мест (смещения, слой, направление) по коду 103AF, 1037E, 1030B, 10262, 10075..101B3. Итог — `docs/formations.md`; C#-перенос шага 4 сделает Claude. Начни с графа вызовов от `1EF26` (см. [codex.md](codex.md), «Граф вызовов оригинала»).
+### C13. Таблица строёв ИИ `[3D45]` — сделано Claude (20.11)
+Перенесено вместе с шагом 4: `docs/formations.md`, `tools/verify_ai_formations.py`. Задача снята с очереди.
 
-### C14. Выручка ИИ 20001 и сообщения A4C2 — открыта
-Только разведка, без C#. Разобрать LE:1 20001 (выручка/доход участника, вызывается из главного цикла ИИ) и A4C2 (очередь сообщений участника `+34`): какие поля записи участника (`0x97A + 0xF5·p`) и блока ИИ меняются, когда вызываются, какие сообщения ставятся. Итог — раздел в `docs/ai-revenue.md` с адресами и доказательствами и, если получится, сверка под Unicorn по образцу `tools/verify_ai_economy.py` (новый файл `tools/verify_ai_revenue.py` и фикстура). Граф вызовов — от `20001` и `A4C2`.
+### C14. Сообщения ИИ A4C2 — открыта
+Только разведка, без C#. Разобрать LE:1 A4C2 (вывод сообщения отряда в центре отряда, текст из таблицы LE:3 F02E по байту характера +29; вызывается из 20071): куда пишется текст, какие поля и очереди меняются, как это видит игрок. Итог — раздел в `docs/ai-messages.md` с адресами и доказательствами. Граф вызовов — от `A4C2`. (20001 Claude перенёс сам: это добыча, а не выручка — см. docs/ai.md «Добыча, 20001».)
 
 ## Идеи (брать, когда очередь пуста)
 

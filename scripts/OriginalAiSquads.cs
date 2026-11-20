@@ -237,12 +237,12 @@ public interface IAiSquadWorld
     uint HostileMask(byte participant);
     /// <summary>Initial minimum of the squad bounds B977 ([18E6], [18EA]).</summary>
     (uint X, uint Y) BoundsLimit { get; }
-    /// <summary>Step 4 (LE:1 1EF26, not ported yet): returns true while the step continues.</summary>
+    /// <summary>Step 4 (LE:1 1EF26, <see cref="OriginalAiFormations"/>): returns true while the step continues.</summary>
     bool StepFour(Span<byte> squad, bool started);
 }
 
 /// <summary>Squad steps of LE:1 1ED26 (table LE:3 F06A): 0 idle, 1 stand (command 40h), 2 gather in the step area
-/// +4D..+50 (48h), 3 clear the area (targets 50h/58h), 4 not ported (hook), 5 march in formation (48h). The step runs
+/// +4D..+50 (48h), 3 clear the area (targets 50h/58h), 4 march in formation (<see cref="OriginalAiFormations"/>, through the world), 5 march in formation (48h). The step runs
 /// in +4A; a new step requested in +4B (below 80h) starts with stage +4C = 0; when a step finishes, +4B becomes 0.</summary>
 public static class OriginalAiSquadSteps
 {
@@ -411,7 +411,8 @@ public interface IAiSquadStateWorld : IAiSquadWorld
     byte Fog(int cell);
     /// <summary>A4C2 at the squad centre with the text id from table LE:3 F02E.</summary>
     void Message(ReadOnlySpan<byte> squad, uint text);
-    void Rescue(Span<byte> squad);
+    /// <summary>Army index of the participant (record +0): objects of that army are its own kind (DA7F skips them).</summary>
+    byte Army(byte participant);
     /// <summary>States 9 and 10 (worker squads, <see cref="OriginalAiWorkers"/>) of the squad at <paramref name="at"/>.</summary>
     void WorkerState(Span<byte> ai, int at);
 }
@@ -695,7 +696,7 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
             if ((U32(s, 0x1b) & 0x1f) != 0) return;
             var (enemy, _) = NearCentre(s);
             if (enemy != 0) { Engaged(ai, s, enemy); return; }
-            if ((U32(s, 0x1b) & 0x3ff) == 0) world.Rescue(s);
+            if ((U32(s, 0x1b) & 0x3ff) == 0) Pickup(ai, s);
             if ((world.Random() & 0x1f) == 0) Say(ai, s, 0);
             return;
         }
@@ -707,6 +708,44 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
         }
         if (!Retreat(ai, s)) s[5] = 0;
     }
+    /// <summary>20001: with strength +19F1 above 1999 and an object of class 200000h (1ECA0), the loaded (+31 ≠ 0) object
+    /// of another army with DAT[40] bits 20h and 20000h (loot, ARMY__00) nearest to the centre in the area of 1F011
+    /// (DA7F over D7B1, later equal distances win) draws the squad's living member nearest to it (BA60): command 48h to
+    /// its cell.</summary>
+    private void Pickup(ReadOnlySpan<byte> ai, ReadOnlySpan<byte> s)
+    {
+        if (U32(ai, 0x19f1) <= 0x7cf || OriginalAiResearch.FirstObject(world.Chain(s[0]), 0x200000, 0x200000) == null) return;
+        byte r = Radius(s);
+        var (x0, y0, x1, y1) = Clip(s[0x20], s[0x21], r, r);
+        uint size = unchecked((uint)(x1 | y1 << 8) - (uint)(x0 | y0 << 8) + 0x101);
+        byte army = world.Army(s[0]);
+        uint cx = (uint)s[0x20] << 5, cy = (uint)s[0x21] << 5, best = uint.MaxValue;
+        byte[]? loot = null;
+        foreach (uint reference in OriginalTargetRules.Collect(new Grid(world), x0, y0, (byte)size, (byte)(size >> 8)))
+        {
+            var (o, t) = world.Resolve(reference);
+            if (o[0] == army || (U32(t, 0x40) & 0x20) == 0 || (U32(t, 0x40) & 0x20000) == 0 || o[0x31] == 0) continue;
+            uint d = Chebyshev(U32(o, 4), U32(o, 8), cx, cy);
+            if (d <= best) { best = d; loot = o; }
+        }
+        if (loot == null) return;
+        uint lx = U32(loot, 4), ly = U32(loot, 8); best = uint.MaxValue;
+        byte[]? member = null;
+        foreach (var (o, _) in world.Chain(s[0]))
+        {
+            if (o[0x1b] != s[1] || (sbyte)o[0x19] <= 0) continue;
+            uint d = Chebyshev(lx, ly, U32(o, 4), U32(o, 8));
+            if (d <= best) { best = d; member = o; }
+        }
+        if (member == null) return;
+        member[0x22] = (byte)(lx >> 5); member[0x23] = (byte)(ly >> 5); member[0x14] = (byte)(member[0x14] & 7 | 0x48);
+    }
+    private static uint Chebyshev(uint x1, uint y1, uint x2, uint y2)
+    {
+        int dx = unchecked((int)(x1 - x2)), dy = unchecked((int)(y1 - y2));
+        return Math.Max(unchecked((uint)(dx < 0 ? -dx : dx)), unchecked((uint)(dy < 0 ? -dy : dy)));
+    }
+
     private void Engaged(Span<byte> ai, Span<byte> s, uint enemy)
     {
         Counter(ai, 0x17c, world.Resolve(enemy).Record[3]);
@@ -1876,6 +1915,14 @@ public interface IAiEconomyWorld : IAiMilitaryWorld
     bool SiteAllowed(byte template, byte army, byte participant, byte x, byte y);
     /// <summary>EDD5: message type, other, owner, BH, parameter.</summary>
     void Send(byte type, byte other, byte owner, byte bh, uint parameter);
+    /// <summary>10AD2 (hook): a free place for the template in growing rings around the point (AC63); null when none.</summary>
+    (uint X, uint Y)? FreeSpot(uint templateArmy, byte variant, uint x, uint y);
+    /// <summary>22FE4 (hook here): the building site check at the cell.</summary>
+    bool BuildingSite(uint templateArmy, byte participant, byte x, byte y);
+    /// <summary>A758 (hook): a new object of the participant; 23551 then marks it under construction (+14 = 81h, +1A = 1)
+    /// and registers it (43E5). Null when no object can be allocated.</summary>
+    byte[]? Create(byte participant, byte army, byte template, byte variant, uint x, uint y);
+    void Register(byte[] record);
 }
 
 /// <summary>AI economy LE:1 21E99 (income, upkeep, economic requests in list +4F3, farm and building orders) and 221AE
@@ -1938,6 +1985,29 @@ public sealed class OriginalAiEconomy(IAiEconomyWorld world, OriginalAiMilitary 
             }
         }
         W32(ai, 1, U32(ai, 1) - 0xd);
+    }
+
+    /// <summary>23551..23666, the end of the turn 2323A: each 1024 turns a settlement without a castle (1ECA0, F08h/508h)
+    /// places a new one near the home (±127 points by 9E41/9E55, 10AD2, 22FE4, A758); with strength +19F1 at least +35
+    /// and bit 0 of +77 clear it orders a random building of class C08h (list +34F, kind 5, key 5Ah, priority 8Ch; CL..DH
+    /// are leftovers of 223B4/22E46, written as zero). Finally +1 −= 42h (2365C).</summary>
+    public void Construction(Span<byte> ai)
+    {
+        if ((U32(ai, 1) & 0x3ff) == 0 && (ai[0x1a27] & 2) == 0
+            && OriginalAiResearch.FirstObject(world.Chain(ai[0]), 0xf08, 0x508) == null && Random(ai, 0xf08, 0x508) is { } castle)
+        {
+            byte variant = (byte)(world.Template(ai[0], (byte)castle)[0x77] & 3);
+            uint x = unchecked((uint)(ai[0x61] << 5) + (uint)(sbyte)world.Random());
+            uint y = unchecked((uint)(ai[0x62] << 5) + (uint)(sbyte)world.Random2());
+            if (world.FreeSpot(castle, variant, x, y) is var (fx, fy) && world.BuildingSite(castle, ai[0], (byte)(fx >> 5), (byte)(fy >> 5))
+                && world.Create(ai[0], (byte)(castle >> 8), (byte)castle, variant, fx, fy) is { } record)
+            {
+                record[0x14] = 0x81; record[0x1a] = 1; world.Register(record);
+            }
+        }
+        if ((U32(ai, 1) & 0x3ff) == 0 && U32(ai, 0x19f1) >= U32(ai, 0x35) && (U32(ai, 0x77) & 1) == 0 && Random(ai, 0xf08, 0xc08) is { } building)
+            OriginalAiMilitary.Request(ai, Orders, 5, 0x5a, 0x8c, 0, 0, 0, 0, building);
+        W32(ai, 1, U32(ai, 1) - 0x42);
     }
 
     private static byte Urgency(byte count, uint stock) => (byte)(0x82 + (count == 0 ? 0x50 : 0) + (stock <= 0x96 ? 0x1e : 0));
@@ -2256,5 +2326,143 @@ public sealed class OriginalAiWorkers(IAiWorkerWorld world)
             y++;
         } while (y <= area.Y1);
         return false;
+    }
+}
+
+/// <summary>Step 4 of a squad (LE:1 1EF26): march in formation to +9/+0A. The formation (LE:3 table 3D45) of kind +8 whose
+/// size is nearest the member count +22 (103AF) is scaled by count·256/size on the axes its flags allow (1037E/1030B),
+/// turned toward the march direction when flag 4 is set (6996, 10262, half sine table DS:2A7E) and laid out around the
+/// goal (10075): along every segment, members of the place's class (DAT[40] byte 1 &amp; 0Fh) are spread at equal steps;
+/// each point takes the free member nearest to the matching point around the squad's centre (101B4) and gives it 48h.
+/// Afterwards the step lasts while members move (+43); every 256 ticks the squad says text 0Bh (A4C2). See
+/// docs/formations.md.</summary>
+public sealed class OriginalAiFormations(IReadOnlyList<byte[]> formations, byte[] sine, byte[] arctangent)
+{
+    private static uint U32(ReadOnlySpan<byte> raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw[offset..]);
+    private static void W32(Span<byte> raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw[offset..], value);
+
+    public static OriginalAiFormations From(OriginalAiData data) => new(data.Formations.Select(Convert.FromHexString).ToList(),
+        Convert.FromHexString(data.SineHex), Convert.FromHexString(data.ArctangentHex));
+
+    /// <summary>1EF26: true while the step goes on.</summary>
+    public bool Step(Span<byte> s, IReadOnlyList<(byte[] Record, byte[] Template)> chain, Action<uint> message, byte mapWidth, byte mapHeight)
+    {
+        if (s[0x4c] != 0)
+        {
+            if ((U32(s, 0x1b) & 0xff) == 0) message(0x0b);
+            return s[0x43] != 0;
+        }
+        s[0x4c]++;
+        var buffer = Scale(formations[Pick(s[8], U32(s, 0x22))], U32(s, 0x22));
+        byte angle = (byte)((Direction(s[0x0b], s[0x0c], s[9], s[0x0a]) >> 2) & 0xf8);
+        if ((buffer[1] & 4) == 0) angle = 0;
+        Rotate(buffer, angle);
+        Place(s, chain, buffer, (uint)(s[9] * 32 + 16), (uint)(s[0x0a] * 32 + 16), mapWidth, mapHeight);
+        W32(s, 0x1b, 0);
+        return true;
+    }
+
+    /// <summary>103AF: the formation of the kind whose size (+12) is nearest the count; later equal ones win; none — 0.</summary>
+    public int Pick(byte kind, uint count)
+    {
+        int index = 0; uint best = uint.MaxValue;
+        for (int i = 0; i < formations.Count; i++)
+        {
+            if (formations[i][0] != kind) continue;
+            uint size = U32(formations[i], 0x12);
+            uint d = count >= size ? count - size : size - count;
+            if (d <= best) { best = d; index = i; }
+        }
+        return index;
+    }
+
+    /// <summary>1037E/1030B: a copy scaled by count·256 / size (DIV word) on X (flag 1) and Y (flag 2). Each value keeps its
+    /// high word and takes the low word of a 16-bit IMUL before SAR 8; the place count becomes that of Y plus 1, and once
+    /// Y's factor is 100h it takes X's for the rest of the places.</summary>
+    public static byte[] Scale(byte[] formation, uint count)
+    {
+        uint dividend = count << 8;
+        uint quotient = dividend / BinaryPrimitives.ReadUInt16LittleEndian(formation.AsSpan(0x12));
+        if (quotient > 0xffff) throw new OverflowException("1037E: DIV word overflow");
+        ushort sx = (formation[1] & 1) != 0 ? (ushort)quotient : (ushort)0x100, sy = (formation[1] & 2) != 0 ? (ushort)quotient : (ushort)0x100;
+        var buffer = (byte[])formation.Clone();
+        static uint Mul(uint value, ushort factor) =>
+            (uint)((int)((value & 0xffff0000) | (ushort)((short)value * (short)factor)) >> 8);
+        for (int k = 0; k < buffer[0x16]; k++)
+        {
+            int p = 0x17 + 0x15 * k;
+            W32(buffer, p, Mul(U32(buffer, p), sx)); W32(buffer, p + 4, Mul(U32(buffer, p + 4), sy));
+            W32(buffer, p + 8, Mul(U32(buffer, p + 8), sx)); W32(buffer, p + 0x0c, Mul(U32(buffer, p + 0x0c), sy));
+            if (sy == 0x100) sy = sx;
+            W32(buffer, p + 0x10, Mul(U32(buffer, p + 0x10), sy) + 1);
+        }
+        return buffer;
+    }
+
+    /// <summary>10262: both points of every place turned by the angle (64 steps; high halves of 32×32 IMUL of value·10000h
+    /// with the half sine table, sign from bit 20h).</summary>
+    public void Rotate(byte[] buffer, byte angle)
+    {
+        int Sine(byte a) { int v = BinaryPrimitives.ReadUInt16LittleEndian(sine.AsSpan((a & 0x1f) * 2)); return (a & 0x20) != 0 ? -v : v; }
+        int cos = Sine((byte)(angle + 0x10)), sin = Sine(angle);
+        static int High(int a, int b) => (int)(((long)a * b) >> 32);
+        for (int k = 0; k < buffer[0x16]; k++)
+            for (int p = 0x17 + 0x15 * k, end = p + 0x10; p < end; p += 8)
+            {
+                int x = (int)(U32(buffer, p) << 16), y = (int)(U32(buffer, p + 4) << 16);
+                W32(buffer, p, (uint)(High(x, cos) - High(y, sin)));
+                W32(buffer, p + 4, (uint)(High(y, cos) + High(x, sin)));
+            }
+    }
+
+    /// <summary>10075/100FA/101B4 after B942 (members drop their commands).</summary>
+    private static void Place(ReadOnlySpan<byte> s, IReadOnlyList<(byte[] Record, byte[] Template)> chain, byte[] buffer, uint tx, uint ty,
+        byte mapWidth, byte mapHeight)
+    {
+        int offX = (int)((uint)(s[0x20] * 32 + 16) - tx), offY = (int)((uint)(s[0x21] * 32 + 16) - ty);
+        foreach (var (o, _) in chain) if (o[0x1b] == s[1]) o[0x14] &= 7;
+        for (int k = 0; k < buffer[0x16]; k++)
+        {
+            int p = 0x17 + 0x15 * k;
+            uint n = U32(buffer, p + 0x10); byte cls = buffer[p + 0x14];
+            int x = (int)(U32(buffer, p) + tx), y = (int)(U32(buffer, p + 4) + ty);
+            int dx = (int)(U32(buffer, p + 8) + tx) - x, dy = (int)(U32(buffer, p + 0x0c) + ty) - y;
+            if (n == 0) continue;
+            short divisor = (short)(n + 1);
+            if (divisor == 0) throw new DivideByZeroException("100FA: IDIV word by zero");
+            int stepY = dy / divisor, stepX = dx / divisor;
+            if (stepY is > short.MaxValue or < short.MinValue || stepX is > short.MaxValue or < short.MinValue) throw new OverflowException("100FA: IDIV word overflow");
+            do
+            {
+                x += (short)stepX; y += (short)stepY;
+                byte[]? member = null; uint best = uint.MaxValue;
+                foreach (var (o, t) in chain)
+                {
+                    if (o[0x1b] != s[1] || (o[0x14] & 0x40) != 0) continue;
+                    if (cls != 0 && ((U32(t, 0x40) >> 8) & 0x0f) != cls) continue;
+                    uint ax = Abs(x + offX - (int)U32(o, 4)), ay = Abs(y + offY - (int)U32(o, 8));
+                    uint d = Math.Max(ax, ay);
+                    if (d <= best) { best = d; member = o; }
+                }
+                if (member == null) break;
+                byte cx = (byte)((uint)x >> 5), cy = (byte)((uint)y >> 5);
+                if (cx >= mapWidth) cx = x < 0 ? (byte)0 : (byte)(mapWidth - 1);
+                if (cy >= mapHeight) cy = y < 0 ? (byte)0 : (byte)(mapHeight - 1);
+                member[0x22] = cx; member[0x23] = cy; member[0x14] = (byte)(member[0x14] & 7 | 0x48);
+            } while (--n != 0);
+        }
+    }
+    private static uint Abs(int v) => v < 0 ? (uint)-v : (uint)v;
+
+    /// <summary>6996 (as in <see cref="OriginalAiSquadStates.Direction"/>).</summary>
+    private byte Direction(uint x1, uint y1, uint x2, uint y2)
+    {
+        byte quadrant = 0x40;
+        uint ecx = x2, eax = x1, edx = y2, ebx = y1;
+        if (ecx < eax) { ecx = eax - ecx; (edx, ebx) = (ebx, edx); quadrant += 0x80; } else ecx -= eax;
+        if (edx < ebx) { edx = ebx - edx; (edx, ecx) = (ecx, edx); quadrant -= 0x40; } else edx -= ebx;
+        if (ecx == edx) return (byte)(0x20 + quadrant);
+        if (ecx > edx) return (byte)(arctangent[(byte)((edx << 8) / (ecx & 0xffff))] + quadrant);
+        return (byte)(0x40 - arctangent[(byte)((ecx << 8) / (edx & 0xffff))] + quadrant);
     }
 }

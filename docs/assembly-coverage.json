@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "f64fc744e821e8ee786a51ed000bed234f0f6da350757dc6feed29232ca7ac55",
+  "annotation_sha256": "e094da329a8ff0f50cd8fbdf734d843c447c099d714e2585364dfa2d405ed6e4",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,9 +32,9 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 6652,
-        "ported": 28647,
-        "unreviewed": 110929,
+        "partial": 6319,
+        "ported": 30690,
+        "unreviewed": 109219,
         "verified": 654
       },
       "linear_rows": 45008,
@@ -1212,6 +1212,25 @@
         },
         {
           "start": 46949,
+          "end": 47426,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "group-orders"
+          ]
+        },
+        {
+          "start": 47426,
+          "end": 47479,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "group-orders",
+            "squad-clear-commands"
+          ]
+        },
+        {
+          "start": 47479,
           "end": 47595,
           "status": "ported",
           "classification": "code",
@@ -1221,10 +1240,35 @@
         },
         {
           "start": 47595,
-          "end": 48644,
+          "end": 47712,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 47712,
+          "end": 47839,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-nearest-member"
+          ]
+        },
+        {
+          "start": 47839,
+          "end": 48399,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 48399,
+          "end": 48644,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "area-hit"
+          ]
         },
         {
           "start": 48644,
@@ -1232,7 +1276,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "target-damage-tail"
+            "target-damage-tail",
+            "area-hit"
           ]
         },
         {
@@ -1412,6 +1457,22 @@
         },
         {
           "start": 54705,
+          "end": 55014,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 55014,
+          "end": 55104,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "effect-flight"
+          ]
+        },
+        {
+          "start": 55104,
           "end": 55217,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1446,6 +1507,22 @@
         },
         {
           "start": 55877,
+          "end": 55935,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 55935,
+          "end": 56135,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-nearest-loot"
+          ]
+        },
+        {
+          "start": 56135,
           "end": 60885,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1535,6 +1612,76 @@
         },
         {
           "start": 62091,
+          "end": 65653,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 65653,
+          "end": 65786,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "formation-place"
+          ]
+        },
+        {
+          "start": 65786,
+          "end": 65972,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "formation-segment"
+          ]
+        },
+        {
+          "start": 65972,
+          "end": 66146,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "formation-nearest-member"
+          ]
+        },
+        {
+          "start": 66146,
+          "end": 66315,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "formation-rotate"
+          ]
+        },
+        {
+          "start": 66315,
+          "end": 66430,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "formation-scale"
+          ]
+        },
+        {
+          "start": 66430,
+          "end": 66479,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "formation-scale-factor"
+          ]
+        },
+        {
+          "start": 66479,
+          "end": 66540,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "formation-pick"
+          ]
+        },
+        {
+          "start": 66540,
           "end": 73392,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1650,11 +1797,9 @@
         {
           "start": 102166,
           "end": 102499,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "menu-plaque-pressed-state"
-          ]
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
         },
         {
           "start": 102499,
@@ -1724,19 +1869,12 @@
         },
         {
           "start": 125050,
-          "end": 125633,
+          "end": 125656,
           "status": "ported",
           "classification": "code",
           "claims": [
             "ai-census-1e87a"
           ]
-        },
-        {
-          "start": 125633,
-          "end": 125656,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
         },
         {
           "start": 125656,
@@ -1793,9 +1931,11 @@
         {
           "start": 126015,
           "end": 126062,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-explored-share"
+          ]
         },
         {
           "start": 126062,
@@ -1833,6 +1973,15 @@
         },
         {
           "start": 126758,
+          "end": 126904,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-step-formation"
+          ]
+        },
+        {
+          "start": 126904,
           "end": 126924,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1917,6 +2066,25 @@
         },
         {
           "start": 129969,
+          "end": 131073,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-squad-state-helpers"
+          ]
+        },
+        {
+          "start": 131073,
+          "end": 131185,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-squad-state-helpers",
+            "ai-loot-pickup"
+          ]
+        },
+        {
+          "start": 131185,
           "end": 131221,
           "status": "ported",
           "classification": "code",
@@ -2316,9 +2484,11 @@
         {
           "start": 144721,
           "end": 144999,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-construction"
+          ]
         },
         {
           "start": 144999,
@@ -2475,8 +2645,8 @@
       "sha256": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33",
       "byte_status": {
         "partial": 100,
-        "ported": 395,
-        "unreviewed": 4908
+        "ported": 602,
+        "unreviewed": 4701
       },
       "linear_rows": 1709,
       "flow_candidate_instructions": 416,
@@ -2536,6 +2706,38 @@
         },
         {
           "start": 1890,
+          "end": 2138,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 2138,
+          "end": 2266,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "catapult-stone"
+          ]
+        },
+        {
+          "start": 2266,
+          "end": 2438,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 2438,
+          "end": 2517,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "explosion-effect"
+          ]
+        },
+        {
+          "start": 2517,
           "end": 5403,
           "status": "unreviewed",
           "classification": "unknown",

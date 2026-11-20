@@ -2202,7 +2202,7 @@
       "id": "ai-census-1e87a",
       "module": "LE:1",
       "start": 125050,
-      "end": 125633,
+      "end": 125656,
       "name": "AI settlement census",
       "classification": "code",
       "status": "ported",
@@ -2213,7 +2213,7 @@
       "implementation": [
         "scripts/OriginalAiRules.cs"
       ],
-      "limitations": "1EC3F (every 256 turns) not included"
+      "limitations": ""
     },
     {
       "id": "ai-threat-23b10",
@@ -3901,7 +3901,7 @@
       "limitations": ""
     },
     {
-      "id": "menu-frame-forward",
+"id": "menu-frame-forward",
       "module": "LE:1",
       "start": 102100,
       "end": 102133,
@@ -4016,7 +4016,221 @@
       "implementation": [
         "scripts/OriginalMenuPlaqueRules.cs"
       ],
-      "limitations": "Только AL=1: latch=0/1 сверены, но реальный hit-test 18699 заменён управляемым CF, действие заменено счётчиком/RET. События 0/2/3, растеризация и реальные действия не перенесены."
+      "limitations": "Только AL=1: latch=0/1 сверены, но реальный hit-test 18699 заменён управляемым CF, действие заменено счётчиком/RET. События 0/2/3, растеризация и реальные действия не перенесены.",
+    "id": "ai-construction",
+      "module": "LE:1",
+      "start": 144721,
+      "end": 144999,
+      "name": "AI turn tail: castle rebuild and class C08h order",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "10AD2, 22FE4, A758 and 43E5 are hooks"
+    },
+    {
+      "id": "ai-loot-pickup",
+      "module": "LE:1",
+      "start": 131073,
+      "end": 131185,
+      "name": "AI squad sends a member to nearby loot",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-nearest-loot",
+      "module": "LE:1",
+      "start": 55935,
+      "end": 56135,
+      "name": "Nearest loaded loot object of another army",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-nearest-member",
+      "module": "LE:1",
+      "start": 47712,
+      "end": 47839,
+      "name": "Nearest living squad member to a point",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-explored-share",
+      "module": "LE:1",
+      "start": 126015,
+      "end": 126062,
+      "name": "Explored share of the map for a participant",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-census.json"],
+      "implementation": ["scripts/OriginalAiRules.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-step-formation",
+      "module": "LE:1",
+      "start": 126758,
+      "end": 126904,
+      "name": "AI squad step 4: march in formation",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-place",
+      "module": "LE:1",
+      "start": 65653,
+      "end": 65786,
+      "name": "Lay a formation out around a goal",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-segment",
+      "module": "LE:1",
+      "start": 65786,
+      "end": 65972,
+      "name": "Spread members along a formation segment",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-nearest-member",
+      "module": "LE:1",
+      "start": 65972,
+      "end": 66146,
+      "name": "Nearest free member of a class to a formation point",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-rotate",
+      "module": "LE:1",
+      "start": 66146,
+      "end": 66315,
+      "name": "Rotate a formation by the sine table",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-scale",
+      "module": "LE:1",
+      "start": 66315,
+      "end": 66430,
+      "name": "Scale a formation (16-bit IMUL)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-scale-factor",
+      "module": "LE:1",
+      "start": 66430,
+      "end": 66479,
+      "name": "Formation scale factor from the member count",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "formation-pick",
+      "module": "LE:1",
+      "start": 66479,
+      "end": 66540,
+      "name": "Formation of a kind nearest the member count",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "squad-clear-commands",
+      "module": "LE:1",
+      "start": 47426,
+      "end": 47479,
+      "name": "Squad members drop their commands",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/formations.md", "tests/fixtures/ai-formations.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "catapult-stone",
+      "module": "ARMY__00.WRK",
+      "start": 2138,
+      "end": 2266,
+      "name": "Catapult stone effect (type 8)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
+      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "limitations": "CFAC crater is a hook"
+    },
+    {
+      "id": "explosion-effect",
+      "module": "ARMY__00.WRK",
+      "start": 2438,
+      "end": 2517,
+      "name": "Explosion effect (type 10)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
+      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "limitations": "drift vector 9E7D not ported"
+    },
+    {
+      "id": "effect-flight",
+      "module": "LE:1",
+      "start": 55014,
+      "end": 55104,
+      "name": "Effect flight step with arc height",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
+      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "area-hit",
+      "module": "LE:1",
+      "start": 48399,
+      "end": 48686,
+      "name": "Hit objects in an area with a fixed attack",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
+      "implementation": ["scripts/OriginalCatapultRules.cs"],
+      "limitations": ""
     }
   ]
 }

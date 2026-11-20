@@ -19,6 +19,8 @@ public partial class TestRunner
         var classes = Convert.FromHexString(root.GetProperty("gather_classes_hex").GetString()!);
         using var producers = GameData.Read<JsonDocument>("res://data/original_producers.json");
         using var digest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        using var buildDigest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        int builds = 0, castles = 0, orders = 0, firstBuildMismatch = -1;
         const int S = OriginalAiSquads.Size, Mil = OriginalAiMilitary.List, Ord = OriginalAiMilitary.Orders;
         int count = 0, firstMismatch = -1; var modes = new int[11];
         foreach (var c in root.GetProperty("cases").EnumerateArray())
@@ -149,11 +151,51 @@ public partial class TestRunner
             digest.AppendData(output);
             if (Convert.ToHexStringLower(SHA256.HashData(output))[..10] != c.GetProperty("sha256_prefix").GetString() && firstMismatch < 0)
             { firstMismatch = count; GD.Print("MISMATCH " + Convert.ToHexStringLower(output)); }
+            if (fault == 0)
+            {
+                // 23551 runs on the compared (masked) state with its own turn, flags and thresholds.
+                var final = (byte[])ai.Clone();
+                for (int k = 0; k < 20; k++)
+                {
+                    int a = Mil + k * 0x15; final[a + 7] = 0;
+                    if (final[a] == 0x0a) final[a + 4] = 0;
+                    if (final[a] != 8) Array.Clear(final, a + 5, 2);
+                    if (final[a] == 6) Array.Clear(final, a + 8, 4);
+                    a = Ord + k * 0x15; Array.Clear(final, a + 4, 4);
+                    if (final[a] == 3) Array.Clear(final, a + 0x0a, 2);
+                    a = 0x4f3 + k * 0x15; Array.Clear(final, a + 4, 4);
+                    if (final[a] == 4) Array.Clear(final, a + 8, 4);
+                }
+                var bd = c.GetProperty("build");
+                BinaryPrimitives.WriteUInt32LittleEndian(final.AsSpan(1), bd.GetProperty("turn").GetUInt32()); final[0x1a27] = (byte)bd.GetProperty("1a27").GetInt32();
+                BinaryPrimitives.WriteUInt32LittleEndian(final.AsSpan(0x19f1), bd.GetProperty("19f1").GetUInt32());
+                BinaryPrimitives.WriteUInt32LittleEndian(final.AsSpan(0x35), bd.GetProperty("35").GetUInt32());
+                BinaryPrimitives.WriteUInt32LittleEndian(final.AsSpan(0x77), bd.GetProperty("77").GetUInt32());
+                world.Blocks[p] = final; world.PlacementLog.Clear(); world.BuildSeed = (byte)bd.GetProperty("seed").GetInt32();
+                var saved = (byte[])tree.Clone();
+                if (bd.GetProperty("church").GetInt32() != 0)
+                    for (int ta = 0; tree[ta + 1] != 0xff; ta += 0x10 + 2 * tree[ta + 0xf])
+                        if (tree[ta] == 0x80 && tree[ta + 1] == 24) tree[ta + 2] = 0;
+                int before = Enumerable.Range(0, 20).Count(k => final[Ord + k * 0x15] == 5 && final[Ord + k * 0x15 + 1] == 0x5a);
+                economy.Construction(final);
+                if (world.Scratch[0x14] == 0x81) castles++;
+                if (Enumerable.Range(0, 20).Count(k => final[Ord + k * 0x15] == 5 && final[Ord + k * 0x15 + 1] == 0x5a) > before) orders++;
+                for (int k = 0; k < 20; k++) Array.Clear(final, Ord + k * 0x15 + 4, 4);
+                saved.CopyTo(tree, 0);
+                byte[] bout = [.. final.AsSpan(0, 5), .. final.AsSpan(Ord, 0x15 * 20), .. world.Scratch, .. world.PlacementLog, world.RandomIndex, world.RandomIndex2];
+                buildDigest.AppendData(bout); builds++;
+                if (Convert.ToHexStringLower(SHA256.HashData(bout))[..10] != bd.GetProperty("sha256_prefix").GetString() && firstBuildMismatch < 0)
+                { firstBuildMismatch = count; GD.Print("BUILD MISMATCH " + Convert.ToHexStringLower(bout)); }
+            }
             count++;
         }
         GD.Print($"AI economy: requests per mode {string.Join(' ', modes)}; first mismatch {firstMismatch}");
         var result = root.GetProperty("results").GetProperty("economy");
         Check(count == result.GetProperty("case_count").GetInt32(), $"AI economy reference coverage ({count})");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == result.GetProperty("sha256").GetString(), "AI economy 21E99/221AE matches original x86");
+        GD.Print($"AI construction 23551: {castles} castles placed, {orders} C08h orders; first mismatch {firstBuildMismatch}");
+        var build = root.GetProperty("results").GetProperty("construction");
+        Check(builds == build.GetProperty("case_count").GetInt32() && castles > 10 && orders > 10, $"AI construction 23551 coverage ({builds}, {castles}, {orders})");
+        Check(Convert.ToHexStringLower(buildDigest.GetHashAndReset()) == build.GetProperty("sha256").GetString(), "AI construction 23551 matches original x86");
     }
 }

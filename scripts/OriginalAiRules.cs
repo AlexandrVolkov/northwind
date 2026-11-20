@@ -19,6 +19,10 @@ public sealed class OriginalAiData
     public string ArmyClassesHex { get; set; } = "";
     /// <summary>LE:3 F0F0: fortification patterns of order mode 7 (5-byte entries: class byte, dx0, dy0, dx1, dy1; FFh ends).</summary>
     public List<string> Fortifications { get; set; } = [];
+    /// <summary>DS:2A7E: half sine table of 10262, 32 words (formation rotation).</summary>
+    public string SineHex { get; set; } = "";
+    /// <summary>LE:3 3D45: formation records of squad step 4 (1EF26).</summary>
+    public List<string> Formations { get; set; } = [];
     public byte[] Table() => Characters.OrderBy(c => c.Index).SelectMany(c => Convert.FromHexString(c.RawHex)).ToArray();
 }
 
@@ -65,6 +69,24 @@ public static class OriginalAiRules
     /// <summary>1E87A..1EAC1: strength, value, building counts, territory and affordability. <paramref name="ai"/> is the
     /// 1A35h-byte AI/statistics block, <paramref name="participant"/> the F5h-byte settlement record.</summary>
     public static CensusBounds Census(Span<byte> ai, ReadOnlySpan<byte> participant, IEnumerable<(byte[] Record, byte[] Template)> chain,
+        byte mapWidth, byte mapHeight, Func<int, byte>? fog = null)
+    {
+        var bounds = CensusBody(ai, participant, chain, mapWidth, mapHeight);
+        // 1EAC1: every 256 turns the explored share (1EC3F) goes to +1A01.
+        if (fog != null && (U32(ai, 1) & 0xff) == 0) ai[0x1a01] = Explored(ai[0], fog, mapWidth, mapHeight);
+        return bounds;
+    }
+
+    /// <summary>1EC3F: (cells the participant has seen · 256 − 1) / cells, low byte (no seen cell gives FFh).</summary>
+    public static byte Explored(byte participant, Func<int, byte> fog, byte mapWidth, byte mapHeight)
+    {
+        byte bit = (byte)(1 << (participant & 31));   // SHL CH, CL on a byte
+        uint cells = (uint)(mapWidth * mapHeight), seen = 0;
+        for (int c = 0; c < cells; c++) if ((fog(c) & bit) == 0) seen++;
+        return (byte)(unchecked((seen << 8) - 1) / cells);
+    }
+
+    private static CensusBounds CensusBody(Span<byte> ai, ReadOnlySpan<byte> participant, IEnumerable<(byte[] Record, byte[] Template)> chain,
         byte mapWidth, byte mapHeight)
     {
         ai[0x1a00] = ai[0x1a02] = ai[0x1a03] = ai[0x5c] = 0;

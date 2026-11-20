@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Execute the AI economy LE:1 21E99 (income, upkeep, requests +4F3, farm and building orders) and 221AE (worker squads,
-mine sites through 22613 and the fog map [18DA], lumbermill orders) under Unicorn. EDD5 (messages) and D363 (mine
+mine sites through 22613 and the fog map [18DA], lumbermill orders) under Unicorn, then the turn tail 23551 (castle rebuild with hooks 10AD2, 22FE4, A758, 43E5, and the class C08h order). EDD5 (messages) and D363 (mine
 placement: allowed unless (x ^ y ^ template ^ seed) & 3 == 0) are stubbed at their entries and recorded.
 
 Shares the world of tools/verify_ai_military.py.
@@ -29,7 +29,7 @@ BUILDINGS = [2, 3, 4, 9, 12, 23, 24, 6, 10]
 RANGES = [(0x21e99, 0x221ae), (0x221ae, 0x223b4), (0x22435, 0x224d1), (0x22613, 0x2268e), (0x1f5f1, 0x1f62b), (0x1f71a, 0x1f72c),
           (0x1f004, 0x1f011), (0x1edfd, 0x1ee02), (0x2098b, 0x209b0), (0xd19c, 0xd1ba), (0xa879, 0xa8a0), (0x20dd0, 0x21459), (0x214c3, 0x21660), (0x21660, 0x21780), (0x21dd4, 0x21e99), (0x1ec6e, 0x1eca0), (0x218a8, 0x219c3),
           (0x219c3, 0x21a00), (0x22e46, 0x22e85), (0x223b4, 0x22435), (0xa673, 0xa6ae), (0x68a0, 0x68bd), (0x6877, 0x68d8),
-          (0x9e41, 0x9e69), (0xc331, 0xc344), (0x1eaed, 0x1eb68), (0x200ab, 0x2029f), (0x2029f, 0x202d0), (0x2035a, 0x20408),
+          (0x9e41, 0x9e69), (0xc331, 0xc344), (0x1eca0, 0x1ecf8), (0x23551, 0x23667), (0x1eaed, 0x1eb68), (0x200ab, 0x2029f), (0x2029f, 0x202d0), (0x2035a, 0x20408),
           (0x20095, 0x200ab), (0x1f306, 0x1f31e), (0x1f464, 0x1f476), (0x1f8c0, 0x1f8cf), (0x1f9ec, 0x1fa01), (0x1fb9c, 0x1fbb1)]
 
 
@@ -88,7 +88,9 @@ def cases():
                              '1a26': rng.choice([0, 3]), '1c': rng.choice([10, 40, 0x1e]), 'support': rng.choice([0, 30, 300]), '61': [rng.randrange(8, 24), rng.randrange(8, 24)]},
                     'resources': [rng.choice([0, 100, 5000]) for _ in range(4)], 'enabled': rng.choice([1, 1, 1, 0]),
                     'terrain': [rng.randrange(2), rng.randrange(4, 26), rng.choice([0, 1, 3]), rng.randrange(6)],
-                    'class': rng.choice([[0x808, 0x800], [0x808, 0x800], [0xa08, 0x800]])})
+                    'class': rng.choice([[0x808, 0x800], [0x808, 0x800], [0xa08, 0x800]]),
+                    'build': {'turn': rng.choice([0x400, 0x800, 0, 0x401, 0x3ff]), '1a27': rng.choice([0, 0, 2, 3]), '19f1': rng.choice([0, 100, 5000]),
+                              '35': rng.choice([0, 100, 4000, 90000]), '77': rng.choice([0, 0, 1]), 'seed': rng.randrange(256), 'church': rng.choice([0, 1])}})
         if n % 3 == 0:   # campaign ready to march, and plunder with mines to find
             c = out[-1]; mines = [q for q in others]
             for q in mines:
@@ -142,6 +144,28 @@ def generate(game):
         log.append(b'M' + struct.pack('<BBBI', o.cpu.reg_read(UC_X86_REG_EAX) & 0xff, (o.cpu.reg_read(UC_X86_REG_EAX) >> 8) & 0xff,
                                       o.cpu.reg_read(UC_X86_REG_EBX) & 0xff, o.cpu.reg_read(UC_X86_REG_EBP))); o.ret()
     o.stubs[0xedd5] = edd5
+    # 23551 hooks: 10AD2 free-spot search, 22FE4 site check, A758 object creation, 43E5 registration (recorded).
+    SCRATCH = 0x3f000; build_seed = [0]
+    def flag(z): o.cpu.reg_write(UC_X86_REG_EFLAGS, (o.cpu.reg_read(UC_X86_REG_EFLAGS) & ~0x40) | (0x40 if z else 0))
+    def free_spot():
+        eax, ebx, ecx, edx = (o.cpu.reg_read(r) for r in (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX, UC_X86_REG_EDX))
+        log.append(b'F' + struct.pack('<HBII', eax & 0xffff, ebx & 0xff, ecx, edx))
+        found = ((ecx >> 5) ^ (edx >> 5) ^ build_seed[0]) % 3 != 0
+        if found: o.cpu.reg_write(UC_X86_REG_ECX, (ecx + 0x20) & 0xffffffff)
+        flag(found); o.ret()
+    def site():
+        eax, ebx, ecx = (o.cpu.reg_read(r) for r in (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX))
+        log.append(b'S' + struct.pack('<HBBB', eax & 0xffff, ebx & 0xff, ecx & 0xff, (ecx >> 8) & 0xff))
+        flag((((ecx & 0xff) ^ ((ecx >> 8) & 0xff) ^ build_seed[0]) & 1) == 0); o.ret()
+    def create():
+        eax, ebx, ecx, edx = (o.cpu.reg_read(r) for r in (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX, UC_X86_REG_EDX))
+        log.append(b'A' + struct.pack('<HHII', eax & 0xffff, ebx & 0xffff, ecx, edx))
+        o.cpu.mem_write(o.POOL + SCRATCH, bytes(0x40)); o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + SCRATCH)
+        flag((build_seed[0] & 4) == 0); o.ret()
+    def register():
+        log.append(b'R' + struct.pack('<I', o.cpu.reg_read(UC_X86_REG_EAX))); o.ret()
+    o.stubs[0x10ad2] = free_spot; o.stubs[0x22fe4] = site; o.stubs[0xa758] = create; o.stubs[0x43e5] = register
+    build_digest = hashlib.sha256()
     for case in all_cases:
         o.prepare(32, 32); p = case['participant']; count = case['count']
         o.cpu.mem_write(0x6c6, bytes([count])); o.cpu.mem_write(0x6c8, bytes([count]))
@@ -229,10 +253,27 @@ def generate(game):
         out = bytes([fault]) if fault else bytes([fault]) + bytes(final[0x7b:0x17b]) + bytes(final[LIST:LIST + 1 + SQUAD * n]) + bytes(final[MIL:MIL + 0x15 * 20]) + \
             bytes(final[ORD:ORD + 0x15 * 20]) + bytes(final[0x4f3:0x4f3 + 0x15 * 20]) + bytes(final[0:0x80]) + bytes(o.cpu.mem_read(0x97a + 0xf5 * p + 0x18, 0x18)) + bytes(o.cpu.mem_read(o.POOL + 0x100, at - 0x100)) + bytes(o.cpu.mem_read(0x19eb, 2)) + bytes(o.cpu.mem_read(0xed39, 8)) + b''.join(log)
         digest.update(out); case['sha256_prefix'] = hashlib.sha256(out).hexdigest()[:10]
+        if fault: continue
+        bd = case['build']; build_seed[0] = bd['seed']; log.clear()
+        struct.pack_into('<I', final, 1, bd['turn']); final[0x1a27] = bd['1a27']; struct.pack_into('<I', final, 0x19f1, bd['19f1'])
+        struct.pack_into('<I', final, 0x35, bd['35']); struct.pack_into('<I', final, 0x77, bd['77'])
+        o.cpu.mem_write(stats, bytes(final)); o.cpu.mem_write(o.POOL + SCRATCH, bytes(0x40))
+        if bd['church']:   # open the church (the only class C08h template) in the participant's tree
+            tree = o.PARTICIPANTS + 0x18000 + 0x400 * p; t = bytearray(o.cpu.mem_read(tree, end + 2)); at = 0
+            while t[at + 1] != 0xff:
+                if t[at] == 0x80 and t[at + 1] == 24: t[at + 2] = 0
+                at += 0x10 + 2 * t[at + 0xf]
+            o.cpu.mem_write(tree, bytes(t))
+        o.cpu.reg_write(UC_X86_REG_ESI, stats); o.run(o.CODE + 0x23551)
+        after = bytearray(o.cpu.mem_read(stats, STATS))
+        for k in range(20): after[ORD + k * 0x15 + 4:ORD + k * 0x15 + 8] = bytes(4)   # CL..DH: left by 223B4/22E46
+        bout = bytes(after[0:5]) + bytes(after[ORD:ORD + 0x15 * 20]) + bytes(o.cpu.mem_read(o.POOL + SCRATCH, 0x40)) + b''.join(log) + bytes(o.cpu.mem_read(0x19eb, 2))
+        build_digest.update(bout); case['build']['sha256_prefix'] = hashlib.sha256(bout).hexdigest()[:10]
     print('faults', faults)
     return {'format_version': 1, 'source_sha256': {k: report['source_sha256'][k] for k in ['NORWIND.EXE', 'ARMY__02.DAT']},
             'tree_sha256': hashlib.sha256(raw[:end + 2]).hexdigest(), 'gather_classes_hex': classes.hex(), 'cases': all_cases,
-            'results': {'economy': {'case_count': len(all_cases), 'sha256': digest.hexdigest()}}}
+            'results': {'economy': {'case_count': len(all_cases), 'sha256': digest.hexdigest()},
+                        'construction': {'case_count': sum(1 for c in all_cases if 'sha256_prefix' in c['build']), 'sha256': build_digest.hexdigest()}}}
 
 
 if __name__ == '__main__':

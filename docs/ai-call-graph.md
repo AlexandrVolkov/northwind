@@ -4,34 +4,33 @@
 
 | Статус | Процедур | Инструкций |
 |---|---|---|
-| not ported | 12 | 162 |
-| partial | 2 | 421 |
-| ported | 113 | 5204 |
+| not ported | 10 | 102 |
+| ported | 117 | 5685 |
 
 | Процедура | Инстр. | Статус | Имя | Вызывает (✓ перенесено, ~ частично, · нет) |
 |---|---|---|---|---|
 | 1E53A | 99 | ported | AI block initialisation from character table | 1EB33✓, 1ECA0✓, 219C3✓ |
-| 1E7EA | 34 | not ported |  | 1E87A~, 1ED26✓, 1F078✓, 209B0✓, 20DD0✓, 21E99✓, 221AE✓, 226F1✓, 227C7✓, 2323A~, 23667✓, 23C11✓ |
-| 1E87A | 154 | partial | AI settlement census | 68BD✓, 1EC3F·, 219C3✓ |
+| 1E7EA | 34 | not ported |  | 1E87A✓, 1ED26✓, 1F078✓, 209B0✓, 20DD0✓, 21E99✓, 221AE✓, 226F1✓, 227C7✓, 2323A✓, 23667✓, 23C11✓ |
+| 1E87A | 154 | ported | AI settlement census | 68BD✓, 1EC3F✓, 219C3✓ |
 | 1EAD8 | 6 | ported | AI block of participant |  |
 | 1EAED | 24 | ported | Add AI plan record |  |
 | 1EB33 | 6 | ported | Clear AI plan list |  |
 | 1EB40 | 13 | ported | Find or add AI plan |  |
 | 1EB5C | 6 | ported | Find or add AI plan | 1EB40✓ |
 | 1EBEF | 24 | ported | Random explored cell for AI patrol | 9E41✓, 9E55✓, 219C3✓ |
-| 1EC3F | 20 | not ported |  |  |
+| 1EC3F | 20 | ported | Explored share of the map for a participant |  |
 | 1EC6E | 18 | ported | Area in sight of an object | 6885✓, 218A8✓, 219C3✓ |
 | 1ECA0 | 30 | ported | First living object of a DAT class | 68BD✓ |
 | 1ECF8 | 7 | not ported |  |  |
 | 1ED0F | 7 | not ported |  |  |
-| 1ED26 | 29 | ported | AI squad step loop and steps 0..3 | 1ED77✓, 1ED78✓, 1ED87✓, 1EE02✓, 1EF26·, 1EFCC✓, 205FB✓ |
+| 1ED26 | 29 | ported | AI squad step loop and steps 0..3 | 1ED77✓, 1ED78✓, 1ED87✓, 1EE02✓, 1EF26✓, 1EFCC✓, 205FB✓ |
 | 1ED77 | 1 | ported | AI squad step loop and steps 0..3 |  |
 | 1ED78 | 6 | ported | AI squad step loop and steps 0..3 | B8A2✓ |
 | 1ED87 | 44 | ported | AI squad step loop and steps 0..3 | B765✓, B977✓ |
 | 1EDFD | 2 | ported | AI squad step loop and steps 0..3 |  |
 | 1EE02 | 82 | ported | AI squad step loop and steps 0..3 | 6885✓, 68BD✓, 20408✓, 20458✓, 207CB✓ |
 | 1EF21 | 2 | ported | AI squad step loop and steps 0..3 |  |
-| 1EF26 | 40 | not ported |  | 6996✓, A4C2·, 10075·, 10262·, 1037E·, 103AF· |
+| 1EF26 | 40 | ported | AI squad step 4: march in formation | 6996✓, A4C2·, 10075✓, 10262✓, 1037E✓, 103AF✓ |
 | 1EFB8 | 7 | not ported |  |  |
 | 1EFCC | 16 | ported | AI squad step 5: formation march | B7B9✓ |
 | 1EFF9 | 4 | not ported |  |  |
@@ -75,7 +74,7 @@
 | 1FF51 | 10 | ported | AI squad retreat, march, fight and strength helpers | 21CA0✓ |
 | 1FF74 | 24 | ported | AI squad retreat, march, fight and strength helpers | 20275✓, 20458✓ |
 | 1FFB7 | 26 | ported | AI squad retreat, march, fight and strength helpers | 1FF51✓, 20275✓ |
-| 20001 | 39 | ported | AI squad retreat, march, fight and strength helpers | BA60·, D7B1✓, DA7F·, 1F011· |
+| 20001 | 39 | ported | AI squad retreat, march, fight and strength helpers | BA60✓, D7B1✓, DA7F✓, 1F011· |
 | 20071 | 10 | ported | AI squad retreat, march, fight and strength helpers | 1EAD8✓ |
 | 20095 | 8 | ported | AI squad registry: numbers, create, remove, disband, transfer, lookups |  |
 | 200AB | 3 | ported | AI squad registry: numbers, create, remove, disband, transfer, lookups |  |
@@ -130,7 +129,7 @@
 | 22F82 | 32 | ported | Produce (60h) and build (58h) commands |  |
 | 22FE4 | 86 | ported | Building site check around a cell | 68A0✓, 68BD✓, AF07· |
 | 23201 | 24 | ported | Object of a class in an area | 6885✓, D7B1✓ |
-| 2323A | 267 | partial | AI turn: tribute, collapse, relation decisions | 43E5✓, 9E41✓, 9E55✓, A758~, EDD5✓, EE69✓, 10AD2·, 1EAD8✓, 1EB5C✓, 1ECA0✓, 22E46✓, 22FE4✓, 23A95✓, 23B10✓, 23B6A✓ |
+| 2323A | 267 | ported | AI turn: tribute, collapse, relation decisions | 43E5✓, 9E41✓, 9E55✓, A758~, EDD5✓, EE69✓, 10AD2·, 1EAD8✓, 1EB5C✓, 1ECA0✓, 22E46✓, 22FE4✓, 23A95✓, 23B10✓, 23B6A✓ |
 | 23667 | 243 | ported | AI plan executor | EDD5✓, EE69✓, 1EB40✓, 1EB5C✓, 23ABB✓, 23B10✓ |
 | 23A95 | 14 | ported | AI has plan for target |  |
 | 23ABB | 31 | ported | Cancel military requests against target |  |
@@ -159,17 +158,17 @@
 | B7B9 | ported | Group orders to squad members and squad bounds | 1EFCC |
 | B8A2 | ported | Group orders to squad members and squad bounds | 1ED78 |
 | B977 | ported | Group orders to squad members and squad bounds | 1ED87 |
-| BA60 | unknown |  | 20001 |
+| BA60 | ported | Nearest living squad member to a point | 20001 |
 | C331 | unknown |  | 214C3, 21555, 2160B |
 | C439 | ported | Find worker cargo receiver | 1F476, 1F653 |
 | D19C | unknown |  | 22E85 |
 | D363 | unknown |  | 221AE |
 | D7B1 | ported | Collect unique occupants of an area | 20001, 209B0, 21CA0, 23201, 23B10 |
-| DA7F | unknown |  | 20001 |
+| DA7F | ported | Nearest loaded loot object of another army | 20001 |
 | EDD5 | ported | Queue and dispatch a message | 21E99, 2323A, 23667 |
 | EE69 | ported | Find a queued message by type and party | 2323A, 23667 |
-| 10075 | unknown |  | 1EF26 |
-| 10262 | unknown |  | 1EF26 |
-| 1037E | unknown |  | 1EF26 |
-| 103AF | unknown |  | 1EF26 |
+| 10075 | ported | Lay a formation out around a goal | 1EF26 |
+| 10262 | ported | Rotate a formation by the sine table | 1EF26 |
+| 1037E | ported | Formation scale factor from the member count | 1EF26 |
+| 103AF | ported | Formation of a kind nearest the member count | 1EF26 |
 | 10AD2 | unknown |  | 2323A |

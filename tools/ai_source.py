@@ -23,6 +23,16 @@ def fortifications(payload):
     return out
 
 
+def formations(payload):
+    """LE:3 3D45: zero-terminated pointers (object-relative) to formation records: +0 kind, +1 scale flags, +12 size,
+    +16 place count, places of 15h bytes from +17 (two points, count, class byte)."""
+    out, at = [], 0x3d45
+    while (pointer := struct.unpack_from('<I', payload, at)[0]) != 0:
+        count = payload[pointer + 0x16]
+        out.append(payload[pointer:pointer + 0x17 + count * 0x15].hex()); at += 4
+    return out
+
+
 def extract(game):
     data = (game / 'NORWIND.EXE').read_bytes()
     if hashlib.sha256(data).hexdigest() != EXE_SHA256: raise ValueError('Unknown EXE version')
@@ -42,7 +52,9 @@ def extract(game):
     tables = {'arctangent_hex': objects[1]['payload'][0x287e:0x297e].hex(),        # DS:287E (LE:2), 256 bytes
               'squad_messages_hex': payload[0xf02e:0xf06a].hex(),                    # LE:3 F02E, 5 rows of three text ids
               'army_classes_hex': payload[0xf0e6:0xf0eb].hex(),                      # LE:3 F0E6, mode-8 class bytes
-              'fortifications': fortifications(payload)}                               # LE:3 F0F0, order mode 7
+              'fortifications': fortifications(payload),                               # LE:3 F0F0, order mode 7
+              'sine_hex': objects[1]['payload'][0x2a7e:0x2abe].hex(),                  # DS:2A7E (LE:2), 32 words of a half wave (10262)
+              'formations': formations(payload)}                                       # LE:3 3D45, step 4 (1EF26)
     return {'format_version': 1, 'source_sha256': EXE_SHA256, 'fixup': {'source_operand': source, 'target_object': 3, 'target_offset': TABLE},
             'block_offset': 5, 'characters': characters, **tables}
 

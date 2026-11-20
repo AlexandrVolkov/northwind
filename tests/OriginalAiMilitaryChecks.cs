@@ -153,7 +153,7 @@ public partial class TestRunner
         public byte Random3() => random[RandomIndex3++];
         public byte Global19E9 => 0xff;
         public void Message(ReadOnlySpan<byte> squad, uint text) { }
-        public void Rescue(Span<byte> squad) { }
+        public byte Army(byte participant) => Participants[participant][0];
         public void WorkerState(Span<byte> ai, int at) { }
         public Span<byte> Block(byte participant) => Blocks[participant];
         public ReadOnlySpan<byte> Participant(byte participant) => Participants[participant];
@@ -186,6 +186,26 @@ public partial class TestRunner
             PlacementLog.Add(template); PlacementLog.AddRange(BitConverter.GetBytes((ushort)(template | army << 8))); PlacementLog.Add(x); PlacementLog.Add(y);
             return ((x ^ y ^ template ^ Seed) & 3) != 0;
         }
+        public byte BuildSeed;
+        public readonly byte[] Scratch = new byte[0x40];
+        public (uint X, uint Y)? FreeSpot(uint templateArmy, byte variant, uint x, uint y)
+        {
+            PlacementLog.Add((byte)'F'); PlacementLog.AddRange(BitConverter.GetBytes((ushort)templateArmy)); PlacementLog.Add(variant);
+            PlacementLog.AddRange(BitConverter.GetBytes(x)); PlacementLog.AddRange(BitConverter.GetBytes(y));
+            return ((x >> 5) ^ (y >> 5) ^ BuildSeed) % 3 != 0 ? (x + 0x20, y) : null;
+        }
+        public bool BuildingSite(uint templateArmy, byte participant, byte x, byte y)
+        {
+            PlacementLog.Add((byte)'S'); PlacementLog.AddRange(BitConverter.GetBytes((ushort)templateArmy)); PlacementLog.Add(participant); PlacementLog.Add(x); PlacementLog.Add(y);
+            return ((x ^ y ^ BuildSeed) & 1) == 0;
+        }
+        public byte[]? Create(byte participant, byte army, byte template, byte variant, uint x, uint y)
+        {
+            PlacementLog.Add((byte)'A'); PlacementLog.AddRange(BitConverter.GetBytes((ushort)(army | participant << 8)));
+            PlacementLog.AddRange(BitConverter.GetBytes((ushort)(template | variant << 8))); PlacementLog.AddRange(BitConverter.GetBytes(x)); PlacementLog.AddRange(BitConverter.GetBytes(y));
+            Array.Clear(Scratch); return (BuildSeed & 4) == 0 ? Scratch : null;
+        }
+        public void Register(byte[] record) { PlacementLog.Add((byte)'R'); PlacementLog.AddRange(BitConverter.GetBytes(0x3f000u)); }
         public void Send(byte type, byte other, byte owner, byte bh, uint parameter)
         { PlacementLog.Add((byte)'M'); PlacementLog.Add(type); PlacementLog.Add(other); PlacementLog.Add(owner); PlacementLog.AddRange(BitConverter.GetBytes(parameter)); }
     }
