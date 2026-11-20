@@ -1,0 +1,9 @@
+{
+  "format_version": 1,
+  "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "cases": 144,
+  "output_sha256": "90f501560f161e21effe51dbd14de5483c2f6760b372bd12e1cdc87bcef50538",
+  "stubbed_calls": [
+    "1CC1B (RET after state mutations)"
+  ]
+}

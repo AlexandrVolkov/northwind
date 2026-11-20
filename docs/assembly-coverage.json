@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "c5fb55c1c9dfc7fdd23faf447dc5381f135c687c30bc0ebd052fee7873f0a14e",
+  "annotation_sha256": "31e8d6037ab95812377a26e5c5b014f8e9fd1f0d7ba83a444a5dddd75520d6d2",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,9 +32,9 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 6137,
+        "partial": 6319,
         "ported": 28647,
-        "unreviewed": 111444,
+        "unreviewed": 111262,
         "verified": 654
       },
       "linear_rows": 45008,
@@ -1674,6 +1674,15 @@
         },
         {
           "start": 102789,
+          "end": 102971,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "menu-hourglass-tick"
+          ]
+        },
+        {
+          "start": 102971,
           "end": 103525,
           "status": "unreviewed",
           "classification": "unknown",
