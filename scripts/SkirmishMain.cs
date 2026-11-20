@@ -293,12 +293,30 @@ public partial class SkirmishMain : Node2D
     /// <summary>Pointer scrolling at the screen edge (can be turned off for tests).</summary>
     public bool EdgeScrolling { get; set; } = true;
     public void ExitMission() => GetTree().ChangeSceneToFile("res://scenes/menus.tscn");
+    private OriginalSoundBank? _soundBank;
+    private readonly List<(AudioStreamPlayer2D Player, string File)> _voices = [];
+    /// <summary>Plays the simulation's sounds (A416/A47E) from the original banks. As the mixer does (1414D), a sample that
+    /// already plays on more than one channel is not started again.</summary>
+    private void PlaySounds()
+    {
+        if (Battle.Sounds.Count == 0) return;
+        _soundBank ??= OriginalSoundBank.Load();
+        foreach (var (player, _) in _voices.Where(v => !v.Player.Playing).ToArray()) { _voices.RemoveAll(v => v.Player == player); player.QueueFree(); }
+        foreach (var sound in Battle.Sounds)
+        {
+            if (_soundBank.Choose(sound.Bank, sound.Id, sound.Random) is not { } variant) continue;
+            if (_voices.Count(v => v.File == variant.File) > 1 || _voices.Count >= 32) continue;
+            var player = new AudioStreamPlayer2D { Stream = OriginalSoundBank.Stream(variant), Position = sound.Position, MaxDistance = 1600 };
+            AddChild(player); player.Play(); _voices.Add((player, variant.File));
+        }
+        Battle.Sounds.Clear();
+    }
     public override void _Process(double delta)
     {
         if (!_ready) return;
         Layout();
         if (Battle.Paused) { RefreshUi(); QueueRedraw(); _markers.QueueRedraw(); Hud.QueueRedraw(); return; }
-        Battle.Advance(delta * Speed); RefreshTerrain();
+        Battle.Advance(delta * Speed); RefreshTerrain(); PlaySounds();
         Selection.RemoveWhere(id => Battle.Find(id) == null);
         ScrollMap(delta);
         // While a building is being placed the castle also shows slot 4 «Построить» (bit 4), as on the screenshot.

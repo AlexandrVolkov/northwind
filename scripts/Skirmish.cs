@@ -477,6 +477,23 @@ public sealed partial class Skirmish : IDisposable
         actor.Record[0x22] = 0xff; actor.Record[0x2d] = (byte)((actor.Record[0x2d] & 15) | 0x30); // 8C7C
         return true;
     }
+    /// <summary>A sound to play: bank (ARMY__0n.FX), number, the random byte that picks the variant (9E69) and the point.</summary>
+    public readonly record struct SoundEvent(string Bank, int Id, byte Random, Vector2 Position);
+    /// <summary>Sounds raised by the simulation since the scene last drained them.</summary>
+    public List<SoundEvent> Sounds { get; } = [];
+    private byte SoundRandom() => _aiRandom.Length > 0 ? _aiRandom[_aiRandom3++] : (byte)0;
+    /// <summary>A416: a sound of the object's army bank at its position; number 0 is silent.</summary>
+    private void ObjectSound(SkirmishActor actor, uint id)
+    {
+        if (id != 0 && Sounds.Count < 64) Sounds.Add(new($"ARMY__{actor.Record[0]:00}.FX", (int)id, SoundRandom(), actor.Position));
+    }
+    /// <summary>A47E: a sound of the effect's army bank (+01) at the effect point (+07/+0C); number 0 is allowed.</summary>
+    private void EffectSound(ReadOnlySpan<byte> effect, int? id)
+    {
+        if (id is not { } sound || Sounds.Count >= 64) return;
+        Sounds.Add(new($"ARMY__{effect[1]:00}.FX", sound, SoundRandom(),
+            new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(effect[7..]), BinaryPrimitives.ReadUInt32LittleEndian(effect[0xc..]))));
+    }
     /// <summary>Live arrow effect records (22h bytes, ARMY__00.WRK type 2).</summary>
     public List<byte[]> Arrows { get; } = [];
     /// <summary>Effect loop 96CD for arrows: one AH=1 update per tick.</summary>
@@ -489,8 +506,9 @@ public sealed partial class Skirmish : IDisposable
             var found = OriginalCombatRules.FindStruck(x, y, arrow[5], (byte)Map.Width, Map.Cells, _properties,
                 (p, cell) => Occupancy.Cells[p * plane + cell], r => Find(r) is { } a ? (a.Record, a.Parameters) : null);
             var victim = Find(found.Reference);
-            var (state, _, _) = OriginalArrowRules.Step(arrow, victim != null ? victim.Record : new byte[54], victim != null ? victim.Parameters : new byte[171],
+            var (state, arrowSound, _) = OriginalArrowRules.Step(arrow, victim != null ? victim.Record : new byte[54], victim != null ? victim.Parameters : new byte[171],
                 victim != null, (uint)(Map.Width * 32), (uint)(Map.Height * 32), _terrainCatalog.NextRandomByte);
+            EffectSound(arrow, arrowSound);
             if (state == ArrowState.Flying) continue;
             Arrows.Remove(arrow);
             if (state is ArrowState.Spark or ArrowState.HardSpark) Effects.Add(new BattleEffect { From = new Vector2(x, y) - new Vector2(8, 8), To = new Vector2(x, y), Team = 0, Remaining = .15 });
@@ -515,7 +533,7 @@ public sealed partial class Skirmish : IDisposable
                     r => { if (Find(r) is not { } a) return (new byte[0x40], new byte[171]); struck.Add(a); return (a.Record, a.Parameters); });
                 foreach (var victim in struck) if (!victim.Alive) Kill(victim);
                 if (_terrainCatalog.Crater(Map.Cells, (byte)Map.Width, (byte)Map.Height, x, y, 3) > 0) TerrainRevision++;   // CFAC AX=300h
-                OriginalCatapultRules.Explode(stone);
+                EffectSound(stone, OriginalCatapultRules.Explode(stone));
             }
             else if (stone[0] == OriginalCatapultRules.Explosion) OriginalCatapultRules.Smoke(stone, Wind.X, Wind.Y);
             else if (stone[0] == OriginalCatapultRules.Bolt)
@@ -527,7 +545,7 @@ public sealed partial class Skirmish : IDisposable
                     if (sx >= width || sy >= height) return null;   // 9727 rejects points outside the map
                     var shot = new byte[0x22]; shot[5] = 1;
                     BinaryPrimitives.WriteUInt32LittleEndian(shot.AsSpan(7), sx); BinaryPrimitives.WriteUInt32LittleEndian(shot.AsSpan(0xc), sy);
-                    OriginalFireRules.Create(shot, ReadOnlySpan<byte>.Empty, tx, ty, width, height, _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
+                    EffectSound(shot, OriginalFireRules.Create(shot, ReadOnlySpan<byte>.Empty, tx, ty, width, height, _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte));
                     Stones.Add(shot); return shot;
                 });
                 if (landed is var (bx, by))
@@ -537,14 +555,14 @@ public sealed partial class Skirmish : IDisposable
                         (p, cell) => p * plane + cell < Occupancy.Cells.Length ? Occupancy.Cells[p * plane + cell] : 0,
                         r => { if (Find(r) is not { } a) return (new byte[0x40], new byte[171]); struck.Add(a); return (a.Record, a.Parameters); });
                     foreach (var victim in struck) if (!victim.Alive) Kill(victim);
-                    OriginalCatapultRules.CreateBigExplosion(stone);
+                    EffectSound(stone, OriginalCatapultRules.CreateBigExplosion(stone));
                 }
             }
             else if (stone[0] == OriginalCatapultRules.BigExplosion) OriginalCatapultRules.StepBigExplosion(stone);
             else if (stone[0] == OriginalFireRules.Shot)
             {
                 SkirmishActor? hit = null;
-                var (outcome, _) = OriginalFireRules.Step(stone, (x0, y0) =>
+                var (outcome, fireSound) = OriginalFireRules.Step(stone, (x0, y0) =>
                     {
                         if (x0 >= Map.Width * 32 || y0 >= Map.Height * 32) return;   // 9727 rejects points outside the map
                         var trail = new byte[0x22]; trail[5] = 1;
@@ -559,11 +577,13 @@ public sealed partial class Skirmish : IDisposable
                         return (hit != null ? (hit.Record, hit.Parameters) : null, found.TerrainClass);
                     }, (uint)(Map.Width * 32), (uint)(Map.Height * 32), _terrainCatalog.NextRandomByte);
                 if (hit is { Alive: false }) Kill(hit);
+                EffectSound(stone, fireSound);
+                FireWorld.Current = stone;
                 if (outcome == FireOutcome.Ignite) OriginalBurnRules.Ignite(stone, FireWorld);
                 else if (outcome == FireOutcome.Deflect) OriginalBurnRules.CreateEmbers(stone);
             }
             else if (stone[0] == OriginalFireRules.Trail) OriginalFireRules.StepTrail(stone, Wind.X, Wind.Y);
-            else if (stone[0] is OriginalBurnRules.Small or OriginalBurnRules.Medium or OriginalBurnRules.Large) OriginalBurnRules.Step(stone, FireWorld);
+            else if (stone[0] is OriginalBurnRules.Small or OriginalBurnRules.Medium or OriginalBurnRules.Large) { FireWorld.Current = stone; OriginalBurnRules.Step(stone, FireWorld); }
             else if (stone[0] == OriginalBurnRules.Embers) OriginalBurnRules.StepEmbers(stone);
             else if (stone[0] == OriginalBurnRules.Column) OriginalBurnRules.StepColumn(stone, Wind.X, Wind.Y, (uint)(Map.Width * 32), (uint)(Map.Height * 32));
             if (stone[0] == 0xff) Stones.Remove(stone);
@@ -578,6 +598,8 @@ public sealed partial class Skirmish : IDisposable
     private sealed class FireWorldBridge(Skirmish battle) : IFireWorld
     {
         public readonly HashSet<SkirmishActor> Touched = [];
+        /// <summary>The effect being updated (A47E takes its army and point).</summary>
+        public byte[] Current = new byte[0x22];
         private int Plane => battle.Occupancy.Width * battle.Occupancy.Height;
         public (byte[] Record, byte[] Template) Resolve(uint reference)
         {
@@ -603,11 +625,11 @@ public sealed partial class Skirmish : IDisposable
             var effect = new byte[0x22]; effect[1] = army; effect[5] = layer;
             BinaryPrimitives.WriteUInt32LittleEndian(effect.AsSpan(7), x); BinaryPrimitives.WriteUInt32LittleEndian(effect.AsSpan(0xc), y);
             if (type == OriginalBurnRules.Embers) { OriginalBurnRules.CreateEmbers(effect); if (height is { } h) effect[0x11] = h; }
-            else if (type == OriginalBurnRules.Small) OriginalBurnRules.Ignite(effect, this);
+            else if (type == OriginalBurnRules.Small) { var outer = Current; Current = effect; OriginalBurnRules.Ignite(effect, this); Current = outer; }
             else return;
             if (effect[0] != 0xff) battle.Stones.Add(effect);
         }
-        public void Sound(int id) { }
+        public void Sound(int id) => battle.EffectSound(Current, id);
         public void Scorch(byte x, byte y)
         {
             if (battle._terrainCatalog.Scorch(battle.Map.Cells, (byte)battle.Map.Width, (byte)battle.Map.Height, x, y, 1) > 0) battle.TerrainRevision++;   // CFAC AX=101h
@@ -624,8 +646,10 @@ public sealed partial class Skirmish : IDisposable
             var found = OriginalCombatRules.FindStruck(impact.X, impact.Y, impact.Layer, (byte)Map.Width, Map.Cells, _properties,
                 (p, cell) => Occupancy.Cells[p * plane + cell], r => Find(r) is { } a ? (a.Record, a.Parameters) : null);
             var victim = Find(found.Reference);
-            OriginalCombatRules.StrikeEffect(new byte[0x22], actor.Record, victim != null ? victim.Record : new byte[54],
+            int? strikeSound = OriginalCombatRules.StrikeEffect(new byte[0x22], actor.Record, victim != null ? victim.Record : new byte[54],
                 victim != null ? victim.Parameters : actor.Parameters, victim != null, _terrainCatalog.NextRandomByte);
+            var point = new byte[0x22]; BinaryPrimitives.WriteUInt32LittleEndian(point.AsSpan(7), impact.X); BinaryPrimitives.WriteUInt32LittleEndian(point.AsSpan(0xc), impact.Y);
+            EffectSound(point, strikeSound);
             if (victim is { Alive: false }) Kill(victim);
             return;
         }
@@ -634,8 +658,8 @@ public sealed partial class Skirmish : IDisposable
             // 9727 places effect type 2 (army 0) at the strike point; WRK 593 aims and launches the arrow.
             var arrow = new byte[0x22]; arrow[0] = 2; arrow[1] = 0; arrow[5] = impact.Layer;
             BinaryPrimitives.WriteUInt32LittleEndian(arrow.AsSpan(7), impact.X); BinaryPrimitives.WriteUInt32LittleEndian(arrow.AsSpan(0xc), impact.Y);
-            OriginalArrowRules.Create(arrow, actor.Record, impact.TargetX, impact.TargetY, (uint)(Map.Width * 32), (uint)(Map.Height * 32),
-                _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
+            EffectSound(arrow, OriginalArrowRules.Create(arrow, actor.Record, impact.TargetX, impact.TargetY, (uint)(Map.Width * 32), (uint)(Map.Height * 32),
+                _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte));
             Arrows.Add(arrow); return;
         }
         if (impact.Code >= 128 && (impact.Code & 0x7f) == OriginalCatapultRules.Stone)
@@ -643,8 +667,8 @@ public sealed partial class Skirmish : IDisposable
             // 9727 places effect type 8 at the strike point; WRK 85A aims and launches the stone.
             var stone = new byte[0x22]; stone[0] = OriginalCatapultRules.Stone; stone[5] = impact.Layer;
             BinaryPrimitives.WriteUInt32LittleEndian(stone.AsSpan(7), impact.X); BinaryPrimitives.WriteUInt32LittleEndian(stone.AsSpan(0xc), impact.Y);
-            OriginalCatapultRules.Create(stone, actor.Record, impact.TargetX, impact.TargetY, (uint)(Map.Width * 32), (uint)(Map.Height * 32),
-                _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
+            EffectSound(stone, OriginalCatapultRules.Create(stone, actor.Record, impact.TargetX, impact.TargetY, (uint)(Map.Width * 32), (uint)(Map.Height * 32),
+                _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte));
             Stones.Add(stone); return;
         }
         if (impact.Code >= 128 && (impact.Code & 0x7f) == OriginalFireRules.Shot)
@@ -652,8 +676,8 @@ public sealed partial class Skirmish : IDisposable
             // 9727 places effect type 11h at the strike point; WRK BAB aims and launches the fire shot.
             var shot = new byte[0x22]; shot[0] = OriginalFireRules.Shot; shot[5] = impact.Layer;
             BinaryPrimitives.WriteUInt32LittleEndian(shot.AsSpan(7), impact.X); BinaryPrimitives.WriteUInt32LittleEndian(shot.AsSpan(0xc), impact.Y);
-            OriginalFireRules.Create(shot, actor.Record, impact.TargetX, impact.TargetY, (uint)(Map.Width * 32), (uint)(Map.Height * 32),
-                _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
+            EffectSound(shot, OriginalFireRules.Create(shot, actor.Record, impact.TargetX, impact.TargetY, (uint)(Map.Width * 32), (uint)(Map.Height * 32),
+                _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte));
             Stones.Add(shot); return;
         }
         if (impact.Code >= 128 && (impact.Code & 0x7f) == OriginalCatapultRules.Bolt)
@@ -683,7 +707,8 @@ public sealed partial class Skirmish : IDisposable
     {
         foreach (var actor in Actors.Where(a => a.Dying))
         {
-            var (special, _) = OriginalDeathRules.Dispatch(actor.Record, actor.Parameters);
+            var (special, voice) = OriginalDeathRules.Dispatch(actor.Record, actor.Parameters);
+            if (voice is { } deathSound) ObjectSound(actor, deathSound);   // DAT[A7]
             if (special) { actor.Dying = false; continue; } // 12D08 is not ported
             OriginalDeathRules.Step(actor.Record, actor.Parameters, new DeathWorld(this, actor));
         }
@@ -699,7 +724,8 @@ public sealed partial class Skirmish : IDisposable
     private bool TickVitals(SkirmishActor actor)
     {
         byte before = actor.Record[0x2d];
-        OriginalCombatRules.Vitals(actor.Record, actor.Parameters, _globalTick, (byte)Map.Width, (byte)Map.Height, Map.Cells, _properties, _terrainCatalog, _vitalsWorld ??= new(this));
+        (_vitalsWorld ??= new(this)).Current = actor;
+        OriginalCombatRules.Vitals(actor.Record, actor.Parameters, _globalTick, (byte)Map.Width, (byte)Map.Height, Map.Cells, _properties, _terrainCatalog, _vitalsWorld);
         if (!actor.Alive) { Kill(actor); return true; }
         // 8E0E requested flight to a random cell; non-workers follow it through the route bridge.
         if (!actor.Worker && (actor.Record[0x2d] >> 4) == 2 && (before >> 4) != 2)
@@ -739,7 +765,8 @@ public sealed partial class Skirmish : IDisposable
     }
     private sealed class VitalsWorld(Skirmish battle) : IVitalsWorld
     {
-        public void Sound(uint reference) { } // Sound banks (*.FX) are not ported yet.
+        public SkirmishActor? Current;
+        public void Sound(uint reference) { if (Current != null) battle.ObjectSound(Current, reference); }   // the wound sound DAT[A3]
         public uint Occupant(int plane, int cell) => battle.Occupancy.Cells[plane * battle.Occupancy.Width * battle.Occupancy.Height + cell];
     }
     public void Dispose() => _guidance.Dispose();
