@@ -56,8 +56,14 @@ public static class OriginalWorkerAnimation
         if (record[0x22] == 255)
         {
             // 93DF..9403: object target from OBE[1C]; the caller passes that object's record.
-            if (BinaryPrimitives.ReadUInt32LittleEndian(record[0x1c..]) == 0 || objectTarget.IsEmpty)
-                throw new ArgumentException("Swing at an absent object target (9275 branch) is not ported");
+            if (BinaryPrimitives.ReadUInt32LittleEndian(record[0x1c..]) == 0)
+            {
+                // 93AD set the state nibble to 3; 93E4 returns to 9275, where state = request cancels to idle (92CA).
+                record[0x2d] = 0; record[0x24] = 0;
+                BinaryPrimitives.WriteUInt16LittleEndian(record[1..], unchecked((ushort)(baseFrame + heading * template[0x4a])));
+                return null;
+            }
+            if (objectTarget.IsEmpty) throw new ArgumentException("Swing at an object target needs the target's record");
             BinaryPrimitives.WriteUInt16LittleEndian(record[0x28..], (ushort)BinaryPrimitives.ReadUInt32LittleEndian(objectTarget[4..]));
             BinaryPrimitives.WriteUInt16LittleEndian(record[0x2a..], (ushort)BinaryPrimitives.ReadUInt32LittleEndian(objectTarget[8..]));
             record[0x27] = (byte)(objectTarget[0x0d] & 3);

@@ -195,6 +195,9 @@ public sealed partial class Skirmish
             uint target = BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(0x1c));
             if ((value & 0x40) != 0)
             {
+                // A new command restarts the unit's action: a pending swing (whose target +1C the group order B851 has just
+                // rewritten) is dropped unless the unit keeps attacking the same target.
+                if (!actor.Stepping && !((value & 0xf8) is 0x50 or 0x58 && target == actor.Target)) actor.Record[0x2d] = 0;
                 switch (value & 0xf8)
                 {
                     case 0x40:
@@ -229,6 +232,7 @@ public sealed partial class Skirmish
     private void EnemyWorkerCommand(SkirmishActor worker)
     {
         byte value = worker.Record[0x14];
+        var job = (worker.GatherTree, worker.PreferredMill, worker.MineJob);
         if ((value & 0x40) != 0)
         {
             byte cargo = worker.Record[0x31];
@@ -258,6 +262,9 @@ public sealed partial class Skirmish
                     break;
             }
         }
+        // A changed job cancels a pending swing (+2D high nibble), as the player's orders do; otherwise the swing would
+        // read the new job's +22/+23 as its target.
+        if ((worker.GatherTree, worker.PreferredMill, worker.MineJob) != job) { worker.Record[0x2d] &= 15; worker.HarvestPrepared = false; }
         // A walk whose route could not be planned (TickWorker set the replan delay, no route) ends there, as a soldier's does.
         if (worker.Goal != null && worker.Route.Count == 0 && !worker.Stepping && worker.ReplanTimer > 0) worker.Goal = null;
         if (worker.MineJob) worker.Record[0x14] = 4;
