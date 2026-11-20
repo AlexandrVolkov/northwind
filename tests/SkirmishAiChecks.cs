@@ -46,6 +46,15 @@ public partial class TestRunner
             fought = battle.Actors.Any(a => a.Team == 1 && !a.Structure && (!a.Alive || a.Target != 0 || a.Record[0x14] is 2 or 3));
         }
         Check(fought, "The enemy fights the player's army near the castle");
+        // The campaign (plan 7): the army request 8 fills to +45 and its squad goes to hold the player's land.
+        battle.Move(mine, battle.PlayerCastle.Cell);
+        var home = battle.PlayerCastle.Cell; bool marched = false;
+        for (int second = 0; second < 30 * 60 && !marched; second += 10)
+        {
+            Run(10);
+            marched = battle.Actors.Count(a => a.Team == 1 && a.Alive && !a.Structure && !a.Worker && (a.Cell - home).Length() < 20) >= 3;
+        }
+        Check(marched, "At war the enemy gathers an army and marches on the player's settlement");
         GD.Print($"Skirmish AI: squads {battle.EnemySquadCount}, enemy units {battle.Actors.Count(a => a.Team == 1 && a.Alive && !a.Structure)}, resources {battle.EnemyResources}");
     }
 }

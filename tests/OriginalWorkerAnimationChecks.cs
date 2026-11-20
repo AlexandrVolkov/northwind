@@ -53,6 +53,21 @@ public partial class TestRunner
         Check(count == step.GetProperty("case_count").GetInt32(), "Worker animation reference coverage");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == step.GetProperty("sha256").GetString(),
             "Stationary worker full record and effect request match native x86");
+        var absent = fixture.GetProperty("absent_target"); count = 0;
+        foreach (var config in step.GetProperty("configurations").EnumerateArray())
+        foreach (int state in Numbers(absent.GetProperty("states")))
+        foreach (int timer in Numbers(absent.GetProperty("timers")))
+        foreach (int progress in Numbers(step.GetProperty("progress")))
+        foreach (int heading in Numbers(step.GetProperty("headings")))
+        foreach (int flags in Numbers(step.GetProperty("flags")))
+        {
+            var raw = AnimationRecord((byte)state, (byte)timer, (byte)progress, (byte)heading, (ushort)flags);
+            raw[0x22] = 255; Array.Clear(raw, 0x1c, 4);
+            var impact = OriginalWorkerAnimation.Step(raw, AnimationTemplate(Numbers(config)));
+            digest.AppendData(raw); digest.AppendData(EncodeImpact(impact)); count++;
+        }
+        Check(count == absent.GetProperty("case_count").GetInt32() && Convert.ToHexStringLower(digest.GetHashAndReset()) == absent.GetProperty("sha256").GetString(),
+            "A swing at a cleared object target (93DF → 9275) cancels to idle like native x86");
         var source = GameData.Read<TemplatesData>("res://assets/imported/templates.json").Armies["ARMY__02.DAT"].Templates[10];
         var template = Convert.FromHexString(source.RawRecordHex); var sequence = fixture.GetProperty("sequence");
         Check(Convert.ToHexStringLower(SHA256.HashData(template)) == sequence.GetProperty("template_sha256").GetString(), "Worker sequence uses original DAT");
