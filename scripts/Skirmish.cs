@@ -325,9 +325,14 @@ public sealed partial class Skirmish : IDisposable
         // A small tolerance keeps whole-tick requests (n / TicksPerSecond) from losing a tick to rounding.
         while (_accumulator >= step - 1e-9 && budget-- > 0 && Outcome == "") { Tick(step); _accumulator -= step; }
     }
+    /// <summary>The wind (9E7D), updated on every running timer tick (9BF9); its vector drifts smoke and carries fire.</summary>
+    public WindState Wind;
+    private byte _windTimer;   // [19E8]
     private void Tick(double dt)
     {
         Elapsed += dt;
+        _windTimer++;
+        OriginalWindRules.Step(ref Wind, _windTimer, _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
         foreach (var effect in Effects) effect.Remaining -= dt;
         Effects.RemoveAll(e => e.Remaining <= 0);
         TickArrows(); // 96CD runs on every world step: twice per object update at the default speed
@@ -496,7 +501,7 @@ public sealed partial class Skirmish : IDisposable
     /// and their smoke (12h).</summary>
     public List<byte[]> Stones { get; } = [];
     /// <summary>Effect loop 96CD for stones: flight D6E6; on landing BD0F hits the cell (planes 0 and 1) and the stone
-    /// becomes an explosion. The crater CFAC and the drift vector [1C8E] (9E7D) are not ported: no crater, no drift.</summary>
+    /// becomes an explosion. The crater CFAC is not ported.</summary>
     private void TickStones()
     {
         int plane = Occupancy.Width * Occupancy.Height;
@@ -511,7 +516,7 @@ public sealed partial class Skirmish : IDisposable
                 foreach (var victim in struck) if (!victim.Alive) Kill(victim);
                 OriginalCatapultRules.Explode(stone);
             }
-            else if (stone[0] == OriginalCatapultRules.Explosion) OriginalCatapultRules.Smoke(stone, 0, 0);
+            else if (stone[0] == OriginalCatapultRules.Explosion) OriginalCatapultRules.Smoke(stone, Wind.X, Wind.Y);
             else if (stone[0] == OriginalFireRules.Shot)
             {
                 SkirmishActor? hit = null;
@@ -533,10 +538,10 @@ public sealed partial class Skirmish : IDisposable
                 if (outcome == FireOutcome.Ignite) OriginalBurnRules.Ignite(stone, FireWorld);
                 else if (outcome == FireOutcome.Deflect) OriginalBurnRules.CreateEmbers(stone);
             }
-            else if (stone[0] == OriginalFireRules.Trail) OriginalFireRules.StepTrail(stone, 0, 0);
+            else if (stone[0] == OriginalFireRules.Trail) OriginalFireRules.StepTrail(stone, Wind.X, Wind.Y);
             else if (stone[0] is OriginalBurnRules.Small or OriginalBurnRules.Medium or OriginalBurnRules.Large) OriginalBurnRules.Step(stone, FireWorld);
             else if (stone[0] == OriginalBurnRules.Embers) OriginalBurnRules.StepEmbers(stone);
-            else if (stone[0] == OriginalBurnRules.Column) OriginalBurnRules.StepColumn(stone, 0, 0, (uint)(Map.Width * 32), (uint)(Map.Height * 32));
+            else if (stone[0] == OriginalBurnRules.Column) OriginalBurnRules.StepColumn(stone, Wind.X, Wind.Y, (uint)(Map.Width * 32), (uint)(Map.Height * 32));
             if (stone[0] == 0xff) Stones.Remove(stone);
         }
         foreach (var burnt in _fireWorld?.Touched ?? []) if (!burnt.Alive && Actors.Contains(burnt) && !burnt.Dying) Kill(burnt);
@@ -544,8 +549,8 @@ public sealed partial class Skirmish : IDisposable
     }
     private FireWorldBridge? _fireWorld;
     private FireWorldBridge FireWorld => _fireWorld ??= new(this);
-    /// <summary>World of the fire (CE3) in the skirmish. The drift vector (wind, 9E7D) and the scorched ground (CFAC) are
-    /// not ported: no drift, so a medium fire neither grows nor spreads; the ground keeps its trees. Sounds are not played.</summary>
+    /// <summary>World of the fire (CE3) in the skirmish, with the ported wind. The scorched ground (CFAC) is not ported: the
+    /// ground keeps its trees. Sounds are not played.</summary>
     private sealed class FireWorldBridge(Skirmish battle) : IFireWorld
     {
         public readonly HashSet<SkirmishActor> Touched = [];
@@ -580,7 +585,7 @@ public sealed partial class Skirmish : IDisposable
         }
         public void Sound(int id) { }
         public void Scorch(byte x, byte y) { }
-        public (int X, int Y) Drift => (0, 0);
+        public (int X, int Y) Drift => (battle.Wind.X, battle.Wind.Y);
     }
     private void ResolveImpact(SkirmishActor actor, SkirmishActor target, WorkerImpact impact)
     {
