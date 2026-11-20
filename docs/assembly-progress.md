@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 111262 | 6319 | 654 | 28647 | 44 |
+| LE:1 | 146882 | 110929 | 6652 | 654 | 28647 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -187,6 +187,7 @@
 | LE:1 `0x18CE5..0x18EC5` | Five menu cursor family initializers | verified | [menu-widgets.md](../docs/menu-widgets.md); [menu-cursor.json](../tests/fixtures/menu-cursor.json) | Пять инициализаторов исполнены под Unicorn; шаг курсора и рисование не перенесены. |
 | LE:1 `0x18ED4..0x18EF5` | Advance menu widget frame by byte timer | ported | [menu-widgets.md](../docs/menu-widgets.md); [menu-animation.json](../tests/fixtures/menu-animation.json) | Сверены 4374 вызова двух helpers; внешние callbacks виджетов и отрисовка не входят. |
 | LE:1 `0x18EF5..0x18F16` | Reverse menu widget frame by byte timer | ported | [menu-widgets.md](../docs/menu-widgets.md); [menu-animation.json](../tests/fixtures/menu-animation.json) | Сверены 4374 вызова двух helpers; внешние callbacks виджетов и отрисовка не входят. |
+| LE:1 `0x18F16..0x19063` | Menu plaque callback including pressed completion | partial | [menu-widgets.md](../docs/menu-widgets.md); [menu-button-press.json](../tests/fixtures/menu-button-press.json) | Только AL=1 с уже установленным widget[12h]=1; наведение 18699, другие события и реальные действия не перенесены. В Unicorn указатель действия заменён счётчиком/RET. |
 | LE:1 `0x19063..0x190ED` | Bush and candle idle widget callbacks | partial | [menu-widgets.md](../docs/menu-widgets.md); [menu-widgets.json](../tests/fixtures/menu-widgets.json) | Только событие AL=1 (шаг кадров) перенесено и сверено; события 0/2/3, растеризация и полные побочные эффекты 192EA не входят. В Unicorn 192EA заглушён RET на входе. |
 | LE:1 `0x190ED..0x19185` | Owl idle callback and phase switch | partial | [menu-widgets.md](../docs/menu-widgets.md); [menu-widgets.json](../tests/fixtures/menu-widgets.json) | Только событие AL=1 (шаг кадров) перенесено и сверено; события 0/2/3, растеризация и полные побочные эффекты 192EA не входят. В Unicorn 192EA заглушён RET на входе. |
 | LE:1 `0x19185..0x1923B` | Hourglass widget timer and launch flag | partial | [menu-widgets.md](../docs/menu-widgets.md); [menu-hourglass.json](../tests/fixtures/menu-hourglass.json) | Только событие AL=1; в Unicorn 1CC1B заглушён RET после записи флага/очистки ввода. Остальные события и внешний переход не перенесены. |

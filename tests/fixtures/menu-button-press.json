@@ -1,0 +1,9 @@
+{
+  "format_version": 1,
+  "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "cases": 72,
+  "output_sha256": "087c5c9e90d909b2b275133a686e9e39f95953e46f246302847da82c06ae23d6",
+  "stubbed_calls": [
+    "Action pointer at widget+0A replaced by counter/RET"
+  ]
+}
