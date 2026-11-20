@@ -492,7 +492,8 @@ public sealed partial class Skirmish : IDisposable
             if (victim is { Alive: false }) Kill(victim);
         }
     }
-    /// <summary>Live catapult stones (type 8) and their explosions (type 10), 22h-byte effect records.</summary>
+    /// <summary>Live missile effects, 22h-byte records: catapult stones (type 8) and their explosions (10), fire shots (11h)
+    /// and their smoke (12h).</summary>
     public List<byte[]> Stones { get; } = [];
     /// <summary>Effect loop 96CD for stones: flight D6E6; on landing BD0F hits the cell (planes 0 and 1) and the stone
     /// becomes an explosion. The crater CFAC and the drift vector [1C8E] (9E7D) are not ported: no crater, no drift.</summary>
@@ -511,6 +512,28 @@ public sealed partial class Skirmish : IDisposable
                 OriginalCatapultRules.Explode(stone);
             }
             else if (stone[0] == OriginalCatapultRules.Explosion) OriginalCatapultRules.Smoke(stone, 0, 0);
+            else if (stone[0] == OriginalFireRules.Shot)
+            {
+                SkirmishActor? hit = null;
+                var (outcome, _) = OriginalFireRules.Step(stone, (x0, y0) =>
+                    {
+                        if (x0 >= Map.Width * 32 || y0 >= Map.Height * 32) return;   // 9727 rejects points outside the map
+                        var trail = new byte[0x22]; trail[5] = 1;
+                        BinaryPrimitives.WriteUInt32LittleEndian(trail.AsSpan(7), x0); BinaryPrimitives.WriteUInt32LittleEndian(trail.AsSpan(0xc), y0);
+                        OriginalFireRules.CreateTrail(trail); Stones.Add(trail);
+                    },
+                    (px, py) =>
+                    {
+                        var found = OriginalCombatRules.FindStruck(px, py, stone[5], (byte)Map.Width, Map.Cells, _properties,
+                            (p, cell) => Occupancy.Cells[p * plane + cell], r => Find(r) is { } a ? (a.Record, a.Parameters) : null);
+                        hit = Find(found.Reference);
+                        return (hit != null ? (hit.Record, hit.Parameters) : null, found.TerrainClass);
+                    }, (uint)(Map.Width * 32), (uint)(Map.Height * 32), _terrainCatalog.NextRandomByte);
+                if (hit is { Alive: false }) Kill(hit);
+                // The fire of CE3 (types 13h..15h) and the deflection FA4 are not ported yet: the shot ends there.
+                if (outcome is FireOutcome.Ignite or FireOutcome.Deflect) stone[0] = 0xff;
+            }
+            else if (stone[0] == OriginalFireRules.Trail) OriginalFireRules.StepTrail(stone, 0, 0);
             if (stone[0] == 0xff) Stones.Remove(stone);
         }
     }
@@ -547,7 +570,16 @@ public sealed partial class Skirmish : IDisposable
                 _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
             Stones.Add(stone); return;
         }
-        // Other missile types (ballista, fire) are not ported: the hit lands on the engaged target with the same attack.
+        if (impact.Code >= 128 && (impact.Code & 0x7f) == OriginalFireRules.Shot)
+        {
+            // 9727 places effect type 11h at the strike point; WRK BAB aims and launches the fire shot.
+            var shot = new byte[0x22]; shot[0] = OriginalFireRules.Shot; shot[5] = impact.Layer;
+            BinaryPrimitives.WriteUInt32LittleEndian(shot.AsSpan(7), impact.X); BinaryPrimitives.WriteUInt32LittleEndian(shot.AsSpan(0xc), impact.Y);
+            OriginalFireRules.Create(shot, actor.Record, impact.TargetX, impact.TargetY, (uint)(Map.Width * 32), (uint)(Map.Height * 32),
+                _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
+            Stones.Add(shot); return;
+        }
+        // Other missile types (ballista) are not ported: the hit lands on the engaged target with the same attack.
         OriginalCombatRules.Hit(target.Record, target.Parameters, OriginalCombatRules.StrikeAttack(actor.Record[0x16]), (byte)(actor.Record[0x14] & 7), _terrainCatalog.NextRandomByte);
         if (!target.Alive) Kill(target);
     }

@@ -3332,6 +3332,30 @@
       "evidence": ["docs/combat.md", "tests/fixtures/catapult.json"],
       "implementation": ["scripts/OriginalCatapultRules.cs"],
       "limitations": ""
+    },
+    {
+      "id": "fire-shot",
+      "module": "ARMY__00.WRK",
+      "start": 2987,
+      "end": 3210,
+      "name": "Fire shot effect (type 11h)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/fire.json"],
+      "implementation": ["scripts/OriginalFireRules.cs"],
+      "limitations": "CE3 fire and FA4 deflection are continuations"
+    },
+    {
+      "id": "smoke-trail",
+      "module": "ARMY__00.WRK",
+      "start": 3210,
+      "end": 3299,
+      "name": "Smoke trail effect (type 12h)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/fire.json"],
+      "implementation": ["scripts/OriginalFireRules.cs"],
+      "limitations": ""
     }
   ]
 }
