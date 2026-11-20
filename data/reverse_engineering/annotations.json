@@ -4661,6 +4661,23 @@
         "tools/save_source.py"
       ],
       "limitations": "Статически проверены ветвление и исходные строки LE:3; снимок подтверждает состояние 3. Победное состояние 4 на живом экране не снято; полный callback не исполнялся под Unicorn."
+    },
+    {
+      "id": "save-scenario11-loader",
+      "module": "LE:1",
+      "start": 64611,
+      "end": 65222,
+      "name": "Load scenario 11h and preserve participant identity prefixes",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/save-format.md",
+        "data/original_save_layout.json"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Разделение 16 записей 0F5h на 9 байт старого эпизода и 0ECh из SAV, а также три счётчика +18/+1C/+20 подтверждены; проверки окружения и DOS I/O не исполнены, хвостовые списки непрозрачны."
     }
   ]
 }

@@ -23,6 +23,184 @@
         "participant_records_offset": 77,
         "participant_records_length": 3920,
         "participant_records_sha256": "77854c0717925350714779feafaa68e3c61bfc545ea4fb82b021bbb03f6663c0",
+        "participants": [
+          {
+            "index": 0,
+            "offset": 77,
+            "sha256": "8cb43ca3e4fb62d8c024de321d085fdda576a4cece7f0aacf6589f786006ee6e",
+            "prefix9_sha256": "fc936388974e41c8e6ec034b73607a1ab97a875031f7dbc04f1bdfd34bd9fe29",
+            "balance_fields_18_1c_20": [
+              1976,
+              1976,
+              0
+            ]
+          },
+          {
+            "index": 1,
+            "offset": 322,
+            "sha256": "c5177351a5072f53d0fc372933903c2a5358da33efe6cbf1d34cc9a554e67cd2",
+            "prefix9_sha256": "ed61359e4db38f701834f318d4ca39eb173d3762ef86f3b3c6f036c95cf789e3",
+            "balance_fields_18_1c_20": [
+              500,
+              500,
+              500
+            ]
+          },
+          {
+            "index": 2,
+            "offset": 567,
+            "sha256": "f69f59dc2ff9d12d4744fd5a409fee72052fef2e0244b00dd2c375e978efe8c7",
+            "prefix9_sha256": "c57c720a463762930a93855d0ba2407db68840f1350ddfd2ec3a46118614d83a",
+            "balance_fields_18_1c_20": [
+              500,
+              500,
+              500
+            ]
+          },
+          {
+            "index": 3,
+            "offset": 812,
+            "sha256": "cba3e10555a1e47e76b8f19d9cc294dac7fe7ae0b92f21459ce0ff1fea1e6d31",
+            "prefix9_sha256": "e61425df5a398855dad603050509cffd3ab9aabf0a39c504ef15a9d4761ba7c6",
+            "balance_fields_18_1c_20": [
+              20536,
+              74746,
+              0
+            ]
+          },
+          {
+            "index": 4,
+            "offset": 1057,
+            "sha256": "69ba253aa0ce03afedb9e02589af0947ab24c884e2f358e6b3c350ad47f6e8e0",
+            "prefix9_sha256": "dad67a5c80a1c1d7197de9ce80e008288818338a31e9a4f347ce8328a48af5b9",
+            "balance_fields_18_1c_20": [
+              112145,
+              134112,
+              415912
+            ]
+          },
+          {
+            "index": 5,
+            "offset": 1302,
+            "sha256": "6901ae0189957526ba28182e5f9b4f076c417f5a10ac013c8b53bbae7b00c27f",
+            "prefix9_sha256": "b89a238a3fd7c26bf12af3c9e47d3babd9d1978ff95e94ba0d863d10b2dbdea6",
+            "balance_fields_18_1c_20": [
+              8120,
+              8120,
+              30980
+            ]
+          },
+          {
+            "index": 6,
+            "offset": 1547,
+            "sha256": "1221703fa5137950ca6e6aaa1506f2ce4b13d0ab92479146b3a16ba702c044b6",
+            "prefix9_sha256": "d1a02296b5dfe3b3a6528739c49ae202fbe85e826419b707716107d4a5c28f4d",
+            "balance_fields_18_1c_20": [
+              10000,
+              10000,
+              10000
+            ]
+          },
+          {
+            "index": 7,
+            "offset": 1792,
+            "sha256": "4ca2a726bd6d6338651d4183ec4d1bcbba03dc13ffe90160dc8f57acad6ab29d",
+            "prefix9_sha256": "de5e64f5bc04f41b6055f8a1253cb470cdb3d371f8ce1256320744004abfadfc",
+            "balance_fields_18_1c_20": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "index": 8,
+            "offset": 2037,
+            "sha256": "02d8f3f83865737e056ccdf3d1bf8dcd4d3b68ce8cb63f3663f092afa6174958",
+            "prefix9_sha256": "3e7077fd2f66d689e0cee6a7cf5b37bf2dca7c979af356d0a31cbc5c85605c7d",
+            "balance_fields_18_1c_20": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "index": 9,
+            "offset": 2282,
+            "sha256": "02d8f3f83865737e056ccdf3d1bf8dcd4d3b68ce8cb63f3663f092afa6174958",
+            "prefix9_sha256": "3e7077fd2f66d689e0cee6a7cf5b37bf2dca7c979af356d0a31cbc5c85605c7d",
+            "balance_fields_18_1c_20": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "index": 10,
+            "offset": 2527,
+            "sha256": "02d8f3f83865737e056ccdf3d1bf8dcd4d3b68ce8cb63f3663f092afa6174958",
+            "prefix9_sha256": "3e7077fd2f66d689e0cee6a7cf5b37bf2dca7c979af356d0a31cbc5c85605c7d",
+            "balance_fields_18_1c_20": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "index": 11,
+            "offset": 2772,
+            "sha256": "02d8f3f83865737e056ccdf3d1bf8dcd4d3b68ce8cb63f3663f092afa6174958",
+            "prefix9_sha256": "3e7077fd2f66d689e0cee6a7cf5b37bf2dca7c979af356d0a31cbc5c85605c7d",
+            "balance_fields_18_1c_20": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "index": 12,
+            "offset": 3017,
+            "sha256": "02d8f3f83865737e056ccdf3d1bf8dcd4d3b68ce8cb63f3663f092afa6174958",
+            "prefix9_sha256": "3e7077fd2f66d689e0cee6a7cf5b37bf2dca7c979af356d0a31cbc5c85605c7d",
+            "balance_fields_18_1c_20": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "index": 13,
+            "offset": 3262,
+            "sha256": "02d8f3f83865737e056ccdf3d1bf8dcd4d3b68ce8cb63f3663f092afa6174958",
+            "prefix9_sha256": "3e7077fd2f66d689e0cee6a7cf5b37bf2dca7c979af356d0a31cbc5c85605c7d",
+            "balance_fields_18_1c_20": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "index": 14,
+            "offset": 3507,
+            "sha256": "02d8f3f83865737e056ccdf3d1bf8dcd4d3b68ce8cb63f3663f092afa6174958",
+            "prefix9_sha256": "3e7077fd2f66d689e0cee6a7cf5b37bf2dca7c979af356d0a31cbc5c85605c7d",
+            "balance_fields_18_1c_20": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "index": 15,
+            "offset": 3752,
+            "sha256": "02d8f3f83865737e056ccdf3d1bf8dcd4d3b68ce8cb63f3663f092afa6174958",
+            "prefix9_sha256": "3e7077fd2f66d689e0cee6a7cf5b37bf2dca7c979af356d0a31cbc5c85605c7d",
+            "balance_fields_18_1c_20": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
         "header_length": 3997,
         "visibility_length": 16384,
         "visibility_sha256": "020ce316745ebc2c8a620dfb7bdb142fc657004932640f10ae0a9f7b9553b14b",

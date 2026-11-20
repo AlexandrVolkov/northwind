@@ -33,6 +33,7 @@ class SaveSourceChecks(unittest.TestCase):
                          ('game    .epi', 4, 5))
         self.assertEqual((result['visibility_length'], result['variable_lists_length']), (16, 3))
         self.assertEqual(len(result['fixed_segments']), 7)
+        self.assertEqual(result['participants'][-1]['offset'] + 0xF5, result['header_length'])
         for invalid in (body[:0xF9C], body[:0xF9D+15]):
             with self.assertRaises(ValueError): parse_scenario11(invalid)
 
@@ -65,6 +66,8 @@ class SaveSourceChecks(unittest.TestCase):
         scenario = records[0]['scenario11']
         self.assertEqual(scenario['visibility_length'], 16384)
         self.assertEqual((scenario['variable_list_count'], scenario['variable_lists_length']), (5, 29296))
+        self.assertEqual(len(scenario['participants']), 16)
+        self.assertEqual(scenario['participants'][0]['balance_fields_18_1c_20'], [1976, 1976, 0])
         self.assertEqual(scenario['variable_lists_offset'] + scenario['variable_lists_length'], records[0]['length'])
         self.assertEqual([r['length'] for r in records], [988085, 25893, 69520, 69520])
         self.assertEqual(records[0]['header_offset'], 4)

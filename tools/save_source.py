@@ -43,11 +43,20 @@ def parse_scenario11(payload):
                              sha256=hashlib.sha256(payload[offset:end]).hexdigest()))
         offset = end
     filename = payload[0x14:0x21].split(b'\0', 1)[0].decode('cp866')
+    participants = []
+    for index in range(16):
+        base = 0x4D + index * 0xF5
+        record = payload[base:base + 0xF5]
+        participants.append(dict(index=index, offset=base,
+                                 sha256=hashlib.sha256(record).hexdigest(),
+                                 prefix9_sha256=hashlib.sha256(record[:9]).hexdigest(),
+                                 balance_fields_18_1c_20=list(struct.unpack_from('<III', record, 0x18))))
     return dict(episode_filename=filename, width=width, height=height,
                 byte_1ec5=payload[0x21], byte_6c6=count_6c6,
                 byte_6c7=count_6c7, byte_6c8=count_6c8,
                 participant_records_offset=0x4D, participant_records_length=0xF50,
                 participant_records_sha256=hashlib.sha256(payload[0x4D:header_length]).hexdigest(),
+                participants=participants,
                 header_length=header_length, visibility_length=cells,
                 visibility_sha256=segments[0]['sha256'], fixed_segments=segments,
                 variable_list_count=count_6c7, variable_lists_offset=offset,
