@@ -20,7 +20,7 @@ def cabinet_slot_caption(index, state):
 
 
 
-def parse_scenario11(payload):
+def parse_scenario11(payload, tree_sizes=None):
     """Known FAB4..FC62 write sequence; the final variable lists stay opaque."""
     header_length = 0xF9D
     if len(payload) < header_length: raise ValueError('Truncated 11h scenario header')
@@ -43,6 +43,7 @@ def parse_scenario11(payload):
                              sha256=hashlib.sha256(payload[offset:end]).hexdigest()))
         offset = end
     filename = payload[0x14:0x21].split(b'\0', 1)[0].decode('cp866')
+    field_190e, field_1912 = struct.unpack_from('<II', payload, 0x24)
     participants = []
     for index in range(16):
         base = 0x4D + index * 0xF5
@@ -51,7 +52,22 @@ def parse_scenario11(payload):
                                  sha256=hashlib.sha256(record).hexdigest(),
                                  prefix9_sha256=hashlib.sha256(record[:9]).hexdigest(),
                                  balance_fields_18_1c_20=list(struct.unpack_from('<III', record, 0x18))))
+    tree_banks = []
+    if tree_sizes is not None:
+        if len(tree_sizes) != count_6c7 or any(size < 0 for size in tree_sizes):
+            raise ValueError('TRE bank count or size mismatch')
+        cursor = offset
+        for index, size in enumerate(tree_sizes):
+            length = size * 16
+            end = cursor + length
+            if end > len(payload): raise ValueError('Truncated TRE bank')
+            tree_banks.append(dict(index=index, tre_file_size=size, offset=cursor, length=length,
+                                   sha256=hashlib.sha256(payload[cursor:end]).hexdigest()))
+            cursor = end
+        if cursor != len(payload): raise ValueError('TRE banks do not fill scenario tail')
     return dict(episode_filename=filename, width=width, height=height,
+                field_190e=field_190e, field_1912=field_1912,
+                field_1906=field_190e >> 5, field_190a=field_1912 >> 5,
                 byte_1ec5=payload[0x21], byte_6c6=count_6c6,
                 byte_6c7=count_6c7, byte_6c8=count_6c8,
                 participant_records_offset=0x4D, participant_records_length=0xF50,
@@ -61,7 +77,8 @@ def parse_scenario11(payload):
                 visibility_sha256=segments[0]['sha256'], fixed_segments=segments,
                 variable_list_count=count_6c7, variable_lists_offset=offset,
                 variable_lists_length=len(payload) - offset,
-                variable_lists_sha256=hashlib.sha256(payload[offset:]).hexdigest())
+                variable_lists_sha256=hashlib.sha256(payload[offset:]).hexdigest(),
+                tree_banks=tree_banks)
 
 
 def parse_session99(payload):
@@ -108,7 +125,7 @@ def parse_area22(payload):
                 bucket_sha256=[hashlib.sha256(buckets[i:i + bucket_size]).hexdigest()
                                for i in range(0, len(buckets), bucket_size)])
 
-def parse(data):
+def parse(data, tree_sizes=None):
     if len(data) < 4: raise ValueError('Truncated save header')
     count = struct.unpack_from('<I', data)[0]
     if count > 4096: raise ValueError('Unreasonable save record count')
@@ -125,7 +142,7 @@ def parse(data):
                       length=size, tag=tag, tag_hex=f'{tag:08X}',
                       payload_sha256=hashlib.sha256(payload).hexdigest())
         if tag == 0x66: record['victory_path_marker'] = True
-        if tag & 0xFFFF == 0x11: record['scenario11'] = parse_scenario11(payload)
+        if tag & 0xFFFF == 0x11: record['scenario11'] = parse_scenario11(payload, tree_sizes)
         if tag == 0x99: record['campaign99'] = parse_session99(payload)
         if tag & 0xFFFF == 0x22: record['area22'] = parse_area22(payload)
         records.append(record)
@@ -139,8 +156,10 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('save', type=Path)
     ap.add_argument('--output', type=Path, default=Path('data/original_save_layout.json'))
+    ap.add_argument('--tree-sizes', type=str, help='Comma-separated original TRE file sizes for each bank')
     args = ap.parse_args()
-    report = parse(args.save.read_bytes())
+    sizes = [int(x) for x in args.tree_sizes.split(',')] if args.tree_sizes else None
+    report = parse(args.save.read_bytes(), sizes)
     args.output.write_text(json.dumps(report, indent=2) + '\n')
     print(f'{report["record_count"]} records in {report["file_size"]} bytes: '+
           ', '.join(f'{x["tag_hex"]}:{x["length"]}' for x in report['records']))

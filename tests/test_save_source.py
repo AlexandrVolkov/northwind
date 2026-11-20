@@ -66,10 +66,16 @@ class SaveSourceChecks(unittest.TestCase):
         scenario = records[0]['scenario11']
         self.assertEqual(scenario['visibility_length'], 16384)
         self.assertEqual((scenario['variable_list_count'], scenario['variable_lists_length']), (5, 29296))
+        self.assertEqual((scenario['field_190e'], scenario['field_1912']), (480, 1152))
+        self.assertEqual((scenario['field_1906'], scenario['field_190a']), (15, 36))
         self.assertEqual(len(scenario['participants']), 16)
         self.assertEqual(scenario['participants'][0]['balance_fields_18_1c_20'], [1976, 1976, 0])
         self.assertEqual(scenario['variable_lists_offset'] + scenario['variable_lists_length'], records[0]['length'])
         self.assertEqual([r['length'] for r in records], [988085, 25893, 69520, 69520])
+        self.assertEqual([x['tre_file_size'] for x in scenario['tree_banks']], [632, 404, 759, 18, 18])
+        self.assertEqual([x['length'] for x in scenario['tree_banks']], [10112, 6464, 12144, 288, 288])
+        self.assertEqual(scenario['tree_banks'][0]['offset'], scenario['variable_lists_offset'])
+        self.assertEqual(scenario['tree_banks'][-1]['offset'] + scenario['tree_banks'][-1]['length'], records[0]['length'])
         self.assertEqual(records[0]['header_offset'], 4)
         self.assertEqual([r['payload_offset'] + r['length'] for r in records[:-1]],
                          [r['header_offset'] for r in records[1:]])

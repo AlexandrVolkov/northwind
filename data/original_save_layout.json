@@ -16,6 +16,10 @@
         "episode_filename": "game    .epi",
         "width": 128,
         "height": 128,
+        "field_190e": 480,
+        "field_1912": 1152,
+        "field_1906": 15,
+        "field_190a": 36,
         "byte_1ec5": 1,
         "byte_6c6": 8,
         "byte_6c7": 5,
@@ -251,7 +255,44 @@
         "variable_list_count": 5,
         "variable_lists_offset": 958789,
         "variable_lists_length": 29296,
-        "variable_lists_sha256": "8812f8cf6cc384e159387157d7b2525f22c4c9a3a88e0393ae96e2be1ac9ebb5"
+        "variable_lists_sha256": "8812f8cf6cc384e159387157d7b2525f22c4c9a3a88e0393ae96e2be1ac9ebb5",
+        "tree_banks": [
+          {
+            "index": 0,
+            "tre_file_size": 632,
+            "offset": 958789,
+            "length": 10112,
+            "sha256": "f48758fd5fedae7ea7c91d9b993004e4ea26ecaee5fa4cf16a5a2f9304396077"
+          },
+          {
+            "index": 1,
+            "tre_file_size": 404,
+            "offset": 968901,
+            "length": 6464,
+            "sha256": "ab834799d62387a5d9da49878d926dd4de1e70c11e821f8e45f6f79d59ef1c3a"
+          },
+          {
+            "index": 2,
+            "tre_file_size": 759,
+            "offset": 975365,
+            "length": 12144,
+            "sha256": "5fed3e45b903e086660733e70e16522a914e2a83fe89941d442463d9b42debb6"
+          },
+          {
+            "index": 3,
+            "tre_file_size": 18,
+            "offset": 987509,
+            "length": 288,
+            "sha256": "e707bd2352aa36c584ec3a769b6bb8576b83812138c8ae80380fa164dcac8b74"
+          },
+          {
+            "index": 4,
+            "tre_file_size": 18,
+            "offset": 987797,
+            "length": 288,
+            "sha256": "e707bd2352aa36c584ec3a769b6bb8576b83812138c8ae80380fa164dcac8b74"
+          }
+        ]
       }
     },
     {
