@@ -153,7 +153,7 @@ public partial class TestRunner
         public byte Random3() => random[RandomIndex3++];
         public byte Global19E9 => 0xff;
         public void Message(ReadOnlySpan<byte> squad, uint text) { }
-        public void Rescue(Span<byte> squad) { }
+        public byte Army(byte participant) => Participants[participant][0];
         public void WorkerState(Span<byte> ai, int at) { }
         public Span<byte> Block(byte participant) => Blocks[participant];
         public ReadOnlySpan<byte> Participant(byte participant) => Participants[participant];

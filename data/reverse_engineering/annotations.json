@@ -3128,6 +3128,42 @@
       "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
       "limitations": "10AD2, 22FE4, A758 and 43E5 are hooks"
+    },
+    {
+      "id": "ai-loot-pickup",
+      "module": "LE:1",
+      "start": 131073,
+      "end": 131185,
+      "name": "AI squad sends a member to nearby loot",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-nearest-loot",
+      "module": "LE:1",
+      "start": 55935,
+      "end": 56135,
+      "name": "Nearest loaded loot object of another army",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-nearest-member",
+      "module": "LE:1",
+      "start": 47712,
+      "end": 47839,
+      "name": "Nearest living squad member to a point",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
     }
   ]
 }

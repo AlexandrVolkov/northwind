@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 113178 | 5512 | 97 | 28095 | 44 |
+| LE:1 | 146882 | 112851 | 5512 | 97 | 28422 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -127,6 +127,7 @@
 | LE:1 `0xB502..0xB5AB` | Remove one random ore mark and replace its surface | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Пометка грязной области экрана (B565..B5A4) не переносится. |
 | LE:1 `0xB72D..0xB764` | Intersect command slots across selected group members | partial | [interface.md](../docs/interface.md); [command-panel.json](../tests/fixtures/command-panel.json) | Фильтрация шести слотов по WorkFlags и ненулевому совпадающему raw_group проверена на 1600 парах. Исходный обход цепочки выделения и запись runtime-указателей не перенесены. |
 | LE:1 `0xB765..0xB9EB` | Group orders to squad members and squad bounds | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) | the order primitives write the OBE command fields only; their execution by WRK is a separate system |
+| LE:1 `0xBA60..0xBADF` | Nearest living squad member to a point | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0xBE04..0xBE2E` | Apply damage to one prepared target | ported | [building-condition-kernel.md](../docs/building-condition-kernel.md); [building-kernel.json](../tests/fixtures/building-kernel.json) | Хвост после подготовки шаблона и силы; выбор цели, генерация силы, площадное действие и смерть с эффектами вне контракта. |
 | LE:1 `0xBFC9..0xC010` | Apply a hit: attack minus defence or a small chance of one point | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
 | LE:1 `0xC344..0xC35F` | Chebyshev distance between object centres | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
@@ -145,6 +146,7 @@
 | LE:1 `0xD7B1..0xD85E` | Collect unique occupants of an area | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 | LE:1 `0xD85E..0xD895` | Search area around the unit | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 | LE:1 `0xD895..0xDA45` | Enemy search: radius, filters, nearest with tie on attacker | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) | Видимость, контакт и враждебность в схватке задаёт мост. |
+| LE:1 `0xDA7F..0xDB47` | Nearest loaded loot object of another army | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0xEDD5..0xEE38` | Queue and dispatch a message | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xEE69..0xEE92` | Find a queued message by type and party | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xEEFA..0xEF3F` | Drop messages between two settlements | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
@@ -173,6 +175,7 @@
 | LE:1 `0x1F71A..0x1F72C` | Set worker squad state 10 | ported | [ai.md](../docs/ai.md); [ai-economy.json](../tests/fixtures/ai-economy.json) |  |
 | LE:1 `0x1F72C..0x1FBB1` | AI squad states 4..8 | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0x1FBB1..0x20095` | AI squad retreat, march, fight and strength helpers | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | 20001 (stuck-member rescue) and the A4C2 message display are hooks |
+| LE:1 `0x20001..0x20071` | AI squad sends a member to nearby loot | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0x20095..0x2029F` | AI squad registry: numbers, create, remove, disband, transfer, lookups | ported | [ai.md](../docs/ai.md); [ai-squads.json](../tests/fixtures/ai-squads.json) | on overflow 200B5 releases pool byte «participant» instead of the new number, as in the original |
 | LE:1 `0x2029F..0x202D0` | Free units join a squad up to a strength | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x202FB..0x2035A` | Squad members leave up to a strength | ported | [ai.md](../docs/ai.md); [ai-garrison.json](../tests/fixtures/ai-garrison.json) |  |
