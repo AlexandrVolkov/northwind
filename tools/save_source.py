@@ -66,11 +66,34 @@ def parse_scenario11(payload, tree_sizes=None, tree_sources=None):
             bank = dict(index=index, tre_file_size=size, offset=cursor, length=length,
                         sha256=hashlib.sha256(payload[cursor:end]).hexdigest())
             if tree_sources is not None:
+                try:
+                    from tools.tech_source import decode as decode_tree
+                except ModuleNotFoundError:
+                    from tech_source import decode as decode_tree
                 source = tree_sources[index]
+                records, _ = decode_tree(source)
                 bank['source_sha256'] = hashlib.sha256(source).hexdigest()
-                bank['copies'] = [dict(index=i, sha256=hashlib.sha256(payload[cursor + i*size:cursor + (i+1)*size]).hexdigest(),
-                                       differing_bytes=sum(a != b for a, b in zip(source, payload[cursor + i*size:cursor + (i+1)*size])))
-                                  for i in range(16)]
+                copies = []
+                for i in range(16):
+                    saved = payload[cursor + i*size:cursor + (i+1)*size]
+                    changed = [at for at, (a, b) in enumerate(zip(source, saved)) if a != b]
+                    copy = dict(index=i, sha256=hashlib.sha256(saved).hexdigest(),
+                                differing_bytes=len(changed))
+                    if changed:
+                        changes = []
+                        explained = set()
+                        for record in records:
+                            at = record['offset']
+                            if source[at] != saved[at] or source[at + 2] != saved[at + 2]:
+                                changes.append(dict(record_offset=at, record_kind=record['kind'],
+                                                    record_id=record['id'], kind_before=source[at],
+                                                    kind_after=saved[at], unmet_before=source[at + 2],
+                                                    unmet_after=saved[at + 2]))
+                                explained.update((at, at + 2))
+                        copy['tech_changes'] = changes
+                        copy['other_changed_offsets'] = [at for at in changed if at not in explained]
+                    copies.append(copy)
+                bank['copies'] = copies
             tree_banks.append(bank)
             cursor = end
         if cursor != len(payload): raise ValueError('TRE banks do not fill scenario tail')

@@ -79,6 +79,12 @@ class SaveSourceChecks(unittest.TestCase):
         modified = [(bank['index'], copy['index'], copy['differing_bytes'])
                     for bank in scenario['tree_banks'] for copy in bank['copies'] if copy['differing_bytes']]
         self.assertEqual(modified, [(1, 11, 7), (2, 12, 18)])
+        self.assertTrue(all(not copy['other_changed_offsets'] for bank in scenario['tree_banks']
+                            for copy in bank['copies'] if copy['differing_bytes']))
+        self.assertEqual(sum((change['kind_before'] != change['kind_after']) +
+                             (change['unmet_before'] != change['unmet_after'])
+                             for bank in scenario['tree_banks'] for copy in bank['copies']
+                             if copy['differing_bytes'] for change in copy['tech_changes']), 25)
         self.assertEqual(records[0]['header_offset'], 4)
         self.assertEqual([r['payload_offset'] + r['length'] for r in records[:-1]],
                          [r['header_offset'] for r in records[1:]])

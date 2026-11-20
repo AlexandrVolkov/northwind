@@ -413,7 +413,73 @@
               {
                 "index": 11,
                 "sha256": "3e9a4a671658d87807bdd0a1f09c3147af10249301212e6d56812e6b7b42cb7c",
-                "differing_bytes": 7
+                "differing_bytes": 7,
+                "tech_changes": [
+                  {
+                    "record_offset": 64,
+                    "record_kind": 1,
+                    "record_id": 3,
+                    "kind_before": 1,
+                    "kind_after": 129,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 116,
+                    "record_kind": 2,
+                    "record_id": 8,
+                    "kind_before": 2,
+                    "kind_after": 130,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 134,
+                    "record_kind": 128,
+                    "record_id": 5,
+                    "kind_before": 128,
+                    "kind_after": 128,
+                    "unmet_before": 1,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 150,
+                    "record_kind": 128,
+                    "record_id": 6,
+                    "kind_before": 128,
+                    "kind_after": 128,
+                    "unmet_before": 2,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 282,
+                    "record_kind": 2,
+                    "record_id": 9,
+                    "kind_before": 2,
+                    "kind_after": 130,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 300,
+                    "record_kind": 128,
+                    "record_id": 12,
+                    "kind_before": 128,
+                    "kind_after": 128,
+                    "unmet_before": 1,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 332,
+                    "record_kind": 1,
+                    "record_id": 13,
+                    "kind_before": 1,
+                    "kind_after": 129,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  }
+                ],
+                "other_changed_offsets": []
               },
               {
                 "index": 12,
@@ -508,7 +574,163 @@
               {
                 "index": 12,
                 "sha256": "809d1c498a12cbbf4eda5aae182f5459c28b9f3c330e02e4200aea7265a3a33e",
-                "differing_bytes": 18
+                "differing_bytes": 18,
+                "tech_changes": [
+                  {
+                    "record_offset": 64,
+                    "record_kind": 1,
+                    "record_id": 3,
+                    "kind_before": 1,
+                    "kind_after": 129,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 98,
+                    "record_kind": 1,
+                    "record_id": 4,
+                    "kind_before": 1,
+                    "kind_after": 129,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 186,
+                    "record_kind": 1,
+                    "record_id": 7,
+                    "kind_before": 1,
+                    "kind_after": 129,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 220,
+                    "record_kind": 2,
+                    "record_id": 0,
+                    "kind_before": 2,
+                    "kind_after": 130,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 254,
+                    "record_kind": 128,
+                    "record_id": 12,
+                    "kind_before": 128,
+                    "kind_after": 128,
+                    "unmet_before": 1,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 302,
+                    "record_kind": 128,
+                    "record_id": 15,
+                    "kind_before": 128,
+                    "kind_after": 128,
+                    "unmet_before": 2,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 318,
+                    "record_kind": 1,
+                    "record_id": 15,
+                    "kind_before": 1,
+                    "kind_after": 129,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 336,
+                    "record_kind": 0,
+                    "record_id": 16,
+                    "kind_before": 0,
+                    "kind_after": 128,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 352,
+                    "record_kind": 2,
+                    "record_id": 9,
+                    "kind_before": 2,
+                    "kind_after": 130,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 370,
+                    "record_kind": 128,
+                    "record_id": 17,
+                    "kind_before": 128,
+                    "kind_after": 128,
+                    "unmet_before": 1,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 386,
+                    "record_kind": 2,
+                    "record_id": 8,
+                    "kind_before": 2,
+                    "kind_after": 130,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 404,
+                    "record_kind": 128,
+                    "record_id": 18,
+                    "kind_before": 128,
+                    "kind_after": 128,
+                    "unmet_before": 1,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 468,
+                    "record_kind": 0,
+                    "record_id": 22,
+                    "kind_before": 0,
+                    "kind_after": 128,
+                    "unmet_before": 1,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 484,
+                    "record_kind": 1,
+                    "record_id": 22,
+                    "kind_before": 1,
+                    "kind_after": 129,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 502,
+                    "record_kind": 128,
+                    "record_id": 23,
+                    "kind_before": 128,
+                    "kind_after": 128,
+                    "unmet_before": 1,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 518,
+                    "record_kind": 1,
+                    "record_id": 23,
+                    "kind_before": 1,
+                    "kind_after": 129,
+                    "unmet_before": 0,
+                    "unmet_after": 0
+                  },
+                  {
+                    "record_offset": 536,
+                    "record_kind": 128,
+                    "record_id": 24,
+                    "kind_before": 128,
+                    "kind_after": 128,
+                    "unmet_before": 1,
+                    "unmet_after": 0
+                  }
+                ],
+                "other_changed_offsets": []
               },
               {
                 "index": 13,
