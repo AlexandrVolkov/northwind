@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 113456 | 5512 | 97 | 27817 | 44 |
+| LE:1 | 146882 | 113178 | 5512 | 97 | 28095 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 4908 | 100 | 0 | 395 | 0 |
@@ -210,6 +210,7 @@
 | LE:1 `0x22FE4..0x230ED` | Building site check around a cell | ported | [ai.md](../docs/ai.md); [ai-orders.json](../tests/fixtures/ai-orders.json); [original_producers.json](../data/original_producers.json) | AF07 permission is a hook |
 | LE:1 `0x23201..0x2323A` | Object of a class in an area | ported | [ai.md](../docs/ai.md); [ai-orders.json](../tests/fixtures/ai-orders.json); [original_producers.json](../data/original_producers.json) |  |
 | LE:1 `0x2323A..0x23551` | AI turn: tribute, collapse, relation decisions | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) | plan bytes +5..+7 are register leftovers, written as zero |
+| LE:1 `0x23551..0x23667` | AI turn tail: castle rebuild and class C08h order | ported | [ai.md](../docs/ai.md); [ai-economy.json](../tests/fixtures/ai-economy.json) | 10AD2, 22FE4, A758 and 43E5 are hooks |
 | LE:1 `0x23667..0x23A6E` | AI plan executor | ported | [ai.md](../docs/ai.md); [ai-plans.json](../tests/fixtures/ai-plans.json) | message parameters and +1AB register bytes not modelled |
 | LE:1 `0x23A6E..0x23A95` | Set mutual relation | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0x23A95..0x23ABB` | AI has plan for target | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |

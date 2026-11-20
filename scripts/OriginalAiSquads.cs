@@ -1876,6 +1876,14 @@ public interface IAiEconomyWorld : IAiMilitaryWorld
     bool SiteAllowed(byte template, byte army, byte participant, byte x, byte y);
     /// <summary>EDD5: message type, other, owner, BH, parameter.</summary>
     void Send(byte type, byte other, byte owner, byte bh, uint parameter);
+    /// <summary>10AD2 (hook): a free place for the template in growing rings around the point (AC63); null when none.</summary>
+    (uint X, uint Y)? FreeSpot(uint templateArmy, byte variant, uint x, uint y);
+    /// <summary>22FE4 (hook here): the building site check at the cell.</summary>
+    bool BuildingSite(uint templateArmy, byte participant, byte x, byte y);
+    /// <summary>A758 (hook): a new object of the participant; 23551 then marks it under construction (+14 = 81h, +1A = 1)
+    /// and registers it (43E5). Null when no object can be allocated.</summary>
+    byte[]? Create(byte participant, byte army, byte template, byte variant, uint x, uint y);
+    void Register(byte[] record);
 }
 
 /// <summary>AI economy LE:1 21E99 (income, upkeep, economic requests in list +4F3, farm and building orders) and 221AE
@@ -1938,6 +1946,29 @@ public sealed class OriginalAiEconomy(IAiEconomyWorld world, OriginalAiMilitary 
             }
         }
         W32(ai, 1, U32(ai, 1) - 0xd);
+    }
+
+    /// <summary>23551..23666, the end of the turn 2323A: each 1024 turns a settlement without a castle (1ECA0, F08h/508h)
+    /// places a new one near the home (±127 points by 9E41/9E55, 10AD2, 22FE4, A758); with strength +19F1 at least +35
+    /// and bit 0 of +77 clear it orders a random building of class C08h (list +34F, kind 5, key 5Ah, priority 8Ch; CL..DH
+    /// are leftovers of 223B4/22E46, written as zero). Finally +1 −= 42h (2365C).</summary>
+    public void Construction(Span<byte> ai)
+    {
+        if ((U32(ai, 1) & 0x3ff) == 0 && (ai[0x1a27] & 2) == 0
+            && OriginalAiResearch.FirstObject(world.Chain(ai[0]), 0xf08, 0x508) == null && Random(ai, 0xf08, 0x508) is { } castle)
+        {
+            byte variant = (byte)(world.Template(ai[0], (byte)castle)[0x77] & 3);
+            uint x = unchecked((uint)(ai[0x61] << 5) + (uint)(sbyte)world.Random());
+            uint y = unchecked((uint)(ai[0x62] << 5) + (uint)(sbyte)world.Random2());
+            if (world.FreeSpot(castle, variant, x, y) is var (fx, fy) && world.BuildingSite(castle, ai[0], (byte)(fx >> 5), (byte)(fy >> 5))
+                && world.Create(ai[0], (byte)(castle >> 8), (byte)castle, variant, fx, fy) is { } record)
+            {
+                record[0x14] = 0x81; record[0x1a] = 1; world.Register(record);
+            }
+        }
+        if ((U32(ai, 1) & 0x3ff) == 0 && U32(ai, 0x19f1) >= U32(ai, 0x35) && (U32(ai, 0x77) & 1) == 0 && Random(ai, 0xf08, 0xc08) is { } building)
+            OriginalAiMilitary.Request(ai, Orders, 5, 0x5a, 0x8c, 0, 0, 0, 0, building);
+        W32(ai, 1, U32(ai, 1) - 0x42);
     }
 
     private static byte Urgency(byte count, uint stock) => (byte)(0x82 + (count == 0 ? 0x50 : 0) + (stock <= 0x96 ? 0x1e : 0));

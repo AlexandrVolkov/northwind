@@ -5,13 +5,13 @@
 | Статус | Процедур | Инструкций |
 |---|---|---|
 | not ported | 12 | 162 |
-| partial | 2 | 421 |
-| ported | 113 | 5204 |
+| partial | 1 | 154 |
+| ported | 114 | 5471 |
 
 | Процедура | Инстр. | Статус | Имя | Вызывает (✓ перенесено, ~ частично, · нет) |
 |---|---|---|---|---|
 | 1E53A | 99 | ported | AI block initialisation from character table | 1EB33✓, 1ECA0✓, 219C3✓ |
-| 1E7EA | 34 | not ported |  | 1E87A~, 1ED26✓, 1F078✓, 209B0✓, 20DD0✓, 21E99✓, 221AE✓, 226F1✓, 227C7✓, 2323A~, 23667✓, 23C11✓ |
+| 1E7EA | 34 | not ported |  | 1E87A~, 1ED26✓, 1F078✓, 209B0✓, 20DD0✓, 21E99✓, 221AE✓, 226F1✓, 227C7✓, 2323A✓, 23667✓, 23C11✓ |
 | 1E87A | 154 | partial | AI settlement census | 68BD✓, 1EC3F·, 219C3✓ |
 | 1EAD8 | 6 | ported | AI block of participant |  |
 | 1EAED | 24 | ported | Add AI plan record |  |
@@ -130,7 +130,7 @@
 | 22F82 | 32 | ported | Produce (60h) and build (58h) commands |  |
 | 22FE4 | 86 | ported | Building site check around a cell | 68A0✓, 68BD✓, AF07· |
 | 23201 | 24 | ported | Object of a class in an area | 6885✓, D7B1✓ |
-| 2323A | 267 | partial | AI turn: tribute, collapse, relation decisions | 43E5✓, 9E41✓, 9E55✓, A758~, EDD5✓, EE69✓, 10AD2·, 1EAD8✓, 1EB5C✓, 1ECA0✓, 22E46✓, 22FE4✓, 23A95✓, 23B10✓, 23B6A✓ |
+| 2323A | 267 | ported | AI turn: tribute, collapse, relation decisions | 43E5✓, 9E41✓, 9E55✓, A758~, EDD5✓, EE69✓, 10AD2·, 1EAD8✓, 1EB5C✓, 1ECA0✓, 22E46✓, 22FE4✓, 23A95✓, 23B10✓, 23B6A✓ |
 | 23667 | 243 | ported | AI plan executor | EDD5✓, EE69✓, 1EB40✓, 1EB5C✓, 23ABB✓, 23B10✓ |
 | 23A95 | 14 | ported | AI has plan for target |  |
 | 23ABB | 31 | ported | Cancel military requests against target |  |
