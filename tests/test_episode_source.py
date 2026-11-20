@@ -29,3 +29,17 @@ class EpisodeSourceTests(unittest.TestCase):
         raw[0] = 0
         with self.assertRaises(ValueError):
             parse_episode(bytes(raw))
+
+    def test_only_original_leader_triggers_area_switch(self):
+        catalog = json.loads((ROOT / 'assets/imported/templates.json').read_text(encoding='utf-8'))['armies']
+        matches = []
+        total = 0
+        for army, group in catalog.items():
+            for template in group['templates']:
+                total += 1
+                record = bytes.fromhex(template['raw_record_hex'])
+                flags = int.from_bytes(record[0x40:0x44], 'little')
+                if flags & 0x0f00 == 0x0f00:
+                    matches.append((army, template['template_index'], template['name'], flags))
+        self.assertEqual(total, 123)
+        self.assertEqual(matches, [('ARMY__02.DAT', 20, 'Предводитель', 0x200f00)])
