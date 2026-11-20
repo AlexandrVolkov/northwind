@@ -1,0 +1,30 @@
+{
+  "format_version": 1,
+  "source": "WORK.SPR",
+  "source_sha256": "27d8d82fb49a41e6ec8786af996ba1fe24e15090202a1588dea117b538e22e0d",
+  "palette": "COLOR1.PAL",
+  "palette_sha256": "022e87d1ccd4961b08d54e073da6bff5cf28a9aa9577dc78422b211407c33a32",
+  "executable_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "widget_le3": 15361,
+  "selector_le1": 60229,
+  "icons": [
+    {
+      "sprite": 359,
+      "file": "359.png",
+      "label": "голубь",
+      "width": 32,
+      "height": 32,
+      "record_bytes": 1052,
+      "rgba_sha256": "d94279b7cd57c54d0568d3c9cddcea6c2e156dfaa15989b75d1e629db063e720"
+    },
+    {
+      "sprite": 360,
+      "file": "360.png",
+      "label": "скрещённые мечи",
+      "width": 32,
+      "height": 32,
+      "record_bytes": 1052,
+      "rgba_sha256": "f1e3281815d171b133d9313b0efa8c09d4b09730dd61623949ad86cbed0d3b36"
+    }
+  ]
+}
