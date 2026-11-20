@@ -7,6 +7,17 @@ from pathlib import Path
 import struct
 
 
+def cabinet_slot_caption(index, state):
+    """LE:1 1B619..1B650: caption chosen for a cabinet slot's state byte."""
+    if not 0 <= index < 8:
+        raise ValueError('Cabinet has eight slots')
+    if state in (2, 3):
+        return f'Игра {index}'
+    if state == 4:
+        return 'Игра окончена'
+    return 'Новая игра'
+
+
 
 
 def parse_scenario11(payload):

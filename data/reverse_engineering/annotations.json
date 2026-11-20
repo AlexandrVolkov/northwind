@@ -4644,6 +4644,23 @@
         "tools/save_source.py"
       ],
       "limitations": "Ветвь при 1EC6=3 пишет tag66h через FA79/F967 без payload; реальный победный SAV отсутствует, DOS путь не исполнен в этом срезе."
+    },
+    {
+      "id": "save-cabinet-caption",
+      "module": "LE:1",
+      "start": 112126,
+      "end": 112213,
+      "name": "Select and render save cabinet slot caption",
+      "classification": "code",
+      "status": "verified",
+      "evidence": [
+        "docs/save-format.md",
+        "docs/reference/original-save-occupied.png"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Статически проверены ветвление и исходные строки LE:3; снимок подтверждает состояние 3. Победное состояние 4 на живом экране не снято; полный callback не исполнялся под Unicorn."
     }
   ]
 }
