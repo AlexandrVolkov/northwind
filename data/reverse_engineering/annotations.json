@@ -4337,6 +4337,40 @@
         "tools/save_source.py"
       ],
       "limitations": "Проверены инструкции и реальный четырёхраздельный файл, Python читает только внешний контейнер; DOS INT 21h не исполнялся под Unicorn, запись SAV и payload не перенесены."
+    },
+    {
+      "id": "save-campaign99-write",
+      "module": "LE:1",
+      "start": 65222,
+      "end": 65338,
+      "name": "Write 99h campaign session record",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/save-format.md",
+        "data/original_save_layout.json"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Сверена структурная длина 25+512+12×841h на реальном файле и поля заголовка; внутренние блоки, DOS I/O и игровая семантика не перенесены."
+    },
+    {
+      "id": "save-campaign99-read",
+      "module": "LE:1",
+      "start": 65338,
+      "end": 65494,
+      "name": "Read 99h campaign session record",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/save-format.md",
+        "data/original_save_layout.json"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Сверена структурная длина 25+512+12×841h на реальном файле и поля заголовка; внутренние блоки, DOS I/O и игровая семантика не перенесены."
     }
   ]
 }

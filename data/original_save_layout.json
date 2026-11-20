@@ -20,7 +20,48 @@
       "length": 25893,
       "tag": 153,
       "tag_hex": "00000099",
-      "payload_sha256": "e1a185a89a1303152511eb291aa6cb2a8bbf3bb0192c1afa898ad0b4480960a3"
+      "payload_sha256": "e1a185a89a1303152511eb291aa6cb2a8bbf3bb0192c1afa898ad0b4480960a3",
+      "campaign99": {
+        "current_participant": 0,
+        "field_1cad": 4294967295,
+        "field_1cb1": 0,
+        "field_1cb5": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "table_length": 512,
+        "table_sha256": "a45dd2d222d4cad5ced325704e13a86d71beee3123656358f28002253c4d2344",
+        "region_record_size": 2113,
+        "region_count": 12,
+        "region_sha256": [
+          "65dd829cd8e1cfd683a56aece71dda5cb54b7b9757f2f7617cd9db53e765a814",
+          "0071850545f4ad9a026696d9f7d0e8f391a01fcb7d8a84429fb71ac455d675ba",
+          "32a3bf400391d83b7812189114861b0f90536e2a0520b8c4b65c750973b98de5",
+          "fce749dea85995aeeef29552aaac84396006de614ab56a2057b66088b2896587",
+          "be4e42b24a285b3dd918e7ce16de7456d40841103dab8c5cf47bd15aced7d8fc",
+          "c04bdba0cd7d7533a9b308175a70bb2573ad98baa2b09e15ad173555e1c539f9",
+          "926ad366ab2a4ecb6ebad2c1b9ef2e9bc230c98c4a79239fc0f80ff7ddb7736a",
+          "1787a2b516b98d3e112333f6283b16dbcb883719557c207ece68d57a247318ec",
+          "d0c1adf90103c311bc74964cfe35817f2ab8c8b942714d9a2bac6518c0f3a2c5",
+          "9b686b124c477372eb10e6a5536643699165c0b9ef0ff523b4f4aafb10568f73",
+          "610b6a574c2e33926b0b1673551e5dfdef46e6a578a518d92a6fc9346578422e",
+          "3ebb30805e0ca0a22d62c41cdcba0c22a4267895c1daff8f2a9abde34e8594ac"
+        ]
+      }
     },
     {
       "index": 2,
