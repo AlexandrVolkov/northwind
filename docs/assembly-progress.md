@@ -7,9 +7,9 @@
 | LE:1 | 146882 | 111125 | 5512 | 97 | 30148 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 3283 | 100 | 0 | 2020 | 0 |
+| ARMY__00.WRK | 5403 | 3228 | 100 | 0 | 2075 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
-| ARMY__02.WRK | 6930 | 6109 | 609 | 0 | 212 | 7 |
+| ARMY__02.WRK | 6930 | 5917 | 609 | 0 | 404 | 7 |
 | ARMY__03.WRK | 13412 | 13412 | 0 | 0 | 0 | 1 |
 | ARMY__04.WRK | 411 | 411 | 0 | 0 | 0 | 0 |
 | ARMY__05.WRK | 882 | 882 | 0 | 0 | 0 | 2 |
@@ -22,6 +22,7 @@
 | --- | --- | --- | --- | --- |
 | ARMY__00.WRK `0x4F3..0x54A` | Melee strike effect: experience attack, lookup, hit, sound | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Объект-эффект и его анимация в схватке не создаются. |
 | ARMY__00.WRK `0x593..0x6C7` | Arrow effect: launch, flight, early and arrival hits | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) | Обработчики 7FE/AEB не перенесены. |
+| ARMY__00.WRK `0x6C7..0x6FE` | Blood splash effect (type 3) | ported | [combat.md](../docs/combat.md); [corpse.json](../tests/fixtures/corpse.json) |  |
 | ARMY__00.WRK `0x6FE..0x762` | Spark effect types 4/5 creation and countdown | partial | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Перенесено создание (AH=0); обновление кадров не подключено. |
 | ARMY__00.WRK `0x85A..0x8DA` | Catapult stone effect (type 8) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | ARMY__00.WRK `0x986..0x9D5` | Explosion effect (type 10) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | drift vector 9E7D not ported |
@@ -49,6 +50,7 @@
 | ARMY__02.WRK `0x9B2..0x9D2` | Return loaded worker to empty template | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Только пустой груз; ветвь сбрасываемого груза/эффекта после 09D0 и смерть не перенесены. |
 | ARMY__02.WRK `0x9ED..0xA9B` | Ore worker handler header, init and action table | partial | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Перенесены инициализация A09 и переход A37..A43; общий префикс 90E9 и диспетчер 8227 не перенесены. |
 | ARMY__02.WRK `0xA9B..0xAB3` | Empty ore worker becomes template 10 | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Ветка сброса груза AB3..ACE (объект 26h) не перенесена. |
+| ARMY__02.WRK `0x161D..0x16DD` | Unit corpse effect (type 1) | ported | [combat.md](../docs/combat.md); [corpse.json](../tests/fixtures/corpse.json) |  |
 | LE:1 `0x2F03..0x2F1B` | Copy four initial resource stocks from SCN | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json) | Только извлечение четырёх dword SCN +15..24; прочие поля владельца, DOS-загрузка и цикл всех слотов вне перенесённого участка. |
 | LE:1 `0x3593..0x35A8` | DAT header and record stride | partial | [executable-analysis.md](../docs/executable-analysis.md) | Статически подтверждён участок чтения заголовка и шага 171; полный загрузчик, ошибки и релокации не перенесены. |
 | LE:1 `0x35B9..0x35C2` | WRK base assignment | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждено сохранение адреса WRK; это не весь загрузчик. |

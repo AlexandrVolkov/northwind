@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "c325b762ce6f75ddaa822a71e5befe9e9a39e330e7cc67b3ef259e51e36390d6",
+  "annotation_sha256": "27ec211e2994122496b0869491bce0076a484b9932ff87eea27345a7774c3135",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -2513,8 +2513,8 @@
       "sha256": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33",
       "byte_status": {
         "partial": 100,
-        "ported": 2020,
-        "unreviewed": 3283
+        "ported": 2075,
+        "unreviewed": 3228
       },
       "linear_rows": 1709,
       "flow_candidate_instructions": 416,
@@ -2559,9 +2559,11 @@
         {
           "start": 1735,
           "end": 1790,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "blood-splash"
+          ]
         },
         {
           "start": 1790,
@@ -2744,8 +2746,8 @@
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
         "partial": 609,
-        "ported": 212,
-        "unreviewed": 6109
+        "ported": 404,
+        "unreviewed": 5917
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -3000,6 +3002,22 @@
         },
         {
           "start": 2739,
+          "end": 5661,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 5661,
+          "end": 5853,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "unit-corpse"
+          ]
+        },
+        {
+          "start": 5853,
           "end": 6930,
           "status": "unreviewed",
           "classification": "unknown",

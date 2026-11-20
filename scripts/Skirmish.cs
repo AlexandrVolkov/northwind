@@ -702,9 +702,18 @@ public sealed partial class Skirmish : IDisposable
         target.Dying = !target.Structure;
         Log($"{target.Source.TemplateName} {(target.Team == 0 ? "потерян" : "уничтожен")}.");
     }
+    /// <summary>Corpses (ARMY__02 type 1, army +01 = 2) and blood splashes (ARMY__00 type 3), 22h-byte effect records.</summary>
+    public List<byte[]> Corpses { get; } = [];
+    private void TickCorpses()
+    {
+        foreach (var e in Corpses)
+            if (e[1] == 2) OriginalCorpseRules.Step(e); else OriginalCorpseRules.StepBlood(e);
+        Corpses.RemoveAll(e => e[0] == 0xff);
+    }
     /// <summary>95D3/A4DF for dead units: death frames by hit kind, then removal. Occupancy was already cleared by Kill.</summary>
     private void TickDeaths()
     {
+        TickCorpses();
         foreach (var actor in Actors.Where(a => a.Dying))
         {
             var (special, voice) = OriginalDeathRules.Dispatch(actor.Record, actor.Parameters);
@@ -716,7 +725,25 @@ public sealed partial class Skirmish : IDisposable
     private sealed class DeathWorld(Skirmish battle, SkirmishActor actor) : IDeathWorld
     {
         public void ClearOccupancy() { }
-        public void Corpse(byte army, byte code, uint x, uint y) { } // corpse effect objects are not ported
+        /// <summary>9727 of the corpse: ARMY__02 type 1 (161D) with the dead unit; other corpse codes are not ported.</summary>
+        public void Corpse(byte army, byte code, uint x, uint y)
+        {
+            if (army != 2 || code != OriginalCorpseRules.Corpse || x >= battle.Map.Width * 32 || y >= battle.Map.Height * 32) return;
+            var corpse = new byte[0x22]; corpse[1] = army;
+            BinaryPrimitives.WriteUInt32LittleEndian(corpse.AsSpan(7), x); BinaryPrimitives.WriteUInt32LittleEndian(corpse.AsSpan(0xc), y);
+            int plane = battle.Occupancy.Width * battle.Occupancy.Height;
+            var found = OriginalCombatRules.FindStruck(x, y, 0, (byte)battle.Map.Width, battle.Map.Cells, battle._properties,
+                (p, cell) => battle.Occupancy.Cells[p * plane + cell], r => battle.Find(r) is { } a ? (a.Record, a.Parameters) : null);
+            bool support = battle.Find(found.Reference) is { } under && (BinaryPrimitives.ReadUInt32LittleEndian(under.Parameters.AsSpan(0x40)) & 2) != 0;
+            if (OriginalCorpseRules.Create(corpse, actor.Record, support, found.TerrainClass, battle._terrainCatalog.NextRandomByte) is var (bx, by)
+                && bx < battle.Map.Width * 32 && by < battle.Map.Height * 32)
+            {
+                var blood = new byte[0x22];
+                BinaryPrimitives.WriteUInt32LittleEndian(blood.AsSpan(7), bx); BinaryPrimitives.WriteUInt32LittleEndian(blood.AsSpan(0xc), by);
+                OriginalCorpseRules.CreateBlood(blood); battle.Corpses.Add(blood);
+            }
+            if (corpse[0] != 0xff) battle.Corpses.Add(corpse);
+        }
         public void Remove() => actor.Dying = false;
         public byte TerrainClass() => (byte)(battle._properties[(int)(battle.Map.Cells[actor.Cell.Y * battle.Map.Width + actor.Cell.X] & 0xffff) * 8] & 7);
     }
