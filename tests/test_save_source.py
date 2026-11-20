@@ -120,5 +120,18 @@ class SaveSourceChecks(unittest.TestCase):
         self.assertEqual([area['area22']['allocated_suffixes'][4]['nonzero_bytes'] for area in records[2:]],
                          [25, 27])
 
+    def test_original_post_load_save_keeps_diplomacy_contact_evidence(self):
+        root = Path(__file__).resolve().parents[1]
+        before = json.loads((root / 'data/original_save_layout.json').read_text())
+        after = json.loads((root / 'data/original_save_after_load_layout.json').read_text())
+        scenario = after['records'][0]['scenario11']
+        self.assertEqual([(scenario['participants'][i]['name'], scenario['participants'][i]['leader_portrait_byte'])
+                          for i in (0, 3, 4)], [('Олег', 1), ('Илья', 5), ('Теймур', 3)])
+        self.assertEqual([(i, scenario['participants'][0]['relations'][i]) for i in (3, 4, 7)],
+                         [(3, 2), (4, 2), (7, 1)])
+        self.assertEqual([scenario['stat_field_6ba_19f1'][i] for i in (3, 4, 7)], [26090, 5000, 0])
+        self.assertEqual([before['records'][i]['payload_sha256'] == after['records'][i]['payload_sha256']
+                          for i in range(4)], [False, False, True, True])
+
 
 if __name__ == '__main__': unittest.main()

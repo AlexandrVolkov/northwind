@@ -51,7 +51,10 @@ def parse_scenario11(payload, tree_sizes=None, tree_sources=None):
         participants.append(dict(index=index, offset=base,
                                  sha256=hashlib.sha256(record).hexdigest(),
                                  prefix9_sha256=hashlib.sha256(record[:9]).hexdigest(),
-                                 balance_fields_18_1c_20=list(struct.unpack_from('<III', record, 0x18))))
+                                 balance_fields_18_1c_20=list(struct.unpack_from('<III', record, 0x18)),
+                                 name=record[0xA4:0xB8].split(b'\xff', 1)[0].split(b'\0', 1)[0].decode('cp866'),
+                                 leader_portrait_byte=record[0xB8],
+                                 relations=list(record[0xB9:0xC9])))
     tree_banks = []
     if tree_sources is not None:
         tree_sizes = [len(source) for source in tree_sources]
@@ -97,6 +100,9 @@ def parse_scenario11(payload, tree_sizes=None, tree_sources=None):
             tree_banks.append(bank)
             cursor = end
         if cursor != len(payload): raise ValueError('TRE banks do not fill scenario tail')
+    stat_base = segments[6]['offset']
+    stat_field_19f1 = [struct.unpack_from('<I', payload, stat_base + index * 0x1A35 + 0x19F1)[0]
+                       for index in range(count_6c8)]
     return dict(episode_filename=filename, width=width, height=height,
                 field_190e=field_190e, field_1912=field_1912,
                 field_1906=field_190e >> 5, field_190a=field_1912 >> 5,
@@ -105,6 +111,7 @@ def parse_scenario11(payload, tree_sizes=None, tree_sources=None):
                 participant_records_offset=0x4D, participant_records_length=0xF50,
                 participant_records_sha256=hashlib.sha256(payload[0x4D:header_length]).hexdigest(),
                 participants=participants,
+                stat_field_6ba_19f1=stat_field_19f1,
                 header_length=header_length, visibility_length=cells,
                 visibility_sha256=segments[0]['sha256'], fixed_segments=segments,
                 variable_list_count=count_6c7, variable_lists_offset=offset,
