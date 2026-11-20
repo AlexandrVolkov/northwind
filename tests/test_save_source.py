@@ -76,6 +76,9 @@ class SaveSourceChecks(unittest.TestCase):
         self.assertEqual([x['length'] for x in scenario['tree_banks']], [10112, 6464, 12144, 288, 288])
         self.assertEqual(scenario['tree_banks'][0]['offset'], scenario['variable_lists_offset'])
         self.assertEqual(scenario['tree_banks'][-1]['offset'] + scenario['tree_banks'][-1]['length'], records[0]['length'])
+        modified = [(bank['index'], copy['index'], copy['differing_bytes'])
+                    for bank in scenario['tree_banks'] for copy in bank['copies'] if copy['differing_bytes']]
+        self.assertEqual(modified, [(1, 11, 7), (2, 12, 18)])
         self.assertEqual(records[0]['header_offset'], 4)
         self.assertEqual([r['payload_offset'] + r['length'] for r in records[:-1]],
                          [r['header_offset'] for r in records[1:]])

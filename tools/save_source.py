@@ -20,7 +20,7 @@ def cabinet_slot_caption(index, state):
 
 
 
-def parse_scenario11(payload, tree_sizes=None):
+def parse_scenario11(payload, tree_sizes=None, tree_sources=None):
     """Known FAB4..FC62 write sequence; the final variable lists stay opaque."""
     header_length = 0xF9D
     if len(payload) < header_length: raise ValueError('Truncated 11h scenario header')
@@ -53,6 +53,8 @@ def parse_scenario11(payload, tree_sizes=None):
                                  prefix9_sha256=hashlib.sha256(record[:9]).hexdigest(),
                                  balance_fields_18_1c_20=list(struct.unpack_from('<III', record, 0x18))))
     tree_banks = []
+    if tree_sources is not None:
+        tree_sizes = [len(source) for source in tree_sources]
     if tree_sizes is not None:
         if len(tree_sizes) != count_6c7 or any(size < 0 for size in tree_sizes):
             raise ValueError('TRE bank count or size mismatch')
@@ -61,8 +63,15 @@ def parse_scenario11(payload, tree_sizes=None):
             length = size * 16
             end = cursor + length
             if end > len(payload): raise ValueError('Truncated TRE bank')
-            tree_banks.append(dict(index=index, tre_file_size=size, offset=cursor, length=length,
-                                   sha256=hashlib.sha256(payload[cursor:end]).hexdigest()))
+            bank = dict(index=index, tre_file_size=size, offset=cursor, length=length,
+                        sha256=hashlib.sha256(payload[cursor:end]).hexdigest())
+            if tree_sources is not None:
+                source = tree_sources[index]
+                bank['source_sha256'] = hashlib.sha256(source).hexdigest()
+                bank['copies'] = [dict(index=i, sha256=hashlib.sha256(payload[cursor + i*size:cursor + (i+1)*size]).hexdigest(),
+                                       differing_bytes=sum(a != b for a, b in zip(source, payload[cursor + i*size:cursor + (i+1)*size])))
+                                  for i in range(16)]
+            tree_banks.append(bank)
             cursor = end
         if cursor != len(payload): raise ValueError('TRE banks do not fill scenario tail')
     return dict(episode_filename=filename, width=width, height=height,
@@ -125,7 +134,7 @@ def parse_area22(payload):
                 bucket_sha256=[hashlib.sha256(buckets[i:i + bucket_size]).hexdigest()
                                for i in range(0, len(buckets), bucket_size)])
 
-def parse(data, tree_sizes=None):
+def parse(data, tree_sizes=None, tree_sources=None):
     if len(data) < 4: raise ValueError('Truncated save header')
     count = struct.unpack_from('<I', data)[0]
     if count > 4096: raise ValueError('Unreasonable save record count')
@@ -142,7 +151,7 @@ def parse(data, tree_sizes=None):
                       length=size, tag=tag, tag_hex=f'{tag:08X}',
                       payload_sha256=hashlib.sha256(payload).hexdigest())
         if tag == 0x66: record['victory_path_marker'] = True
-        if tag & 0xFFFF == 0x11: record['scenario11'] = parse_scenario11(payload, tree_sizes)
+        if tag & 0xFFFF == 0x11: record['scenario11'] = parse_scenario11(payload, tree_sizes, tree_sources)
         if tag == 0x99: record['campaign99'] = parse_session99(payload)
         if tag & 0xFFFF == 0x22: record['area22'] = parse_area22(payload)
         records.append(record)
@@ -157,9 +166,19 @@ if __name__ == '__main__':
     ap.add_argument('save', type=Path)
     ap.add_argument('--output', type=Path, default=Path('data/original_save_layout.json'))
     ap.add_argument('--tree-sizes', type=str, help='Comma-separated original TRE file sizes for each bank')
+    ap.add_argument('--tree-dir', type=Path, help='Directory with original ARMY__NN.TRE files for copy comparison')
     args = ap.parse_args()
+    if args.tree_sizes and args.tree_dir: ap.error('Use either --tree-sizes or --tree-dir')
     sizes = [int(x) for x in args.tree_sizes.split(',')] if args.tree_sizes else None
-    report = parse(args.save.read_bytes(), sizes)
+    save_data = args.save.read_bytes()
+    sources = None
+    if args.tree_dir:
+        initial = parse(save_data)
+        scenarios = [record['scenario11'] for record in initial['records'] if 'scenario11' in record]
+        if not scenarios: ap.error('No scenario 11h record for TRE bank count')
+        count = scenarios[0]['byte_6c7']
+        sources = [(args.tree_dir / f'ARMY__{i:02}.TRE').read_bytes() for i in range(count)]
+    report = parse(save_data, sizes, sources)
     args.output.write_text(json.dumps(report, indent=2) + '\n')
     print(f'{report["record_count"]} records in {report["file_size"]} bytes: '+
           ', '.join(f'{x["tag_hex"]}:{x["length"]}' for x in report['records']))
