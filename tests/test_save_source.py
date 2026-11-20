@@ -93,6 +93,8 @@ class SaveSourceChecks(unittest.TestCase):
         self.assertEqual(records[-1]['payload_offset'] + records[-1]['length'], data['file_size'])
         section = records[1]['campaign99']
         self.assertEqual(section['region_count'], 12)
+        self.assertEqual((section['world_width'], section['world_height'],
+                          section['current_area_x'], section['current_area_y']), (4, 3, 0, 0))
         self.assertEqual([area['flag'] for area in section['campaign_areas']], [1] + [0] * 11)
         self.assertTrue(all(len(area['participant_sha256']) == 16 and area['participant_record_size'] == 0x84
                             for area in section['campaign_areas']))

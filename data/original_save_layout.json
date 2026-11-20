@@ -964,6 +964,10 @@
           0,
           0
         ],
+        "world_width": 4,
+        "world_height": 3,
+        "current_area_x": 0,
+        "current_area_y": 0,
         "table_length": 512,
         "table_sha256": "a45dd2d222d4cad5ced325704e13a86d71beee3123656358f28002253c4d2344",
         "cabinet_summary_offset_in_table": 6,

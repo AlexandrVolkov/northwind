@@ -137,6 +137,8 @@ def parse_session99(payload):
         names.append(dict(index=index, name=name, trailing_bytes=list(row[20:22])))
     return dict(current_participant=current_participant, field_1cad=field_1cad,
                 field_1cb1=field_1cb1, field_1cb5=field_1cb5,
+                world_width=table[0], world_height=table[1],
+                current_area_x=table[2], current_area_y=table[3],
                 table_length=512, table_sha256=hashlib.sha256(table).hexdigest(),
                 cabinet_summary_offset_in_table=6, cabinet_summary_length=0x160,
                 cabinet_summary_sha256=hashlib.sha256(cabinet).hexdigest(),
