@@ -21,7 +21,7 @@ def generate(game):
     oracle = CursorOracle(code)
     out = []
     for name, entry in [('main', 0x18CE5), ('cabinet', 0x18D45),
-                        ('campaign', 0x18DA5), ('victory', 0x18E05),
+                        ('screen_6', 0x18DA5), ('screen_7_and_victory', 0x18E05),
                         ('authors', 0x18E65)]:
         oracle.cpu.mem_write(0x1932, b'\xa5' * 0x40)
         oracle.run('cursor', entry)
