@@ -3948,6 +3948,40 @@
       ],
       "implementation": [],
       "limitations": "Пять инициализаторов исполнены под Unicorn; шаг курсора и рисование не перенесены."
+    },
+    {
+      "id": "menu-loop-frames",
+      "module": "LE:1",
+      "start": 102499,
+      "end": 102637,
+      "name": "Bush and candle idle widget callbacks",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/menu-widgets.md",
+        "tests/fixtures/menu-widgets.json"
+      ],
+      "implementation": [
+        "scripts/OriginalMenuWidgetRules.cs"
+      ],
+      "limitations": "Только событие AL=1 (шаг кадров) перенесено и сверено; события 0/2/3, растеризация и полные побочные эффекты 192EA не входят. В Unicorn 192EA заглушён RET на входе."
+    },
+    {
+      "id": "menu-owl-frames",
+      "module": "LE:1",
+      "start": 102637,
+      "end": 102789,
+      "name": "Owl idle callback and phase switch",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/menu-widgets.md",
+        "tests/fixtures/menu-widgets.json"
+      ],
+      "implementation": [
+        "scripts/OriginalMenuWidgetRules.cs"
+      ],
+      "limitations": "Только событие AL=1 (шаг кадров) перенесено и сверено; события 0/2/3, растеризация и полные побочные эффекты 192EA не входят. В Unicorn 192EA заглушён RET на входе."
     }
   ]
 }

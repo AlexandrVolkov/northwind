@@ -1,0 +1,9 @@
+{
+  "format_version": 1,
+  "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "cases": 432,
+  "output_sha256": "dddea655aab86826f80da6e3ff74f94c84ef20e9f4312030ef42000e4480af9e",
+  "stubbed_calls": [
+    "192EA (RET only after owl changes phase)"
+  ]
+}
