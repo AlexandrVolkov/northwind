@@ -1035,7 +1035,7 @@
       "implementation": [
         "scripts/OriginalForestryRules.cs"
       ],
-      "limitations": "Перенесены логические правила смены тайлов и масок для проверенных операций; отрисовка, dirty-cache и исходные глобальные эффекты не объявляются полностью перенесёнными."
+      "limitations": "Перенесены логические правила смены тайлов и масок; CFAC сверен для AX=201h (лесоруб), 101h (огонь) и 300h (воронка катапульты). Отрисовка, dirty-cache и исходные глобальные эффекты не объявляются полностью перенесёнными."
     },
     {
       "id": "forestry-tile",
@@ -3149,6 +3149,720 @@
       "limitations": ""
     },
     {
+      "id": "ai-economy-plan",
+      "module": "LE:1",
+      "start": 138905,
+      "end": 139694,
+      "name": "AI economy planning: income, upkeep, economy requests, farm and building orders",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-economy-execute",
+      "module": "LE:1",
+      "start": 139694,
+      "end": 140212,
+      "name": "AI economy executor over list +4F3 (workers, mines, lumbermill)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": "D363 occupancy check is a hook"
+    },
+    {
+      "id": "ai-gather-workers",
+      "module": "LE:1",
+      "start": 140341,
+      "end": 140497,
+      "name": "Gather free workers into a squad",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-mine-site",
+      "module": "LE:1",
+      "start": 140819,
+      "end": 140942,
+      "name": "Random seen ore cell around the home for a mine",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-worker-state-9-init",
+      "module": "LE:1",
+      "start": 128497,
+      "end": 128555,
+      "name": "Set worker squad state 9 with its target area",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-worker-state-10-init",
+      "module": "LE:1",
+      "start": 128794,
+      "end": 128812,
+      "name": "Set worker squad state 10",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-worker-state-9",
+      "module": "LE:1",
+      "start": 128118,
+      "end": 128497,
+      "name": "AI squad state 9: timber workers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-worker-state-10",
+      "module": "LE:1",
+      "start": 128595,
+      "end": 128794,
+      "name": "AI squad state 10: mine workers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-idle-member",
+      "module": "LE:1",
+      "start": 132821,
+      "end": 132912,
+      "name": "Random idle member of a squad",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-member-activity",
+      "module": "LE:1",
+      "start": 132912,
+      "end": 132977,
+      "name": "Squad member with an activity code",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-nearest-timber",
+      "module": "LE:1",
+      "start": 140497,
+      "end": 140687,
+      "name": "Nearest terrain cell of a class in the squad area",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": "The original's distance formula (|dx| - y against ±y) is kept"
+    },
+    {
+      "id": "ai-random-grove",
+      "module": "LE:1",
+      "start": 140687,
+      "end": 140819,
+      "name": "Random seen grove cell around the squad centre",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-area-terrain-class",
+      "module": "LE:1",
+      "start": 140942,
+      "end": 141041,
+      "name": "Terrain class present in an area",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-squad-covers-cell",
+      "module": "LE:1",
+      "start": 133469,
+      "end": 133515,
+      "name": "Squad of a state whose area holds a cell",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-construction",
+      "module": "LE:1",
+      "start": 144721,
+      "end": 144999,
+      "name": "AI turn tail: castle rebuild and class C08h order",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": "10AD2, 22FE4, A758 and 43E5 are hooks"
+    },
+    {
+      "id": "ai-loot-pickup",
+      "module": "LE:1",
+      "start": 131073,
+      "end": 131185,
+      "name": "AI squad sends a member to nearby loot",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-nearest-loot",
+      "module": "LE:1",
+      "start": 55935,
+      "end": 56135,
+      "name": "Nearest loaded loot object of another army",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-nearest-member",
+      "module": "LE:1",
+      "start": 47712,
+      "end": 47839,
+      "name": "Nearest living squad member to a point",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-explored-share",
+      "module": "LE:1",
+      "start": 126015,
+      "end": 126062,
+      "name": "Explored share of the map for a participant",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-census.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ai-step-formation",
+      "module": "LE:1",
+      "start": 126758,
+      "end": 126904,
+      "name": "AI squad step 4: march in formation",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "formation-place",
+      "module": "LE:1",
+      "start": 65653,
+      "end": 65786,
+      "name": "Lay a formation out around a goal",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "formation-segment",
+      "module": "LE:1",
+      "start": 65786,
+      "end": 65972,
+      "name": "Spread members along a formation segment",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "formation-nearest-member",
+      "module": "LE:1",
+      "start": 65972,
+      "end": 66146,
+      "name": "Nearest free member of a class to a formation point",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "formation-rotate",
+      "module": "LE:1",
+      "start": 66146,
+      "end": 66315,
+      "name": "Rotate a formation by the sine table",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "formation-scale",
+      "module": "LE:1",
+      "start": 66315,
+      "end": 66430,
+      "name": "Scale a formation (16-bit IMUL)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "formation-scale-factor",
+      "module": "LE:1",
+      "start": 66430,
+      "end": 66479,
+      "name": "Formation scale factor from the member count",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "formation-pick",
+      "module": "LE:1",
+      "start": 66479,
+      "end": 66540,
+      "name": "Formation of a kind nearest the member count",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "squad-clear-commands",
+      "module": "LE:1",
+      "start": 47426,
+      "end": 47479,
+      "name": "Squad members drop their commands",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/formations.md",
+        "tests/fixtures/ai-formations.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "catapult-stone",
+      "module": "ARMY__00.WRK",
+      "start": 2138,
+      "end": 2266,
+      "name": "Catapult stone effect (type 8)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/catapult.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCatapultRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "explosion-effect",
+      "module": "ARMY__00.WRK",
+      "start": 2438,
+      "end": 2517,
+      "name": "Explosion effect (type 10)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/catapult.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCatapultRules.cs"
+      ],
+      "limitations": "drift vector 9E7D not ported"
+    },
+    {
+      "id": "effect-flight",
+      "module": "LE:1",
+      "start": 55014,
+      "end": 55104,
+      "name": "Effect flight step with arc height",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/catapult.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCatapultRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "area-hit",
+      "module": "LE:1",
+      "start": 48399,
+      "end": 48686,
+      "name": "Hit objects in an area with a fixed attack",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/catapult.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCatapultRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "fire-shot",
+      "module": "ARMY__00.WRK",
+      "start": 2987,
+      "end": 3210,
+      "name": "Fire shot effect (type 11h)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/fire.json"
+      ],
+      "implementation": [
+        "scripts/OriginalFireRules.cs"
+      ],
+      "limitations": "CE3 fire and FA4 deflection are continuations"
+    },
+    {
+      "id": "smoke-trail",
+      "module": "ARMY__00.WRK",
+      "start": 3210,
+      "end": 3299,
+      "name": "Smoke trail effect (type 12h)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/fire.json"
+      ],
+      "implementation": [
+        "scripts/OriginalFireRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "fire-burn",
+      "module": "ARMY__00.WRK",
+      "start": 3299,
+      "end": 4004,
+      "name": "Fire effect (types 13h..15h)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/burn.json"
+      ],
+      "implementation": [
+        "scripts/OriginalBurnRules.cs"
+      ],
+      "limitations": "9727, A47E and CFAC are calls of the caller"
+    },
+    {
+      "id": "embers",
+      "module": "ARMY__00.WRK",
+      "start": 4004,
+      "end": 4049,
+      "name": "Embers effect (type 16h)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/burn.json"
+      ],
+      "implementation": [
+        "scripts/OriginalBurnRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "smoke-column",
+      "module": "ARMY__00.WRK",
+      "start": 2517,
+      "end": 2628,
+      "name": "Smoke column effect (type 0Bh)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/burn.json"
+      ],
+      "implementation": [
+        "scripts/OriginalBurnRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "object-in-cell",
+      "module": "LE:1",
+      "start": 38854,
+      "end": 38955,
+      "name": "Object in an effect's cell and the terrain class",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/burn.json"
+      ],
+      "implementation": [
+        "scripts/OriginalBurnRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "wind",
+      "module": "LE:1",
+      "start": 40573,
+      "end": 40760,
+      "name": "Wind vector, direction and random acceleration",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/wind.json"
+      ],
+      "implementation": [
+        "scripts/OriginalWindRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "ballista-bolt",
+      "module": "ARMY__00.WRK",
+      "start": 4844,
+      "end": 5027,
+      "name": "Ballista bolt effect (type 1Dh)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/catapult.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCatapultRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "big-explosion",
+      "module": "ARMY__00.WRK",
+      "start": 2628,
+      "end": 2668,
+      "name": "Big explosion effect (type 0Ch)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/catapult.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCatapultRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "frame-loop-2",
+      "module": "ARMY__00.WRK",
+      "start": 2773,
+      "end": 2795,
+      "name": "Two-tick frame loop of explosions",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/catapult.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCatapultRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
       "id": "exploration-reveal",
       "module": "LE:1",
       "start": 33086,
@@ -3663,244 +4377,6 @@
       "limitations": "27 исходных изображений совпали по RGBA с исполнением 19465. Это подготовленные PNG для Godot, не C#-дубликат RLE-рисовальщика. Заглушён dirty-helper 3EEA."
     },
     {
-      "id": "ai-economy-plan",
-      "module": "LE:1",
-      "start": 138905,
-      "end": 139694,
-      "name": "AI economy planning: income, upkeep, economy requests, farm and building orders",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-economy.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-economy-execute",
-      "module": "LE:1",
-      "start": 139694,
-      "end": 140212,
-      "name": "AI economy executor over list +4F3 (workers, mines, lumbermill)",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-economy.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": "D363 occupancy check is a hook"
-    },
-    {
-      "id": "ai-gather-workers",
-      "module": "LE:1",
-      "start": 140341,
-      "end": 140497,
-      "name": "Gather free workers into a squad",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-economy.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-mine-site",
-      "module": "LE:1",
-      "start": 140819,
-      "end": 140942,
-      "name": "Random seen ore cell around the home for a mine",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-economy.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-worker-state-9-init",
-      "module": "LE:1",
-      "start": 128497,
-      "end": 128555,
-      "name": "Set worker squad state 9 with its target area",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-economy.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-worker-state-10-init",
-      "module": "LE:1",
-      "start": 128794,
-      "end": 128812,
-      "name": "Set worker squad state 10",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-economy.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-worker-state-9",
-      "module": "LE:1",
-      "start": 128118,
-      "end": 128497,
-      "name": "AI squad state 9: timber workers",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-workers.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-worker-state-10",
-      "module": "LE:1",
-      "start": 128595,
-      "end": 128794,
-      "name": "AI squad state 10: mine workers",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-workers.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-idle-member",
-      "module": "LE:1",
-      "start": 132821,
-      "end": 132912,
-      "name": "Random idle member of a squad",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-workers.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-member-activity",
-      "module": "LE:1",
-      "start": 132912,
-      "end": 132977,
-      "name": "Squad member with an activity code",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-workers.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-nearest-timber",
-      "module": "LE:1",
-      "start": 140497,
-      "end": 140687,
-      "name": "Nearest terrain cell of a class in the squad area",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-workers.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": "The original's distance formula (|dx| - y against ±y) is kept"
-    },
-    {
-      "id": "ai-random-grove",
-      "module": "LE:1",
-      "start": 140687,
-      "end": 140819,
-      "name": "Random seen grove cell around the squad centre",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-workers.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-area-terrain-class",
-      "module": "LE:1",
-      "start": 140942,
-      "end": 141041,
-      "name": "Terrain class present in an area",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-workers.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-squad-covers-cell",
-      "module": "LE:1",
-      "start": 133469,
-      "end": 133515,
-      "name": "Squad of a state whose area holds a cell",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-workers.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
       "id": "menu-frame-forward",
       "module": "LE:1",
       "start": 102100,
@@ -3999,312 +4475,6 @@
         "scripts/OriginalMenuHourglassRules.cs"
       ],
       "limitations": "Только событие AL=1; в Unicorn 1CC1B заглушён RET после записи флага/очистки ввода. Остальные события и внешний переход не перенесены."
-    },
-    {
-      "id": "ai-construction",
-      "module": "LE:1",
-      "start": 144721,
-      "end": 144999,
-      "name": "AI turn tail: castle rebuild and class C08h order",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-economy.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": "10AD2, 22FE4, A758 and 43E5 are hooks"
-    },
-    {
-      "id": "ai-loot-pickup",
-      "module": "LE:1",
-      "start": 131073,
-      "end": 131185,
-      "name": "AI squad sends a member to nearby loot",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-squad-states.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-nearest-loot",
-      "module": "LE:1",
-      "start": 55935,
-      "end": 56135,
-      "name": "Nearest loaded loot object of another army",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-squad-states.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-nearest-member",
-      "module": "LE:1",
-      "start": 47712,
-      "end": 47839,
-      "name": "Nearest living squad member to a point",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-squad-states.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-explored-share",
-      "module": "LE:1",
-      "start": 126015,
-      "end": 126062,
-      "name": "Explored share of the map for a participant",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/ai.md",
-        "tests/fixtures/ai-census.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiRules.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "ai-step-formation",
-      "module": "LE:1",
-      "start": 126758,
-      "end": 126904,
-      "name": "AI squad step 4: march in formation",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/formations.md",
-        "tests/fixtures/ai-formations.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "formation-place",
-      "module": "LE:1",
-      "start": 65653,
-      "end": 65786,
-      "name": "Lay a formation out around a goal",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/formations.md",
-        "tests/fixtures/ai-formations.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "formation-segment",
-      "module": "LE:1",
-      "start": 65786,
-      "end": 65972,
-      "name": "Spread members along a formation segment",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/formations.md",
-        "tests/fixtures/ai-formations.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "formation-nearest-member",
-      "module": "LE:1",
-      "start": 65972,
-      "end": 66146,
-      "name": "Nearest free member of a class to a formation point",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/formations.md",
-        "tests/fixtures/ai-formations.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "formation-rotate",
-      "module": "LE:1",
-      "start": 66146,
-      "end": 66315,
-      "name": "Rotate a formation by the sine table",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/formations.md",
-        "tests/fixtures/ai-formations.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "formation-scale",
-      "module": "LE:1",
-      "start": 66315,
-      "end": 66430,
-      "name": "Scale a formation (16-bit IMUL)",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/formations.md",
-        "tests/fixtures/ai-formations.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "formation-scale-factor",
-      "module": "LE:1",
-      "start": 66430,
-      "end": 66479,
-      "name": "Formation scale factor from the member count",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/formations.md",
-        "tests/fixtures/ai-formations.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "formation-pick",
-      "module": "LE:1",
-      "start": 66479,
-      "end": 66540,
-      "name": "Formation of a kind nearest the member count",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/formations.md",
-        "tests/fixtures/ai-formations.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "squad-clear-commands",
-      "module": "LE:1",
-      "start": 47426,
-      "end": 47479,
-      "name": "Squad members drop their commands",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/formations.md",
-        "tests/fixtures/ai-formations.json"
-      ],
-      "implementation": [
-        "scripts/OriginalAiSquads.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "catapult-stone",
-      "module": "ARMY__00.WRK",
-      "start": 2138,
-      "end": 2266,
-      "name": "Catapult stone effect (type 8)",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/combat.md",
-        "tests/fixtures/catapult.json"
-      ],
-      "implementation": [
-        "scripts/OriginalCatapultRules.cs"
-      ],
-      "limitations": "CFAC crater is a hook"
-    },
-    {
-      "id": "explosion-effect",
-      "module": "ARMY__00.WRK",
-      "start": 2438,
-      "end": 2517,
-      "name": "Explosion effect (type 10)",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/combat.md",
-        "tests/fixtures/catapult.json"
-      ],
-      "implementation": [
-        "scripts/OriginalCatapultRules.cs"
-      ],
-      "limitations": "drift vector 9E7D not ported"
-    },
-    {
-      "id": "effect-flight",
-      "module": "LE:1",
-      "start": 55014,
-      "end": 55104,
-      "name": "Effect flight step with arc height",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/combat.md",
-        "tests/fixtures/catapult.json"
-      ],
-      "implementation": [
-        "scripts/OriginalCatapultRules.cs"
-      ],
-      "limitations": ""
-    },
-    {
-      "id": "area-hit",
-      "module": "LE:1",
-      "start": 48399,
-      "end": 48686,
-      "name": "Hit objects in an area with a fixed attack",
-      "classification": "code",
-      "status": "ported",
-      "evidence": [
-        "docs/combat.md",
-        "tests/fixtures/catapult.json"
-      ],
-      "implementation": [
-        "scripts/OriginalCatapultRules.cs"
-      ],
-      "limitations": ""
     },
     {
       "id": "menu-orb-action",

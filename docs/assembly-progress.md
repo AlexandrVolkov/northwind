@@ -4,10 +4,10 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 107596 | 7926 | 670 | 30690 | 44 |
+| LE:1 | 146882 | 107308 | 7926 | 670 | 30978 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 4701 | 100 | 0 | 602 | 0 |
+| ARMY__00.WRK | 5403 | 3283 | 100 | 0 | 2020 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
 | ARMY__02.WRK | 6930 | 5581 | 609 | 528 | 212 | 7 |
 | ARMY__03.WRK | 13412 | 13412 | 0 | 0 | 0 | 1 |
@@ -23,8 +23,16 @@
 | ARMY__00.WRK `0x4F3..0x54A` | Melee strike effect: experience attack, lookup, hit, sound | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Объект-эффект и его анимация в схватке не создаются. |
 | ARMY__00.WRK `0x593..0x6C7` | Arrow effect: launch, flight, early and arrival hits | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) | Обработчики 7FE/AEB не перенесены. |
 | ARMY__00.WRK `0x6FE..0x762` | Spark effect types 4/5 creation and countdown | partial | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Перенесено создание (AH=0); обновление кадров не подключено. |
-| ARMY__00.WRK `0x85A..0x8DA` | Catapult stone effect (type 8) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | CFAC crater is a hook |
+| ARMY__00.WRK `0x85A..0x8DA` | Catapult stone effect (type 8) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | ARMY__00.WRK `0x986..0x9D5` | Explosion effect (type 10) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | drift vector 9E7D not ported |
+| ARMY__00.WRK `0x9D5..0xA44` | Smoke column effect (type 0Bh) | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) |  |
+| ARMY__00.WRK `0xA44..0xA6C` | Big explosion effect (type 0Ch) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
+| ARMY__00.WRK `0xAD5..0xAEB` | Two-tick frame loop of explosions | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
+| ARMY__00.WRK `0xBAB..0xC8A` | Fire shot effect (type 11h) | ported | [combat.md](../docs/combat.md); [fire.json](../tests/fixtures/fire.json) | CE3 fire and FA4 deflection are continuations |
+| ARMY__00.WRK `0xC8A..0xCE3` | Smoke trail effect (type 12h) | ported | [combat.md](../docs/combat.md); [fire.json](../tests/fixtures/fire.json) |  |
+| ARMY__00.WRK `0xCE3..0xFA4` | Fire effect (types 13h..15h) | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) | 9727, A47E and CFAC are calls of the caller |
+| ARMY__00.WRK `0xFA4..0xFD1` | Embers effect (type 16h) | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) |  |
+| ARMY__00.WRK `0x12EC..0x13A3` | Ballista bolt effect (type 1Dh) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | ARMY__02.WRK `0x4C..0x64` | Six relative action targets after inline FS dispatcher | verified | [order-buttons.md](../docs/order-buttons.md); [order-dispatch.json](../tests/fixtures/order-dispatch.json) | Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит. |
 | ARMY__02.WRK `0xCB..0xE3` | Six relative action targets after inline FS dispatcher | verified | [order-buttons.md](../docs/order-buttons.md); [order-dispatch.json](../tests/fixtures/order-dispatch.json) | Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит. |
 | ARMY__02.WRK `0x13B..0x157` | Castle AH=5 visitor validator | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Принимающая ветка 1B8 общая с хвостом обработчика. |
@@ -122,6 +130,7 @@
 | LE:1 `0x95D3..0x960B` | Death dispatch: special path, death voice, animation | ported | [combat.md](../docs/combat.md); [death.json](../tests/fixtures/death.json) | 12D08 не перенесена. |
 | LE:1 `0x9653..0x9688` | Turn one heading sector | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Включает исходный ZF от расчёта кадра; общий таймер обновлений задаётся вызывающей стороной. |
 | LE:1 `0x9688..0x96CD` | Direction toward world coordinates | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Исходная u32-арифметика и переполнения; правило отличается от направления локального поиска 79C0. |
+| LE:1 `0x97C6..0x982B` | Object in an effect's cell and the terrain class | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) |  |
 | LE:1 `0x982B..0x98CC` | Object under an effect point with footprint containment | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Схватка пока бьёт явную цель вместо точки удара. |
 | LE:1 `0x98CC..0x996F` | Detach object from owner chain | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Корректная монотонная цепочка с достижимым объектом; момент смерти, порождение эффекта и повторное выделение записи не включены. |
 | LE:1 `0x996F..0x9A1B` | Missile distance, 24.8 velocity and arc speed | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) | Деление на ноль/переполнение DIV при вырожденных расстояниях не воспроизводится. |
@@ -130,6 +139,7 @@
 | LE:1 `0x9B86..0x9BF9` | Gap between object footprints | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Сохранены байтовые сдвиги размеров и u32-переполнения; игровое использование включает лишь проверенные ветви подхода. |
 | LE:1 `0x9E41..0x9E69` | Random byte streams [19EB]/[19EC] over table DS:297E | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | third stream 9E69 ([19ED]) is not covered |
 | LE:1 `0x9E69..0x9E7D` | Random byte stream [19ED] over table DS:297E | ported | [ai.md](../docs/ai.md); [ai-garrison.json](../tests/fixtures/ai-garrison.json) |  |
+| LE:1 `0x9E7D..0x9F38` | Wind vector, direction and random acceleration | ported | [combat.md](../docs/combat.md); [wind.json](../tests/fixtures/wind.json) |  |
 | LE:1 `0x9F38..0xA10B` | Fog viewport scratch and weighted corner shading | ported | [fog-of-war.md](../docs/fog-of-war.md); [visibility.json](../tests/fixtures/visibility.json); [fog-raster.json](../tests/fixtures/fog-raster.json); [fog-edge.json](../docs/reference/fog-edge.json) | 135 полных кадров совпали по индексам и RGB, 16384 маски углов и 28 селекторов. Визуальная сверка 196 тайлов оригинала, из них 16 с краем тумана. DOS scratch/dirty-cache заменён прямым обходом и Godot-изображением. В renderer схватки не встроено. |
 | LE:1 `0xA10B..0xA1D1` | Game speed gate and slow-tick flags | partial | [game-timing.md](../docs/game-timing.md) | Перенесены частота и шаг по умолчанию; клавиши смены скорости и флаги [19E7] не подключены. |
 | LE:1 `0xA1D1..0xA320` | Explored minimap pixels and camera outline | partial | [fog-of-war.md](../docs/fog-of-war.md); [visibility.json](../tests/fixtures/visibility.json) | 60 полных native framebuffer совпали с C#. Расписание перерисовки 1C4E/1C60, dirty-учёт и DOS-адреса не входят; 3EEA заглушён. |
@@ -171,7 +181,7 @@
 | LE:1 `0xC88C..0xC8C9` | Building action dispatch | partial | [building-command-lifecycle.md](../docs/building-command-lifecycle.md) | Известны вызов через FS:41, встроенная таблица и выбор текущего состояния; полный диспетчер с обработчиками и визуальными эффектами не перенесён. |
 | LE:1 `0xC8C9..0xC8E0` | Complete queued direct action | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [building-lifecycle.json](../tests/fixtures/building-lifecycle.json) | Только продолжение после ZF=1 текущего обработчика; групповой ввод и доступность кнопок вне контракта. |
 | LE:1 `0xCC7B..0xCCC4` | Castle takes cargo from the worker in its entry | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Проверены грузы 0..2; прочие коды идут в слоты предметов 1243A и не перенесены. |
-| LE:1 `0xCD72..0xD101` | Terrain blend and forest replacement | partial | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Перенесены логические правила смены тайлов и масок для проверенных операций; отрисовка, dirty-cache и исходные глобальные эффекты не объявляются полностью перенесёнными. |
+| LE:1 `0xCD72..0xD101` | Terrain blend and forest replacement | partial | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Перенесены логические правила смены тайлов и масок; CFAC сверен для AX=201h (лесоруб), 101h (огонь) и 300h (воронка катапульты). Отрисовка, dirty-cache и исходные глобальные эффекты не объявляются полностью перенесёнными. |
 | LE:1 `0xD101..0xD12C` | Classify harvestable timber tile | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Критерий дескриптора SEG, не полная классификация местности и не её цвет. |
 | LE:1 `0xD2D1..0xD363` | Conditional occupancy registration | partial | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Перенесена ветвь CL=0 с заменой совпавших ячеек и подсчётом конфликтов. Ветка повреждения чужих объектов не перенесена. |
 | LE:1 `0xD40C..0xD453` | Owner free population growth | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |

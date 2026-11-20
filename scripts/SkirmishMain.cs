@@ -495,6 +495,14 @@ public partial class SkirmishMain : Node2D
         {
             var at = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(stone.AsSpan(7)), BinaryPrimitives.ReadUInt32LittleEndian(stone.AsSpan(0xc)) - BinaryPrimitives.ReadUInt16LittleEndian(stone.AsSpan(0x10)) / 256f);
             if (stone[0] == OriginalCatapultRules.Stone) DrawCircle(at - new Vector2(0, 16), 4, new Color("8a8178"));
+            else if (stone[0] == OriginalCatapultRules.Bolt) DrawCircle(at - new Vector2(0, 16), 3, new Color("c9b38a"));
+            else if (stone[0] == OriginalCatapultRules.BigExplosion) DrawCircle(at - new Vector2(0, 16), 10 + (0x12 - stone[0x17]), new Color(1f, .6f, .25f, stone[0x17] / 30f));
+            else if (stone[0] == OriginalFireRules.Shot) DrawCircle(at - new Vector2(0, 16), 3, new Color("ff9a2e"));
+            else if (stone[0] == OriginalFireRules.Trail) DrawCircle(at - new Vector2(0, 16), 3, new Color(.5f, .5f, .5f, stone[0x17] / 22f));
+            else if (stone[0] is OriginalBurnRules.Small or OriginalBurnRules.Medium or OriginalBurnRules.Large)
+                DrawCircle(at - new Vector2(0, 12), 5 + 4 * (stone[0] - OriginalBurnRules.Small), new Color(1f, .45f, .1f, .75f));
+            else if (stone[0] == OriginalBurnRules.Embers) DrawCircle(at - new Vector2(0, 16), 2, new Color("ffcf5a"));
+            else if (stone[0] == OriginalBurnRules.Column) DrawCircle(at - new Vector2(0, 20), 7, new Color(.35f, .35f, .35f, stone[0x17] / 28f));
             else DrawCircle(at - new Vector2(0, 16), 6 + (0x12 - stone[0x17]), new Color(.55f, .5f, .45f, stone[0x17] / 36f));
         }
         foreach (var effect in Battle.Effects)

@@ -42,8 +42,8 @@ def prepare(source, output):
                 frames.update(range(base,base+8*raw[0x4a]))
                 frames.update(action_frames(raw, base))
     # Runtime economy objects are not initially present in the player's source slot.
-    # 12, 15, 22, 23, 24: buildings the enemy AI orders (227C7); 16, 17, 18, 21: units their producers make.
-    for index in [16,17,18,21]:
+    # 12, 15, 22, 23, 24: buildings the enemy AI orders (227C7); 16, 17, 18, 21, 26: units their producers make.
+    for index in [16,17,18,21,26]:
         key=('ARMY__02.DAT',index);raw=bytes.fromhex(tables[key[0]]['templates'][index]['raw_record_hex'])
         base=struct.unpack_from('<H',raw,0x48)[0]
         wanted.setdefault(key,set()).update(range(base,base+8*raw[0x4a]))

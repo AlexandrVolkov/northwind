@@ -78,7 +78,7 @@ public sealed class OriginalTerrainCatalog
     private readonly byte[] _properties, _random;
     private readonly uint[] _masks;
     private readonly Dictionary<uint, List<ushort>> _variants = [];
-    private readonly List<ushort> _cleared = [];
+    private readonly Dictionary<int, List<ushort>> _anchors = [];
     public byte RandomIndex { get; set; }
     public OriginalTerrainCatalog(byte[] properties, OriginalTerrainData constants)
     {
@@ -90,7 +90,9 @@ public sealed class OriginalTerrainCatalog
             uint descriptor = Descriptor(i), key = descriptor & 0xffff0f00;
             if (!_variants.TryGetValue(key, out var group)) _variants[key] = group = [];
             group.Add((ushort)i);
-            if ((descriptor & 0xf00) == 0x200) _cleared.Add((ushort)i);
+            int subtype = (int)(descriptor >> 8) & 15;
+            if (!_anchors.TryGetValue(subtype, out var anchors)) _anchors[subtype] = anchors = [];
+            anchors.Add((ushort)i);
         }
     }
     public uint Descriptor(int tile) => OriginalForestryRules.Property(_properties, (uint)tile);
@@ -112,7 +114,25 @@ public sealed class OriginalTerrainCatalog
         byte value = NextRandomByte();
         tile = candidates[(value * candidates.Count) >> 8]; return true;
     }
-    public int ClearTimber(uint[] cells, byte width, byte height, int x, int y)
+    /// <summary>CFAC with AX = 201h (the woodcutter's seventh load): the forest cell becomes cleared ground.</summary>
+    public int ClearTimber(uint[] cells, byte width, byte height, int x, int y) => Scorch(cells, width, height, x, y, 2);
+
+    /// <summary>CFAC with AL = 0 (AX = 300h: the catapult's crater): a cell whose four corner codes are equal gets a random
+    /// surface of the same corners and the subtype (CE9D), blended into its neighbours (CD72).</summary>
+    public int Crater(uint[] cells, byte width, byte height, int x, int y, byte subtype)
+    {
+        if (cells.Length != width * height || width == 0 || height == 0) throw new ArgumentException("Invalid map");
+        if (x < 0 || y < 0 || x >= width || y >= height) return 0;
+        uint descriptor = Descriptor((int)(cells[y * width + x] & 65535));
+        byte low = (byte)(descriptor >> 16), high = (byte)(descriptor >> 24);
+        if (low != high || (byte)(low << 4 | low >> 4) != high) return 0;
+        if (!Choose((descriptor & 0xffff0000) | (uint)subtype << 8, out ushort tile)) return 0;
+        return Blend(cells, width, height, x, y, tile);
+    }
+
+    /// <summary>CFAC with AL ≠ 0: a cell becomes ground of subtype AH (2 — cleared by the woodcutter, 1 — burnt by fire),
+    /// trying the anchors of that subtype in catalog order until both corner themes exist; blended by CD72.</summary>
+    public int Scorch(uint[] cells, byte width, byte height, int x, int y, byte subtype)
     {
         if (cells.Length != width * height || width == 0 || height == 0) throw new ArgumentException("Invalid map");
         if (x < 0 || y < 0 || x >= width || y >= height) return 0;
@@ -121,7 +141,7 @@ public sealed class OriginalTerrainCatalog
         byte c = (byte)((original >> 24) & 15), d = (byte)((original >> 28) & 15);
         if (a == b) { b = c; if (a == b) b = d; }
         byte aa = (byte)(a | (a << 4)), bb = (byte)(b | (b << 4));
-        foreach (ushort anchor in _cleared)
+        foreach (ushort anchor in _anchors.GetValueOrDefault(subtype) ?? [])
         {
             uint theme = Descriptor(anchor) & 0xff000000;
             // The first probe retains AH from the candidate index before SHL EAX,16.

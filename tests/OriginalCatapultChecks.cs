@@ -91,5 +91,66 @@ public partial class TestRunner
             digest.AppendData(effect); count++;
         }
         Finish("smoke");
+
+        spec = root.GetProperty("bolt_create");
+        foreach (var origin in Items(spec, "origins")) foreach (var target in Items(spec, "targets")) foreach (var experience in Items(spec, "experience"))
+        foreach (var indexElement in Items(spec, "random_indices"))
+        {
+            uint ax = origin[0].GetUInt32(), ay = origin[1].GetUInt32(); byte index = (byte)indexElement.GetInt32();
+            var shooter = CombatUnit(26, 3, 10, 0, ax, ay, 1); shooter[0x16] = (byte)experience.GetInt32();
+            var effect = Effect(ax + 8, ay - 8);
+            var random = new OriginalTerrainCatalog(properties, constants) { RandomIndex = index, SecondaryIndex = unchecked((byte)(index * 7)) };
+            OriginalCatapultRules.CreateBolt(effect, shooter, target[0].GetUInt32(), target[1].GetUInt32(), W * 32, H * 32, random.NextRandomByte, random.NextSecondaryByte);
+            digest.AppendData(effect); digest.AppendData([random.RandomIndex, random.SecondaryIndex]); count++;
+        }
+        Finish("bolt_create");
+
+        spec = root.GetProperty("bolt_step"); int thrown = 0;
+        foreach (var position in Items(spec, "positions")) foreach (var remaining in Items(spec, "remaining")) foreach (var objects in Items(spec, "objects"))
+        foreach (var indexElement in Items(spec, "random_indices")) foreach (var refuse in Items(spec, "refuse"))
+        {
+            uint x = position[0].GetUInt32(), y = position[1].GetUInt32(); byte index = (byte)indexElement.GetInt32();
+            var effect = Effect(x, y); effect[0] = 0x1d; effect[2] = 3;
+            BinaryPrimitives.WriteInt32LittleEndian(effect.AsSpan(0x12), remaining.GetInt32());
+            BinaryPrimitives.WriteInt32LittleEndian(effect.AsSpan(0x18), 0x900); BinaryPrimitives.WriteInt32LittleEndian(effect.AsSpan(0x1c), -0x300);
+            BinaryPrimitives.WriteUInt32LittleEndian(effect.AsSpan(0x10), 0); BinaryPrimitives.WriteUInt16LittleEndian(effect.AsSpan(0x20), 0x200);
+            int cell = (int)(Math.Min(H - 1, y >> 5) * W + Math.Min(W - 1, x >> 5));
+            var grid = new uint[3 * W * H]; var records = new Dictionary<uint, (byte[], byte[])>(); var order = new List<byte[]>(); uint at = 0x100;
+            foreach (var o in objects.EnumerateArray())
+            {
+                int t = o[2].GetInt32() == 0 ? 0 : 2;
+                var rec = CombatUnit(0, 1, (byte)o[1].GetInt32(), 0x1f, x, y, 1); rec[0x0e] = (byte)t;
+                records[at] = (rec, Dat(t)); order.Add(rec); grid[o[0].GetInt32() * W * H + cell] = at; at += 0x40;
+            }
+            var random = new OriginalTerrainCatalog(properties, constants) { RandomIndex = index, SecondaryIndex = unchecked((byte)(index * 3 + 1)) };
+            var scratch = new byte[0x22]; var spawned = new List<string>(); bool refused = refuse.GetInt32() != 0;
+            string sounds = "[]";
+            uint bx = BinaryPrimitives.ReadUInt32LittleEndian(effect.AsSpan(7)), by = BinaryPrimitives.ReadUInt32LittleEndian(effect.AsSpan(0xc));
+            if (OriginalCatapultRules.StepBolt(effect, W * 32, H * 32, random.NextRandomByte, random.NextSecondaryByte, (tx, ty) =>
+                {
+                    spawned.Add($"[{tx & 0xff}, 401, {BinaryPrimitives.ReadUInt32LittleEndian(effect.AsSpan(7))}, {BinaryPrimitives.ReadUInt32LittleEndian(effect.AsSpan(0xc))}, 0, {tx}, {ty}]");
+                    Array.Clear(scratch); return refused ? null : scratch;
+                }) is var (cx, cy))
+            {
+                OriginalCatapultRules.Hit(OriginalCatapultRules.Attack, 3, 3, cx, cy, 1, 1, W, H, (plane, c) => grid[plane * W * H + c], r => records[r]);
+                sounds = $"[{OriginalCatapultRules.CreateBigExplosion(effect)}]";
+            }
+            thrown += spawned.Count;
+            digest.AppendData(effect); foreach (var r in order) digest.AppendData(r.AsSpan(0, 0x36));
+            digest.AppendData([scratch[2], random.RandomIndex, random.SecondaryIndex]);
+            digest.AppendData(Encoding.UTF8.GetBytes($"[{sounds}, [{string.Join(", ", spawned)}]]")); count++;
+        }
+        Check(thrown > 100, $"Ballista bolts throw fire shots ({thrown})");
+        Finish("bolt_step");
+
+        spec = root.GetProperty("big");
+        foreach (var frames in Items(spec, "frames")) foreach (var ah in Items(spec, "ah"))
+        {
+            var effect = Effect(300, 200); effect[0] = 0x0c; effect[0x16] = (byte)frames[0].GetInt32(); effect[0x17] = (byte)frames[1].GetInt32();
+            string sounds = "[]";
+            if (ah.GetInt32() == 0) sounds = $"[{OriginalCatapultRules.CreateBigExplosion(effect)}]"; else OriginalCatapultRules.StepBigExplosion(effect);
+            digest.AppendData(effect); digest.AppendData(Encoding.UTF8.GetBytes(sounds)); count++;
+        }
+        Finish("big");
     }
 }
