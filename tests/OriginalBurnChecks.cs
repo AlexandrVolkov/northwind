@@ -124,6 +124,10 @@ public partial class TestRunner
             burning |= battle.Stones.Any(e => e[0] is OriginalBurnRules.Small or OriginalBurnRules.Medium or OriginalBurnRules.Large);
         }
         Check(burning, "A fire shot landing on a building sets it alight (BAB → CE3)");
+        Check(battle.Sounds.Any(e => e.Bank == "ARMY__00.FX" && e.Id == 5) && battle.Sounds.Any(e => e.Bank == "ARMY__00.FX" && e.Id == 8),
+            "The fire raises its sounds (A47E: ignition 5, crackle 8 of ARMY__00.FX)");
+        var bank = OriginalSoundBank.Load();
+        Check(battle.Sounds.All(e => bank.Choose(e.Bank, e.Id, e.Random) != null), "Every sound event names a sample of the original banks");
         Check(castle.Record[0x19] < before, $"The fire burns the building down over time ({before} → {castle.Record[0x19]})");
         battle.Stones.Clear();
         var bolt = new byte[0x22]; bolt[0] = OriginalCatapultRules.Bolt; bolt[2] = 1; bolt[5] = 1;
