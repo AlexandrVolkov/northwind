@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "f9e0269e1c82d8ce8d9ba6735c926c212db08b1e05bfac92022222297a5d2c7f",
+  "annotation_sha256": "92e1555b5171356fc61ccda3e33214c28e681d2487f271c69b10b7a28984edea",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -34,8 +34,8 @@
       "byte_status": {
         "partial": 8817,
         "ported": 30978,
-        "unreviewed": 106330,
-        "verified": 757
+        "unreviewed": 106293,
+        "verified": 794
       },
       "linear_rows": 45008,
       "flow_candidate_instructions": 30465,
@@ -1777,6 +1777,15 @@
         },
         {
           "start": 66540,
+          "end": 66577,
+          "status": "verified",
+          "classification": "code",
+          "claims": [
+            "save-area-coordinate-tag"
+          ]
+        },
+        {
+          "start": 66577,
           "end": 66931,
           "status": "unreviewed",
           "classification": "unknown",

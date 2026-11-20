@@ -4729,6 +4729,23 @@
         "tools/save_source.py"
       ],
       "limitations": "Размер 1+16×84h и проверка бита 0 подтверждены инструкциями и SAV; графический вывод и внутренние поля записей не перенесены."
+    },
+    {
+      "id": "save-area-coordinate-tag",
+      "module": "LE:1",
+      "start": 66540,
+      "end": 66577,
+      "name": "Validate destination area X/Y and prepare save tag",
+      "classification": "code",
+      "status": "verified",
+      "evidence": [
+        "docs/save-format.md",
+        "data/original_save_layout.json"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Статически подтверждены границы X/Y и присваивания в 1F00/1F01, соседние теги сверены с SAV; полная процедура переноса объектов и внешние вызовы не исполнены."
     }
   ]
 }

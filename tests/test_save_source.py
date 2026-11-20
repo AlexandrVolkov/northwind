@@ -61,6 +61,8 @@ class SaveSourceChecks(unittest.TestCase):
         data = json.loads((root / 'data/original_save_layout.json').read_text())
         records = data['records']
         self.assertEqual([r['tag'] for r in records], [0x11, 0x99, 0x01000022, 0x00010022])
+        self.assertEqual([(r['area_x'], r['area_y']) for r in (records[0], records[2], records[3])],
+                         [(0, 0), (0, 1), (1, 0)])
         self.assertEqual(records[0]['scenario11']['episode_filename'], 'game    .epi')
         self.assertEqual((records[0]['scenario11']['width'], records[0]['scenario11']['height']), (128, 128))
         scenario = records[0]['scenario11']

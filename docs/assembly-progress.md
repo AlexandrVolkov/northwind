@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 106330 | 8817 | 757 | 30978 | 44 |
+| LE:1 | 146882 | 106293 | 8817 | 794 | 30978 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3228 | 100 | 0 | 2075 | 0 |
@@ -212,6 +212,7 @@
 | LE:1 `0x1030B..0x1037E` | Scale a formation (16-bit IMUL) | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x1037E..0x103AF` | Formation scale factor from the member count | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x103AF..0x103EC` | Formation of a kind nearest the member count | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
+| LE:1 `0x103EC..0x10411` | Validate destination area X/Y and prepare save tag | verified | [save-format.md](../docs/save-format.md); [original_save_layout.json](../data/original_save_layout.json) | Статически подтверждены границы X/Y и присваивания в 1F00/1F01, соседние теги сверены с SAV; полная процедура переноса объектов и внешние вызовы не исполнены. |
 | LE:1 `0x10573..0x105EE` | Create 22h area payload and its fixed buckets | partial | [save-format.md](../docs/save-format.md); [original_save_layout.json](../data/original_save_layout.json) | Контейнер 0F50h+40h+8×2000h подтверждён инструкциями и реальным файлом; внутренние объекты и DOS I/O не перенесены. |
 | LE:1 `0x10802..0x10830` | Open tagged 22h area payload | partial | [save-format.md](../docs/save-format.md); [original_save_layout.json](../data/original_save_layout.json) | Загрузка 16 отложенных записей участников, обратного суффикса bucket и обнуление после чтения прослежены; два объекта по 40 байт в каждом образце размечены через DAT. Внешние проверки объектов и DOS I/O не исполнены. |
 | LE:1 `0x11EB0..0x11ECB` | Goods code 1: +100 gold and statistics | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Только AH=2. |

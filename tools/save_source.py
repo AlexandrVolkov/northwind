@@ -225,6 +225,9 @@ def parse(data, tree_sizes=None, tree_sources=None, dat_sources=None, template_s
         record = dict(index=index, header_offset=offset, payload_offset=payload_offset,
                       length=size, tag=tag, tag_hex=f'{tag:08X}',
                       payload_sha256=hashlib.sha256(payload).hexdigest())
+        if tag & 0xFFFF in (0x11, 0x22):
+            record['area_x'] = (tag >> 16) & 0xFF
+            record['area_y'] = (tag >> 24) & 0xFF
         if tag == 0x66: record['victory_path_marker'] = True
         if tag & 0xFFFF == 0x11: record['scenario11'] = parse_scenario11(payload, tree_sizes, tree_sources)
         if tag == 0x99: record['campaign99'] = parse_session99(payload)

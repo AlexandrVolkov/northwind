@@ -12,6 +12,8 @@
       "tag": 17,
       "tag_hex": "00000011",
       "payload_sha256": "8659f590b2b6c1c9f738a6593212406776d750ef0ef643447bcb15b87894f834",
+      "area_x": 0,
+      "area_y": 0,
       "scenario11": {
         "episode_filename": "game    .epi",
         "width": 128,
@@ -1401,6 +1403,8 @@
       "tag": 16777250,
       "tag_hex": "01000022",
       "payload_sha256": "b43d5e8c0df05efba25277a992922e34f509268b94aee2ed111256ae6b481c0d",
+      "area_x": 0,
+      "area_y": 1,
       "area22": {
         "prefix_length": 3920,
         "prefix_sha256": "68759c7aeaec08736341a86049846fad33738a8fe44bda6057f5f5d4a9730901",
@@ -1682,6 +1686,8 @@
       "tag": 65570,
       "tag_hex": "00010022",
       "payload_sha256": "d43a1a249dec8e467dd1876c36902b8769fa05fa492922484b4ca971d7a3dc1e",
+      "area_x": 1,
+      "area_y": 0,
       "area22": {
         "prefix_length": 3920,
         "prefix_sha256": "68759c7aeaec08736341a86049846fad33738a8fe44bda6057f5f5d4a9730901",
