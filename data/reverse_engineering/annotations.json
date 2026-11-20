@@ -4678,6 +4678,23 @@
         "tools/save_source.py"
       ],
       "limitations": "Разделение 16 записей 0F5h на 9 байт старого эпизода и 0ECh из SAV, три счётчика +18/+1C/+20 и размеры TRE-банков подтверждены; проверки окружения и DOS I/O не исполнены."
+    },
+    {
+      "id": "save-campaign-area-display",
+      "module": "LE:1",
+      "start": 106766,
+      "end": 107046,
+      "name": "Display active campaign area from 16 participant records",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/save-format.md",
+        "data/original_save_layout.json"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Размер 1+16×84h и проверка бита 0 подтверждены инструкциями и SAV; графический вывод и внутренние поля записей не перенесены."
     }
   ]
 }

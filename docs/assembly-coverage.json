@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "dd8f9d497f9a84c5012a7948f21f646efda145ba86c021e588a276ec6d63f467",
+  "annotation_sha256": "fc0780a7480974a5e395cd0758ba196708bd1f05f49f392ada27d342477c790a",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,9 +32,9 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 8537,
+        "partial": 8817,
         "ported": 30978,
-        "unreviewed": 106610,
+        "unreviewed": 106330,
         "verified": 757
       },
       "linear_rows": 45008,
@@ -1998,6 +1998,22 @@
         },
         {
           "start": 104320,
+          "end": 106766,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 106766,
+          "end": 107046,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "save-campaign-area-display"
+          ]
+        },
+        {
+          "start": 107046,
           "end": 112126,
           "status": "unreviewed",
           "classification": "unknown",

@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 106610 | 8537 | 757 | 30978 | 44 |
+| LE:1 | 146882 | 106330 | 8817 | 757 | 30978 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3283 | 100 | 0 | 2020 | 0 |
@@ -226,6 +226,7 @@
 | LE:1 `0x19436..0x19465` | Cabinet orb action returns to menu transition phase | partial | [menu-widgets.md](../docs/menu-widgets.md); [menu-orb.json](../tests/fixtures/menu-orb.json) | 19436 исполнен под Unicorn, но внешние 19294, 1CC4E, 1CC71 заглушены на входе; исходный экран и последующие эффекты не перенесены. |
 | LE:1 `0x19465..0x194B2` | Render MENU RLE with dword width, including 320px rule pages | verified | [credits-layout.md](../docs/credits-layout.md); [credits.json](../tests/fixtures/credits.json) | 27 исходных изображений совпали по RGBA с исполнением 19465. Это подготовленные PNG для Godot, не C#-дубликат RLE-рисовальщика. Заглушён dirty-helper 3EEA. |
 | LE:1 `0x19668..0x19780` | Scan eight save files and fill cabinet slot records | partial | [save-format.md](../docs/save-format.md); [original_save_layout.json](../data/original_save_layout.json); [original-save-slots.png](../docs/reference/original-save-slots.png) | Форма восьми путей и копирование 352байт доказаны кодом; DOS-файловые вызовы, проверка слов 90C9/2C2 и внутренняя разметка сводки не перенесены. |
+| LE:1 `0x1A10E..0x1A226` | Display active campaign area from 16 participant records | partial | [save-format.md](../docs/save-format.md); [original_save_layout.json](../data/original_save_layout.json) | Размер 1+16×84h и проверка бита 0 подтверждены инструкциями и SAV; графический вывод и внутренние поля записей не перенесены. |
 | LE:1 `0x1B5FE..0x1B655` | Select and render save cabinet slot caption | verified | [save-format.md](../docs/save-format.md); [original-save-occupied.png](../docs/reference/original-save-occupied.png) | Статически проверены ветвление и исходные строки LE:3; снимок подтверждает состояние 3. Победное состояние 4 на живом экране не снято; полный callback не исполнялся под Unicorn. |
 | LE:1 `0x1E53A..0x1E6C2` | AI block initialisation from character table | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
 | LE:1 `0x1E87A..0x1EAD8` | AI settlement census | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) |  |

@@ -123,6 +123,13 @@ def parse_session99(payload):
     table = payload[25:537]
     regions = payload[537:]
     cabinet = table[6:6 + 0x160]
+    campaign_areas = []
+    for index in range(len(regions) // 0x841):
+        area = regions[index * 0x841:(index + 1) * 0x841]
+        campaign_areas.append(dict(index=index, flag=area[0],
+                                   participant_record_size=0x84,
+                                   participant_sha256=[hashlib.sha256(area[1 + i*0x84:1 + (i+1)*0x84]).hexdigest()
+                                                       for i in range(16)]))
     names = []
     for index in range(16):
         row = cabinet[index * 22:(index + 1) * 22]
@@ -135,6 +142,7 @@ def parse_session99(payload):
                 cabinet_summary_sha256=hashlib.sha256(cabinet).hexdigest(),
                 cabinet_participants=names,
                 region_record_size=0x841, region_count=len(regions) // 0x841,
+                campaign_areas=campaign_areas,
                 region_sha256=[hashlib.sha256(regions[i:i + 0x841]).hexdigest()
                                for i in range(0, len(regions), 0x841)])
 
