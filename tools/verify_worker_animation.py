@@ -72,6 +72,14 @@ def generate(game):
         event = oracle.animation(); digest.update(oracle.record() + event); count += 1
     spec.update(case_count=count, sha256=digest.hexdigest())
     print('Animation', count, flush=True)
+    # 93DF: a swing request at an object target (+22 = FFh) whose +1C was cleared (target dead, 42BB tail) returns to 9275.
+    absent = {'states': [48], 'timers': [0, 1, 2, 255], 'case_count': 0}
+    digest = hashlib.sha256()
+    for config, state, timer, progress, heading, flags in product(spec['configurations'], absent['states'], absent['timers'], spec['progress'], spec['headings'], spec['flags']):
+        raw = record(state, timer, progress, heading, flags); raw[0x22] = 255; raw[0x1c:0x20] = bytes(4)
+        oracle.worker(bytes(raw), bytes(template(config)))
+        event = oracle.animation(); digest.update(oracle.record() + event); absent['case_count'] += 1
+    absent['sha256'] = digest.hexdigest()
     source = (game / 'ARMY__02.DAT').read_bytes()[2 + 10 * 171:2 + 11 * 171]
     raw = record(0, 0, 0, 2, 0); raw[0x23] = 3; raw[0x32] = 5; raw[0x33] = 3
     raw[0x15] = 2; raw[0x16] = 0; raw[0x2f] = 0; raw[0x34] = source[0x78]
@@ -91,7 +99,7 @@ def generate(game):
         if completed: break
     if not completed: raise ValueError('Worker did not finish a load')
     return {'format_version': 1, 'source_sha256': {name: report['source_sha256'][name] for name in ['NORWIND.EXE', 'ARMY__02.DAT', 'ARMY__02.WRK']},
-            'step': spec, 'sequence': {'template_sha256': hashlib.sha256(source).hexdigest(), 'ticks': tick + 1,
+            'step': spec, 'absent_target': absent, 'sequence': {'template_sha256': hashlib.sha256(source).hexdigest(), 'ticks': tick + 1,
                 'impact_ticks': impacts, 'preview_columns': ['tick', 'frame', 'animation', 'work', 'gate'], 'preview': preview,
                 'sha256': digest.hexdigest()}}
 

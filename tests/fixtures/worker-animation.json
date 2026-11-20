@@ -75,6 +75,19 @@
     "case_count": 215040,
     "sha256": "505f4650064bfa5975449e5dd9a1cb72319a32a113696ea787c2c55b4d9638ae"
   },
+  "absent_target": {
+    "states": [
+      48
+    ],
+    "timers": [
+      0,
+      1,
+      2,
+      255
+    ],
+    "case_count": 840,
+    "sha256": "c16b482f67ec7838da51abf8cb5b8833f2fcf4225c82664d8b8110f8b90b0aaf"
+  },
   "sequence": {
     "template_sha256": "30dec9921542e318c3eb12978cdbc63cbc54eec5375007769468350b63860b53",
     "ticks": 321,
