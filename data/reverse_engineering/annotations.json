@@ -9,8 +9,13 @@
       "name": "Rasterize a column-filled status gauge",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/interface.md", "tests/fixtures/status-bars.json"],
-      "implementation": ["scripts/OriginalStatusBarRules.cs"],
+      "evidence": [
+        "docs/interface.md",
+        "tests/fixtures/status-bars.json"
+      ],
+      "implementation": [
+        "scripts/OriginalStatusBarRules.cs"
+      ],
       "limitations": "Сверены индексы всех пикселей 1314 изображений в трёх размерах, current<=maximum и особый нулевой предел. DOS framebuffer и dirty-cache заменены отрисовкой Godot; опасные размеры и DIV за пределами контракта не перенесены."
     },
     {
@@ -21,8 +26,14 @@
       "name": "Update health gauge value and threshold color",
       "classification": "code",
       "status": "partial",
-      "evidence": ["docs/interface.md", "tests/fixtures/status-bars.json"],
-      "implementation": ["scripts/OriginalStatusBarRules.cs", "scripts/OriginalHud.cs"],
+      "evidence": [
+        "docs/interface.md",
+        "tests/fixtures/status-bars.json"
+      ],
+      "implementation": [
+        "scripts/OriginalStatusBarRules.cs",
+        "scripts/OriginalHud.cs"
+      ],
       "limitations": "Перенесён выбор цвета по половине и четверти исходного предела. Runtime-буфер виджета и его dirty-флаг не воспроизводятся."
     },
     {
@@ -33,8 +44,13 @@
       "name": "Advance cursor frame on a four-tick byte timer interval",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/interface.md", "tests/fixtures/cursor-animation.json"],
-      "implementation": ["scripts/OriginalCursorRules.cs"],
+      "evidence": [
+        "docs/interface.md",
+        "tests/fixtures/cursor-animation.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCursorRules.cs"
+      ],
       "limitations": "Числовой шаг проверен на 35840 входах. Выбор семейства, DOS-мышь, фоновый буфер и полный цикл отрисовки курсора не включены; HUD использует только диапазон обычной стрелки."
     },
     {
@@ -45,8 +61,14 @@
       "name": "Intersect command slots across selected group members",
       "classification": "code",
       "status": "partial",
-      "evidence": ["docs/interface.md", "tests/fixtures/command-panel.json"],
-      "implementation": ["scripts/OriginalInterface.cs", "scripts/OriginalHud.cs"],
+      "evidence": [
+        "docs/interface.md",
+        "tests/fixtures/command-panel.json"
+      ],
+      "implementation": [
+        "scripts/OriginalInterface.cs",
+        "scripts/OriginalHud.cs"
+      ],
       "limitations": "Фильтрация шести слотов по WorkFlags и ненулевому совпадающему raw_group проверена на 1600 парах. Исходный обход цепочки выделения и запись runtime-указателей не перенесены."
     },
     {
@@ -57,8 +79,14 @@
       "name": "Single selection command panel filtered by WorkFlags",
       "classification": "code",
       "status": "partial",
-      "evidence": ["docs/interface.md", "tests/fixtures/command-panel.json"],
-      "implementation": ["scripts/OriginalInterface.cs", "scripts/OriginalHud.cs"],
+      "evidence": [
+        "docs/interface.md",
+        "tests/fixtures/command-panel.json"
+      ],
+      "implementation": [
+        "scripts/OriginalInterface.cs",
+        "scripts/OriginalHud.cs"
+      ],
       "limitations": "Маски одиночной панели проверены для пяти DAT-шаблонов и всех 256 WorkFlags. Исходный runtime-буфер указателей, группа выделения и полный диспетчер кликов не перенесены."
     },
     {
@@ -2561,8 +2589,13 @@
       "name": "AI squad registry: numbers, create, remove, disband, transfer, lookups",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squads.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squads.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "on overflow 200B5 releases pool byte «participant» instead of the new number, as in the original"
     },
     {
@@ -2573,8 +2606,13 @@
       "name": "AI squad census from its members",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squads.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squads.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2585,8 +2623,13 @@
       "name": "Find AI squad by state and target object",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squads.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squads.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2597,8 +2640,13 @@
       "name": "Group orders to squad members and squad bounds",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squads.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squads.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "the order primitives write the OBE command fields only; their execution by WRK is a separate system"
     },
     {
@@ -2609,8 +2657,13 @@
       "name": "AI squad step loop and steps 0..3",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-steps.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-steps.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "step 4 (1EF26) is a hook"
     },
     {
@@ -2621,8 +2674,13 @@
       "name": "AI squad step 5: formation march",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-steps.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-steps.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2633,8 +2691,13 @@
       "name": "Nearest visible hostile object in a cell area",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-steps.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-steps.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "object visibility OBE[20] is not maintained by the skirmish yet"
     },
     {
@@ -2645,8 +2708,13 @@
       "name": "Squad stands; members outside the area return",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-steps.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-steps.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2657,8 +2725,13 @@
       "name": "AI squad states 0..3 and the state loop",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "the state setters 1F1C7, 1F306 and 1F464 are field writes made by the military requests, not ported yet"
     },
     {
@@ -2669,8 +2742,13 @@
       "name": "AI squad states 4..8",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2681,8 +2759,13 @@
       "name": "AI squad retreat, march, fight and strength helpers",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "20001 (stuck-member rescue) and the A4C2 message display are hooks"
     },
     {
@@ -2693,8 +2776,13 @@
       "name": "Hostile objects of an area for AI squads",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2705,8 +2793,13 @@
       "name": "Direction byte between two points (arctangent table DS:287E)",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2717,8 +2810,13 @@
       "name": "Random explored cell for AI patrol",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2729,8 +2827,14 @@
       "name": "Random byte streams [19EB]/[19EC] over table DS:297E",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
-      "implementation": ["scripts/OriginalForestryRules.cs", "scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalForestryRules.cs",
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "third stream 9E69 ([19ED]) is not covered"
     },
     {
@@ -2741,8 +2845,13 @@
       "name": "Participant record and DAT template of an object",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/formats.md", "tests/fixtures/ai-squad-states.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/formats.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "implicit: the port passes template records alongside objects"
     },
     {
@@ -2753,8 +2862,13 @@
       "name": "AI strength wanted for an area (215F1) and against an object (2160B)",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-squad-states.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "implemented inside the squad states; the dead branch 21646..2165D is not used"
     },
     {
@@ -2765,8 +2879,13 @@
       "name": "AI military requests (list +1AB, modes 1..10)",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-military.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "bytes filled from register leftovers are written as zero"
     },
     {
@@ -2777,8 +2896,13 @@
       "name": "AI raid targets: random building, nearest mine",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-military.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2789,8 +2913,13 @@
       "name": "AI squad recruitment (21660/21696 free units, 216DF nearest with lower-priority squads)",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-military.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2801,8 +2930,13 @@
       "name": "Nearest object for a squad of a priority",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-military.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2813,8 +2947,13 @@
       "name": "Area in sight of an object",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-military.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2825,8 +2964,13 @@
       "name": "Friendly and hostile strength in an area",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-military.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2837,8 +2981,13 @@
       "name": "Free units join a squad up to a strength",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-military.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2849,8 +2998,13 @@
       "name": "Nearest free object of a class",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-military.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-military.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2861,8 +3015,13 @@
       "name": "AI garrison: unit orders, building guards, hostile buildings, patrols, wandering",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-garrison.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-garrison.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2873,8 +3032,13 @@
       "name": "Squad members leave up to a strength",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-garrison.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-garrison.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2885,8 +3049,13 @@
       "name": "Random byte stream [19ED] over table DS:297E",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-garrison.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-garrison.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2897,8 +3066,14 @@
       "name": "AI order executor (list +34F, modes 1..10)",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-orders.json", "data/original_producers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-orders.json",
+        "data/original_producers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "order mode 5 leaves [ED39]/[ED3D] = 68h/8, as the original"
     },
     {
@@ -2909,8 +3084,14 @@
       "name": "Producer of a template (WRK AH=6 tables)",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-orders.json", "data/original_producers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-orders.json",
+        "data/original_producers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2921,8 +3102,14 @@
       "name": "Produce (60h) and build (58h) commands",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-orders.json", "data/original_producers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-orders.json",
+        "data/original_producers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -2933,8 +3120,14 @@
       "name": "Building site check around a cell",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-orders.json", "data/original_producers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-orders.json",
+        "data/original_producers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "AF07 permission is a hook"
     },
     {
@@ -2945,12 +3138,18 @@
       "name": "Object of a class in an area",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-orders.json", "data/original_producers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-orders.json",
+        "data/original_producers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
-"id": "exploration-reveal",
+      "id": "exploration-reveal",
       "module": "LE:1",
       "start": 33086,
       "end": 33241,
@@ -3464,30 +3663,20 @@
       "limitations": "27 исходных изображений совпали по RGBA с исполнением 19465. Это подготовленные PNG для Godot, не C#-дубликат RLE-рисовальщика. Заглушён dirty-helper 3EEA."
     },
     {
-      "id": "authors-widget-records",
-      "module": "LE:3",
-      "start": 56476,
-      "end": 56770,
-      "name": "Six authors-screen widget records",
-      "classification": "data",
-      "status": "verified",
-      "evidence": [
-        "docs/credits-layout.md",
-        "docs/reference/original-credits-empty.png"
-      ],
-      "implementation": [
-        "assets/imported/credits/manifest.json"
-      ],
-      "limitations": "6 записей по49байт, адреса callbacks, геометрия и кадры. Фон/спрайты сверены по снимку, весь callback lifecycle не перенесён.",
-    "id": "ai-economy-plan",
+      "id": "ai-economy-plan",
       "module": "LE:1",
       "start": 138905,
       "end": 139694,
       "name": "AI economy planning: income, upkeep, economy requests, farm and building orders",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -3498,8 +3687,13 @@
       "name": "AI economy executor over list +4F3 (workers, mines, lumbermill)",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "D363 occupancy check is a hook"
     },
     {
@@ -3510,8 +3704,13 @@
       "name": "Gather free workers into a squad",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -3522,8 +3721,13 @@
       "name": "Random seen ore cell around the home for a mine",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -3534,8 +3738,13 @@
       "name": "Set worker squad state 9 with its target area",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -3546,8 +3755,13 @@
       "name": "Set worker squad state 10",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-economy.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -3558,8 +3772,13 @@
       "name": "AI squad state 9: timber workers",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -3570,8 +3789,13 @@
       "name": "AI squad state 10: mine workers",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -3582,8 +3806,13 @@
       "name": "Random idle member of a squad",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -3594,8 +3823,13 @@
       "name": "Squad member with an activity code",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -3606,8 +3840,13 @@
       "name": "Nearest terrain cell of a class in the squad area",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": "The original's distance formula (|dx| - y against ±y) is kept"
     },
     {
@@ -3618,8 +3857,13 @@
       "name": "Random seen grove cell around the squad centre",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -3630,8 +3874,13 @@
       "name": "Terrain class present in an area",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
     },
     {
@@ -3642,9 +3891,48 @@
       "name": "Squad of a state whose area holds a cell",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
-      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "evidence": [
+        "docs/ai.md",
+        "tests/fixtures/ai-workers.json"
+      ],
+      "implementation": [
+        "scripts/OriginalAiSquads.cs"
+      ],
       "limitations": ""
+    },
+    {
+      "id": "menu-frame-forward",
+      "module": "LE:1",
+      "start": 102100,
+      "end": 102133,
+      "name": "Advance menu widget frame by byte timer",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/menu-widgets.md",
+        "tests/fixtures/menu-animation.json"
+      ],
+      "implementation": [
+        "scripts/OriginalMenuAnimationRules.cs"
+      ],
+      "limitations": "Сверены 4374 вызова двух helpers; внешние callbacks виджетов и отрисовка не входят."
+    },
+    {
+      "id": "menu-frame-backward",
+      "module": "LE:1",
+      "start": 102133,
+      "end": 102166,
+      "name": "Reverse menu widget frame by byte timer",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/menu-widgets.md",
+        "tests/fixtures/menu-animation.json"
+      ],
+      "implementation": [
+        "scripts/OriginalMenuAnimationRules.cs"
+      ],
+      "limitations": "Сверены 4374 вызова двух helpers; внешние callbacks виджетов и отрисовка не входят."
     }
   ]
 }
