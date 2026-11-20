@@ -125,5 +125,13 @@ public partial class TestRunner
         }
         Check(burning, "A fire shot landing on a building sets it alight (BAB → CE3)");
         Check(castle.Record[0x19] < before, $"The fire burns the building down over time ({before} → {castle.Record[0x19]})");
+        battle.Stones.Clear();
+        var bolt = new byte[0x22]; bolt[0] = OriginalCatapultRules.Bolt; bolt[2] = 1; bolt[5] = 1;
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(bolt.AsSpan(7), (uint)castle.Position.X + 64);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(bolt.AsSpan(0xc), (uint)castle.Position.Y + 64);
+        battle.Stones.Add(bolt);
+        battle.Advance(1 / 18.2);
+        Check(battle.Stones.Any(e => e[0] == OriginalCatapultRules.BigExplosion) && battle.Stones.Count(e => e[0] == OriginalFireRules.Shot) > 0,
+            "A landing ballista bolt explodes and throws fire shots (12EC → A44, BAB)");
     }
 }

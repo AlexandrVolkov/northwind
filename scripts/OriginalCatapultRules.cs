@@ -105,4 +105,52 @@ public static class OriginalCatapultRules
         effect[0x16] = 2; W16(effect, 3, unchecked((ushort)(U16(effect, 3) + 1)));
         if (--effect[0x17] == 0) effect[0] = 0xff;
     }
+
+    public const byte Bolt = 0x1d, BigExplosion = 0x0c;
+
+    /// <summary>WRK 12EC AH=0 (ballista bolt): owner, frame 226h, aim with accuracy 0 (9A1B), speed 12 (996F), direction
+    /// A5B8 added to the frame once. No sound.</summary>
+    public static void CreateBolt(Span<byte> effect, ReadOnlySpan<byte> shooter, uint targetX, uint targetY, uint widthPixels, uint heightPixels,
+        Func<byte> random, Func<byte> secondary)
+    {
+        effect[2] = shooter[3]; effect[0] = Bolt; W16(effect, 3, 0x226);
+        var (x, y) = OriginalArrowRules.Scatter(shooter, targetX, targetY, 0, widthPixels, heightPixels, random, secondary);
+        OriginalArrowRules.Velocity(effect, x, y, 0x0c);
+        OriginalArrowRules.Direction(effect);
+    }
+
+    /// <summary>WRK 1319: a flight step; on landing, five tries to throw a fire shot (type 11h, owner of the bolt) from the
+    /// bolt toward a point within ±64 of it (Y from 9E55, X from 9E41; a point beyond the map size is skipped), a hit on
+    /// the cell (attack 0Ah, kind 3, planes 0 and 1) and the big explosion (<see cref="CreateBigExplosion"/>). Returns the
+    /// landing cell or null while flying. <paramref name="spawn"/> is 9727 of a fire shot from the bolt's point toward the
+    /// target; it returns the new effect or null.</summary>
+    public static (byte X, byte Y)? StepBolt(Span<byte> effect, uint widthPixels, uint heightPixels, Func<byte> random, Func<byte> secondary,
+        Func<uint, uint, byte[]?> spawn)
+    {
+        if (Fly(effect, widthPixels, heightPixels)) return null;
+        for (int k = 0; k < 5; k++)
+        {
+            uint y = unchecked((uint)((sbyte)secondary() >> 1) + U32(effect, 0x0c));
+            if (y > heightPixels) continue;
+            uint x = unchecked((uint)((sbyte)random() >> 1) + U32(effect, 7));
+            if (x > widthPixels) continue;
+            if (spawn(x, y) is { } shot) shot[2] = effect[2];
+        }
+        return ((byte)(U32(effect, 7) >> 5), (byte)(U32(effect, 0x0c) >> 5));
+    }
+
+    /// <summary>WRK A44 AH=0: big explosion (type 0Ch, 128×128), frame 85h, 18 frames of 2 ticks. Returns the sound (9).</summary>
+    public static int CreateBigExplosion(Span<byte> effect)
+    {
+        W16(effect, 3, 0x85); effect[0] = BigExplosion; effect[0x16] = 2; effect[0x17] = 0x12;
+        return 9;
+    }
+
+    /// <summary>WRK AD5: frames of the big explosion, then free.</summary>
+    public static void StepBigExplosion(Span<byte> effect)
+    {
+        if (--effect[0x16] != 0) return;
+        effect[0x16] = 2; W16(effect, 3, unchecked((ushort)(U16(effect, 3) + 1)));
+        if (--effect[0x17] == 0) effect[0] = 0xff;
+    }
 }
