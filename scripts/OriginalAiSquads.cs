@@ -411,7 +411,8 @@ public interface IAiSquadStateWorld : IAiSquadWorld
     byte Fog(int cell);
     /// <summary>A4C2 at the squad centre with the text id from table LE:3 F02E.</summary>
     void Message(ReadOnlySpan<byte> squad, uint text);
-    void Rescue(Span<byte> squad);
+    /// <summary>Army index of the participant (record +0): objects of that army are its own kind (DA7F skips them).</summary>
+    byte Army(byte participant);
     /// <summary>States 9 and 10 (worker squads, <see cref="OriginalAiWorkers"/>) of the squad at <paramref name="at"/>.</summary>
     void WorkerState(Span<byte> ai, int at);
 }
@@ -695,7 +696,7 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
             if ((U32(s, 0x1b) & 0x1f) != 0) return;
             var (enemy, _) = NearCentre(s);
             if (enemy != 0) { Engaged(ai, s, enemy); return; }
-            if ((U32(s, 0x1b) & 0x3ff) == 0) world.Rescue(s);
+            if ((U32(s, 0x1b) & 0x3ff) == 0) Pickup(ai, s);
             if ((world.Random() & 0x1f) == 0) Say(ai, s, 0);
             return;
         }
@@ -707,6 +708,44 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
         }
         if (!Retreat(ai, s)) s[5] = 0;
     }
+    /// <summary>20001: with strength +19F1 above 1999 and an object of class 200000h (1ECA0), the loaded (+31 ≠ 0) object
+    /// of another army with DAT[40] bits 20h and 20000h (loot, ARMY__00) nearest to the centre in the area of 1F011
+    /// (DA7F over D7B1, later equal distances win) draws the squad's living member nearest to it (BA60): command 48h to
+    /// its cell.</summary>
+    private void Pickup(ReadOnlySpan<byte> ai, ReadOnlySpan<byte> s)
+    {
+        if (U32(ai, 0x19f1) <= 0x7cf || OriginalAiResearch.FirstObject(world.Chain(s[0]), 0x200000, 0x200000) == null) return;
+        byte r = Radius(s);
+        var (x0, y0, x1, y1) = Clip(s[0x20], s[0x21], r, r);
+        uint size = unchecked((uint)(x1 | y1 << 8) - (uint)(x0 | y0 << 8) + 0x101);
+        byte army = world.Army(s[0]);
+        uint cx = (uint)s[0x20] << 5, cy = (uint)s[0x21] << 5, best = uint.MaxValue;
+        byte[]? loot = null;
+        foreach (uint reference in OriginalTargetRules.Collect(new Grid(world), x0, y0, (byte)size, (byte)(size >> 8)))
+        {
+            var (o, t) = world.Resolve(reference);
+            if (o[0] == army || (U32(t, 0x40) & 0x20) == 0 || (U32(t, 0x40) & 0x20000) == 0 || o[0x31] == 0) continue;
+            uint d = Chebyshev(U32(o, 4), U32(o, 8), cx, cy);
+            if (d <= best) { best = d; loot = o; }
+        }
+        if (loot == null) return;
+        uint lx = U32(loot, 4), ly = U32(loot, 8); best = uint.MaxValue;
+        byte[]? member = null;
+        foreach (var (o, _) in world.Chain(s[0]))
+        {
+            if (o[0x1b] != s[1] || (sbyte)o[0x19] <= 0) continue;
+            uint d = Chebyshev(lx, ly, U32(o, 4), U32(o, 8));
+            if (d <= best) { best = d; member = o; }
+        }
+        if (member == null) return;
+        member[0x22] = (byte)(lx >> 5); member[0x23] = (byte)(ly >> 5); member[0x14] = (byte)(member[0x14] & 7 | 0x48);
+    }
+    private static uint Chebyshev(uint x1, uint y1, uint x2, uint y2)
+    {
+        int dx = unchecked((int)(x1 - x2)), dy = unchecked((int)(y1 - y2));
+        return Math.Max(unchecked((uint)(dx < 0 ? -dx : dx)), unchecked((uint)(dy < 0 ? -dy : dy)));
+    }
+
     private void Engaged(Span<byte> ai, Span<byte> s, uint enemy)
     {
         Counter(ai, 0x17c, world.Resolve(enemy).Record[3]);

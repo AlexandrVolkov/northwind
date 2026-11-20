@@ -4,7 +4,8 @@
 Helpers covered: 1FBB1 retreat (6996 direction with the DS:287E arctangent table, DS:19C7 steps), 1FC28/1FC6B march to a
 cell (step 4 request), 1FCED fight modes, 1FF74/1FFB7 strength comparisons, 21CA0 enemy census (D7B1), 1EBEF random
 explored cell, 20071 messages (table LE:3 F02E), 1EB5C requests, squad registry calls. Stubbed at their entries and
-recorded: A4C2 (message display), 20001 (stuck-member rescue), worker states 9 (1F476) and 10 (1F653).
+recorded: A4C2 (message display), worker states 9 (1F476) and 10 (1F653). 20001 (a member goes to the nearest loaded loot
+object of another army, ARMY__00.DAT, near the centre: DA7F, BA60) runs for real.
 Request lists +1AB/+34F are compared without bytes +3 and +5..+0B (register leftovers at several call sites).
 """
 import argparse
@@ -25,7 +26,8 @@ EXPLORED = 0x7000
 RANGES = [(0x1f078, 0x1f476), (0x1f72c, 0x1fbb1), (0x1fbb1, 0x20095), (0x200ab, 0x200b5), (0x20143, 0x2024d), (0x20275, 0x2029f),
           (0x20408, 0x205fb), (0x219c3, 0x21a00), (0x21ca0, 0x21d84), (0xd7b1, 0xd85e), (0x1eaed, 0x1eb68), (0x1ead8, 0x1eaed),
           (0x1ecf8, 0x1ed26), (0x1edfd, 0x1ee02), (0x1ef21, 0x1ef26), (0x1efb8, 0x1efcc), (0x1eff9, 0x1f078), (0x6996, 0x69fe), (0x9e41, 0x9e69),
-          (0x215f1, 0x21660), (0xc331, 0xc344), (0x6877, 0x68d8), (0x1ebef, 0x1ec3f)]
+          (0x215f1, 0x21660), (0xc331, 0xc344), (0x6877, 0x68d8), (0x1ebef, 0x1ec3f), (0x20001, 0x20071), (0xda7f, 0xdb47),
+          (0xba60, 0xbadf), (0x1eca0, 0x1ecf8)]
 
 
 class StateOracle(CombatOracle):
@@ -68,6 +70,15 @@ def cases():
                               '29': rng.choice([0, 1, 2, 3, 4])},
                     'global': rng.choice([0, 0xff]), 'random': [rng.randrange(256), rng.randrange(256)], 'explored_seed': rng.randrange(1 << 16),
                     'stale_y': rng.randrange(256)})
+        extra = random.Random(n * 7919 + 1)   # separate stream: earlier fields keep their values
+        out[-1]['b19f1'] = extra.choice([0, 1999, 2000, 9000])
+        out[-1]['loot'] = [[extra.choice([2, 3, 9, 23, 24]), extra.choice([0, 1, 5]), min(31, y0 + extra.randrange(h + 1)) * 32 + min(31, x0 + extra.randrange(w + 1)) if fight and extra.random() < 0.7 else extra.randrange(1024),
+                            extra.choice([1, 2])] for _ in range(extra.choice([0, 0, 1, 3]))]
+        out[-1]['seat'] = extra.choice([0, 0, 1])   # own object with DAT[40] bit 200000h (castle, template 2)
+        if out[-1]['loot'] and extra.random() < 0.5:
+            out[-1]['seat'] = 1; out[-1]['b19f1'] = 9000
+            for sq in out[-1]['squads']:
+                if sq['state'] == 0 and extra.random() < 0.6: sq['timer'] = 0x400; sq['stage'] = 1; sq['count'] = extra.choice([2, 5, 11])
     return out
 
 
@@ -116,9 +127,8 @@ def generate(game):
             log.append(bytes([name]) + b''.join(struct.pack('<I', o.cpu.reg_read(globals()['UC_X86_REG_' + r])) for r in registers)); o.ret()
         return run
     o.stubs[0xa4c2] = stub(1, ['EAX'])
-    def rescue():
-        log.append(bytes([2, bytes(o.cpu.mem_read(o.cpu.reg_read(UC_X86_REG_EDI) + 1, 1))[0]])); o.ret()
-    o.stubs[0x20001] = rescue
+    loot_dat = (game / 'ARMY__00.DAT').read_bytes(); o.cpu.mem_write(o.DAT + 0x8000, loot_dat)
+    o.cpu.mem_write(0x6ca + 4, struct.pack('<I', o.DAT + 0x8000 + 2))
     def worker():
         log.append(bytes([3, bytes(o.cpu.mem_read(o.cpu.reg_read(UC_X86_REG_EDI) + 1, 1))[0]])); o.ret()
     o.stubs[0x1f476] = worker; o.stubs[0x1f653] = worker
@@ -127,7 +137,7 @@ def generate(game):
         o.prepare(32, 32); p = case['participant']; stats = o.PARTICIPANTS + STATS * p
         block = bytearray(STATS); block[0] = p
         b = case['block']; struct.pack_into('<I', block, 0x0a, b['0a']); struct.pack_into('<I', block, 0x0e, b['0e']); block[0x77] = b['77']
-        block[0x2a] = b['2a']; block[0x29] = b['29']
+        block[0x2a] = b['2a']; block[0x29] = b['29']; struct.pack_into('<I', block, 0x19f1, case['b19f1'])
         for k, (mode, first) in enumerate(case['lists']):
             r = bytearray((i * 5 + k) & 255 for i in range(0x15)); r[0] = mode; r[1] = first
             block[(0x1ab if k < 20 else 0x34f) + (k % 20) * 0x15:][:0x15] = r
@@ -137,6 +147,7 @@ def generate(game):
         o.cpu.mem_write(0x19e9, bytes([case['global']])); o.cpu.mem_write(0x19eb, bytes(case['random']))
         o.cpu.mem_write(EXPLORED, explored(case['explored_seed'])); o.cpu.mem_write(0xf0e5, bytes([case['stale_y']]))
         for q in range(8):
+            o.cpu.mem_write(0x97a + 0xf5 * q, b'\x02')   # army 2 (the loot army is 0)
             o.cpu.mem_write(0x97a + 0xf5 * q + 9, struct.pack('<I', 0x100) + bytes(1) + struct.pack('<I', 0x100) + struct.pack('<I', case['hostile'][q]))
         size = 32 * 32 * 4; at = 0x100
         enemy_refs = []
@@ -144,9 +155,16 @@ def generate(game):
             rec = unit(t, owner, hp, 0, (c & 31) * 32 + 17, (c >> 5) * 32 + 3, 1) + bytes(10)
             rec[0x20] = f20; struct.pack_into('<I', rec, 0x10, 0x40)
             o.cpu.mem_write(o.POOL + at, bytes(rec)); o.cpu.mem_write(o.GRID + plane * size + c * 4, struct.pack('<I', at)); at += 0x40
+        for t, cargo, c, plane in case['loot']:
+            rec = unit(t, 0, 10, 0, (c & 31) * 32 + 11, (c >> 5) * 32 + 21, 1) + bytes(10)
+            rec[0] = 0; rec[0x31] = cargo; struct.pack_into('<I', rec, 0x10, 0x40)
+            o.cpu.mem_write(o.POOL + at, bytes(rec)); o.cpu.mem_write(o.GRID + plane * size + c * 4, struct.pack('<I', at)); at += 0x40
         while at < 0x100 + 0x40 * 3:
             o.cpu.mem_write(o.POOL + at, bytes(unit(0, 7, 0, 0, 40, 40, 1)) + bytes(10)); at += 0x40   # dead placeholders for +0F
         start = at
+        if case['seat']:
+            rec = unit(2, p, 100, 0, 7 * 32, 7 * 32, 1) + bytes(10); rec[0x14] = 1; rec[0x1b] = 0; struct.pack_into('<I', rec, 0x10, 0x40)
+            o.cpu.mem_write(o.POOL + at, bytes(rec)); at += 0x40
         for t, sq, f0f, f14, f15, f17, c, f20, target, plane in case['own']:
             rec = unit(t, p, 10, f17, (c & 31) * 32 + 5, (c >> 5) * 32 + 9, 1) + bytes(10)
             rec[0x1b] = sq; rec[0x0f] = f0f; rec[0x14] = f14; rec[0x20] = f20; struct.pack_into('<I', rec, 0x10, 0x40)

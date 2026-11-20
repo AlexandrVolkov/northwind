@@ -75,7 +75,7 @@
 | 1FF51 | 10 | ported | AI squad retreat, march, fight and strength helpers | 21CA0✓ |
 | 1FF74 | 24 | ported | AI squad retreat, march, fight and strength helpers | 20275✓, 20458✓ |
 | 1FFB7 | 26 | ported | AI squad retreat, march, fight and strength helpers | 1FF51✓, 20275✓ |
-| 20001 | 39 | ported | AI squad retreat, march, fight and strength helpers | BA60·, D7B1✓, DA7F·, 1F011· |
+| 20001 | 39 | ported | AI squad retreat, march, fight and strength helpers | BA60✓, D7B1✓, DA7F✓, 1F011· |
 | 20071 | 10 | ported | AI squad retreat, march, fight and strength helpers | 1EAD8✓ |
 | 20095 | 8 | ported | AI squad registry: numbers, create, remove, disband, transfer, lookups |  |
 | 200AB | 3 | ported | AI squad registry: numbers, create, remove, disband, transfer, lookups |  |
@@ -159,13 +159,13 @@
 | B7B9 | ported | Group orders to squad members and squad bounds | 1EFCC |
 | B8A2 | ported | Group orders to squad members and squad bounds | 1ED78 |
 | B977 | ported | Group orders to squad members and squad bounds | 1ED87 |
-| BA60 | unknown |  | 20001 |
+| BA60 | ported | Nearest living squad member to a point | 20001 |
 | C331 | unknown |  | 214C3, 21555, 2160B |
 | C439 | ported | Find worker cargo receiver | 1F476, 1F653 |
 | D19C | unknown |  | 22E85 |
 | D363 | unknown |  | 221AE |
 | D7B1 | ported | Collect unique occupants of an area | 20001, 209B0, 21CA0, 23201, 23B10 |
-| DA7F | unknown |  | 20001 |
+| DA7F | ported | Nearest loaded loot object of another army | 20001 |
 | EDD5 | ported | Queue and dispatch a message | 21E99, 2323A, 23667 |
 | EE69 | ported | Find a queued message by type and party | 2323A, 23667 |
 | 10075 | unknown |  | 1EF26 |

@@ -447,7 +447,7 @@ public sealed partial class Skirmish
             participant == battle.Rules.EnemySlot ? battle.EnemyConstruct(template, new Vector2I((int)(x >> 5), (int)(y >> 5))).Record : null;
         public void Register(byte[] record) { }
         public void Message(ReadOnlySpan<byte> squad, uint text) { }
-        public void Rescue(Span<byte> squad) { }
+        public byte Army(byte participant) => battle._participants[participant][0];
         public void WorkerState(Span<byte> ai, int at) => battle._aiWorkers!.Run(ai, at);
         public uint TileProperty(int cell) => cell >= 0 && cell < battle.Map.Cells.Length
             ? BinaryPrimitives.ReadUInt32LittleEndian(battle._properties.AsSpan((int)(battle.Map.Cells[cell] & 0xffff) * 8)) : 0;
