@@ -101,7 +101,10 @@ class SaveSourceChecks(unittest.TestCase):
             block = area['area22']
             self.assertEqual(block['bucket_count'], 8)
             self.assertEqual(block['descriptor_counts'][4], 80)
+            self.assertEqual([x['length'] for x in block['allocated_suffixes']], [0, 0, 0, 0, 80, 0, 0, 0])
             self.assertEqual(0xF50 + 0x40 + 8 * 0x2000, area['length'])
+        self.assertEqual([area['area22']['allocated_suffixes'][4]['nonzero_bytes'] for area in records[2:]],
+                         [25, 27])
 
 
 if __name__ == '__main__': unittest.main()

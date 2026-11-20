@@ -151,9 +151,17 @@ def parse_area22(payload):
     bucket_count = len(buckets) // bucket_size
     if bucket_count > 16 or any(x > bucket_size for x in counts[:bucket_count]):
         raise ValueError('Invalid area 22h allocation counts')
+    allocated_suffixes = []
+    for index in range(bucket_count):
+        chunk = buckets[index * bucket_size:(index + 1) * bucket_size]
+        used = chunk[bucket_size - counts[index]:] if counts[index] else b''
+        allocated_suffixes.append(dict(index=index, length=counts[index],
+                                       sha256=hashlib.sha256(used).hexdigest(),
+                                       nonzero_bytes=sum(value != 0 for value in used)))
     return dict(prefix_length=prefix, prefix_sha256=hashlib.sha256(payload[:prefix]).hexdigest(),
                 descriptor_offset=prefix, descriptor_counts=counts,
                 bucket_size=bucket_size, bucket_count=bucket_count,
+                allocated_suffixes=allocated_suffixes,
                 bucket_sha256=[hashlib.sha256(buckets[i:i + bucket_size]).hexdigest()
                                for i in range(0, len(buckets), bucket_size)])
 
