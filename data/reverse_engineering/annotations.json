@@ -4791,6 +4791,30 @@
       ],
       "implementation": [],
       "limitations": "Источники портрета, значка и имени установлены по коду; точная пиксельная отрисовка и все callbacks не перенесены."
+    },
+    {
+      "id": "campaign-border-transfer-coordinate",
+      "module": "LE:1",
+      "start": 67481,
+      "end": 67561,
+      "name": "Select adjacent campaign area and destination edge coordinate",
+      "classification": "code",
+      "status": "partial",
+      "evidence": ["docs/campaign.md", "data/original_episodes.json"],
+      "implementation": [],
+      "limitations": "Направления и координаты подтверждены дизассемблированием; загрузка области и перенос объекта не сверены исполнением или C#."
+    },
+    {
+      "id": "campaign-world-record-update",
+      "module": "LE:1",
+      "start": 68768,
+      "end": 69145,
+      "name": "Copy live participant state and leader position into campaign area records",
+      "classification": "code",
+      "status": "partial",
+      "evidence": ["docs/campaign.md", "assets/imported/templates.json"],
+      "implementation": [],
+      "limitations": "Основные поля и поиск предводителя установлены статически; неизвестные поля, полная инициализация и C#-перенос открыты."
     }
   ]
 }
