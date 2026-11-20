@@ -4746,6 +4746,51 @@
         "tools/save_source.py"
       ],
       "limitations": "Статически подтверждены границы X/Y и присваивания в 1F00/1F01, соседние теги сверены с SAV; полная процедура переноса объектов и внешние вызовы не исполнены."
+    },
+    {
+      "id": "diplomacy-button-gate",
+      "module": "LE:1",
+      "start": 60376,
+      "end": 60472,
+      "name": "Open diplomacy only for a known living contact",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/diplomacy-ui.md",
+        "docs/reference/original-diplomacy-contacts.png"
+      ],
+      "implementation": [],
+      "limitations": "Условие и два контакта образца сверены со снимком; внешний 111C5 и полный callback не исполнены."
+    },
+    {
+      "id": "diplomacy-contact-layout",
+      "module": "LE:1",
+      "start": 58971,
+      "end": 59159,
+      "name": "Lay out known diplomacy contacts in one or two rows",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/diplomacy-ui.md",
+        "docs/reference/original-diplomacy-contacts.png"
+      ],
+      "implementation": [],
+      "limitations": "Геометрия из инструкций и двухконтактный экран сверены; варианты с более чем четырьмя контактами на живом экране не сняты."
+    },
+    {
+      "id": "diplomacy-contact-widgets",
+      "module": "LE:1",
+      "start": 60120,
+      "end": 60376,
+      "name": "Create portrait, relation icon and name widgets for a contact",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/diplomacy-ui.md",
+        "docs/reference/original-diplomacy-contacts.png"
+      ],
+      "implementation": [],
+      "limitations": "Источники портрета, значка и имени установлены по коду; точная пиксельная отрисовка и все callbacks не перенесены."
     }
   ]
 }

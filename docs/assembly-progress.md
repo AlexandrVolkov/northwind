@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 106293 | 8817 | 794 | 30978 | 44 |
+| LE:1 | 146882 | 105753 | 9357 | 794 | 30978 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3228 | 100 | 0 | 2075 | 0 |
@@ -193,6 +193,9 @@
 | LE:1 `0xD85E..0xD895` | Search area around the unit | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 | LE:1 `0xD895..0xDA45` | Enemy search: radius, filters, nearest with tie on attacker | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) | Видимость, контакт и враждебность в схватке задаёт мост. |
 | LE:1 `0xDA7F..0xDB47` | Nearest loaded loot object of another army | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
+| LE:1 `0xE65B..0xE717` | Lay out known diplomacy contacts in one or two rows | partial | [diplomacy-ui.md](../docs/diplomacy-ui.md); [original-diplomacy-contacts.png](../docs/reference/original-diplomacy-contacts.png) | Геометрия из инструкций и двухконтактный экран сверены; варианты с более чем четырьмя контактами на живом экране не сняты. |
+| LE:1 `0xEAD8..0xEBD8` | Create portrait, relation icon and name widgets for a contact | partial | [diplomacy-ui.md](../docs/diplomacy-ui.md); [original-diplomacy-contacts.png](../docs/reference/original-diplomacy-contacts.png) | Источники портрета, значка и имени установлены по коду; точная пиксельная отрисовка и все callbacks не перенесены. |
+| LE:1 `0xEBD8..0xEC38` | Open diplomacy only for a known living contact | partial | [diplomacy-ui.md](../docs/diplomacy-ui.md); [original-diplomacy-contacts.png](../docs/reference/original-diplomacy-contacts.png) | Условие и два контакта образца сверены со снимком; внешний 111C5 и полный callback не исполнены. |
 | LE:1 `0xEDD5..0xEE38` | Queue and dispatch a message | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xEE69..0xEE92` | Find a queued message by type and party | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xEEFA..0xEF3F` | Drop messages between two settlements | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
