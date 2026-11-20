@@ -154,6 +154,14 @@ def parse_area22(payload):
     bucket_size = 0x2000
     if len(payload) < prefix + descriptor or (len(payload) - prefix - descriptor) % bucket_size:
         raise ValueError('Invalid area 22h payload length')
+    participant_transfers = []
+    for index in range(16):
+        row = payload[index * 0xF5:(index + 1) * 0xF5]
+        tokens = row[0xCD:0xCD + 0x14]
+        participant_transfers.append(dict(index=index,
+                                          balance_fields_18_1c_20=list(struct.unpack_from('<III', row, 0x18)),
+                                          token_slots_nonzero=sum(value != 0 for value in tokens),
+                                          token_slots_sha256=hashlib.sha256(tokens).hexdigest()))
     counts = list(struct.unpack_from('<16I', payload, prefix))
     buckets = payload[prefix + descriptor:]
     bucket_count = len(buckets) // bucket_size
@@ -167,6 +175,7 @@ def parse_area22(payload):
                                        sha256=hashlib.sha256(used).hexdigest(),
                                        nonzero_bytes=sum(value != 0 for value in used)))
     return dict(prefix_length=prefix, prefix_sha256=hashlib.sha256(payload[:prefix]).hexdigest(),
+                participant_transfers=participant_transfers,
                 descriptor_offset=prefix, descriptor_counts=counts,
                 bucket_size=bucket_size, bucket_count=bucket_count,
                 allocated_suffixes=allocated_suffixes,

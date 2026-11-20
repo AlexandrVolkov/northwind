@@ -103,6 +103,9 @@ class SaveSourceChecks(unittest.TestCase):
         for area in records[2:]:
             block = area['area22']
             self.assertEqual(block['bucket_count'], 8)
+            self.assertEqual(len(block['participant_transfers']), 16)
+            self.assertTrue(all(entry['balance_fields_18_1c_20'] == [0, 0, 0] and
+                                entry['token_slots_nonzero'] == 0 for entry in block['participant_transfers']))
             self.assertEqual(block['descriptor_counts'][4], 80)
             self.assertEqual([x['length'] for x in block['allocated_suffixes']], [0, 0, 0, 0, 80, 0, 0, 0])
             self.assertEqual(0xF50 + 0x40 + 8 * 0x2000, area['length'])
