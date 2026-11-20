@@ -73,7 +73,7 @@ public sealed partial class Skirmish
                 carrier != null ? carrier.Parameters : ReadOnlySpan<byte>.Empty, ref credit) && cargoBefore != 0 && castle.Team == 0)
             Log($"В замок доставлено 100: {OreName(cargoBefore)}.");
         if (castle.Team == 0) { Metal = credit.Metal; Gold = credit.Gold; ProducedMetal = credit.MetalStatistics; ProducedGold = credit.GoldStatistics; }
-        else EnemyResources = wallet with { First = credit.Metal, Third = credit.Gold };
+        else SetWallet(castle.Team, wallet with { First = credit.Metal, Third = credit.Gold });
     }
 
     private void TickOreWorker(SkirmishActor worker)

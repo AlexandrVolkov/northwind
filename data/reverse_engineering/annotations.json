@@ -3863,6 +3863,40 @@
       "limitations": ""
     },
     {
+      "id": "unit-corpse",
+      "module": "ARMY__02.WRK",
+      "start": 5661,
+      "end": 5853,
+      "name": "Unit corpse effect (type 1)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/corpse.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCorpseRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "blood-splash",
+      "module": "ARMY__00.WRK",
+      "start": 1735,
+      "end": 1790,
+      "name": "Blood splash effect (type 3)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/combat.md",
+        "tests/fixtures/corpse.json"
+      ],
+      "implementation": [
+        "scripts/OriginalCorpseRules.cs"
+      ],
+      "limitations": ""
+    },
+    {
       "id": "exploration-reveal",
       "module": "LE:1",
       "start": 33086,

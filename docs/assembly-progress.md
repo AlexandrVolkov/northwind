@@ -7,9 +7,9 @@
 | LE:1 | 146882 | 106330 | 8817 | 757 | 30978 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 3283 | 100 | 0 | 2020 | 0 |
+| ARMY__00.WRK | 5403 | 3228 | 100 | 0 | 2075 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
-| ARMY__02.WRK | 6930 | 5581 | 609 | 528 | 212 | 7 |
+| ARMY__02.WRK | 6930 | 5389 | 609 | 528 | 404 | 7 |
 | ARMY__03.WRK | 13412 | 13412 | 0 | 0 | 0 | 1 |
 | ARMY__04.WRK | 411 | 411 | 0 | 0 | 0 | 0 |
 | ARMY__05.WRK | 882 | 882 | 0 | 0 | 0 | 2 |
@@ -22,6 +22,7 @@
 | --- | --- | --- | --- | --- |
 | ARMY__00.WRK `0x4F3..0x54A` | Melee strike effect: experience attack, lookup, hit, sound | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Объект-эффект и его анимация в схватке не создаются. |
 | ARMY__00.WRK `0x593..0x6C7` | Arrow effect: launch, flight, early and arrival hits | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) | Обработчики 7FE/AEB не перенесены. |
+| ARMY__00.WRK `0x6C7..0x6FE` | Blood splash effect (type 3) | ported | [combat.md](../docs/combat.md); [corpse.json](../tests/fixtures/corpse.json) |  |
 | ARMY__00.WRK `0x6FE..0x762` | Spark effect types 4/5 creation and countdown | partial | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Перенесено создание (AH=0); обновление кадров не подключено. |
 | ARMY__00.WRK `0x85A..0x8DA` | Catapult stone effect (type 8) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | ARMY__00.WRK `0x986..0x9D5` | Explosion effect (type 10) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | drift vector 9E7D not ported |
@@ -73,6 +74,7 @@
 | ARMY__02.WRK `0x143F..0x1457` | Six relative action targets after inline FS dispatcher | verified | [order-buttons.md](../docs/order-buttons.md); [order-dispatch.json](../tests/fixtures/order-dispatch.json) | Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит. |
 | ARMY__02.WRK `0x1521..0x1539` | Six relative action targets after inline FS dispatcher | verified | [order-buttons.md](../docs/order-buttons.md); [order-dispatch.json](../tests/fixtures/order-dispatch.json) | Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит. |
 | ARMY__02.WRK `0x15F0..0x1608` | Six relative action targets after inline FS dispatcher | verified | [order-buttons.md](../docs/order-buttons.md); [order-dispatch.json](../tests/fixtures/order-dispatch.json) | Реальные 8227/C88C исполнены до входа каждого из шести обработчиков. Только таблица адресов; выполнение обработчиков не входит. |
+| ARMY__02.WRK `0x161D..0x16DD` | Unit corpse effect (type 1) | ported | [combat.md](../docs/combat.md); [corpse.json](../tests/fixtures/corpse.json) |  |
 | LE:1 `0x2F03..0x2F1B` | Copy four initial resource stocks from SCN | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json) | Только извлечение четырёх dword SCN +15..24; прочие поля владельца, DOS-загрузка и цикл всех слотов вне перенесённого участка. |
 | LE:1 `0x32AA..0x32BA` | Write completion marker tag 66h | verified | [save-format.md](../docs/save-format.md); [test_save_source.py](../tests/test_save_source.py) | Ветвь при 1EC6=3 пишет tag66h через FA79/F967 без payload; реальный победный SAV отсутствует, DOS путь не исполнен в этом срезе. |
 | LE:1 `0x3593..0x35A8` | DAT header and record stride | partial | [executable-analysis.md](../docs/executable-analysis.md) | Статически подтверждён участок чтения заголовка и шага 171; полный загрузчик, ошибки и релокации не перенесены. |

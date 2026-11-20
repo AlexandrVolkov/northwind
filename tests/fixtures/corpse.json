@@ -1,0 +1,65 @@
+{
+  "format_version": 1,
+  "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "ARMY__02.DAT": "f3e67bae10d1042689e13802fadba443329cc782c612208792d4eee00fb72475",
+    "ARMY__02.WRK": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
+    "ARMY__00.WRK": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33"
+  },
+  "templates_sha256": {
+    "0": "096dcc81394f05943ea0ff4d5df154bc0c4cbc071b81f7bf3ecbcebb789e5b5f",
+    "7": "b4a9788f29ce77e9a952a2cd7da740f2e64f5288bbfc809a7ff35c595b15c9d6"
+  },
+  "results": {
+    "corpse": {
+      "case_count": 1755,
+      "sha256": "b823aa48e097a7850fcfec3aab8acdf429f0e0884051947523cb40b6b1ba9fac"
+    },
+    "blood": {
+      "case_count": 32,
+      "sha256": "70e4678a0e981d0b6ca3731558ff1396acb65ec3c3d9e796a7e14cee1a41ed0e"
+    }
+  },
+  "corpse": {
+    "terrain": [
+      0,
+      2,
+      1
+    ],
+    "support": [
+      null,
+      0,
+      7
+    ],
+    "flags": [
+      0,
+      8,
+      16,
+      24,
+      31,
+      128
+    ],
+    "headings": [
+      0,
+      3,
+      7,
+      255
+    ],
+    "random_indices": [
+      0,
+      1,
+      99,
+      255
+    ],
+    "positions": [
+      [
+        200,
+        200
+      ],
+      [
+        3,
+        4
+      ]
+    ]
+  }
+}
