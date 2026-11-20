@@ -24,6 +24,25 @@ def parse_session99(payload):
                 region_sha256=[hashlib.sha256(regions[i:i + 0x841]).hexdigest()
                                for i in range(0, len(regions), 0x841)])
 
+
+def parse_area22(payload):
+    """Structure created by 1058F..105E7; opaque blocks remain hashed."""
+    prefix = 0xF50
+    descriptor = 0x40
+    bucket_size = 0x2000
+    if len(payload) < prefix + descriptor or (len(payload) - prefix - descriptor) % bucket_size:
+        raise ValueError('Invalid area 22h payload length')
+    counts = list(struct.unpack_from('<16I', payload, prefix))
+    buckets = payload[prefix + descriptor:]
+    bucket_count = len(buckets) // bucket_size
+    if bucket_count > 16 or any(x > bucket_size for x in counts[:bucket_count]):
+        raise ValueError('Invalid area 22h allocation counts')
+    return dict(prefix_length=prefix, prefix_sha256=hashlib.sha256(payload[:prefix]).hexdigest(),
+                descriptor_offset=prefix, descriptor_counts=counts,
+                bucket_size=bucket_size, bucket_count=bucket_count,
+                bucket_sha256=[hashlib.sha256(buckets[i:i + bucket_size]).hexdigest()
+                               for i in range(0, len(buckets), bucket_size)])
+
 def parse(data):
     if len(data) < 4: raise ValueError('Truncated save header')
     count = struct.unpack_from('<I', data)[0]
@@ -41,6 +60,7 @@ def parse(data):
                       length=size, tag=tag, tag_hex=f'{tag:08X}',
                       payload_sha256=hashlib.sha256(payload).hexdigest())
         if tag == 0x99: record['campaign99'] = parse_session99(payload)
+        if tag & 0xFFFF == 0x22: record['area22'] = parse_area22(payload)
         records.append(record)
         offset = end
     if offset != len(data): raise ValueError('Trailing bytes after declared records')

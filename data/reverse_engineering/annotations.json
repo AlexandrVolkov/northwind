@@ -4371,6 +4371,40 @@
         "tools/save_source.py"
       ],
       "limitations": "Сверена структурная длина 25+512+12×841h на реальном файле и поля заголовка; внутренние блоки, DOS I/O и игровая семантика не перенесены."
+    },
+    {
+      "id": "save-area22-create",
+      "module": "LE:1",
+      "start": 66931,
+      "end": 67054,
+      "name": "Create 22h area payload and its fixed buckets",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/save-format.md",
+        "data/original_save_layout.json"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Контейнер 0F50h+40h+8×2000h подтверждён инструкциями и реальным файлом; внутренние объекты и DOS I/O не перенесены."
+    },
+    {
+      "id": "save-area22-open",
+      "module": "LE:1",
+      "start": 67586,
+      "end": 67632,
+      "name": "Open tagged 22h area payload",
+      "classification": "code",
+      "status": "partial",
+      "evidence": [
+        "docs/save-format.md",
+        "data/original_save_layout.json"
+      ],
+      "implementation": [
+        "tools/save_source.py"
+      ],
+      "limitations": "Контейнер 0F50h+40h+8×2000h подтверждён инструкциями и реальным файлом; внутренние объекты и DOS I/O не перенесены."
     }
   ]
 }

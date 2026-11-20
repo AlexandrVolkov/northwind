@@ -70,7 +70,42 @@
       "length": 69520,
       "tag": 16777250,
       "tag_hex": "01000022",
-      "payload_sha256": "b43d5e8c0df05efba25277a992922e34f509268b94aee2ed111256ae6b481c0d"
+      "payload_sha256": "b43d5e8c0df05efba25277a992922e34f509268b94aee2ed111256ae6b481c0d",
+      "area22": {
+        "prefix_length": 3920,
+        "prefix_sha256": "68759c7aeaec08736341a86049846fad33738a8fe44bda6057f5f5d4a9730901",
+        "descriptor_offset": 3920,
+        "descriptor_counts": [
+          0,
+          0,
+          0,
+          0,
+          80,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bucket_size": 8192,
+        "bucket_count": 8,
+        "bucket_sha256": [
+          "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+          "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+          "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+          "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+          "f91df76d488d6c07a53b436677cf57849fd6c488bea0a6eb3977cea19aa7d79b",
+          "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+          "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+          "d6d9bd38de9955451c646422451d0fe3b26a1b7b65e12ce270650b6041a75e88"
+        ]
+      }
     },
     {
       "index": 3,
@@ -79,7 +114,42 @@
       "length": 69520,
       "tag": 65570,
       "tag_hex": "00010022",
-      "payload_sha256": "d43a1a249dec8e467dd1876c36902b8769fa05fa492922484b4ca971d7a3dc1e"
+      "payload_sha256": "d43a1a249dec8e467dd1876c36902b8769fa05fa492922484b4ca971d7a3dc1e",
+      "area22": {
+        "prefix_length": 3920,
+        "prefix_sha256": "68759c7aeaec08736341a86049846fad33738a8fe44bda6057f5f5d4a9730901",
+        "descriptor_offset": 3920,
+        "descriptor_counts": [
+          0,
+          0,
+          0,
+          0,
+          80,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bucket_size": 8192,
+        "bucket_count": 8,
+        "bucket_sha256": [
+          "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+          "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+          "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+          "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+          "380e3b8bbb87c620752432db87a869aec3b69d248e0fdc66b51630b67e9aa245",
+          "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+          "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+          "2b465b3f61a73070457c25dcc6c53f48e1280a47ffa2027258cb2e7bf6d10bc3"
+        ]
+      }
     }
   ]
 }
