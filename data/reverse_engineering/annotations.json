@@ -3116,6 +3116,18 @@
       "evidence": ["docs/ai.md", "tests/fixtures/ai-workers.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
       "limitations": ""
+    },
+    {
+      "id": "ai-construction",
+      "module": "LE:1",
+      "start": 144721,
+      "end": 144999,
+      "name": "AI turn tail: castle rebuild and class C08h order",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-economy.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": "10AD2, 22FE4, A758 and 43E5 are hooks"
     }
   ]
 }
