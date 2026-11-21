@@ -11,6 +11,8 @@ namespace Northwind;
 /// return to the squads. A fifth of the soldiers always stays at home as the guard.</summary>
 public sealed partial class Skirmish
 {
+    /// <summary>Waves launched so far (tests).</summary>
+    public int WavesLaunched { get; private set; }
     private readonly Dictionary<int, double> _waveCooldown = [];
     private readonly Dictionary<int, double> _waveNext = [];
     private readonly Dictionary<int, int> _waveSize = [];
@@ -42,7 +44,7 @@ public sealed partial class Skirmish
             // The nearest first: the soldiers closest to the first target go.
             var first = NearestTarget(ready.Average(a => a.Position.X), ready.Average(a => a.Position.Y), targets);
             foreach (var unit in ready.OrderBy(a => a.Position.DistanceSquaredTo(first.Position)).Take(take)) { unit.Detached = true; unit.Record[0x1b] = 0; wave.Add(unit); }
-            _waveSize[slot] = wave.Count;
+            _waveSize[slot] = wave.Count; WavesLaunched++;
             Log($"ИИ (участник {slot}) выступает в поход: {wave.Count} бойцов.");
         }
         // Targets of the wave: the nearest building to the group's centre; each unit without a living target attacks it.

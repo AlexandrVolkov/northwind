@@ -9,7 +9,7 @@ public partial class TestRunner
     /// declares war it raises military requests, and its guards fight the player's army at the castle.</summary>
     private void SkirmishAiChecks()
     {
-        using var battle = CreateSkirmish();
+        using var battle = CreateSkirmish(); battle.ImprovedAi = false;   // the original's logic (the setting «ИИ: оригинальный»)
         void Run(double seconds) { for (int t = 0; t < (int)(seconds * 18.2); t++) battle.Advance(1 / 18.2); }
         var start = battle.EnemyResources;
         int units0 = battle.Actors.Count(a => a.Team == 1 && a.Alive && !a.Structure);
