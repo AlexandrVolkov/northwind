@@ -52,13 +52,15 @@ def prepare(source, output):
         base=struct.unpack_from('<H',raw,0x48)[0]
         wanted.setdefault(key,set()).update(range(base,base+8*raw[0x4a]))
         wanted[key].update(action_frames(raw, base)); wanted[key].update(death_frames(raw, base))
-    for index in [3,4,6,7,9,10,11,12,15,22,23,24]:
+    for index in [3,4,6,7,8,9,10,11,12,15,22,23,24]:
         key=('ARMY__02.DAT',index);entry=tables[key[0]]['templates'][index]
         raw=bytes.fromhex(entry['raw_record_hex']);base=struct.unpack_from('<H',raw,0x48)[0]
-        wanted.setdefault(key,set()).update(range(base,base+(8*raw[0x4a] if index in [10,11] else raw[0x4a]+1)))
+        wanted.setdefault(key,set()).update(range(base,base+(8*raw[0x4a] if index in [8,10,11] else raw[0x4a]+1)))
+        if index in [3,4,6,12,15,23]:   # C88C: the working animation of a building is [base+4A, base+4A+4B)
+            wanted[key].update(range(base + raw[0x4a], base + raw[0x4a] + raw[0x4b]))
         if index == 10:
             wanted[key].update(range(base + 8*raw[0x4a], base + 8*raw[0x4a] + 8*raw[0x4b]))
-        if index in [10,11]:
+        if index in [8,10,11]:
             wanted[key].update(death_frames(raw, base))
     entries=[];images=[];team_pixels=[]
     for (filename,index),frames in sorted(wanted.items()):

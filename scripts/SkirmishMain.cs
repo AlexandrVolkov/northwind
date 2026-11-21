@@ -131,14 +131,14 @@ public partial class SkirmishMain : Node2D
     }
     public void HireMilitia()
     {
-        if (Selection.Count != 1 || Battle.Find(Selection.Single()) is not { } barracks || !Skirmish.IsBarracks(barracks)) return;
+        if (Selection.Count != 1 || Battle.Find(Selection.Single()) is not { } barracks || !Skirmish.IsBarracks(barracks) || barracks.Team != 0) return;
         Battle.QueueBarracksMilitia(barracks);
         RefreshUi();
     }
     public void CancelRecruitment()
     {
         if (Selection.Contains(Battle.PlayerCastle.Id)) Battle.CancelRecruitment();
-        else if (Selection.Count == 1 && Battle.Find(Selection.Single()) is { } barracks && Skirmish.IsBarracks(barracks)) Battle.CancelBarracksRecruitment(barracks);
+        else if (Selection.Count == 1 && Battle.Find(Selection.Single()) is { } barracks && Skirmish.IsBarracks(barracks) && barracks.Team == 0) Battle.CancelBarracksRecruitment(barracks);
         RefreshUi();
     }
     public void BeginBarracksPlacement()
@@ -364,8 +364,12 @@ public partial class SkirmishMain : Node2D
             if (_dragStart.DistanceTo(_dragEnd) < 6)
             {
                 var point = GetViewport().GetCanvasTransform().AffineInverse() * button.Position;
-                if (Battle.At(point) is { Team: 0 } actor)
-                { if (!Selection.Add(actor.Id)) Selection.Remove(actor.Id); }
+                if (Battle.At(point) is { } actor && (actor.Team == 0 || !_showFog || Seen(actor.Cell)))
+                {
+                    // An enemy or foreign object can be selected alone, to look at it; orders ignore it.
+                    if (actor.Team != 0) { Selection.Clear(); Selection.Add(actor.Id); }
+                    else if (!Selection.Add(actor.Id)) Selection.Remove(actor.Id);
+                }
             }
             else
             {
@@ -466,7 +470,7 @@ public partial class SkirmishMain : Node2D
             for (int y = Math.Max(0, first.Y); y < Math.Min(Battle.Map.Height, last.Y); y++)
             for (int x = Math.Max(0, first.X); x < Math.Min(Battle.Map.Width, last.X); x++)
                 if (!Seen(new Vector2I(x, y))) DrawRect(new Rect2(x * 32, y * 32, 32, 32), new Color(0, 0, 0, 0.85f));
-        var producer = Selection.Count == 1 && Battle.Find(Selection.Single()) is { } barracks && Skirmish.IsBarracks(barracks)
+        var producer = Selection.Count == 1 && Battle.Find(Selection.Single()) is { } barracks && Skirmish.IsBarracks(barracks) && barracks.Team == 0
             ? barracks : Selection.Contains(Battle.PlayerCastle.Id) ? Battle.PlayerCastle : null;
         if (_ui.Visible && !PlacingBuilding && producer is { Alive: true })
         {
@@ -693,7 +697,7 @@ public partial class SkirmishMain : Node2D
             !Battle.Objective.Standing ? $"Замок разрушен\nОсталось защитников: {Battle.Actors.Count(a => a.Team == 1 && !a.Structure && a.Alive)} · T — найти" :
             $"Время {TimeSpan.FromSeconds(Battle.Elapsed):mm\\:ss} · ×{Speed}";
         var units = Selection.Select(Battle.Find).OfType<SkirmishActor>().ToArray();
-        _selection.Text = units.Length == 1 ? $"{units[0].Source.TemplateName}\nЗдоровье {units[0].Health}/{units[0].MaxHealth}"
+        _selection.Text = units.Length == 1 ? $"{units[0].Source.TemplateName}{(units[0].Team != 0 ? " (чужой)" : "")}\nЗдоровье {units[0].Health}/{units[0].MaxHealth}"
             : $"Выбрано отрядов: {units.Length}\nЖивых союзников: {Battle.Actors.Count(a => a.Team == 0 && a.Alive && !a.Structure)}";
         if (units is [{ Worker: true } worker]) _selection.Text += $"\n{worker.JobText}";
         if (units is [var selectedFarm] && selectedFarm.Source.TemplateName == "Ферма")
@@ -709,7 +713,7 @@ public partial class SkirmishMain : Node2D
         _economy.Text = $"Металл: {Battle.Metal} · Дерево: {Battle.Wood}\nЗолото: {Battle.Gold} · Люди: {Battle.FreePeople}\nПоддержка ферм: {Battle.Population.FarmSupport} · Нагрузка: {Battle.Population.Used}";
         if (Battle.FreePeople == 0) _economy.Text += Battle.PopulationGrowthSeconds is { } seconds ? $"\nПополнение через {Math.Ceiling(seconds)} с" : "\nДля прироста нужна ферма";
         bool castle = units is [var selected] && selected.Id == Battle.PlayerCastle.Id && selected.Alive;
-        SkirmishActor? selectedBarracks = units is [var selectedB] && Skirmish.IsBarracks(selectedB) ? selectedB : null;
+        SkirmishActor? selectedBarracks = units is [var selectedB] && Skirmish.IsBarracks(selectedB) && selectedB.Team == 0 ? selectedB : null;
         bool barracks = selectedBarracks != null;
         _hire.Visible = _buildMill.Visible = _buildFarm.Visible = _buildBarracks.Visible = _buildMine.Visible = castle;
         _hireMilitia.Visible = barracks;

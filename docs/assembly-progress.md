@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 108301 | 5512 | 97 | 32972 | 44 |
+| LE:1 | 146882 | 107940 | 5512 | 97 | 33333 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
@@ -165,6 +165,7 @@
 | LE:1 `0xC80D..0xC88C` | Building maintenance condition step | ported | [building-condition-kernel.md](../docs/building-condition-kernel.md); [building-kernel.json](../tests/fixtures/building-kernel.json) | Изолированный шаг Condition/Counter/WorkFlags и трёх запасов; частота вызовов, UI и полный цикл здания не восстановлены. |
 | LE:1 `0xC88C..0xC8C9` | Building action dispatch | partial | [building-command-lifecycle.md](../docs/building-command-lifecycle.md) | Известны вызов через FS:41, встроенная таблица и выбор текущего состояния; полный диспетчер с обработчиками и визуальными эффектами не перенесён. |
 | LE:1 `0xC8C9..0xC8E0` | Complete queued direct action | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [building-lifecycle.json](../tests/fixtures/building-lifecycle.json) | Только продолжение после ZF=1 текущего обработчика; групповой ввод и доступность кнопок вне контракта. |
+| LE:1 `0xC8E0..0xCA49` | Building update tail: working animation, stage frame by condition, ruin decay, collapse | ported | [building-animation.md](../docs/building-animation.md); [building-frames.json](../tests/fixtures/building-frames.json); [verify_building_frames.py](../tools/verify_building_frames.py) | Debris 9727 and the removal 98CC are callbacks (debris is not drawn); the dispatch C88C..C8E0 into the WRK entries is not ported; line templates and the castle are not drawn by it (their frames are not in the atlas) |
 | LE:1 `0xCC7B..0xCCC4` | Castle takes cargo from the worker in its entry | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Проверены грузы 0..2; прочие коды идут в слоты предметов 1243A и не перенесены. |
 | LE:1 `0xCCCB..0xCD72` | Laboratory research executor: pick an item, pay per 256 updates, complete the item | ported | [tech.md](../docs/tech.md); [lab.json](../tests/fixtures/lab.json); [verify_lab.py](../tools/verify_lab.py) | A716 and A6AE are recorded stubs of the check (ported elsewhere); the player's research interface is not ported |
 | LE:1 `0xCD72..0xD101` | Terrain blend and forest replacement | partial | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Перенесены логические правила смены тайлов и масок; CFAC сверен для AX=201h (лесоруб), 101h (огонь) и 300h (воронка катапульты). Отрисовка, dirty-cache и исходные глобальные эффекты не объявляются полностью перенесёнными. |
