@@ -102,6 +102,23 @@ public sealed partial class Skirmish : IDisposable
     public SkirmishActor Hero => Actors.Single(a => a.Team == 0 && a.Hero);
     public SkirmishActor Objective => Actors.Single(a => a.Team == 1 && a.Source.TemplateName == "Замок");
 
+    /// <summary>The fog map [18DA]: one byte per cell, bit n set while participant n has not seen the cell (all set at the start).</summary>
+    public byte[] FogMap { get; private set; } = [];
+    private readonly Dictionary<SkirmishActor, Vector2I> _revealedAt = [];
+    /// <summary>813E for every object that placed or finished a step (72B3, 81D9): opens the square around it for its owner.</summary>
+    private void TickFog()
+    {
+        if (FogMap.Length != Map.Width * Map.Height) { FogMap = new byte[Map.Width * Map.Height]; Array.Fill(FogMap, (byte)0xff); }
+        foreach (var actor in Actors)
+        {
+            if (!actor.Alive) continue;
+            var cell = actor.Cell;
+            if (_revealedAt.TryGetValue(actor, out var last) && last == cell) continue;
+            _revealedAt[actor] = cell;
+            OriginalVisibilityRules.Reveal(FogMap, (byte)Map.Width, (byte)Map.Height, actor.Record[3],
+                BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(4)), BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(8)), actor.Parameters[0x47], actor.Record[0x16]);
+        }
+    }
     private readonly Dictionary<int, int> _colorTables = [];
     /// <summary>COLOR_NN.TAB number of an owner: byte 0 of its scenario slot record (LE:1 2F79..2F90). The rival copy uses
     /// the table of its own slot.</summary>
@@ -370,6 +387,7 @@ public sealed partial class Skirmish : IDisposable
             var engaged = Find(BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(0x1c)));
             OriginalCombatRules.AfterUpdate(actor.Record, engaged != null ? engaged.Record : ReadOnlySpan<byte>.Empty, _globalTick);
         }
+        TickFog();
         TickAi(); // 1E7EA follows the object update (LE:1 31D6)
         if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";
         else if (!Objective.Standing && !Actors.Any(a => a.Team == 1 && !a.Structure && a.Alive)) Outcome = "Победа — вражеское поселение разбито";

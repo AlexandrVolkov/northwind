@@ -3536,6 +3536,18 @@
       "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
       "implementation": ["scripts/OriginalAiSquads.cs"],
       "limitations": ""
+    },
+    {
+      "id": "fog-reveal",
+      "module": "LE:1",
+      "start": 33086,
+      "end": 33241,
+      "name": "Fog of war reveal around an object",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/fog-of-war.md", "tests/fixtures/visibility.json"],
+      "implementation": ["scripts/OriginalVisibilityRules.cs"],
+      "limitations": "Objects outside the map are not modelled; callers 72B3/81D9/12A7B are approximated by a change of cell"
     }
   ]
 }
