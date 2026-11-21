@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 110759 | 5512 | 97 | 30514 | 44 |
+| LE:1 | 146882 | 110604 | 5512 | 97 | 30669 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3228 | 100 | 0 | 2075 | 0 |
@@ -83,6 +83,7 @@
 | LE:1 `0x802C..0x809D` | Allocate and pack owner route block | ported | [native-route-storage.md](../docs/native-route-storage.md); [route-pool.json](../tests/fixtures/route-pool.json) | Выделение, упаковка, старое содержимое последнего полубайта и полный пул; вызывающая сторона отвечает за освобождение прежней ссылки. Адаптер ограничивает вход 125 шагами. |
 | LE:1 `0x809D..0x8120` | Movement wait and contact handling | partial | [native-route-storage.md](../docs/native-route-storage.md); [movement-admission.json](../tests/fixtures/movement-admission.json) | Исходные ветви ожидания, разрушения контакта, повторного поиска и резервирования ещё не перенесены целиком; поведение прототипа не является доказательством этих ветвей. |
 | LE:1 `0x8120..0x813E` | Release packed route block | ported | [native-route-storage.md](../docs/native-route-storage.md); [route-pool.json](../tests/fixtures/route-pool.json) | Только действительный курсор пути либо FFFFFFFF; поле +28 используется другими состояниями рабочего, поэтому адаптер освобождает только свою живую аренду. |
+| LE:1 `0x813E..0x81D9` | Fog of war reveal around an object | ported | [fog-of-war.md](../docs/fog-of-war.md); [visibility.json](../tests/fixtures/visibility.json) | Objects outside the map are not modelled; callers 72B3/81D9/12A7B are approximated by a change of cell |
 | LE:1 `0x8227..0x824F` | Worker action dispatcher | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md) | Статически установлены чтение адреса встроенной таблицы, шестисловный пропуск возврата и выбор по действию; полный диспетчер с обработчиками не перенесён. |
 | LE:1 `0x8542..0x8554` | Initialize worker harvest counter | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Изолированная подготовка счётчика; переход увеличения действия 84E1 учитывается отдельно реализацией, координаты цели принадлежат вызывающей стороне. |
 | LE:1 `0x8585..0x85CC` | Worker strike requests and timber-load counter | partial | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Проверены ожидание/запрос взмаха и завершение младшего счётчика. Нужны внешние 8AF4/8C89, завершение анимации и вызовы изменения леса/выдачи груза; весь внешний автомат рабочего не перенесён. |

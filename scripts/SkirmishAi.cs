@@ -14,8 +14,9 @@ namespace Northwind;
 /// <see cref="ExecuteAiCommands"/> through the port's movement and attack, as the player's orders are, and replaced by
 /// activity codes (0 idle, 1 moving, 2/3 attacking) inferred from what the AI reads back; the original WRK command
 /// handlers are not ported.</item>
-/// <item>Fog of war is not ported: the fog map [18DA] counts the enemy's land +63..+66 grown by 8 cells as seen and the rest
-/// as unseen (patrols 1EBEF go there; mine sites 22613 need seen cells); objects keep their scenario visibility FFh.</item>
+/// <item>The fog map [18DA] is real (<see cref="OriginalVisibilityRules"/>): it opens around an object when it changes cell
+/// (the original: at the end of each step, 72B3) and on placement; patrols 1EBEF go to unseen cells and mine sites 22613
+/// need seen ones. Objects keep their scenario visibility FFh.</item>
 /// <item>Only the enemy settlement thinks; the player's block is initialised and counted (census) so that the enemy can
 /// weigh it, but it gives no orders. Participant records (F5h) are rebuilt from the diplomacy state around each turn.</item>
 /// <item>[18E6]/[18EA] (bounds start of B977) are taken as the map size in fixed point; [19E9] (state 6 timer) as FFh.</item>
@@ -447,10 +448,7 @@ public sealed partial class Skirmish
         public byte Random3() => battle._aiRandom[battle._aiRandom3++];   // 9E69: third index [19ED] into the same table
         public byte Fog(int cell)
         {
-            var ai = battle._aiBlocks[battle._aiSlot];
-            int x = cell % battle.Map.Width, y = cell / battle.Map.Width;
-            bool seen = ai != null && x >= ai[0x63] - 8 && x <= ai[0x65] + 8 && y >= ai[0x64] - 8 && y <= ai[0x66] + 8;
-            return seen ? (byte)~(1 << battle._aiSlot) : (byte)0xff;
+            return cell >= 0 && cell < battle.FogMap.Length ? battle.FogMap[cell] : (byte)0xff;   // the real [18DA]
         }
         public Span<byte> ParticipantRecord(byte participant) => battle._participants[participant];
         public byte TileOre(int cell) => cell >= 0 && cell < battle.Map.Cells.Length ? (byte)(battle.Map.Cells[cell] >> 16) : (byte)0;
