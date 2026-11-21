@@ -776,6 +776,24 @@ public sealed partial class Skirmish : IDisposable
         OriginalCombatRules.Hit(target.Record, target.Parameters, OriginalCombatRules.StrikeAttack(actor.Record[0x16]), (byte)(actor.Record[0x14] & 7), _terrainCatalog.NextRandomByte);
         if (!target.Alive) Kill(target);
     }
+    /// <summary>The debris of a collapsing building falls on the units standing in its footprint and one cell around it: each takes a hit of
+    /// <see cref="DebrisAttack"/> (the combat formula BFC9, kind 3), weak ones die. An addition of the port (asked for; the original code of the
+    /// ruin effects, ARMY__02 types 21h..28h, only leaves the ruin picture for 5000 ticks).</summary>
+    private const byte DebrisAttack = 16;
+    private void CollapseDebris(SkirmishActor building)
+    {
+        var area = new HashSet<Vector2I>();
+        foreach (var cell in FootprintCells(building, building.Cell))
+            for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++) area.Add(cell + new Vector2I(dx, dy));
+        int hurt = 0;
+        foreach (var unit in Actors.Where(a => a.Alive && !a.Structure && area.Contains(a.Cell)).ToArray())
+        {
+            OriginalCombatRules.Hit(unit.Record, unit.Parameters, DebrisAttack, 3, _terrainCatalog.NextRandomByte);
+            hurt++;
+            if (!unit.Alive) Kill(unit);
+        }
+        if (hurt > 0 && building.Team == 0) Log($"Обломки {building.Source.TemplateName.ToLowerInvariant()} задели бойцов: {hurt}.");
+    }
     private void Kill(SkirmishActor target)
     {
         var cells = Occupancy.Cells.ToArray();
@@ -783,6 +801,7 @@ public sealed partial class Skirmish : IDisposable
         Occupancy.LoadCells(cells);
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         target.Dying = !target.Structure;
+        if (target.Structure) CollapseDebris(target);
         Log($"{target.Source.TemplateName} {(target.Team == 0 ? "потерян" : "уничтожен")}.");
     }
     /// <summary>Corpses (ARMY__02 type 1, army +01 = 2) and blood splashes (ARMY__00 type 3), 22h-byte effect records.</summary>

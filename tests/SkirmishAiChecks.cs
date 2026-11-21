@@ -64,3 +64,19 @@ public partial class TestRunner
         GD.Print($"Skirmish AI: squads {battle.EnemySquadCount}, enemy units {battle.Actors.Count(a => a.Team == 1 && a.Alive && !a.Structure)}, resources {battle.EnemyResources}");
     }
 }
+
+public partial class TestRunner
+{
+    /// <summary>The debris of a collapsing building hurts the units under it (an addition of the port).</summary>
+    private void DebrisChecks()
+    {
+        using var battle = CreateSkirmish();
+        var building = battle.Actors.First(a => a.Team == 1 && a.Structure && a.Alive);
+        var unit = battle.Actors.First(a => a.Team == 0 && a.Alive && !a.Structure && !a.Worker);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(unit.Record.AsSpan(4), (uint)building.Position.X);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(unit.Record.AsSpan(8), (uint)building.Position.Y);
+        int before = unit.Health; building.Record[0x19] = 0;
+        typeof(Skirmish).GetMethod("Kill", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(battle, [building]);
+        Check(unit.Health < before || !unit.Alive, $"The debris of a collapsed building hurts the unit under it ({before} → {unit.Health})");
+    }
+}

@@ -195,7 +195,7 @@ public sealed partial class Skirmish
     private void TickBuildingFrames()
     {
         foreach (var building in Actors.Where(a => a.Structure && (sbyte)a.Record[0x19] > 0 && a.Source.TemplateIndex is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24).ToArray())
-            try { OriginalBuildingFrames.Update(building.Record, building.Parameters, _globalTick, (_, _, _, _) => { }, () => building.Record[0x19] = 0); }
+            try { OriginalBuildingFrames.Update(building.Record, building.Parameters, _globalTick, (_, _, _, _) => { }, () => { building.Record[0x19] = 0; Kill(building); }); }
             catch (Exception e) when (e is DivideByZeroException or OverflowException) { }
     }
 
