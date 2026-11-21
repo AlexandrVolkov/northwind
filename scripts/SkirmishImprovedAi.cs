@@ -48,27 +48,59 @@ public sealed partial class Skirmish
         // Targets of the wave: the nearest building to the group's centre; each unit without a living target attacks it.
         var centre = new Vector2(wave.Average(a => a.Position.X), wave.Average(a => a.Position.Y));
         var goal = NearestTarget(centre.X, centre.Y, targets);
+        // The route search of the port is local, so the wave follows a coarse path over the whole map (cells a soldier can stand on,
+        // bridges included), recomputed every 20 s, and each walker goes to the point ten cells further along it.
+        if (!_wavePath.TryGetValue(slot, out var cached) || cached.Goal != goal.Id || Elapsed > cached.Until)
+        {
+            var sample = wave[0];
+            _wavePath[slot] = cached = (goal.Id, Elapsed + 20, CoarsePath(sample, sample.Cell, goal.Cell, 14));
+        }
+        var path = cached.Path;
         foreach (var unit in wave)
         {
             var aim = Find(unit.Target);
             if (aim != null && aim.Alive) continue;                       // engaged (or walking the last stretch to its target)
             unit.Target = 0;
-            var offset = goal.Cell - unit.Cell; double distance = offset.Length();
-            if (distance <= 16) { unit.Target = goal.Id; unit.Goal = null; unit.Route.Clear(); unit.ReplanTimer = 0; continue; }
-            if (unit.Stepping || (unit.Goal != null && unit.Route.Count > 0)) continue;
-            // Long marches go by stages: the route search only reaches a few dozen cells; the walkers also answer enemies on the way.
-            var forward = (Vector2)offset / (float)distance;
-            bool moved = false;
-            foreach (double step in new[] { 24.0, 12.0, 40.0, 7.0 })
+            if ((goal.Cell - unit.Cell).Length() <= 16) { unit.Target = goal.Id; unit.Goal = null; unit.Route.Clear(); unit.ReplanTimer = 0; continue; }
+            if (unit.Stepping || (unit.Goal != null && unit.Route.Count > 0) || path.Count == 0) continue;
+            int near = 0; float best = float.MaxValue;
+            for (int i = 0; i < path.Count; i++) { float d = ((Vector2)(path[i] - unit.Cell)).LengthSquared(); if (d < best) { best = d; near = i; } }
+            var stage = path[Math.Min(path.Count - 1, near + 10)];
+            if (!OrderMove(unit, stage, 3)) OrderMove(unit, path[Math.Min(path.Count - 1, near + 4)], 3);
+        }
+    }
+
+    private readonly Dictionary<int, (uint Goal, double Until, List<Vector2I> Path)> _wavePath = [];
+
+    /// <summary>Breadth-first path over the whole map for a soldier (8 neighbours, no corner cutting through blocked cells) to any cell
+    /// within <paramref name="reach"/> of the goal; empty when there is none.</summary>
+    private List<Vector2I> CoarsePath(SkirmishActor sample, Vector2I from, Vector2I goal, int reach)
+    {
+        int w = Map.Width, h = Map.Height;
+        var back = new int[w * h]; Array.Fill(back, -2);
+        var queue = new Queue<Vector2I>(); queue.Enqueue(from); back[from.Y * w + from.X] = -1;
+        var stand = new sbyte[w * h];
+        bool Free(Vector2I c) { int i = c.Y * w + c.X; if (stand[i] == 0) stand[i] = (sbyte)(CanStand(sample, c) ? 1 : -1); return stand[i] > 0; }
+        while (queue.Count > 0)
+        {
+            var c = queue.Dequeue();
+            if (Math.Max(Math.Abs(c.X - goal.X), Math.Abs(c.Y - goal.Y)) <= reach)
             {
-                foreach (var side in new[] { 0f, 0.5f, -0.5f, 1.0f, -1.0f, 1.6f, -1.6f })
-                {
-                    var stage = unit.Cell + (Vector2I)(forward.Rotated(side) * (float)Math.Min(step, distance - 8)).Round();
-                    if (OrderMove(unit, stage, 3)) { moved = true; break; }
-                }
-                if (moved) break;
+                var path = new List<Vector2I>();
+                for (int i = c.Y * w + c.X; i >= 0; i = back[i]) path.Add(new Vector2I(i % w, i / w));
+                path.Reverse(); return path;
+            }
+            for (int dy = -1; dy <= 1; dy++)
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                if (dx == 0 && dy == 0) continue;
+                var n = new Vector2I(c.X + dx, c.Y + dy);
+                if (n.X < 0 || n.Y < 0 || n.X >= w || n.Y >= h || back[n.Y * w + n.X] != -2) continue;
+                if (!Free(n) || (dx != 0 && dy != 0 && (!Free(new(c.X + dx, c.Y)) || !Free(new(c.X, c.Y + dy))))) continue;
+                back[n.Y * w + n.X] = c.Y * w + c.X; queue.Enqueue(n);
             }
         }
+        return [];
     }
 
     private static SkirmishActor NearestTarget(double x, double y, List<SkirmishActor> targets) =>
