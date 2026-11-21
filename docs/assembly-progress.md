@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 108468 | 5512 | 97 | 32805 | 44 |
+| LE:1 | 146882 | 108301 | 5512 | 97 | 32972 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
@@ -166,6 +166,7 @@
 | LE:1 `0xC88C..0xC8C9` | Building action dispatch | partial | [building-command-lifecycle.md](../docs/building-command-lifecycle.md) | Известны вызов через FS:41, встроенная таблица и выбор текущего состояния; полный диспетчер с обработчиками и визуальными эффектами не перенесён. |
 | LE:1 `0xC8C9..0xC8E0` | Complete queued direct action | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [building-lifecycle.json](../tests/fixtures/building-lifecycle.json) | Только продолжение после ZF=1 текущего обработчика; групповой ввод и доступность кнопок вне контракта. |
 | LE:1 `0xCC7B..0xCCC4` | Castle takes cargo from the worker in its entry | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Проверены грузы 0..2; прочие коды идут в слоты предметов 1243A и не перенесены. |
+| LE:1 `0xCCCB..0xCD72` | Laboratory research executor: pick an item, pay per 256 updates, complete the item | ported | [tech.md](../docs/tech.md); [lab.json](../tests/fixtures/lab.json); [verify_lab.py](../tools/verify_lab.py) | A716 and A6AE are recorded stubs of the check (ported elsewhere); the player's research interface is not ported |
 | LE:1 `0xCD72..0xD101` | Terrain blend and forest replacement | partial | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Перенесены логические правила смены тайлов и масок; CFAC сверен для AX=201h (лесоруб), 101h (огонь) и 300h (воронка катапульты). Отрисовка, dirty-cache и исходные глобальные эффекты не объявляются полностью перенесёнными. |
 | LE:1 `0xD101..0xD12C` | Classify harvestable timber tile | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Критерий дескриптора SEG, не полная классификация местности и не её цвет. |
 | LE:1 `0xD2D1..0xD363` | Conditional occupancy registration | partial | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Перенесена ветвь CL=0 с заменой совпавших ячеек и подсчётом конфликтов. Ветка повреждения чужих объектов не перенесена. |

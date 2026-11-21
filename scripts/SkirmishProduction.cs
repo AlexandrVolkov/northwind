@@ -133,6 +133,7 @@ public sealed partial class Skirmish
         recruit.Source.RawX = exit.X; recruit.Source.RawY = exit.Y; recruit.Source.RawLayer = exit.Layer;
         if (worker) OriginalWorkerDelivery.InitializeEmpty(recruit.Record, recruit.Parameters, _terrainCatalog.NextRandomByte());
         recruit.Record[0x17] |= 0x20;
+        CountProduced(recruit);
         recruit.Route.Attach(_routes, recruit.Record); Actors.Add(recruit);
         Occupancy.WriteFootprint(recruit.Parameters[3], recruit.Parameters[4], exit.Layer, exit.X, exit.Y, recruit.Id);
         if (producer.Team != 0) { EnemyRecruitLeaves(recruit); return true; }
