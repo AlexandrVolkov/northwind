@@ -499,6 +499,11 @@ public sealed partial class Skirmish : IDisposable
     {
         if (id != 0 && Sounds.Count < 64) Sounds.Add(new($"ARMY__{actor.Record[0]:00}.FX", (int)id, SoundRandom(), actor.Position));
     }
+    /// <summary>A4C2: a sound of the shared bank WORK.FX at the cell (+20/+21 of a squad or command); number 0 is allowed.</summary>
+    private void WorkSound(uint id, byte cellX, byte cellY)
+    {
+        if (Sounds.Count < 64) Sounds.Add(new("WORK.FX", (int)id, SoundRandom(), new Vector2(cellX * 32 + 16, cellY * 32 + 16)));
+    }
     /// <summary>A47E: a sound of the effect's army bank (+01) at the effect point (+07/+0C); number 0 is allowed.</summary>
     private void EffectSound(ReadOnlySpan<byte> effect, int? id)
     {
