@@ -226,12 +226,14 @@ public sealed partial class Skirmish : IDisposable
     {
         foreach (var key in _reservations.Where(p => p.Value == reference).Select(p => p.Key).ToArray()) _reservations.Remove(key);
     }
+    private byte[] _searchCache = [];   // reused between searches (a fresh map-sized array per search cost allocations)
     private List<Vector2I> SearchPath(SkirmishActor actor, Vector2I goal)
     {
         int fw = actor.Parameters[3], fh = actor.Parameters[4];
         var offset = new Vector2I(fw / 2, fh / 2);
         var start = actor.Cell - offset;
-        var cache = new byte[Map.Width * Map.Height];
+        if (_searchCache.Length != Map.Width * Map.Height) _searchCache = new byte[Map.Width * Map.Height]; else Array.Clear(_searchCache);
+        var cache = _searchCache;
         bool Admit(byte left, byte top, byte direction)
         {
             if (left > Map.Width - fw || top > Map.Height - fh) return false;
@@ -370,7 +372,7 @@ public sealed partial class Skirmish : IDisposable
     private byte _windTimer;   // [19E8]
     private void Tick(double dt)
     {
-        Elapsed += dt;
+        Elapsed += dt; _searchBudget = SearchBudgetPerStep;
         _windTimer++;
         OriginalWindRules.Step(ref Wind, _windTimer, _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
         foreach (var effect in Effects) effect.Remaining -= dt;
@@ -429,7 +431,7 @@ public sealed partial class Skirmish : IDisposable
             if (target != null && actor.Target == 0) target = null;
             if (!actor.Stepping && target != null && actor.ReplanTimer <= 0)
             {
-                t0 = P0(); PlanAttack(actor, target); P1("u.planattack", t0); actor.ReplanTimer = ReplanDelay;
+                t0 = P0(); bool planned = PlanAttack(actor, target); P1("u.planattack", t0); if (planned) actor.ReplanTimer = ReplanDelay;
             }
             else if (!actor.Stepping && actor.Goal is { } goal && actor.Route.Count == 0 && actor.ReplanTimer <= 0)
             {
@@ -438,7 +440,13 @@ public sealed partial class Skirmish : IDisposable
             }
             t0 = P0(); MoveTick(actor); P1("u.move", t0);
             }
-    private void PlanAttack(SkirmishActor actor, SkirmishActor target)
+    /// <summary>Route searches left in this world step: a unit that cannot reach its target used to try every standing cell around it, each with a
+    /// full search, which cost most of the step with a large army. Now at most <see cref="SearchBudgetPerStep"/> searches run per step, a unit tries
+    /// the few nearest standing cells, and one that finds nothing waits (<see cref="UnreachableDelay"/>) before it tries again.</summary>
+    private int _searchBudget;
+    private const int SearchBudgetPerStep = 6, AttackCandidates = 6;
+    private const double UnreachableDelay = 2.5;
+    private bool PlanAttack(SkirmishActor actor, SkirmishActor target)
     {
         actor.Route.Clear();
         int radius = (int)Math.Ceiling(actor.Rules.Range / 32) + 3;
@@ -450,12 +458,18 @@ public sealed partial class Skirmish : IDisposable
             var point = actor.Position + (Vector2)((cell - actor.Cell) * 32);
             if (CanStand(actor, cell) && Distance(point, target) <= actor.Rules.Range) candidates.Add(cell);
         }
+        int tried = 0;
         foreach (var cell in candidates.OrderBy(c => ((Vector2)c).DistanceSquaredTo(actor.Cell)))
         {
+            if (_searchBudget <= 0) { actor.ReplanTimer = 0.1; return false; }   // the next step
+            if (tried++ >= AttackCandidates) break;
+            _searchBudget--;
             var path = SearchPath(actor, cell);
             if (path.Count < 2) continue;
-            if (actor.Route.Set(path)) break;
+            if (actor.Route.Set(path)) return true;
         }
+        actor.ReplanTimer = UnreachableDelay;
+        return false;
     }
     private void MoveTick(SkirmishActor actor)
     {
