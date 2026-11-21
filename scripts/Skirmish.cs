@@ -381,6 +381,7 @@ public sealed partial class Skirmish : IDisposable
         TickArrows();
         TickStones(); TickStones();
         for (int i = Sparks.Count - 1; i >= 0; i--) { var sp = Sparks[i]; Sparks[i] = sp with { Left = sp.Left - 1 }; if (sp.Left <= 1) Sparks.RemoveAt(i); }
+        for (int i = Ruins.Count - 1; i >= 0; i--) { var ru = Ruins[i]; if (ru.Left <= 1) Ruins.RemoveAt(i); else Ruins[i] = ru with { Left = ru.Left - 1 }; }
         Prof("deaths", TickDeaths); Prof("buildings", TickBuildings); Prof("mining", TickMining); Prof("frames", TickBuildingFrames); Prof("production", TickProduction); Prof("population", TickPopulation);
         // 42BB visits the settlements in order and each settlement's objects in pool order.
         Prof("units", () =>
@@ -780,6 +781,8 @@ public sealed partial class Skirmish : IDisposable
     /// <see cref="DebrisAttack"/> (the combat formula BFC9, kind 3), weak ones die. An addition of the port (asked for; the original code of the
     /// ruin effects, ARMY__02 types 21h..28h, only leaves the ruin picture for 5000 ticks).</summary>
     private const byte DebrisAttack = 16;
+    /// <summary>The picture a collapsed building leaves (ARMY__02 effect types 21h..28h, 1A65): the building's frame and owner for 5000 updates.</summary>
+    public List<(int Template, ushort Frame, Vector2 Point, byte Owner, int Left)> Ruins { get; } = [];
     private void CollapseDebris(SkirmishActor building)
     {
         var area = new HashSet<Vector2I>();
@@ -801,7 +804,7 @@ public sealed partial class Skirmish : IDisposable
         Occupancy.LoadCells(cells);
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         target.Dying = !target.Structure;
-        if (target.Structure) CollapseDebris(target);
+        if (target.Structure) { CollapseDebris(target); if (target.Source.TemplateIndex is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24) Ruins.Add((target.Source.TemplateIndex, target.Frame, target.Position, target.Record[3], 5000)); }
         Log($"{target.Source.TemplateName} {(target.Team == 0 ? "потерян" : "уничтожен")}.");
     }
     /// <summary>Corpses (ARMY__02 type 1, army +01 = 2) and blood splashes (ARMY__00 type 3), 22h-byte effect records.</summary>
