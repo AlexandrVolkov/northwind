@@ -56,6 +56,7 @@ public sealed partial class Skirmish
             _wavePath[slot] = cached = (goal.Id, Elapsed + 20, CoarsePath(sample, sample.Cell, goal.Cell, 14));
         }
         var path = cached.Path;
+        if ((int)Elapsed % 60 < 2) GD.Print($"IMPROVED t={Elapsed:0} slot {slot} wave {wave.Count} path {path.Count} from {wave[0].Cell} goal {goal.Cell} moving {wave.Count(a => a.Stepping || a.Goal != null)} engaged {wave.Count(a => a.Target != 0)}");
         foreach (var unit in wave)
         {
             var aim = Find(unit.Target);
