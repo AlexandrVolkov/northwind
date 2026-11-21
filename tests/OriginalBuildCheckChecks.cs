@@ -53,7 +53,8 @@ public partial class TestRunner
             var world = new BuildCheckWorld(W, H, tiles, properties, grid, blockerRecords, Dat, objects, c.GetProperty("hook").GetInt32() != 0, c.GetProperty("line").GetInt32() != 0,
                 c.GetProperty("fog").GetBoolean() ? (p[1] * W + p[0]) : -1, log);
             var tp = Dat(t);
-            bool ok = OriginalBuildCheck.Allowed(world, tp, (byte)t, 2, (byte)owner, (uint)(p[0] * 32 + 16), (uint)(p[1] * 32 + 16));
+            bool ok = c.GetProperty("site").GetBoolean() ? OriginalBuildCheck.SiteAllowed(world, tp, (byte)t, 2, (byte)owner, (byte)p[0], (byte)p[1])
+                : OriginalBuildCheck.Allowed(world, tp, (byte)t, 2, (byte)owner, (uint)(p[0] * 32 + 16), (uint)(p[1] * 32 + 16));
             if (ok) allowed++; if (log.Count > 0) hooks++;
             byte[] output = [(byte)(ok ? 1 : 0), .. log];
             digest.AppendData(output);
@@ -78,6 +79,8 @@ public partial class TestRunner
             if (result.Status == ConstructionPlacementStatus.Rejected) return BuilderProbe.Rejected;
             blocker = blockers[result.BlockingObjectOffset]; return BuilderProbe.Blocked;
         }
+        public BuilderProbe CreationProbe(byte template, byte army, byte plane, uint x, uint y) =>
+            OriginalCreationPlacement.Probe((byte)w, (byte)h, tiles, properties, grid, plane, dat(template), x, y, reference => (blockers[reference], dat(blockers[reference][0x0e]))).Status;
         public IEnumerable<(byte[] Record, byte[] Template)> Objects(byte participant) => objects;
         private void Log(char kind, int ax, uint x, uint y) { log.Add((byte)kind); log.AddRange(BitConverter.GetBytes((ushort)ax)); log.AddRange(BitConverter.GetBytes(x)); log.AddRange(BitConverter.GetBytes(y)); }
         public bool Hook(byte template, byte army, uint x, uint y) { Log('H', 4 << 8, x, y); return hook; }

@@ -23,7 +23,7 @@ HOOK = 0x3000
 
 
 class BuildCheckOracle(CombatOracle):
-    RANGES = {'buildcheck': ([(0xaf07, 0xafdb), (0xb1ec, 0xb319), (0xad5f, 0xae3a), (0x6885, 0x68bd)], [])}
+    RANGES = {'buildcheck': ([(0xaf07, 0xafdb), (0xb1ec, 0xb319), (0xad5f, 0xae3a), (0x6885, 0x68bd), (0xd363, 0xd3e5), (0xac63, 0xad5f), (0x7b79, 0x7c63)], [])}
 
     def run(self, address):
         self.stopped = False
@@ -56,7 +56,7 @@ def cases():
             blockers.append({'plane': rng.choice([0, 1, 1, 2]), 'same': rng.random() < 0.5, 'cell': [px, py] if rng.random() < 0.7 else [rng.randrange(2, 30), rng.randrange(2, 30)],
                              'army': rng.choice([2, 2, 3]), 't': t if rng.random() < 0.7 else rng.choice(TEMPLATES)})
         out.append({'t': t, 'owner': owner, 'p': [px, py], 'river': [rng.randrange(4, 24), rng.randrange(1, 5), rng.randrange(2), rng.randrange(40)], 'objects': objects, 'blockers': blockers,
-                    'hook': rng.choice([0, 1, 1, 1]), 'line': rng.choice([0, 1, 1, 1]), 'fog': [rng.random() < 0.3 for _ in range(1)][0], 'seed': rng.randrange(1 << 16)})
+                    'hook': rng.choice([0, 1, 1, 1]), 'line': rng.choice([0, 1, 1, 1]), 'fog': [rng.random() < 0.3 for _ in range(1)][0], 'seed': rng.randrange(1 << 16), 'site': n % 2 == 1})
     return out
 
 
@@ -101,8 +101,11 @@ def generate(game):
         if case['fog']: o.cpu.mem_write(FOG + case['p'][1] * W + case['p'][0], bytes([1 << owner]))
         o.mode = 'buildcheck'
         o.cpu.reg_write(UC_X86_REG_EAX, t | 2 << 8); o.cpu.reg_write(UC_X86_REG_EBX, owner)
-        o.cpu.reg_write(UC_X86_REG_ECX, case['p'][0] * 32 + 16); o.cpu.reg_write(UC_X86_REG_EDX, case['p'][1] * 32 + 16)
-        o.run(o.CODE + 0xaf07)
+        if case['site']:
+            o.cpu.reg_write(UC_X86_REG_ECX, case['p'][0] | case['p'][1] << 8); o.cpu.reg_write(UC_X86_REG_EDX, 0)
+        else:
+            o.cpu.reg_write(UC_X86_REG_ECX, case['p'][0] * 32 + 16); o.cpu.reg_write(UC_X86_REG_EDX, case['p'][1] * 32 + 16)
+        o.run(o.CODE + (0xd363 if case['site'] else 0xaf07))
         out = bytes([1 if o.cpu.reg_read(UC_X86_REG_EFLAGS) & 0x40 else 0]) + b''.join(log)
         digest.update(out); case['sha256_prefix'] = hashlib.sha256(out).hexdigest()[:10]
     return {'format_version': 1, 'source_sha256': {k: report['source_sha256'][k] for k in ['NORWIND.EXE', 'ARMY__02.DAT']},

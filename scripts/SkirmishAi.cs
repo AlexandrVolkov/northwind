@@ -398,6 +398,10 @@ public sealed partial class Skirmish
             battle.Actors.Where(a => a.Alive && a.Record[3] == participant && a.Source.TemplateFile == "ARMY__02.DAT").Select(a => (a.Record, a.Parameters));
         /// <summary>WRK AH=4 of the mine (template 6): ore of type 1 or 2 must lie under the site (FS:59, as the deposit at its completion);
         /// the other templates answer «allowed» (the entry returns at once, ZF=0). The entry of template 19 is not ported (allows).</summary>
+        public BuilderProbe CreationProbe(byte template, byte army, byte plane, uint x, uint y) =>
+            OriginalCreationPlacement.Probe((byte)battle.Map.Width, (byte)battle.Map.Height, battle.Map.Cells, battle._properties, battle.Occupancy.Cells, Math.Min(plane, (byte)2),
+                Convert.FromHexString(battle._templates.Armies["ARMY__02.DAT"].Templates[template].RawRecordHex), x, y,
+                reference => (battle.Actors.First(a => a.Id == reference).Record, battle.Actors.First(a => a.Id == reference).Parameters)).Status;
         public bool Hook(byte template, byte army, uint x, uint y) =>
             template != 6 || OriginalMineRules.Initialize(battle.Map.Cells, battle.Map.Width, battle.Map.Height, x, y).Remaining > 0;
         public bool Line(byte template, byte army, uint x, uint y) => battle._lineNeighbors.Allowed((byte)battle.Map.Width, (byte)battle.Map.Height,
@@ -515,8 +519,10 @@ public sealed partial class Skirmish
         }
         public Span<byte> ParticipantRecord(byte participant) => battle._participants[participant];
         public byte TileOre(int cell) => cell >= 0 && cell < battle.Map.Cells.Length ? (byte)(battle.Map.Cells[cell] >> 16) : (byte)0;
+        /// <summary>D363 (ported, <see cref="OriginalBuildCheck.SiteAllowed"/>).</summary>
         public bool SiteAllowed(byte template, byte army, byte participant, byte x, byte y) =>
-            battle.Inside(new Vector2I(x, y)) && battle.EnemyPlacement(template, new Vector2I(x, y)) == ConstructionPlacementStatus.Clear;
+            battle.Inside(new Vector2I(x, y)) && OriginalBuildCheck.SiteAllowed(new SkirmishBuildCheckWorld(battle, participant),
+                Convert.FromHexString(battle._templates.Armies["ARMY__02.DAT"].Templates[template].RawRecordHex), template, army, participant, x, y);
         public void Send(byte type, byte other, byte owner, byte bh, uint parameter) => battle._aiTurnWorld!.Send(type, other, owner, bh, parameter);
         /// <summary>10AD2 (ported, <see cref="OriginalCreationPlacement"/>): random points in growing squares around the point,
         /// each checked by AC63 on the occupancy planes.</summary>
