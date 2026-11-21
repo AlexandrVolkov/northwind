@@ -524,6 +524,14 @@ public partial class SkirmishMain : Node2D
                 DrawString(ThemeDB.FallbackFont, pointOfEntry + new Vector2(-24, -10), "Приём груза", HorizontalAlignment.Left, -1, 12, new Color("e7cd82"));
             }
         }
+        foreach (var (template, frameNumber, at, owner, _) in Battle.Ruins)
+            if (_frames.TryGetValue(("ARMY__02.DAT", template, frameNumber), out var ruin))
+            {
+                var ruinSize = new Vector2(ruin.Width, ruin.Height); var ruinAt = at - new Vector2(ruinSize.X / 2, ruinSize.Y - 16);
+                if (ruin.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(owner), out var ruinSheet))
+                    DrawTextureRectRegion(ruinSheet, new Rect2(ruinAt, ruinSize), new Rect2(ruin.TeamSlot % 64 * 64, ruin.TeamSlot / 64 * 64, ruin.Width, ruin.Height));
+                else DrawTextureRectRegion(_sprites, new Rect2(ruinAt, ruinSize), new Rect2(ruin.X, ruin.Y, ruin.Width, ruin.Height));
+            }
         foreach (var corpse in Battle.Corpses)
         {
             var at = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(corpse.AsSpan(7)), BinaryPrimitives.ReadUInt32LittleEndian(corpse.AsSpan(0xc)));
