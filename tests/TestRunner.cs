@@ -60,7 +60,7 @@ public partial class TestRunner : Node
                 case "rival-shots": await RivalShots(); return;
                 case "original-ai": OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); OriginalAiResearchChecks(); OriginalAiSquadChecks(); OriginalAiSquadStepChecks(); OriginalAiSquadStateChecks(); OriginalAiMilitaryChecks(); OriginalAiGarrisonChecks(); OriginalAiOrderChecks(); OriginalAiEconomyChecks(); OriginalAiWorkerChecks(); OriginalAiFormationChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
-                case "perf": Perf(); break;
+                case "aiperf": Perf(); break;
                 case "skirmish-ai": SkirmishAiChecks(); SkirmishRivalChecks(); SkirmishImprovedChecks(); break;
                 default: throw new ArgumentException($"Unknown test mode: {mode}");
             }
