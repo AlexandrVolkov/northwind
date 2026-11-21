@@ -75,7 +75,7 @@ public sealed partial class Skirmish
             var sample = wave[0];
             var found = CoarsePath(sample, sample.Cell, goal.Cell, 14);
             if (found.Count == 0) OrderBridge(slot, sample, goal.Cell);
-            _wavePath[slot] = cached = (goal.Id, Elapsed + 20, found);
+            _wavePath[slot] = cached = (goal.Id, Elapsed + 45, found);
         }
         var path = cached.Path;
         foreach (var unit in wave)
