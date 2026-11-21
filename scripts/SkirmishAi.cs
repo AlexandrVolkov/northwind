@@ -9,8 +9,7 @@ namespace Northwind;
 /// with its decisions (2323A), the plan executor (23667) and research (23C11). Adapters of the port, not the original:
 /// <list type="bullet">
 /// <item>Not yet ported steps are skipped: the worker states 9/10 (workers for mines and lumbermills), 21E99/221AE (economy), the
-/// the formation table of step 4, messages A4C2, the rescue 20001.</item>
-/// <item>Step 4 (formation march) sends the members to the target cell with command 48h instead of a formation.</item>
+/// nothing of the main loop remains unported.</item>
 /// <item>Commands the AI writes into OBE +14 (48h move to +22/+23, 50h/58h attack +1C, 40h stand) are carried out by
 /// <see cref="ExecuteAiCommands"/> through the port's movement and attack, as the player's orders are, and replaced by
 /// activity codes (0 idle, 1 moving, 2/3 attacking) inferred from what the AI reads back; the original WRK command
@@ -436,8 +435,12 @@ public sealed partial class Skirmish
         public uint HostileMask(byte participant) => participant < battle.Diplomacy.Count ? battle.Diplomacy.Hostile[participant] : 0;
         public (uint X, uint Y) BoundsLimit => ((uint)battle.Map.Width * 32, (uint)battle.Map.Height * 32);
         private readonly OriginalAiFormations _formations = OriginalAiFormations.From(GameData.Read<OriginalAiData>("res://data/original_ai.json"));
-        /// <summary>Step 4 (1EF26, ported); the squad message A4C2 is not shown.</summary>
-        public bool StepFour(Span<byte> squad, bool started) => _formations.Step(squad, Chain(squad[0]), _ => { }, MapWidth, MapHeight);
+        /// <summary>Step 4 (1EF26, ported) with its message A4C2.</summary>
+        public bool StepFour(Span<byte> squad, bool started)
+        {
+            byte x = squad[0x20], y = squad[0x21];
+            return _formations.Step(squad, Chain(squad[0]), text => battle.WorkSound(text, x, y), MapWidth, MapHeight);
+        }
         public byte Global19E9 => 0xff;
         public byte Random() => battle._terrainCatalog.NextRandomByte();
         public byte Random2() => battle._terrainCatalog.NextSecondaryByte();
@@ -473,7 +476,8 @@ public sealed partial class Skirmish
         public byte[]? Create(byte participant, byte army, byte template, byte variant, uint x, uint y) =>
             battle.AiSlots.Contains(participant) ? battle.EnemyConstruct(template, new Vector2I((int)(x >> 5), (int)(y >> 5)), participant).Record : null;
         public void Register(byte[] record) { }
-        public void Message(ReadOnlySpan<byte> squad, uint text) { }
+        /// <summary>A4C2: the squad's message is a sound of WORK.FX at the squad's centre.</summary>
+        public void Message(ReadOnlySpan<byte> squad, uint text) => battle.WorkSound(text, squad[0x20], squad[0x21]);
         public byte Army(byte participant) => battle._participants[participant][0];
         public void WorkerState(Span<byte> ai, int at) => battle._aiWorkers!.Run(ai, at);
         public uint TileProperty(int cell) => cell >= 0 && cell < battle.Map.Cells.Length

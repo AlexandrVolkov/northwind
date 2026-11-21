@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 111125 | 5512 | 97 | 30148 | 44 |
+| LE:1 | 146882 | 110759 | 5512 | 97 | 30514 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3228 | 100 | 0 | 2075 | 0 |
@@ -116,6 +116,7 @@
 | LE:1 `0x9E69..0x9E7D` | Random byte stream [19ED] over table DS:297E | ported | [ai.md](../docs/ai.md); [ai-garrison.json](../tests/fixtures/ai-garrison.json) |  |
 | LE:1 `0x9E7D..0x9F38` | Wind vector, direction and random acceleration | ported | [combat.md](../docs/combat.md); [wind.json](../tests/fixtures/wind.json) |  |
 | LE:1 `0xA10B..0xA1D1` | Game speed gate and slow-tick flags | partial | [game-timing.md](../docs/game-timing.md) | Перенесены частота и шаг по умолчанию; клавиши смены скорости и флаги [19E7] не подключены. |
+| LE:1 `0xA4C2..0xA4DF` | Shared-bank sound at a squad centre (AI squad message) | ported | [ai.md](../docs/ai.md); [sound.md](../docs/sound.md); [SkirmishRivalChecks.cs](../tests/SkirmishRivalChecks.cs) | Playback by the scene; the mixer (1416B) is not ported |
 | LE:1 `0xA4DF..0xA5B8` | Death frames by hit kind, corpse object and removal | ported | [combat.md](../docs/combat.md); [death.json](../tests/fixtures/death.json) | Объект-труп (9727) и удаление 98DB исполняет мост схватки. |
 | LE:1 `0xA5B8..0xA5F4` | Sixteen-way missile direction frame | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) |  |
 | LE:1 `0xA673..0xA6AE` | Template open in development tree | ported | [tech.md](../docs/tech.md); [tech.json](../tests/fixtures/tech.json); [original_tech.json](../data/original_tech.json) |  |
@@ -182,6 +183,7 @@
 | LE:1 `0x123D3..0x12404` | Grant timber through worker callback | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Живой рабочий, флаг 20000, пустой груз и AL=3. Другие грузы, непустой груз и все WRK-получатели не перенесены. |
 | LE:1 `0x1243A..0x124A5` | Goods handler dispatch and item slots | partial | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Перенесены коды 0..2. Слоты +CD, UI/звук для локального игрока (5593/A4A9) не перенесены. |
 | LE:1 `0x1E53A..0x1E6C2` | AI block initialisation from character table | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
+| LE:1 `0x1E7EA..0x1E87A` | AI main loop of a settlement | ported | [ai.md](../docs/ai.md); [SkirmishAiChecks.cs](../tests/SkirmishAiChecks.cs) | Order of the calls as in LE:1 31D6; run per AI settlement |
 | LE:1 `0x1E87A..0x1EAD8` | AI settlement census | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) |  |
 | LE:1 `0x1EAD8..0x1EAED` | AI block of participant | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
 | LE:1 `0x1EAED..0x1EB33` | Add AI plan record | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) | plan bytes +5..+7 are register leftovers, written as zero |
@@ -191,9 +193,12 @@
 | LE:1 `0x1EC3F..0x1EC6E` | Explored share of the map for a participant | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) |  |
 | LE:1 `0x1EC6E..0x1ECA0` | Area in sight of an object | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |
 | LE:1 `0x1ECA0..0x1ECF8` | First living object of a DAT class | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) | inlined for mask 38h value 0 |
+| LE:1 `0x1ECF8..0x1ED26` | Hostile contact counters of the AI block | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0x1ED26..0x1EF26` | AI squad step loop and steps 0..3 | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) | step 4 (1EF26) is a hook |
 | LE:1 `0x1EF26..0x1EFB8` | AI squad step 4: march in formation | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
+| LE:1 `0x1EFB8..0x1EFCC` | Request a squad step | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) |  |
 | LE:1 `0x1EFCC..0x1EFF9` | AI squad step 5: formation march | ported | [ai.md](../docs/ai.md); [ai-squad-steps.json](../tests/fixtures/ai-squad-steps.json) |  |
+| LE:1 `0x1EFF9..0x1F078` | Squad area and step accessors | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0x1F078..0x1F476` | AI squad states 0..3 and the state loop | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | the state setters 1F1C7, 1F306 and 1F464 are field writes made by the military requests, not ported yet |
 | LE:1 `0x1F476..0x1F5F1` | AI squad state 9: timber workers | ported | [ai.md](../docs/ai.md); [ai-workers.json](../tests/fixtures/ai-workers.json) |  |
 | LE:1 `0x1F5F1..0x1F62B` | Set worker squad state 9 with its target area | ported | [ai.md](../docs/ai.md); [ai-economy.json](../tests/fixtures/ai-economy.json) |  |

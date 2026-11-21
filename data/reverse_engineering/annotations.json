@@ -3476,6 +3476,66 @@
       "evidence": ["docs/combat.md", "tests/fixtures/corpse.json"],
       "implementation": ["scripts/OriginalCorpseRules.cs"],
       "limitations": ""
+    },
+    {
+      "id": "ai-squad-message",
+      "module": "LE:1",
+      "start": 42178,
+      "end": 42207,
+      "name": "Shared-bank sound at a squad centre (AI squad message)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "docs/sound.md", "tests/SkirmishRivalChecks.cs"],
+      "implementation": ["scripts/SkirmishAi.cs"],
+      "limitations": "Playback by the scene; the mixer (1416B) is not ported"
+    },
+    {
+      "id": "ai-main-loop",
+      "module": "LE:1",
+      "start": 124906,
+      "end": 125050,
+      "name": "AI main loop of a settlement",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/SkirmishAiChecks.cs"],
+      "implementation": ["scripts/SkirmishAi.cs"],
+      "limitations": "Order of the calls as in LE:1 31D6; run per AI settlement"
+    },
+    {
+      "id": "ai-squad-counters",
+      "module": "LE:1",
+      "start": 126200,
+      "end": 126246,
+      "name": "Hostile contact counters of the AI block",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-step-request",
+      "module": "LE:1",
+      "start": 126904,
+      "end": 126924,
+      "name": "Request a squad step",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-steps.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
+    },
+    {
+      "id": "ai-squad-area-helpers",
+      "module": "LE:1",
+      "start": 126969,
+      "end": 127096,
+      "name": "Squad area and step accessors",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/ai.md", "tests/fixtures/ai-squad-states.json"],
+      "implementation": ["scripts/OriginalAiSquads.cs"],
+      "limitations": ""
     }
   ]
 }

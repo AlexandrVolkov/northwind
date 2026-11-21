@@ -4,13 +4,12 @@
 
 | Статус | Процедур | Инструкций |
 |---|---|---|
-| not ported | 10 | 102 |
-| ported | 117 | 5685 |
+| ported | 127 | 5787 |
 
 | Процедура | Инстр. | Статус | Имя | Вызывает (✓ перенесено, ~ частично, · нет) |
 |---|---|---|---|---|
 | 1E53A | 99 | ported | AI block initialisation from character table | 1EB33✓, 1ECA0✓, 219C3✓ |
-| 1E7EA | 34 | not ported |  | 1E87A✓, 1ED26✓, 1F078✓, 209B0✓, 20DD0✓, 21E99✓, 221AE✓, 226F1✓, 227C7✓, 2323A✓, 23667✓, 23C11✓ |
+| 1E7EA | 34 | ported | AI main loop of a settlement | 1E87A✓, 1ED26✓, 1F078✓, 209B0✓, 20DD0✓, 21E99✓, 221AE✓, 226F1✓, 227C7✓, 2323A✓, 23667✓, 23C11✓ |
 | 1E87A | 154 | ported | AI settlement census | 68BD✓, 1EC3F✓, 219C3✓ |
 | 1EAD8 | 6 | ported | AI block of participant |  |
 | 1EAED | 24 | ported | Add AI plan record |  |
@@ -21,8 +20,8 @@
 | 1EC3F | 20 | ported | Explored share of the map for a participant |  |
 | 1EC6E | 18 | ported | Area in sight of an object | 6885✓, 218A8✓, 219C3✓ |
 | 1ECA0 | 30 | ported | First living object of a DAT class | 68BD✓ |
-| 1ECF8 | 7 | not ported |  |  |
-| 1ED0F | 7 | not ported |  |  |
+| 1ECF8 | 7 | ported | Hostile contact counters of the AI block |  |
+| 1ED0F | 7 | ported | Hostile contact counters of the AI block |  |
 | 1ED26 | 29 | ported | AI squad step loop and steps 0..3 | 1ED77✓, 1ED78✓, 1ED87✓, 1EE02✓, 1EF26✓, 1EFCC✓, 205FB✓ |
 | 1ED77 | 1 | ported | AI squad step loop and steps 0..3 |  |
 | 1ED78 | 6 | ported | AI squad step loop and steps 0..3 | B8A2✓ |
@@ -30,40 +29,40 @@
 | 1EDFD | 2 | ported | AI squad step loop and steps 0..3 |  |
 | 1EE02 | 82 | ported | AI squad step loop and steps 0..3 | 6885✓, 68BD✓, 20408✓, 20458✓, 207CB✓ |
 | 1EF21 | 2 | ported | AI squad step loop and steps 0..3 |  |
-| 1EF26 | 40 | ported | AI squad step 4: march in formation | 6996✓, A4C2·, 10075✓, 10262✓, 1037E✓, 103AF✓ |
-| 1EFB8 | 7 | not ported |  |  |
+| 1EF26 | 40 | ported | AI squad step 4: march in formation | 6996✓, A4C2✓, 10075✓, 10262✓, 1037E✓, 103AF✓ |
+| 1EFB8 | 7 | ported | Request a squad step |  |
 | 1EFCC | 16 | ported | AI squad step 5: formation march | B7B9✓ |
-| 1EFF9 | 4 | not ported |  |  |
-| 1F004 | 5 | not ported |  |  |
-| 1F011 | 15 | not ported |  | 219C3✓ |
-| 1F03B | 9 | not ported |  |  |
-| 1F054 | 9 | not ported |  |  |
-| 1F06D | 5 | not ported |  |  |
+| 1EFF9 | 4 | ported | Squad area and step accessors |  |
+| 1F004 | 5 | ported | Squad area and step accessors |  |
+| 1F011 | 15 | ported | Squad area and step accessors | 219C3✓ |
+| 1F03B | 9 | ported | Squad area and step accessors |  |
+| 1F054 | 9 | ported | Squad area and step accessors |  |
+| 1F06D | 5 | ported | Squad area and step accessors |  |
 | 1F078 | 30 | ported | AI squad states 0..3 and the state loop | 1F0D5✓, 1F1DF✓, 1F31E✓, 1F3F5✓, 1F476✓, 1F653✓, 1F72C✓, 1F7CA✓, 1F8CF✓, 1FA01✓, 1FAD9✓ |
-| 1F0D5 | 71 | ported | AI squad states 0..3 and the state loop | 1EB5C✓, 1ECF8·, 1EDFD✓, 1EF21✓, 1F004·, 1F03B·, 1F06D·, 1FCED✓, 1FE78✓, 1FECE✓, 1FF74✓, 201B8✓, 20458✓, 215F1✓ |
-| 1F1DF | 90 | ported | AI squad states 0..3 and the state loop | 1EB5C✓, 1ED0F·, 1F3E9✓, 1FBB1✓, 1FC28✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FF00✓, 1FFB7✓, 20071✓, 201B8✓, 205E7✓, 219C3✓ |
+| 1F0D5 | 71 | ported | AI squad states 0..3 and the state loop | 1EB5C✓, 1ECF8✓, 1EDFD✓, 1EF21✓, 1F004✓, 1F03B✓, 1F06D✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FF74✓, 201B8✓, 20458✓, 215F1✓ |
+| 1F1DF | 90 | ported | AI squad states 0..3 and the state loop | 1EB5C✓, 1ED0F✓, 1F3E9✓, 1FBB1✓, 1FC28✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FF00✓, 1FFB7✓, 20071✓, 201B8✓, 205E7✓, 219C3✓ |
 | 1F306 | 8 | ported | AI squad states 0..3 and the state loop |  |
-| 1F31E | 50 | ported | AI squad states 0..3 and the state loop | 9E41✓, 1ECF8·, 1FBB1✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FFB7✓, 20001✓, 20071✓, 201B8✓, 205E7✓ |
+| 1F31E | 50 | ported | AI squad states 0..3 and the state loop | 9E41✓, 1ECF8✓, 1FBB1✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FFB7✓, 20001✓, 20071✓, 201B8✓, 205E7✓ |
 | 1F3E9 | 4 | ported | AI squad states 0..3 and the state loop |  |
-| 1F3F5 | 32 | ported | AI squad states 0..3 and the state loop | 1ECF8·, 1F3E9✓, 1FC6B✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FFB7✓, 205E7✓ |
+| 1F3F5 | 32 | ported | AI squad states 0..3 and the state loop | 1ECF8✓, 1F3E9✓, 1FC6B✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FFB7✓, 205E7✓ |
 | 1F464 | 6 | ported | AI squad states 0..3 and the state loop |  |
-| 1F476 | 106 | ported | AI squad state 9: timber workers | 6885✓, C439✓, 1EB5C✓, 1EDFD✓, 1F004·, 1F06D·, 1FE97✓, 201B8✓, 205E7✓, 206D5✓, 20730✓, 219C3✓, 224D1✓, 2258F✓ |
-| 1F5F1 | 16 | ported | Set worker squad state 9 with its target area | 1EDFD✓, 1F004·, 219C3✓ |
+| 1F476 | 106 | ported | AI squad state 9: timber workers | 6885✓, C439✓, 1EB5C✓, 1EDFD✓, 1F004✓, 1F06D✓, 1FE97✓, 201B8✓, 205E7✓, 206D5✓, 20730✓, 219C3✓, 224D1✓, 2258F✓ |
+| 1F5F1 | 16 | ported | Set worker squad state 9 with its target area | 1EDFD✓, 1F004✓, 219C3✓ |
 | 1F653 | 56 | ported | AI squad state 10: mine workers | 6885✓, C439✓, 1EB5C✓, 201B8✓, 205E7✓, 206D5✓, 219C3✓ |
 | 1F71A | 5 | ported | Set worker squad state 10 |  |
 | 1F72C | 45 | ported | AI squad states 4..8 | 1FBB1✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FFB7✓, 201B8✓, 205E7✓ |
 | 1F7CA | 69 | ported | AI squad states 4..8 | 1F3E9✓, 1FC6B✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FF19✓, 201B8✓, 201F6✓, 20232✓, 205E7✓ |
 | 1F8C0 | 5 | ported | AI squad states 4..8 |  |
-| 1F8CF | 80 | ported | AI squad states 4..8 | 1EB5C✓, 1ECF8·, 1F054·, 1F3E9✓, 1FBB1✓, 1FC28✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FFB7✓, 201B8✓, 20458✓, 2160B✓ |
+| 1F8CF | 80 | ported | AI squad states 4..8 | 1EB5C✓, 1ECF8✓, 1F054✓, 1F3E9✓, 1FBB1✓, 1FC28✓, 1FCED✓, 1FE78✓, 1FECE✓, 1FFB7✓, 201B8✓, 20458✓, 2160B✓ |
 | 1F9EC | 6 | ported | AI squad states 4..8 |  |
 | 1FA01 | 58 | ported | AI squad states 4..8 | 1EB5C✓, 1EBEF✓, 1FBB1✓, 1FC28✓, 1FCED✓, 1FE78✓, 1FE8A✓, 1FECE✓, 1FFB7✓, 201B8✓, 205E7✓, 219C3✓ |
 | 1FACD | 4 | ported | AI squad states 4..8 |  |
-| 1FAD9 | 56 | ported | AI squad states 4..8 | 1ED0F·, 1F3E9✓, 1FC28✓, 1FCED✓, 1FE78✓, 1FECE✓, 201B8✓, 205E7✓ |
+| 1FAD9 | 56 | ported | AI squad states 4..8 | 1ED0F✓, 1F3E9✓, 1FC28✓, 1FCED✓, 1FE78✓, 1FECE✓, 201B8✓, 205E7✓ |
 | 1FB9C | 6 | ported | AI squad states 4..8 |  |
 | 1FBB1 | 34 | ported | AI squad retreat, march, fight and strength helpers | 6996✓, 1FC6B✓, 1FF51✓, 20071✓ |
 | 1FC28 | 26 | ported | AI squad retreat, march, fight and strength helpers | 1FC6B✓ |
-| 1FC6B | 26 | ported | AI squad retreat, march, fight and strength helpers | 1EFB8·, 1F06D· |
-| 1FCED | 101 | ported | AI squad retreat, march, fight and strength helpers | 1EF21✓, 1EFB8·, 1EFF9·, 1F011·, 1F054·, 1F06D·, 1FF19✓, 1FF2E✓, 1FF51✓ |
+| 1FC6B | 26 | ported | AI squad retreat, march, fight and strength helpers | 1EFB8✓, 1F06D✓ |
+| 1FCED | 101 | ported | AI squad retreat, march, fight and strength helpers | 1EF21✓, 1EFB8✓, 1EFF9✓, 1F011✓, 1F054✓, 1F06D✓, 1FF19✓, 1FF2E✓, 1FF51✓ |
 | 1FE78 | 8 | ported | AI squad retreat, march, fight and strength helpers |  |
 | 1FE8A | 5 | ported | AI squad retreat, march, fight and strength helpers |  |
 | 1FE97 | 5 | ported | AI squad retreat, march, fight and strength helpers |  |
@@ -74,7 +73,7 @@
 | 1FF51 | 10 | ported | AI squad retreat, march, fight and strength helpers | 21CA0✓ |
 | 1FF74 | 24 | ported | AI squad retreat, march, fight and strength helpers | 20275✓, 20458✓ |
 | 1FFB7 | 26 | ported | AI squad retreat, march, fight and strength helpers | 1FF51✓, 20275✓ |
-| 20001 | 39 | ported | AI squad retreat, march, fight and strength helpers | BA60✓, D7B1✓, DA7F✓, 1F011· |
+| 20001 | 39 | ported | AI squad retreat, march, fight and strength helpers | BA60✓, D7B1✓, DA7F✓, 1F011✓ |
 | 20071 | 10 | ported | AI squad retreat, march, fight and strength helpers | 1EAD8✓ |
 | 20095 | 8 | ported | AI squad registry: numbers, create, remove, disband, transfer, lookups |  |
 | 200AB | 3 | ported | AI squad registry: numbers, create, remove, disband, transfer, lookups |  |
@@ -92,7 +91,7 @@
 | 20408 | 73 | ported | Nearest visible hostile object in a cell area | 6877✓, 2055C✓ |
 | 20458 | 74 | ported | Nearest visible hostile object in a cell area | 2055C✓ |
 | 2055C | 41 | ported | Nearest visible hostile object in a cell area |  |
-| 205E7 | 6 | ported | Nearest visible hostile object in a cell area | 1F011·, 20458✓ |
+| 205E7 | 6 | ported | Nearest visible hostile object in a cell area | 1F011✓, 20458✓ |
 | 205FB | 70 | ported | AI squad census from its members |  |
 | 206D5 | 31 | ported | Random idle member of a squad | 9E41✓ |
 | 20730 | 22 | ported | Squad member with an activity code |  |
@@ -150,7 +149,7 @@
 | 9E41 | ported | Random byte streams [19EB]/[19EC] over table DS:297E | 1EBEF, 1F31E, 206D5, 209B0, 20DD0, 214C3, 2258F, 22613, 227C7, 22E46, 22E85, 2323A, 23C11 |
 | 9E55 | ported | Random byte streams [19EB]/[19EC] over table DS:297E | 1EBEF, 209B0, 2258F, 22613, 227C7, 2323A |
 | 9E69 | ported | Random byte stream [19ED] over table DS:297E | 209B0 |
-| A4C2 | unknown |  | 1EF26 |
+| A4C2 | ported | Shared-bank sound at a squad centre (AI squad message) | 1EF26 |
 | A673 | ported | Template open in development tree | 223B4, 22E85 |
 | A758 | partial | Allocate and initialize object record | 2323A |
 | AF07 | unknown |  | 22FE4 |
