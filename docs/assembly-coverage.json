@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "10badb9b80cfad8d625fbdaae1d9d1dc9d63b4ddc4464989e8c0977c36b13d70",
+  "annotation_sha256": "c0fa868952cf36fbfafc2c4c2170bbdd8936de690c08b6bf2793cad9da530716",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 5512,
-        "ported": 31116,
-        "unreviewed": 110157,
+        "ported": 31765,
+        "unreviewed": 109508,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -423,10 +423,19 @@
         },
         {
           "start": 31235,
-          "end": 31843,
+          "end": 31609,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 31609,
+          "end": 31843,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "placement-footprint-7b79"
+          ]
         },
         {
           "start": 31843,
@@ -1110,10 +1119,19 @@
         },
         {
           "start": 43697,
-          "end": 44383,
+          "end": 44131,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 44131,
+          "end": 44383,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "placement-ac63"
+          ]
         },
         {
           "start": 44383,
@@ -1707,6 +1725,22 @@
         },
         {
           "start": 66540,
+          "end": 68306,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 68306,
+          "end": 68469,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "free-spot-10ad2"
+          ]
+        },
+        {
+          "start": 68469,
           "end": 73392,
           "status": "unreviewed",
           "classification": "unknown",

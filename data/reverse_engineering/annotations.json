@@ -3584,6 +3584,42 @@
       "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/builder.json", "tools/verify_builder.py"],
       "implementation": ["scripts/OriginalBuilder.cs"],
       "limitations": "none"
+    },
+    {
+      "id": "placement-ac63",
+      "module": "LE:1",
+      "start": 44131,
+      "end": 44383,
+      "name": "Creation placement check on an occupancy plane",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/placement.json", "tools/verify_placement.py"],
+      "implementation": ["scripts/OriginalCreationPlacement.cs", "scripts/SkirmishAi.cs"],
+      "limitations": "Planes 0..2; the map is the valid-map domain of the check"
+    },
+    {
+      "id": "placement-footprint-7b79",
+      "module": "LE:1",
+      "start": 31609,
+      "end": 31843,
+      "name": "Footprint scan of the creation check (empty plane, terrain value, supporting object over water)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/placement.json", "tools/verify_placement.py"],
+      "implementation": ["scripts/OriginalCreationPlacement.cs", "scripts/SkirmishAi.cs"],
+      "limitations": "Planes 0..2"
+    },
+    {
+      "id": "free-spot-10ad2",
+      "module": "LE:1",
+      "start": 68306,
+      "end": 68469,
+      "name": "Free-spot search: random points in growing squares, AC63 on each",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/placement.json", "tools/verify_placement.py"],
+      "implementation": ["scripts/OriginalCreationPlacement.cs", "scripts/SkirmishAi.cs"],
+      "limitations": "The random generators come from the caller"
     }
   ]
 }
