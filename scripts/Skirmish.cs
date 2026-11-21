@@ -449,19 +449,20 @@ public sealed partial class Skirmish : IDisposable
     private bool PlanAttack(SkirmishActor actor, SkirmishActor target)
     {
         actor.Route.Clear();
+        if (_searchBudget <= 0) { actor.ReplanTimer = 0.25; return false; }   // later: the searches of this step are used up
         int radius = (int)Math.Ceiling(actor.Rules.Range / 32) + 3;
-        var candidates = new List<Vector2I>();
+        var around = new List<Vector2I>((2 * radius + 1) * (2 * radius + 1));
         for (int y = -radius; y <= radius; y++)
-        for (int x = -radius; x <= radius; x++)
-        {
-            var cell = target.Cell + new Vector2I(x, y);
-            var point = actor.Position + (Vector2)((cell - actor.Cell) * 32);
-            if (CanStand(actor, cell) && Distance(point, target) <= actor.Rules.Range) candidates.Add(cell);
-        }
+        for (int x = -radius; x <= radius; x++) around.Add(target.Cell + new Vector2I(x, y));
+        // The nearest cells to the unit first; the standing test (costly) only for as many as are tried.
+        around.Sort((p, q) => ((Vector2)(p - actor.Cell)).LengthSquared().CompareTo(((Vector2)(q - actor.Cell)).LengthSquared()));
         int tried = 0;
-        foreach (var cell in candidates.OrderBy(c => ((Vector2)c).DistanceSquaredTo(actor.Cell)))
+        foreach (var cell in around)
         {
-            if (_searchBudget <= 0) { actor.ReplanTimer = 0.1; return false; }   // the next step
+            if (!Inside(cell)) continue;
+            var point = actor.Position + (Vector2)((cell - actor.Cell) * 32);
+            if (Distance(point, target) > actor.Rules.Range || !CanStand(actor, cell)) continue;
+            if (_searchBudget <= 0) { actor.ReplanTimer = 0.25; return false; }
             if (tried++ >= AttackCandidates) break;
             _searchBudget--;
             var path = SearchPath(actor, cell);
