@@ -25,6 +25,7 @@ public sealed partial class Skirmish
                 var actor = NewEconomyActor(obj.TemplateIndex, site, false, false, team);
                 if (actor.Record.Length >= 0x28) { actor.Record.AsSpan(0x22, 5).Fill(0xff); actor.Record[0x27] = 0xff; }   // producers' queue
                 actor.Record[0x14] = 0;
+                if (obj.TemplateIndex == 12) { actor.Record[0x22] = actor.Record[0x23] = 1; actor.Record[0x15] = 0; }
                 // A finished building shows its last construction frame (as TickBuildings writes on completion).
                 BinaryPrimitives.WriteUInt16LittleEndian(actor.Record.AsSpan(1), (ushort)(actor.Template.InitialFrame + actor.Parameters[0x4a]));
                 Actors.Add(actor);

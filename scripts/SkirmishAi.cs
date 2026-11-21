@@ -101,6 +101,7 @@ public sealed partial class Skirmish
         _aiFortification = data.Fortifications.Count > 0 ? Convert.FromHexString(data.Fortifications[0]) : [];
         // A6AE marks a finished building in the development tree; the buildings standing at the start count as finished
         // (assumption: the scenario load path is not ported).
+        foreach (var lab in Actors.Where(a => a.Team != 0 && a.Source.TemplateIndex == 12 && a.Record.Length >= 0x29)) { lab.Record[0x22] = lab.Record[0x23] = 1; lab.Record[0x15] = 0; }   // the laboratory's AH=0
         foreach (var built in Actors.Where(a => a.Team != 0 && a.Structure)) OriginalTechRules.Complete(TreeOf(built.Record[3]), 1, (byte)built.Source.TemplateIndex);
         _aiSquadWorld = new AiSquadWorld(this);
         _aiTurnWorld = new AiTurnWorld(this);
@@ -207,6 +208,8 @@ public sealed partial class Skirmish
             // A building under construction carries 81h (command 80h, activity 1); the handled command leaves activity 1, which
             // 22E85 reads as «producer under construction». Completion (C80D path) gives the same next state for 81h and 1.
             if (building.ConstructionRemaining > 0 && (building.Record[0x14] & 0x80) != 0) building.Record[0x14] &= 7;
+            if (building.Source.TemplateIndex == 12 && building.ConstructionRemaining <= 0 && building.Record.Length >= 0x29)
+                OriginalLabResearch.Tick(new SkirmishLabWorld(this, building.Record[3]), building.Record, _participants[building.Record[3]], _aiBlocks[building.Record[3]] ?? [], _globalTick);
             byte order = building.Record[0x14];
             if ((order & 0xf8) == 0x60) building.Record[0x14] = 4;              // produce: the queue head +22 is the template
             else if ((order & 0xf8) == 0x58) { EnemyBuild(building); building.Record[0x14] = 0; }
@@ -215,6 +218,8 @@ public sealed partial class Skirmish
         foreach (var actor in Actors.Where(a => a.Team == _aiTeam && a.Alive && !a.Structure && !a.Worker))
         {
             byte value = actor.Record[0x14];
+            // A new unit's first update clears bit 7 of +14 (A839 sets 80h; the WRK entries start with TEST [ESI+14],80 / AND 7F).
+            if ((value & 0x80) != 0 && (value & 0x40) == 0) actor.Record[0x14] = value &= 0x7f;
             uint target = BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(0x1c));
             if ((value & 0x40) != 0)
             {
@@ -333,6 +338,7 @@ public sealed partial class Skirmish
     {
         var tree = TreeOf(building.Record[3]);
         if (tree.Length > 0) OriginalTechRules.Complete(tree, 1, (byte)building.Source.TemplateIndex);
+        if (tree.Length > 0 && BinaryPrimitives.ReadUInt32LittleEndian(_participants[building.Record[3]].AsSpan(0x2c)) is >= 0x28 and <= 0x32) OriginalTechRules.Complete(tree, 2, 0);   // AFDB's end of a build: farms support 28h..32h
     }
 
     /// <summary>Enemy objects that make something (WRK AH=6 table with rows): castle, barracks, factory, stable…</summary>
@@ -384,12 +390,36 @@ public sealed partial class Skirmish
         builder.Record[0x22] = 0xff;
     }
 
+    /// <summary>AA07..AA35: a produced unit counts in its class (DAT[41] &amp; 0Fh) in the settlement's statistics (+1A16 + class); the tenth
+    /// of class 8 (militia, knights) completes development event (8, kind 2), the tenth of class 9 (archers, arsonists) event 9.</summary>
+    private void CountProduced(SkirmishActor recruit)
+    {
+        if (recruit.Record[3] >= _aiBlocks.Length || _aiBlocks[recruit.Record[3]] is not { } stats) return;
+        stats[0x1a16 + (recruit.Parameters[0x41] & 0xf)]++;
+        var tree = TreeOf(recruit.Record[3]);
+        if (tree.Length == 0) return;
+        if (stats[0x1a1e] == 10) OriginalTechRules.Complete(tree, 2, 8);
+        if (stats[0x1a1f] == 10) OriginalTechRules.Complete(tree, 2, 9);
+    }
+
     private byte[] _arctangent = [];
     private readonly OriginalLineNeighbors _lineNeighbors = OriginalLineNeighbors.From(GameData.Read<LineNeighborData>("res://data/line_neighbors.json"));
     private byte _builderToggle = 1;
 
     /// <summary>The builder's world in the skirmish: AD5F on the occupancy, A758 as a new actor under construction (adapter for
     /// the timing); registration and tree updates happen when the building is finished.</summary>
+    /// <summary>The laboratory's research (CCCB): items of the settlement's tree (A716), the random byte 9E41, completion A6AE.</summary>
+    private sealed class SkirmishLabWorld(Skirmish battle, byte owner) : ILabResearchWorld
+    {
+        public IReadOnlyList<(byte Id, uint Cost)> Researchable(byte owner, byte army)
+        {
+            var tree = battle.TreeOf(owner);
+            return tree.Length == 0 ? [] : OriginalTechRules.Researchable(tree).Select(at => (tree[at + 1], BinaryPrimitives.ReadUInt32LittleEndian(tree.AsSpan(at + 7)))).ToList();
+        }
+        public byte Random() => battle._terrainCatalog.NextRandomByte();
+        public void Complete(byte item) { var tree = battle.TreeOf(owner); if (tree.Length > 0) OriginalTechRules.Complete(tree, 0, item); }
+    }
+
     private sealed class SkirmishBuildCheckWorld(Skirmish battle, int slot) : IBuildCheckWorld
     {
         private readonly SkirmishBuilderWorld _probe = new(battle, slot);
@@ -451,6 +481,7 @@ public sealed partial class Skirmish
         building.Record[0x14] &= 7;   // the handled construction command leaves activity 1 at once (see ExecuteAiCommands)
         if (building.Record.Length > 0x20) building.Record[0x20] = 0xff;
         if (building.Record.Length >= 0x28) { building.Record.AsSpan(0x22, 5).Fill(0xff); building.Record[0x27] = 0xff; }   // producers' queue
+        if (index == 12) { building.Record[0x22] = building.Record[0x23] = 1; building.Record[0x15] = 0; }   // the laboratory's AH=0
         if (template.Name == "Шахта" && building.Record.Length >= 0x28)
         {
             var deposit = OriginalMineRules.Initialize(Map.Cells, Map.Width, Map.Height, (uint)building.Position.X, (uint)building.Position.Y);
@@ -552,6 +583,9 @@ public sealed partial class Skirmish
         public Span<byte> Block(byte participant) => battle._aiBlocks[participant];
         public ReadOnlySpan<byte> Participant(byte participant) => battle._participants[participant];
         public byte ParticipantCount => battle._participantCount;
+        /// <summary>Adapter: siege engines (16, 26) do not march with the campaign's army yet (they stay idle at home and the army never reports ready), so the
+        /// fill of the army request leaves them out; other requests may still order them.</summary>
+        public IReadOnlyList<byte> ArmyFill(byte participant, uint mask, uint value) => Buildable(participant, mask, value).Where(t => t is not (16 or 26)).ToList();
         public IReadOnlyList<byte> Buildable(byte participant, uint mask, uint value) => OriginalTechRules.Buildable(battle._aiTemplates, battle.TreeOf(participant), true, mask, value);
         public byte[] Template(byte participant, byte template) => battle._aiTemplates[template];
         public uint Reference(byte[] record) => battle.Actors.FirstOrDefault(a => ReferenceEquals(a.Record, record))?.Id ?? 0;

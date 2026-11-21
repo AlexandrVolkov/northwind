@@ -1026,6 +1026,8 @@ public interface IAiMilitaryWorld : IAiSquadWorld
     byte ParticipantCount { get; }
     /// <summary>223B4 for the settlement: open templates of the class (DAT[40] &amp; mask = value, DAT[9C] ≠ FFh, tree allows).</summary>
     IReadOnlyList<byte> Buildable(byte participant, uint mask, uint value);
+    /// <summary>The templates the army request (20DD0 mode 8) may order to fill its strength: the original's list; the skirmish adapter leaves out the siege engines.</summary>
+    IReadOnlyList<byte> ArmyFill(byte participant, uint mask, uint value) => Buildable(participant, mask, value);
     byte[] Template(byte participant, byte template);
     /// <summary>Pool reference (offset from [6AA]) of an object record.</summary>
     uint Reference(byte[] record);
@@ -1373,7 +1375,7 @@ public sealed class OriginalAiMilitary(IAiMilitaryWorld world, byte[] gatherClas
         if (wanted > U32(ai, s + 0x36))
         {
             uint shortfall = wanted - U32(ai, s + 0x36);
-            var open = world.Buildable(ai[0], mask, value);
+            var open = world.ArmyFill(ai[0], mask, value);
             if (open.Count == 0) return false;
             byte t = open[(world.Random() * open.Count) >> 8];
             byte strength = world.Template(ai[0], t)[0x76];
@@ -1697,7 +1699,7 @@ public sealed class OriginalAiOrders(IAiOrdersWorld world, OriginalAiMilitary mi
                     {
                         if ((U32(r, 0x10) & 0x3f) != 0) return true;
                         uint mask = (uint)(8 | (r[6] >> 4) << 8), value = (uint)((r[6] & 0xf) << 8);
-                        var open = world.Buildable(ai[0], mask, value);
+                        var open = world.ArmyFill(ai[0], mask, value);
                         if (open.Count == 0) return false;
                         byte t = open[(world.Random() * open.Count) >> 8];
                         byte army = world.Participant(ai[0])[0];
