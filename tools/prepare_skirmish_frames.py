@@ -62,9 +62,14 @@ def prepare(source, output):
             wanted[key].update(range(base + 8*raw[0x4a], base + 8*raw[0x4a] + 8*raw[0x4b]))
         if index in [8,10,11]:
             wanted[key].update(death_frames(raw, base))
+    # Effects of ARMY__00 (WRK effect types; sizes from the type table of ARMY__00.DAT, the record w,h,u32 handler,flag starts at the 2,2 / 4F3 type 0):
+    # the sparks of a strike or of a chopped tree, types 4 and 5 (frames 62h..71h and 7Dh..84h of ARMY__00.SPR).
+    eff=files['ARMY__00.DAT'].read_bytes();t0=eff.find(bytes([2,2])+struct.pack('<I',0x4f3))
+    for kind,frames in {4:range(0x62,0x72),5:range(0x7d,0x85)}.items():wanted[('ARMY__00.EFF',kind)]=set(frames)
     entries=[];images=[];team_pixels=[]
     for (filename,index),frames in sorted(wanted.items()):
-        entry=tables[filename]['templates'][index];sprite_name=filename.replace('.DAT','.SPR')
+        if filename=='ARMY__00.EFF':entry={'width':eff[t0+7*index],'height':eff[t0+7*index+1]};sprite_name='ARMY__00.SPR'
+        else:entry=tables[filename]['templates'][index];sprite_name=filename.replace('.DAT','.SPR')
         data=files[sprite_name].read_bytes();hashes[sprite_name]=hashlib.sha256(data).hexdigest()
         for frame in sorted(frames):
             pixels=decode_spr_frame(data,frame)

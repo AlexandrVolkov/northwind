@@ -13,6 +13,11 @@ public partial class TestRunner
         var chopper = scene.Battle.Actors.FirstOrDefault(x => x.Alive && x.Worker && x.JobText == "Рубит дерево");
         for (int t = 0; t < (int)(120 * 18.2) && chopper == null; t++) { scene.Battle.Advance(1 / 18.2); chopper = scene.Battle.Actors.FirstOrDefault(x => x.Alive && x.Worker && x.JobText == "Рубит дерево"); }
         if (chopper != null) { var seq = new List<int>(); for (int t = 0; t < 60; t++) { scene.Battle.Advance(1 / 18.2); seq.Add(chopper.Frame); } GD.Print("CHOP " + chopper.Source.TemplateIndex + " frames " + string.Join(",", seq)); }
+        { var victim = scene.Battle.Actors.First(x => x.Alive && !x.Structure && !x.Worker && x.Team == 1);
+          typeof(Skirmish).GetMethod("Kill", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public)!.Invoke(scene.Battle, [victim]);
+          var seq = new List<string>(); for (int t = 0; t < 120; t++) { scene.Battle.Advance(1 / 18.2); seq.Add(victim.Frame + (victim.Dying ? "d" : "") + (victim.Alive ? "a" : "")); }
+          scene.FocusWorld(victim.Position); for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw); GetViewport().GetTexture().GetImage().SavePng("res://build/shot-death.png"); GD.Print("CORPSES " + scene.Battle.Corpses.Count);
+          GD.Print("DEATH " + victim.Source.TemplateName + " " + string.Join(",", seq.Distinct())); }
         var names = new[] { "Лесопилка", "Шахта", "Рабочий" };
         int k = 0;
         foreach (var name in names)

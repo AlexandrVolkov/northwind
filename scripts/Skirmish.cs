@@ -226,12 +226,14 @@ public sealed partial class Skirmish : IDisposable
     {
         foreach (var key in _reservations.Where(p => p.Value == reference).Select(p => p.Key).ToArray()) _reservations.Remove(key);
     }
+    private byte[] _searchCache = [];   // reused between searches (a fresh map-sized array per search cost allocations)
     private List<Vector2I> SearchPath(SkirmishActor actor, Vector2I goal)
     {
         int fw = actor.Parameters[3], fh = actor.Parameters[4];
         var offset = new Vector2I(fw / 2, fh / 2);
         var start = actor.Cell - offset;
-        var cache = new byte[Map.Width * Map.Height];
+        if (_searchCache.Length != Map.Width * Map.Height) _searchCache = new byte[Map.Width * Map.Height]; else Array.Clear(_searchCache);
+        var cache = _searchCache;
         bool Admit(byte left, byte top, byte direction)
         {
             if (left > Map.Width - fw || top > Map.Height - fh) return false;
@@ -370,7 +372,7 @@ public sealed partial class Skirmish : IDisposable
     private byte _windTimer;   // [19E8]
     private void Tick(double dt)
     {
-        Elapsed += dt;
+        Elapsed += dt; _searchBudget = SearchBudgetPerStep;
         _windTimer++;
         OriginalWindRules.Step(ref Wind, _windTimer, _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
         foreach (var effect in Effects) effect.Remaining -= dt;
@@ -378,23 +380,23 @@ public sealed partial class Skirmish : IDisposable
         TickArrows(); // 96CD runs on every world step: twice per object update at the default speed
         TickArrows();
         TickStones(); TickStones();
-        TickDeaths();
-        TickBuildings();
-        TickMining();
-        TickBuildingFrames();
-        TickProduction();
-        TickPopulation();
+        for (int i = Sparks.Count - 1; i >= 0; i--) { var sp = Sparks[i]; Sparks[i] = sp with { Left = sp.Left - 1 }; if (sp.Left <= 1) Sparks.RemoveAt(i); }
+        Prof("deaths", TickDeaths); Prof("buildings", TickBuildings); Prof("mining", TickMining); Prof("frames", TickBuildingFrames); Prof("production", TickProduction); Prof("population", TickPopulation);
         // 42BB visits the settlements in order and each settlement's objects in pool order.
+        Prof("units", () =>
+        {
         foreach (var actor in Actors.Where(a => a.Alive && !a.Structure).OrderBy(a => a.Record[3]).ToArray())
         {
             if (!actor.Alive) continue;
             UpdateUnit(actor, dt);
             if (!actor.Alive) continue;
-            var engaged = Find(BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(0x1c)));
+            long ta = P0(); var engaged = Find(BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(0x1c)));
+            P1("u.find", ta);
             OriginalCombatRules.AfterUpdate(actor.Record, engaged != null ? engaged.Record : ReadOnlySpan<byte>.Empty, _globalTick);
         }
-        TickFog();
-        TickAi(); // 1E7EA follows the object update (LE:1 31D6)
+        });
+        Prof("fog", TickFog);
+        Prof("ai", TickAi); // 1E7EA follows the object update (LE:1 31D6)
         if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";
         else if (!Objective.Standing && !Actors.Any(a => a.Team == 1 && !a.Structure && a.Alive)) Outcome = "Победа — вражеское поселение разбито";
     }
@@ -402,8 +404,8 @@ public sealed partial class Skirmish : IDisposable
     {
             if (!actor.Alive) return;
             actor.AttackTimer -= dt; actor.ReplanTimer -= dt;
-            if (TickVitals(actor)) return;
-            if (actor.Worker) { TickWorker(actor, dt); return; }
+            long t0 = P0(); bool vitals = TickVitals(actor); P1("u.vitals", t0); if (vitals) return;
+            if (actor.Worker) { t0 = P0(); TickWorker(actor, dt); P1("u.worker", t0); return; }
             var target = Find(actor.Target);
             if (actor.Target != 0 && target == null) { actor.Target = 0; actor.Route.Clear(); actor.Goal = null; }
             // An assault on a building engages its nearby defenders first, then resumes the objective.
@@ -420,42 +422,55 @@ public sealed partial class Skirmish : IDisposable
                 if ((idle && (actor.Record[0x2e] & 7) == 0) || struck)
                 {
                     if (struck) actor.Record[0x17] &= 0xfd;
-                    var found = OriginalTargetRules.FindEnemy(actor.Id, actor.Record, actor.Parameters, struck, new SearchWorld(this, actor.Record[3]));
+                    t0 = P0(); var found = OriginalTargetRules.FindEnemy(actor.Id, actor.Record, actor.Parameters, struck, new SearchWorld(this, actor.Record[3])); P1("u.findenemy", t0);
                     target = Find(found.Target);
                     if (target != null) { actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); }
                 }
             }
-            if (target != null && !actor.Stepping && AttackStep(actor, target)) return;
+            t0 = P0(); bool attacked = target != null && !actor.Stepping && AttackStep(actor, target); P1("u.attack", t0); if (attacked) return;
             if (target != null && actor.Target == 0) target = null;
             if (!actor.Stepping && target != null && actor.ReplanTimer <= 0)
             {
-                PlanAttack(actor, target); actor.ReplanTimer = ReplanDelay;
+                t0 = P0(); bool planned = PlanAttack(actor, target); P1("u.planattack", t0); if (planned) actor.ReplanTimer = ReplanDelay;
             }
             else if (!actor.Stepping && actor.Goal is { } goal && actor.Route.Count == 0 && actor.ReplanTimer <= 0)
             {
                 if (actor.Cell == goal) actor.Goal = null;
-                else { Plan(actor, goal); actor.ReplanTimer = ReplanDelay; }
+                else { t0 = P0(); Plan(actor, goal); P1("u.plan", t0); actor.ReplanTimer = ReplanDelay; }
             }
-            MoveTick(actor);
+            t0 = P0(); MoveTick(actor); P1("u.move", t0);
             }
-    private void PlanAttack(SkirmishActor actor, SkirmishActor target)
+    /// <summary>Route searches left in this world step: a unit that cannot reach its target used to try every standing cell around it, each with a
+    /// full search, which cost most of the step with a large army. Now at most <see cref="SearchBudgetPerStep"/> searches run per step, a unit tries
+    /// the few nearest standing cells, and one that finds nothing waits (<see cref="UnreachableDelay"/>) before it tries again.</summary>
+    private int _searchBudget;
+    private const int SearchBudgetPerStep = 6, AttackCandidates = 6;
+    private const double UnreachableDelay = 2.5;
+    private bool PlanAttack(SkirmishActor actor, SkirmishActor target)
     {
         actor.Route.Clear();
+        if (_searchBudget <= 0) { actor.ReplanTimer = 0.25; return false; }   // later: the searches of this step are used up
         int radius = (int)Math.Ceiling(actor.Rules.Range / 32) + 3;
-        var candidates = new List<Vector2I>();
+        var around = new List<Vector2I>((2 * radius + 1) * (2 * radius + 1));
         for (int y = -radius; y <= radius; y++)
-        for (int x = -radius; x <= radius; x++)
+        for (int x = -radius; x <= radius; x++) around.Add(target.Cell + new Vector2I(x, y));
+        // The nearest cells to the unit first; the standing test (costly) only for as many as are tried.
+        around.Sort((p, q) => ((Vector2)(p - actor.Cell)).LengthSquared().CompareTo(((Vector2)(q - actor.Cell)).LengthSquared()));
+        int tried = 0;
+        foreach (var cell in around)
         {
-            var cell = target.Cell + new Vector2I(x, y);
+            if (!Inside(cell)) continue;
             var point = actor.Position + (Vector2)((cell - actor.Cell) * 32);
-            if (CanStand(actor, cell) && Distance(point, target) <= actor.Rules.Range) candidates.Add(cell);
-        }
-        foreach (var cell in candidates.OrderBy(c => ((Vector2)c).DistanceSquaredTo(actor.Cell)))
-        {
+            if (Distance(point, target) > actor.Rules.Range || !CanStand(actor, cell)) continue;
+            if (_searchBudget <= 0) { actor.ReplanTimer = 0.25; return false; }
+            if (tried++ >= AttackCandidates) break;
+            _searchBudget--;
             var path = SearchPath(actor, cell);
             if (path.Count < 2) continue;
-            if (actor.Route.Set(path)) break;
+            if (actor.Route.Set(path)) return true;
         }
+        actor.ReplanTimer = UnreachableDelay;
+        return false;
     }
     private void MoveTick(SkirmishActor actor)
     {
@@ -683,6 +698,25 @@ public sealed partial class Skirmish : IDisposable
         }
         public (int X, int Y) Drift => (battle.Wind.X, battle.Wind.Y);
     }
+    /// <summary>Sparks and chips (ARMY__00 effect types 4 and 5): type, first frame, point, updates left (8 frames, one per update).</summary>
+    public List<(byte Type, ushort Frame, Vector2 Point, int Left)> Sparks { get; } = [];
+
+    /// <summary>The axe of a worker at a tree (effect type 6, WRK 762): the hit on the cell, a chopped-tree sound and chips (hard spark).</summary>
+    private void ChopHit(SkirmishActor worker, WorkerImpact hit)
+    {
+        if (hit.X >= Map.Width * 32 || hit.Y >= Map.Height * 32) return;
+        int plane = Occupancy.Width * Occupancy.Height;
+        var found = OriginalCombatRules.CellObject(hit.X, hit.Y, hit.Layer, (byte)Map.Width, Map.Cells, _properties, (p, cell) => Occupancy.Cells[p * plane + cell]);
+        var victim = Find(found.Reference);
+        var effect = new byte[0x22]; effect[0] = 6; effect[5] = hit.Layer;
+        BinaryPrimitives.WriteUInt32LittleEndian(effect.AsSpan(7), hit.X); BinaryPrimitives.WriteUInt32LittleEndian(effect.AsSpan(0xc), hit.Y);
+        int? sound = OriginalCombatRules.CellHitEffect(effect, worker.Record, victim != null ? victim.Record : new byte[54], victim != null ? victim.Parameters : worker.Parameters,
+            victim != null ? found : found with { Reference = 0 }, _terrainCatalog.NextRandomByte);
+        EffectSound(effect, sound);
+        if (effect[0] is 4 or 5) Sparks.Add((effect[0], BinaryPrimitives.ReadUInt16LittleEndian(effect.AsSpan(3)), new Vector2(hit.X, hit.Y), 8));
+        if (victim is { Alive: false }) Kill(victim);
+    }
+
     private void ResolveImpact(SkirmishActor actor, SkirmishActor target, WorkerImpact impact)
     {
         if (impact.X >= Map.Width * 32 || impact.Y >= Map.Height * 32) return; // 9727 rejects points outside the map
@@ -693,10 +727,12 @@ public sealed partial class Skirmish : IDisposable
             var found = OriginalCombatRules.FindStruck(impact.X, impact.Y, impact.Layer, (byte)Map.Width, Map.Cells, _properties,
                 (p, cell) => Occupancy.Cells[p * plane + cell], r => Find(r) is { } a ? (a.Record, a.Parameters) : null);
             var victim = Find(found.Reference);
-            int? strikeSound = OriginalCombatRules.StrikeEffect(new byte[0x22], actor.Record, victim != null ? victim.Record : new byte[54],
+            var strike = new byte[0x22];
+            int? strikeSound = OriginalCombatRules.StrikeEffect(strike, actor.Record, victim != null ? victim.Record : new byte[54],
                 victim != null ? victim.Parameters : actor.Parameters, victim != null, _terrainCatalog.NextRandomByte);
             var point = new byte[0x22]; BinaryPrimitives.WriteUInt32LittleEndian(point.AsSpan(7), impact.X); BinaryPrimitives.WriteUInt32LittleEndian(point.AsSpan(0xc), impact.Y);
             EffectSound(point, strikeSound);
+            if (strike[0] is 4 or 5) Sparks.Add((strike[0], BinaryPrimitives.ReadUInt16LittleEndian(strike.AsSpan(3)), new Vector2(impact.X, impact.Y), 8));
             if (victim is { Alive: false }) Kill(victim);
             return;
         }

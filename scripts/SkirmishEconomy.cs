@@ -300,8 +300,7 @@ public sealed partial class Skirmish
         if (OriginalWorkerAnimation.Pending(worker.Record))
         {
             var impact = OriginalWorkerAnimation.Step(worker.Record, worker.Parameters);
-            if (impact is { } hit)
-                Effects.Add(new BattleEffect { From = new Vector2(hit.X, hit.Y), To = new Vector2(hit.TargetX, hit.TargetY), Team = 0, Remaining = .12 });
+            if (impact is { } hit) ChopHit(worker, hit);
             if (OriginalWorkerAnimation.Pending(worker.Record))
             { worker.JobText = (worker.Record[0x2d] & 15) == 1 ? "Поворачивается к лесопилке" : "Рубит дерево"; return; }
         }
