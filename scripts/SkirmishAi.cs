@@ -497,19 +497,16 @@ public sealed partial class Skirmish
         public bool SiteAllowed(byte template, byte army, byte participant, byte x, byte y) =>
             battle.Inside(new Vector2I(x, y)) && battle.EnemyPlacement(template, new Vector2I(x, y)) == ConstructionPlacementStatus.Clear;
         public void Send(byte type, byte other, byte owner, byte bh, uint parameter) => battle._aiTurnWorld!.Send(type, other, owner, bh, parameter);
-        /// <summary>10AD2 (adapter): the nearest cell in rings of up to 12 around the point where the building fits.</summary>
+        /// <summary>10AD2 (ported, <see cref="OriginalCreationPlacement"/>): random points in growing squares around the point,
+        /// each checked by AC63 on the occupancy planes.</summary>
         public (uint X, uint Y)? FreeSpot(uint templateArmy, byte variant, uint x, uint y)
         {
-            var centre = new Vector2I((int)(x >> 5), (int)(y >> 5));
-            for (int r = 0; r <= 12; r++)
-                for (int dy = -r; dy <= r; dy++)
-                    for (int dx = -r; dx <= r; dx++)
-                    {
-                        var cell = centre + new Vector2I(dx, dy);
-                        if (Math.Max(Math.Abs(dx), Math.Abs(dy)) == r && battle.Inside(cell) && battle.EnemyPlacement((byte)templateArmy, cell) == ConstructionPlacementStatus.Clear)
-                            return ((uint)(cell.X * 32 + 16), (uint)(cell.Y * 32 + 16));
-                    }
-            return null;
+            var template = Convert.FromHexString(battle._templates.Armies["ARMY__02.DAT"].Templates[(byte)templateArmy].RawRecordHex);
+            byte plane = (byte)Math.Min(variant & 3, 2);
+            BuilderProbe Probe(uint px, uint py) => OriginalCreationPlacement.Probe((byte)battle.Map.Width, (byte)battle.Map.Height, battle.Map.Cells, battle._properties,
+                battle.Occupancy.Cells, plane, template, px, py, reference => _search.Resolve(reference)).Status;
+            var result = OriginalCreationPlacement.Search(Random, Random2, (uint)battle.Map.Width * 32, (uint)battle.Map.Height * 32, template, x, y, Probe);
+            return result.Found ? (result.X, result.Y) : null;
         }
         public bool BuildingSite(uint templateArmy, byte participant, byte x, byte y) =>
             battle.Inside(new Vector2I(x, y)) && battle.EnemyPlacement((byte)templateArmy, new Vector2I(x, y)) == ConstructionPlacementStatus.Clear;
