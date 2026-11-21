@@ -3680,6 +3680,18 @@
       "evidence": ["docs/combat.md", "tests/fixtures/combat.json", "tools/verify_combat.py"],
       "implementation": ["scripts/OriginalCombatRules.cs"],
       "limitations": "Who creates effects of type 6 in the campaign is not traced; the spark tail 6FE/735 is shared with the strike"
+    },
+    {
+      "id": "site-check-d363",
+      "module": "LE:1",
+      "start": 54115,
+      "end": 54245,
+      "name": "May template N be placed in a cell: creation check, range rules, template check",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/buildcheck.json", "tools/verify_buildcheck.py"],
+      "implementation": ["scripts/OriginalBuildCheck.cs", "scripts/SkirmishAi.cs"],
+      "limitations": "The template check (WRK AH=4) is the world's (the skirmish: the mine needs ore, others allow)"
     }
   ]
 }

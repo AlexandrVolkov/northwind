@@ -11,6 +11,8 @@ public interface IBuildCheckWorld
     bool Hook(byte template, byte army, uint x, uint y);
     /// <summary>BC2E: the neighbour rule of a line of segments: true when it allows the segment.</summary>
     bool Line(byte template, byte army, uint x, uint y);
+    /// <summary>AC63 at the point on the plane (the creation placement check).</summary>
+    BuilderProbe CreationProbe(byte template, byte army, byte plane, uint x, uint y);
     /// <summary>[18DA]: the participant has seen the cell.</summary>
     bool Explored(byte participant, uint x, uint y);
 }
@@ -36,6 +38,15 @@ public static class OriginalBuildCheck
         if (!world.Hook(index, army, x, y)) return false;
         if (line && !world.Line(index, army, x, y)) return false;
         return world.Explored(participant, x, y);
+    }
+
+    /// <summary>LE:1 D363 «may template N be placed in the cell (cx, cy)» (sites of mines and mills in the AI economy): the creation check
+    /// AC63 on the plane DAT[77]&amp;3 at the cell's point (an odd footprint is shifted by half a cell), the range rules and the template's own check.</summary>
+    public static bool SiteAllowed(IBuildCheckWorld world, ReadOnlySpan<byte> template, byte index, byte army, byte participant, byte cellX, byte cellY)
+    {
+        uint x = (uint)(cellX << 5) + (uint)((template[3] << 4) & 0x10), y = (uint)(cellY << 5) + (uint)((template[4] << 4) & 0x10);
+        if (world.CreationProbe(index, army, (byte)(template[0x77] & 3), x, y) != BuilderProbe.Clear) return false;
+        return InRange(world, template, participant, x, y) && world.Hook(index, army, x, y);
     }
 
     /// <summary>B1EC: unless DAT[4E] is FFh (anywhere), a centre building (DAT[40] bit 3) of the participant with condition above DAT[46]

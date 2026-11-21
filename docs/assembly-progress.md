@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 108598 | 5512 | 97 | 32675 | 44 |
+| LE:1 | 146882 | 108468 | 5512 | 97 | 32805 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
@@ -169,6 +169,7 @@
 | LE:1 `0xCD72..0xD101` | Terrain blend and forest replacement | partial | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Перенесены логические правила смены тайлов и масок; CFAC сверен для AX=201h (лесоруб), 101h (огонь) и 300h (воронка катапульты). Отрисовка, dirty-cache и исходные глобальные эффекты не объявляются полностью перенесёнными. |
 | LE:1 `0xD101..0xD12C` | Classify harvestable timber tile | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Критерий дескриптора SEG, не полная классификация местности и не её цвет. |
 | LE:1 `0xD2D1..0xD363` | Conditional occupancy registration | partial | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Перенесена ветвь CL=0 с заменой совпавших ячеек и подсчётом конфликтов. Ветка повреждения чужих объектов не перенесена. |
+| LE:1 `0xD363..0xD3E5` | May template N be placed in a cell: creation check, range rules, template check | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [buildcheck.json](../tests/fixtures/buildcheck.json); [verify_buildcheck.py](../tools/verify_buildcheck.py) | The template check (WRK AH=4) is the world's (the skirmish: the mine needs ore, others allow) |
 | LE:1 `0xD40C..0xD453` | Owner free population growth | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |
 | LE:1 `0xD453..0xD5B1` | Owner population demand, support and limit recount | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |
 | LE:1 `0xD6E6..0xD740` | Effect flight step with arc height | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
