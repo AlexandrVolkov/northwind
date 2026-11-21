@@ -18,6 +18,9 @@ public partial class TestRunner
           var seq = new List<string>(); for (int t = 0; t < 120; t++) { scene.Battle.Advance(1 / 18.2); seq.Add(victim.Frame + (victim.Dying ? "d" : "") + (victim.Alive ? "a" : "")); }
           scene.FocusWorld(victim.Position); for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw); GetViewport().GetTexture().GetImage().SavePng("res://build/shot-death.png"); GD.Print("CORPSES " + scene.Battle.Corpses.Count);
           GD.Print("DEATH " + victim.Source.TemplateName + " " + string.Join(",", seq.Distinct())); }
+        { var site = scene.Battle.Actors.FirstOrDefault(x => x.Structure && x.Alive && x.ConstructionRemaining > 0);
+          for (int t = 0; t < (int)(300 * 18.2) && site == null; t++) { scene.Battle.Advance(1 / 18.2); site = scene.Battle.Actors.FirstOrDefault(x => x.Structure && x.Alive && x.ConstructionRemaining > 0); }
+          if (site != null) { var seq = new List<string>(); for (int t = 0; t < (int)(200 * 18.2) && site.ConstructionRemaining > 0; t++) { scene.Battle.Advance(1 / 18.2); var f = site.Frame - BitConverter.ToUInt16(site.Parameters, 0x48); if (seq.Count == 0 || seq[^1] != f + "/" + site.Record[0x19]) seq.Add(f + "/" + site.Record[0x19]); } GD.Print("BUILD " + site.Source.TemplateName + " frame/cond " + string.Join(" ", seq.Take(40))); } }
         var names = new[] { "Лесопилка", "Шахта", "Рабочий" };
         int k = 0;
         foreach (var name in names)

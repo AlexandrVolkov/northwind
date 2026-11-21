@@ -65,10 +65,13 @@ def prepare(source, output):
     # Effects of ARMY__00 (WRK effect types; sizes from the type table of ARMY__00.DAT, the record w,h,u32 handler,flag starts at the 2,2 / 4F3 type 0):
     # the sparks of a strike or of a chopped tree, types 4 and 5 (frames 62h..71h and 7Dh..84h of ARMY__00.SPR).
     eff=files['ARMY__00.DAT'].read_bytes();t0=eff.find(bytes([2,2])+struct.pack('<I',0x4f3))
-    for kind,frames in {4:range(0x62,0x72),5:range(0x7d,0x85)}.items():wanted[('ARMY__00.EFF',kind)]=set(frames)
+    for kind,frames in {3:range(0x72,0x7d),4:range(0x62,0x72),5:range(0x7d,0x85)}.items():wanted[('ARMY__00.EFF',kind)]=set(frames)   # 3: the blood splash (6C7, 11 frames)
+    # ARMY__02 effect type 1, the corpse (161D): 62x62; after the first stage its frames are 235h + 3·variant + stage.
+    wanted[('ARMY__02.EFF',1)]=set(range(0x235,0x235+25))
     entries=[];images=[];team_pixels=[]
     for (filename,index),frames in sorted(wanted.items()):
         if filename=='ARMY__00.EFF':entry={'width':eff[t0+7*index],'height':eff[t0+7*index+1]};sprite_name='ARMY__00.SPR'
+        elif filename=='ARMY__02.EFF':entry={'width':62,'height':62};sprite_name='ARMY__02.SPR'
         else:entry=tables[filename]['templates'][index];sprite_name=filename.replace('.DAT','.SPR')
         data=files[sprite_name].read_bytes();hashes[sprite_name]=hashlib.sha256(data).hexdigest()
         for frame in sorted(frames):

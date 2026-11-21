@@ -812,7 +812,7 @@ public sealed partial class Skirmish : IDisposable
         public void Corpse(byte army, byte code, uint x, uint y)
         {
             if (army != 2 || code != OriginalCorpseRules.Corpse || x >= battle.Map.Width * 32 || y >= battle.Map.Height * 32) return;
-            var corpse = new byte[0x22]; corpse[1] = army;
+            var corpse = new byte[0x22]; corpse[1] = army; corpse[0x0e] = (byte)actor.Source.TemplateIndex;   // +0E is unused by the corpse rules: the template of the unit's frames for drawing
             BinaryPrimitives.WriteUInt32LittleEndian(corpse.AsSpan(7), x); BinaryPrimitives.WriteUInt32LittleEndian(corpse.AsSpan(0xc), y);
             int plane = battle.Occupancy.Width * battle.Occupancy.Height;
             var found = OriginalCombatRules.FindStruck(x, y, 0, (byte)battle.Map.Width, battle.Map.Cells, battle._properties,

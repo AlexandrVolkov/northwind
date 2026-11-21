@@ -189,11 +189,12 @@ public sealed partial class Skirmish
         { ClearDelivery(worker); worker.MineJob = false; worker.PreferredMill = millId; worker.Route.Clear(); worker.Goal = null; worker.ReplanTimer = 0; accepted = true; }
         return accepted;
     }
-    /// <summary>C8E0..CA48 for the buildings whose frames are in the atlas: the working animation, the stage frame that follows the condition,
+    /// <summary>C8E0..CA48 for the buildings whose frames are in the atlas: the working animation, the stage frame that follows the condition
+    /// (also while a building is raised, its condition climbing, and while it is damaged),
     /// the slow decay of a ruin. Debris (9727) is not drawn; a collapsed building (condition below zero) is removed.</summary>
     private void TickBuildingFrames()
     {
-        foreach (var building in Actors.Where(a => a.Structure && (sbyte)a.Record[0x19] > 0 && a.ConstructionRemaining <= 0 && a.Source.TemplateIndex is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24).ToArray())
+        foreach (var building in Actors.Where(a => a.Structure && (sbyte)a.Record[0x19] > 0 && a.Source.TemplateIndex is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24).ToArray())
             try { OriginalBuildingFrames.Update(building.Record, building.Parameters, _globalTick, (_, _, _, _) => { }, () => building.Record[0x19] = 0); }
             catch (Exception e) when (e is DivideByZeroException or OverflowException) { }
     }
