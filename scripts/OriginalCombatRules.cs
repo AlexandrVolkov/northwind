@@ -57,6 +57,40 @@ public static class OriginalCombatRules
     }
     private static bool Inside(int point, int center, byte half) => point >= center - half && point <= center + half;
 
+    /// <summary>97C6 (FS 11): the object in the cell of the point on the effect's plane, whatever its footprint, and the terrain class.</summary>
+    public static StruckObject CellObject(uint x, uint y, byte layer, byte mapWidth, ReadOnlySpan<uint> cells, ReadOnlySpan<byte> properties, Func<int, int, uint> occupant)
+    {
+        int index = (byte)(y >> 5) * mapWidth + (int)(x >> 5);
+        return new(occupant(layer & 3, index), (byte)(properties[(int)(cells[index] & 0xffff) * 8] & 7));
+    }
+
+    /// <summary>ARMY__00.WRK 762 effect type 6, AH=0: the hit on the object in the cell. The attack grows with the attacker's experience
+    /// (5..7), the kind is the attacker's command &amp; 7; a living object (kind other than 3) loses attack − DAT[44] (byte arithmetic) and
+    /// is marked as wounded; an empty cell or a miss on terrain class 1 ends in a hard spark. Returns the sound (A47E argument) or null.</summary>
+    public static int? CellHitEffect(Span<byte> effect, ReadOnlySpan<byte> attacker, Span<byte> target, ReadOnlySpan<byte> targetTemplate,
+        StruckObject found, Func<byte> random)
+    {
+        byte attack = StrikeAttack(attacker[0x16]), kind = (byte)(attacker[0x14] & 7);
+        int sound; bool hard;
+        if (found.Reference != 0 && kind != 3 && (sbyte)target[0x19] > 0)
+        {
+            byte bits = 1, health = target[0x19];
+            if (attack > targetTemplate[0x44])
+            {
+                bits |= 2;
+                byte left = unchecked((byte)(health - (byte)(attack - targetTemplate[0x44])));
+                target[0x19] = (left & 0x80) != 0 ? (byte)0 : left;
+            }
+            target[0x17] = (byte)((target[0x17] & 0xe0) | bits);
+            sound = 0xc; hard = (U32(targetTemplate, 0x40) & 0x10) != 0;
+        }
+        else if (found.TerrainClass == 1) { sound = 0xd; hard = true; }
+        else { effect[0] = 0xff; return null; }
+        BinaryPrimitives.WriteUInt16LittleEndian(effect[3..], hard ? (ushort)0x7d : (ushort)((random() & 8) + 0x62));
+        effect[0] = (byte)(hard ? 5 : 4); effect[0x16] = 2; effect[0x17] = 8;
+        return sound;
+    }
+
     /// <summary>ARMY__00.WRK 4F3 effect type 0, AH=0. Returns the sound (A47E argument) or null when freed silently.</summary>
     public static int? StrikeEffect(Span<byte> effect, ReadOnlySpan<byte> attacker, Span<byte> target, ReadOnlySpan<byte> targetTemplate,
         bool targetFound, Func<byte> random)

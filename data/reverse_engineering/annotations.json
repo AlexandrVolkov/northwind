@@ -3668,6 +3668,18 @@
       "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/neighbors.json", "tools/verify_neighbors.py", "tools/export_line_neighbors.py"],
       "implementation": ["scripts/OriginalLineNeighbors.cs", "data/line_neighbors.json"],
       "limitations": "Only the mask is used by BC2E; the store into the buffer [1F45] is not modelled"
+    },
+    {
+      "id": "cell-hit-762",
+      "module": "ARMY__00.WRK",
+      "start": 1890,
+      "end": 2046,
+      "name": "Effect type 6: hit on the object in the cell of the point (attack from experience)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/combat.md", "tests/fixtures/combat.json", "tools/verify_combat.py"],
+      "implementation": ["scripts/OriginalCombatRules.cs"],
+      "limitations": "Who creates effects of type 6 in the campaign is not traced; the spark tail 6FE/735 is shared with the strike"
     }
   ]
 }
