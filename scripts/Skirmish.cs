@@ -133,7 +133,14 @@ public sealed partial class Skirmish : IDisposable
         InitializeAi(scenario, templates);
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
     }
-    public SkirmishActor? Find(uint id) => Actors.FirstOrDefault(a => a.Id == id && a.Alive);
+    // Actors only grows (the fallen stay with Alive = false), so an index over the list is extended lazily with the new tail.
+    private readonly Dictionary<uint, SkirmishActor> _actorIndex = [];
+    private int _actorsIndexed;
+    public SkirmishActor? Find(uint id)
+    {
+        for (; _actorsIndexed < Actors.Count; _actorsIndexed++) _actorIndex.TryAdd(Actors[_actorsIndexed].Id, Actors[_actorsIndexed]);   // the first of equal ids, as before
+        return _actorIndex.TryGetValue(id, out var actor) && actor.Alive ? actor : null;
+    }
     public bool Inside(Vector2I cell) => cell.X >= 0 && cell.Y >= 0 && cell.X < Map.Width && cell.Y < Map.Height;
     public void Log(string text) { Events.Add(text); if (Events.Count > 5) Events.RemoveAt(0); }
     public Rect2 Bounds(SkirmishActor a)

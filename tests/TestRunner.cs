@@ -55,6 +55,7 @@ public partial class TestRunner : Node
                 case "original-tech": OriginalTechChecks(); break;
                 case "ai-workers": OriginalAiWorkerChecks(); break;
                 case "ai-formations": OriginalAiFormationChecks(); break;
+                case "perf": PerfProbe(); break;
                 case "rival-shots": await RivalShots(); return;
                 case "original-ai": OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); OriginalAiResearchChecks(); OriginalAiSquadChecks(); OriginalAiSquadStepChecks(); OriginalAiSquadStateChecks(); OriginalAiMilitaryChecks(); OriginalAiGarrisonChecks(); OriginalAiOrderChecks(); OriginalAiEconomyChecks(); OriginalAiWorkerChecks(); OriginalAiFormationChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
