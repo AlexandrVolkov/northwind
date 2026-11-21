@@ -3620,6 +3620,30 @@
       "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/placement.json", "tools/verify_placement.py"],
       "implementation": ["scripts/OriginalCreationPlacement.cs", "scripts/SkirmishAi.cs"],
       "limitations": "The random generators come from the caller"
+    },
+    {
+      "id": "build-check-af07",
+      "module": "LE:1",
+      "start": 44807,
+      "end": 45019,
+      "name": "May this be built here: probe, range rule, template check, line rule, explored cell",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/buildcheck.json", "tools/verify_buildcheck.py"],
+      "implementation": ["scripts/OriginalBuildCheck.cs", "scripts/SkirmishAi.cs"],
+      "limitations": "The template check (WRK AH=4) and the line rule BC2E are interfaces of the world; the skirmish allows them (adapter)"
+    },
+    {
+      "id": "build-range-b1ec",
+      "module": "LE:1",
+      "start": 45548,
+      "end": 45849,
+      "name": "Range rules of building: a centre building within DAT[4E] cells, a castle-class building within 800 pixels",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/buildcheck.json", "tools/verify_buildcheck.py"],
+      "implementation": ["scripts/OriginalBuildCheck.cs", "scripts/SkirmishAi.cs"],
+      "limitations": "The player interface keeps its own radius (adapter)"
     }
   ]
 }
