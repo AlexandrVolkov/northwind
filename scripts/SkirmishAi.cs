@@ -300,11 +300,11 @@ public sealed partial class Skirmish
     /// <summary>Adapter for the original's failed route search, which ends the move: an AI move whose goal has not come closer
     /// for 20 seconds (an unreachable cell across the river) is dropped, so the squad sees it did not arrive (and orders a
     /// bridge, 1FC28 → 1EB5C mode 0Ah).</summary>
+    /// <summary>Adapter: a unit that has not moved for 10 seconds ends its move (the original's stuck patrol never reports arrival).</summary>
     private bool NoProgress(SkirmishActor actor, Vector2I goal)
     {
-        int distance = Math.Max(Math.Abs(actor.Cell.X - goal.X), Math.Abs(actor.Cell.Y - goal.Y));
-        if (distance < actor.BestGoalDistance || Elapsed < actor.BestGoalTime) { actor.BestGoalDistance = distance; actor.BestGoalTime = Elapsed; return false; }
-        return Elapsed - actor.BestGoalTime > 90;
+        if (actor.Position.DistanceTo(actor.LastPosition) > 1f || Elapsed < actor.StillSince) { actor.LastPosition = actor.Position; actor.StillSince = Elapsed; return false; }
+        return Elapsed - actor.StillSince > 10;
     }
     private readonly Dictionary<int, PopulationTotals> _enemyPopulation = [];
     /// <summary>The free people (participant +24) of every AI settlement grow by the ported population rules, as the player's do.</summary>
@@ -385,6 +385,7 @@ public sealed partial class Skirmish
     }
 
     private byte[] _arctangent = [];
+    private readonly OriginalLineNeighbors _lineNeighbors = OriginalLineNeighbors.From(GameData.Read<LineNeighborData>("res://data/line_neighbors.json"));
     private byte _builderToggle = 1;
 
     /// <summary>The builder's world in the skirmish: AD5F on the occupancy, A758 as a new actor under construction (adapter for
@@ -396,7 +397,9 @@ public sealed partial class Skirmish
         public IEnumerable<(byte[] Record, byte[] Template)> Objects(byte participant) =>
             battle.Actors.Where(a => a.Alive && a.Record[3] == participant && a.Source.TemplateFile == "ARMY__02.DAT").Select(a => (a.Record, a.Parameters));
         public bool Hook(byte template, byte army, uint x, uint y) => true;
-        public bool Line(byte template, byte army, uint x, uint y) => true;
+        public bool Line(byte template, byte army, uint x, uint y) => battle._lineNeighbors.Allowed((byte)battle.Map.Width, (byte)battle.Map.Height,
+            (plane, cell) => battle.Occupancy.Cells[plane * battle.Map.Width * battle.Map.Height + cell] is var id and not 0 ? battle.Actors.FirstOrDefault(a => a.Alive && a.Id == id)?.Record : null,
+            index => battle._aiTemplates[index], template, x, y);
         public bool Explored(byte participant, uint x, uint y)
         {
             int cell = (int)((y >> 5) * battle.Map.Width + (x >> 5));
@@ -474,7 +477,7 @@ public sealed partial class Skirmish
             if (!Inside(goal) || !CanStand(actor, goal)) continue;
             if (!actor.Stepping && !Plan(actor, goal)) continue;
             actor.Target = 0; actor.Goal = goal; actor.ReplanTimer = 0;
-            actor.BestGoalDistance = int.MaxValue; actor.BestGoalTime = Elapsed;
+            actor.LastPosition = actor.Position; actor.StillSince = Elapsed;
             if (actor.Stepping) actor.Route.Clear();
             return true;
         }
@@ -524,7 +527,7 @@ public sealed partial class Skirmish
             return result.Found ? (result.X, result.Y) : null;
         }
         /// <summary>AF07 (ported, <see cref="OriginalBuildCheck"/>): probe, range of a centre building, explored cell. The template's own
-        /// check (WRK AH=4) and the neighbour rule of lines (BC2E) are not ported and allow.</summary>
+        /// check (WRK AH=4) is not ported and allows; the neighbour rule of lines is BC2E (ported).</summary>
         public bool BuildingSite(uint templateArmy, byte participant, byte x, byte y) =>
             battle.Inside(new Vector2I(x, y)) && OriginalBuildCheck.Allowed(new SkirmishBuildCheckWorld(battle, participant),
                 Convert.FromHexString(battle._templates.Armies["ARMY__02.DAT"].Templates[(byte)templateArmy].RawRecordHex), (byte)templateArmy, 2, participant, (uint)(x * 32 + 16), (uint)(y * 32 + 16));

@@ -52,7 +52,7 @@ public sealed class SkirmishActor
     public Vector2I? Goal { get; set; }
     /// <summary>Closest the actor has come to its goal and when (adapter: an AI move that makes no progress ends, see
     /// <c>Skirmish.ExecuteAiCommands</c>).</summary>
-    public int BestGoalDistance = int.MaxValue; public double BestGoalTime;
+    public Vector2 LastPosition = new(float.NaN, float.NaN); public double StillSince;
     public uint Target { get; set; }
     public bool Stepping { get; set; }
     public bool Turning { get; set; }
