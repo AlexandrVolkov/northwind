@@ -3644,6 +3644,30 @@
       "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/buildcheck.json", "tools/verify_buildcheck.py"],
       "implementation": ["scripts/OriginalBuildCheck.cs", "scripts/SkirmishAi.cs"],
       "limitations": "The player interface keeps its own radius (adapter)"
+    },
+    {
+      "id": "line-neighbors-bc2e",
+      "module": "LE:1",
+      "start": 48174,
+      "end": 48399,
+      "name": "Neighbour rule of lines (fence, bridge segments)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/neighbors.json", "tools/verify_neighbors.py", "tools/export_line_neighbors.py"],
+      "implementation": ["scripts/OriginalLineNeighbors.cs", "data/line_neighbors.json"],
+      "limitations": "Tables of templates 5, 7 and 25 from the WRK entries AH=9; one map layer per template"
+    },
+    {
+      "id": "line-neighbors-badf",
+      "module": "LE:1",
+      "start": 47839,
+      "end": 48011,
+      "name": "Neighbours of a segment of the same template (mask of directions)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/neighbors.json", "tools/verify_neighbors.py", "tools/export_line_neighbors.py"],
+      "implementation": ["scripts/OriginalLineNeighbors.cs", "data/line_neighbors.json"],
+      "limitations": "Only the mask is used by BC2E; the store into the buffer [1F45] is not modelled"
     }
   ]
 }
