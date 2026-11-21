@@ -406,6 +406,7 @@ public partial class SkirmishMain : Node2D
                     break;
                 case Key.F10: GetTree().ChangeSceneToFile("res://scenes/main.tscn"); break;
                 case Key.F1: _ui.Visible = !_ui.Visible; break;
+                case Key.F4: _showFog = !_showFog; QueueRedraw(); break;
             }
         }
         if (e is InputEventMouseButton button)
@@ -445,7 +446,9 @@ public partial class SkirmishMain : Node2D
             if (_pan) { Camera.Position -= motion.Relative / Camera.Zoom; ClampCamera(); }
         }
     }
+    private bool Seen(Vector2I cell) { int i = cell.Y * Battle.Map.Width + cell.X; return i < 0 || i >= Battle.FogMap.Length || (Battle.FogMap[i] & (1 << Battle.Rules.PlayerSlot)) == 0; }
     private Vector2 ClampToMap(Vector2 point) { var r = MapScreenRect; return point.Clamp(r.Position, r.End); }
+    private bool _showFog;   // adapter: a plain dark overlay of the cells the player has not seen ([18DA]); the original's edge drawing 9F38 is not ported
     public override void _Draw()
     {
         if (!_ready) return;
@@ -458,7 +461,11 @@ public partial class SkirmishMain : Node2D
             int tile = (int)(Battle.Map.Cells[y * Battle.Map.Width + x] & 65535);
             DrawTextureRectRegion(_terrain, new Rect2(x * 32, y * 32, 32, 32), new Rect2(tile % 32 * 32, tile / 32 * 32, 32, 32));
         }
-        foreach (var actor in Battle.Actors.Where(a => a.Alive || a.Dying).OrderBy(a => a.Position.Y)) DrawActor(actor);
+        foreach (var actor in Battle.Actors.Where(a => a.Alive || a.Dying).OrderBy(a => a.Position.Y)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);
+        if (_showFog)
+            for (int y = Math.Max(0, first.Y); y < Math.Min(Battle.Map.Height, last.Y); y++)
+            for (int x = Math.Max(0, first.X); x < Math.Min(Battle.Map.Width, last.X); x++)
+                if (!Seen(new Vector2I(x, y))) DrawRect(new Rect2(x * 32, y * 32, 32, 32), new Color(0, 0, 0, 0.85f));
         var producer = Selection.Count == 1 && Battle.Find(Selection.Single()) is { } barracks && Skirmish.IsBarracks(barracks)
             ? barracks : Selection.Contains(Battle.PlayerCastle.Id) ? Battle.PlayerCastle : null;
         if (_ui.Visible && !PlacingBuilding && producer is { Alive: true })
