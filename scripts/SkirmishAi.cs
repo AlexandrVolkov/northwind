@@ -169,6 +169,13 @@ public sealed partial class Skirmish
     /// <summary>Per-section timings of the world step (milliseconds, count), filled while <see cref="ProfileOn"/> is set.</summary>
     public Dictionary<string, (double Ms, int Calls)> Profile { get; } = [];
     public bool ProfileOn { get; set; }
+    private long P0() => ProfileOn ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
+    private void P1(string name, long start)
+    {
+        if (!ProfileOn) return;
+        var old = Profile.GetValueOrDefault(name);
+        Profile[name] = (old.Ms + (System.Diagnostics.Stopwatch.GetTimestamp() - start) * 1000.0 / System.Diagnostics.Stopwatch.Frequency, old.Calls + 1);
+    }
     private void Prof(string name, Action work)
     {
         if (!ProfileOn) { work(); return; }

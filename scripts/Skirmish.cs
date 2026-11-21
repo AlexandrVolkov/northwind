@@ -388,7 +388,8 @@ public sealed partial class Skirmish : IDisposable
             if (!actor.Alive) continue;
             UpdateUnit(actor, dt);
             if (!actor.Alive) continue;
-            var engaged = Find(BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(0x1c)));
+            long ta = P0(); var engaged = Find(BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(0x1c)));
+            P1("u.find", ta);
             OriginalCombatRules.AfterUpdate(actor.Record, engaged != null ? engaged.Record : ReadOnlySpan<byte>.Empty, _globalTick);
         }
         });
@@ -401,8 +402,8 @@ public sealed partial class Skirmish : IDisposable
     {
             if (!actor.Alive) return;
             actor.AttackTimer -= dt; actor.ReplanTimer -= dt;
-            if (TickVitals(actor)) return;
-            if (actor.Worker) { TickWorker(actor, dt); return; }
+            long t0 = P0(); bool vitals = TickVitals(actor); P1("u.vitals", t0); if (vitals) return;
+            if (actor.Worker) { t0 = P0(); TickWorker(actor, dt); P1("u.worker", t0); return; }
             var target = Find(actor.Target);
             if (actor.Target != 0 && target == null) { actor.Target = 0; actor.Route.Clear(); actor.Goal = null; }
             // An assault on a building engages its nearby defenders first, then resumes the objective.
@@ -419,23 +420,23 @@ public sealed partial class Skirmish : IDisposable
                 if ((idle && (actor.Record[0x2e] & 7) == 0) || struck)
                 {
                     if (struck) actor.Record[0x17] &= 0xfd;
-                    var found = OriginalTargetRules.FindEnemy(actor.Id, actor.Record, actor.Parameters, struck, new SearchWorld(this, actor.Record[3]));
+                    t0 = P0(); var found = OriginalTargetRules.FindEnemy(actor.Id, actor.Record, actor.Parameters, struck, new SearchWorld(this, actor.Record[3])); P1("u.findenemy", t0);
                     target = Find(found.Target);
                     if (target != null) { actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); }
                 }
             }
-            if (target != null && !actor.Stepping && AttackStep(actor, target)) return;
+            t0 = P0(); bool attacked = target != null && !actor.Stepping && AttackStep(actor, target); P1("u.attack", t0); if (attacked) return;
             if (target != null && actor.Target == 0) target = null;
             if (!actor.Stepping && target != null && actor.ReplanTimer <= 0)
             {
-                PlanAttack(actor, target); actor.ReplanTimer = ReplanDelay;
+                t0 = P0(); PlanAttack(actor, target); P1("u.planattack", t0); actor.ReplanTimer = ReplanDelay;
             }
             else if (!actor.Stepping && actor.Goal is { } goal && actor.Route.Count == 0 && actor.ReplanTimer <= 0)
             {
                 if (actor.Cell == goal) actor.Goal = null;
-                else { Plan(actor, goal); actor.ReplanTimer = ReplanDelay; }
+                else { t0 = P0(); Plan(actor, goal); P1("u.plan", t0); actor.ReplanTimer = ReplanDelay; }
             }
-            MoveTick(actor);
+            t0 = P0(); MoveTick(actor); P1("u.move", t0);
             }
     private void PlanAttack(SkirmishActor actor, SkirmishActor target)
     {
