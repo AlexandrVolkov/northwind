@@ -389,6 +389,21 @@ public sealed partial class Skirmish
 
     /// <summary>The builder's world in the skirmish: AD5F on the occupancy, A758 as a new actor under construction (adapter for
     /// the timing); registration and tree updates happen when the building is finished.</summary>
+    private sealed class SkirmishBuildCheckWorld(Skirmish battle, int slot) : IBuildCheckWorld
+    {
+        private readonly SkirmishBuilderWorld _probe = new(battle, slot);
+        public BuilderProbe Probe(byte template, byte army, uint x, uint y, out byte[]? blocker) => _probe.Probe(template, army, x, y, out blocker);
+        public IEnumerable<(byte[] Record, byte[] Template)> Objects(byte participant) =>
+            battle.Actors.Where(a => a.Alive && a.Record[3] == participant && a.Source.TemplateFile == "ARMY__02.DAT").Select(a => (a.Record, a.Parameters));
+        public bool Hook(byte template, byte army, uint x, uint y) => true;
+        public bool Line(byte template, byte army, uint x, uint y) => true;
+        public bool Explored(byte participant, uint x, uint y)
+        {
+            int cell = (int)((y >> 5) * battle.Map.Width + (x >> 5));
+            return cell < 0 || cell >= battle.FogMap.Length || (battle.FogMap[cell] & (1 << participant)) == 0;
+        }
+    }
+
     private sealed class SkirmishBuilderWorld(Skirmish battle, int slot) : IBuilderWorld
     {
         public BuilderProbe Probe(byte template, byte army, uint x, uint y, out byte[]? blocker)
@@ -508,8 +523,11 @@ public sealed partial class Skirmish
             var result = OriginalCreationPlacement.Search(Random, Random2, (uint)battle.Map.Width * 32, (uint)battle.Map.Height * 32, template, x, y, Probe);
             return result.Found ? (result.X, result.Y) : null;
         }
+        /// <summary>AF07 (ported, <see cref="OriginalBuildCheck"/>): probe, range of a centre building, explored cell. The template's own
+        /// check (WRK AH=4) and the neighbour rule of lines (BC2E) are not ported and allow.</summary>
         public bool BuildingSite(uint templateArmy, byte participant, byte x, byte y) =>
-            battle.Inside(new Vector2I(x, y)) && battle.EnemyPlacement((byte)templateArmy, new Vector2I(x, y)) == ConstructionPlacementStatus.Clear;
+            battle.Inside(new Vector2I(x, y)) && OriginalBuildCheck.Allowed(new SkirmishBuildCheckWorld(battle, participant),
+                Convert.FromHexString(battle._templates.Armies["ARMY__02.DAT"].Templates[(byte)templateArmy].RawRecordHex), (byte)templateArmy, 2, participant, (uint)(x * 32 + 16), (uint)(y * 32 + 16));
         public byte[]? Create(byte participant, byte army, byte template, byte variant, uint x, uint y) =>
             battle.AiSlots.Contains(participant) ? battle.EnemyConstruct(template, new Vector2I((int)(x >> 5), (int)(y >> 5)), participant).Record : null;
         public void Register(byte[] record) { }
