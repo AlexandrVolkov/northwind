@@ -396,7 +396,10 @@ public sealed partial class Skirmish
         public BuilderProbe Probe(byte template, byte army, uint x, uint y, out byte[]? blocker) => _probe.Probe(template, army, x, y, out blocker);
         public IEnumerable<(byte[] Record, byte[] Template)> Objects(byte participant) =>
             battle.Actors.Where(a => a.Alive && a.Record[3] == participant && a.Source.TemplateFile == "ARMY__02.DAT").Select(a => (a.Record, a.Parameters));
-        public bool Hook(byte template, byte army, uint x, uint y) => true;
+        /// <summary>WRK AH=4 of the mine (template 6): ore of type 1 or 2 must lie under the site (FS:59, as the deposit at its completion);
+        /// the other templates answer «allowed» (the entry returns at once, ZF=0). The entry of template 19 is not ported (allows).</summary>
+        public bool Hook(byte template, byte army, uint x, uint y) =>
+            template != 6 || OriginalMineRules.Initialize(battle.Map.Cells, battle.Map.Width, battle.Map.Height, x, y).Remaining > 0;
         public bool Line(byte template, byte army, uint x, uint y) => battle._lineNeighbors.Allowed((byte)battle.Map.Width, (byte)battle.Map.Height,
             (plane, cell) => battle.Occupancy.Cells[plane * battle.Map.Width * battle.Map.Height + cell] is var id and not 0 ? battle.Actors.FirstOrDefault(a => a.Alive && a.Id == id)?.Record : null,
             index => battle._aiTemplates[index], template, x, y);
