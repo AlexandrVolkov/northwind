@@ -163,7 +163,18 @@ public sealed partial class Skirmish
 
         foreach (int slot in AiSlots) { _aiSlot = slot; TurnOf((byte)slot); }
         _aiSlot = Rules.EnemySlot;
-        if (ImprovedAi) foreach (int slot in AiSlots) ImprovedStrategy(slot);
+        if (ImprovedAi) foreach (int slot in AiSlots) Prof("ai.improved", () => ImprovedStrategy(slot));
+    }
+
+    /// <summary>Per-section timings of the world step (milliseconds, count), filled while <see cref="ProfileOn"/> is set.</summary>
+    public Dictionary<string, (double Ms, int Calls)> Profile { get; } = [];
+    public bool ProfileOn { get; set; }
+    private void Prof(string name, Action work)
+    {
+        if (!ProfileOn) { work(); return; }
+        long t = System.Diagnostics.Stopwatch.GetTimestamp(); work();
+        var old = Profile.GetValueOrDefault(name);
+        Profile[name] = (old.Ms + (System.Diagnostics.Stopwatch.GetTimestamp() - t) * 1000.0 / System.Diagnostics.Stopwatch.Frequency, old.Calls + 1);
     }
 
     /// <summary>1E7EA for one AI settlement.</summary>
@@ -174,20 +185,19 @@ public sealed partial class Skirmish
         BinaryPrimitives.WriteUInt32LittleEndian(ai.AsSpan(1), BinaryPrimitives.ReadUInt32LittleEndian(ai.AsSpan(1)) + 1);
         var chain = AiChain(me);
         if ((BinaryPrimitives.ReadUInt32LittleEndian(ai.AsSpan(1)) & 0x1f) == 0)
-            OriginalAiRules.Census(ai, _participants[me], chain, (byte)Map.Width, (byte)Map.Height, _aiSquadWorld!.Fog);
-        OriginalAiSquadSteps.Tick(ai, _aiSquadWorld!);
-        _aiStates!.Run(ai);
-        _aiGarrison!.Run(ai);
-        _aiMilitary!.Run(ai);
-        _aiOrders!.Run(ai);
-        _aiEconomy!.Plan(ai);      // 21E99
-        _aiEconomy.Execute(ai);    // 221AE
-        OriginalAiRules.Upkeep(ai, chain);
+            Prof("ai.census", () => OriginalAiRules.Census(ai, _participants[me], chain, (byte)Map.Width, (byte)Map.Height, _aiSquadWorld!.Fog));
+        Prof("ai.steps", () => OriginalAiSquadSteps.Tick(ai, _aiSquadWorld!));
+        Prof("ai.states", () => _aiStates!.Run(ai));
+        Prof("ai.garrison", () => _aiGarrison!.Run(ai));
+        Prof("ai.military", () => _aiMilitary!.Run(ai));
+        Prof("ai.orders", () => _aiOrders!.Run(ai));
+        Prof("ai.economy", () => { _aiEconomy!.Plan(ai); _aiEconomy.Execute(ai); });
+        Prof("ai.upkeep", () => OriginalAiRules.Upkeep(ai, chain));
         if (OriginalAiTurn.Decide(_aiTurnWorld!, me, 0, (uint)Map.Width, _aiThreat)) _aiEconomy.Construction(ai);   // 23551..23666
-        OriginalAiPlans.Execute(_aiTurnWorld!, me, _aiThreat);
+        Prof("ai.plans", () => OriginalAiPlans.Execute(_aiTurnWorld!, me, _aiThreat));
         OriginalAiResearch.Step(ai, me, _aiArmy, _aiTree, _aiTemplates, chain, _terrainCatalog.NextRandomByte);
         SyncDiplomacy();
-        ExecuteAiCommands();
+        Prof("ai.commands", ExecuteAiCommands);
     }
 
     /// <summary>Carries out the commands the AI wrote into OBE +14 of the enemy's units (adapter, see the class summary). A

@@ -61,10 +61,10 @@ public partial class TestRunner
             battle.Paused = true; var frozenStrike = worker.Record.ToArray(); battle.Advance(10);
             Check(worker.Record.SequenceEqual(frozenStrike), "Pause freezes the entire strike record"); battle.Paused = false;
             for (int i = 0; i < 5; i++) battle.Advance(1.0 / battle.Rules.TicksPerSecond);
-            Check(worker.Frame == swingFrame + 5 && worker.Record[0x2f] == worker.Parameters[0x75] && battle.Effects.Count == 0,
+            Check(worker.Frame == swingFrame + 5 && worker.Record[0x2f] == worker.Parameters[0x75] && battle.Effects.Count + battle.Sparks.Count == 0,
                 "Pre-impact frames retain the work gate and emit no chopping effect");
             battle.Advance(1.0 / battle.Rules.TicksPerSecond);
-            Check(worker.Frame == swingFrame + 6 && worker.Record[0x2f] == 0 && battle.Effects.Count == 1 && worker.Record[0x31] == 0,
+            Check(worker.Frame == swingFrame + 6 && worker.Record[0x2f] == 0 && battle.Effects.Count + battle.Sparks.Count == 1 && worker.Record[0x31] == 0,
                 "Native impact frame resets the gate and emits one effect before cargo is granted");
             for (int i = 0; i < 900 && worker.Record[0x31] != 3; i++) battle.Advance(.1);
             Check(worker.Record[0x31] == 3 && worker.Source.TemplateIndex == 11 && worker.Record[0x0f] == 0x13 && worker.Record[0x20] == 255 && battle.Harvestable(tree) && worker.Record[0x34] == 0x20 && worker.Record[0x16] == 5,

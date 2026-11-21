@@ -465,6 +465,9 @@ public partial class SkirmishMain : Node2D
             int tile = (int)(Battle.Map.Cells[y * Battle.Map.Width + x] & 65535);
             DrawTextureRectRegion(_terrain, new Rect2(x * 32, y * 32, 32, 32), new Rect2(tile % 32 * 32, tile / 32 * 32, 32, 32));
         }
+        foreach (var (type, firstFrame, at, left) in Battle.Sparks)
+            if (_frames.TryGetValue(("ARMY__00.EFF", type, firstFrame + (8 - left)), out var spark))
+                DrawTextureRectRegion(_sprites, new Rect2(at - new Vector2(spark.Width / 2f, spark.Height / 2f), new Vector2(spark.Width, spark.Height)), new Rect2(spark.X, spark.Y, spark.Width, spark.Height));
         foreach (var actor in Battle.Actors.Where(a => a.Alive || a.Dying).OrderBy(a => a.Position.Y)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);
         if (_showFog)
             for (int y = Math.Max(0, first.Y); y < Math.Min(Battle.Map.Height, last.Y); y++)
