@@ -56,13 +56,12 @@ public sealed partial class Skirmish
             _wavePath[slot] = cached = (goal.Id, Elapsed + 20, CoarsePath(sample, sample.Cell, goal.Cell, 14));
         }
         var path = cached.Path;
-        if ((int)Elapsed % 60 < 2) GD.Print($"IMPROVED t={Elapsed:0} slot {slot} wave {wave.Count} path {path.Count} from {wave[0].Cell} goal {goal.Cell} moving {wave.Count(a => a.Stepping || a.Goal != null)} engaged {wave.Count(a => a.Target != 0)}");
         foreach (var unit in wave)
         {
             var aim = Find(unit.Target);
             if (aim != null && aim.Alive) continue;                       // engaged (or walking the last stretch to its target)
             unit.Target = 0;
-            if ((goal.Cell - unit.Cell).Length() <= 16) { unit.Target = goal.Id; unit.Goal = null; unit.Route.Clear(); unit.ReplanTimer = 0; continue; }
+            if (Math.Max(Math.Abs(goal.Cell.X - unit.Cell.X), Math.Abs(goal.Cell.Y - unit.Cell.Y)) <= 16) { unit.Target = goal.Id; unit.Goal = null; unit.Route.Clear(); unit.ReplanTimer = 0; continue; }
             if (unit.Stepping || (unit.Goal != null && unit.Route.Count > 0) || path.Count == 0) continue;
             int near = 0; float best = float.MaxValue;
             for (int i = 0; i < path.Count; i++) { float d = ((Vector2)(path[i] - unit.Cell)).LengthSquared(); if (d < best) { best = d; near = i; } }
