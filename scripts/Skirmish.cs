@@ -102,9 +102,15 @@ public sealed partial class Skirmish : IDisposable
     public SkirmishActor Hero => Actors.Single(a => a.Team == 0 && a.Hero);
     public SkirmishActor Objective => Actors.Single(a => a.Team == 1 && a.Source.TemplateName == "Замок");
 
+    private readonly Dictionary<int, int> _colorTables = [];
+    /// <summary>COLOR_NN.TAB number of an owner: byte 0 of its scenario slot record (LE:1 2F79..2F90). The rival copy uses
+    /// the table of its own slot.</summary>
+    public int ColorTable(int slot) => _colorTables.GetValueOrDefault(slot, 2);
+
     public Skirmish(MapData map, ScenarioData scenario, TemplatesData templates, SkirmishRules rules)
     {
         _resolveMovement = ResolveMovementObject;
+        foreach (var s in scenario.Slots) _colorTables[s.SlotIndex] = Convert.FromHexString(s.RawRecordHex)[0];
         Map = map; Rules = rules; _properties = Convert.FromHexString(map.SegmentPropertiesHex);
         var snapshot = OriginalOccupancySnapshot.Build(map, scenario, templates);
         if (!snapshot.MatchesReference) throw new InvalidDataException("Scenario occupancy does not match its source profile");
