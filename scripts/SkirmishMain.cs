@@ -527,8 +527,21 @@ public partial class SkirmishMain : Node2D
         foreach (var corpse in Battle.Corpses)
         {
             var at = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(corpse.AsSpan(7)), BinaryPrimitives.ReadUInt32LittleEndian(corpse.AsSpan(0xc)));
-            if (corpse[1] == 2) DrawRect(new Rect2(at - new Vector2(9, 4), new Vector2(18, 8)), new Color(.25f, .18f, .12f, .35f + corpse[0x17] * .1f));
-            else DrawCircle(at, 3, new Color(.5f, .05f, .05f, .5f));
+            ushort frameNumber = BinaryPrimitives.ReadUInt16LittleEndian(corpse.AsSpan(3));
+            BattleFrame? sprite = null;
+            if (corpse[1] == 2)
+            {
+                // The unit's own last death frame first, then the corpse frames of ARMY__02 effect type 1.
+                _frames.TryGetValue(("ARMY__02.DAT", corpse[0x0e], frameNumber), out sprite);
+                if (sprite == null) _frames.TryGetValue(("ARMY__02.EFF", 1, frameNumber), out sprite);
+                if (sprite == null) { DrawRect(new Rect2(at - new Vector2(9, 4), new Vector2(18, 8)), new Color(.25f, .18f, .12f, .35f + corpse[0x17] * .1f)); continue; }
+            }
+            else if (!_frames.TryGetValue(("ARMY__00.EFF", 3, frameNumber), out sprite)) { DrawCircle(at, 3, new Color(.5f, .05f, .05f, .5f)); continue; }
+            var spriteSize = new Vector2(sprite.Width, sprite.Height);
+            var spriteAt = corpse[1] == 2 ? at - new Vector2(spriteSize.X / 2, spriteSize.Y - 16) : at - spriteSize / 2;
+            if (corpse[1] == 2 && sprite.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(corpse[2]), out var corpseSheet))
+                DrawTextureRectRegion(corpseSheet, new Rect2(spriteAt, spriteSize), new Rect2(sprite.TeamSlot % 64 * 64, sprite.TeamSlot / 64 * 64, sprite.Width, sprite.Height));
+            else DrawTextureRectRegion(_sprites, new Rect2(spriteAt, spriteSize), new Rect2(sprite.X, sprite.Y, sprite.Width, sprite.Height));
         }
         foreach (var arrow in Battle.Arrows)
         {
