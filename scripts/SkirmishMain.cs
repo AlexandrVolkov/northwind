@@ -556,12 +556,13 @@ public partial class SkirmishMain : Node2D
             // Effect record: position +7/+0C, 24.8 velocity +18/+1C, height above ground +10 (8.8).
             var at = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(arrow.AsSpan(7)), BinaryPrimitives.ReadUInt32LittleEndian(arrow.AsSpan(0xc)) - BinaryPrimitives.ReadUInt16LittleEndian(arrow.AsSpan(0x10)) / 256f);
             var velocity = new Vector2(BinaryPrimitives.ReadInt32LittleEndian(arrow.AsSpan(0x18)), BinaryPrimitives.ReadInt32LittleEndian(arrow.AsSpan(0x1c))).Normalized();
-            DrawLine(at - velocity * 9 - new Vector2(0, 16), at - new Vector2(0, 16), new Color("e8dcc0"), 2);
+            if (!DrawEffectSprite(2, arrow, at - new Vector2(0, 16))) DrawLine(at - velocity * 9 - new Vector2(0, 16), at - new Vector2(0, 16), new Color("e8dcc0"), 2);
         }
         foreach (var stone in Battle.Stones)
         {
             var at = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(stone.AsSpan(7)), BinaryPrimitives.ReadUInt32LittleEndian(stone.AsSpan(0xc)) - BinaryPrimitives.ReadUInt16LittleEndian(stone.AsSpan(0x10)) / 256f);
-            if (stone[0] == OriginalCatapultRules.Stone) DrawCircle(at - new Vector2(0, 16), 4, new Color("8a8178"));
+            if (stone[0] is 8 or 0x0a or 0x0b or 0x0c or 0x0d or 0x0e && DrawEffectSprite(stone[0], stone, at - new Vector2(0, 16))) { }
+            else if (stone[0] == OriginalCatapultRules.Stone) DrawCircle(at - new Vector2(0, 16), 4, new Color("8a8178"));
             else if (stone[0] == OriginalCatapultRules.Bolt) DrawCircle(at - new Vector2(0, 16), 3, new Color("c9b38a"));
             else if (stone[0] == OriginalCatapultRules.BigExplosion) DrawCircle(at - new Vector2(0, 16), 10 + (0x12 - stone[0x17]), new Color(1f, .6f, .25f, stone[0x17] / 30f));
             else if (stone[0] == OriginalFireRules.Shot) DrawCircle(at - new Vector2(0, 16), 3, new Color("ff9a2e"));
@@ -592,6 +593,14 @@ public partial class SkirmishMain : Node2D
             var rect = new Rect2(inverse * _dragStart, inverse * _dragEnd - inverse * _dragStart).Abs();
             DrawRect(rect, new Color(.3f, .9f, .7f, .12f)); DrawRect(rect, new Color("88e7bf"), false, 1);
         }
+    }
+    /// <summary>An ARMY__00 effect (arrow, stone, explosions, smoke) from its original frame, centred on the point; false when the frame is not in the atlas.</summary>
+    private bool DrawEffectSprite(byte type, ReadOnlySpan<byte> effect, Vector2 center)
+    {
+        if (!_frames.TryGetValue(("ARMY__00.EFF", type, BinaryPrimitives.ReadUInt16LittleEndian(effect[3..])), out var f)) return false;
+        var size = new Vector2(f.Width, f.Height);
+        DrawTextureRectRegion(_sprites, new Rect2(center - size / 2, size), new Rect2(f.X, f.Y, f.Width, f.Height));
+        return true;
     }
     private void DrawActor(SkirmishActor actor)
     {

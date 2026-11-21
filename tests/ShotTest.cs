@@ -26,6 +26,10 @@ public partial class TestRunner
           b.Record[0x19] = 3; typeof(Skirmish).GetMethod("Kill", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(scene.Battle, [b]);
           scene.FocusWorld(b.Position); for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
           GetViewport().GetTexture().GetImage().SavePng("res://build/shot-ruin.png"); GD.Print("RUINS " + scene.Battle.Ruins.Count); }
+        { var e = new byte[0x22]; var hero = scene.Battle.Hero.Position; System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(e.AsSpan(7), (uint)hero.X + 64); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(e.AsSpan(0xc), (uint)hero.Y);
+          OriginalCatapultRules.CreateBigExplosion(e); e[0x17] = 12; System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(e.AsSpan(3), 0x8d); scene.Battle.Stones.Add(e); scene.Battle.Paused = true;
+          scene.FocusWorld(hero); for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+          GetViewport().GetTexture().GetImage().SavePng("res://build/shot-explosion.png"); }
         var names = new[] { "Лесопилка", "Шахта", "Рабочий" };
         int k = 0;
         foreach (var name in names)
