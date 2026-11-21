@@ -7,7 +7,7 @@
 | LE:1 | 146882 | 108598 | 5512 | 97 | 32675 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 3228 | 100 | 0 | 2075 | 0 |
+| ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
 | ARMY__02.WRK | 6930 | 5917 | 609 | 0 | 404 | 7 |
 | ARMY__03.WRK | 13412 | 13412 | 0 | 0 | 0 | 1 |
@@ -24,6 +24,7 @@
 | ARMY__00.WRK `0x593..0x6C7` | Arrow effect: launch, flight, early and arrival hits | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) | Обработчики 7FE/AEB не перенесены. |
 | ARMY__00.WRK `0x6C7..0x6FE` | Blood splash effect (type 3) | ported | [combat.md](../docs/combat.md); [corpse.json](../tests/fixtures/corpse.json) |  |
 | ARMY__00.WRK `0x6FE..0x762` | Spark effect types 4/5 creation and countdown | partial | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Перенесено создание (AH=0); обновление кадров не подключено. |
+| ARMY__00.WRK `0x762..0x7FE` | Effect type 6: hit on the object in the cell of the point (attack from experience) | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json); [verify_combat.py](../tools/verify_combat.py) | Who creates effects of type 6 in the campaign is not traced; the spark tail 6FE/735 is shared with the strike |
 | ARMY__00.WRK `0x85A..0x8DA` | Catapult stone effect (type 8) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | ARMY__00.WRK `0x986..0x9D5` | Explosion effect (type 10) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | drift vector 9E7D not ported |
 | ARMY__00.WRK `0x9D5..0xA44` | Smoke column effect (type 0Bh) | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) |  |

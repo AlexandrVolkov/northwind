@@ -95,6 +95,30 @@ public partial class TestRunner
         }
         Finish("strike");
 
+        spec = root.GetProperty("cellhit");
+        foreach (byte experience in Bytes(spec.GetProperty("experience")))
+        foreach (byte kind in Bytes(spec.GetProperty("kinds")))
+        foreach (byte defence in Bytes(spec.GetProperty("defences")))
+        foreach (byte hp in Bytes(spec.GetProperty("health")))
+        foreach (uint flags in Uints(spec.GetProperty("flags")))
+        foreach (byte present in Bytes(spec.GetProperty("present")))
+        foreach (byte cx in Bytes(spec.GetProperty("cells")))
+        foreach (byte index in Bytes(spec.GetProperty("random_indices")))
+        {
+            var template = Dat(0); template[3] = 1; template[4] = 1; template[0x44] = defence;
+            BinaryPrimitives.WriteUInt32LittleEndian(template.AsSpan(0x40), flags);
+            var target = CombatUnit(0, 3, hp, 0, (uint)(cx * 32 + 16), 112, 1);
+            var attacker = CombatUnit(0, 0, 10, 0, 64, 96, 1); attacker[0x16] = experience; attacker[0x14] = (byte)(kind | 0x10);
+            var effect = Enumerable.Range(0, 0x22).Select(i => unchecked((byte)(i * 5 + 9))).ToArray();
+            effect[0] = 6; effect[1] = 0; effect[5] = 1;
+            var random = Random(index);
+            var found = OriginalCombatRules.CellObject((uint)(cx * 32 + 16), 112, effect[5], 8, cells, classes, (plane, cell) => present != 0 && plane == 1 && cell == 24 + cx ? 0x100u : 0);
+            int? sound = OriginalCombatRules.CellHitEffect(effect, attacker, target, template, found, random.NextRandomByte);
+            digest.AppendData(effect); digest.AppendData(target); digest.AppendData([random.RandomIndex]);
+            digest.AppendData(Encoding.UTF8.GetBytes(sound is { } s ? $"[{s}]" : "[]")); count++;
+        }
+        Finish("cellhit");
+
         spec = root.GetProperty("vitals");
         var allowed = new byte[] { 1, 1, 1, 0, 1, 1, 1, 1 };
         foreach (byte hp in Bytes(spec.GetProperty("health")))
