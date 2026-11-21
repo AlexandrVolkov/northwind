@@ -1028,6 +1028,9 @@ public interface IAiMilitaryWorld : IAiSquadWorld
     IReadOnlyList<byte> Buildable(byte participant, uint mask, uint value);
     /// <summary>The templates the army request (20DD0 mode 8) may order to fill its strength: the original's list; the skirmish adapter leaves out the siege engines.</summary>
     IReadOnlyList<byte> ArmyFill(byte participant, uint mask, uint value) => Buildable(participant, mask, value);
+    /// <summary>The port's own AI logic (switchable in the settings; false = the original's behaviour): all orders run by priority, farms
+    /// are urgent when people run out.</summary>
+    bool Improved => false;
     byte[] Template(byte participant, byte template);
     /// <summary>Pool reference (offset from [6AA]) of an object record.</summary>
     uint Reference(byte[] record);
@@ -1621,10 +1624,20 @@ public sealed class OriginalAiOrders(IAiOrdersWorld world, OriginalAiMilitary mi
         if ((ai[0x1a15] & 1) == 0) return;
         byte top = 0;
         for (int k = 0; k < 20; k++) if (ai[List + k * Size] != 0xff && ai[List + k * Size + 3] > top) top = ai[List + k * Size + 3];
-        for (int k = 0; k < 20; k++)
+        // The original runs only the orders of the highest priority present: an unpayable order of the army (people run out) then starves
+        // the farm that would bring the people. The improved logic runs every order, the highest priority first.
+        var order = Enumerable.Range(0, 20).ToList();
+        if (world.Improved)
+        {
+            var priority = new int[20];
+            for (int k = 0; k < 20; k++) priority[k] = ai[List + k * Size] != 0xff ? ai[List + k * Size + 3] : -1;
+            order = [.. order.OrderByDescending(k => priority[k])];
+        }
+        foreach (int k in order)
         {
             int at = List + k * Size;
-            if (ai[at + 3] >= top && !Process(ai, at)) ai[at] = 0xff;
+            if (ai[at] == 0xff && world.Improved) continue;
+            if ((world.Improved || ai[at + 3] >= top) && !Process(ai, at)) ai[at] = 0xff;
             W32(ai, at + 0x10, U32(ai, at + 0x10) + 1);
         }
     }
@@ -1965,6 +1978,7 @@ public sealed class OriginalAiEconomy(IAiEconomyWorld world, OriginalAiMilitary 
             if ((turn & 0x1ff) == 0 && U32(ai, 0x4e) > U32(p, 0x2c))
             {
                 byte urgency = (byte)((ulong)(U32(ai, 0x4e) - U32(p, 0x2c)) * 200 / U32(ai, 0x4e));
+                if (world.Improved && U32(p, 0x24) < 4) urgency = Math.Max(urgency, (byte)0xc8);   // out of people: farms first
                 if (Random(ai, 0xf08, 0x108) is { } farm) Request(ai, Orders, 8, 0x3c, urgency, farm);
             }
             if (((turn + 0x100) & 0x1ff) == 0)

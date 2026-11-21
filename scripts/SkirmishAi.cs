@@ -123,7 +123,7 @@ public sealed partial class Skirmish
     }
 
     private List<(byte[] Record, byte[] Template)> AiChain(byte participant) =>
-        Actors.Where(a => a.Record[3] == participant).Select(a => (a.Record, a.Parameters)).ToList();
+        Actors.Where(a => a.Record[3] == participant && !a.Detached).Select(a => (a.Record, a.Parameters)).ToList();
 
     /// <summary>Participant records from the diplomacy state: +12 war mask, +34 message queue, +B9 relations.</summary>
     private void SyncParticipants()
@@ -163,6 +163,7 @@ public sealed partial class Skirmish
 
         foreach (int slot in AiSlots) { _aiSlot = slot; TurnOf((byte)slot); }
         _aiSlot = Rules.EnemySlot;
+        if (ImprovedAi) foreach (int slot in AiSlots) ImprovedStrategy(slot);
     }
 
     /// <summary>1E7EA for one AI settlement.</summary>
@@ -402,6 +403,8 @@ public sealed partial class Skirmish
         if (stats[0x1a1f] == 10) OriginalTechRules.Complete(tree, 2, 9);
     }
 
+    /// <summary>The port's own AI logic (default) or the original's (settings): see <see cref="IAiMilitaryWorld.Improved"/>.</summary>
+    public bool ImprovedAi { get; set; } = !DisplaySettings.OriginalAi;
     private byte[] _arctangent = [];
     private readonly OriginalLineNeighbors _lineNeighbors = OriginalLineNeighbors.From(GameData.Read<LineNeighborData>("res://data/line_neighbors.json"));
     private byte _builderToggle = 1;
@@ -585,7 +588,8 @@ public sealed partial class Skirmish
         public byte ParticipantCount => battle._participantCount;
         /// <summary>Adapter: siege engines (16, 26) do not march with the campaign's army yet (they stay idle at home and the army never reports ready), so the
         /// fill of the army request leaves them out; other requests may still order them.</summary>
-        public IReadOnlyList<byte> ArmyFill(byte participant, uint mask, uint value) => Buildable(participant, mask, value).Where(t => t is not (16 or 26)).ToList();
+        public bool Improved => battle.ImprovedAi;
+        public IReadOnlyList<byte> ArmyFill(byte participant, uint mask, uint value) => battle.ImprovedAi ? Buildable(participant, mask, value) : Buildable(participant, mask, value).Where(t => t is not (16 or 26)).ToList();
         public IReadOnlyList<byte> Buildable(byte participant, uint mask, uint value) => OriginalTechRules.Buildable(battle._aiTemplates, battle.TreeOf(participant), true, mask, value);
         public byte[] Template(byte participant, byte template) => battle._aiTemplates[template];
         public uint Reference(byte[] record) => battle.Actors.FirstOrDefault(a => ReferenceEquals(a.Record, record))?.Id ?? 0;

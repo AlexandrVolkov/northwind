@@ -54,6 +54,8 @@ public sealed class SkirmishActor
     /// <c>Skirmish.ExecuteAiCommands</c>).</summary>
     public Vector2 LastPosition = new(float.NaN, float.NaN); public double StillSince;
     public uint Target { get; set; }
+    /// <summary>Taken out of the original AI's squads by the improved logic: it is on an attack wave and invisible to the squad machinery.</summary>
+    public bool Detached { get; set; }
     public bool Stepping { get; set; }
     public bool Turning { get; set; }
     public Vector2I StepGoal { get; set; }

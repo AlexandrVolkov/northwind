@@ -38,8 +38,10 @@ public partial class DisplaySettingsWindow : Node2D
             () => DisplaySettings.Set(fullscreen: !DisplaySettings.Fullscreen));
         Add(new(Window.Position.X + 28, Window.Position.Y + 136), DisplaySettings.ClassicLayout ? "Рамка: оригинал 4:3" : "Рамка: широкий экран", false,
             () => DisplaySettings.Set(classic: !DisplaySettings.ClassicLayout));
+        Add(new(Window.Position.X + 28, Window.Position.Y + 152), DisplaySettings.OriginalAi ? "ИИ: оригинальный" : "ИИ: улучшенный", false,
+            () => DisplaySettings.Set(originalAi: !DisplaySettings.OriginalAi));
         string back = "Назад";
-        Add(new(Window.GetCenter().X - _font.Width(back) / 2f, Window.End.Y - 30), back, false, () => Visible = false);
+        Add(new(Window.GetCenter().X - _font.Width(back) / 2f, Window.End.Y - 22), back, false, () => Visible = false);
         return _items;
     }
 
