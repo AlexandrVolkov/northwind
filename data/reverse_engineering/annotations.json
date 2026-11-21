@@ -3548,6 +3548,42 @@
       "evidence": ["docs/fog-of-war.md", "tests/fixtures/visibility.json"],
       "implementation": ["scripts/OriginalVisibilityRules.cs"],
       "limitations": "Objects outside the map are not modelled; callers 72B3/81D9/12A7B are approximated by a change of cell"
+    },
+    {
+      "id": "builder-afdb",
+      "module": "LE:1",
+      "start": 45104,
+      "end": 45548,
+      "name": "Builder engine of command 58h: payment per segment, probe, creation, line of segments",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/builder.json", "tools/verify_builder.py"],
+      "implementation": ["scripts/OriginalBuilder.cs", "scripts/SkirmishAi.cs"],
+      "limitations": "A758, 43E5, A6AE and D453 are recorded stubs of the check; in the skirmish segments are built as ordinary construction"
+    },
+    {
+      "id": "builder-line-step",
+      "module": "LE:1",
+      "start": 27134,
+      "end": 27251,
+      "name": "Step along a line of segments (bridge, fence)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/builder.json", "tools/verify_builder.py"],
+      "implementation": ["scripts/OriginalBuilder.cs"],
+      "limitations": "The toggle [50D] is a field of the builder"
+    },
+    {
+      "id": "direction-6996",
+      "module": "LE:1",
+      "start": 27030,
+      "end": 27134,
+      "name": "Direction byte between two points (arctangent table)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/building-command-lifecycle.md", "tests/fixtures/builder.json", "tools/verify_builder.py"],
+      "implementation": ["scripts/OriginalBuilder.cs"],
+      "limitations": "none"
     }
   ]
 }

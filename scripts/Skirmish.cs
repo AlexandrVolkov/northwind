@@ -50,6 +50,9 @@ public sealed class SkirmishActor
     public SkirmishRoute Route { get; } = new();
     internal Vector2I? GuidanceGoal { get; set; }
     public Vector2I? Goal { get; set; }
+    /// <summary>Closest the actor has come to its goal and when (adapter: an AI move that makes no progress ends, see
+    /// <c>Skirmish.ExecuteAiCommands</c>).</summary>
+    public int BestGoalDistance = int.MaxValue; public double BestGoalTime;
     public uint Target { get; set; }
     public bool Stepping { get; set; }
     public bool Turning { get; set; }

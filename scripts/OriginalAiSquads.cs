@@ -621,16 +621,7 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
     private static readonly (int X, int Y)[] Directions = [(0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1)]; // DS:19C7
 
     /// <summary>6996: direction byte (0..255, 0 = north, clockwise) from (x1, y1) to (x2, y2) with the arctangent table DS:287E.</summary>
-    public byte Direction(uint x1, uint y1, uint x2, uint y2)
-    {
-        byte quadrant = 0x40;
-        uint ecx = x2, eax = x1, edx = y2, ebx = y1;
-        if (ecx < eax) { ecx = eax - ecx; (edx, ebx) = (ebx, edx); quadrant += 0x80; } else ecx -= eax;
-        if (edx < ebx) { edx = ebx - edx; (edx, ecx) = (ecx, edx); quadrant -= 0x40; } else edx -= ebx;
-        if (ecx == edx) return (byte)(0x20 + quadrant);
-        if (ecx > edx) return (byte)(arctangent[(byte)((edx << 8) / (ecx & 0xffff))] + quadrant);
-        return (byte)(0x40 - arctangent[(byte)((ecx << 8) / (edx & 0xffff))] + quadrant);
-    }
+    public byte Direction(uint x1, uint y1, uint x2, uint y2) => OriginalDirectionRules.Between(arctangent, x1, y1, x2, y2);
 
     /// <summary>1FCED: fight in the area, by mode +7 (0: chase the enemy centre, 1: march, then clear, 2: clear +17..+1A).
     /// True while the fight goes on.</summary>
@@ -798,7 +789,7 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
                 if (!arrived)
                 {
                     var (x0, y0, x1, y1) = Clip(s[0x20], s[0x21], 0x14, 0x14);
-                    Request(ai, Orders, 0x0a, s[1], s[4], x0, 0);
+                    OriginalAiMilitary.Request(ai, Orders, 0x0a, s[1], s[4], x0, y0, x1, y1, 0);   // CL..DH of 219C3: the area to cross
                     ToIdle(s, 0); return;
                 }
                 (s[0x17], s[0x18], s[0x19], s[0x1a]) = (s[0x13], s[0x14], s[0x15], s[0x16]);
@@ -1013,7 +1004,7 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
             if (!arrived)
             {
                 var (x0, y0, x1, y1) = Clip(s[0x20], s[0x21], 0x14, 0x14);
-                Request(ai, Orders, 0x0a, s[1], 0x40, x0, 0);
+                OriginalAiMilitary.Request(ai, Orders, 0x0a, s[1], 0x40, x0, y0, x1, y1, 0);
             }
             s[5] = 0; return;
         }
@@ -2455,14 +2446,5 @@ public sealed class OriginalAiFormations(IReadOnlyList<byte[]> formations, byte[
     private static uint Abs(int v) => v < 0 ? (uint)-v : (uint)v;
 
     /// <summary>6996 (as in <see cref="OriginalAiSquadStates.Direction"/>).</summary>
-    private byte Direction(uint x1, uint y1, uint x2, uint y2)
-    {
-        byte quadrant = 0x40;
-        uint ecx = x2, eax = x1, edx = y2, ebx = y1;
-        if (ecx < eax) { ecx = eax - ecx; (edx, ebx) = (ebx, edx); quadrant += 0x80; } else ecx -= eax;
-        if (edx < ebx) { edx = ebx - edx; (edx, ecx) = (ecx, edx); quadrant -= 0x40; } else edx -= ebx;
-        if (ecx == edx) return (byte)(0x20 + quadrant);
-        if (ecx > edx) return (byte)(arctangent[(byte)((edx << 8) / (ecx & 0xffff))] + quadrant);
-        return (byte)(0x40 - arctangent[(byte)((ecx << 8) / (edx & 0xffff))] + quadrant);
-    }
+    private byte Direction(uint x1, uint y1, uint x2, uint y2) => OriginalDirectionRules.Between(arctangent, x1, y1, x2, y2);
 }

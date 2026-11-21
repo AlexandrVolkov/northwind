@@ -105,7 +105,11 @@ def mask_lists(block):
     out = bytearray()
     for base in (0x1ab, 0x34f):
         for k in range(20):
-            r = bytearray(block[base + k * 0x15:base + (k + 1) * 0x15]); r[3] = 0; r[5:0x0c] = bytes(7); out += r
+            r = bytearray(block[base + k * 0x15:base + (k + 1) * 0x15]); r[3] = 0
+            # +5..+7 are leftovers at most call sites, but the area to cross of a bridge order (mode 0Ah, CL..DH of 219C3) is real
+            if base == 0x34f and r[0] == 0x0a: r[8:0x0c] = bytes(4)
+            else: r[5:0x0c] = bytes(7)
+            out += r
     return bytes(out)
 
 
