@@ -3,7 +3,7 @@ using System.Buffers.Binary;
 namespace Northwind;
 
 public sealed class TerrainColorsData { public int[][] Colors { get; set; } = []; }
-public sealed class BattleFramesData { public BattleFrame[] Frames { get; set; } = []; }
+public sealed class BattleFramesData { public int[] TeamTables { get; set; } = []; public BattleFrame[] Frames { get; set; } = []; }
 public sealed class BattleFrame
 {
     public string TemplateFile { get; set; } = "";
@@ -13,6 +13,8 @@ public sealed class BattleFrame
     public int Y { get; set; }
     public int Width { get; set; }
     public int Height { get; set; }
+    /// <summary>Slot in the owner-colour sheets (battle_frames_team_NN.png, 64×64 cells); −1 when the frame has no owner colour.</summary>
+    public int TeamSlot { get; set; } = -1;
 }
 
 public partial class SkirmishMain : Node2D
@@ -37,6 +39,7 @@ public partial class SkirmishMain : Node2D
     public float Speed { get; private set; } = 1;
     private Texture2D _terrain = null!, _sprites = null!;
     private readonly Dictionary<(string, int, int), BattleFrame> _frames = [];
+    private readonly Dictionary<int, Texture2D> _teamSheets = [];
     private Label _status = null!, _selection = null!, _events = null!;
     private Label _economy = null!, _recruitment = null!;
     private Button _cancelRecruitment = null!;
@@ -71,8 +74,9 @@ public partial class SkirmishMain : Node2D
             _terrain = GD.Load<Texture2D>("res://assets/imported/terrain.png");
             _sprites = GD.Load<Texture2D>("res://assets/imported/battle_frames.png");
             if (_terrain == null || _sprites == null) throw new InvalidDataException("Bundled textures are missing");
-            foreach (var frame in GameData.Read<BattleFramesData>("res://assets/imported/battle_frames.json").Frames)
-                _frames[(frame.TemplateFile, frame.TemplateIndex, frame.Frame)] = frame;
+            var framesData = GameData.Read<BattleFramesData>("res://assets/imported/battle_frames.json");
+            foreach (var frame in framesData.Frames) _frames[(frame.TemplateFile, frame.TemplateIndex, frame.Frame)] = frame;
+            foreach (int table in framesData.TeamTables) _teamSheets[table] = GD.Load<Texture2D>($"res://assets/imported/battle_frames_team_{table:00}.png");
             _terrainColors = GameData.Read<TerrainColorsData>("res://assets/imported/terrain_colors.json").Colors;
             _minimapImage = GD.Load<Texture2D>("res://assets/imported/minimap.png").GetImage();
             _minimapTexture = ImageTexture.CreateFromImage(_minimapImage); _minimap.Texture = _minimapTexture;
@@ -571,7 +575,11 @@ public partial class SkirmishMain : Node2D
         if (frame != null)
         {
             var size = new Vector2(frame.Width, frame.Height);
-            DrawTextureRectRegion(_sprites, new Rect2(point - new Vector2(size.X / 2, size.Y - 16), size), new Rect2(frame.X, frame.Y, frame.Width, frame.Height));
+            // The owner's colour (COLOR_NN.TAB of the owner's slot) only changes the sprite indices 240..255.
+            if (frame.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(actor.Record[3]), out var sheet))
+                DrawTextureRectRegion(sheet, new Rect2(point - new Vector2(size.X / 2, size.Y - 16), size), new Rect2(frame.TeamSlot % 64 * 64, frame.TeamSlot / 64 * 64, frame.Width, frame.Height));
+            else
+                DrawTextureRectRegion(_sprites, new Rect2(point - new Vector2(size.X / 2, size.Y - 16), size), new Rect2(frame.X, frame.Y, frame.Width, frame.Height));
         }
         else if (!actor.Dying) DrawCircle(point - Vector2.Down * 12, 9, color);
         if (actor.Dying) return; // death frames only, no ring or health bar

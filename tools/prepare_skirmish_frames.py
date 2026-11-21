@@ -20,6 +20,10 @@ def death_frames(raw, base):
     return set(range(start, start + 4*sum(raw[0x4f:0x53])))
 
 
+def scenario_slot_color(slot):
+    return bytes.fromhex(slot['raw_record_hex'])[0]
+
+
 def prepare(source, output):
     tables=json.loads((output/'templates.json').read_text(encoding='utf-8'))['armies']
     scenario=json.loads((output/'scenario.json').read_text(encoding='utf-8'))
@@ -56,7 +60,7 @@ def prepare(source, output):
             wanted[key].update(range(base + 8*raw[0x4a], base + 8*raw[0x4a] + 8*raw[0x4b]))
         if index in [10,11]:
             wanted[key].update(death_frames(raw, base))
-    entries=[];images=[]
+    entries=[];images=[];team_pixels=[]
     for (filename,index),frames in sorted(wanted.items()):
         entry=tables[filename]['templates'][index];sprite_name=filename.replace('.DAT','.SPR')
         data=files[sprite_name].read_bytes();hashes[sprite_name]=hashlib.sha256(data).hexdigest()
@@ -65,14 +69,28 @@ def prepare(source, output):
             if len(pixels)!=entry['width']*entry['height']:raise ValueError(f'Frame size mismatch: {filename}:{index}:{frame}')
             image=Image.new('RGBA',(entry['width'],entry['height']))
             image.putdata([tuple((c&252)|(c>>6) for c in palette[table[v]*3:table[v]*3+3])+(255,) if v>=0 else (0,0,0,0) for v in pixels])
-            slot=len(images);images.append(image)
+            slot=len(images);images.append(image);team_pixels.append(pixels if any(v>=240 for v in pixels) else None)
             entries.append({'template_file':filename,'template_index':index,'frame':frame,
                             'x':slot%32*128,'y':slot//32*128,'width':image.width,'height':image.height})
     atlas=Image.new('RGBA',(4096,((len(images)+31)//32)*128))   # 32 columns keep the height under 16384
     for entry,image in zip(entries,images):atlas.paste(image,(entry['x'],entry['y']))
     atlas.save(output/'battle_frames.png')
-    (output/'battle_frames.json').write_text(json.dumps({'format_version':1,'source_sha256':hashes,'frames':entries},indent=2)+'\n',encoding='utf-8')
-    print(f'Prepared {len(images)} frames; playback timing and anchors remain experimental.')
+    # The owner's colour: COLOR_NN.TAB, NN = byte 0 of the owner's scenario slot (LE:1 2F79..2F90), differs from COLOR_02 only
+    # in the sprite indices 240..255. Frames that use them are repeated, per table, in 64x64 slots (units are at most 62x62).
+    team=[(e,v) for e,v in zip(entries,team_pixels) if v and e['width']<=64 and e['height']<=64]
+    for slot,(entry,_) in enumerate(team):entry['team_slot']=slot
+    # Tables of the sides that play: the player, the enemy and the observed rival (slot 1, SkirmishRules.RivalSlot).
+    tables_used=sorted({scenario_slot_color(s) for s in scenario['slots'] if s['slot_index'] in [rules['player_slot'],rules['enemy_slot'],1]})
+    for number in tables_used:
+        recolor=files[f'COLOR_{number:02d}.TAB'].read_bytes();hashes[f'COLOR_{number:02d}.TAB']=hashlib.sha256(recolor).hexdigest()
+        sheet=Image.new('RGBA',(4096,((len(team)+63)//64)*64))
+        for slot,(entry,pixels) in enumerate(team):
+            image=Image.new('RGBA',(entry['width'],entry['height']))
+            image.putdata([tuple((c&252)|(c>>6) for c in palette[recolor[v]*3:recolor[v]*3+3])+(255,) if v>=0 else (0,0,0,0) for v in pixels])
+            sheet.paste(image,(slot%64*64,slot//64*64))
+        sheet.save(output/f'battle_frames_team_{number:02d}.png')
+    (output/'battle_frames.json').write_text(json.dumps({'format_version':1,'source_sha256':hashes,'team_tables':tables_used,'frames':entries},indent=2)+'\n',encoding='utf-8')
+    print(f'Prepared {len(images)} frames, {len(team)} with owner colours in {len(tables_used)} tables; playback timing and anchors remain experimental.')
 
 
 if __name__=='__main__':
