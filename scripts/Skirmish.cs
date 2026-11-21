@@ -381,6 +381,7 @@ public sealed partial class Skirmish : IDisposable
         TickDeaths();
         TickBuildings();
         TickMining();
+        TickBuildingFrames();
         TickProduction();
         TickPopulation();
         // 42BB visits the settlements in order and each settlement's objects in pool order.

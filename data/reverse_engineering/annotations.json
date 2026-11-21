@@ -3704,6 +3704,18 @@
       "evidence": ["docs/tech.md", "tests/fixtures/lab.json", "tools/verify_lab.py"],
       "implementation": ["scripts/OriginalLabResearch.cs", "scripts/SkirmishAi.cs"],
       "limitations": "A716 and A6AE are recorded stubs of the check (ported elsewhere); the player's research interface is not ported"
+    },
+    {
+      "id": "building-frames-c8e0",
+      "module": "LE:1",
+      "start": 51424,
+      "end": 51785,
+      "name": "Building update tail: working animation, stage frame by condition, ruin decay, collapse",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/building-animation.md", "tests/fixtures/building-frames.json", "tools/verify_building_frames.py"],
+      "implementation": ["scripts/OriginalBuildingFrames.cs", "scripts/SkirmishEconomy.cs"],
+      "limitations": "Debris 9727 and the removal 98CC are callbacks (debris is not drawn); the dispatch C88C..C8E0 into the WRK entries is not ported; line templates and the castle are not drawn by it (their frames are not in the atlas)"
     }
   ]
 }
