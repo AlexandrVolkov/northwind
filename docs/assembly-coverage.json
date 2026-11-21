@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "fb6edb43b6c4c6d971d337ab64a82e543fd5fe17bd1e5b534eafd8dfc43fccbb",
+  "annotation_sha256": "10badb9b80cfad8d625fbdaae1d9d1dc9d63b4ddc4464989e8c0977c36b13d70",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 5512,
-        "ported": 30669,
-        "unreviewed": 110604,
+        "ported": 31116,
+        "unreviewed": 110157,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -308,11 +308,21 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "direction-byte"
+            "direction-byte",
+            "direction-6996"
           ]
         },
         {
           "start": 27134,
+          "end": 27251,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "builder-line-step"
+          ]
+        },
+        {
+          "start": 27251,
           "end": 28143,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1116,10 +1126,19 @@
         },
         {
           "start": 44602,
-          "end": 45187,
+          "end": 45104,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 45104,
+          "end": 45187,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "builder-afdb"
+          ]
         },
         {
           "start": 45187,
@@ -1127,15 +1146,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "construction-upfront"
+            "construction-upfront",
+            "builder-afdb"
           ]
         },
         {
           "start": 45289,
           "end": 45418,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "builder-afdb"
+          ]
         },
         {
           "start": 45418,
@@ -1143,11 +1165,21 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "construction-mark"
+            "construction-mark",
+            "builder-afdb"
           ]
         },
         {
           "start": 45430,
+          "end": 45548,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "builder-afdb"
+          ]
+        },
+        {
+          "start": 45548,
           "end": 46071,
           "status": "unreviewed",
           "classification": "unknown",

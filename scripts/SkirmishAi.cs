@@ -104,6 +104,7 @@ public sealed partial class Skirmish
         foreach (var built in Actors.Where(a => a.Team != 0 && a.Structure)) OriginalTechRules.Complete(TreeOf(built.Record[3]), 1, (byte)built.Source.TemplateIndex);
         _aiSquadWorld = new AiSquadWorld(this);
         _aiTurnWorld = new AiTurnWorld(this);
+        _arctangent = Convert.FromHexString(data.ArctangentHex);
         _aiStates = new OriginalAiSquadStates(_aiSquadWorld, Convert.FromHexString(data.ArctangentHex), Convert.FromHexString(data.SquadMessagesHex));
         _aiMilitary = new OriginalAiMilitary(_aiSquadWorld, Convert.FromHexString(data.ArmyClassesHex));
         _aiGarrison = new OriginalAiGarrison(_aiSquadWorld, _aiMilitary, _aiStates);
@@ -241,6 +242,7 @@ public sealed partial class Skirmish
             switch (value & 7)
             {
                 case 1 when actor.Goal == null && actor.Route.Count == 0 && !actor.Stepping: actor.Record[0x14] = 0; break;
+                case 1 when actor.Goal is { } goal && NoProgress(actor, goal): actor.Goal = null; actor.Route.Clear(); actor.Record[0x14] = 0; break;
                 case 2 or 3 when actor.Target == 0 || Find(actor.Target) == null: actor.Record[0x14] = 0; break;
             }
         }
@@ -295,6 +297,15 @@ public sealed partial class Skirmish
         else { worker.Record[0x14] = 0; worker.Record[0x15] = 0; }
     }
 
+    /// <summary>Adapter for the original's failed route search, which ends the move: an AI move whose goal has not come closer
+    /// for 20 seconds (an unreachable cell across the river) is dropped, so the squad sees it did not arrive (and orders a
+    /// bridge, 1FC28 → 1EB5C mode 0Ah).</summary>
+    private bool NoProgress(SkirmishActor actor, Vector2I goal)
+    {
+        int distance = Math.Max(Math.Abs(actor.Cell.X - goal.X), Math.Abs(actor.Cell.Y - goal.Y));
+        if (distance < actor.BestGoalDistance || Elapsed < actor.BestGoalTime) { actor.BestGoalDistance = distance; actor.BestGoalTime = Elapsed; return false; }
+        return Elapsed - actor.BestGoalTime > 90;
+    }
     private readonly Dictionary<int, PopulationTotals> _enemyPopulation = [];
     /// <summary>The free people (participant +24) of every AI settlement grow by the ported population rules, as the player's do.</summary>
     private void TickEnemyPopulation()
@@ -362,17 +373,47 @@ public sealed partial class Skirmish
     private void EnemyBuild(SkirmishActor builder)
     {
         byte index = builder.Record[0x22];
-        builder.Record[0x22] = 0xff;
         var templates = _templates.Armies["ARMY__02.DAT"].Templates;
-        if (index >= templates.Count() || !Rules.Units.ContainsKey(templates[index].Name) || templates[index].Name is "Замок") return;
-        var template = templates[index];
-        var cell = new Vector2I(BinaryPrimitives.ReadUInt16LittleEndian(builder.Record.AsSpan(0x29)) >> 5, BinaryPrimitives.ReadUInt16LittleEndian(builder.Record.AsSpan(0x2b)) >> 5);
-        if (!Inside(cell) || EnemyPlacement(index, cell) != ConstructionPlacementStatus.Clear) return;
+        if (index >= templates.Count() || !Rules.Units.ContainsKey(templates[index].Name) || templates[index].Name is "Замок") { builder.Record[0x22] = 0xff; return; }
         int slot = builder.Record[3];
-        var payment = OriginalConstructionRules.TryDebitUpfront(AiResources(slot), Price(template));
-        if (!payment.Accepted) return;
-        SetAiResources(slot, payment.Balances);
-        EnemyConstruct(index, cell, slot);
+        var template = templates[index];
+        // The builder engine AFDB (ported): pays per segment, probes, creates the segments and steps along a line (bridges, fences).
+        var engine = new OriginalBuilder(_arctangent) { Toggle = _builderToggle };
+        engine.Run(new SkirmishBuilderWorld(this, slot), builder.Record, Convert.FromHexString(template.RawRecordHex), _participants[slot]);
+        _builderToggle = engine.Toggle;
+        builder.Record[0x22] = 0xff;
+    }
+
+    private byte[] _arctangent = [];
+    private byte _builderToggle = 1;
+
+    /// <summary>The builder's world in the skirmish: AD5F on the occupancy, A758 as a new actor under construction (adapter for
+    /// the timing); registration and tree updates happen when the building is finished.</summary>
+    private sealed class SkirmishBuilderWorld(Skirmish battle, int slot) : IBuilderWorld
+    {
+        public BuilderProbe Probe(byte template, byte army, uint x, uint y, out byte[]? blocker)
+        {
+            blocker = null;
+            var cell = new Vector2I((int)(x >> 5), (int)(y >> 5));
+            if (!battle.Inside(cell)) return BuilderProbe.Rejected;
+            var parameters = battle._templates.Armies["ARMY__02.DAT"].Templates[template].Construction;
+            if (parameters.FootprintWidth == 0) return BuilderProbe.Rejected;
+            var result = OriginalConstructionRules.ProbePlacement(battle.Occupancy.Width, battle.Occupancy.Height, battle.Map.Cells, battle._properties, battle.Occupancy.Cells,
+                parameters.FootprintWidth, parameters.FootprintHeight, parameters.TerrainMask.ToArray(), x, y);
+            if (result.Status == ConstructionPlacementStatus.Rejected) return BuilderProbe.Rejected;
+            if (result.Status == ConstructionPlacementStatus.Occupied)
+            {
+                blocker = battle.Actors.FirstOrDefault(a => a.Alive && a.Id == result.BlockingObjectOffset)?.Record;
+                return blocker == null ? BuilderProbe.Rejected : BuilderProbe.Blocked;
+            }
+            var area = new Rect2I(cell - new Vector2I(parameters.FootprintWidth / 2, parameters.FootprintHeight / 2), new(parameters.FootprintWidth, parameters.FootprintHeight));
+            return battle._reservations.Any(r => area.HasPoint(r.Key.Cell)) ? BuilderProbe.Rejected : BuilderProbe.Clear;
+        }
+        public byte[]? Create(byte army, byte owner, byte template, byte variant, uint x, uint y) =>
+            battle.EnemyConstruct(template, new Vector2I((int)(x >> 5), (int)(y >> 5)), slot).Record;
+        public void Register(byte[] record) { }
+        public void Complete(byte template, byte kind) { }
+        public void Recount(byte[] builder) { }
     }
 
     /// <summary>A new enemy building under construction at the cell (the castle's 58h and 23551's A758, adapter).</summary>
@@ -418,6 +459,7 @@ public sealed partial class Skirmish
             if (!Inside(goal) || !CanStand(actor, goal)) continue;
             if (!actor.Stepping && !Plan(actor, goal)) continue;
             actor.Target = 0; actor.Goal = goal; actor.ReplanTimer = 0;
+            actor.BestGoalDistance = int.MaxValue; actor.BestGoalTime = Elapsed;
             if (actor.Stepping) actor.Route.Clear();
             return true;
         }

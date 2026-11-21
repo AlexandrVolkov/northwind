@@ -72,3 +72,5 @@ python -m unittest discover -s tests -p 'test_*.py'
 ## Текст для новой сессии
 
 > Продолжай перенос «Орды: Северный ветер» в `https://github.com/AlexandrVolkov/northwind`, ветка `codex-work`. Сначала прочитай `AGENTS.md` и `docs/continuation.md`, затем проверь состояние Git. Следующий этап указан в разделе «Следующий срез». Подтверждай правила по коду оригинала, сохраняй доказательства и тесты; не добавляй оригинальные файлы игры в Git. Сохраняй изменения в `codex-work`, без слияния в `main`.
+
+**Двигатель строителя (мосты, заборы) перенесён** (`OriginalBuilder`, `tools/verify_builder.py`; docs/building-command-lifecycle.md). Дальше: отрисовка тумана, фазы подхода 843E, A758, микшер.
