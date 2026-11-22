@@ -182,3 +182,26 @@ public partial class TestRunner
         GetTree().Quit();
     }
 }
+public partial class TestRunner
+{
+    private async System.Threading.Tasks.Task EffectsShot()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+        var b = scene.Battle; var hero = b.Hero.Position;
+        void Add(byte type, ushort frame, float dx)
+        {
+            var e = new byte[0x22]; e[0] = type; System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(e.AsSpan(3), frame); e[0x17] = 5; e[0x16] = 3;
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(e.AsSpan(7), (uint)(hero.X + dx)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(e.AsSpan(0xc), (uint)(hero.Y + 40));
+            b.Stones.Add(e);
+        }
+        Add(0x13, 0xce, 60); Add(0x14, 0x104, 140); Add(0x15, 0x13a, 240); Add(0x1d, 0x226, 340); Add(0x11, 0x19, 420); Add(0x12, 0x49, 480);
+        b.Paused = true; Array.Fill(b.FogMap, (byte)0); scene.FocusWorld(hero + new Vector2(200, 0));
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-effects.png");
+        GetTree().Quit();
+    }
+}
