@@ -477,7 +477,7 @@ public sealed partial class Skirmish : IDisposable
     /// full search, which cost most of the step with a large army. Now at most <see cref="SearchBudgetPerStep"/> searches run per step, a unit tries
     /// the few nearest standing cells, and one that finds nothing waits (<see cref="UnreachableDelay"/>) before it tries again.</summary>
     private int _searchBudget;
-    private const int SearchBudgetPerStep = 6, AttackCandidates = 6;
+    private const int SearchBudgetPerStep = 3, AttackCandidates = 6;
     private const double UnreachableDelay = 2.5;
     private bool PlanAttack(SkirmishActor actor, SkirmishActor target)
     {
