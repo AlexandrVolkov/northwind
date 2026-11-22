@@ -48,6 +48,9 @@ public partial class SkirmishMain : Node2D
     private Button _hire = null!, _buildMill = null!, _hireMilitia = null!, _buildFarm = null!, _buildBarracks = null!, _buildMine = null!;
     public bool PlacingBarracks { get; private set; }
     public bool PlacingMine { get; private set; }
+    /// <summary>The bridge takes two clicks: the first end, then the second (docs/bridges.md).</summary>
+    public bool PlacingBridge { get; private set; }
+    private Vector2I? _bridgeStart;
     public bool PlacingMill { get; private set; }
     public bool PlacingFarm { get; private set; }
     public bool PlacingBuilding => PlacingMill || PlacingFarm || PlacingBarracks || PlacingMine;
@@ -97,7 +100,7 @@ public partial class SkirmishMain : Node2D
         Battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"),
             GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
-        Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false;
+        Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingBridge = false; _bridgeStart = null;
         PendingOrder = 0; Hud.MenuOpen = false;
         // DOSBox screenshots: the idle castle shows «Выбор» and «Разрушить» (WorkFlags bits 2 and 5 = 24h) although its OBE record holds 0;
         // the WRK handler that sets them is not ported, so the observed idle value is applied here.
@@ -123,7 +126,7 @@ public partial class SkirmishMain : Node2D
     public BuildItem[] CastleBuildItems() =>
     [
         new(Battle.BarracksTemplate, 3, BeginBarracksPlacement), new(Battle.MillTemplate, 4, BeginMillPlacement),
-        new(Battle.MineTemplate, 6, BeginMinePlacement), new(Battle.FarmTemplate, 9, BeginFarmPlacement), new(Battle.WorkerTemplate, 10, HireWorker),
+        new(Battle.MineTemplate, 6, BeginMinePlacement), new(Battle.FarmTemplate, 9, BeginFarmPlacement), new(Battle.BridgeTemplate, 7, BeginBridgePlacement), new(Battle.WorkerTemplate, 10, HireWorker),
     ];
     public bool BuildMenuVisible => BuildMenuOpen && Selection.Count == 1 && Selection.Contains(Battle.PlayerCastle.Id) && Battle.PlayerCastle.Alive;
     public TemplateEntry? PlacingTemplate => PlacingBarracks ? Battle.BarracksTemplate : PlacingMill ? Battle.MillTemplate : PlacingMine ? Battle.MineTemplate : PlacingFarm ? Battle.FarmTemplate : null;
@@ -149,6 +152,11 @@ public partial class SkirmishMain : Node2D
     {
         if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
         PlacingBarracks = true; PlacingMill = PlacingFarm = PlacingMine = false; RefreshUi();
+    }
+    public void BeginBridgePlacement()
+    {
+        if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
+        PlacingBridge = true; _bridgeStart = null; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; RefreshUi();
     }
     public void BeginMinePlacement()
     {
@@ -408,6 +416,7 @@ public partial class SkirmishMain : Node2D
                 case Key.X: Battle.Stop(Selection); break;
                 case Key.Escape:
                     if (PendingOrder != 0) PendingOrder = 0;
+                    else if (PlacingBridge) { PlacingBridge = false; _bridgeStart = null; RefreshUi(); }
                     else if (PlacingBuilding) { PlacingMill = false; PlacingFarm = PlacingBarracks = PlacingMine = false; }
                     else if (Hud.MenuOpen) Hud.MenuOpen = false;
                     else Selection.Clear();
@@ -424,6 +433,15 @@ public partial class SkirmishMain : Node2D
             if (button.ButtonIndex is MouseButton.Left or MouseButton.Right && Hud.Click(ToHud(button.Position), button.ButtonIndex)) return;
             if (!MapScreenRect.HasPoint(button.Position)) return;
             if (button.ButtonIndex == MouseButton.Right && PendingOrder != 0) { PendingOrder = 0; return; }
+            if (PlacingBridge && button.ButtonIndex == MouseButton.Right) { if (_bridgeStart != null) _bridgeStart = null; else PlacingBridge = false; RefreshUi(); return; }
+            if (PlacingBridge && button.ButtonIndex == MouseButton.Left)
+            {
+                var spot = GetViewport().GetCanvasTransform().AffineInverse() * button.Position;
+                var at = new Vector2I((int)MathF.Floor(spot.X / 32), (int)MathF.Floor(spot.Y / 32));
+                if (_bridgeStart is not { } first) _bridgeStart = at;
+                else if (Battle.BuildBridge(first, at) > 0) { PlacingBridge = false; _bridgeStart = null; }
+                RefreshUi(); return;
+            }
             if (PlacingBuilding && button.ButtonIndex == MouseButton.Right) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; RefreshUi(); return; }
             if (PlacingBuilding && button.ButtonIndex == MouseButton.Left)
             {
@@ -495,6 +513,19 @@ public partial class SkirmishMain : Node2D
                 DrawRect(new Rect2((Vector2)(cell * 32), Vector2.One * 32), new Color("a0dfa0"), false, 2);
                 DrawString(ThemeDB.FallbackFont, (Vector2)(cell * 32) - new Vector2(0, 4), "Лес · ПКМ — рубить", HorizontalAlignment.Left, -1, 12, new Color("d9e8b5"));
             }
+        }
+        if (PlacingBridge)
+        {
+            var mouse = GetGlobalMousePosition(); var at = new Vector2I((int)MathF.Floor(mouse.X / 32), (int)MathF.Floor(mouse.Y / 32));
+            var line = _bridgeStart is { } begin ? Battle.BridgeCells(begin, at) : [at];
+            bool affordable = !Battle.Paused && Battle.CanAffordBridge(line.Count);
+            var c = affordable ? new Color(40 / 255f, 28 / 255f, 223 / 255f) : new Color(200 / 255f, 30 / 255f, 30 / 255f);
+            foreach (var cell in line)
+            {
+                var cc = Battle.Inside(cell) && Battle.BridgeCellFree(cell) ? c : new Color(200 / 255f, 30 / 255f, 30 / 255f);
+                var r = new Rect2((Vector2)(cell * 32), new Vector2(32, 32)); DrawRect(r, new Color(cc, .25f)); DrawRect(r.Grow(-1), cc, false, 1);
+            }
+            if (_bridgeStart != null) DrawString(ThemeDB.FallbackFont, (Vector2)(line[^1] * 32) + new Vector2(0, -5), $"Секций: {line.Count}", HorizontalAlignment.Left, -1, 12, c.Lightened(.5f));
         }
         if (PlacingBuilding)
         {
@@ -788,6 +819,7 @@ public partial class SkirmishMain : Node2D
         _buildFarm.TooltipText = Battle.MissingResources(Battle.FarmTemplate);
         _buildBarracks.TooltipText = Battle.MissingResources(Battle.BarracksTemplate);
         _buildMine.TooltipText = Battle.MissingResources(Battle.MineTemplate);
+        if (PlacingBridge) _status.Text = _bridgeStart == null ? "Мост: первый конец\nЛКМ — выбрать · ПКМ/Esc — отмена" : "Мост: второй конец\nЛКМ — строить · ПКМ — отмена точки";
         if (PlacingMine) _status.Text = "Место для шахты\nЛКМ — строить · ПКМ/Esc — отмена";
         if (PlacingBarracks) _status.Text = "Место для казармы\nЛКМ — строить · ПКМ/Esc — отмена";
         if (PlacingFarm) _status.Text = "Место для фермы\nЛКМ — строить · ПКМ/Esc — отмена";

@@ -22,6 +22,7 @@ public partial class TestRunner : Node
                 case "pause": await PauseChecks(); break;
                 case "shots": await Shots(); break;
                 case "horde-shot": await HordeShot(); break;
+                case "bridge-shot": await BridgeShot(); break;
                 case "display": await DisplayChecks(); break;
                 case "menus": await MenuChecks(); break;
                 case "build-menu": await BuildMenuChecks(); break;
@@ -62,7 +63,7 @@ public partial class TestRunner : Node
                 case "original-ai": OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); OriginalAiResearchChecks(); OriginalAiSquadChecks(); OriginalAiSquadStepChecks(); OriginalAiSquadStateChecks(); OriginalAiMilitaryChecks(); OriginalAiGarrisonChecks(); OriginalAiOrderChecks(); OriginalAiEconomyChecks(); OriginalAiWorkerChecks(); OriginalAiFormationChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
                 case "aiperf": Perf(); break;
-                case "skirmish-ai": DebrisChecks(); SkirmishHordeChecks(); SkirmishAiChecks(); SkirmishRivalChecks(); SkirmishImprovedChecks(); break;
+                case "skirmish-ai": DebrisChecks(); BridgeChecks(); SkirmishHordeChecks(); SkirmishAiChecks(); SkirmishRivalChecks(); SkirmishImprovedChecks(); break;
                 default: throw new ArgumentException($"Unknown test mode: {mode}");
             }
             GD.Print($"C# {mode}: PASS ({_checks} checks)"); GetTree().Quit();
