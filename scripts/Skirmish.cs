@@ -56,8 +56,8 @@ public sealed class SkirmishActor
     public uint Target { get; set; }
     /// <summary>Taken out of the original AI's squads by the improved logic: it is on an attack wave and invisible to the squad machinery.</summary>
     public bool Detached { get; set; }
-    /// <summary>A unit among trees that an enemy stands next to: seen after all.</summary>
-    public bool Revealed { get; set; }
+    /// <summary>The owners that can see this unit (kept in OBE[20]): all, unless it stands among trees.</summary>
+    public byte VisibleTo { get; set; } = 0xff;
     public bool Stepping { get; set; }
     public bool Turning { get; set; }
     public Vector2I StepGoal { get; set; }
@@ -408,11 +408,24 @@ public sealed partial class Skirmish : IDisposable
             if (!actor.Alive) return;
             actor.AttackTimer -= dt; actor.ReplanTimer -= dt;
             // OBE[20] is the mask of the owners that can see the object (FFh: all): a unit among trees is seen by its owner only.
-            // An enemy within two cells (checked every fourth update) uncovers it.
-            if (!InForest(actor)) actor.Revealed = false;
+            // Seen by whom (OBE[20], checked every fourth update): a unit among trees sees every unit; a unit outside sees a unit among
+            // trees only when that one stands at the edge of the forest and is within three cells.
+            if (!InForest(actor)) actor.VisibleTo = 0xff;
             else if ((actor.Record[0x2e] & 3) == 0)
-                actor.Revealed = Actors.Any(a => a.Alive && !a.Structure && a != actor && AtWar(actor, a) && Math.Max(Math.Abs(a.Cell.X - actor.Cell.X), Math.Abs(a.Cell.Y - actor.Cell.Y)) <= 2);
-            actor.Record[0x20] = InForest(actor) && !actor.Revealed ? (byte)(1 << (actor.Record[3] & 7)) : (byte)0xff;
+            {
+                byte mask = (byte)(1 << (actor.Record[3] & 7));
+                bool edge = false;
+                for (int dy = -1; dy <= 1 && !edge; dy++) for (int dx = -1; dx <= 1; dx++)
+                    if ((dx != 0 || dy != 0) && Inside(actor.Cell + new Vector2I(dx, dy)) && !Harvestable(actor.Cell + new Vector2I(dx, dy))) { edge = true; break; }
+                foreach (var other in Actors)
+                {
+                    if (!other.Alive || other.Structure || other.Record[3] == actor.Record[3]) continue;
+                    int near = Math.Max(Math.Abs(other.Cell.X - actor.Cell.X), Math.Abs(other.Cell.Y - actor.Cell.Y));
+                    if (near <= 12 && (InForest(other) || (edge && near <= 3))) mask |= (byte)(1 << (other.Record[3] & 7));
+                }
+                actor.VisibleTo = mask;
+            }
+            actor.Record[0x20] = actor.VisibleTo;
             long t0 = P0(); bool vitals = TickVitals(actor); P1("u.vitals", t0); if (vitals) return;
             if (actor.Worker) { t0 = P0(); TickWorker(actor, dt); P1("u.worker", t0); return; }
             var target = Find(actor.Target);

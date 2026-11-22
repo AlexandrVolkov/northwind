@@ -613,7 +613,7 @@ public partial class SkirmishMain : Node2D
             DrawSetTransform(Vector2.Zero);
         }
         // A unit among the trees is hidden: its owner sees only a hollow green triangle, the others see nothing.
-        if (!actor.Structure && !actor.Dying && Battle.InForest(actor) && !actor.Revealed)
+        if (!actor.Structure && !actor.Dying && Battle.InForest(actor) && (actor.Team == 0 || (actor.VisibleTo & (1 << (Battle.Rules.PlayerSlot & 7))) == 0))
         {
             if (actor.Team == 0)
             {
