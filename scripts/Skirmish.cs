@@ -48,7 +48,8 @@ public sealed class SkirmishActor
     public bool Ruined => Structure && ConstructionRemaining <= 0 && (sbyte)Record[0x19] <= (sbyte)Parameters[0x46];
     public bool Standing => Alive && !Ruined;
     public bool Worker => Rules.Worker;
-    public bool Structure => Rules.Damage == 0 && !Worker;
+    /// <summary>A building by its DAT flag (bit 8 of DAT[40]); a tower has an attack, so the rule table's damage cannot tell it from a soldier.</summary>
+    public bool Structure => Parameters.Length > 0x43 ? (BinaryPrimitives.ReadUInt32LittleEndian(Parameters.AsSpan(0x40)) & 8) != 0 : Rules.Damage == 0 && !Worker;
     /// <summary>Template index within ARMY__02, or -1 for another army (index-keyed rules of the ARMY__02 tree must not hit the horde's ARMY__01 indices).</summary>
     public int Index02 => Source.TemplateFile == "ARMY__02.DAT" ? Source.TemplateIndex : -1;
     public bool Hero => Source.TemplateName == "Предводитель";
@@ -448,7 +449,7 @@ public sealed partial class Skirmish : IDisposable
             OriginalCombatRules.AfterUpdate(actor.Record, engaged != null ? engaged.Record : ReadOnlySpan<byte>.Empty, _globalTick);
         }
         });
-        TickFauna(); TickPits();
+        TickFauna(); TickPits(); TickTowers();
         Prof("fog", TickFog);
         Prof("ai", TickAi); // 1E7EA follows the object update (LE:1 31D6)
         if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";

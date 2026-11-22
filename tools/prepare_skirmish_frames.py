@@ -52,7 +52,7 @@ def prepare(source, output):
         base=struct.unpack_from('<H',raw,0x48)[0]
         wanted.setdefault(key,set()).update(range(base,base+8*raw[0x4a]))
         wanted[key].update(action_frames(raw, base)); wanted[key].update(death_frames(raw, base))
-    for index in [3,4,6,7,8,9,10,11,12,15,22,23,24]:
+    for index in [3,4,6,7,8,9,10,11,12,13,15,22,23,24]:
         key=('ARMY__02.DAT',index);entry=tables[key[0]]['templates'][index]
         raw=bytes.fromhex(entry['raw_record_hex']);base=struct.unpack_from('<H',raw,0x48)[0]
         wanted.setdefault(key,set()).update(range(base,base+(8*raw[0x4a] if index in [8,10,11] else raw[0x4a]+1)))

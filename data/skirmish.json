@@ -78,8 +78,18 @@
       "range": 48,
       "cooldown": 1.0
     },
-    "Катапульта": {"health": 60, "damage": 10, "range": 192, "cooldown": 3.3},
-    "Балиста": {"health": 60, "damage": 10, "range": 192, "cooldown": 3.3},
+    "Катапульта": {
+      "health": 60,
+      "damage": 10,
+      "range": 192,
+      "cooldown": 3.3
+    },
+    "Балиста": {
+      "health": 60,
+      "damage": 10,
+      "range": 192,
+      "cooldown": 3.3
+    },
     "Всадник": {
       "health": 80,
       "damage": 9,
@@ -112,6 +122,12 @@
     },
     "Церковь": {
       "health": 150,
+      "damage": 0,
+      "range": 0,
+      "cooldown": 1
+    },
+    "Башня": {
+      "health": 110,
       "damage": 0,
       "range": 0,
       "cooldown": 1

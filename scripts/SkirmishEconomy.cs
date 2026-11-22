@@ -136,20 +136,26 @@ public sealed partial class Skirmish
     }
     public TemplateEntry FactoryTemplate => _templates.Armies["ARMY__02.DAT"].Templates[15];
     public static bool IsFactory(SkirmishActor actor) => actor.Alive && actor.Team == 0 && actor.Source.TemplateName == "Завод" && actor.ConstructionRemaining <= 0;
+    public TemplateEntry TowerTemplate => _templates.Armies["ARMY__02.DAT"].Templates[13];
+    public TemplateEntry TemplateOf(int index) => _templates.Armies["ARMY__02.DAT"].Templates[index];
     public ConstructionPlacement ProbeFactory(Vector2I cell) => ProbeEconomyBuilding(cell, FactoryTemplate);
-    public SkirmishActor? BuildFactory(Vector2I cell)
+    public ConstructionPlacement ProbeIndex(int index, Vector2I cell) => ProbeEconomyBuilding(cell, TemplateOf(index));
+    public SkirmishActor? BuildFactory(Vector2I cell) => BuildIndex(15, cell);
+    /// <summary>A building of the castle's or the factory's list at the cell (the factory 15, the tower 13): near the castle, paid up front, built over time.</summary>
+    public SkirmishActor? BuildIndex(int index, Vector2I cell)
     {
         if (Paused || Outcome != "" || !PlayerCastle.Alive) return null;
-        if (ProbeFactory(cell).Status != ConstructionPlacementStatus.Clear) { Log("Для завода нужна свободная площадка рядом с замком."); return null; }
-        if (!Spend(FactoryTemplate)) return null;
-        var factory = NewEconomyActor(15, cell, false);
+        var template = TemplateOf(index); string name = template.Name.ToLowerInvariant();
+        if (ProbeIndex(index, cell).Status != ConstructionPlacementStatus.Clear) { Log($"Для постройки ({name}) нужна свободная площадка рядом с замком."); return null; }
+        if (!Spend(template)) return null;
+        var factory = NewEconomyActor(index, cell, false);
         factory.ConstructionDuration = factory.ConstructionRemaining = factory.Template.InitialCondition * Math.Max(1, (int)factory.Parameters[0x57]) / (double)Rules.TicksPerSecond;
         OriginalBuildingLifecycle.MarkConstruction(factory.Record);
         factory.Record.AsSpan(0x22, 5).Fill(0xff);
         factory.Record[0x20] = 0xff; factory.Record[0x27] = 0xff;
         Actors.Add(factory);
         Occupancy.WriteFootprint(factory.Parameters[3], factory.Parameters[4], factory.Record[0x0d], (uint)factory.Position.X, (uint)factory.Position.Y, factory.Id);
-        Log("Завод строится. Мосты строят через него."); return factory;
+        Log(index == 15 ? "Завод строится. Мосты и башни строят через него." : "Башня строится."); return factory;
     }
     public ConstructionPlacement ProbeBarracks(Vector2I cell) => ProbeEconomyBuilding(cell, BarracksTemplate);
     public SkirmishActor? BuildBarracks(Vector2I cell)
@@ -237,7 +243,7 @@ public sealed partial class Skirmish
                 building.ConstructionRemaining = maintenance.ContinueAction
                     ? ((building.Template.InitialCondition - maintenance.State.Condition + 1) * Math.Max(1, (int)building.Parameters[0x57]) - maintenance.State.Counter) / (double)Rules.TicksPerSecond : 0;
                 // Provisional visual stage binding; the full C88C frame/effects handler is not connected.
-                if (building.Source.TemplateName is "Ферма" or "Казарма" or "Шахта" or "Мост")
+                if (building.Source.TemplateName is "Ферма" or "Казарма" or "Шахта" or "Мост" or "Башня")
                     BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(LineShapeFrames(building) + building.Template.InitialFrame + Math.Min(building.Parameters[0x4a], building.Record[0x19] * (building.Parameters[0x4a] + 1) / (building.Template.InitialCondition + 1))));
                 if (maintenance.ContinueAction) continue;
                 var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(building.Record[0x14], building.Record[0x15], building.Record[0x0f]));

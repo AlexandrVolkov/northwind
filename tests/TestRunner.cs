@@ -65,7 +65,7 @@ public partial class TestRunner : Node
                 case "original-ai": OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); OriginalAiResearchChecks(); OriginalAiSquadChecks(); OriginalAiSquadStepChecks(); OriginalAiSquadStateChecks(); OriginalAiMilitaryChecks(); OriginalAiGarrisonChecks(); OriginalAiOrderChecks(); OriginalAiEconomyChecks(); OriginalAiWorkerChecks(); OriginalAiFormationChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
                 case "aiperf": Perf(); break;
-                case "skirmish-ai": DebrisChecks(); BridgeChecks(); FaunaChecks(); FaunaBehaviourChecks(); PitChecks(); SkirmishHordeChecks(); SkirmishAiChecks(); SkirmishRivalChecks(); SkirmishImprovedChecks(); break;
+                case "skirmish-ai": DebrisChecks(); BridgeChecks(); FaunaChecks(); FaunaBehaviourChecks(); TowerChecks(); PitChecks(); SkirmishHordeChecks(); SkirmishAiChecks(); SkirmishRivalChecks(); SkirmishImprovedChecks(); break;
                 default: throw new ArgumentException($"Unknown test mode: {mode}");
             }
             GD.Print($"C# {mode}: PASS ({_checks} checks)"); GetTree().Quit();
