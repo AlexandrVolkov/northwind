@@ -142,3 +142,23 @@ public partial class TestRunner
         GetTree().Quit();
     }
 }
+public partial class TestRunner
+{
+    private async System.Threading.Tasks.Task TowerShot()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+        var b = scene.Battle; b.GrantPeople(10); SkirmishActor? tower = null;
+        for (int r = 4; r < 12 && tower == null; r++) for (int dy = -r; dy <= r && tower == null; dy++) for (int dx = -r; dx <= r && tower == null; dx++)
+        { var cell = b.PlayerCastle.Cell + new Vector2I(dx, dy); if (Math.Max(Math.Abs(dx), Math.Abs(dy)) == r && b.ProbeIndex(13, cell).Status == ConstructionPlacementStatus.Clear) tower = b.BuildIndex(13, cell); }
+        for (int t = 0; t < (int)(300 * 18.2) && tower!.ConstructionRemaining > 0; t++) b.Advance(1 / 18.2);
+        Array.Fill(b.FogMap, (byte)0);
+        scene.FocusWorld(tower!.Position);
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-tower.png");
+        GetTree().Quit();
+    }
+}

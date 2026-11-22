@@ -49,6 +49,8 @@ public partial class SkirmishMain : Node2D
     public bool PlacingBarracks { get; private set; }
     public bool PlacingMine { get; private set; }
     public bool PlacingFactory { get; private set; }
+    /// <summary>ARMY__02 index of the building placed from the castle's or the factory's list (15 factory, 13 tower).</summary>
+    private int _placingIndex = 15;
     /// <summary>The bridge takes two clicks: the first end, then the second (docs/bridges.md).</summary>
     public bool PlacingBridge { get; private set; }
     private Vector2I? _bridgeStart;
@@ -134,10 +136,10 @@ public partial class SkirmishMain : Node2D
     ];
     /// <summary>A finished factory of the player is selected: its list offers the line buildings (the bridge; fence, gate, tower and the siege engines are not offered yet).</summary>
     public SkirmishActor? SelectedFactory => Selection.Count == 1 && Battle.Find(Selection.Single()) is { } f && Skirmish.IsFactory(f) ? f : null;
-    public BuildItem[] FactoryBuildItems() => [new(Battle.BridgeTemplate, 7, BeginBridgePlacement)];
+    public BuildItem[] FactoryBuildItems() => [new(Battle.BridgeTemplate, 7, BeginBridgePlacement), new(Battle.TowerTemplate, 13, BeginTowerPlacement)];
     public BuildItem[] BuildItems() => SelectedFactory != null ? FactoryBuildItems() : CastleBuildItems();
     public bool BuildMenuVisible => (BuildMenuOpen && Selection.Count == 1 && Selection.Contains(Battle.PlayerCastle.Id) && Battle.PlayerCastle.Alive) || SelectedFactory != null;
-    public TemplateEntry? PlacingTemplate => PlacingFactory ? Battle.FactoryTemplate : PlacingBarracks ? Battle.BarracksTemplate : PlacingMill ? Battle.MillTemplate : PlacingMine ? Battle.MineTemplate : PlacingFarm ? Battle.FarmTemplate : null;
+    public TemplateEntry? PlacingTemplate => PlacingFactory ? Battle.TemplateOf(_placingIndex) : PlacingBarracks ? Battle.BarracksTemplate : PlacingMill ? Battle.MillTemplate : PlacingMine ? Battle.MineTemplate : PlacingFarm ? Battle.FarmTemplate : null;
     public void HireWorker()
     {
         if (!Selection.Contains(Battle.PlayerCastle.Id)) return;
@@ -169,7 +171,12 @@ public partial class SkirmishMain : Node2D
     public void BeginFactoryPlacement()
     {
         if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
-        PlacingFactory = true; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; RefreshUi();
+        _placingIndex = 15; PlacingFactory = true; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; RefreshUi();
+    }
+    public void BeginTowerPlacement()
+    {
+        if (Battle.Paused || Battle.Outcome != "" || SelectedFactory == null) return;
+        _placingIndex = 13; PlacingFactory = true; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingBridge = false; RefreshUi();
     }
     public void BeginMinePlacement()
     {
@@ -468,7 +475,7 @@ public partial class SkirmishMain : Node2D
             {
                 var point = GetViewport().GetCanvasTransform().AffineInverse() * button.Position;
                 var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
-                var mill = PlacingFarm ? Battle.BuildFarm(cell) : PlacingFactory ? Battle.BuildFactory(cell) : PlacingBarracks ? Battle.BuildBarracks(cell) : PlacingMine ? Battle.BuildMine(cell) : Battle.BuildMill(cell);
+                var mill = PlacingFarm ? Battle.BuildFarm(cell) : PlacingFactory ? Battle.BuildIndex(_placingIndex, cell) : PlacingBarracks ? Battle.BuildBarracks(cell) : PlacingMine ? Battle.BuildMine(cell) : Battle.BuildMill(cell);
                 // The original keeps the castle selected and its build list open after placing (DOSBox screenshots).
                 if (mill != null) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingFactory = false; if (!BuildMenuVisible) { Selection.Clear(); Selection.Add(mill.Id); } }
                 RefreshUi(); return;
@@ -568,7 +575,7 @@ public partial class SkirmishMain : Node2D
             var point = GetGlobalMousePosition(); var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
             var parameters = (PlacingTemplate ?? Battle.MillTemplate).Construction;
             var rect = new Rect2((Vector2)((cell - new Vector2I(parameters.FootprintWidth / 2, parameters.FootprintHeight / 2)) * 32), new Vector2(parameters.FootprintWidth * 32, parameters.FootprintHeight * 32));
-            bool clear = !Battle.Paused && Battle.CanAfford(PlacingTemplate ?? Battle.MillTemplate) && (PlacingFarm ? Battle.ProbeFarm(cell) : PlacingFactory ? Battle.ProbeFactory(cell) : PlacingBarracks ? Battle.ProbeBarracks(cell) : PlacingMine ? Battle.ProbeMine(cell) : Battle.ProbeMill(cell)).Status == ConstructionPlacementStatus.Clear;
+            bool clear = !Battle.Paused && Battle.CanAfford(PlacingTemplate ?? Battle.MillTemplate) && (PlacingFarm ? Battle.ProbeFarm(cell) : PlacingFactory ? Battle.ProbeIndex(_placingIndex, cell) : PlacingBarracks ? Battle.ProbeBarracks(cell) : PlacingMine ? Battle.ProbeMine(cell) : Battle.ProbeMill(cell)).Status == ConstructionPlacementStatus.Clear;
             if (_ui.Visible) { var color = clear ? new Color("8de5b8") : new Color("ef8272"); DrawRect(rect, new Color(color, .2f)); DrawRect(rect, color, false, 2); }
             else
             {
