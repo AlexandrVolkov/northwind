@@ -7,6 +7,7 @@ public partial class TestRunner
 
     private static void BuildTestFactory(Skirmish battle)
     {
+        battle.GrantPeople(8);
         for (int r = 4; r < 14; r++)
             for (int dy = -r; dy <= r; dy++)
                 for (int dx = -r; dx <= r; dx++)

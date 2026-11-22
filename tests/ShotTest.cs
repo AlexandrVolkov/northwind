@@ -97,6 +97,10 @@ public partial class TestRunner
             await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
             GetViewport().GetTexture().GetImage().SavePng($"res://build/shot-bridge-{name}.png");
         }
+        { var f = b.Actors.First(Skirmish.IsFactory); scene.Selection.Clear(); scene.Selection.Add(f.Id); scene.FocusWorld(f.Position);
+          for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+          await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+          GetViewport().GetTexture().GetImage().SavePng("res://build/shot-factory.png"); }
         GD.Print("SHAPES " + string.Join(",", b.Actors.Where(a => a.Index02 == 7).Select(a => a.Record[0x22])));
         GetTree().Quit();
     }
