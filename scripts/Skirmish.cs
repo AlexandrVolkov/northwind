@@ -11,6 +11,8 @@ public sealed class SkirmishRules
     public int RivalSlot { get; set; } = -1;
     /// <summary>The horde of Teymur (slot 4, ARMY__01; docs/horde.md): -1 off.</summary>
     public int HordeSlot { get; set; } = -1;
+    /// <summary>The wolves and bears of slots 6 and 7 (docs/fauna.md); off by default.</summary>
+    public bool Fauna { get; set; }
     public int RivalShiftX { get; set; } = 44;
     /// <summary>Object updates per second. Original: PIT 1193182/16384 Hz, world step every 2 ticks at speed FDh, objects every 2nd step.</summary>
     public double TicksPerSecond { get; set; } = 1193182.0 / 16384 / 4;
@@ -138,6 +140,7 @@ public sealed partial class Skirmish : IDisposable
     public Skirmish(MapData map, ScenarioData scenario, TemplatesData templates, SkirmishRules rules)
     {
         _resolveMovement = ResolveMovementObject;
+        _armyFiles = scenario.ArmyFiles.ToList();
         foreach (var s in scenario.Slots) _colorTables[s.SlotIndex] = Convert.FromHexString(s.RawRecordHex)[0];
         Map = map; Rules = rules; _properties = Convert.FromHexString(map.SegmentPropertiesHex);
         var snapshot = OriginalOccupancySnapshot.Build(map, scenario, templates);
@@ -166,6 +169,7 @@ public sealed partial class Skirmish : IDisposable
         if (rules.RivalSlot >= 0) CreateRival(scenario, templates);
         InitializeAi(scenario, templates);
         InitializeHorde(scenario);
+        InitializeFauna(scenario, templates);
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
     }
     // Actors only grows (the fallen stay with Alive = false), so an index over the list is extended lazily with the new tail.
@@ -184,7 +188,7 @@ public sealed partial class Skirmish : IDisposable
         var size = new Vector2I(a.Parameters[3], a.Parameters[4]);
         return new Rect2((Vector2)((a.Cell - size / 2) * 32), (Vector2)(size * 32));
     }
-    public SkirmishActor? At(Vector2 point) => Actors.Where(a => a.Alive && HitBounds(a).HasPoint(point))
+    public SkirmishActor? At(Vector2 point) => Actors.Where(a => a.Alive && !IsAnimal(a) && HitBounds(a).HasPoint(point))
         .OrderBy(a => a.Structure).ThenBy(a => (a.Position - new Vector2(0, 16)).DistanceSquaredTo(point)).FirstOrDefault();
     private Rect2 HitBounds(SkirmishActor actor)
     {
@@ -403,6 +407,7 @@ public sealed partial class Skirmish : IDisposable
             OriginalCombatRules.AfterUpdate(actor.Record, engaged != null ? engaged.Record : ReadOnlySpan<byte>.Empty, _globalTick);
         }
         });
+        TickFauna();
         Prof("fog", TickFog);
         Prof("ai", TickAi); // 1E7EA follows the object update (LE:1 31D6)
         if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";
@@ -567,9 +572,12 @@ public sealed partial class Skirmish : IDisposable
     public List<SoundEvent> Sounds { get; } = [];
     private byte SoundRandom() => _aiRandom.Length > 0 ? _aiRandom[_aiRandom3++] : (byte)0;
     /// <summary>A416: a sound of the object's army bank at its position; number 0 is silent.</summary>
+    /// <summary>The army byte of an object (+00) indexes the scenario's list of army files (ARMY__00..03 and ARMY__05 on the first map).</summary>
+    private string ArmyBank(byte army) => _armyFiles.Count > army ? _armyFiles[army].Replace(".DAT", ".FX") : $"ARMY__{army:00}.FX";
+    private List<string> _armyFiles = [];
     private void ObjectSound(SkirmishActor actor, uint id)
     {
-        if (id != 0 && Sounds.Count < 64) Sounds.Add(new($"ARMY__{actor.Record[0]:00}.FX", (int)id, SoundRandom(), actor.Position));
+        if (id != 0 && Sounds.Count < 64) Sounds.Add(new(ArmyBank(actor.Record[0]), (int)id, SoundRandom(), actor.Position));
     }
     /// <summary>A4C2: a sound of the shared bank WORK.FX at the cell (+20/+21 of a squad or command); number 0 is allowed.</summary>
     private void WorkSound(uint id, byte cellX, byte cellY)
@@ -831,6 +839,7 @@ public sealed partial class Skirmish : IDisposable
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         target.Dying = !target.Structure;
         if (target.Structure) { CollapseDebris(target); if (target.Index02 is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24) Ruins.Add((target.Index02, target.Frame, target.Position, target.Record[3], 5000)); }
+        if (IsAnimal(target)) AnimalDied(target);
         Log($"{target.Source.TemplateName} {(target.Team == 0 ? "потерян" : "уничтожен")}.");
     }
     /// <summary>Corpses (ARMY__02 type 1, army +01 = 2) and blood splashes (ARMY__00 type 3), 22h-byte effect records.</summary>

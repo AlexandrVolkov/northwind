@@ -51,6 +51,8 @@ public sealed class ScenarioData
 {
     public string MapFile { get; set; } = "";
     public int SlotCount { get; set; }
+    /// <summary>Army files of the map; the army byte of an object (+00) indexes this list.</summary>
+    public string[] ArmyFiles { get; set; } = [];
     public ScenarioSlot[] Slots { get; set; } = [];
     public InitialOccupancyData InitialOccupancy { get; set; } = new();
 }

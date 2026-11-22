@@ -95,6 +95,7 @@ public partial class SkirmishMain : Node2D
     {
         if (Battle != null) Battle.Dispose();
         var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        rules.Fauna = true;   // wolves and bears of slots 6 and 7 (docs/fauna.md)
         rules.HordeSlot = 4;   // the horde of Teymur (docs/horde.md): camps found a tent at random
         rules.RivalSlot = 1;   // observation: a second AI settlement in the east, at war with the red one
         Battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"),
@@ -490,7 +491,7 @@ public partial class SkirmishMain : Node2D
         foreach (var (type, firstFrame, at, left) in Battle.Sparks)
             if (_frames.TryGetValue(("ARMY__00.EFF", type, firstFrame + (8 - left)), out var spark))
                 DrawTextureRectRegion(_sprites, new Rect2(at - new Vector2(spark.Width / 2f, spark.Height / 2f), new Vector2(spark.Width, spark.Height)), new Rect2(spark.X, spark.Y, spark.Width, spark.Height));
-        foreach (var actor in Battle.Actors.Where(a => a.Alive || a.Dying).OrderBy(a => a.Position.Y)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);
+        foreach (var actor in Battle.Actors.Where(a => (a.Alive || a.Dying) && !Skirmish.IsAnimal(a)).OrderBy(a => a.Position.Y)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);
         if (_showFog)
             for (int y = Math.Max(0, first.Y); y < Math.Min(Battle.Map.Height, last.Y); y++)
             for (int x = Math.Max(0, first.X); x < Math.Min(Battle.Map.Width, last.X); x++)
@@ -764,7 +765,7 @@ public partial class SkirmishMain : Node2D
     {
         if (!_ready) return;
         var rect = MiniRect(); var world = new Vector2(Battle.Map.Width, Battle.Map.Height) * 32;
-        foreach (var actor in Battle.Actors.Where(a => a.Alive))
+        foreach (var actor in Battle.Actors.Where(a => a.Alive && !Skirmish.IsAnimal(a)))
             _markers.DrawCircle(rect.Position + actor.Position / world * rect.Size, actor.Structure ? 3 : 2, TeamColor(actor.Team));
         var view = GetViewportRect().Size / Camera.Zoom;
         _markers.DrawRect(new Rect2(rect.Position + (Camera.Position - view / 2) / world * rect.Size, view / world * rect.Size), new Color("f1da93"), false);
