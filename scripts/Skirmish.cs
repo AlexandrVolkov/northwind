@@ -43,6 +43,8 @@ public sealed class SkirmishActor
     public bool Standing => Alive && !Ruined;
     public bool Worker => Rules.Worker;
     public bool Structure => Rules.Damage == 0 && !Worker;
+    /// <summary>Template index within ARMY__02, or -1 for another army (index-keyed rules of the ARMY__02 tree must not hit the horde's ARMY__01 indices).</summary>
+    public int Index02 => Source.TemplateFile == "ARMY__02.DAT" ? Source.TemplateIndex : -1;
     public bool Hero => Source.TemplateName == "Предводитель";
     public Vector2 Position => new(BinaryPrimitives.ReadUInt32LittleEndian(Record.AsSpan(4)), BinaryPrimitives.ReadUInt32LittleEndian(Record.AsSpan(8)));
     public Vector2I Cell => new((int)Position.X >> 5, (int)Position.Y >> 5);
@@ -825,7 +827,7 @@ public sealed partial class Skirmish : IDisposable
         Occupancy.LoadCells(cells);
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         target.Dying = !target.Structure;
-        if (target.Structure) { CollapseDebris(target); if (target.Source.TemplateIndex is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24) Ruins.Add((target.Source.TemplateIndex, target.Frame, target.Position, target.Record[3], 5000)); }
+        if (target.Structure) { CollapseDebris(target); if (target.Index02 is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24) Ruins.Add((target.Index02, target.Frame, target.Position, target.Record[3], 5000)); }
         Log($"{target.Source.TemplateName} {(target.Team == 0 ? "потерян" : "уничтожен")}.");
     }
     /// <summary>Corpses (ARMY__02 type 1, army +01 = 2) and blood splashes (ARMY__00 type 3), 22h-byte effect records.</summary>

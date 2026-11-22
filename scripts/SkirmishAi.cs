@@ -101,7 +101,7 @@ public sealed partial class Skirmish
         _aiFortification = data.Fortifications.Count > 0 ? Convert.FromHexString(data.Fortifications[0]) : [];
         // A6AE marks a finished building in the development tree; the buildings standing at the start count as finished
         // (assumption: the scenario load path is not ported).
-        foreach (var lab in Actors.Where(a => a.Team != 0 && a.Source.TemplateIndex == 12 && a.Record.Length >= 0x29)) { lab.Record[0x22] = lab.Record[0x23] = 1; lab.Record[0x15] = 0; }   // the laboratory's AH=0
+        foreach (var lab in Actors.Where(a => a.Team != 0 && a.Index02 == 12 && a.Record.Length >= 0x29)) { lab.Record[0x22] = lab.Record[0x23] = 1; lab.Record[0x15] = 0; }   // the laboratory's AH=0
         foreach (var built in Actors.Where(a => a.Team != 0 && a.Structure)) OriginalTechRules.Complete(TreeOf(built.Record[3]), 1, (byte)built.Source.TemplateIndex);
         _aiSquadWorld = new AiSquadWorld(this);
         _aiTurnWorld = new AiTurnWorld(this);
@@ -226,7 +226,7 @@ public sealed partial class Skirmish
             // A building under construction carries 81h (command 80h, activity 1); the handled command leaves activity 1, which
             // 22E85 reads as «producer under construction». Completion (C80D path) gives the same next state for 81h and 1.
             if (building.ConstructionRemaining > 0 && (building.Record[0x14] & 0x80) != 0) building.Record[0x14] &= 7;
-            if (building.Source.TemplateIndex == 12 && building.ConstructionRemaining <= 0 && building.Record.Length >= 0x29)
+            if (building.Index02 == 12 && building.ConstructionRemaining <= 0 && building.Record.Length >= 0x29)
                 OriginalLabResearch.Tick(new SkirmishLabWorld(this, building.Record[3]), building.Record, _participants[building.Record[3]], _aiBlocks[building.Record[3]] ?? [], _globalTick);
             byte order = building.Record[0x14];
             if ((order & 0xf8) == 0x60) building.Record[0x14] = 4;              // produce: the queue head +22 is the template

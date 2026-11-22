@@ -196,7 +196,7 @@ public sealed partial class Skirmish
     /// the slow decay of a ruin. Debris (9727) is not drawn; a collapsed building (condition below zero) is removed.</summary>
     private void TickBuildingFrames()
     {
-        foreach (var building in Actors.Where(a => a.Structure && (sbyte)a.Record[0x19] > 0 && a.Source.TemplateIndex is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24).ToArray())
+        foreach (var building in Actors.Where(a => a.Structure && (sbyte)a.Record[0x19] > 0 && a.Index02 is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24).ToArray())
             try { OriginalBuildingFrames.Update(building.Record, building.Parameters, _globalTick, (_, _, _, _) => { }, () => { building.Record[0x19] = 0; Kill(building); }); }
             catch (Exception e) when (e is DivideByZeroException or OverflowException) { }
     }
@@ -307,8 +307,8 @@ public sealed partial class Skirmish
             if (OriginalWorkerAnimation.Pending(worker.Record))
             { worker.JobText = (worker.Record[0x2d] & 15) == 1 ? "Поворачивается к лесопилке" : "Рубит дерево"; return; }
         }
-        if (worker.MineJob || worker.Source.TemplateIndex == OriginalOreRules.OreWorker) { TickOreWorker(worker); return; }
-        if (worker.Source.TemplateIndex == 11 && worker.Record[0x31] == 0)
+        if (worker.MineJob || worker.Index02 == OriginalOreRules.OreWorker) { TickOreWorker(worker); return; }
+        if (worker.Index02 == 11 && worker.Record[0x31] == 0)
         {
             var empty = Convert.FromHexString(_templates.Armies["ARMY__02.DAT"].Templates[10].RawRecordHex);
             OriginalWorkerDelivery.ReturnEmpty(worker.Record, empty, _terrainCatalog.NextRandomByte()); ApplyWorkerTemplate(worker);
