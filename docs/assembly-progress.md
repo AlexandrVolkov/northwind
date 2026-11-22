@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 107940 | 5512 | 97 | 33333 | 44 |
+| LE:1 | 146882 | 107264 | 5512 | 97 | 34009 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
@@ -193,6 +193,7 @@
 | LE:1 `0x1037E..0x103AF` | Formation scale factor from the member count | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x103AF..0x103EC` | Formation of a kind nearest the member count | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x10AD2..0x10B75` | Free-spot search: random points in growing squares, AC63 on each | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [placement.json](../tests/fixtures/placement.json); [verify_placement.py](../tools/verify_placement.py) | The random generators come from the caller |
+| LE:1 `0x1192B..0x11B4D` | Horde camp (Teymur): timer, tent founding, feeding, respawn, alert | ported | [horde.md](../docs/horde.md); [camp.json](../tests/fixtures/camp.json); [verify_camp.py](../tools/verify_camp.py) | Callbacks 22E46, 10AD2 (ported), A758, 43E5, 103EC, 98DB are host adapters; not yet wired into the skirmish |
 | LE:1 `0x11EB0..0x11ECB` | Goods code 1: +100 gold and statistics | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Только AH=2. |
 | LE:1 `0x11ECB..0x11EE6` | Goods code 2: +100 metal and statistics | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Только AH=2. |
 | LE:1 `0x123D3..0x12404` | Grant timber through worker callback | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Живой рабочий, флаг 20000, пустой груз и AL=3. Другие грузы, непустой груз и все WRK-получатели не перенесены. |
@@ -204,6 +205,7 @@
 | LE:1 `0x1EAED..0x1EB33` | Add AI plan record | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) | plan bytes +5..+7 are register leftovers, written as zero |
 | LE:1 `0x1EB33..0x1EB40` | Clear AI plan list | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
 | LE:1 `0x1EB40..0x1EB68` | Find or add AI plan | ported | [ai.md](../docs/ai.md); [ai-turn.json](../tests/fixtures/ai-turn.json) |  |
+| LE:1 `0x1EB40..0x1EBEA` | SetCharacter: copy AI character record into the participant AI block | ported | [camp.json](../tests/fixtures/camp.json); [verify_camp.py](../tools/verify_camp.py) |  |
 | LE:1 `0x1EBEF..0x1EC3F` | Random explored cell for AI patrol | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0x1EC3F..0x1EC6E` | Explored share of the map for a participant | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) |  |
 | LE:1 `0x1EC6E..0x1ECA0` | Area in sight of an object | ported | [ai.md](../docs/ai.md); [ai-military.json](../tests/fixtures/ai-military.json) |  |

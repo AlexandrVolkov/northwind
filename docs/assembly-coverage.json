@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "f3fca0d4117d3f9bdf0c2b3c559f5bc84af832b96ba871a45444d04926ebf239",
+  "annotation_sha256": "cc55dc8914591441e61489358e0cdcb277a99bf625809c503c624b5b8b90202e",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 5512,
-        "ported": 33333,
-        "unreviewed": 107940,
+        "ported": 34009,
+        "unreviewed": 107264,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -1811,6 +1811,22 @@
         },
         {
           "start": 68469,
+          "end": 71979,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 71979,
+          "end": 72525,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "horde-camp-11943"
+          ]
+        },
+        {
+          "start": 72525,
           "end": 73392,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1940,11 +1956,21 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "ai-1eb40"
+            "ai-1eb40",
+            "ai-set-character-1e740"
           ]
         },
         {
           "start": 125800,
+          "end": 125930,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-set-character-1e740"
+          ]
+        },
+        {
+          "start": 125930,
           "end": 125935,
           "status": "unreviewed",
           "classification": "unknown",

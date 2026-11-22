@@ -3716,6 +3716,30 @@
       "evidence": ["docs/building-animation.md", "tests/fixtures/building-frames.json", "tools/verify_building_frames.py"],
       "implementation": ["scripts/OriginalBuildingFrames.cs", "scripts/SkirmishEconomy.cs"],
       "limitations": "Debris 9727 and the removal 98CC are callbacks (debris is not drawn); the dispatch C88C..C8E0 into the WRK entries is not ported; line templates and the castle are not drawn by it (their frames are not in the atlas)"
+    },
+    {
+      "id": "horde-camp-11943",
+      "module": "LE:1",
+      "start": 71979,
+      "end": 72525,
+      "name": "Horde camp (Teymur): timer, tent founding, feeding, respawn, alert",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/horde.md", "tests/fixtures/camp.json", "tools/verify_camp.py"],
+      "implementation": ["scripts/OriginalCamp.cs"],
+      "limitations": "Callbacks 22E46, 10AD2 (ported), A758, 43E5, 103EC, 98DB are host adapters; not yet wired into the skirmish"
+    },
+    {
+      "id": "ai-set-character-1e740",
+      "module": "LE:1",
+      "start": 125760,
+      "end": 125930,
+      "name": "SetCharacter: copy AI character record into the participant AI block",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["tests/fixtures/camp.json", "tools/verify_camp.py"],
+      "implementation": ["scripts/OriginalAiRules.cs"],
+      "limitations": ""
     }
   ]
 }
