@@ -264,9 +264,13 @@ public sealed partial class Skirmish
     /// the slow decay of a ruin. Debris (9727) is not drawn; a collapsed building (condition below zero) is removed.</summary>
     private void TickBuildingFrames()
     {
-        foreach (var building in Actors.Where(a => a.Structure && (sbyte)a.Record[0x19] > 0 && a.Index02 is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24).ToArray())
+        foreach (var building in Actors.Where(a => a.Structure && (sbyte)a.Record[0x19] > 0 && a.Index02 is 2 or 3 or 4 or 5 or 6 or 7 or 9 or 12 or 13 or 15 or 22 or 23 or 24).ToArray())
+        {
             try { OriginalBuildingFrames.Update(building.Record, building.Parameters, _globalTick, (_, _, _, _) => { }, () => { building.Record[0x19] = 0; Kill(building); }); }
             catch (Exception e) when (e is DivideByZeroException or OverflowException) { }
+            // The object update 42BB keeps OBE[1A] = the condition of the previous update, so that a drop is seen (and its frame chosen) once.
+            if (building.Alive) building.Record[0x1a] = building.Record[0x19];
+        }
     }
 
     private void TickBuildings()
@@ -425,6 +429,7 @@ public sealed partial class Skirmish
             }
             else
             {
+                FellOnWorkers(worker, tree);
                 bool clear = OriginalForestryRules.FinishLoad(worker.Record);
                 if (clear && _terrainCatalog.ClearTimber(Map.Cells, Occupancy.Width, Occupancy.Height, tree.X, tree.Y) > 0)
                 { TerrainRevision++; if (!Harvestable(tree)) ClearedGroves.Add(tree); }

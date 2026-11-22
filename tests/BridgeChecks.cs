@@ -126,7 +126,9 @@ public partial class TestRunner
         Run(2);
         Check(battle.Ruins.Count > 0 && battle.Stones.Count > 0, "The falling building raises dust");
         Run(Skirmish.CollapseTicks / 18.2 + 1);
-        Check(battle.Ruins.Count == 0, "Nothing is left of the building after the collapse");
+        Check(battle.Ruins.Count > 0, "The ruin stays for a while after the collapse");
+        Run(Skirmish.RuinTicks / 18.2 + 6);
+        Check(battle.Ruins.Count == 0, "The ruin is gone after its time");
     }
 }
 
@@ -212,5 +214,39 @@ public partial class TestRunner
         }
         Check(chopped.Count == 2, $"Both workers fell trees ({chopped.Count} of 2, trees {trees.Count})");
         Check(trees.Count >= 2, "The workers fell different trees instead of one waiting for the other");
+    }
+}
+
+public partial class TestRunner
+{
+    /// <summary>A felled tree strikes a worker standing in its cell only with a probability (1 % by default).</summary>
+    private void TreeFallChecks()
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        Check(battle.TreeKillPercent == 1, "A felled tree kills a worker in its cell with a probability of 1 %");
+        battle.GrantPeople(10);
+        for (int i = 0; i < 4; i++) battle.QueueWorker();
+        for (int t = 0; t < (int)(200 * 18.2); t++) battle.Advance(1 / 18.2);
+        var workers = battle.Actors.Where(a => a.Team == 0 && a.Worker && a.Alive).Take(4).ToList();
+        Check(workers.Count == 4, $"Four workers for the felling check ({workers.Count})");
+        var trees = Enumerable.Range(0, battle.Map.Width * battle.Map.Height).Select(i => new Vector2I(i % battle.Map.Width, i / battle.Map.Width))
+            .Where(c => c.X >= 4 && c.Y >= 4 && c.X < battle.Map.Width - 4 && c.Y < battle.Map.Height - 4 && battle.Harvestable(c) && battle.CanStand(workers[0], c + Vector2I.Left)).Take(40).ToList();
+        // The victim stands in the tree's cell; with 100 % the next felled load kills it, with 0 % it survives.
+        int pair = 0;
+        foreach (var (percent, expectDead) in new[] { (0, false), (100, true) })
+        {
+            var tree = trees[pair * 10]; int victimIndex = pair * 2 + 1, chopperIndex = pair * 2; pair++;
+            battle.TreeKillPercent = percent;
+            var victim = workers[victimIndex];
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(victim.Record.AsSpan(4), (uint)(tree.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(victim.Record.AsSpan(8), (uint)(tree.Y * 32 + 16));
+            var chopper = workers[chopperIndex];
+            var at = tree + Vector2I.Left;
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(chopper.Record.AsSpan(4), (uint)(at.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(chopper.Record.AsSpan(8), (uint)(at.Y * 32 + 16));
+            battle.GatherTimber([chopper.Id], tree);
+            for (int t = 0; t < 40 * 18 && victim.Alive; t++) battle.Advance(1 / 18.2);
+            Check(victim.Alive != expectDead, $"With {percent} % the worker in the felled cell {(expectDead ? "dies" : "survives")}");
+        }
     }
 }
