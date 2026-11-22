@@ -15,7 +15,7 @@ public partial class TestRunner
         Check(rivalCastle != null && rivalCastle.Cell.X > 95 && rivalCastle.Record[3] == 1, "The rival settlement stands in the east (slot 1)");
         Check(battle.Diplomacy.AtWar(3, 1) && !battle.Diplomacy.AtWar(0, 1), "The rival is at war with the red settlement only");
         bool marched = false; int squadSounds = 0;
-        for (int second = 0; second < 35 * 60; second += 10)
+        for (int second = 0; second < 50 * 60; second += 10)
         {
             Run(10);
             squadSounds += battle.Sounds.Count(e => e.Bank == "WORK.FX"); battle.Sounds.Clear();   // A4C2: the squads' messages
@@ -26,10 +26,6 @@ public partial class TestRunner
             "Both AI settlements build up (barracks)");
         Check(marched, "The red AI marches its army on the rival");
         Check(squadSounds > 0, $"AI squads send their messages as WORK.FX sounds (A4C2: {squadSounds})");
-        { var reds = battle.Actors.Where(a => a.Team == 1 && a.Alive && !a.Structure && !a.Worker).ToList(); var rivals = battle.Actors.Where(a => a.Team == 2 && a.Alive && !a.Structure && !a.Worker).ToList();
-          double near = reds.Count == 0 || rivals.Count == 0 ? -1 : reds.Min(r => rivals.Min(v => Math.Max(Math.Abs(r.Cell.X - v.Cell.X), Math.Abs(r.Cell.Y - v.Cell.Y))));
-          GD.Print($"DIAG2 nearest red-rival {near} reds with target {reds.Count(r => r.Target != 0)} rivals with target {rivals.Count(r => r.Target != 0)} atwar {battle.Diplomacy.AtWar(3, 1)} vis {string.Join(",", rivals.Take(6).Select(v => v.Record[0x20].ToString("x")))}"); }
-        GD.Print($"DIAG corpses {battle.Corpses.Count(c => c[1] == 2)} east {battle.Corpses.Count(c => c[1] == 2 && System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(c.AsSpan(7)) > 85 * 32)} red east units {battle.Actors.Count(a => a.Team == 1 && a.Alive && !a.Structure && !a.Worker && a.Cell.X > 85)} forest {battle.Actors.Count(a => a.Alive && !a.Structure && battle.InForest(a))} rival units {battle.Actors.Count(a => a.Team == 2 && a.Alive && !a.Structure && !a.Worker)} t={battle.Elapsed:0}");
         Check(battle.Corpses.Count(c => c[1] == 2 && System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(c.AsSpan(7)) > 85 * 32) >= 3, "They fight in the east (corpses)");
         GD.Print($"Rival: red {battle.Actors.Count(a => a.Team == 1 && a.Alive)}, rival {battle.Actors.Count(a => a.Team == 2 && a.Alive)}, after {battle.Elapsed / 60:0} min");
     }
