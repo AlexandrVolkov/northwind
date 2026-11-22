@@ -113,7 +113,8 @@ public sealed partial class Skirmish : IDisposable
     /// <summary>Bridge-only route replanning delay: 21 object updates (0.7 s at the former experimental 30/s).</summary>
     private double ReplanDelay => 21 / Rules.TicksPerSecond;
     public SkirmishActor Hero => Actors.Single(a => a.Team == 0 && a.Hero);
-    public SkirmishActor Objective => Actors.Single(a => a.Team == 1 && a.Source.TemplateName == "Замок");
+    /// <summary>The enemy's first castle (the AI may found more later).</summary>
+    public SkirmishActor Objective => Actors.First(a => a.Team == 1 && a.Source.TemplateName == "Замок");
 
     /// <summary>The fog map [18DA]: one byte per cell, bit n set while participant n has not seen the cell (all set at the start).</summary>
     public byte[] FogMap { get; private set; } = [];
@@ -411,7 +412,7 @@ public sealed partial class Skirmish : IDisposable
         Prof("fog", TickFog);
         Prof("ai", TickAi); // 1E7EA follows the object update (LE:1 31D6)
         if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";
-        else if (!Objective.Standing && !Actors.Any(a => a.Team == 1 && !a.Structure && a.Alive)) Outcome = "Победа — вражеское поселение разбито";
+        else if (!Actors.Any(a => a.Team == 1 && a.Source.TemplateName == "Замок" && a.Standing) && !Actors.Any(a => a.Team == 1 && !a.Structure && a.Alive)) Outcome = "Победа — вражеское поселение разбито";
     }
     private void UpdateUnit(SkirmishActor actor, double dt)
     {
