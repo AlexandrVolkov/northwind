@@ -20,6 +20,9 @@ public sealed partial class Skirmish
     /// <summary>DAT footprint height of an ARMY__02 template (for the sprite anchor of buildings and ruins).</summary>
     public int StructureFootprintHeight(int templateIndex) => _templates.Armies["ARMY__02.DAT"].Templates[templateIndex].Construction.FootprintHeight;
     public TemplateEntry BridgeTemplate => _templates.Armies["ARMY__02.DAT"].Templates[7];
+    /// <summary>The line template being placed: 7 the bridge, 5 the fence (docs/bridges.md). The UI sets it when a factory list item starts.</summary>
+    public int LineIndex { get; set; } = 7;
+    public TemplateEntry LineTemplate => _templates.Armies["ARMY__02.DAT"].Templates[LineIndex];
 
     /// <summary>The second point snaps to the axis of the longer side (adapter: the line step 69FE is verified for axis lines).</summary>
     public static Vector2I BridgeEnd(Vector2I from, Vector2I to) =>
@@ -31,7 +34,7 @@ public sealed partial class Skirmish
     public (Vector2I Start, Vector2I Target, int Segments) BridgeLine(Vector2I from, Vector2I to)
     {
         to = BridgeEnd(from, to);
-        var raw = Convert.FromHexString(BridgeTemplate.RawRecordHex); int fw = raw[3], fh = raw[4];
+        var raw = Convert.FromHexString(LineTemplate.RawRecordHex); int fw = raw[3], fh = raw[4];
         var start = from + new Vector2I(fw / 2, fh / 2);
         if (Math.Abs(to.X - from.X) >= Math.Abs(to.Y - from.Y) && to.Y == from.Y)
         {
@@ -48,7 +51,7 @@ public sealed partial class Skirmish
     public List<Vector2I> BridgeCells(Vector2I from, Vector2I to)
     {
         var (start, target, _) = BridgeLine(from, to);
-        var raw = Convert.FromHexString(BridgeTemplate.RawRecordHex);
+        var raw = Convert.FromHexString(LineTemplate.RawRecordHex);
         var engine = new OriginalBuilder(_arctangent);
         var cells = new List<Vector2I>();
         uint x = (uint)(start.X * 32), y = (uint)(start.Y * 32), x1 = (uint)(target.X * 32), y1 = (uint)(target.Y * 32);
@@ -64,12 +67,12 @@ public sealed partial class Skirmish
 
     /// <summary>The terrain and the occupancy allow a segment in the cell (AD5F on the bridge's mask; an occupied cell of another object is refused).</summary>
     public bool BridgeCellFree(Vector2I cell) =>
-        new SkirmishBuilderWorld(this, Rules.PlayerSlot).Probe(7, 2, (uint)(cell.X * 32), (uint)(cell.Y * 32), out _) == BuilderProbe.Clear;
+        new SkirmishBuilderWorld(this, Rules.PlayerSlot).Probe((byte)LineIndex, 2, (uint)(cell.X * 32), (uint)(cell.Y * 32), out _) == BuilderProbe.Clear;
 
     /// <summary>The wallet covers every segment of the line.</summary>
     public bool CanAffordBridge(int segments)
     {
-        var price = Price(BridgeTemplate); var have = Resources;
+        var price = Price(LineTemplate); var have = Resources;
         return price.First * (uint)segments <= have.First && price.Second * (uint)segments <= have.Second && price.Third * (uint)segments <= have.Third;
     }
 
@@ -77,16 +80,16 @@ public sealed partial class Skirmish
     public int BuildBridge(Vector2I from, Vector2I to)
     {
         if (Paused || Outcome != "" || !Inside(from) || !Inside(to)) return 0;
-        if (!Actors.Any(IsFactory)) { Log("Мосты строят через завод."); return 0; }
+        if (!Actors.Any(IsFactory)) { Log("Мосты, заборы и башни строят через завод."); return 0; }
         var (start, target, _) = BridgeLine(from, to);
         if (!BridgeCellFree(start)) { Log("Здесь нельзя строить мост: первая секция не встаёт."); return 0; }
-        var raw = Convert.FromHexString(BridgeTemplate.RawRecordHex);
+        var raw = Convert.FromHexString(LineTemplate.RawRecordHex);
         var wallet = Resources;
         var participant = new byte[0xf5];
         BinaryPrimitives.WriteUInt32LittleEndian(participant.AsSpan(0x18), wallet.First); BinaryPrimitives.WriteUInt32LittleEndian(participant.AsSpan(0x1c), wallet.Second);
         BinaryPrimitives.WriteUInt32LittleEndian(participant.AsSpan(0x20), wallet.Third); BinaryPrimitives.WriteUInt32LittleEndian(participant.AsSpan(0x24), wallet.Fourth);
         var builder = new byte[0x31];
-        builder[0] = 2; builder[3] = (byte)Rules.PlayerSlot; builder[0x14] = 0x58; builder[0x22] = 7;
+        builder[0] = 2; builder[3] = (byte)Rules.PlayerSlot; builder[0x14] = 0x58; builder[0x22] = (byte)LineIndex;
         BinaryPrimitives.WriteUInt16LittleEndian(builder.AsSpan(0x29), (ushort)(start.X * 32)); BinaryPrimitives.WriteUInt16LittleEndian(builder.AsSpan(0x2b), (ushort)(start.Y * 32));
         BinaryPrimitives.WriteUInt16LittleEndian(builder.AsSpan(0x2d), (ushort)(target.X * 32)); BinaryPrimitives.WriteUInt16LittleEndian(builder.AsSpan(0x2f), (ushort)(target.Y * 32));
         int before = Actors.Count;
@@ -96,7 +99,7 @@ public sealed partial class Skirmish
         SetResources(new ResourceQuad(BinaryPrimitives.ReadUInt32LittleEndian(participant.AsSpan(0x18)), BinaryPrimitives.ReadUInt32LittleEndian(participant.AsSpan(0x1c)),
             BinaryPrimitives.ReadUInt32LittleEndian(participant.AsSpan(0x20)), BinaryPrimitives.ReadUInt32LittleEndian(participant.AsSpan(0x24))));
         int laid = Actors.Count - before;
-        Log(laid > 0 ? $"Мост: заложено секций — {laid}." : "Здесь нельзя строить мост.");
+        Log(laid > 0 ? $"{LineTemplate.Name}: заложено секций — {laid}." : $"Здесь нельзя строить: {LineTemplate.Name.ToLowerInvariant()}.");
         return laid;
     }
 }

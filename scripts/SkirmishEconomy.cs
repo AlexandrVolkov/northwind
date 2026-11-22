@@ -243,7 +243,7 @@ public sealed partial class Skirmish
                 building.ConstructionRemaining = maintenance.ContinueAction
                     ? ((building.Template.InitialCondition - maintenance.State.Condition + 1) * Math.Max(1, (int)building.Parameters[0x57]) - maintenance.State.Counter) / (double)Rules.TicksPerSecond : 0;
                 // Provisional visual stage binding; the full C88C frame/effects handler is not connected.
-                if (building.Source.TemplateName is "Ферма" or "Казарма" or "Шахта" or "Мост" or "Башня")
+                if (building.Source.TemplateName is "Ферма" or "Казарма" or "Шахта" or "Мост" or "Башня" or "Забор")
                     BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(LineShapeFrames(building) + building.Template.InitialFrame + Math.Min(building.Parameters[0x4a], building.Record[0x19] * (building.Parameters[0x4a] + 1) / (building.Template.InitialCondition + 1))));
                 if (maintenance.ContinueAction) continue;
                 var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(building.Record[0x14], building.Record[0x15], building.Record[0x0f]));

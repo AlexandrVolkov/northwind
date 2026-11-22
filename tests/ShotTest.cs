@@ -162,3 +162,23 @@ public partial class TestRunner
         GetTree().Quit();
     }
 }
+public partial class TestRunner
+{
+    private async System.Threading.Tasks.Task FenceShot()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+        var b = scene.Battle; BuildTestFactory(b); b.LineIndex = 5; var hero = b.Hero; Vector2I? start = null;
+        for (int r = 6; r < 16 && start == null; r++) for (int dx = -r; dx <= r && start == null; dx++)
+        { var c = b.PlayerCastle.Cell + new Vector2I(dx, r); if (Enumerable.Range(0, 6).All(k => b.BridgeCellFree(c + new Vector2I(k, 0)) && b.CanStand(hero, c + new Vector2I(k, 0)))) start = c; }
+        b.BuildBridge(start!.Value, start.Value + new Vector2I(5, 0)); b.BuildBridge(start.Value + new Vector2I(2, 1), start.Value + new Vector2I(2, 3)); b.BuildBridge(start.Value + new Vector2I(5, 1), start.Value + new Vector2I(5, 2));
+        for (int t = 0; t < (int)(200 * 18.2); t++) b.Advance(1 / 18.2);
+        Array.Fill(b.FogMap, (byte)0); scene.FocusWorld(new Vector2(start.Value.X * 32 + 96, start.Value.Y * 32 + 64));
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-fence.png");
+        GetTree().Quit();
+    }
+}
