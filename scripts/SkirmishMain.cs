@@ -612,6 +612,17 @@ public partial class SkirmishMain : Node2D
             DrawArc(Vector2.Zero, Selection.Contains(actor.Id) ? 19 : 14, 0, Mathf.Tau, 32, color, Selection.Contains(actor.Id) ? 3 : 1);
             DrawSetTransform(Vector2.Zero);
         }
+        // A unit among the trees is hidden: its owner sees only a hollow green triangle, the others see nothing.
+        if (!actor.Structure && !actor.Dying && Battle.InForest(actor))
+        {
+            if (actor.Team == 0)
+            {
+                var t = point + new Vector2(0, -10);
+                DrawPolyline([t + new Vector2(0, -7), t + new Vector2(6, 5), t + new Vector2(-6, 5), t + new Vector2(0, -7)], new Color("5ee06a"), 1.5f);
+                if (Selection.Contains(actor.Id)) DrawCorners(new Rect2(point - Vector2.One * 16, Vector2.One * 32));
+            }
+            return;
+        }
         int frameIndex = actor.Frame;
         if (actor.Stepping && !actor.Turning) frameIndex += (int)(Battle.Elapsed * 8) % Math.Max(1, (int)actor.Parameters[0x4a]);
         if (!_frames.TryGetValue((actor.Source.TemplateFile, actor.Source.TemplateIndex, frameIndex), out var frame))

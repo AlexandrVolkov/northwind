@@ -30,6 +30,9 @@ public partial class TestRunner
           OriginalCatapultRules.CreateBigExplosion(e); e[0x17] = 12; System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(e.AsSpan(3), 0x8d); scene.Battle.Stones.Add(e); scene.Battle.Paused = true;
           scene.FocusWorld(hero); for (int i = 0; i < 2; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
           GetViewport().GetTexture().GetImage().SavePng("res://build/shot-explosion.png"); }
+        { var b = scene.Battle; var hero = b.Hero; int n = 0, ok = 0; Godot.Vector2I? any = null;
+          for (int y = 0; y < b.Map.Height; y++) for (int x = 0; x < b.Map.Width; x++) { var c = new Godot.Vector2I(x, y); if (!b.Harvestable(c)) continue; n++; if (b.CanStand(hero, c)) { ok++; any ??= c; } }
+          GD.Print($"TIMBER cells {n} standable by hero {ok} first {any}"); }
         var names = new[] { "Лесопилка", "Шахта", "Рабочий" };
         int k = 0;
         foreach (var name in names)

@@ -405,6 +405,8 @@ public sealed partial class Skirmish : IDisposable
     {
             if (!actor.Alive) return;
             actor.AttackTimer -= dt; actor.ReplanTimer -= dt;
+            // OBE[20] is the mask of the owners that can see the object (FFh: all): a unit among trees is seen by its owner only.
+            actor.Record[0x20] = InForest(actor) ? (byte)(1 << (actor.Record[3] & 7)) : (byte)0xff;
             long t0 = P0(); bool vitals = TickVitals(actor); P1("u.vitals", t0); if (vitals) return;
             if (actor.Worker) { t0 = P0(); TickWorker(actor, dt); P1("u.worker", t0); return; }
             var target = Find(actor.Target);
