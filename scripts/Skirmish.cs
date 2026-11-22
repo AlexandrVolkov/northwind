@@ -108,7 +108,8 @@ public sealed partial class Skirmish : IDisposable
     private readonly OriginalRouteSearch _search = new();
     private readonly AStarGrid2D _guidance = new();
     private readonly Dictionary<(int, int, int), (AStarGrid2D Grid, double At)> _guidanceGrids = [];
-    private const double GuidanceRefresh = 0.5;
+    /// <summary>The shared blocked-cell grid is rebuilt this often (seconds). The original AI's mode keeps the exact per-search rebuild (its checks depend on the timing of paths).</summary>
+    private double GuidanceRefresh => ImprovedAi ? 0.5 : 0;
     private AStarGrid2D NewGuidanceGrid()
     {
         var grid = new AStarGrid2D { Region = new Rect2I(0, 0, Map.Width, Map.Height), DiagonalMode = AStarGrid2D.DiagonalModeEnum.Always,
