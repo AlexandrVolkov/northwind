@@ -98,6 +98,7 @@ public partial class SkirmishMain : Node2D
     {
         if (Battle != null) Battle.Dispose();
         var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        rules.PlayerStartBoost = 20; rules.AiStartBoost = 10;   // TEMPORARY (user request): 20× and 10× starting stores; restore 1/1 like the original (docs/continuation.md)
         rules.Pits = true;   // pit traps of the first map (docs/campaign-items.md)
         rules.Fauna = true;   // wolves and bears of slots 6 and 7 (docs/fauna.md)
         rules.HordeSlot = 4;   // the horde of Teymur (docs/horde.md): camps found a tent at random
@@ -277,6 +278,8 @@ public partial class SkirmishMain : Node2D
             case (4, 4) when unit.Worker: PendingOrder = 4; break;
             case (8, 7) when unit.Worker: PendingOrder = 8; break;
             case var _ when slot.Sprite == 874 && unit.Id == Battle.PlayerCastle.Id: BuildMenuOpen = !BuildMenuOpen; break;
+            case var _ when slot.Label == "Ремонт" && unit.Structure: Battle.StartRepair(unit); break;
+            case var _ when slot.Label == "Разрушить" && unit.Structure: Battle.Demolish(unit); break;
             default: Battle.Log($"Приказ «{slot.Label}» ещё не перенесён."); break;
         }
     }
@@ -604,14 +607,26 @@ public partial class SkirmishMain : Node2D
                 DrawString(ThemeDB.FallbackFont, pointOfEntry + new Vector2(-24, -10), "Приём груза", HorizontalAlignment.Left, -1, 12, new Color("e7cd82"));
             }
         }
-        foreach (var (template, frameNumber, at, owner, _) in Battle.Ruins)
-            if (_frames.TryGetValue(("ARMY__02.DAT", template, frameNumber), out var ruin))
-            {
-                var ruinSize = new Vector2(ruin.Width, ruin.Height); var ruinAt = at - new Vector2(ruinSize.X / 2, ruinSize.Y - StructureBottom(template));
-                if (ruin.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(owner), out var ruinSheet))
-                    DrawTextureRectRegion(ruinSheet, new Rect2(ruinAt, ruinSize), new Rect2(ruin.TeamSlot % 64 * 64, ruin.TeamSlot / 64 * 64, ruin.Width, ruin.Height));
-                else DrawTextureRectRegion(_sprites, new Rect2(ruinAt, ruinSize), new Rect2(ruin.X, ruin.Y, ruin.Width, ruin.Height));
-            }
+        foreach (var (template, finalFrame, at, owner, left) in Battle.Ruins)
+        {
+            // The construction frames backwards (stage = DAT[4A] · remaining share), the walls sink and shake, the last fifth fades out.
+            int stages = Battle.Templates02(template).Parameters4A;
+            float p = left / (float)Skirmish.CollapseTicks;
+            int stage = Math.Clamp((int)MathF.Floor(stages * p), 0, stages);
+            ushort frameNumber = (ushort)(finalFrame - (stages - stage));
+            if (!_frames.TryGetValue(("ARMY__02.DAT", template, frameNumber), out var ruin) && !_frames.TryGetValue(("ARMY__02.DAT", template, finalFrame), out ruin)) continue;
+            var ruinSize = new Vector2(ruin.Width, ruin.Height);
+            var ruinAt = at - new Vector2(ruinSize.X / 2, ruinSize.Y - StructureBottom(template)) + new Vector2((left & 1) == 0 ? 1 : -1, 0) * (p > .2f ? 1 : 0) + new Vector2(0, (1 - p) * ruinSize.Y * .3f);
+            var tint = new Color(1, 1, 1, Math.Min(1f, p / .2f));
+            // The picture is clipped to the building's own footprint line so that the sinking walls do not draw below the ground.
+            float ground = at.Y + Battle.StructureFootprintHeight(template) * 16;
+            float visible = Math.Clamp(ground - ruinAt.Y, 0, ruinSize.Y);
+            if (visible <= 0) continue;
+            var dst = new Rect2(ruinAt, new Vector2(ruinSize.X, visible));
+            if (ruin.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(owner), out var ruinSheet))
+                DrawTextureRectRegion(ruinSheet, dst, new Rect2(ruin.TeamSlot % 64 * 64, ruin.TeamSlot / 64 * 64, ruin.Width, visible), tint);
+            else DrawTextureRectRegion(_sprites, dst, new Rect2(ruin.X, ruin.Y, ruin.Width, visible), tint);
+        }
         foreach (var corpse in Battle.Corpses)
         {
             var at = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(corpse.AsSpan(7)), BinaryPrimitives.ReadUInt32LittleEndian(corpse.AsSpan(0xc)));

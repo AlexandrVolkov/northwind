@@ -62,7 +62,8 @@ public sealed partial class Skirmish
     {
         _templates = templates;
         var slot = scenario.Slots.Single(s => s.SlotIndex == Rules.PlayerSlot);
-        SetResources(Rules.Economy.StartingResources ?? OriginalResourceRules.ReadScenario(Convert.FromHexString(slot.RawRecordHex)));
+        var start = Rules.Economy.StartingResources ?? OriginalResourceRules.ReadScenario(Convert.FromHexString(slot.RawRecordHex));
+        SetResources(new ResourceQuad(start.First * Rules.PlayerStartBoost, start.Second * Rules.PlayerStartBoost, start.Third * Rules.PlayerStartBoost, start.Fourth));   // TEMPORARY boost, see SkirmishRules.PlayerStartBoost
         _terrainCatalog = new OriginalTerrainCatalog(_properties, GameData.Read<OriginalTerrainData>("res://data/original_terrain.json"));
         _workerSeed = scenario.Slots.SelectMany(s => s.Objects)
             .First(o => o.TemplateFile == "ARMY__02.DAT" && o.TemplateIndex == 10);
@@ -133,6 +134,25 @@ public sealed partial class Skirmish
         OriginalBuildingLifecycle.MarkConstruction(mill.Record); mill.Record[0x23] = 100; mill.Record[0x24] = 0;
         Actors.Add(mill); Occupancy.WriteFootprint(mill.Parameters[3], mill.Parameters[4], 1, (uint)mill.Position.X, (uint)mill.Position.Y, mill.Id);
         Log("Лесопилка строится. Рабочий сможет сдавать сюда древесину после завершения."); return mill;
+    }
+    /// <summary>The «Ремонт» button (command slot 1, state 48h → 1 with WorkFlags = 1, docs/building-command-lifecycle.md): the building's condition rises by one
+    /// every DAT[57] updates and each step pays DAT[8C, 90, 94] from the player's stores (the maintenance step C80D); it stops when the stores run dry or the condition
+    /// reaches DAT[45].</summary>
+    public bool StartRepair(SkirmishActor building)
+    {
+        if (Paused || Outcome != "" || building.Team != 0 || !building.Structure || !building.Alive || building.Ruined || building.ConstructionRemaining > 0) return false;
+        if ((sbyte)building.Record[0x19] >= building.Template.InitialCondition) { Log($"{building.Source.TemplateName}: ремонт не нужен."); return false; }
+        building.Repairing = true; building.Record[0x0f] = 1; building.Record[0x16] = 0;
+        int steps = building.Template.InitialCondition - building.Record[0x19] + 1;
+        building.ConstructionDuration = building.ConstructionRemaining = steps * Math.Max(1, (int)building.Parameters[0x57]) / (double)Rules.TicksPerSecond;
+        Log($"{building.Source.TemplateName}: идёт ремонт.");
+        return true;
+    }
+    /// <summary>The «Разрушить» button: the player pulls his own building down.</summary>
+    public bool Demolish(SkirmishActor building)
+    {
+        if (Paused || Outcome != "" || building.Team != 0 || !building.Structure || !building.Alive || building == PlayerCastle) return false;
+        building.Repairing = false; building.ConstructionRemaining = 0; building.Record[0x19] = 0; Kill(building); return true;
     }
     public TemplateEntry FactoryTemplate => _templates.Armies["ARMY__02.DAT"].Templates[15];
     public static bool IsFactory(SkirmishActor actor) => actor.Alive && actor.Team == 0 && actor.Source.TemplateName == "Завод" && actor.ConstructionRemaining <= 0;
@@ -237,7 +257,8 @@ public sealed partial class Skirmish
                     new(building.Template.InitialCondition, building.Parameters[0x57], new(
                         BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x8c)),
                         BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x90)),
-                        BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x94)))), default, false);
+                        BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x94)))), building.Repairing ? new(Metal, Wood, Gold) : default, false);
+                if (building.Repairing) SetResources(new ResourceQuad(maintenance.Balances.First, maintenance.Balances.Second, maintenance.Balances.Third, FreePeople));
                 building.Record[0x19] = maintenance.State.Condition; building.Record[0x16] = maintenance.State.Counter; building.Record[0x0f] = maintenance.State.WorkFlags;
                 BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(0x17), maintenance.State.ObjectFlags);
                 building.ConstructionRemaining = maintenance.ContinueAction
@@ -249,7 +270,12 @@ public sealed partial class Skirmish
                 var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(building.Record[0x14], building.Record[0x15], building.Record[0x0f]));
                 building.Record[0x14] = completed.EncodedState; building.Record[0x15] = completed.Auxiliary; building.Record[0x0f] = completed.WorkFlags;
                 BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(LineShapeFrames(building) + building.Template.InitialFrame + building.Parameters[0x4a]));
-                if (building.Team == 0) Log(building.Source.TemplateName + " готова.");
+                if (building.Repairing)
+                {
+                    building.Repairing = false;
+                    Log(building.Record[0x19] >= building.Template.InitialCondition ? $"{building.Source.TemplateName}: ремонт закончен." : $"{building.Source.TemplateName}: ремонт остановлен — не хватает ресурсов.");
+                }
+                else if (building.Team == 0) Log(building.Source.TemplateName + " готова.");
                 if (building.Team != 0) { EnemyBuildingFinished(building); continue; }
             }
             if (building.Source.TemplateName != "Лесопилка") continue;

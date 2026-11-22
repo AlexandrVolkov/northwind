@@ -105,7 +105,10 @@ public sealed partial class Skirmish
         if (Rules.RivalSlot >= 0) _participants[Rules.RivalSlot][0x16] = enemyRaw[0x13];
         SyncParticipants();
         foreach (int slot in AiSlots)
-            SetAiResources(slot, OriginalResourceRules.ReadScenario(Horde && slot == Rules.HordeSlot ? Convert.FromHexString(scenario.Slots.Single(x => x.SlotIndex == slot).RawRecordHex) : enemyRaw));
+        {
+            var start = OriginalResourceRules.ReadScenario(Horde && slot == Rules.HordeSlot ? Convert.FromHexString(scenario.Slots.Single(x => x.SlotIndex == slot).RawRecordHex) : enemyRaw);
+            SetAiResources(slot, new ResourceQuad(start.First * Rules.AiStartBoost, start.Second * Rules.AiStartBoost, start.Third * Rules.AiStartBoost, start.Fourth));   // TEMPORARY boost, see SkirmishRules.AiStartBoost
+        }
         // The enemy castle starts without WorkFlags; the player's castle shows 24h (observed in DOSBox, docs/interface.md).
         foreach (var castle in Actors.Where(a => a.Team != 0 && a.Source.TemplateName == "Замок" && a.Record[0x0f] == 0)) castle.Record[0x0f] = 0x24;
         using (var producers = GameData.Read<System.Text.Json.JsonDocument>("res://data/original_producers.json"))
