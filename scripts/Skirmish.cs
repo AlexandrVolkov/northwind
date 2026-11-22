@@ -190,6 +190,14 @@ public sealed partial class Skirmish : IDisposable
     // Actors only grows (the fallen stay with Alive = false), so an index over the list is extended lazily with the new tail.
     private readonly Dictionary<uint, SkirmishActor> _actorIndex = [];
     private int _actorsIndexed;
+    // Index of the actors by their record array (the AI addresses units by record): extended lazily with the tail like the id index.
+    private readonly Dictionary<byte[], SkirmishActor> _recordIndex = new(ReferenceEqualityComparer.Instance);
+    private int _recordsIndexed;
+    internal SkirmishActor? ActorOfRecord(byte[] record)
+    {
+        for (; _recordsIndexed < Actors.Count; _recordsIndexed++) _recordIndex.TryAdd(Actors[_recordsIndexed].Record, Actors[_recordsIndexed]);
+        return _recordIndex.TryGetValue(record, out var actor) ? actor : null;
+    }
     public SkirmishActor? Find(uint id)
     {
         for (; _actorsIndexed < Actors.Count; _actorsIndexed++) _actorIndex.TryAdd(Actors[_actorsIndexed].Id, Actors[_actorsIndexed]);   // the first of equal ids, as before
@@ -871,9 +879,7 @@ public sealed partial class Skirmish : IDisposable
     }
     private void Kill(SkirmishActor target)
     {
-        var cells = Occupancy.Cells.ToArray();
-        for (int i = 0; i < cells.Length; i++) if (cells[i] == target.Id) cells[i] = 0;
-        Occupancy.LoadCells(cells);
+        Occupancy.ClearReference(target.Id);
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         target.Dying = !target.Structure;
         if (target.Structure) { CollapseDebris(target); if (target.Index02 is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24) Ruins.Add((target.Index02, target.Frame, target.Position, target.Record[3], 5000)); }

@@ -22,6 +22,9 @@ public sealed class OriginalOccupancyMap
         cells.CopyTo(_cells);
     }
 
+    /// <summary>Clears every cell of every plane that holds the reference (a vectorised pass; the removal of a dead object).</summary>
+    public void ClearReference(uint reference) => _cells.AsSpan().Replace(reference, 0u);
+
     private (int Start, int Width, int Height) Locate(byte footprintWidth, byte footprintHeight, byte rawLayer, uint x, uint y)
     {
         int plane = rawLayer & 3;

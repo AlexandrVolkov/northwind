@@ -207,8 +207,8 @@ public sealed partial class Skirmish
     /// <summary>Longest single call of each profiled section (milliseconds).</summary>
     public Dictionary<string, double> ProfilePeak { get; } = [];
     public bool ProfileOn { get; set; }
-    private long P0() => ProfileOn ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
-    private void P1(string name, long start)
+    internal long P0() => ProfileOn ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
+    internal void P1(string name, long start)
     {
         if (!ProfileOn) return;
         var old = Profile.GetValueOrDefault(name);
@@ -623,12 +623,14 @@ public sealed partial class Skirmish
         /// each checked by AC63 on the occupancy planes.</summary>
         public (uint X, uint Y)? FreeSpot(uint templateArmy, byte variant, uint x, uint y)
         {
+            long t0 = battle.P0(); try {
             var template = battle._aiTemplates[(byte)templateArmy];
             byte plane = (byte)Math.Min(variant & 3, 2);
             BuilderProbe Probe(uint px, uint py) => OriginalCreationPlacement.Probe((byte)battle.Map.Width, (byte)battle.Map.Height, battle.Map.Cells, battle._properties,
                 battle.Occupancy.Cells, plane, template, px, py, reference => _search.Resolve(reference)).Status;
             var result = OriginalCreationPlacement.Search(Random, Random2, (uint)battle.Map.Width * 32, (uint)battle.Map.Height * 32, template, x, y, Probe);
             return result.Found ? (result.X, result.Y) : null;
+            } finally { battle.P1("w.freespot", t0); }
         }
         /// <summary>AF07 (ported, <see cref="OriginalBuildCheck"/>): probe, range of a centre building, explored cell. The template's own
         /// check (WRK AH=4) is not ported and allows; the neighbour rule of lines is BC2E (ported).</summary>
@@ -653,7 +655,7 @@ public sealed partial class Skirmish
         public IReadOnlyList<byte> ArmyFill(byte participant, uint mask, uint value) => battle.ImprovedAi ? Buildable(participant, mask, value) : Buildable(participant, mask, value).Where(t => t is not (16 or 26)).ToList();
         public IReadOnlyList<byte> Buildable(byte participant, uint mask, uint value) => OriginalTechRules.Buildable(battle.Ctx(participant).Templates, battle.TreeOf(participant), true, mask, value);
         public byte[] Template(byte participant, byte template) => battle.Ctx(participant).Templates[template];
-        public uint Reference(byte[] record) => battle.Actors.FirstOrDefault(a => ReferenceEquals(a.Record, record))?.Id ?? 0;
+        public uint Reference(byte[] record) { long t = battle.P0(); var id = battle.ActorOfRecord(record)?.Id ?? 0; battle.P1("w.reference", t); return id; }
         public IReadOnlyList<byte> Makes(byte template) => battle._aiMakes.TryGetValue(template, out var m) ? m : [];
         public byte TemplateCount => (byte)battle._aiTemplates.Length;
         /// <summary>AF07 replaced by the port's building placement check (ProbePlacement), adapter.</summary>
