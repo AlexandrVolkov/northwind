@@ -345,12 +345,12 @@ public partial class SkirmishMain : Node2D
         Battle.Sounds.Clear();
     }
     /// <summary>Milliseconds spent in <see cref="_Process"/> (world steps included) and <see cref="_Draw"/>, summed over frames (profiling).</summary>
-    public double ProcessMs, DrawMs, StepsMs; public int ProfiledFrames;
+    public double ProcessMs, DrawMs, StepsMs, ProcessMaxMs; public int ProfiledFrames;
     public override void _Process(double delta)
     {
         long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
         ProcessBody(delta);
-        ProcessMs += (System.Diagnostics.Stopwatch.GetTimestamp() - t0) * 1000.0 / System.Diagnostics.Stopwatch.Frequency; ProfiledFrames++;
+        double ms = (System.Diagnostics.Stopwatch.GetTimestamp() - t0) * 1000.0 / System.Diagnostics.Stopwatch.Frequency; ProcessMs += ms; ProcessMaxMs = Math.Max(ProcessMaxMs, ms); ProfiledFrames++;
     }
     private void ProcessBody(double delta)
     {
