@@ -9,6 +9,8 @@ public sealed class SkirmishRules
     /// <summary>A second AI settlement for observation: its slot (−1 none). It is a copy of the enemy settlement shifted by
     /// <see cref="RivalShiftX"/> cells and at war with it from the start (adapter, not a scenario of the original).</summary>
     public int RivalSlot { get; set; } = -1;
+    /// <summary>The horde of Teymur (slot 4, ARMY__01; docs/horde.md): -1 off.</summary>
+    public int HordeSlot { get; set; } = -1;
     public int RivalShiftX { get; set; } = 44;
     /// <summary>Object updates per second. Original: PIT 1193182/16384 Hz, world step every 2 ticks at speed FDh, objects every 2nd step.</summary>
     public double TicksPerSecond { get; set; } = 1193182.0 / 16384 / 4;
@@ -163,6 +165,7 @@ public sealed partial class Skirmish : IDisposable
         InitializeProduction();
         if (rules.RivalSlot >= 0) CreateRival(scenario, templates);
         InitializeAi(scenario, templates);
+        InitializeHorde(scenario);
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
     }
     // Actors only grows (the fallen stay with Alive = false), so an index over the list is extended lazily with the new tail.

@@ -83,12 +83,12 @@ public sealed partial class Skirmish
         worker.GatherTree = null; worker.Route.Clear(); worker.JobText = "Поблизости нет леса";
         Log("Поблизости нет подходящего леса. Укажите рабочему другой участок."); return false;
     }
-    private SkirmishActor NewEconomyActor(int templateIndex, Vector2I cell, bool worker, bool soldier = false, int team = 0)
+    private SkirmishActor NewEconomyActor(int templateIndex, Vector2I cell, bool worker, bool soldier = false, int team = 0, string file = "ARMY__02.DAT")
     {
-        var template = _templates.Armies["ARMY__02.DAT"].Templates[templateIndex];
+        var template = _templates.Armies[file].Templates[templateIndex];
         var parameters = Convert.FromHexString(template.RawRecordHex);
         var raw = worker ? Convert.FromHexString(_workerSeed.RawRecordHex) : soldier ? Convert.FromHexString((_soldierSeeds.GetValueOrDefault(templateIndex) ?? _militiaSeed).RawRecordHex).AsSpan(0, template.RuntimeRecordBytes).ToArray() : new byte[template.RuntimeRecordBytes];
-        raw[0] = 2; raw[3] = (byte)SlotOfTeam(team); raw[0x0d] = 1; raw[0x0e] = (byte)templateIndex;
+        raw[0] = (byte)(file[7] - '0'); raw[3] = (byte)SlotOfTeam(team); raw[0x0d] = 1; raw[0x0e] = (byte)templateIndex;
         raw[0x14] = 0x80; raw[0x19] = raw[0x1a] = template.InitialCondition; raw[0x20] = 0xff; // A855: visible to every owner
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(1), template.InitialFrame);
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(0x17), 0);
@@ -97,9 +97,9 @@ public sealed partial class Skirmish
         BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(0x10), (uint)raw.Length);
         if (worker || soldier) { raw[0x24] = 0; raw[0x25] = 0; raw[0x26] = 0; raw[0x2c] = 0; raw[0x2d] = 0; raw[0x30] = 0; if (worker) raw[0x31] = 0; }
         return new SkirmishActor { Source = new ObjectRecord { RuntimeReference = _nextEconomyId++, TemplateName = template.Name,
-                TemplateFile = "ARMY__02.DAT", TemplateIndex = templateIndex, RecordBytes = raw.Length,
+                TemplateFile = file, TemplateIndex = templateIndex, RecordBytes = raw.Length,
                 RawX = BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(4)), RawY = BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(8)), RawLayer = 1 },
-            Template = template, Parameters = parameters, Record = raw, Rules = Rules.Units[template.Name], Team = team };
+            Template = template, Parameters = parameters, Record = raw, Rules = SpecOf(file, template, parameters), Team = team };
     }
     public DeliveryPoint MillEntry(Vector2I cell)
     {
