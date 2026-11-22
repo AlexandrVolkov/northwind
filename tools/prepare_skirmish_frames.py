@@ -58,6 +58,8 @@ def prepare(source, output):
         wanted.setdefault(key,set()).update(range(base,base+(8*raw[0x4a] if index in [8,10,11] else raw[0x4a]+1)))
         if index in [3,4,6,12,15,23]:   # C88C: the working animation of a building is [base+4A, base+4A+4B)
             wanted[key].update(range(base + raw[0x4a], base + raw[0x4a] + raw[0x4b]))
+        if index == 7:   # the bridge's shapes (BB8B): shape · (2·DAT[4A] + DAT[4B]) frames each, six shapes in its neighbour table
+            wanted[key].update(range(base, base + 6*(2*raw[0x4a] + raw[0x4b])))
         if index == 10:
             wanted[key].update(range(base + 8*raw[0x4a], base + 8*raw[0x4a] + 8*raw[0x4b]))
         if index in [8,10,11]:

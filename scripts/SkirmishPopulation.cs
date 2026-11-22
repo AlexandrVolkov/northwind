@@ -5,6 +5,8 @@ namespace Northwind;
 public sealed partial class Skirmish
 {
     public uint FreePeople { get; private set; }
+    /// <summary>Test and observation hook: free people the farms would supply later.</summary>
+    public void GrantPeople(uint count) => FreePeople += count;
     public PopulationTotals Population { get; private set; }
     private uint _populationTick;
     private ObjectRecord _militiaSeed = null!;

@@ -147,7 +147,7 @@ public partial class OriginalHud : Node2D
     public SkirmishMain.BuildItem? BuildItemAt(Vector2 logical)
     {
         if (Game?.Battle == null || !Game.BuildMenuVisible || MenuOpen) return null;
-        var items = Game.CastleBuildItems();
+        var items = Game.BuildItems();
         for (int k = 0; k < items.Length; k++) if (BuildItemRect(k).HasPoint(logical)) return items[k];
         return null;
     }
@@ -155,7 +155,7 @@ public partial class OriginalHud : Node2D
     private void DrawBuildList()
     {
         if (!Game.BuildMenuVisible || MenuOpen) return;
-        var items = Game.CastleBuildItems();
+        var items = Game.BuildItems();
         for (int k = 0; k < items.Length; k++)
         {
             var tint = Game.Battle.CanAfford(items[k].Template) ? Colors.White : new Color(.45f, .45f, .45f);

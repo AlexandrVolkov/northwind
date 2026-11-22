@@ -134,6 +134,23 @@ public sealed partial class Skirmish
         Actors.Add(mill); Occupancy.WriteFootprint(mill.Parameters[3], mill.Parameters[4], 1, (uint)mill.Position.X, (uint)mill.Position.Y, mill.Id);
         Log("Лесопилка строится. Рабочий сможет сдавать сюда древесину после завершения."); return mill;
     }
+    public TemplateEntry FactoryTemplate => _templates.Armies["ARMY__02.DAT"].Templates[15];
+    public static bool IsFactory(SkirmishActor actor) => actor.Alive && actor.Team == 0 && actor.Source.TemplateName == "Завод" && actor.ConstructionRemaining <= 0;
+    public ConstructionPlacement ProbeFactory(Vector2I cell) => ProbeEconomyBuilding(cell, FactoryTemplate);
+    public SkirmishActor? BuildFactory(Vector2I cell)
+    {
+        if (Paused || Outcome != "" || !PlayerCastle.Alive) return null;
+        if (ProbeFactory(cell).Status != ConstructionPlacementStatus.Clear) { Log("Для завода нужна свободная площадка рядом с замком."); return null; }
+        if (!Spend(FactoryTemplate)) return null;
+        var factory = NewEconomyActor(15, cell, false);
+        factory.ConstructionDuration = factory.ConstructionRemaining = factory.Template.InitialCondition * Math.Max(1, (int)factory.Parameters[0x57]) / (double)Rules.TicksPerSecond;
+        OriginalBuildingLifecycle.MarkConstruction(factory.Record);
+        factory.Record.AsSpan(0x22, 5).Fill(0xff);
+        factory.Record[0x20] = 0xff; factory.Record[0x27] = 0xff;
+        Actors.Add(factory);
+        Occupancy.WriteFootprint(factory.Parameters[3], factory.Parameters[4], factory.Record[0x0d], (uint)factory.Position.X, (uint)factory.Position.Y, factory.Id);
+        Log("Завод строится. Мосты строят через него."); return factory;
+    }
     public ConstructionPlacement ProbeBarracks(Vector2I cell) => ProbeEconomyBuilding(cell, BarracksTemplate);
     public SkirmishActor? BuildBarracks(Vector2I cell)
     {
@@ -221,11 +238,11 @@ public sealed partial class Skirmish
                     ? ((building.Template.InitialCondition - maintenance.State.Condition + 1) * Math.Max(1, (int)building.Parameters[0x57]) - maintenance.State.Counter) / (double)Rules.TicksPerSecond : 0;
                 // Provisional visual stage binding; the full C88C frame/effects handler is not connected.
                 if (building.Source.TemplateName is "Ферма" or "Казарма" or "Шахта" or "Мост")
-                    BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(building.Template.InitialFrame + Math.Min(building.Parameters[0x4a], building.Record[0x19] * (building.Parameters[0x4a] + 1) / (building.Template.InitialCondition + 1))));
+                    BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(LineShapeFrames(building) + building.Template.InitialFrame + Math.Min(building.Parameters[0x4a], building.Record[0x19] * (building.Parameters[0x4a] + 1) / (building.Template.InitialCondition + 1))));
                 if (maintenance.ContinueAction) continue;
                 var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(building.Record[0x14], building.Record[0x15], building.Record[0x0f]));
                 building.Record[0x14] = completed.EncodedState; building.Record[0x15] = completed.Auxiliary; building.Record[0x0f] = completed.WorkFlags;
-                BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(building.Template.InitialFrame + building.Parameters[0x4a]));
+                BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(LineShapeFrames(building) + building.Template.InitialFrame + building.Parameters[0x4a]));
                 if (building.Team == 0) Log(building.Source.TemplateName + " готова.");
                 if (building.Team != 0) { EnemyBuildingFinished(building); continue; }
             }

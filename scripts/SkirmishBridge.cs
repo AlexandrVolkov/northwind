@@ -6,6 +6,17 @@ namespace Northwind;
 /// (docs/bridges.md); the ported builder engine AFDB pays per segment and lays them along the line, as for the AI.</summary>
 public sealed partial class Skirmish
 {
+    /// <summary>The shape of a new line segment and of its neighbours (fence, bridge): vertical, horizontal, entrance and exit ends (LE:1 BB8B).</summary>
+    private void ReshapeLine(SkirmishActor segment) =>
+        _lineNeighbors.Reshape((byte)Map.Width, (byte)Map.Height,
+            (plane, cell) => Occupancy.Cells[plane * Map.Width * Map.Height + cell] is var id and not 0 ? Actors.FirstOrDefault(a => a.Alive && a.Id == id)?.Record : null,
+            index => Convert.FromHexString(_templates.Armies["ARMY__02.DAT"].Templates[index].RawRecordHex), segment.Record);
+
+    /// <summary>Frame offset of the segment's shape (+22) in a line template: shape · (2·DAT[4A] + DAT[4B]).</summary>
+    private static int LineShapeFrames(SkirmishActor building) =>
+        building.Index02 != -1 && building.Record.Length > 0x22 && (BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x40)) & 0x80) != 0
+            ? (sbyte)building.Record[0x22] * (2 * building.Parameters[0x4a] + building.Parameters[0x4b]) : 0;
+
     public TemplateEntry BridgeTemplate => _templates.Armies["ARMY__02.DAT"].Templates[7];
 
     /// <summary>The second point snaps to the axis of the longer side (adapter: the line step 69FE is verified for axis lines).</summary>
@@ -44,7 +55,8 @@ public sealed partial class Skirmish
     /// <summary>Order the castle's command 58h: returns the number of segments laid (the line stops at the first segment the wallet or the terrain refuses).</summary>
     public int BuildBridge(Vector2I from, Vector2I to)
     {
-        if (Paused || Outcome != "" || !PlayerCastle.Alive || !Inside(from) || !Inside(to)) return 0;
+        if (Paused || Outcome != "" || !Inside(from) || !Inside(to)) return 0;
+        if (!Actors.Any(IsFactory)) { Log("Мосты строят через завод."); return 0; }
         to = BridgeEnd(from, to);
         if (!BridgeCellFree(from)) { Log("Здесь нельзя строить мост: первая секция не встаёт."); return 0; }
         var raw = Convert.FromHexString(BridgeTemplate.RawRecordHex);
