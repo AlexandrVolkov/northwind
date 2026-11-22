@@ -21,6 +21,9 @@ public partial class TestRunner
         Check(tower != null && tower.Structure && tower.Source.TemplateName == "Башня", "The player builds a tower (a structure with an attack)");
         for (int t = 0; t < (int)(400 * 18.2) && tower!.ConstructionRemaining > 0; t++) battle.Advance(1 / 18.2);
         var foe = battle.Actors.First(a => a.Team == 1 && a.Alive && !a.Structure && !a.Worker);
+        battle.Attack([battle.Hero.Id], foe.Id); battle.Attack([battle.Hero.Id], foe.Id);   // the repeated order declares the war (the tower only fires at those at war)
+        for (int t = 0; t < 3 * 18; t++) battle.Advance(1 / 18.2);
+        Check(battle.Diplomacy.AtWar(0, 3), "The player is at war with the red settlement");
         var near = tower!.Cell + new Vector2I(0, 5);
         System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(foe.Record.AsSpan(4), (uint)(near.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(foe.Record.AsSpan(8), (uint)(near.Y * 32 + 16));
         int before = foe.Health, arrows = 0;

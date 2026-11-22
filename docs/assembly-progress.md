@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 107054 | 5722 | 97 | 34009 | 44 |
+| LE:1 | 146882 | 106940 | 5722 | 97 | 34123 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
@@ -111,6 +111,7 @@
 | LE:1 `0x95D3..0x960B` | Death dispatch: special path, death voice, animation | ported | [combat.md](../docs/combat.md); [death.json](../tests/fixtures/death.json) | 12D08 не перенесена. |
 | LE:1 `0x9653..0x9688` | Turn one heading sector | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Включает исходный ZF от расчёта кадра; общий таймер обновлений задаётся вызывающей стороной. |
 | LE:1 `0x9688..0x96CD` | Direction toward world coordinates | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Исходная u32-арифметика и переполнения; правило отличается от направления локального поиска 79C0. |
+| LE:1 `0x9688..0x96CD` | Direction (0..7) from a point to a target by sign classes and the 2:1 ratio | ported | [tower.json](../tests/fixtures/tower.json); [verify_tower.py](../tools/verify_tower.py) | The table DS:19D7 is embedded; the same point returns FFh |
 | LE:1 `0x97C6..0x982B` | Object in an effect's cell and the terrain class | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) |  |
 | LE:1 `0x982B..0x98CC` | Object under an effect point with footprint containment | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Схватка пока бьёт явную цель вместо точки удара. |
 | LE:1 `0x98CC..0x996F` | Detach object from owner chain | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Корректная монотонная цепочка с достижимым объектом; момент смерти, порождение эффекта и повторное выделение записи не включены. |
@@ -167,6 +168,7 @@
 | LE:1 `0xC88C..0xC8C9` | Building action dispatch | partial | [building-command-lifecycle.md](../docs/building-command-lifecycle.md) | Известны вызов через FS:41, встроенная таблица и выбор текущего состояния; полный диспетчер с обработчиками и визуальными эффектами не перенесён. |
 | LE:1 `0xC8C9..0xC8E0` | Complete queued direct action | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [building-lifecycle.json](../tests/fixtures/building-lifecycle.json) | Только продолжение после ZF=1 текущего обработчика; групповой ввод и доступность кнопок вне контракта. |
 | LE:1 `0xC8E0..0xCA49` | Building update tail: working animation, stage frame by condition, ruin decay, collapse | ported | [building-animation.md](../docs/building-animation.md); [building-frames.json](../tests/fixtures/building-frames.json); [verify_building_frames.py](../tools/verify_building_frames.py) | Debris 9727 and the removal 98CC are callbacks (debris is not drawn); the dispatch C88C..C8E0 into the WRK entries is not ported; line templates and the castle are not drawn by it (their frames are not in the atlas) |
+| LE:1 `0xCA7C..0xCAEE` | FS:9D: ranged building attack (tower): reload, enemy search, muzzle point, arrow effect | ported | [tower.md](../docs/tower.md); [tower.json](../tests/fixtures/tower.json); [verify_tower.py](../tools/verify_tower.py) | D895 and 9727 are recorded stubs in the check; only the arrow effect (DAT[70] = 82h) is created in the skirmish; the same point (direction FFh) reads beyond the record in the original and is not modelled |
 | LE:1 `0xCC7B..0xCCC4` | Castle takes cargo from the worker in its entry | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Проверены грузы 0..2; прочие коды идут в слоты предметов 1243A и не перенесены. |
 | LE:1 `0xCCCB..0xCD72` | Laboratory research executor: pick an item, pay per 256 updates, complete the item | ported | [tech.md](../docs/tech.md); [lab.json](../tests/fixtures/lab.json); [verify_lab.py](../tools/verify_lab.py) | A716 and A6AE are recorded stubs of the check (ported elsewhere); the player's research interface is not ported |
 | LE:1 `0xCD72..0xD101` | Terrain blend and forest replacement | partial | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Перенесены логические правила смены тайлов и масок; CFAC сверен для AX=201h (лесоруб), 101h (огонь) и 300h (воронка катапульты). Отрисовка, dirty-cache и исходные глобальные эффекты не объявляются полностью перенесёнными. |

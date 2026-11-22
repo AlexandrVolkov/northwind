@@ -24,6 +24,7 @@ public partial class TestRunner : Node
                 case "horde-shot": await HordeShot(); break;
                 case "bridge-shot": await BridgeShot(); break;
                 case "castle-shot": await CastleShot(); break;
+                case "tower-shot": await TowerShot(); break;
                 case "draw-perf": await DrawPerf(); break;
                 case "display": await DisplayChecks(); break;
                 case "menus": await MenuChecks(); break;

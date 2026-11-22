@@ -3776,6 +3776,30 @@
       "evidence": ["docs/campaign-items.md"],
       "implementation": [],
       "limitations": "Identified from the loader's FS table and disassembly; rectangle set up by 4409; not ported"
+    },
+    {
+      "id": "tower-fire-ca7c",
+      "module": "LE:1",
+      "start": 51836,
+      "end": 51950,
+      "name": "FS:9D: ranged building attack (tower): reload, enemy search, muzzle point, arrow effect",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/tower.md", "tests/fixtures/tower.json", "tools/verify_tower.py"],
+      "implementation": ["scripts/OriginalTowerFire.cs", "scripts/SkirmishTowers.cs"],
+      "limitations": "D895 and 9727 are recorded stubs in the check; only the arrow effect (DAT[70] = 82h) is created in the skirmish; the same point (direction FFh) reads beyond the record in the original and is not modelled"
+    },
+    {
+      "id": "shot-direction-9688",
+      "module": "LE:1",
+      "start": 38536,
+      "end": 38605,
+      "name": "Direction (0..7) from a point to a target by sign classes and the 2:1 ratio",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["tests/fixtures/tower.json", "tools/verify_tower.py"],
+      "implementation": ["scripts/OriginalTowerFire.cs"],
+      "limitations": "The table DS:19D7 is embedded; the same point returns FFh"
     }
   ]
 }

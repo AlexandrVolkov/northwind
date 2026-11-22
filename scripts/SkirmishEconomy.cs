@@ -151,8 +151,8 @@ public sealed partial class Skirmish
         var factory = NewEconomyActor(index, cell, false);
         factory.ConstructionDuration = factory.ConstructionRemaining = factory.Template.InitialCondition * Math.Max(1, (int)factory.Parameters[0x57]) / (double)Rules.TicksPerSecond;
         OriginalBuildingLifecycle.MarkConstruction(factory.Record);
-        factory.Record.AsSpan(0x22, 5).Fill(0xff);
-        factory.Record[0x20] = 0xff; factory.Record[0x27] = 0xff;
+        if (factory.Record.Length >= 0x28) { factory.Record.AsSpan(0x22, 5).Fill(0xff); factory.Record[0x27] = 0xff; }   // producers' queue (the tower's record is shorter)
+        factory.Record[0x20] = 0xff;
         Actors.Add(factory);
         Occupancy.WriteFootprint(factory.Parameters[3], factory.Parameters[4], factory.Record[0x0d], (uint)factory.Position.X, (uint)factory.Position.Y, factory.Id);
         Log(index == 15 ? "Завод строится. Мосты и башни строят через него." : "Башня строится."); return factory;
