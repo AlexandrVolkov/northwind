@@ -4,7 +4,7 @@ public partial class TestRunner
 {
     private void Perf()
     {
-        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json"); rules.RivalSlot = 1;
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json"); rules.RivalSlot = 1; rules.HordeSlot = 4; rules.Fauna = true;
         using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
         for (int minute = 1; minute <= 25; minute++)

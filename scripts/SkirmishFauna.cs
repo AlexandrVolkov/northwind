@@ -44,6 +44,8 @@ public sealed partial class Skirmish
         {
             if (!animal.Alive || animal.Stepping || animal.Target != 0 || animal.Goal != null || animal.Route.Count > 0) continue;
             if ((animal.Record[0x2e] & 63) != 0 || _terrainCatalog.NextRandomByte() > 40) continue;
+            // Adapter (speed): an animal far from every settlement's units stays put; route searches of 46 animals tripled the step time.
+            if (!Actors.Any(o => o.Alive && !o.Structure && !IsAnimal(o) && Math.Abs(o.Cell.X - animal.Cell.X) < 30 && Math.Abs(o.Cell.Y - animal.Cell.Y) < 30)) continue;
             for (int attempt = 0; attempt < 6; attempt++)
             {
                 var cell = animal.Cell + new Vector2I(_terrainCatalog.NextRandomByte() % 13 - 6, _terrainCatalog.NextRandomByte() % 13 - 6);
