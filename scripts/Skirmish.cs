@@ -879,9 +879,7 @@ public sealed partial class Skirmish : IDisposable
     }
     private void Kill(SkirmishActor target)
     {
-        var cells = Occupancy.Cells.ToArray();
-        for (int i = 0; i < cells.Length; i++) if (cells[i] == target.Id) cells[i] = 0;
-        Occupancy.LoadCells(cells);
+        Occupancy.ClearReference(target.Id);
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         target.Dying = !target.Structure;
         if (target.Structure) { CollapseDebris(target); if (target.Index02 is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24) Ruins.Add((target.Index02, target.Frame, target.Position, target.Record[3], 5000)); }
