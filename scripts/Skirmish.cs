@@ -9,6 +9,8 @@ public sealed class SkirmishRules
     /// <summary>A second AI settlement for observation: its slot (−1 none). It is a copy of the enemy settlement shifted by
     /// <see cref="RivalShiftX"/> cells and at war with it from the start (adapter, not a scenario of the original).</summary>
     public int RivalSlot { get; set; } = -1;
+    /// <summary>The horde of Teymur (slot 4, ARMY__01; docs/horde.md): -1 off.</summary>
+    public int HordeSlot { get; set; } = -1;
     public int RivalShiftX { get; set; } = 44;
     /// <summary>Object updates per second. Original: PIT 1193182/16384 Hz, world step every 2 ticks at speed FDh, objects every 2nd step.</summary>
     public double TicksPerSecond { get; set; } = 1193182.0 / 16384 / 4;
@@ -43,6 +45,8 @@ public sealed class SkirmishActor
     public bool Standing => Alive && !Ruined;
     public bool Worker => Rules.Worker;
     public bool Structure => Rules.Damage == 0 && !Worker;
+    /// <summary>Template index within ARMY__02, or -1 for another army (index-keyed rules of the ARMY__02 tree must not hit the horde's ARMY__01 indices).</summary>
+    public int Index02 => Source.TemplateFile == "ARMY__02.DAT" ? Source.TemplateIndex : -1;
     public bool Hero => Source.TemplateName == "Предводитель";
     public Vector2 Position => new(BinaryPrimitives.ReadUInt32LittleEndian(Record.AsSpan(4)), BinaryPrimitives.ReadUInt32LittleEndian(Record.AsSpan(8)));
     public Vector2I Cell => new((int)Position.X >> 5, (int)Position.Y >> 5);
@@ -161,6 +165,7 @@ public sealed partial class Skirmish : IDisposable
         InitializeProduction();
         if (rules.RivalSlot >= 0) CreateRival(scenario, templates);
         InitializeAi(scenario, templates);
+        InitializeHorde(scenario);
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
     }
     // Actors only grows (the fallen stay with Alive = false), so an index over the list is extended lazily with the new tail.
@@ -825,7 +830,7 @@ public sealed partial class Skirmish : IDisposable
         Occupancy.LoadCells(cells);
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         target.Dying = !target.Structure;
-        if (target.Structure) { CollapseDebris(target); if (target.Source.TemplateIndex is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24) Ruins.Add((target.Source.TemplateIndex, target.Frame, target.Position, target.Record[3], 5000)); }
+        if (target.Structure) { CollapseDebris(target); if (target.Index02 is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24) Ruins.Add((target.Index02, target.Frame, target.Position, target.Record[3], 5000)); }
         Log($"{target.Source.TemplateName} {(target.Team == 0 ? "потерян" : "уничтожен")}.");
     }
     /// <summary>Corpses (ARMY__02 type 1, army +01 = 2) and blood splashes (ARMY__00 type 3), 22h-byte effect records.</summary>
