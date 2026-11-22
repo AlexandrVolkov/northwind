@@ -35,8 +35,8 @@ public sealed partial class Skirmish
     /// <summary>Settlements the AI runs: the enemy and, for observation, the rival.</summary>
     public IReadOnlyList<int> AiSlots => (Rules.RivalSlot >= 0 ? [Rules.EnemySlot, Rules.RivalSlot] : (IEnumerable<int>)[Rules.EnemySlot]).Concat(Rules.HordeSlot >= 0 ? [Rules.HordeSlot] : []).ToList();
     /// <summary>Team of the actors of a slot: 0 the player, 1 the enemy, 2 the rival.</summary>
-    public int TeamOfSlot(int slot) => slot == Rules.PlayerSlot ? 0 : slot == Rules.HordeSlot && slot >= 0 ? 3 : slot == Rules.RivalSlot && slot >= 0 ? 2 : 1;
-    public int SlotOfTeam(int team) => team == 0 ? Rules.PlayerSlot : team == 3 && Rules.HordeSlot >= 0 ? Rules.HordeSlot : team == 2 && Rules.RivalSlot >= 0 ? Rules.RivalSlot : Rules.EnemySlot;
+    public int TeamOfSlot(int slot) => slot == Rules.PlayerSlot ? 0 : slot == Rules.HordeSlot && slot >= 0 ? 3 : Rules.Fauna && IsFaunaSlot(slot) ? 4 : slot == Rules.RivalSlot && slot >= 0 ? 2 : 1;
+    public int SlotOfTeam(int team) => team == 0 ? Rules.PlayerSlot : team == 3 && Rules.HordeSlot >= 0 ? Rules.HordeSlot : team == 4 && Rules.Fauna ? 7 : team == 2 && Rules.RivalSlot >= 0 ? Rules.RivalSlot : Rules.EnemySlot;
     /// <summary>What a settlement's AI knows of its army: the DAT templates, the WRK producer rows, the army byte. The horde (slot 4)
     /// plays ARMY__01, the settlements ARMY__02.</summary>
     private sealed class AiContext
