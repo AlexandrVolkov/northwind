@@ -114,7 +114,9 @@ public sealed partial class Skirmish
     public ConstructionPlacement ProbeMill(Vector2I cell) => ProbeEconomyBuilding(cell, MillTemplate);
     private ConstructionPlacement ProbeEconomyBuilding(Vector2I cell, TemplateEntry template)
     {
-        if (!Inside(cell) || !PlayerCastle.Alive || (new Vector2(cell.X * 32 + 16, cell.Y * 32 + 16)).DistanceTo(PlayerCastle.Position) > Rules.Economy.BuildRadius)
+        // Sawmills and mines may be raised anywhere on the map (user, 22.11); the other buildings keep the radius around the castle.
+        bool anywhere = template.Name is "Лесопилка" or "Шахта";
+        if (!Inside(cell) || !PlayerCastle.Alive || (!anywhere && (new Vector2(cell.X * 32 + 16, cell.Y * 32 + 16)).DistanceTo(PlayerCastle.Position) > Rules.Economy.BuildRadius))
             return new(ConstructionPlacementStatus.Rejected);
         var parameters = template.Construction;
         var result = OriginalConstructionRules.ProbePlacement(Occupancy.Width, Occupancy.Height, Map.Cells, _properties, Occupancy.Cells,
@@ -221,6 +223,7 @@ public sealed partial class Skirmish
         int count = 0;
         foreach (var worker in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && a.Worker))
         {
+            worker.LastJob = new WorkerJob(WorkerJobKind.Timber, tree, 0); worker.IdleSince = -1;
             worker.GatherTree = tree; worker.PreferredMill = 0; worker.MineJob = false; ClearDelivery(worker); worker.Goal = null; worker.Target = 0;
             worker.Route.Clear(); worker.HarvestPrepared = false; worker.Record[0x2d] &= 15; worker.ReplanTimer = 0; count++;
         }
@@ -349,6 +352,7 @@ public sealed partial class Skirmish
     }
     private void TickWorker(SkirmishActor worker, double dt)
     {
+        WorkerRetryTick(worker);
         // WRK 883 calls the animation core before the work dispatcher; 856C waits while state 3 is active.
         if (OriginalWorkerAnimation.Pending(worker.Record))
         {
