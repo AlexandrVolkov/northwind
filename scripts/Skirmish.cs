@@ -107,6 +107,14 @@ public sealed partial class Skirmish : IDisposable
     public double Elapsed { get; private set; }
     private readonly OriginalRouteSearch _search = new();
     private readonly AStarGrid2D _guidance = new();
+    private readonly Dictionary<(int, int, int), (AStarGrid2D Grid, double At)> _guidanceGrids = [];
+    private const double GuidanceRefresh = 4;
+    private AStarGrid2D NewGuidanceGrid()
+    {
+        var grid = new AStarGrid2D { Region = new Rect2I(0, 0, Map.Width, Map.Height), DiagonalMode = AStarGrid2D.DiagonalModeEnum.Always,
+            DefaultComputeHeuristic = AStarGrid2D.Heuristic.Chebyshev, DefaultEstimateHeuristic = AStarGrid2D.Heuristic.Chebyshev };
+        grid.Update(); return grid;
+    }
     public int GuidedRouteSearches { get; private set; }
     private readonly OriginalRoutePool _routes = new();
     private readonly byte[] _properties;
@@ -281,10 +289,18 @@ public sealed partial class Skirmish : IDisposable
         }
         // Provisional distant-order guidance. Do not present these waypoints as recovered AI.
         GuidedRouteSearches++;
-        for (int y = 0; y < Map.Height; y++) for (int x = 0; x < Map.Width; x++)
-            _guidance.SetPointSolid(new(x, y), !CanStand(actor, new(x, y)));
-        _guidance.SetPointSolid(actor.Cell, false);
-        var guide = _guidance.GetIdPath(actor.Cell, goal);
+        // The blocked-cell grid of a footprint class is shared by all searches of that class and rebuilt every few seconds (the build costs a CanStand per cell).
+        var key = (fw, fh, actor.Record[0x0d] & 3);
+        if (!_guidanceGrids.TryGetValue(key, out var entry) || Elapsed - entry.At > GuidanceRefresh)
+        {
+            var grid = entry.Grid ?? NewGuidanceGrid();
+            for (int y = 0; y < Map.Height; y++) for (int x = 0; x < Map.Width; x++)
+                grid.SetPointSolid(new(x, y), !CanStand(actor, new(x, y)));
+            _guidanceGrids[key] = entry = (grid, Elapsed);
+        }
+        entry.Grid.SetPointSolid(actor.Cell, false);
+        if (CanStand(actor, goal)) entry.Grid.SetPointSolid(goal, false);
+        var guide = entry.Grid.GetIdPath(actor.Cell, goal);
         for (int i = Math.Min(16, guide.Count - 1); i > 0; i--)
         {
             var native = NativePath(guide[i]);
@@ -381,10 +397,20 @@ public sealed partial class Skirmish : IDisposable
         double step = 1.0 / Rules.TicksPerSecond;
         // Retain time rather than discarding it when frame rate drops.
         int budget = 240;
+        // A frame may spend at most FrameBudgetMs on world steps (a large army made steps slower than the frame, and the retained time
+        // then ran ever more steps per frame); the time that does not fit is dropped beyond a quarter second, the game slows down instead of freezing.
+        long frameStart = System.Diagnostics.Stopwatch.GetTimestamp();
+        double limit = FrameBudgetMs * System.Diagnostics.Stopwatch.Frequency / 1000.0;
         // A small tolerance keeps whole-tick requests (n / TicksPerSecond) from losing a tick to rounding.
-        while (_accumulator >= step - 1e-9 && budget-- > 0 && Outcome == "") { Tick(step); _accumulator -= step; }
+        while (_accumulator >= step - 1e-9 && budget-- > 0 && Outcome == "")
+        {
+            Tick(step); _accumulator -= step;
+            if (FrameBudgetMs > 0 && System.Diagnostics.Stopwatch.GetTimestamp() - frameStart > limit) { _accumulator = Math.Min(_accumulator, 0.25); break; }
+        }
     }
     /// <summary>The wind (9E7D), updated on every running timer tick (9BF9); its vector drifts smoke and carries fire.</summary>
+    /// <summary>Real milliseconds one frame may spend on world steps; 0 = unlimited (tests, headless runs).</summary>
+    public double FrameBudgetMs { get; set; }
     public WindState Wind;
     private byte _windTimer;   // [19E8]
     private void Tick(double dt)
@@ -942,5 +968,5 @@ public sealed partial class Skirmish : IDisposable
         public void Sound(uint reference) { if (Current != null) battle.ObjectSound(Current, reference); }   // the wound sound DAT[A3]
         public uint Occupant(int plane, int cell) => battle.Occupancy.Cells[plane * battle.Occupancy.Width * battle.Occupancy.Height + cell];
     }
-    public void Dispose() => _guidance.Dispose();
+    public void Dispose() { _guidance.Dispose(); foreach (var g in _guidanceGrids.Values) g.Grid.Dispose(); }
 }
