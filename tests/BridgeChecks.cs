@@ -4,6 +4,21 @@ using Northwind;
 public partial class TestRunner
 {
     /// <summary>The player's bridge (docs/bridges.md): a line across water is paid per segment and laid as bridge objects.</summary>
+
+    private static void BuildTestFactory(Skirmish battle)
+    {
+        for (int r = 4; r < 14; r++)
+            for (int dy = -r; dy <= r; dy++)
+                for (int dx = -r; dx <= r; dx++)
+                {
+                    var cell = battle.PlayerCastle.Cell + new Vector2I(dx, dy);
+                    if (Math.Max(Math.Abs(dx), Math.Abs(dy)) != r || battle.ProbeFactory(cell).Status != ConstructionPlacementStatus.Clear) continue;
+                    var factory = battle.BuildFactory(cell);
+                    if (factory == null) continue;
+                    for (int t = 0; t < (int)(300 * 18.2) && factory.ConstructionRemaining > 0; t++) battle.Advance(1 / 18.2);
+                    return;
+                }
+    }
     private void BridgeChecks()
     {
         var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
@@ -19,6 +34,9 @@ public partial class TestRunner
                 if (run >= 3 && run <= 6) { start = new(x, y); end = new(x + run - 1, y); }
             }
         Check(start != null, "A river stretch for a bridge exists on the map");
+        Check(battle.BuildBridge(start!.Value, end!.Value) == 0, "Without a factory no bridge is laid (they are built through the factory)");
+        BuildTestFactory(battle);
+        Check(battle.Actors.Any(Skirmish.IsFactory), "The player builds a factory");
         var before = battle.Resources; int actors = battle.Actors.Count;
         int laid = battle.BuildBridge(start!.Value, end!.Value);
         var cells = battle.BridgeCells(start.Value, end.Value);

@@ -546,6 +546,7 @@ public sealed partial class Skirmish
         }
         Actors.Add(building);
         Occupancy.WriteFootprint(building.Parameters[3], building.Parameters[4], building.Record[0x0d], (uint)building.Position.X, (uint)building.Position.Y, building.Id);
+        if (building.Index02 != -1 && (BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x40)) & 0x80) != 0) ReshapeLine(building);   // WRK AH=0 → FS:55
         return building;
     }
 

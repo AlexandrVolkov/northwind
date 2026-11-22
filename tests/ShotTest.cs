@@ -74,11 +74,30 @@ public partial class TestRunner
         var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
         for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         GetTree().Root.Size = new Vector2I(1280, 720);
-        scene.SelectCastle(); scene.BuildMenuOpen = true; scene.BeginBridgePlacement();
         DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
-        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-bridge.png");
+        var b = scene.Battle; var hero = b.Hero;
+        Vector2I? h0 = null, h1 = null, v0 = null, v1 = null;
+        for (int y = 2; y < b.Map.Height - 8 && (h0 == null || v0 == null); y++)
+            for (int x = 2; x < b.Map.Width - 8; x++)
+            {
+                int run = 0; while (x + run < b.Map.Width && b.BridgeCellFree(new(x + run, y)) && !b.CanStand(hero, new(x + run, y))) run++;
+                if (h0 == null && run >= 4 && run <= 7) { h0 = new(x, y); h1 = new(x + run - 1, y); }
+                int vr = 0; while (y + vr < b.Map.Height && b.BridgeCellFree(new(x, y + vr)) && !b.CanStand(hero, new(x, y + vr))) vr++;
+                if (v0 == null && vr >= 4 && vr <= 7) { v0 = new(x, y); v1 = new(x, y + vr - 1); }
+            }
+        BuildTestFactory(b);
+        int ha = b.BuildBridge(h0!.Value, h1!.Value), va = b.BuildBridge(v0!.Value, v1!.Value);
+        for (int t = 0; t < (int)(120 * 18.2); t++) b.Advance(1 / 18.2);
+        GD.Print($"BRIDGE h {h0}-{h1} {ha} v {v0}-{v1} {va}");
+        Array.Fill(b.FogMap, (byte)0);
+        foreach (var (name, at) in new[] { ("h", h0.Value), ("v", v0.Value) })
+        {
+            scene.FocusWorld(new Vector2(at.X * 32 + 100, at.Y * 32 + 100));
+            for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            GetViewport().GetTexture().GetImage().SavePng($"res://build/shot-bridge-{name}.png");
+        }
+        GD.Print("SHAPES " + string.Join(",", b.Actors.Where(a => a.Index02 == 7).Select(a => a.Record[0x22])));
         GetTree().Quit();
     }
 }

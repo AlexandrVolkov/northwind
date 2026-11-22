@@ -32,6 +32,46 @@ public sealed class OriginalLineNeighbors(IReadOnlyDictionary<byte, (byte Mask, 
         return mask;
     }
 
+    /// <summary>BADF with the neighbours collected (al = 1): the mask and the records of the same template around the record.</summary>
+    private static (byte Mask, List<byte[]> Neighbors) AroundWithNeighbors(byte width, byte height, Occupant occupant, Func<byte, byte[]> template, byte[] record)
+    {
+        byte mask = 0; var found = new List<byte[]>(); var tp = template(record[0x0e]);
+        for (int direction = 0; direction < 8; direction++)
+        {
+            int cell = Neighbor(width, height, tp, BitConverter.ToUInt32(record, 4), BitConverter.ToUInt32(record, 8), direction);
+            if (cell < 0 || occupant(record[0x0d] & 3, cell) is not { } other || other[0x0e] != record[0x0e]) continue;
+            mask |= (byte)(1 << direction); found.Add(other);
+        }
+        return (mask, found);
+    }
+
+    /// <summary>BBE4: the shape of a segment (+22) from the mask of its neighbours: the first pair of the table whose mask equals the neighbour mask
+    /// (an unknown pattern is retried with mask 0); the frame word moves by (old shape − new shape) · (2·DAT[4A] + DAT[4B]).</summary>
+    private void Apply(byte[] record, int stride, byte mask)
+    {
+        var (tableMask, pairs) = tables[record[0x0e]];
+        for (int attempt = 0, m = mask & tableMask; attempt < 2; attempt++, m = 0)
+            for (int i = 0; i + 1 < pairs.Length && pairs[i] != 0xff; i += 2)
+            {
+                if (pairs[i + 1] != m) continue;
+                short delta = (short)((sbyte)(byte)(record[0x22] - pairs[i]) * (sbyte)(byte)stride);
+                System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(record.AsSpan(1), (ushort)(System.Buffers.Binary.BinaryPrimitives.ReadUInt16LittleEndian(record.AsSpan(1)) - delta));
+                record[0x22] = pairs[i];
+                return;
+            }
+    }
+
+    /// <summary>BB8B (called by the WRK AH=0 of a line segment through FS:55): the new segment and each neighbour take the shape that matches their neighbours
+    /// (vertical, horizontal, the ends where a line starts and stops).</summary>
+    public void Reshape(byte width, byte height, Occupant occupant, Func<byte, byte[]> template, byte[] record)
+    {
+        if (!tables.ContainsKey(record[0x0e])) return;
+        var tp = template(record[0x0e]); int stride = 2 * tp[0x4a] + tp[0x4b];
+        var (mask, neighbors) = AroundWithNeighbors(width, height, occupant, template, record);
+        Apply(record, stride, mask);
+        foreach (var other in neighbors) Apply(other, stride, Around(width, height, occupant, template, other));
+    }
+
     private bool Known(byte index, byte mask)
     {
         var (_, pairs) = tables[index];
