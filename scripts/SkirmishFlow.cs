@@ -54,6 +54,50 @@ public sealed partial class Skirmish
         return null;
     }
 
+    /// <summary>Another worker is already felling this tree.</summary>
+    private bool TreeTakenByOther(SkirmishActor worker, Vector2I cell) =>
+        Actors.Any(w => w != worker && w.Alive && w.Worker && w.HarvestPrepared && w.GatherTree == cell);
+
+    /// <summary>A side of the tree where the worker can stand: one of the four neighbours, free of other units.</summary>
+    private bool HasFreeApproach(SkirmishActor worker, Vector2I tree)
+    {
+        foreach (var d in new[] { Vector2I.Up, Vector2I.Down, Vector2I.Left, Vector2I.Right })
+        {
+            var n = tree + d;
+            if (Inside(n) && (n == worker.Cell || CanStand(worker, n))) return true;
+        }
+        return false;
+    }
+
+    /// <summary>The nearest tree (by rings around <paramref name="around"/>, ties by the distance from the worker) that nobody fells and that has a free side to stand on
+    /// (user, 22.11: a worker does not wait for one particular tree to become free, it fells the next one beside it).</summary>
+    private Vector2I? NearestFreeTree(SkirmishActor worker, Vector2I around, int radius)
+    {
+        for (int r = 0; r <= radius; r++)
+        {
+            Vector2I? best = null; float bestDistance = float.MaxValue;
+            for (int dy = -r; dy <= r; dy++)
+                for (int dx = -r; dx <= r; dx++)
+                {
+                    if (Math.Max(Math.Abs(dx), Math.Abs(dy)) != r) continue;
+                    var c = around + new Vector2I(dx, dy);
+                    if (!Harvestable(c) || TreeTakenByOther(worker, c) || !HasFreeApproach(worker, c)) continue;
+                    float d = ((Vector2)(c - worker.Cell)).LengthSquared();
+                    if (d < bestDistance) { bestDistance = d; best = c; }
+                }
+            if (best != null) return best;
+        }
+        return null;
+    }
+
+    /// <summary>Points the worker at another tree near its current one; false when there is none in <paramref name="radius"/>.</summary>
+    private bool SwitchTree(SkirmishActor worker, Vector2I around, int radius = 12)
+    {
+        if (NearestFreeTree(worker, around, radius) is not { } next) return false;
+        worker.GatherTree = next; worker.HarvestPrepared = false; worker.Route.Clear(); worker.ReplanTimer = 0; worker.JobText = "Берёт соседнее дерево";
+        return true;
+    }
+
     private int _flowSweep;
     /// <summary>Once a second idle units that stand in the ring of their own service building walk to the nearest free cell outside every ring (three per sweep).</summary>
     private void TickFlow()

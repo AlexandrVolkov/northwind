@@ -173,3 +173,44 @@ public partial class TestRunner
         Check(w.LastJob == null, "A move order makes the worker forget the job");
     }
 }
+
+public partial class TestRunner
+{
+    /// <summary>Two workers sent to the same tree both fell: the one that finds it taken goes to a neighbouring free tree instead of waiting.</summary>
+    private void ChopNearbyChecks()
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        battle.GrantPeople(10);
+        for (int i = 0; i < 3; i++) battle.QueueWorker();
+        for (int t = 0; t < (int)(150 * 18.2); t++) battle.Advance(1 / 18.2);
+        var workers = battle.Actors.Where(a => a.Team == 0 && a.Worker && a.Alive).Take(2).ToList();
+        Check(workers.Count == 2, $"Two workers are available ({workers.Count})");
+        // A tree with free land on both sides and more trees around it.
+        Vector2I? tree = null;
+        for (int y = 3; y < battle.Map.Height - 3 && tree == null; y++)
+            for (int x = 3; x < battle.Map.Width - 3 && tree == null; x++)
+            {
+                var c = new Vector2I(x, y);
+                if (battle.Harvestable(c) && battle.CanStand(workers[0], c + Vector2I.Left) && battle.CanStand(workers[1], c + Vector2I.Right)
+                    && Enumerable.Range(-2, 5).SelectMany(dy => Enumerable.Range(-2, 5).Select(dx => c + new Vector2I(dx, dy))).Count(battle.Harvestable) >= 4) tree = c;
+            }
+        Check(tree != null, "A clump of trees with free sides exists");
+        foreach (var (w, side) in workers.Zip([Vector2I.Left, Vector2I.Right]))
+        {
+            var at = tree!.Value + side;
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(w.Record.AsSpan(4), (uint)(at.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(w.Record.AsSpan(8), (uint)(at.Y * 32 + 16));
+            w.Goal = null; w.Route.Clear(); w.Stepping = false;
+        }
+        battle.GatherTimber(workers.Select(w => w.Id), tree!.Value);
+        var chopped = new HashSet<uint>(); var trees = new HashSet<Vector2I>();
+        for (int t = 0; t < 60 * 18; t++)
+        {
+            battle.Advance(1 / 18.2);
+            foreach (var w in workers) if (w.JobText.StartsWith("Рубит")) { chopped.Add(w.Id); if (w.GatherTree is { } g) trees.Add(g); }
+        }
+        Check(chopped.Count == 2, $"Both workers fell trees ({chopped.Count} of 2, trees {trees.Count})");
+        Check(trees.Count >= 2, "The workers fell different trees instead of one waiting for the other");
+    }
+}
