@@ -609,23 +609,22 @@ public partial class SkirmishMain : Node2D
         }
         foreach (var (template, finalFrame, at, owner, left) in Battle.Ruins)
         {
-            // The construction frames backwards (stage = DAT[4A] · remaining share), the walls sink and shake, the last fifth fades out.
-            int stages = Battle.Templates02(template).Parameters4A;
-            float p = left / (float)Skirmish.CollapseTicks;
-            int stage = Math.Clamp((int)MathF.Floor(stages * p), 0, stages);
-            ushort frameNumber = (ushort)(finalFrame - (stages - stage));
+            // A building that dies goes through the rest of its destruction frames (the block [4A+4B-1, 2·4A+4B-1] of its shape that a damaged building
+            // shows by its condition, C88C); the last frame is the ruin, it stays for RuinTicks and fades out.
+            var (a4, b4, baseFrame, line) = Battle.Templates02(template);
+            int stride = 2 * a4 + b4, shape = line && stride > 0 ? Math.Max(0, (finalFrame - baseFrame) / stride) : 0;
+            int blockStart = baseFrame + shape * stride + a4 + b4 - 1, blockEnd = baseFrame + shape * stride + 2 * a4 + b4 - 1;
+            int from = finalFrame >= blockStart && finalFrame <= blockEnd ? finalFrame : blockStart;
+            int falling = Math.Max(0, left - Skirmish.RuinTicks);   // collapse ticks still to go
+            float progress = 1f - falling / (float)Skirmish.CollapseTicks;
+            ushort frameNumber = (ushort)Math.Clamp(from + (int)MathF.Round((blockEnd - from) * progress), blockStart, blockEnd);
             if (!_frames.TryGetValue(("ARMY__02.DAT", template, frameNumber), out var ruin) && !_frames.TryGetValue(("ARMY__02.DAT", template, finalFrame), out ruin)) continue;
             var ruinSize = new Vector2(ruin.Width, ruin.Height);
-            var ruinAt = at - new Vector2(ruinSize.X / 2, ruinSize.Y - StructureBottom(template)) + new Vector2((left & 1) == 0 ? 1 : -1, 0) * (p > .2f ? 1 : 0) + new Vector2(0, (1 - p) * ruinSize.Y * .3f);
-            var tint = new Color(1, 1, 1, Math.Min(1f, p / .2f));
-            // The picture is clipped to the building's own footprint line so that the sinking walls do not draw below the ground.
-            float ground = at.Y + Battle.StructureFootprintHeight(template) * 16;
-            float visible = Math.Clamp(ground - ruinAt.Y, 0, ruinSize.Y);
-            if (visible <= 0) continue;
-            var dst = new Rect2(ruinAt, new Vector2(ruinSize.X, visible));
+            var ruinAt = at - new Vector2(ruinSize.X / 2, ruinSize.Y - StructureBottom(template));
+            var tint = new Color(1, 1, 1, Math.Min(1f, left / (float)Skirmish.RuinFadeTicks));
             if (ruin.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(owner), out var ruinSheet))
-                DrawTextureRectRegion(ruinSheet, dst, new Rect2(ruin.TeamSlot % 64 * 64, ruin.TeamSlot / 64 * 64, ruin.Width, visible), tint);
-            else DrawTextureRectRegion(_sprites, dst, new Rect2(ruin.X, ruin.Y, ruin.Width, visible), tint);
+                DrawTextureRectRegion(ruinSheet, new Rect2(ruinAt, ruinSize), new Rect2(ruin.TeamSlot % 64 * 64, ruin.TeamSlot / 64 * 64, ruin.Width, ruin.Height), tint);
+            else DrawTextureRectRegion(_sprites, new Rect2(ruinAt, ruinSize), new Rect2(ruin.X, ruin.Y, ruin.Width, ruin.Height), tint);
         }
         foreach (var corpse in Battle.Corpses)
         {

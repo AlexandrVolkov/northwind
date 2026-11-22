@@ -98,6 +98,21 @@ public sealed partial class Skirmish
         return true;
     }
 
+    /// <summary>Chance, in percent, that a felled tree kills another worker standing in its cell (user, 22.11: not at once, but with a probability of 1 %).</summary>
+    public int TreeKillPercent { get; set; } = 1;
+    /// <summary>A load is felled in the cell: another worker standing there is struck by the falling tree with the chance <see cref="TreeKillPercent"/>.</summary>
+    private void FellOnWorkers(SkirmishActor chopper, Vector2I tree)
+    {
+        if (TreeKillPercent <= 0) return;
+        foreach (var other in Actors.Where(a => a != chopper && a.Alive && a.Worker && a.Cell == tree).ToArray())
+        {
+            int roll = (_terrainCatalog.NextRandomByte() * 256 + _terrainCatalog.NextSecondaryByte()) % 100;
+            if (roll >= TreeKillPercent) continue;
+            other.Record[0x19] = 0; Kill(other);
+            Log("Упавшее дерево убило рабочего.");
+        }
+    }
+
     private int _flowSweep;
     /// <summary>Once a second idle units that stand in the ring of their own service building walk to the nearest free cell outside every ring (three per sweep).</summary>
     private void TickFlow()

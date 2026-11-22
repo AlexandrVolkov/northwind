@@ -214,16 +214,23 @@ public partial class TestRunner
         GetTree().Root.Size = new Vector2I(1280, 720);
         DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
         var b = scene.Battle; BuildTestFactory(b); var f = b.Actors.First(Skirmish.IsFactory);
-        Array.Fill(b.FogMap, (byte)0); scene.FocusWorld(f.Position); b.Demolish(f);
-        foreach (int target in new[] { 70, 45, 20 })
+        Array.Fill(b.FogMap, (byte)0); scene.FocusWorld(f.Position);
+        int full = f.Template.InitialCondition;
+        // The staged destruction by condition (frames after the animation block), then the fall at death, then the ruin.
+        foreach (var (name, share) in new[] { ("100", 1.0), ("70", .7), ("40", .4), ("15", .15) })
         {
-            while (b.Ruins.Count > 0 && b.Ruins[0].Left > target) b.Advance(1 / 18.2);
-            b.Paused = true;
-            for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            f.Record[0x19] = (byte)(full * share); for (int t = 0; t < 8; t++) b.Advance(1 / 18.2);
+            b.Paused = true; for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-            GetViewport().GetTexture().GetImage().SavePng($"res://build/shot-collapse-{target}.png");
-            b.Paused = false;
+            GetViewport().GetTexture().GetImage().SavePng($"res://build/shot-damage-{name}.png"); b.Paused = false;
+            GD.Print($"DAMAGE {name}: cond {f.Record[0x19]} prev {f.Record[0x1a]} frame {f.Frame - f.Template.InitialFrame} dat45 {f.Parameters[0x45]} 46 {f.Parameters[0x46]} 4a {f.Parameters[0x4a]} 4b {f.Parameters[0x4b]} init {f.Template.InitialCondition} base {f.Template.InitialFrame}");
         }
+        b.Demolish(f);
+        for (int t = 0; t < 400; t++) b.Advance(1 / 18.2);
+        b.Paused = true; for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-ruin2.png");
+        GD.Print("RUIN2 ruins " + b.Ruins.Count + " " + string.Join(";", b.Ruins.Select(r => r.Template + "/" + r.Frame + "/" + r.Left)) + " alive " + f.Alive);
         GetTree().Quit();
     }
 }

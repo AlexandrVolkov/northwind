@@ -20,7 +20,11 @@ public sealed partial class Skirmish
     /// <summary>DAT footprint height of an ARMY__02 template (for the sprite anchor of buildings and ruins).</summary>
     public int StructureFootprintHeight(int templateIndex) => _templates.Armies["ARMY__02.DAT"].Templates[templateIndex].Construction.FootprintHeight;
     /// <summary>DAT[4A] (construction stages) of an ARMY__02 template.</summary>
-    public (int Parameters4A, int Unused) Templates02(int index) => (Convert.FromHexString(_templates.Armies["ARMY__02.DAT"].Templates[index].RawRecordHex)[0x4a], 0);
+    public (int Parameters4A, int Parameters4B, int BaseFrame, bool Line) Templates02(int index)
+    {
+        var raw = Convert.FromHexString(_templates.Armies["ARMY__02.DAT"].Templates[index].RawRecordHex);
+        return (raw[0x4a], raw[0x4b], BinaryPrimitives.ReadUInt16LittleEndian(raw.AsSpan(0x48)), (BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(0x40)) & 0x80) != 0);
+    }
     public TemplateEntry BridgeTemplate => _templates.Armies["ARMY__02.DAT"].Templates[7];
     /// <summary>The line template being placed: 7 the bridge, 5 the fence (docs/bridges.md). The UI sets it when a factory list item starts.</summary>
     public int LineIndex { get; set; } = 7;
