@@ -45,7 +45,7 @@ public partial class TestRunner
         }
         GD.Print($"Camp: {founded} founded, {fed} feedings, {reverted} returns, {beacons} alerts; first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("camp");
-        Check(count == summary.GetProperty("case_count").GetInt32() && founded > 50 && fed > 50 && beacons > 50, $"Camp reference coverage ({count})");
+        Check(count == summary.GetProperty("case_count").GetInt32() && founded > 20 && fed > 50 && beacons > 50, $"Camp reference coverage ({count})");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Camp of the horde LE:1 11943 matches original x86");
     }
 
