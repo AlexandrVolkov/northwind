@@ -20,6 +20,7 @@ public sealed partial class Skirmish
         int count = 0;
         foreach (var worker in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && a.Worker && a.Record[0x31] is 0 or 1 or 2))
         {
+            worker.LastJob = new WorkerJob(WorkerJobKind.Mine, default, mine.Id); worker.IdleSince = -1;
             worker.GatherTree = null; worker.PreferredMill = 0; worker.HarvestPrepared = false; worker.Goal = null; worker.Target = 0;
             worker.Route.Clear(); worker.ReplanTimer = 0; worker.Record[0x2d] &= 15; worker.Record[0x17] &= 0xbf;
             BinaryPrimitives.WriteUInt32LittleEndian(worker.Record.AsSpan(0x1c), mine.Id);

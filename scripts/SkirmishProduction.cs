@@ -101,7 +101,7 @@ public sealed partial class Skirmish
         }
         byte interval = producer.Team == 0 ? _production.Interval(producer.Source.TemplateName, record[0x22]) : EnemyInterval(producer, record[0x22]);
         if (!OriginalProductionRules.Tick(record, interval, ProductionSpeedShift, template.InitialCondition)) return;
-        if (!ReleaseRecruit(producer, template)) { SetBlocked(producer, true); if (producer.Team != 0) EnemyClearExit(producer, template); return; }
+        if (!ReleaseRecruit(producer, template)) { SetBlocked(producer, true); if (producer.Team != 0) EnemyClearExit(producer, template); else ClearExit(producer, template); return; }
         OriginalProductionRules.Complete(record); SetBlocked(producer, false);
     }
     private Vector2I? EnemyExitCell(SkirmishActor recruit, Vector2I exit, byte layer)
@@ -127,8 +127,8 @@ public sealed partial class Skirmish
         BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(8), exit.Y);
         if (!CanStand(recruit, cell) || _reservations.ContainsKey((cell, exit.Layer)))
         {
-            // The enemy has nobody to clear its exit: its recruit takes the nearest free cell within 3 of it (adapter).
-            if (producer.Team == 0 || EnemyExitCell(recruit, cell, exit.Layer) is not { } free) return false;
+            // The exit is taken: the recruit takes the nearest free cell within 3 of it, else it waits while ClearExit moves the unit in the way (adapter).
+            if (EnemyExitCell(recruit, cell, exit.Layer) is not { } free) return false;
             cell = free; exit = exit with { X = (uint)(free.X * 32 + 16), Y = (uint)(free.Y * 32 + 16) };
             BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(4), exit.X);
             BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(8), exit.Y);
@@ -140,6 +140,7 @@ public sealed partial class Skirmish
         recruit.Route.Attach(_routes, recruit.Record); Actors.Add(recruit);
         Occupancy.WriteFootprint(recruit.Parameters[3], recruit.Parameters[4], exit.Layer, exit.X, exit.Y, recruit.Id);
         if (producer.Team != 0) { EnemyRecruitLeaves(recruit); return true; }
+        RecruitStepsAway(recruit, producer);
         LastRecruitId = recruit.Id; RecountPopulation(); Log(template.Name + " готов у выхода из " + producer.Source.TemplateName + "."); return true;
     }
 }

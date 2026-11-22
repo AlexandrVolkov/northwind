@@ -121,3 +121,47 @@ public partial class TestRunner
         Check(battle.Ruins.Count == 0, "Nothing is left of the building after the collapse");
     }
 }
+
+public partial class TestRunner
+{
+    /// <summary>Flow around the buildings: recruits step off the exit, a blocked exit is cleared one unit at a time, idle units leave the rings of service buildings,
+    /// workers retry their last order after a pause, mines and sawmills are built anywhere.</summary>
+    private void FlowChecks()
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        void Run(double seconds) { for (int t = 0; t < (int)(seconds * 18.2); t++) battle.Advance(1 / 18.2); }
+        battle.GrantPeople(20);
+        // A far sawmill: outside the build radius of the castle.
+        var far = battle.PlayerCastle.Cell; Vector2I? site = null;
+        for (int r = 24; r < 60 && site == null; r += 2)
+            for (int dx = -r; dx <= r && site == null; dx += 3)
+                foreach (var dy in new[] { -r, r }) { var c = far + new Vector2I(dx, dy); if (battle.Inside(c) && battle.ProbeMill(c).Status == ConstructionPlacementStatus.Clear) { site = c; break; } }
+        Check(site != null && (new Vector2(site.Value.X * 32, site.Value.Y * 32) - battle.PlayerCastle.Position).Length() > rules.Economy.BuildRadius, $"A sawmill site beyond the build radius is accepted ({site})");
+        // A recruit steps away from the exit; units in the way of the exit are moved.
+        battle.QueueWorker();
+        Run(60);
+        var workers = battle.Actors.Where(a => a.Team == 0 && a.Worker && a.Alive).ToList();
+        Check(workers.Count >= 1, $"The castle produces a worker ({workers.Count})");
+        var exitCell = battle.PlayerCastle.Cell;
+        Check(battle.Actors.Where(a => a.Team == 0 && a.Worker && a.Id == battle.LastRecruitId).All(a => a.Stepping || a.Goal != null || (a.Cell - exitCell).Length() > 3), "The new worker walks away from the exit");
+        // An idle soldier standing right beside the castle is moved out of the ring.
+        var soldier = battle.Actors.First(a => a.Team == 0 && a.Alive && !a.Structure && !a.Worker && !a.Hero);
+        var ring = battle.PlayerCastle.Cell + new Vector2I(-battle.PlayerCastle.Parameters[3] / 2 - 1, 0);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(soldier.Record.AsSpan(4), (uint)(ring.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(soldier.Record.AsSpan(8), (uint)(ring.Y * 32 + 16));
+        soldier.Goal = null; soldier.Target = 0; soldier.Route.Clear();
+        Check(battle.IsServiceCell(soldier.Cell, 0), "The test cell lies in the ring of the castle");
+        Run(6);
+        Check(!battle.IsServiceCell(soldier.Cell, 0), $"An idle unit leaves the ring of the castle (now {soldier.Cell})");
+        // A worker that lost its job takes up the last order again after a pause.
+        var w = workers[0]; var tree = Enumerable.Range(0, 3000).Select(i => new Vector2I(i % battle.Map.Width, i / battle.Map.Width)).FirstOrDefault(c => battle.Harvestable(c));
+        battle.GatherTimber([w.Id], tree);
+        Check(w.LastJob is { Kind: WorkerJobKind.Timber } && w.GatherTree != null, "A felling order is remembered");
+        w.GatherTree = null; w.Goal = null; w.Route.Clear(); w.Stepping = false;   // the job failed
+        Run(Skirmish.WorkerRetrySeconds + 3);
+        Check(w.GatherTree != null || w.Goal != null || w.Route.Count > 0 || w.Stepping, "An idle worker tries its last order again after a pause");
+        battle.Move([w.Id], battle.PlayerCastle.Cell + new Vector2I(0, 8));
+        Check(w.LastJob == null, "A move order makes the worker forget the job");
+    }
+}

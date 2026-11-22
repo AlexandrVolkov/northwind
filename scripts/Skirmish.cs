@@ -73,6 +73,9 @@ public sealed class SkirmishActor
     public bool Detached { get; set; }
     /// <summary>The building is being repaired: the maintenance step C80D pays its price at every condition step (WorkFlags = 1).</summary>
     public bool Repairing { get; set; }
+    /// <summary>The last work order (felling or mining) and when the worker became idle (−1: not idle); see Skirmish.WorkerRetryTick.</summary>
+    public WorkerJob? LastJob { get; set; }
+    public double IdleSince { get; set; } = -1;
     /// <summary>The owners that can see this unit (kept in OBE[20]): all, unless it stands among trees.</summary>
     public byte VisibleTo { get; set; } = 0xff;
     public bool Stepping { get; set; }
@@ -338,15 +341,18 @@ public sealed partial class Skirmish : IDisposable
         foreach (var actor in ids.Distinct().Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && !a.Structure))
         {
             bool assigned = false;
+            // First pass keeps out of the rings around the service buildings (the way to a mine, a sawmill, the castle must stay open), the second takes any cell.
+            for (int pass = 0; pass < 2 && !assigned; pass++)
             for (int radius = 0; radius <= 5 && !assigned; radius++)
             for (int y = -radius; y <= radius && !assigned; y++)
             for (int x = -radius; x <= radius && !assigned; x++)
             {
                 var goal = destination + new Vector2I(x, y);
+                if (pass == 0 && IsServiceCell(goal, actor.Team)) continue;
                 if (FootprintCells(actor, goal).Any(c => used.Contains((c, actor.Record[0x0d] & 3))) || !CanStand(actor, goal)) continue;
                 if (!actor.Stepping && !Plan(actor, goal)) continue;
                 actor.Target = 0; actor.Goal = goal; actor.ResumeGoal = null; actor.ReplanTimer = 0;
-                actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false;
+                actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false; actor.LastJob = null;
                 if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); }
                 if (actor.Stepping) actor.Route.Clear();
                 foreach (var cell in FootprintCells(actor, goal)) used.Add((cell, actor.Record[0x0d] & 3));
@@ -404,7 +410,7 @@ public sealed partial class Skirmish : IDisposable
     {
         if (Paused || Outcome != "") return;
         foreach (var actor in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0))
-        { actor.Target = 0; actor.Goal = null; actor.ResumeGoal = null; actor.Route.Clear(); actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false; actor.MineJob = false; if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); } actor.JobText = "Без задания"; }
+        { actor.Target = 0; actor.Goal = null; actor.ResumeGoal = null; actor.LastJob = null; actor.Route.Clear(); actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false; actor.MineJob = false; if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); } actor.JobText = "Без задания"; }
     }
     public void Advance(double delta)
     {
@@ -461,7 +467,7 @@ public sealed partial class Skirmish : IDisposable
             OriginalCombatRules.AfterUpdate(actor.Record, engaged != null ? engaged.Record : ReadOnlySpan<byte>.Empty, _globalTick);
         }
         });
-        TickFauna(); TickPits(); TickTowers();
+        TickFauna(); TickPits(); TickTowers(); TickFlow();
         Prof("fog", TickFog);
         Prof("ai", TickAi); // 1E7EA follows the object update (LE:1 31D6)
         if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";
