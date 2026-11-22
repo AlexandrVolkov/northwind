@@ -3740,6 +3740,42 @@
       "evidence": ["tests/fixtures/camp.json", "tools/verify_camp.py"],
       "implementation": ["scripts/OriginalAiRules.cs"],
       "limitations": ""
+    },
+    {
+      "id": "pit-trap-wrk-7f0",
+      "module": "ARMY__03.WRK",
+      "start": 2032,
+      "end": 2284,
+      "name": "Pit trap (template 12): detect, open, crush, close",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/pit.json", "tools/verify_pit.py"],
+      "implementation": ["scripts/OriginalPit.cs"],
+      "limitations": "Services FS:14B and FS:157 are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "fs-14b-square-search-11dde",
+      "module": "LE:1",
+      "start": 73182,
+      "end": 73392,
+      "name": "FS:14B: hostile and other objects in a rectangle (nearest hostile, counts)",
+      "classification": "code",
+      "status": "partial",
+      "evidence": ["docs/campaign-items.md"],
+      "implementation": [],
+      "limitations": "Identified from the loader's FS table and disassembly; calls 21A00 (rectangle list), D7B1, C344, D157; not ported"
+    },
+    {
+      "id": "fs-157-claim-crush-d2d1",
+      "module": "LE:1",
+      "start": 53969,
+      "end": 54115,
+      "name": "FS:157: claim a rectangle of the occupancy plane for an object, or crush the objects in it",
+      "classification": "code",
+      "status": "partial",
+      "evidence": ["docs/campaign-items.md"],
+      "implementation": [],
+      "limitations": "Identified from the loader's FS table and disassembly; rectangle set up by 4409; not ported"
     }
   ]
 }

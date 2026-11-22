@@ -4,13 +4,13 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 107264 | 5512 | 97 | 34009 | 44 |
+| LE:1 | 146882 | 107054 | 5722 | 97 | 34009 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
 | ARMY__02.WRK | 6930 | 5917 | 609 | 0 | 404 | 7 |
-| ARMY__03.WRK | 13412 | 13412 | 0 | 0 | 0 | 1 |
+| ARMY__03.WRK | 13412 | 13160 | 0 | 0 | 252 | 1 |
 | ARMY__04.WRK | 411 | 411 | 0 | 0 | 0 | 0 |
 | ARMY__05.WRK | 882 | 882 | 0 | 0 | 0 | 2 |
 
@@ -52,6 +52,7 @@
 | ARMY__02.WRK `0x9ED..0xA9B` | Ore worker handler header, init and action table | partial | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Перенесены инициализация A09 и переход A37..A43; общий префикс 90E9 и диспетчер 8227 не перенесены. |
 | ARMY__02.WRK `0xA9B..0xAB3` | Empty ore worker becomes template 10 | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Ветка сброса груза AB3..ACE (объект 26h) не перенесена. |
 | ARMY__02.WRK `0x161D..0x16DD` | Unit corpse effect (type 1) | ported | [combat.md](../docs/combat.md); [corpse.json](../tests/fixtures/corpse.json) |  |
+| ARMY__03.WRK `0x7F0..0x8EC` | Pit trap (template 12): detect, open, crush, close | ported | [campaign-items.md](../docs/campaign-items.md); [pit.json](../tests/fixtures/pit.json); [verify_pit.py](../tools/verify_pit.py) | Services FS:14B and FS:157 are recorded stubs in the check; not yet wired into the skirmish |
 | LE:1 `0x2F03..0x2F1B` | Copy four initial resource stocks from SCN | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json) | Только извлечение четырёх dword SCN +15..24; прочие поля владельца, DOS-загрузка и цикл всех слотов вне перенесённого участка. |
 | LE:1 `0x3593..0x35A8` | DAT header and record stride | partial | [executable-analysis.md](../docs/executable-analysis.md) | Статически подтверждён участок чтения заголовка и шага 171; полный загрузчик, ошибки и релокации не перенесены. |
 | LE:1 `0x35B9..0x35C2` | WRK base assignment | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждено сохранение адреса WRK; это не весь загрузчик. |
@@ -171,6 +172,7 @@
 | LE:1 `0xCD72..0xD101` | Terrain blend and forest replacement | partial | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Перенесены логические правила смены тайлов и масок; CFAC сверен для AX=201h (лесоруб), 101h (огонь) и 300h (воронка катапульты). Отрисовка, dirty-cache и исходные глобальные эффекты не объявляются полностью перенесёнными. |
 | LE:1 `0xD101..0xD12C` | Classify harvestable timber tile | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Критерий дескриптора SEG, не полная классификация местности и не её цвет. |
 | LE:1 `0xD2D1..0xD363` | Conditional occupancy registration | partial | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Перенесена ветвь CL=0 с заменой совпавших ячеек и подсчётом конфликтов. Ветка повреждения чужих объектов не перенесена. |
+| LE:1 `0xD2D1..0xD363` | FS:157: claim a rectangle of the occupancy plane for an object, or crush the objects in it | partial | [campaign-items.md](../docs/campaign-items.md) | Identified from the loader's FS table and disassembly; rectangle set up by 4409; not ported |
 | LE:1 `0xD363..0xD3E5` | May template N be placed in a cell: creation check, range rules, template check | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [buildcheck.json](../tests/fixtures/buildcheck.json); [verify_buildcheck.py](../tools/verify_buildcheck.py) | The template check (WRK AH=4) is the world's (the skirmish: the mine needs ore, others allow) |
 | LE:1 `0xD40C..0xD453` | Owner free population growth | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |
 | LE:1 `0xD453..0xD5B1` | Owner population demand, support and limit recount | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |
@@ -194,6 +196,7 @@
 | LE:1 `0x103AF..0x103EC` | Formation of a kind nearest the member count | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x10AD2..0x10B75` | Free-spot search: random points in growing squares, AC63 on each | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [placement.json](../tests/fixtures/placement.json); [verify_placement.py](../tools/verify_placement.py) | The random generators come from the caller |
 | LE:1 `0x1192B..0x11B4D` | Horde camp (Teymur): timer, tent founding, feeding, respawn, alert | ported | [horde.md](../docs/horde.md); [camp.json](../tests/fixtures/camp.json); [verify_camp.py](../tools/verify_camp.py) | Callbacks 22E46, 10AD2 (ported), A758, 43E5, 103EC, 98DB are host adapters; not yet wired into the skirmish |
+| LE:1 `0x11DDE..0x11EB0` | FS:14B: hostile and other objects in a rectangle (nearest hostile, counts) | partial | [campaign-items.md](../docs/campaign-items.md) | Identified from the loader's FS table and disassembly; calls 21A00 (rectangle list), D7B1, C344, D157; not ported |
 | LE:1 `0x11EB0..0x11ECB` | Goods code 1: +100 gold and statistics | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Только AH=2. |
 | LE:1 `0x11ECB..0x11EE6` | Goods code 2: +100 metal and statistics | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Только AH=2. |
 | LE:1 `0x123D3..0x12404` | Grant timber through worker callback | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Живой рабочий, флаг 20000, пустой груз и AL=3. Другие грузы, непустой груз и все WRK-получатели не перенесены. |
