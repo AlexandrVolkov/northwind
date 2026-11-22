@@ -416,7 +416,7 @@ public sealed partial class Skirmish : IDisposable
     private byte _windTimer;   // [19E8]
     private void Tick(double dt)
     {
-        Elapsed += dt; _searchBudget = SearchBudgetPerStep;
+        Elapsed += dt; _searchBudget = SearchBudgetPerStep; _tickStartStamp = System.Diagnostics.Stopwatch.GetTimestamp();
         _windTimer++;
         OriginalWindRules.Step(ref Wind, _windTimer, _terrainCatalog.NextRandomByte, _terrainCatalog.NextSecondaryByte);
         foreach (var effect in Effects) effect.Remaining -= dt;
@@ -501,6 +501,7 @@ public sealed partial class Skirmish : IDisposable
             else if (!actor.Stepping && actor.Goal is { } goal && actor.Route.Count == 0 && actor.ReplanTimer <= 0)
             {
                 if (actor.Cell == goal) actor.Goal = null;
+                else if (SearchTimeUp) actor.ReplanTimer = 0.25;
                 else { t0 = P0(); Plan(actor, goal); P1("u.plan", t0); actor.ReplanTimer = ReplanDelay; }
             }
             t0 = P0(); MoveTick(actor); P1("u.move", t0);
@@ -509,12 +510,16 @@ public sealed partial class Skirmish : IDisposable
     /// full search, which cost most of the step with a large army. Now at most <see cref="SearchBudgetPerStep"/> searches run per step, a unit tries
     /// the few nearest standing cells, and one that finds nothing waits (<see cref="UnreachableDelay"/>) before it tries again.</summary>
     private int _searchBudget;
+    private long _tickStartStamp;
+    /// <summary>Real milliseconds of a world step after which no further route searches start (one failed search can scan the whole map); 0 = no limit (headless tests).</summary>
+    public double SearchTimeLimitMs { get; set; }
+    private bool SearchTimeUp => SearchTimeLimitMs > 0 && (System.Diagnostics.Stopwatch.GetTimestamp() - _tickStartStamp) * 1000.0 / System.Diagnostics.Stopwatch.Frequency > SearchTimeLimitMs;
     private const int SearchBudgetPerStep = 4, AttackCandidates = 6;
     private const double UnreachableDelay = 2.5;
     private bool PlanAttack(SkirmishActor actor, SkirmishActor target)
     {
         actor.Route.Clear();
-        if (_searchBudget <= 0) { actor.ReplanTimer = 0.25; return false; }   // later: the searches of this step are used up
+        if (_searchBudget <= 0 || SearchTimeUp) { actor.ReplanTimer = 0.25; return false; }   // later: the searches of this step are used up
         int radius = (int)Math.Ceiling(actor.Rules.Range / 32) + 3;
         var around = new List<Vector2I>((2 * radius + 1) * (2 * radius + 1));
         for (int y = -radius; y <= radius; y++)
@@ -527,7 +532,7 @@ public sealed partial class Skirmish : IDisposable
             if (!Inside(cell)) continue;
             var point = actor.Position + (Vector2)((cell - actor.Cell) * 32);
             if (Distance(point, target) > actor.Rules.Range || !CanStand(actor, cell)) continue;
-            if (_searchBudget <= 0) { actor.ReplanTimer = 0.25; return false; }
+            if (_searchBudget <= 0 || SearchTimeUp) { actor.ReplanTimer = 0.25; return false; }
             if (tried++ >= AttackCandidates) break;
             _searchBudget--;
             var path = SearchPath(actor, cell);

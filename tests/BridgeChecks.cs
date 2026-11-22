@@ -26,13 +26,15 @@ public partial class TestRunner
         using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
         var hero = battle.Hero;
-        // The first water row stretch (cells the hero cannot stand on, but a bridge can) with free cells at both ends of a horizontal line.
-        Vector2I? start = null, end = null;
-        for (int y = 2; y < battle.Map.Height - 2 && start == null; y++)
-            for (int x = 2; x < battle.Map.Width - 8 && start == null; x++)
+        void Run(double seconds) { for (int t = 0; t < (int)(seconds * 18.2); t++) battle.Advance(1 / 18.2); }
+        // Four water columns (the hero cannot stand on any of them) between two land cells: two segments of 2×2 at x+1 and x+3 cover them.
+        Vector2I? start = null, end = null; int bx = 0, by = 0;
+        for (int y = 3; y < battle.Map.Height - 3 && start == null; y++)
+            for (int x = 3; x < battle.Map.Width - 8 && start == null; x++)
             {
-                int run = 0; while (x + run < battle.Map.Width && battle.BridgeCellFree(new(x + run, y)) && !battle.CanStand(hero, new(x + run, y))) run++;
-                if (run >= 3 && run <= 6) { start = new(x, y); end = new(x + run - 1, y); }
+                bool water = Enumerable.Range(0, 4).All(k => !battle.CanStand(hero, new(x + k, y)) && !battle.CanStand(hero, new(x + k, y - 1)));
+                if (water && battle.CanStand(hero, new(x - 1, y)) && battle.CanStand(hero, new(x + 4, y)) && battle.BridgeCellFree(new(x + 1, y)) && battle.BridgeCellFree(new(x + 3, y)))
+                { start = new(x, y - 1); end = new(x + 3, y - 1); bx = x; by = y; }
             }
         Check(start != null, "A river stretch for a bridge exists on the map");
         Check(battle.BuildBridge(start!.Value, end!.Value) == 0, "Without a factory no bridge is laid (they are built through the factory)");
@@ -45,6 +47,15 @@ public partial class TestRunner
         Check(battle.Actors.Skip(actors).All(a => a.Source.TemplateIndex == 7 && a.Team == 0 && a.Record[3] == 0), "The segments are bridge objects of the player");
         var price = Skirmish.Price(battle.BridgeTemplate);
         Check(before.First - battle.Resources.First == price.First * (uint)laid && before.Second - battle.Resources.Second == price.Second * (uint)laid, "The wallet is charged per segment");
+        Run(400);
+        var built = battle.Actors.Skip(actors).Where(a => a.Index02 == 7).ToList();
+        Check(built.All(a => a.ConstructionRemaining <= 0) && built.All(a => a.Record[0x0d] == 0), "The segments finish in the bridge plane 0");
+        Check(cells.Select(c => battle.CanStand(hero, c)).Any(ok => ok) && built.Any(a => battle.CanStand(hero, a.Cell)), "A unit can stand on a finished bridge");
+        // The hero walks across: the four columns are water, so he can only get over by the bridge.
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(4), (uint)((bx - 1) * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(8), (uint)(by * 32 + 16));
+        GD.Print("BRIDGECELLS " + string.Join(",", Enumerable.Range(-1, 6).Select(k => $"{bx + k}:{battle.CanStand(hero, new(bx + k, by))}")) + " segs " + string.Join(" ", built.Select(a => $"{a.Cell}/{a.Record[0x0d]}/{a.Health}/{a.Parameters[0x46]}")));
+        battle.Move([hero.Id], new Vector2I(bx + 4, by)); Run(30);
+        Check(hero.Cell.X >= bx + 3, $"The hero crosses the river by the bridge ({hero.Cell}, wanted {bx + 4},{by})");
         Check(battle.BuildBridge(new(0, 0), new(3, 0)) == 0 && battle.Resources.First == before.First - price.First * (uint)laid, "A refused first segment costs nothing");
     }
 }

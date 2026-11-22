@@ -537,6 +537,8 @@ public sealed partial class Skirmish
         string file = FileOf(slot);
         var template = _templates.Armies[file].Templates[index];
         var building = NewEconomyActor(index, cell, false, false, TeamOfSlot(slot), file);
+        // A line template stands in the plane DAT[77] & 3 names (the bridge in plane 0: units walk in plane 1 and cross water on a bridge found below them, 7EAC).
+        if ((BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x40)) & 0x80) != 0) building.Record[0x0d] = (byte)(building.Parameters[0x77] & 3);
         building.ConstructionDuration = building.ConstructionRemaining = template.InitialCondition * Math.Max(1, (int)building.Parameters[0x57]) / (double)Rules.TicksPerSecond;
         OriginalBuildingLifecycle.MarkConstruction(building.Record);
         building.Record[0x14] &= 7;   // the handled construction command leaves activity 1 at once (see ExecuteAiCommands)

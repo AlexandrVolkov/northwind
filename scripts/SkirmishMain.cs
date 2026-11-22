@@ -103,7 +103,7 @@ public partial class SkirmishMain : Node2D
         Battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"),
             GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
-        Battle.FrameBudgetMs = 14;   // keep the frame rate when a large army makes the world step slow
+        Battle.FrameBudgetMs = 14; Battle.SearchTimeLimitMs = 5;   // keep the frame rate when a large army makes the world step slow
         Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingFactory = PlacingBridge = false; _bridgeStart = null;
         PendingOrder = 0; Hud.MenuOpen = false;
         // DOSBox screenshots: the idle castle shows «Выбор» and «Разрушить» (WorkFlags bits 2 and 5 = 24h) although its OBE record holds 0;
@@ -524,7 +524,8 @@ public partial class SkirmishMain : Node2D
             if (_frames.TryGetValue(("ARMY__03.DAT", 12, BinaryPrimitives.ReadUInt16LittleEndian(pit.AsSpan(1))), out var pitFrame))
                 DrawTextureRectRegion(_spritesHorde, new Rect2(spot - new Vector2(pitFrame.Width, pitFrame.Height) / 2, new Vector2(pitFrame.Width, pitFrame.Height)), new Rect2(pitFrame.X, pitFrame.Y, pitFrame.Width, pitFrame.Height));
         }
-        foreach (var actor in Battle.Actors.Where(a => (a.Alive || a.Dying) && !Skirmish.IsAnimal(a)).OrderBy(a => a.Position.Y)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);
+        foreach (var actor in Battle.Actors.Where(a => a.Alive && a.Index02 == 7)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);   // bridges lie under everything that walks
+        foreach (var actor in Battle.Actors.Where(a => (a.Alive || a.Dying) && !Skirmish.IsAnimal(a) && a.Index02 != 7).OrderBy(a => a.Position.Y)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);
         if (_showFog)
             for (int y = Math.Max(0, first.Y); y < Math.Min(Battle.Map.Height, last.Y); y++)
             for (int x = Math.Max(0, first.X); x < Math.Min(Battle.Map.Width, last.X); x++)
@@ -551,15 +552,16 @@ public partial class SkirmishMain : Node2D
         if (PlacingBridge)
         {
             var mouse = GetGlobalMousePosition(); var at = new Vector2I((int)MathF.Floor(mouse.X / 32), (int)MathF.Floor(mouse.Y / 32));
-            var line = _bridgeStart is { } begin ? Battle.BridgeCells(begin, at) : [at];
+            var line = Battle.BridgeCells(_bridgeStart ?? at, at);
             bool affordable = !Battle.Paused && Battle.CanAffordBridge(line.Count);
             var c = affordable ? new Color(40 / 255f, 28 / 255f, 223 / 255f) : new Color(200 / 255f, 30 / 255f, 30 / 255f);
+            var segment = Battle.BridgeTemplate.Construction; var halfFoot = new Vector2I(segment.FootprintWidth / 2, segment.FootprintHeight / 2);
             foreach (var cell in line)
             {
                 var cc = Battle.Inside(cell) && Battle.BridgeCellFree(cell) ? c : new Color(200 / 255f, 30 / 255f, 30 / 255f);
-                var r = new Rect2((Vector2)(cell * 32), new Vector2(32, 32)); DrawRect(r, new Color(cc, .25f)); DrawRect(r.Grow(-1), cc, false, 1);
+                var r = new Rect2((Vector2)((cell - halfFoot) * 32), new Vector2(segment.FootprintWidth * 32, segment.FootprintHeight * 32)); DrawRect(r, new Color(cc, .25f)); DrawRect(r.Grow(-1), cc, false, 1);
             }
-            if (_bridgeStart != null) DrawString(ThemeDB.FallbackFont, (Vector2)(line[^1] * 32) + new Vector2(0, -5), $"Секций: {line.Count}", HorizontalAlignment.Left, -1, 12, c.Lightened(.5f));
+            if (_bridgeStart != null) DrawString(ThemeDB.FallbackFont, (Vector2)((line[^1] - halfFoot) * 32) + new Vector2(0, -5), $"Секций: {line.Count}", HorizontalAlignment.Left, -1, 12, c.Lightened(.5f));
         }
         if (PlacingBuilding)
         {
@@ -596,7 +598,7 @@ public partial class SkirmishMain : Node2D
         foreach (var (template, frameNumber, at, owner, _) in Battle.Ruins)
             if (_frames.TryGetValue(("ARMY__02.DAT", template, frameNumber), out var ruin))
             {
-                var ruinSize = new Vector2(ruin.Width, ruin.Height); var ruinAt = at - new Vector2(ruinSize.X / 2, ruinSize.Y - 16);
+                var ruinSize = new Vector2(ruin.Width, ruin.Height); var ruinAt = at - new Vector2(ruinSize.X / 2, ruinSize.Y - StructureBottom(template));
                 if (ruin.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(owner), out var ruinSheet))
                     DrawTextureRectRegion(ruinSheet, new Rect2(ruinAt, ruinSize), new Rect2(ruin.TeamSlot % 64 * 64, ruin.TeamSlot / 64 * 64, ruin.Width, ruin.Height));
                 else DrawTextureRectRegion(_sprites, new Rect2(ruinAt, ruinSize), new Rect2(ruin.X, ruin.Y, ruin.Width, ruin.Height));
@@ -671,6 +673,9 @@ public partial class SkirmishMain : Node2D
         DrawTextureRectRegion(_sprites, new Rect2(center - size / 2, size), new Rect2(f.X, f.Y, f.Width, f.Height));
         return true;
     }
+    /// <summary>Distance from the position of a building to the bottom of its sprite: the footprint's lower half plus 16 px (the castle's record
+    /// position and its observed top-left corner (−64, −63) fix this, docs/castle-reference.md); a unit's sprite stands 16 px below its position.</summary>
+    private float StructureBottom(int templateIndex) => Battle.StructureFootprintHeight(templateIndex) * 16 + 16;
     private void DrawActor(SkirmishActor actor)
     {
         var point = actor.Position; var color = TeamColor(actor.Team);
@@ -701,9 +706,9 @@ public partial class SkirmishMain : Node2D
             var size = new Vector2(frame.Width, frame.Height);
             // The owner's colour (COLOR_NN.TAB of the owner's slot) only changes the sprite indices 240..255.
             if (frame.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(actor.Record[3]), out var sheet))
-                DrawTextureRectRegion(sheet, new Rect2(point - new Vector2(size.X / 2, size.Y - 16), size), new Rect2(frame.TeamSlot % 64 * 64, frame.TeamSlot / 64 * 64, frame.Width, frame.Height));
+                DrawTextureRectRegion(sheet, new Rect2(point - new Vector2(size.X / 2, size.Y - (actor.Structure ? actor.Parameters[4] * 16 + 16 : 16)), size), new Rect2(frame.TeamSlot % 64 * 64, frame.TeamSlot / 64 * 64, frame.Width, frame.Height));
             else
-                DrawTextureRectRegion(frame.Page == 1 ? _spritesHorde : _sprites, new Rect2(point - new Vector2(size.X / 2, size.Y - 16), size), new Rect2(frame.X, frame.Y, frame.Width, frame.Height));
+                DrawTextureRectRegion(frame.Page == 1 ? _spritesHorde : _sprites, new Rect2(point - new Vector2(size.X / 2, size.Y - (actor.Structure ? actor.Parameters[4] * 16 + 16 : 16)), size), new Rect2(frame.X, frame.Y, frame.Width, frame.Height));
         }
         else if (!actor.Dying) DrawCircle(point - Vector2.Down * 12, 9, color);
         if (actor.Dying) return; // death frames only, no ring or health bar
