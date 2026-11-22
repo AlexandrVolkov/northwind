@@ -140,15 +140,36 @@ public sealed partial class Skirmish
     /// <summary>The «Ремонт» button (command slot 1, state 48h → 1 with WorkFlags = 1, docs/building-command-lifecycle.md): the building's condition rises by one
     /// every DAT[57] updates and each step pays DAT[8C, 90, 94] from the player's stores (the maintenance step C80D); it stops when the stores run dry or the condition
     /// reaches DAT[45].</summary>
-    public bool StartRepair(SkirmishActor building)
+    public bool StartRepair(SkirmishActor building, bool byAi = false)
     {
-        if (Paused || Outcome != "" || building.Team != 0 || !building.Structure || !building.Alive || building.Ruined || building.ConstructionRemaining > 0) return false;
-        if ((sbyte)building.Record[0x19] >= building.Template.InitialCondition) { Log($"{building.Source.TemplateName}: ремонт не нужен."); return false; }
-        building.Repairing = true; building.Record[0x0f] = 1; building.Record[0x16] = 0;
-        int steps = building.Template.InitialCondition - building.Record[0x19] + 1;
-        building.ConstructionDuration = building.ConstructionRemaining = steps * Math.Max(1, (int)building.Parameters[0x57]) / (double)Rules.TicksPerSecond;
-        Log($"{building.Source.TemplateName}: идёт ремонт.");
+        if (Paused || Outcome != "" || (building.Team != 0 && !byAi) || !building.Structure || !building.Alive || building.Ruined || building.ConstructionRemaining > 0 || building.Repairing) return false;
+        if ((sbyte)building.Record[0x19] >= building.Template.InitialCondition) { if (!byAi) Log($"{building.Source.TemplateName}: ремонт не нужен."); return false; }
+        building.Repairing = true; building.RepairFlags = building.Record[0x0f]; building.Record[0x16] = 0;
+        if (!byAi) Log($"{building.Source.TemplateName}: идёт ремонт.");
         return true;
+    }
+    /// <summary>The maintenance step C80D of every building under repair (the building keeps working: its production and attack go on), paid from the owner's stores
+    /// (WorkFlags = 1 inside the step); the AI starts a repair as soon as one of its finished buildings is damaged (improved AI only).</summary>
+    private void TickRepairs()
+    {
+        if (ImprovedAi && (_globalTick & 3) == 0)
+            foreach (var b in Actors)
+                if (b.Team != 0 && b.Alive && b.Structure && !b.Repairing && b.ConstructionRemaining <= 0 && !b.Ruined && (sbyte)b.Record[0x19] < b.Template.InitialCondition && b.Record[0x19] > 0)
+                    StartRepair(b, byAi: true);
+        foreach (var b in Actors.Where(a => a.Repairing).ToArray())
+        {
+            if (!b.Alive || b.Ruined || b.ConstructionRemaining > 0) { b.Repairing = false; b.Record[0x0f] = b.RepairFlags; continue; }
+            var wallet = Wallet(b.Team);
+            var m = OriginalBuildingRules.StepMaintenance(new(b.Record[0x19], b.Record[0x16], 1, BinaryPrimitives.ReadUInt16LittleEndian(b.Record.AsSpan(0x17))),
+                new(b.Template.InitialCondition, b.Parameters[0x57], new(BinaryPrimitives.ReadUInt32LittleEndian(b.Parameters.AsSpan(0x8c)),
+                    BinaryPrimitives.ReadUInt32LittleEndian(b.Parameters.AsSpan(0x90)), BinaryPrimitives.ReadUInt32LittleEndian(b.Parameters.AsSpan(0x94)))),
+                new(wallet.First, wallet.Second, wallet.Third), false);
+            b.Record[0x19] = m.State.Condition; b.Record[0x16] = m.State.Counter;
+            SetWallet(b.Team, new ResourceQuad(m.Balances.First, m.Balances.Second, m.Balances.Third, wallet.Fourth));
+            if (m.ContinueAction) continue;
+            b.Repairing = false; b.Record[0x0f] = b.RepairFlags;
+            if (b.Team == 0) Log(b.Record[0x19] >= b.Template.InitialCondition ? $"{b.Source.TemplateName}: ремонт закончен." : $"{b.Source.TemplateName}: ремонт остановлен — не хватает ресурсов.");
+        }
     }
     /// <summary>The «Разрушить» button: the player pulls his own building down.</summary>
     public bool Demolish(SkirmishActor building)
@@ -260,8 +281,7 @@ public sealed partial class Skirmish
                     new(building.Template.InitialCondition, building.Parameters[0x57], new(
                         BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x8c)),
                         BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x90)),
-                        BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x94)))), building.Repairing ? new(Metal, Wood, Gold) : default, false);
-                if (building.Repairing) SetResources(new ResourceQuad(maintenance.Balances.First, maintenance.Balances.Second, maintenance.Balances.Third, FreePeople));
+                        BinaryPrimitives.ReadUInt32LittleEndian(building.Parameters.AsSpan(0x94)))), default, false);
                 building.Record[0x19] = maintenance.State.Condition; building.Record[0x16] = maintenance.State.Counter; building.Record[0x0f] = maintenance.State.WorkFlags;
                 BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(0x17), maintenance.State.ObjectFlags);
                 building.ConstructionRemaining = maintenance.ContinueAction
@@ -273,12 +293,7 @@ public sealed partial class Skirmish
                 var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(building.Record[0x14], building.Record[0x15], building.Record[0x0f]));
                 building.Record[0x14] = completed.EncodedState; building.Record[0x15] = completed.Auxiliary; building.Record[0x0f] = completed.WorkFlags;
                 BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(LineShapeFrames(building) + building.Template.InitialFrame + building.Parameters[0x4a]));
-                if (building.Repairing)
-                {
-                    building.Repairing = false;
-                    Log(building.Record[0x19] >= building.Template.InitialCondition ? $"{building.Source.TemplateName}: ремонт закончен." : $"{building.Source.TemplateName}: ремонт остановлен — не хватает ресурсов.");
-                }
-                else if (building.Team == 0) Log(building.Source.TemplateName + " готова.");
+                if (building.Team == 0) Log(building.Source.TemplateName + " готова.");
                 if (building.Team != 0) { EnemyBuildingFinished(building); continue; }
             }
             if (building.Source.TemplateName != "Лесопилка") continue;

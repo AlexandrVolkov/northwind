@@ -113,6 +113,14 @@ public partial class TestRunner
         Check(factory.Record[0x19] >= full && !factory.Repairing, $"The repair restores the condition ({factory.Record[0x19]} of {full})");
         Check(after.First < before.First || after.Second < before.Second || after.Third < before.Third, "The repair is paid from the stores");
         Check(!battle.StartRepair(factory), "A sound building needs no repair");
+        // The AI repairs its damaged buildings by itself, paying from its stores.
+        var barracks = battle.Actors.First(x => x.Team == 1 && x.Alive && x.Source.TemplateName == "Казарма" && x.ConstructionRemaining <= 0);
+        int fullB = barracks.Template.InitialCondition; barracks.Record[0x19] = (byte)(fullB - 25);
+        var aiBefore = battle.AiResources(3);
+        Run(90);
+        Check(barracks.Record[0x19] >= fullB && !barracks.Repairing, $"The AI repairs a damaged barracks at once ({barracks.Record[0x19]} of {fullB})");
+        var aiAfter = battle.AiResources(3);
+        Check(aiAfter.First != aiBefore.First || aiAfter.Second != aiBefore.Second || aiAfter.Third != aiBefore.Third, "The AI's repair is paid from its stores");
         // Collapse: the construction frames run backwards, the building then vanishes for good.
         Check(battle.Demolish(factory) && battle.Ruins.Count > 0 && !factory.Alive, "A demolished building starts to fall apart");
         Run(2);
