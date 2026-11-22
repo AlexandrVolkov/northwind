@@ -89,6 +89,8 @@ public partial class TestRunner
         int ha = b.BuildBridge(h0!.Value, h1!.Value), va = b.BuildBridge(v0!.Value, v1!.Value);
         for (int t = 0; t < (int)(120 * 18.2); t++) b.Advance(1 / 18.2);
         GD.Print($"BRIDGE h {h0}-{h1} {ha} v {v0}-{v1} {va}");
+        { var seg = b.Actors.First(x => x.Index02 == 7 && x.Cell.Y == h0!.Value.Y + 1 || x.Index02 == 7);
+          System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(4), (uint)(seg.Position.X)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(8), (uint)(seg.Position.Y)); }
         Array.Fill(b.FogMap, (byte)0);
         foreach (var (name, at) in new[] { ("h", h0.Value), ("v", v0.Value) })
         {
