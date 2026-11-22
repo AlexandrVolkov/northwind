@@ -47,3 +47,23 @@ public partial class TestRunner
         GetTree().Quit();
     }
 }
+public partial class TestRunner
+{
+    private async System.Threading.Tasks.Task HordeShot()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        foreach (var c in scene.Battle.Camps) System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(c.AsSpan(0x23), 3);
+        for (int t = 0; t < (int)(150 * 18.2); t++) scene.Battle.Advance(1 / 18.2);
+        DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+        var tent = scene.Battle.Actors.First(a => a.Team == 3 && a.Source.TemplateName == "Шатер");
+        Array.Fill(scene.Battle.FogMap, (byte)0);
+        scene.FocusWorld(tent.Position);
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-horde.png");
+        GD.Print($"HORDE tent {tent.Cell} units {scene.Battle.Actors.Count(a => a.Team == 3 && !a.Structure)}");
+        GetTree().Quit();
+    }
+}
