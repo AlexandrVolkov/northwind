@@ -56,6 +56,8 @@ public sealed class SkirmishActor
     public uint Target { get; set; }
     /// <summary>Taken out of the original AI's squads by the improved logic: it is on an attack wave and invisible to the squad machinery.</summary>
     public bool Detached { get; set; }
+    /// <summary>A unit among trees that an enemy stands next to: seen after all.</summary>
+    public bool Revealed { get; set; }
     public bool Stepping { get; set; }
     public bool Turning { get; set; }
     public Vector2I StepGoal { get; set; }
@@ -406,7 +408,11 @@ public sealed partial class Skirmish : IDisposable
             if (!actor.Alive) return;
             actor.AttackTimer -= dt; actor.ReplanTimer -= dt;
             // OBE[20] is the mask of the owners that can see the object (FFh: all): a unit among trees is seen by its owner only.
-            actor.Record[0x20] = InForest(actor) ? (byte)(1 << (actor.Record[3] & 7)) : (byte)0xff;
+            // An enemy within two cells (checked every fourth update) uncovers it.
+            if (!InForest(actor)) actor.Revealed = false;
+            else if ((actor.Record[0x2e] & 3) == 0)
+                actor.Revealed = Actors.Any(a => a.Alive && !a.Structure && a != actor && AtWar(actor, a) && Math.Max(Math.Abs(a.Cell.X - actor.Cell.X), Math.Abs(a.Cell.Y - actor.Cell.Y)) <= 2);
+            actor.Record[0x20] = InForest(actor) && !actor.Revealed ? (byte)(1 << (actor.Record[3] & 7)) : (byte)0xff;
             long t0 = P0(); bool vitals = TickVitals(actor); P1("u.vitals", t0); if (vitals) return;
             if (actor.Worker) { t0 = P0(); TickWorker(actor, dt); P1("u.worker", t0); return; }
             var target = Find(actor.Target);
