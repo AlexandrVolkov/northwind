@@ -190,6 +190,14 @@ public sealed partial class Skirmish : IDisposable
     // Actors only grows (the fallen stay with Alive = false), so an index over the list is extended lazily with the new tail.
     private readonly Dictionary<uint, SkirmishActor> _actorIndex = [];
     private int _actorsIndexed;
+    // Index of the actors by their record array (the AI addresses units by record): extended lazily with the tail like the id index.
+    private readonly Dictionary<byte[], SkirmishActor> _recordIndex = new(ReferenceEqualityComparer.Instance);
+    private int _recordsIndexed;
+    internal SkirmishActor? ActorOfRecord(byte[] record)
+    {
+        for (; _recordsIndexed < Actors.Count; _recordsIndexed++) _recordIndex.TryAdd(Actors[_recordsIndexed].Record, Actors[_recordsIndexed]);
+        return _recordIndex.TryGetValue(record, out var actor) ? actor : null;
+    }
     public SkirmishActor? Find(uint id)
     {
         for (; _actorsIndexed < Actors.Count; _actorsIndexed++) _actorIndex.TryAdd(Actors[_actorsIndexed].Id, Actors[_actorsIndexed]);   // the first of equal ids, as before
