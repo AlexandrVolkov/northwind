@@ -102,5 +102,92 @@
     60
    ]
   }
+ },
+ "armies": {
+  "1": {
+   "army": "ARMY__01",
+   "source_sha256": {
+    "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+    "ARMY__01.WRK": "d2554037e3a135ce7c06530cf2ee85e89ae240aa31a00c7c72a9b3cb251c46de",
+    "ARMY__01.DAT": "a8c5aa398ff63219eefcd58e56f89653b1135cd1443fed9d7cedd2cb03c61d6e"
+   },
+   "producers": {
+    "2": {
+     "wrk_table_offset": 539,
+     "makes": [
+      3,
+      13,
+      4,
+      6,
+      14,
+      15
+     ],
+     "intervals": [
+      10,
+      10,
+      10,
+      20,
+      20,
+      10
+     ]
+    },
+    "3": {
+     "wrk_table_offset": 822,
+     "makes": [
+      1,
+      0,
+      5,
+      12
+     ],
+     "intervals": [
+      10,
+      10,
+      10,
+      10
+     ]
+    },
+    "6": {
+     "wrk_table_offset": 1222,
+     "makes": [
+      8,
+      9,
+      10,
+      11
+     ],
+     "intervals": [
+      1,
+      1,
+      20,
+      1
+     ]
+    },
+    "14": {
+     "wrk_table_offset": 2661,
+     "makes": [
+      7
+     ],
+     "intervals": [
+      20
+     ]
+    },
+    "18": {
+     "wrk_table_offset": 3533,
+     "makes": [
+      1,
+      0,
+      5,
+      12,
+      7
+     ],
+     "intervals": [
+      1,
+      1,
+      1,
+      1,
+      1
+     ]
+    }
+   }
+  }
  }
 }
