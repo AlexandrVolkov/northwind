@@ -572,7 +572,7 @@ public sealed partial class Skirmish
             var goal = destination + new Vector2I(x, y);
             if (!Inside(goal) || !CanStand(actor, goal)) continue;
             if (!actor.Stepping && !Plan(actor, goal)) continue;
-            actor.Target = 0; actor.Goal = goal; actor.ReplanTimer = 0;
+            actor.Target = 0; actor.Goal = goal; actor.ResumeGoal = null; actor.ReplanTimer = 0;
             actor.LastPosition = actor.Position; actor.StillSince = Elapsed;
             if (actor.Stepping) actor.Route.Clear();
             return true;

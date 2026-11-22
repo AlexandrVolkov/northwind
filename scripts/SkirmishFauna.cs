@@ -43,7 +43,20 @@ public sealed partial class Skirmish
         foreach (var animal in _fauna)
         {
             if (!animal.Alive || animal.Stepping || animal.Target != 0 || animal.Goal != null || animal.Route.Count > 0) continue;
-            if ((animal.Record[0x2e] & 63) != 0 || _terrainCatalog.NextRandomByte() > 40) continue;
+            if ((animal.Record[0x2e] & 63) != 0) continue;
+            // In the forest an animal sees every unit within 12 cells (the forest visibility rule) and goes for the nearest one on its own.
+            if (InForest(animal))
+            {
+                SkirmishActor? prey = null; int best = 13;
+                foreach (var o in Actors)
+                {
+                    if (!o.Alive || o.Structure || IsAnimal(o)) continue;
+                    int d = Math.Max(Math.Abs(o.Cell.X - animal.Cell.X), Math.Abs(o.Cell.Y - animal.Cell.Y));
+                    if (d < best) { best = d; prey = o; }
+                }
+                if (prey != null) { animal.Target = prey.Id; animal.Goal = null; animal.Route.Clear(); animal.ReplanTimer = 0; continue; }
+            }
+            if (_terrainCatalog.NextRandomByte() > 40) continue;
             // Adapter (speed): an animal far from every settlement's units stays put; route searches of 46 animals tripled the step time.
             if (!Actors.Any(o => o.Alive && !o.Structure && !IsAnimal(o) && Math.Abs(o.Cell.X - animal.Cell.X) < 30 && Math.Abs(o.Cell.Y - animal.Cell.Y) < 30)) continue;
             for (int attempt = 0; attempt < 6; attempt++)

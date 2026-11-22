@@ -58,6 +58,8 @@ public sealed class SkirmishActor
     public SkirmishRoute Route { get; } = new();
     internal Vector2I? GuidanceGoal { get; set; }
     public Vector2I? Goal { get; set; }
+    /// <summary>The move the unit was on when an enemy struck or came in sight: it stops, fights, then goes on (user, 22.11).</summary>
+    public Vector2I? ResumeGoal { get; set; }
     /// <summary>Closest the actor has come to its goal and when (adapter: an AI move that makes no progress ends, see
     /// <c>Skirmish.ExecuteAiCommands</c>).</summary>
     public Vector2 LastPosition = new(float.NaN, float.NaN); public double StillSince;
@@ -311,7 +313,7 @@ public sealed partial class Skirmish : IDisposable
                 var goal = destination + new Vector2I(x, y);
                 if (FootprintCells(actor, goal).Any(c => used.Contains((c, actor.Record[0x0d] & 3))) || !CanStand(actor, goal)) continue;
                 if (!actor.Stepping && !Plan(actor, goal)) continue;
-                actor.Target = 0; actor.Goal = goal; actor.ReplanTimer = 0;
+                actor.Target = 0; actor.Goal = goal; actor.ResumeGoal = null; actor.ReplanTimer = 0;
                 actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false;
                 if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); }
                 if (actor.Stepping) actor.Route.Clear();
@@ -328,7 +330,7 @@ public sealed partial class Skirmish : IDisposable
         if (ids.Distinct().Select(Find).OfType<SkirmishActor>().Any(a => a.Team == 0 && !a.Structure && !a.Worker) && !DeclareWarByOrder(foe)) return false;
         bool accepted = false;
         foreach (var actor in ids.Distinct().Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && !a.Structure && !a.Worker))
-        { actor.Target = targetId; actor.Goal = null; actor.Route.Clear(); actor.ReplanTimer = 0; accepted = true; }
+        { actor.Target = targetId; actor.Goal = null; actor.ResumeGoal = null; actor.Route.Clear(); actor.ReplanTimer = 0; accepted = true; }
         if (accepted) Log($"Атаковать: {Find(targetId)!.Source.TemplateName}. Отряды сами сблизятся.");
         return accepted;
     }
@@ -370,7 +372,7 @@ public sealed partial class Skirmish : IDisposable
     {
         if (Paused || Outcome != "") return;
         foreach (var actor in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0))
-        { actor.Target = 0; actor.Goal = null; actor.Route.Clear(); actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false; actor.MineJob = false; if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); } actor.JobText = "Без задания"; }
+        { actor.Target = 0; actor.Goal = null; actor.ResumeGoal = null; actor.Route.Clear(); actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false; actor.MineJob = false; if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); } actor.JobText = "Без задания"; }
     }
     public void Advance(double delta)
     {
@@ -443,7 +445,7 @@ public sealed partial class Skirmish : IDisposable
             long t0 = P0(); bool vitals = TickVitals(actor); P1("u.vitals", t0); if (vitals) return;
             if (actor.Worker) { t0 = P0(); TickWorker(actor, dt); P1("u.worker", t0); return; }
             var target = Find(actor.Target);
-            if (actor.Target != 0 && target == null) { actor.Target = 0; actor.Route.Clear(); actor.Goal = null; }
+            if (actor.Target != 0 && target == null) { actor.Target = 0; actor.Route.Clear(); actor.Goal = actor.ResumeGoal; actor.ResumeGoal = null; actor.ReplanTimer = 0; }
             // An assault on a building engages its nearby defenders first, then resumes the objective.
             if (actor.Team == 0 && target is { Structure: true })
                 target = Actors.Where(a => a.Alive && a.Team == 1 && !a.Structure && Distance(actor.Position, a) <= Rules.AggroRange)
@@ -460,7 +462,7 @@ public sealed partial class Skirmish : IDisposable
                     if (struck) actor.Record[0x17] &= 0xfd;
                     t0 = P0(); var found = OriginalTargetRules.FindEnemy(actor.Id, actor.Record, actor.Parameters, struck, new SearchWorld(this, actor.Record[3])); P1("u.findenemy", t0);
                     target = Find(found.Target);
-                    if (target != null) { actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); }
+                    if (target != null) { if (actor.Goal != null) actor.ResumeGoal = actor.Goal; actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); }
                 }
             }
             t0 = P0(); bool attacked = target != null && !actor.Stepping && AttackStep(actor, target); P1("u.attack", t0); if (attacked) return;
