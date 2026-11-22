@@ -393,9 +393,12 @@ public sealed partial class Skirmish
         }
         if (worker.Record[0x31] == 3) { TickDelivery(worker); return; }
         var tree = worker.GatherTree!.Value;
-        if (!Harvestable(tree))
+        // Before (re)starting a load the worker checks that the tree can be felled: it still stands, nobody else fells it and a side is free to stand on; if not it
+        // takes the nearest neighbouring free tree instead of waiting (user, 22.11).
+        // (Improved AI mode only: the original AI's checks depend on the old timing.)
+        if (!Harvestable(tree) || (ImprovedAi && !worker.HarvestPrepared && (TreeTakenByOther(worker, tree) || !HasFreeApproach(worker, tree))))
         {
-            if (!FindNextGrove(worker)) return;
+            if (!(ImprovedAi && SwitchTree(worker, tree)) && !Harvestable(tree) && !FindNextGrove(worker)) return;
             tree = worker.GatherTree!.Value;
         }
         var point = new Vector2(tree.X * 32 + 16, tree.Y * 32 + 16);
@@ -435,7 +438,10 @@ public sealed partial class Skirmish
         else if (worker.ReplanTimer <= 0)
         {
             var candidates = new[] { Vector2I.Up, Vector2I.Down, Vector2I.Left, Vector2I.Right }.Select(d => tree + d).OrderBy(c => ((Vector2)c).DistanceSquaredTo(worker.Cell));
-            foreach (var cell in candidates) if (Plan(worker, cell)) break;
+            bool planned = false;
+            foreach (var cell in candidates) if (Plan(worker, cell)) { planned = true; break; }
+            // No side can be reached: go to a neighbouring free tree rather than standing and waiting.
+            if (!planned && !SearchTimeUp && ImprovedAi) SwitchTree(worker, tree);
             worker.ReplanTimer = ReplanDelay;
         }
         MoveTick(worker);
