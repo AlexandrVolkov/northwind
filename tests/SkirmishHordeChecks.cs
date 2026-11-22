@@ -27,6 +27,16 @@ public partial class TestRunner
         }
         var names = battle.Actors.Where(a => a.Team == 3 && !a.Structure && a.Source.TemplateFile == "ARMY__01.DAT").Select(a => a.Source.TemplateName).ToHashSet();
         Check(names.Count >= 4 && names.Contains("Мечник") && names.Contains("Всадник"), $"The Шатер produces ARMY__01 units ({string.Join(", ", names)})");
+        Check(battle.Diplomacy.AtWar(4, 0), "The horde is at war with the player (scenario diplomacy)");
+        int far = 0, count = 0;
+        for (int minute = 0; minute < 6; minute++)
+        {
+            Run(60);
+            var army = battle.Actors.Where(a => a.Team == 3 && a.Alive && !a.Structure && !a.Worker).ToList();
+            count = army.Count; far = Math.Max(far, army.Select(a => Math.Max(Math.Abs(a.Cell.X - tent!.Cell.X), Math.Abs(a.Cell.Y - tent.Cell.Y))).DefaultIfEmpty(0).Max());
+            GD.Print($"Horde +{minute + 7} min: {army.Count} soldiers, farthest from tent {army.Select(a => Math.Max(Math.Abs(a.Cell.X - tent!.Cell.X), Math.Abs(a.Cell.Y - tent.Cell.Y))).DefaultIfEmpty(0).Max()}, at war with 0: {battle.Diplomacy.AtWar(4, 0)}, squads {battle.AiBlock(4)[OriginalAiSquads.List]}");
+        }
+        Check(count >= 20 && far >= 40, $"The horde's army leaves its tent to explore and attack ({count} soldiers, up to {far} cells away)");
         GD.Print($"Horde: tent {tent?.Cell}, camps {string.Join(",", battle.Camps.Select(c => c[0x15]))}");
     }
 }

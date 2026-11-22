@@ -38,6 +38,9 @@ public sealed partial class Skirmish
             record[0x15] = 0;
             _camps.Add(record);
         }
+        // The horde is hostile to every settlement (adapter: the scenario's diplomacy leaves slot 4 at peace; message 5 sets war both ways).
+        foreach (int other in new[] { Rules.PlayerSlot, Rules.EnemySlot, Rules.RivalSlot }.Where(o => o >= 0))
+            _diplomacyRules.Send(Diplomacy, 5, (byte)other, (byte)Rules.HordeSlot, (byte)other, 0);
         _campWorld = new SkirmishCampWorld(this);
     }
 
