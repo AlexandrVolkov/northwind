@@ -69,6 +69,8 @@ def prepare(source, output):
             wanted.setdefault(key,set()).update(range(base,base+raw[0x4a]+1))
             continue
         wanted.setdefault(key,set()).update(range(base,base+8*raw[0x4a]));wanted[key].update(action_frames(raw,base))
+    # The pit trap (ARMY__03 12): 19 opening frames from 289h; its first frame is the closed pit.
+    wanted[('ARMY__03.DAT',12)]=set(range(0x289,0x29d))
     # Effects of ARMY__00 (WRK effect types; sizes from the type table of ARMY__00.DAT, the record w,h,u32 handler,flag starts at the 2,2 / 4F3 type 0):
     # the sparks of a strike or of a chopped tree, types 4 and 5 (frames 62h..71h and 7Dh..84h of ARMY__00.SPR).
     eff=files['ARMY__00.DAT'].read_bytes();t0=eff.find(bytes([2,2])+struct.pack('<I',0x4f3))
@@ -86,8 +88,8 @@ def prepare(source, output):
             if len(pixels)!=entry['width']*entry['height']:raise ValueError(f'Frame size mismatch: {filename}:{index}:{frame}')
             image=Image.new('RGBA',(entry['width'],entry['height']))
             image.putdata([tuple((c&252)|(c>>6) for c in palette[table[v]*3:table[v]*3+3])+(255,) if v>=0 else (0,0,0,0) for v in pixels])
-            # The horde's frames (ARMY__01) fill a second page: one page of 128 cells cannot hold them under the 16384 px texture limit.
-            page=1 if filename=='ARMY__01.DAT' else 0;target=horde_images if page else images
+            # The frames of ARMY__01 (the horde) and ARMY__03 (the map's objects) fill a second page: one page of 128 cells cannot hold them under the 16384 px texture limit.
+            page=1 if filename in ('ARMY__01.DAT','ARMY__03.DAT') else 0;target=horde_images if page else images
             slot=len(target);target.append(image);team_pixels.append(pixels if any(v>=240 for v in pixels) else None)
             entries.append({'template_file':filename,'template_index':index,'frame':frame,'page':page,
                             'x':slot%32*128,'y':slot//32*128,'width':image.width,'height':image.height})
