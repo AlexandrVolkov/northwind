@@ -68,7 +68,7 @@ public sealed partial class Skirmish
             .First(o => o.TemplateFile == "ARMY__02.DAT" && o.TemplateIndex == 10);
     }
     /// <summary>The unit stands among trees (a timber cell): hidden from the others, visible to its owner only as a marker.</summary>
-    public bool InForest(SkirmishActor actor) => !actor.Structure && Harvestable(actor.Cell);
+    public bool InForest(SkirmishActor actor) => System.Environment.GetEnvironmentVariable("NOFOREST") == null && !actor.Structure && Harvestable(actor.Cell);
     public bool Harvestable(Vector2I cell) => Inside(cell) && OriginalForestryRules.IsTimber(
         OriginalForestryRules.Property(_properties, Map.Cells[cell.Y * Map.Width + cell.X]));
     private bool FindNextGrove(SkirmishActor worker)
