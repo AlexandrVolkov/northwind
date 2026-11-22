@@ -62,13 +62,20 @@ def prepare(source, output):
             wanted[key].update(range(base + 8*raw[0x4a], base + 8*raw[0x4a] + 8*raw[0x4b]))
         if index in [8,10,11]:
             wanted[key].update(death_frames(raw, base))
+    # The horde of Teymur (slot 4, ARMY__01): its soldiers (0 swordsman, 1 archer, 5 moor, 7 rider, 12 arsonist, 19 charmed, 20 shackled) and the tent (18).
+    for index in [0,1,5,7,12,19,18]:
+        key=('ARMY__01.DAT',index);raw=bytes.fromhex(tables[key[0]]['templates'][index]['raw_record_hex']);base=struct.unpack_from('<H',raw,0x48)[0]
+        if index==18:
+            wanted.setdefault(key,set()).update(range(base,base+raw[0x4a]+1))
+            continue
+        wanted.setdefault(key,set()).update(range(base,base+8*raw[0x4a]));wanted[key].update(action_frames(raw,base))
     # Effects of ARMY__00 (WRK effect types; sizes from the type table of ARMY__00.DAT, the record w,h,u32 handler,flag starts at the 2,2 / 4F3 type 0):
     # the sparks of a strike or of a chopped tree, types 4 and 5 (frames 62h..71h and 7Dh..84h of ARMY__00.SPR).
     eff=files['ARMY__00.DAT'].read_bytes();t0=eff.find(bytes([2,2])+struct.pack('<I',0x4f3))
     for kind,frames in {2:range(0x19,0x39),3:range(0x72,0x7d),4:range(0x62,0x72),5:range(0x7d,0x85),8:range(0xbb,0xbc),10:range(0xbc,0xce),11:range(0x54,0x62),12:range(0x85,0x97),13:range(0x97,0xa9),14:range(0xa9,0xbb)}.items():wanted[('ARMY__00.EFF',kind)]=set(frames)   # 3: the blood splash (6C7, 11 frames)
     # ARMY__02 effect type 1, the corpse (161D): 62x62; after the first stage its frames are 235h + 3·variant + stage.
     wanted[('ARMY__02.EFF',1)]=set(range(0x235,0x235+25))
-    entries=[];images=[];team_pixels=[]
+    entries=[];images=[];team_pixels=[];horde_images=[]
     for (filename,index),frames in sorted(wanted.items()):
         if filename=='ARMY__00.EFF':entry={'width':eff[t0+7*index],'height':eff[t0+7*index+1]};sprite_name='ARMY__00.SPR'
         elif filename=='ARMY__02.EFF':entry={'width':62,'height':62};sprite_name='ARMY__02.SPR'
@@ -79,18 +86,23 @@ def prepare(source, output):
             if len(pixels)!=entry['width']*entry['height']:raise ValueError(f'Frame size mismatch: {filename}:{index}:{frame}')
             image=Image.new('RGBA',(entry['width'],entry['height']))
             image.putdata([tuple((c&252)|(c>>6) for c in palette[table[v]*3:table[v]*3+3])+(255,) if v>=0 else (0,0,0,0) for v in pixels])
-            slot=len(images);images.append(image);team_pixels.append(pixels if any(v>=240 for v in pixels) else None)
-            entries.append({'template_file':filename,'template_index':index,'frame':frame,
+            # The horde's frames (ARMY__01) fill a second page: one page of 128 cells cannot hold them under the 16384 px texture limit.
+            page=1 if filename=='ARMY__01.DAT' else 0;target=horde_images if page else images
+            slot=len(target);target.append(image);team_pixels.append(pixels if any(v>=240 for v in pixels) else None)
+            entries.append({'template_file':filename,'template_index':index,'frame':frame,'page':page,
                             'x':slot%32*128,'y':slot//32*128,'width':image.width,'height':image.height})
     atlas=Image.new('RGBA',(4096,((len(images)+31)//32)*128))   # 32 columns keep the height under 16384
     for entry,image in zip(entries,images):atlas.paste(image,(entry['x'],entry['y']))
     atlas.save(output/'battle_frames.png')
+    page2=Image.new('RGBA',(4096,((len(horde_images)+31)//32)*128))
+    for entry,image in zip([e for e in entries if e['page']],horde_images):page2.paste(image,(entry['x'],entry['y']))
+    page2.save(output/'battle_frames_horde.png')
     # The owner's colour: COLOR_NN.TAB, NN = byte 0 of the owner's scenario slot (LE:1 2F79..2F90), differs from COLOR_02 only
     # in the sprite indices 240..255. Frames that use them are repeated, per table, in 64x64 slots (units are at most 62x62).
     team=[(e,v) for e,v in zip(entries,team_pixels) if v and e['width']<=64 and e['height']<=64]
     for slot,(entry,_) in enumerate(team):entry['team_slot']=slot
     # Tables of the sides that play: the player, the enemy and the observed rival (slot 1, SkirmishRules.RivalSlot).
-    tables_used=sorted({scenario_slot_color(s) for s in scenario['slots'] if s['slot_index'] in [rules['player_slot'],rules['enemy_slot'],1]})
+    tables_used=sorted({scenario_slot_color(s) for s in scenario['slots'] if s['slot_index'] in [rules['player_slot'],rules['enemy_slot'],1,4]})
     for number in tables_used:
         recolor=files[f'COLOR_{number:02d}.TAB'].read_bytes();hashes[f'COLOR_{number:02d}.TAB']=hashlib.sha256(recolor).hexdigest()
         sheet=Image.new('RGBA',(4096,((len(team)+63)//64)*64))

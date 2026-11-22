@@ -21,6 +21,7 @@ public partial class TestRunner : Node
                 case "hud": await HudChecks(); break;
                 case "pause": await PauseChecks(); break;
                 case "shots": await Shots(); break;
+                case "horde-shot": await HordeShot(); break;
                 case "display": await DisplayChecks(); break;
                 case "menus": await MenuChecks(); break;
                 case "build-menu": await BuildMenuChecks(); break;

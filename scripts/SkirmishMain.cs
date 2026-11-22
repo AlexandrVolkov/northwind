@@ -15,6 +15,8 @@ public sealed class BattleFrame
     public int Height { get; set; }
     /// <summary>Slot in the owner-colour sheets (battle_frames_team_NN.png, 64×64 cells); −1 when the frame has no owner colour.</summary>
     public int TeamSlot { get; set; } = -1;
+    /// <summary>0 = battle_frames.png, 1 = battle_frames_horde.png (the horde's ARMY__01 frames).</summary>
+    public int Page { get; set; }
 }
 
 public partial class SkirmishMain : Node2D
@@ -37,7 +39,7 @@ public partial class SkirmishMain : Node2D
     public HashSet<uint> Selection { get; } = [];
     public Camera2D Camera { get; } = new();
     public float Speed { get; private set; } = 1;
-    private Texture2D _terrain = null!, _sprites = null!;
+    private Texture2D _terrain = null!, _sprites = null!, _spritesHorde = null!;
     private readonly Dictionary<(string, int, int), BattleFrame> _frames = [];
     private readonly Dictionary<int, Texture2D> _teamSheets = [];
     private Label _status = null!, _selection = null!, _events = null!;
@@ -73,7 +75,8 @@ public partial class SkirmishMain : Node2D
         {
             _terrain = GD.Load<Texture2D>("res://assets/imported/terrain.png");
             _sprites = GD.Load<Texture2D>("res://assets/imported/battle_frames.png");
-            if (_terrain == null || _sprites == null) throw new InvalidDataException("Bundled textures are missing");
+            _spritesHorde = GD.Load<Texture2D>("res://assets/imported/battle_frames_horde.png");
+            if (_terrain == null || _sprites == null || _spritesHorde == null) throw new InvalidDataException("Bundled textures are missing");
             var framesData = GameData.Read<BattleFramesData>("res://assets/imported/battle_frames.json");
             foreach (var frame in framesData.Frames) _frames[(frame.TemplateFile, frame.TemplateIndex, frame.Frame)] = frame;
             foreach (int table in framesData.TeamTables) _teamSheets[table] = GD.Load<Texture2D>($"res://assets/imported/battle_frames_team_{table:00}.png");
@@ -89,6 +92,7 @@ public partial class SkirmishMain : Node2D
     {
         if (Battle != null) Battle.Dispose();
         var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        rules.HordeSlot = 4;   // the horde of Teymur (docs/horde.md): camps found a tent at random
         rules.RivalSlot = 1;   // observation: a second AI settlement in the east, at war with the red one
         Battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"),
             GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
@@ -634,7 +638,7 @@ public partial class SkirmishMain : Node2D
             if (frame.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(actor.Record[3]), out var sheet))
                 DrawTextureRectRegion(sheet, new Rect2(point - new Vector2(size.X / 2, size.Y - 16), size), new Rect2(frame.TeamSlot % 64 * 64, frame.TeamSlot / 64 * 64, frame.Width, frame.Height));
             else
-                DrawTextureRectRegion(_sprites, new Rect2(point - new Vector2(size.X / 2, size.Y - 16), size), new Rect2(frame.X, frame.Y, frame.Width, frame.Height));
+                DrawTextureRectRegion(frame.Page == 1 ? _spritesHorde : _sprites, new Rect2(point - new Vector2(size.X / 2, size.Y - 16), size), new Rect2(frame.X, frame.Y, frame.Width, frame.Height));
         }
         else if (!actor.Dying) DrawCircle(point - Vector2.Down * 12, 9, color);
         if (actor.Dying) return; // death frames only, no ring or health bar
