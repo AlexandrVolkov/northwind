@@ -82,3 +82,18 @@ public partial class TestRunner
         GetTree().Quit();
     }
 }
+public partial class TestRunner
+{
+    private async System.Threading.Tasks.Task CastleShot()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+        scene.FocusWorld(scene.Battle.PlayerCastle.Position);
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-castle.png");
+        GetTree().Quit();
+    }
+}
