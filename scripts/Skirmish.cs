@@ -13,6 +13,10 @@ public sealed class SkirmishRules
     public int HordeSlot { get; set; } = -1;
     /// <summary>The wolves and bears of slots 6 and 7 (docs/fauna.md); off by default.</summary>
     public bool Fauna { get; set; }
+    /// <summary>TEMPORARY (user request, 22.11): multipliers of the starting metal, wood and gold of the player and of every AI settlement, to try the late game
+    /// sooner. The original starts with the scenario's own stores: set both to 1 to restore it (the scene sets 20 and 10, see SkirmishMain.Restart).</summary>
+    public uint PlayerStartBoost { get; set; } = 1;
+    public uint AiStartBoost { get; set; } = 1;
     /// <summary>The pit traps of slot 6 (docs/campaign-items.md); off by default.</summary>
     public bool Pits { get; set; }
     public int RivalShiftX { get; set; } = 44;
@@ -67,6 +71,8 @@ public sealed class SkirmishActor
     public uint Target { get; set; }
     /// <summary>Taken out of the original AI's squads by the improved logic: it is on an attack wave and invisible to the squad machinery.</summary>
     public bool Detached { get; set; }
+    /// <summary>The building is being repaired: the maintenance step C80D pays its price at every condition step (WorkFlags = 1).</summary>
+    public bool Repairing { get; set; }
     /// <summary>The owners that can see this unit (kept in OBE[20]): all, unless it stands among trees.</summary>
     public byte VisibleTo { get; set; } = 0xff;
     public bool Stepping { get; set; }
@@ -434,7 +440,13 @@ public sealed partial class Skirmish : IDisposable
         TickArrows();
         TickStones(); TickStones();
         for (int i = Sparks.Count - 1; i >= 0; i--) { var sp = Sparks[i]; Sparks[i] = sp with { Left = sp.Left - 1 }; if (sp.Left <= 1) Sparks.RemoveAt(i); }
-        for (int i = Ruins.Count - 1; i >= 0; i--) { var ru = Ruins[i]; if (ru.Left <= 1) Ruins.RemoveAt(i); else Ruins[i] = ru with { Left = ru.Left - 1 }; }
+        for (int i = Ruins.Count - 1; i >= 0; i--)
+        {
+            var ru = Ruins[i];
+            if (ru.Left <= 1) { Ruins.RemoveAt(i); continue; }
+            Ruins[i] = ru with { Left = ru.Left - 1 };
+            if ((ru.Left & 3) == 0 && ru.Left > CollapseTicks / 5) CollapseDust(ru);   // dust rises from the falling walls
+        }
         Prof("deaths", TickDeaths); Prof("buildings", TickBuildings); Prof("mining", TickMining); Prof("frames", TickBuildingFrames); Prof("production", TickProduction); Prof("population", TickPopulation);
         // 42BB visits the settlements in order and each settlement's objects in pool order.
         Prof("units", () =>
@@ -863,7 +875,18 @@ public sealed partial class Skirmish : IDisposable
     /// ruin effects, ARMY__02 types 21h..28h, only leaves the ruin picture for 5000 ticks).</summary>
     private const byte DebrisAttack = 16;
     /// <summary>The picture a collapsed building leaves (ARMY__02 effect types 21h..28h, 1A65): the building's frame and owner for 5000 updates.</summary>
+    /// <summary>Destroyed buildings that are still falling apart: the construction frames run backwards, the walls sink and shake, dust rises, then the
+    /// building is gone for good (user, 22.11: nothing is left on the ground). Left counts down from <see cref="CollapseTicks"/>.</summary>
     public List<(int Template, ushort Frame, Vector2 Point, byte Owner, int Left)> Ruins { get; } = [];
+    public const int CollapseTicks = 90;
+    private void CollapseDust((int Template, ushort Frame, Vector2 Point, byte Owner, int Left) ru)
+    {
+        var template = _templates.Armies["ARMY__02.DAT"].Templates[ru.Template]; var fp = template.Construction;
+        int rx = _terrainCatalog.NextRandomByte() % Math.Max(1, fp.FootprintWidth * 32) - fp.FootprintWidth * 16, ry = _terrainCatalog.NextRandomByte() % Math.Max(1, fp.FootprintHeight * 32) - fp.FootprintHeight * 16;
+        var dust = new byte[0x22]; OriginalBurnRules.CreateColumn(dust);
+        BinaryPrimitives.WriteUInt32LittleEndian(dust.AsSpan(7), (uint)Math.Max(0, ru.Point.X + rx)); BinaryPrimitives.WriteUInt32LittleEndian(dust.AsSpan(0xc), (uint)Math.Max(0, ru.Point.Y + ry + fp.FootprintHeight * 8));
+        Stones.Add(dust);
+    }
     private void CollapseDebris(SkirmishActor building)
     {
         var area = new HashSet<Vector2I>();
@@ -883,7 +906,7 @@ public sealed partial class Skirmish : IDisposable
         Occupancy.ClearReference(target.Id);
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         target.Dying = !target.Structure;
-        if (target.Structure) { CollapseDebris(target); if (target.Index02 is 3 or 4 or 6 or 9 or 12 or 15 or 22 or 23 or 24) Ruins.Add((target.Index02, target.Frame, target.Position, target.Record[3], 5000)); }
+        if (target.Structure) { CollapseDebris(target); if (target.Index02 is 3 or 4 or 5 or 6 or 7 or 9 or 12 or 13 or 15 or 22 or 23 or 24) Ruins.Add((target.Index02, target.Frame, target.Position, target.Record[3], CollapseTicks)); }
         if (IsAnimal(target)) AnimalDied(target);
         Log($"{target.Source.TemplateName} {(target.Team == 0 ? "потерян" : "уничтожен")}.");
     }

@@ -205,3 +205,25 @@ public partial class TestRunner
         GetTree().Quit();
     }
 }
+public partial class TestRunner
+{
+    private async System.Threading.Tasks.Task CollapseShot()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+        var b = scene.Battle; BuildTestFactory(b); var f = b.Actors.First(Skirmish.IsFactory);
+        Array.Fill(b.FogMap, (byte)0); scene.FocusWorld(f.Position); b.Demolish(f);
+        foreach (int target in new[] { 70, 45, 20 })
+        {
+            while (b.Ruins.Count > 0 && b.Ruins[0].Left > target) b.Advance(1 / 18.2);
+            b.Paused = true;
+            for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+            GetViewport().GetTexture().GetImage().SavePng($"res://build/shot-collapse-{target}.png");
+            b.Paused = false;
+        }
+        GetTree().Quit();
+    }
+}

@@ -92,3 +92,32 @@ public partial class TestRunner
         Check(segments.All(a => !battle.CanStand(hero, a.Cell)), "Units cannot stand on a fence");
     }
 }
+
+public partial class TestRunner
+{
+    /// <summary>Repair (the «Ремонт» button) pays per condition step and restores a damaged building; a destroyed building falls apart and disappears.</summary>
+    private void RepairChecks()
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        void Run(double seconds) { for (int t = 0; t < (int)(seconds * 18.2); t++) battle.Advance(1 / 18.2); }
+        BuildTestFactory(battle);
+        var factory = battle.Actors.First(Skirmish.IsFactory);
+        int full = factory.Template.InitialCondition;
+        factory.Record[0x19] = (byte)(full - 30);
+        var before = battle.Resources;
+        Check(battle.StartRepair(factory) && factory.Repairing, "The repair of a damaged building starts");
+        Run(120);
+        var after = battle.Resources;
+        Check(factory.Record[0x19] >= full && !factory.Repairing, $"The repair restores the condition ({factory.Record[0x19]} of {full})");
+        Check(after.First < before.First || after.Second < before.Second || after.Third < before.Third, "The repair is paid from the stores");
+        Check(!battle.StartRepair(factory), "A sound building needs no repair");
+        // Collapse: the construction frames run backwards, the building then vanishes for good.
+        Check(battle.Demolish(factory) && battle.Ruins.Count > 0 && !factory.Alive, "A demolished building starts to fall apart");
+        Run(2);
+        Check(battle.Ruins.Count > 0 && battle.Stones.Count > 0, "The falling building raises dust");
+        Run(Skirmish.CollapseTicks / 18.2 + 1);
+        Check(battle.Ruins.Count == 0, "Nothing is left of the building after the collapse");
+    }
+}
