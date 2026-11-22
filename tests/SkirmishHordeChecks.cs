@@ -20,6 +20,13 @@ public partial class TestRunner
         Check(tent != null && tent.Source.TemplateName == "Шатер" && tent.Record[3] == 4, "The camp founds a «Шатер» of ARMY__01 for slot 4");
         Check(battle.Camps[0][0x15] == 1, "The camp goes to state 1 (feeding)");
         Check(battle.AiBlock(4)[0x5c] != 0, "The horde's AI block counts its building (+5C)");
+        for (int minute = 0; minute < 6; minute++)
+        {
+            Run(60);
+            GD.Print($"Horde +{minute + 1} min: tent done {tent!.ConstructionRemaining <= 0}, units {string.Join(",", battle.Actors.Where(a => a.Team == 3 && a.Alive && !a.Structure).GroupBy(a => a.Source.TemplateName).Select(g => g.Key + g.Count()))}, res {battle.AiResources(4)}");
+        }
+        var names = battle.Actors.Where(a => a.Team == 3 && !a.Structure && a.Source.TemplateFile == "ARMY__01.DAT").Select(a => a.Source.TemplateName).ToHashSet();
+        Check(names.Count >= 4 && names.Contains("Мечник") && names.Contains("Всадник"), $"The Шатер produces ARMY__01 units ({string.Join(", ", names)})");
         GD.Print($"Horde: tent {tent?.Cell}, camps {string.Join(",", battle.Camps.Select(c => c[0x15]))}");
     }
 }

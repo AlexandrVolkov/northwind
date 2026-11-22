@@ -38,7 +38,7 @@ public sealed partial class Skirmish
     public bool BarracksRecruitmentBlocked(SkirmishActor barracks) => _blockedBarracks.Contains(barracks.Id);
     private static int CountQueue(SkirmishActor producer)
     { int count = 0; foreach (byte slot in producer.Record.AsSpan(0x22, 5)) if (slot != 0xff) count++; return count; }
-    private TemplateEntry? QueuedTemplate(SkirmishActor producer) => CountQueue(producer) == 0 ? null : _templates.Armies["ARMY__02.DAT"].Templates[producer.Record[0x22]];
+    private TemplateEntry? QueuedTemplate(SkirmishActor producer) => CountQueue(producer) == 0 ? null : _templates.Armies[producer.Source.TemplateFile].Templates[producer.Record[0x22]];
     private string ProductionText(SkirmishActor producer)
     {
         if (QueuedTemplate(producer) is not { } template) return "Очередь найма пуста";
@@ -88,8 +88,10 @@ public sealed partial class Skirmish
     {
         if (!producer.Alive || producer.ConstructionRemaining > 0 || QueuedTemplate(producer) is not { } template) return;
         var record = producer.Record;
-        if (producer.Team != 0 && template.TemplateIndex != 10 && (!Rules.Units.TryGetValue(template.Name, out var unitRules) || unitRules.Damage == 0
-            || (!_soldierSeeds.ContainsKey(template.TemplateIndex) && unitRules.Range > 48 && template.TemplateIndex is not (16 or 26))))
+        string file = producer.Source.TemplateFile;
+        var unitRules = file == "ARMY__02.DAT" ? (Rules.Units.TryGetValue(template.Name, out var known) ? known : null) : SpecOf(file, template, Convert.FromHexString(template.RawRecordHex));
+        if (producer.Team != 0 && !(file == "ARMY__02.DAT" ? template.TemplateIndex == 10 : unitRules is { Worker: true }) && (unitRules == null || unitRules.Damage == 0
+            || (file == "ARMY__02.DAT" && !_soldierSeeds.ContainsKey(template.TemplateIndex) && unitRules.Range > 48 && template.TemplateIndex is not (16 or 26))))
         { OriginalProductionRules.Complete(record); return; }   // no rules, or a ranged unit without a seed record: dropped
         if (record[0x15] == 0)
         {
@@ -117,8 +119,9 @@ public sealed partial class Skirmish
     {
         var exit = RecruitExit(producer, template); var cell = new Vector2I((int)(exit.X >> 5), (int)(exit.Y >> 5));
         if (!Inside(cell)) return false;
-        bool worker = template.TemplateIndex == 10;
-        var recruit = NewEconomyActor(template.TemplateIndex, cell, worker, !worker, producer.Team);
+        string file = producer.Source.TemplateFile;
+        bool worker = file == "ARMY__02.DAT" ? template.TemplateIndex == 10 : SpecOf(file, template, Convert.FromHexString(template.RawRecordHex)).Worker;
+        var recruit = NewEconomyActor(template.TemplateIndex, cell, worker, !worker, producer.Team, file);
         recruit.Record[0x0d] = exit.Layer;
         BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(4), exit.X);
         BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(8), exit.Y);
