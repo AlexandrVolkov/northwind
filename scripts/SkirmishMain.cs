@@ -95,6 +95,7 @@ public partial class SkirmishMain : Node2D
     {
         if (Battle != null) Battle.Dispose();
         var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        rules.Pits = true;   // pit traps of the first map (docs/campaign-items.md)
         rules.Fauna = true;   // wolves and bears of slots 6 and 7 (docs/fauna.md)
         rules.HordeSlot = 4;   // the horde of Teymur (docs/horde.md): camps found a tent at random
         rules.RivalSlot = 1;   // observation: a second AI settlement in the east, at war with the red one
@@ -491,6 +492,13 @@ public partial class SkirmishMain : Node2D
         foreach (var (type, firstFrame, at, left) in Battle.Sparks)
             if (_frames.TryGetValue(("ARMY__00.EFF", type, firstFrame + (8 - left)), out var spark))
                 DrawTextureRectRegion(_sprites, new Rect2(at - new Vector2(spark.Width / 2f, spark.Height / 2f), new Vector2(spark.Width, spark.Height)), new Rect2(spark.X, spark.Y, spark.Width, spark.Height));
+        foreach (var pit in Battle.Pits)
+        {
+            var spot = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(pit.AsSpan(4)), BinaryPrimitives.ReadUInt32LittleEndian(pit.AsSpan(8)));
+            if (_showFog && !Seen(new Vector2I((int)spot.X >> 5, (int)spot.Y >> 5))) continue;
+            if (_frames.TryGetValue(("ARMY__03.DAT", 12, BinaryPrimitives.ReadUInt16LittleEndian(pit.AsSpan(1))), out var pitFrame))
+                DrawTextureRectRegion(_spritesHorde, new Rect2(spot - new Vector2(pitFrame.Width, pitFrame.Height) / 2, new Vector2(pitFrame.Width, pitFrame.Height)), new Rect2(pitFrame.X, pitFrame.Y, pitFrame.Width, pitFrame.Height));
+        }
         foreach (var actor in Battle.Actors.Where(a => (a.Alive || a.Dying) && !Skirmish.IsAnimal(a)).OrderBy(a => a.Position.Y)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);
         if (_showFog)
             for (int y = Math.Max(0, first.Y); y < Math.Min(Battle.Map.Height, last.Y); y++)

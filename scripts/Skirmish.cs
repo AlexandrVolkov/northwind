@@ -13,6 +13,8 @@ public sealed class SkirmishRules
     public int HordeSlot { get; set; } = -1;
     /// <summary>The wolves and bears of slots 6 and 7 (docs/fauna.md); off by default.</summary>
     public bool Fauna { get; set; }
+    /// <summary>The pit traps of slot 6 (docs/campaign-items.md); off by default.</summary>
+    public bool Pits { get; set; }
     public int RivalShiftX { get; set; } = 44;
     /// <summary>Object updates per second. Original: PIT 1193182/16384 Hz, world step every 2 ticks at speed FDh, objects every 2nd step.</summary>
     public double TicksPerSecond { get; set; } = 1193182.0 / 16384 / 4;
@@ -171,6 +173,7 @@ public sealed partial class Skirmish : IDisposable
         InitializeAi(scenario, templates);
         InitializeHorde(scenario);
         InitializeFauna(scenario, templates);
+        InitializePits(scenario);
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
     }
     // Actors only grows (the fallen stay with Alive = false), so an index over the list is extended lazily with the new tail.
@@ -408,7 +411,7 @@ public sealed partial class Skirmish : IDisposable
             OriginalCombatRules.AfterUpdate(actor.Record, engaged != null ? engaged.Record : ReadOnlySpan<byte>.Empty, _globalTick);
         }
         });
-        TickFauna();
+        TickFauna(); TickPits();
         Prof("fog", TickFog);
         Prof("ai", TickAi); // 1E7EA follows the object update (LE:1 31D6)
         if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";
