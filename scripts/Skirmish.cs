@@ -73,6 +73,8 @@ public sealed class SkirmishActor
     public bool Detached { get; set; }
     /// <summary>The building is being repaired: the maintenance step C80D pays its price at every condition step (WorkFlags = 1).</summary>
     public bool Repairing { get; set; }
+    /// <summary>WorkFlags (+0F) of the building before the repair (the maintenance step uses WorkFlags = 1 inside).</summary>
+    public byte RepairFlags { get; set; }
     /// <summary>The last work order (felling or mining) and when the worker became idle (−1: not idle); see Skirmish.WorkerRetryTick.</summary>
     public WorkerJob? LastJob { get; set; }
     public double IdleSince { get; set; } = -1;
@@ -467,7 +469,7 @@ public sealed partial class Skirmish : IDisposable
             OriginalCombatRules.AfterUpdate(actor.Record, engaged != null ? engaged.Record : ReadOnlySpan<byte>.Empty, _globalTick);
         }
         });
-        TickFauna(); TickPits(); TickTowers(); TickFlow();
+        TickFauna(); TickPits(); TickTowers(); TickFlow(); TickRepairs();
         Prof("fog", TickFog);
         Prof("ai", TickAi); // 1E7EA follows the object update (LE:1 31D6)
         if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";
