@@ -94,7 +94,7 @@ def prepare(source, output):
             entries.append({'template_file':filename,'template_index':index,'frame':frame,'page':page,
                             'x':slot%32*128,'y':slot//32*128,'width':image.width,'height':image.height})
     atlas=Image.new('RGBA',(4096,((len(images)+31)//32)*128))   # 32 columns keep the height under 16384
-    for entry,image in zip(entries,images):atlas.paste(image,(entry['x'],entry['y']))
+    for entry,image in zip([e for e in entries if not e['page']],images):atlas.paste(image,(entry['x'],entry['y']))
     atlas.save(output/'battle_frames.png')
     page2=Image.new('RGBA',(4096,((len(horde_images)+31)//32)*128))
     for entry,image in zip([e for e in entries if e['page']],horde_images):page2.paste(image,(entry['x'],entry['y']))

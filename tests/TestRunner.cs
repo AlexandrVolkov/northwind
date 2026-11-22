@@ -17,12 +17,13 @@ public partial class TestRunner : Node
             string mode = OS.GetCmdlineUserArgs().FirstOrDefault() ?? "simulation";
             switch (mode)
             {
-                case "scene": await SceneChecks(); break;
+                case "scene": AtlasChecks(); await SceneChecks(); break;
                 case "hud": await HudChecks(); break;
                 case "pause": await PauseChecks(); break;
                 case "shots": await Shots(); break;
                 case "horde-shot": await HordeShot(); break;
                 case "bridge-shot": await BridgeShot(); break;
+                case "castle-shot": await CastleShot(); break;
                 case "display": await DisplayChecks(); break;
                 case "menus": await MenuChecks(); break;
                 case "build-menu": await BuildMenuChecks(); break;
