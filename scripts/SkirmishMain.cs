@@ -136,7 +136,7 @@ public partial class SkirmishMain : Node2D
     ];
     /// <summary>A finished factory of the player is selected: its list offers the line buildings (the bridge; fence, gate, tower and the siege engines are not offered yet).</summary>
     public SkirmishActor? SelectedFactory => Selection.Count == 1 && Battle.Find(Selection.Single()) is { } f && Skirmish.IsFactory(f) ? f : null;
-    public BuildItem[] FactoryBuildItems() => [new(Battle.BridgeTemplate, 7, BeginBridgePlacement), new(Battle.TowerTemplate, 13, BeginTowerPlacement)];
+    public BuildItem[] FactoryBuildItems() => [new(Battle.TemplateOf(5), 5, BeginFencePlacement), new(Battle.BridgeTemplate, 7, BeginBridgePlacement), new(Battle.TowerTemplate, 13, BeginTowerPlacement)];
     public BuildItem[] BuildItems() => SelectedFactory != null ? FactoryBuildItems() : CastleBuildItems();
     public bool BuildMenuVisible => (BuildMenuOpen && Selection.Count == 1 && Selection.Contains(Battle.PlayerCastle.Id) && Battle.PlayerCastle.Alive) || SelectedFactory != null;
     public TemplateEntry? PlacingTemplate => PlacingFactory ? Battle.TemplateOf(_placingIndex) : PlacingBarracks ? Battle.BarracksTemplate : PlacingMill ? Battle.MillTemplate : PlacingMine ? Battle.MineTemplate : PlacingFarm ? Battle.FarmTemplate : null;
@@ -163,10 +163,12 @@ public partial class SkirmishMain : Node2D
         if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
         PlacingBarracks = true; PlacingMill = PlacingFarm = PlacingMine = PlacingFactory = false; RefreshUi();
     }
-    public void BeginBridgePlacement()
+    public void BeginBridgePlacement() => BeginLinePlacement(7);
+    public void BeginFencePlacement() => BeginLinePlacement(5);
+    private void BeginLinePlacement(int index)
     {
         if (Battle.Paused || Battle.Outcome != "" || SelectedFactory == null) return;
-        PlacingBridge = true; _bridgeStart = null; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingFactory = false; RefreshUi();
+        Battle.LineIndex = index; PlacingBridge = true; _bridgeStart = null; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingFactory = false; RefreshUi();
     }
     public void BeginFactoryPlacement()
     {
@@ -562,7 +564,7 @@ public partial class SkirmishMain : Node2D
             var line = Battle.BridgeCells(_bridgeStart ?? at, at);
             bool affordable = !Battle.Paused && Battle.CanAffordBridge(line.Count);
             var c = affordable ? new Color(40 / 255f, 28 / 255f, 223 / 255f) : new Color(200 / 255f, 30 / 255f, 30 / 255f);
-            var segment = Battle.BridgeTemplate.Construction; var halfFoot = new Vector2I(segment.FootprintWidth / 2, segment.FootprintHeight / 2);
+            var segment = Battle.LineTemplate.Construction; var halfFoot = new Vector2I(segment.FootprintWidth / 2, segment.FootprintHeight / 2);
             foreach (var cell in line)
             {
                 var cc = Battle.Inside(cell) && Battle.BridgeCellFree(cell) ? c : new Color(200 / 255f, 30 / 255f, 30 / 255f);

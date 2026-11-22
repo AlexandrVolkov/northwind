@@ -52,12 +52,15 @@ def prepare(source, output):
         base=struct.unpack_from('<H',raw,0x48)[0]
         wanted.setdefault(key,set()).update(range(base,base+8*raw[0x4a]))
         wanted[key].update(action_frames(raw, base)); wanted[key].update(death_frames(raw, base))
-    for index in [3,4,6,7,8,9,10,11,12,13,15,22,23,24]:
+    for index in [3,4,5,6,7,8,9,10,11,12,13,15,22,23,24]:
         key=('ARMY__02.DAT',index);entry=tables[key[0]]['templates'][index]
         raw=bytes.fromhex(entry['raw_record_hex']);base=struct.unpack_from('<H',raw,0x48)[0]
         wanted.setdefault(key,set()).update(range(base,base+(8*raw[0x4a] if index in [8,10,11] else raw[0x4a]+1)))
         if index in [3,4,6,12,15,23]:   # C88C: the working animation of a building is [base+4A, base+4A+4B)
             wanted[key].update(range(base + raw[0x4a], base + raw[0x4a] + raw[0x4b]))
+        if index == 5:   # the fence's shapes: its neighbour table (data/line_neighbors.json) names up to ten of them
+            shapes = max(bytes.fromhex(json.loads((Path(__file__).resolve().parents[1]/'data/line_neighbors.json').read_text(encoding='utf-8'))['templates']['5']['pairs_hex'])[0::2]) + 1
+            wanted[key].update(range(base, base + shapes*(2*raw[0x4a] + raw[0x4b])))
         if index == 7:   # the bridge's shapes (BB8B): shape · (2·DAT[4A] + DAT[4B]) frames each, six shapes in its neighbour table
             wanted[key].update(range(base, base + 6*(2*raw[0x4a] + raw[0x4b])))
         if index == 10:

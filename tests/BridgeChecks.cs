@@ -59,3 +59,36 @@ public partial class TestRunner
         Check(battle.BuildBridge(new(0, 0), new(3, 0)) == 0 && battle.Resources.First == before.First - price.First * (uint)laid, "A refused first segment costs nothing");
     }
 }
+
+public partial class TestRunner
+{
+    /// <summary>The fence (ARMY__02 5, built through the factory like the bridge): a line of one-cell segments whose ends take their own shapes and which units cannot walk through.</summary>
+    private void FenceChecks()
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        var hero = battle.Hero;
+        BuildTestFactory(battle);
+        battle.LineIndex = 5;
+        Vector2I? start = null;
+        for (int r = 6; r < 16 && start == null; r++)
+            for (int dx = -r; dx <= r && start == null; dx++)
+            {
+                var c = battle.PlayerCastle.Cell + new Vector2I(dx, r);
+                if (Enumerable.Range(0, 5).All(k => battle.BridgeCellFree(c + new Vector2I(k, 0)) && battle.CanStand(hero, c + new Vector2I(k, 0)))) start = c;
+            }
+        Check(start != null, "A free stretch for a fence exists");
+        int laid = battle.BuildBridge(start!.Value, start.Value + new Vector2I(4, 0));
+        Check(laid == 5, $"The fence lays one segment per cell ({laid})");
+        for (int t = 0; t < (int)(200 * 18.2); t++) battle.Advance(1 / 18.2);
+        var segments = battle.Actors.Where(a => a.Index02 == 5).OrderBy(a => a.Cell.X).ToList();
+        Check(segments.Count == 5 && segments.All(a => a.Alive && a.ConstructionRemaining <= 0), "The fence segments are built");
+        // A branch hanging from the middle makes a T: a horizontal line is shape 0 everywhere, the branch and the junction take other shapes.
+        int branch = battle.BuildBridge(start.Value + new Vector2I(2, 1), start.Value + new Vector2I(2, 3));
+        for (int t = 0; t < (int)(200 * 18.2); t++) battle.Advance(1 / 18.2);
+        var all = battle.Actors.Where(a => a.Index02 == 5).ToList();
+        Check(branch == 3 && all.Select(a => a.Record[0x22]).Distinct().Count() >= 2, $"A branch gives the fence more shapes ({string.Join(",", all.Select(a => a.Record[0x22]))})");
+        Check(segments.All(a => !battle.CanStand(hero, a.Cell)), "Units cannot stand on a fence");
+    }
+}
