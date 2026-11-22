@@ -286,9 +286,18 @@ public partial class OriginalHud : Node2D
 
     private void DrawBar(Rect2 rect, byte current, byte maximum, byte color)
     {
-        int filled = OriginalStatusBarRules.FilledColumns((int)rect.Size.X, current, maximum);
         DrawRect(rect, _uiColors[0]);
-        if (filled > 0) DrawRect(new Rect2(rect.Position + Vector2.One, new Vector2(filled, rect.Size.Y - 2)), _uiColors[color]);
+        if (rect.Size.Y > rect.Size.X)
+        {
+            // The health and experience gauges beside the portrait stand upright and fill from the bottom (user, 22.11); the length is the height.
+            int rows = OriginalStatusBarRules.FilledColumns((int)rect.Size.Y, current, maximum);
+            if (rows > 0) DrawRect(new Rect2(rect.Position.X + 1, rect.End.Y - 1 - rows, rect.Size.X - 2, rows), _uiColors[color]);
+        }
+        else
+        {
+            int filled = OriginalStatusBarRules.FilledColumns((int)rect.Size.X, current, maximum);
+            if (filled > 0) DrawRect(new Rect2(rect.Position + Vector2.One, new Vector2(filled, rect.Size.Y - 2)), _uiColors[color]);
+        }
         var border = _uiColors[0x44];
         DrawRect(new Rect2(rect.Position, new Vector2(rect.Size.X, 1)), border);
         DrawRect(new Rect2(rect.Position.X, rect.End.Y - 1, rect.Size.X, 1), border);

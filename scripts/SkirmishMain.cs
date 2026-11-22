@@ -103,6 +103,7 @@ public partial class SkirmishMain : Node2D
         Battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"),
             GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        Battle.FrameBudgetMs = 14;   // keep the frame rate when a large army makes the world step slow
         Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingFactory = PlacingBridge = false; _bridgeStart = null;
         PendingOrder = 0; Hud.MenuOpen = false;
         // DOSBox screenshots: the idle castle shows «Выбор» and «Разрушить» (WorkFlags bits 2 and 5 = 24h) although its OBE record holds 0;
@@ -343,7 +344,15 @@ public partial class SkirmishMain : Node2D
         }
         Battle.Sounds.Clear();
     }
+    /// <summary>Milliseconds spent in <see cref="_Process"/> (world steps included) and <see cref="_Draw"/>, summed over frames (profiling).</summary>
+    public double ProcessMs, DrawMs, StepsMs, ProcessMaxMs; public int ProfiledFrames;
     public override void _Process(double delta)
+    {
+        long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+        ProcessBody(delta);
+        double ms = (System.Diagnostics.Stopwatch.GetTimestamp() - t0) * 1000.0 / System.Diagnostics.Stopwatch.Frequency; ProcessMs += ms; ProcessMaxMs = Math.Max(ProcessMaxMs, ms); ProfiledFrames++;
+    }
+    private void ProcessBody(double delta)
     {
         if (!_ready) return;
         Layout();
@@ -488,6 +497,12 @@ public partial class SkirmishMain : Node2D
     private Vector2 ClampToMap(Vector2 point) { var r = MapScreenRect; return point.Clamp(r.Position, r.End); }
     private bool _showFog;   // adapter: a plain dark overlay of the cells the player has not seen ([18DA]); the original's edge drawing 9F38 is not ported
     public override void _Draw()
+    {
+        long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+        DrawBody();
+        DrawMs += (System.Diagnostics.Stopwatch.GetTimestamp() - t0) * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+    }
+    private void DrawBody()
     {
         if (!_ready) return;
         var half = GetViewportRect().Size / Camera.Zoom / 2;

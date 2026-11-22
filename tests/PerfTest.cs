@@ -14,6 +14,7 @@ public partial class TestRunner
             for (int t = 0; t < steps; t++) battle.Advance(1 / 18.2);
             if (minute % 5 == 0) GD.Print($"PERF min {minute}: {sw.Elapsed.TotalMilliseconds / steps:0.00} ms/tick, units {battle.Actors.Count(a => a.Alive && !a.Structure)}, actors {battle.Actors.Count}");
         }
+        foreach (var (name, peak) in battle.ProfilePeak.OrderByDescending(p => p.Value).Take(8)) GD.Print($"PEAK {name,-14} {peak:0.0} ms");
         foreach (var (name, v) in battle.Profile.OrderByDescending(p => p.Value.Ms)) GD.Print($"PROF {name,-14} {v.Ms / v.Calls:0.000} ms/call × {v.Calls} = {v.Ms / (5 * 60 * 18.2):0.00} ms/tick");
     }
 }

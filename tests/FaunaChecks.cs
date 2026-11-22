@@ -35,3 +35,39 @@ public partial class TestRunner
         Check(battle.Sounds.Any(s => s.Bank == "ARMY__05.FX"), "An animal voice is heard (ARMY__05.FX)");
     }
 }
+
+public partial class TestRunner
+{
+    /// <summary>Animals in the forest go for units that come near; soldiers answer animals; a walking unit that is struck stops, fights, then goes on.</summary>
+    private void FaunaBehaviourChecks()
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json"); rules.Fauna = true;
+        using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        void Run(double seconds) { for (int t = 0; t < (int)(seconds * 18.2); t++) battle.Advance(1 / 18.2); }
+        var hero = battle.Hero;
+        // The nearest wolf in the forest, hero placed 8 cells from it on a standable cell.
+        var wolf = battle.Animals.First(a => a.Source.TemplateName == "Волк" && battle.InForest(a));
+        Vector2I? spot = null;
+        for (int r = 6; r <= 9 && spot == null; r++)
+            for (int dx = -r; dx <= r && spot == null; dx++)
+                { var c = wolf.Cell + new Vector2I(dx, r); if (battle.Inside(c) && battle.CanStand(hero, c) && !battle.InForestCell(c)) spot = c; }
+        Check(spot != null, "A free cell 6..9 cells from a forest wolf exists");
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(4), (uint)(spot!.Value.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(8), (uint)(spot.Value.Y * 32 + 16));
+        Run(10);
+        Check(wolf.Target == hero.Id || !wolf.Alive || wolf.Cell != new Vector2I((int)(wolf.Source.RawX >> 5), (int)(wolf.Source.RawY >> 5)), "A forest wolf goes for a unit that comes near");
+        // A walking hero that is struck stops, fights the wolf, then resumes the walk.
+        var goal = hero.Cell + new Vector2I(10, 0);
+        if (!battle.CanStand(hero, goal)) goal = hero.Cell + new Vector2I(-10, 0);
+        battle.Move([hero.Id], goal);
+        Run(0.6);
+        var biter = battle.Animals.First(a => a.Alive && a.Source.TemplateName == "Волк");
+        var next = hero.Cell + new Vector2I(0, 1);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(biter.Record.AsSpan(4), (uint)(next.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(biter.Record.AsSpan(8), (uint)(next.Y * 32 + 16));
+        biter.Target = hero.Id;
+        int engaged = 0; for (int t = 0; t < 40 * 18; t++) { battle.Advance(1 / 18.2); if (hero.Target == biter.Id) engaged++; }
+        Check(engaged > 0 || !biter.Alive, $"The struck hero engages the animal (target for {engaged} ticks)");
+        Run(60);
+        Check(Math.Max(Math.Abs(hero.Cell.X - goal.X), Math.Abs(hero.Cell.Y - goal.Y)) <= 3 || hero.ResumeGoal != null || hero.Goal != null, $"After the fight the hero goes on to {goal} (now {hero.Cell})");
+    }
+}

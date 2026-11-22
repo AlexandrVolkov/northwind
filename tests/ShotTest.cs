@@ -120,3 +120,23 @@ public partial class TestRunner
         GetTree().Quit();
     }
 }
+public partial class TestRunner
+{
+    private async System.Threading.Tasks.Task DrawPerf()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        scene.Battle.FrameBudgetMs = 0;
+        for (int t = 0; t < (int)(1080 * 18.2); t++) scene.Battle.Advance(1 / 18.2);
+        scene.Battle.FrameBudgetMs = 14;
+        var b = scene.Battle;
+        GD.Print($"DRAWPERF units {b.Actors.Count(a => a.Alive && !a.Structure)} actors {b.Actors.Count}");
+        scene.FocusWorld(b.Hero.Position); Array.Fill(b.FogMap, (byte)0);
+        scene.ProcessMs = scene.DrawMs = 0; scene.ProfiledFrames = 0;
+        for (int i = 0; i < 400; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GD.Print($"DRAWPERF max {scene.ProcessMaxMs:0.0} ms, game seconds advanced {scene.Battle.Elapsed:0}");
+        GD.Print($"DRAWPERF frames {scene.ProfiledFrames}: process {scene.ProcessMs / scene.ProfiledFrames:0.00} ms, draw {scene.DrawMs / scene.ProfiledFrames:0.00} ms");
+        GetTree().Quit();
+    }
+}

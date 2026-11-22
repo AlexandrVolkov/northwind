@@ -204,20 +204,24 @@ public sealed partial class Skirmish
 
     /// <summary>Per-section timings of the world step (milliseconds, count), filled while <see cref="ProfileOn"/> is set.</summary>
     public Dictionary<string, (double Ms, int Calls)> Profile { get; } = [];
+    /// <summary>Longest single call of each profiled section (milliseconds).</summary>
+    public Dictionary<string, double> ProfilePeak { get; } = [];
     public bool ProfileOn { get; set; }
     private long P0() => ProfileOn ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
     private void P1(string name, long start)
     {
         if (!ProfileOn) return;
         var old = Profile.GetValueOrDefault(name);
-        Profile[name] = (old.Ms + (System.Diagnostics.Stopwatch.GetTimestamp() - start) * 1000.0 / System.Diagnostics.Stopwatch.Frequency, old.Calls + 1);
+        double took = (System.Diagnostics.Stopwatch.GetTimestamp() - start) * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+        Profile[name] = (old.Ms + took, old.Calls + 1); ProfilePeak[name] = Math.Max(ProfilePeak.GetValueOrDefault(name), took);
     }
     private void Prof(string name, Action work)
     {
         if (!ProfileOn) { work(); return; }
         long t = System.Diagnostics.Stopwatch.GetTimestamp(); work();
         var old = Profile.GetValueOrDefault(name);
-        Profile[name] = (old.Ms + (System.Diagnostics.Stopwatch.GetTimestamp() - t) * 1000.0 / System.Diagnostics.Stopwatch.Frequency, old.Calls + 1);
+        double took = (System.Diagnostics.Stopwatch.GetTimestamp() - t) * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+        Profile[name] = (old.Ms + took, old.Calls + 1); ProfilePeak[name] = Math.Max(ProfilePeak.GetValueOrDefault(name), took);
     }
 
     /// <summary>1E7EA for one AI settlement.</summary>
@@ -572,7 +576,7 @@ public sealed partial class Skirmish
             var goal = destination + new Vector2I(x, y);
             if (!Inside(goal) || !CanStand(actor, goal)) continue;
             if (!actor.Stepping && !Plan(actor, goal)) continue;
-            actor.Target = 0; actor.Goal = goal; actor.ReplanTimer = 0;
+            actor.Target = 0; actor.Goal = goal; actor.ResumeGoal = null; actor.ReplanTimer = 0;
             actor.LastPosition = actor.Position; actor.StillSince = Elapsed;
             if (actor.Stepping) actor.Route.Clear();
             return true;

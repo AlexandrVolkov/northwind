@@ -58,6 +58,8 @@ public sealed class SkirmishActor
     public SkirmishRoute Route { get; } = new();
     internal Vector2I? GuidanceGoal { get; set; }
     public Vector2I? Goal { get; set; }
+    /// <summary>The move the unit was on when an enemy struck or came in sight: it stops, fights, then goes on (user, 22.11).</summary>
+    public Vector2I? ResumeGoal { get; set; }
     /// <summary>Closest the actor has come to its goal and when (adapter: an AI move that makes no progress ends, see
     /// <c>Skirmish.ExecuteAiCommands</c>).</summary>
     public Vector2 LastPosition = new(float.NaN, float.NaN); public double StillSince;
@@ -105,6 +107,15 @@ public sealed partial class Skirmish : IDisposable
     public double Elapsed { get; private set; }
     private readonly OriginalRouteSearch _search = new();
     private readonly AStarGrid2D _guidance = new();
+    private readonly Dictionary<(int, int, int), (AStarGrid2D Grid, double At)> _guidanceGrids = [];
+    /// <summary>The shared blocked-cell grid is rebuilt this often (seconds). The original AI's mode keeps the exact per-search rebuild (its checks depend on the timing of paths).</summary>
+    private double GuidanceRefresh => ImprovedAi ? 0.5 : 0;
+    private AStarGrid2D NewGuidanceGrid()
+    {
+        var grid = new AStarGrid2D { Region = new Rect2I(0, 0, Map.Width, Map.Height), DiagonalMode = AStarGrid2D.DiagonalModeEnum.Always,
+            DefaultComputeHeuristic = AStarGrid2D.Heuristic.Chebyshev, DefaultEstimateHeuristic = AStarGrid2D.Heuristic.Chebyshev };
+        grid.Update(); return grid;
+    }
     public int GuidedRouteSearches { get; private set; }
     private readonly OriginalRoutePool _routes = new();
     private readonly byte[] _properties;
@@ -279,10 +290,18 @@ public sealed partial class Skirmish : IDisposable
         }
         // Provisional distant-order guidance. Do not present these waypoints as recovered AI.
         GuidedRouteSearches++;
-        for (int y = 0; y < Map.Height; y++) for (int x = 0; x < Map.Width; x++)
-            _guidance.SetPointSolid(new(x, y), !CanStand(actor, new(x, y)));
-        _guidance.SetPointSolid(actor.Cell, false);
-        var guide = _guidance.GetIdPath(actor.Cell, goal);
+        // The blocked-cell grid of a footprint class is shared by all searches of that class and rebuilt every few seconds (the build costs a CanStand per cell).
+        var key = (fw, fh, actor.Record[0x0d] & 3);
+        if (!_guidanceGrids.TryGetValue(key, out var entry) || Elapsed - entry.At > GuidanceRefresh)
+        {
+            var grid = entry.Grid ?? NewGuidanceGrid();
+            for (int y = 0; y < Map.Height; y++) for (int x = 0; x < Map.Width; x++)
+                grid.SetPointSolid(new(x, y), !CanStand(actor, new(x, y)));
+            _guidanceGrids[key] = entry = (grid, Elapsed);
+        }
+        entry.Grid.SetPointSolid(actor.Cell, false);
+        if (CanStand(actor, goal)) entry.Grid.SetPointSolid(goal, false);
+        var guide = entry.Grid.GetIdPath(actor.Cell, goal);
         for (int i = Math.Min(16, guide.Count - 1); i > 0; i--)
         {
             var native = NativePath(guide[i]);
@@ -311,7 +330,7 @@ public sealed partial class Skirmish : IDisposable
                 var goal = destination + new Vector2I(x, y);
                 if (FootprintCells(actor, goal).Any(c => used.Contains((c, actor.Record[0x0d] & 3))) || !CanStand(actor, goal)) continue;
                 if (!actor.Stepping && !Plan(actor, goal)) continue;
-                actor.Target = 0; actor.Goal = goal; actor.ReplanTimer = 0;
+                actor.Target = 0; actor.Goal = goal; actor.ResumeGoal = null; actor.ReplanTimer = 0;
                 actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false;
                 if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); }
                 if (actor.Stepping) actor.Route.Clear();
@@ -328,7 +347,7 @@ public sealed partial class Skirmish : IDisposable
         if (ids.Distinct().Select(Find).OfType<SkirmishActor>().Any(a => a.Team == 0 && !a.Structure && !a.Worker) && !DeclareWarByOrder(foe)) return false;
         bool accepted = false;
         foreach (var actor in ids.Distinct().Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && !a.Structure && !a.Worker))
-        { actor.Target = targetId; actor.Goal = null; actor.Route.Clear(); actor.ReplanTimer = 0; accepted = true; }
+        { actor.Target = targetId; actor.Goal = null; actor.ResumeGoal = null; actor.Route.Clear(); actor.ReplanTimer = 0; accepted = true; }
         if (accepted) Log($"Атаковать: {Find(targetId)!.Source.TemplateName}. Отряды сами сблизятся.");
         return accepted;
     }
@@ -370,7 +389,7 @@ public sealed partial class Skirmish : IDisposable
     {
         if (Paused || Outcome != "") return;
         foreach (var actor in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0))
-        { actor.Target = 0; actor.Goal = null; actor.Route.Clear(); actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false; actor.MineJob = false; if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); } actor.JobText = "Без задания"; }
+        { actor.Target = 0; actor.Goal = null; actor.ResumeGoal = null; actor.Route.Clear(); actor.GatherTree = null; actor.PreferredMill = 0; actor.HarvestPrepared = false; actor.MineJob = false; if (actor.Worker) { actor.Record[0x2d] &= 15; ClearDelivery(actor); } actor.JobText = "Без задания"; }
     }
     public void Advance(double delta)
     {
@@ -379,10 +398,20 @@ public sealed partial class Skirmish : IDisposable
         double step = 1.0 / Rules.TicksPerSecond;
         // Retain time rather than discarding it when frame rate drops.
         int budget = 240;
+        // A frame may spend at most FrameBudgetMs on world steps (a large army made steps slower than the frame, and the retained time
+        // then ran ever more steps per frame); the time that does not fit is dropped beyond a quarter second, the game slows down instead of freezing.
+        long frameStart = System.Diagnostics.Stopwatch.GetTimestamp();
+        double limit = FrameBudgetMs * System.Diagnostics.Stopwatch.Frequency / 1000.0;
         // A small tolerance keeps whole-tick requests (n / TicksPerSecond) from losing a tick to rounding.
-        while (_accumulator >= step - 1e-9 && budget-- > 0 && Outcome == "") { Tick(step); _accumulator -= step; }
+        while (_accumulator >= step - 1e-9 && budget-- > 0 && Outcome == "")
+        {
+            Tick(step); _accumulator -= step;
+            if (FrameBudgetMs > 0 && System.Diagnostics.Stopwatch.GetTimestamp() - frameStart > limit) { _accumulator = Math.Min(_accumulator, 0.25); break; }
+        }
     }
     /// <summary>The wind (9E7D), updated on every running timer tick (9BF9); its vector drifts smoke and carries fire.</summary>
+    /// <summary>Real milliseconds one frame may spend on world steps; 0 = unlimited (tests, headless runs).</summary>
+    public double FrameBudgetMs { get; set; }
     public WindState Wind;
     private byte _windTimer;   // [19E8]
     private void Tick(double dt)
@@ -443,7 +472,7 @@ public sealed partial class Skirmish : IDisposable
             long t0 = P0(); bool vitals = TickVitals(actor); P1("u.vitals", t0); if (vitals) return;
             if (actor.Worker) { t0 = P0(); TickWorker(actor, dt); P1("u.worker", t0); return; }
             var target = Find(actor.Target);
-            if (actor.Target != 0 && target == null) { actor.Target = 0; actor.Route.Clear(); actor.Goal = null; }
+            if (actor.Target != 0 && target == null) { actor.Target = 0; actor.Route.Clear(); actor.Goal = actor.ResumeGoal; actor.ResumeGoal = null; actor.ReplanTimer = 0; }
             // An assault on a building engages its nearby defenders first, then resumes the objective.
             if (actor.Team == 0 && target is { Structure: true })
                 target = Actors.Where(a => a.Alive && a.Team == 1 && !a.Structure && Distance(actor.Position, a) <= Rules.AggroRange)
@@ -460,7 +489,7 @@ public sealed partial class Skirmish : IDisposable
                     if (struck) actor.Record[0x17] &= 0xfd;
                     t0 = P0(); var found = OriginalTargetRules.FindEnemy(actor.Id, actor.Record, actor.Parameters, struck, new SearchWorld(this, actor.Record[3])); P1("u.findenemy", t0);
                     target = Find(found.Target);
-                    if (target != null) { actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); }
+                    if (target != null) { if (actor.Goal != null) actor.ResumeGoal = actor.Goal; actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); }
                 }
             }
             t0 = P0(); bool attacked = target != null && !actor.Stepping && AttackStep(actor, target); P1("u.attack", t0); if (attacked) return;
@@ -940,5 +969,5 @@ public sealed partial class Skirmish : IDisposable
         public void Sound(uint reference) { if (Current != null) battle.ObjectSound(Current, reference); }   // the wound sound DAT[A3]
         public uint Occupant(int plane, int cell) => battle.Occupancy.Cells[plane * battle.Occupancy.Width * battle.Occupancy.Height + cell];
     }
-    public void Dispose() => _guidance.Dispose();
+    public void Dispose() { _guidance.Dispose(); foreach (var g in _guidanceGrids.Values) g.Grid.Dispose(); }
 }
