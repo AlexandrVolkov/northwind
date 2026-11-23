@@ -15,7 +15,7 @@ public sealed partial class Skirmish
     private OriginalItemData? _itemData;
     public IReadOnlyList<OriginalItem> ItemTable => (_itemData ??= GameData.Read<OriginalItemData>("res://data/original_items.json")).Items;
     /// <summary>The player's inventory (participant +CD, 20 bytes of item codes; 0 is free).</summary>
-    public byte[] Inventory { get; } = new byte[InventorySlots];
+    public byte[] Inventory { get; } = new byte[InventorySlots];   // participant +CD
     public string ItemName(int code) => code > 0 && code < ItemTable.Count ? ItemTable[code].Name : "";
     public static bool IsContainer(SkirmishActor actor) => actor.Scenery && actor.Source.TemplateFile == "ARMY__03.DAT" && actor.Source.TemplateIndex is 1 or 9 or 10 or 11 or 30 or 33;
     private static bool IsChest(SkirmishActor actor) => actor.Source.TemplateIndex is 9 or 10 or 11;
@@ -50,18 +50,40 @@ public sealed partial class Skirmish
         return true;
     }
 
-    /// <summary>1243A: the handler of the item code (AH = 2) takes it (gold) or lets it go into the first free slot.</summary>
+    private OriginalItemRules? _itemRules; private SkirmishItemWorld? _itemWorld;
+    public OriginalItemRules ItemRules => _itemRules ??= new OriginalItemRules(code => ItemTable[code].Handler);
+    private SkirmishItemWorld ItemWorld => _itemWorld ??= new SkirmishItemWorld(this);
+    private void TickItems() { if (Inventory.Any(i => i != 0)) ItemRules.Update(ItemWorld); }
+
+    /// <summary>1243A (<see cref="OriginalItemRules.Pickup"/>): the handler of the item takes it (gold, cargo) or the item goes into the first free slot of the participant.</summary>
     public bool PickUp(SkirmishActor unit, byte item)
     {
         if (unit.Team != 0 || item == 0 || item >= ItemTable.Count) return false;
-        switch (ItemTable[item].Handler)
-        {
-            case "11EE6": { uint gold = 5000u + ((uint)_terrainCatalog.NextRandomByte() << 5); Gold += gold; Log($"Найдено золото: {gold}."); return true; }   // 9E41 « 5 + 1388h
-            case "11EB0": Gold += 100; return true;
-            case "11ECB": Wood += 100; return true;
-        }
-        int slot = Array.IndexOf(Inventory, (byte)0);
-        if (slot < 0) { Log("Инвентарь полон."); return false; }
-        Inventory[slot] = item; Log($"Подобран предмет: {ItemName(item)}."); return true;
+        uint gold = Gold; var before = Inventory.ToArray();
+        var (al, _) = ItemRules.Pickup(ItemWorld, item, Rules.PlayerSlot);
+        if (Gold > gold) Log($"Найдено золото: {Gold - gold}.");
+        else if (al == 0xff) Log("Инвентарь полон.");
+        else if (!Inventory.SequenceEqual(before)) Log($"Подобран предмет: {ItemName(item)}.");
+        return al != 0xff;
+    }
+
+    /// <summary>The participants as the item handlers see them: the player's wallet and inventory, the objects of an owner, the streams of random numbers.</summary>
+    private sealed class SkirmishItemWorld(Skirmish battle) : IItemWorld
+    {
+        private readonly byte[][] _inventories = Enumerable.Range(0, 8).Select(_ => new byte[InventorySlots]).ToArray();
+        public byte[] Inventory(int owner) => owner == battle.Rules.PlayerSlot ? battle.Inventory : _inventories[owner & 7];
+        public uint Gold(int owner) => owner == battle.Rules.PlayerSlot ? battle.Gold : 0;
+        public void SetGold(int owner, uint value) { if (owner == battle.Rules.PlayerSlot) battle.Gold = value; }
+        public uint Wood(int owner) => owner == battle.Rules.PlayerSlot ? battle.Wood : 0;
+        public void SetWood(int owner, uint value) { if (owner == battle.Rules.PlayerSlot) battle.Wood = value; }
+        public void AddGoldStatistics(int owner, uint value) { }   // the statistics screen is not ported
+        public void AddWoodStatistics(int owner, uint value) { }
+        public byte Random1() => battle._terrainCatalog.NextRandomByte(); public byte Random2() => battle._terrainCatalog.NextSecondaryByte(); public byte Random3() => battle.SoundRandom();
+        public byte Tick19E9 => (byte)battle._globalTick; public byte Tick19EA => (byte)battle._globalTick; public byte Global1EC5 => 0;   // ADAPTER: both counters are the update count, [1EC5] is unknown
+        public int PlayerOwner => battle.Rules.PlayerSlot; public int ParticipantCount => 8; public bool ItemsActive => true;
+        public IReadOnlyList<ItemObject> Objects(int owner) => battle.Actors.Where(a => a.Alive && !a.Scenery && a.Record[3] == owner).Select(a => new ItemObject(a.Record, a.Structure)).ToList();
+        public void FleeRequest(byte[] record) => OriginalCombatRules.Flee(record, (byte)battle.Map.Width, (byte)battle.Map.Height, battle._terrainCatalog);
+        public void Message() { }
+        public void Sound(byte id) { }
     }
 }

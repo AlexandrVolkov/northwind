@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "3c32be4894738923413e004f61d88c9b9f039a08afbe1d379663ab568edde7c7",
+  "annotation_sha256": "0cc5ce9ec1433023d2bf16c6cbc250a10cf566876ad6b1bf7e0972cf33490b20",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,9 +32,9 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 5722,
-        "ported": 34123,
-        "unreviewed": 106940,
+        "partial": 6123,
+        "ported": 34574,
+        "unreviewed": 106088,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -1589,9 +1589,11 @@
         {
           "start": 54705,
           "end": 55014,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "le1-gate-d5b1"
+          ]
         },
         {
           "start": 55014,
@@ -1865,7 +1867,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "goods-gold-credit"
+            "goods-gold-credit",
+            "items-handlers-gold-cargo"
           ]
         },
         {
@@ -1874,15 +1877,93 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "goods-metal-credit"
+            "goods-metal-credit",
+            "items-handlers-gold-cargo"
           ]
         },
         {
           "start": 73446,
-          "end": 74707,
+          "end": 73471,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handlers-gold-cargo"
+          ]
+        },
+        {
+          "start": 73471,
+          "end": 73563,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "items-handler-manuscript"
+          ]
+        },
+        {
+          "start": 73563,
+          "end": 73572,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handler-staff"
+          ]
+        },
+        {
+          "start": 73572,
+          "end": 73820,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handlers-curses"
+          ]
+        },
+        {
+          "start": 73820,
+          "end": 74110,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 74110,
+          "end": 74136,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handler-stone-6"
+          ]
+        },
+        {
+          "start": 74136,
+          "end": 74213,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 74213,
+          "end": 74239,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handler-crystal-14"
+          ]
+        },
+        {
+          "start": 74239,
+          "end": 74627,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 74627,
+          "end": 74707,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-update-12383"
+          ]
         },
         {
           "start": 74707,
@@ -1906,11 +1987,28 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "goods-credit-dispatch"
+            "goods-credit-dispatch",
+            "items-pickup-1243a"
           ]
         },
         {
           "start": 74917,
+          "end": 74968,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 74968,
+          "end": 75005,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-find-124d8"
+          ]
+        },
+        {
+          "start": 75005,
           "end": 124218,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2976,9 +3074,9 @@
       "zero_fill_bytes": 0,
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
-        "partial": 609,
+        "partial": 855,
         "ported": 404,
-        "unreviewed": 5917
+        "unreviewed": 5671
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -3233,6 +3331,22 @@
         },
         {
           "start": 2739,
+          "end": 3461,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 3461,
+          "end": 3707,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "wrk2-gate-d85"
+          ]
+        },
+        {
+          "start": 3707,
           "end": 5661,
           "status": "unreviewed",
           "classification": "unknown",
@@ -3265,8 +3379,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 252,
-        "unreviewed": 13160
+        "ported": 631,
+        "unreviewed": 12781
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -3278,10 +3392,35 @@
       "regions": [
         {
           "start": 0,
-          "end": 2032,
+          "end": 228,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 228,
+          "end": 393,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-jug-e4"
+          ]
+        },
+        {
+          "start": 393,
+          "end": 1818,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1818,
+          "end": 2032,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-chest-71a"
+          ]
         },
         {
           "start": 2032,

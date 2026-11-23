@@ -143,11 +143,12 @@ public static class OriginalCombatRules
     }
 
     /// <summary>8E0E: request a move to a random map cell unless the unit is already in state 4.</summary>
-    public static void Flee(Span<byte> unit, byte mapWidth, byte mapHeight, OriginalTerrainCatalog random)
+    public static void Flee(Span<byte> unit, byte mapWidth, byte mapHeight, OriginalTerrainCatalog random) => Flee(unit, mapWidth, mapHeight, random.NextRandomByte, random.NextSecondaryByte);
+    public static void Flee(Span<byte> unit, byte mapWidth, byte mapHeight, Func<byte> first, Func<byte> second)
     {
         if ((unit[0x2d] & 15) == 4) return;
-        unit[0x22] = (byte)((random.NextRandomByte() * mapWidth) >> 8);
-        unit[0x23] = (byte)((random.NextSecondaryByte() * mapHeight) >> 8);
+        unit[0x22] = (byte)((first() * mapWidth) >> 8);
+        unit[0x23] = (byte)((second() * mapHeight) >> 8);
         unit[0x2d] = (byte)((unit[0x2d] & 15) | 0x20);
     }
 
