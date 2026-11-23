@@ -25,11 +25,8 @@ public sealed partial class Skirmish
                 animal.Route.Attach(_routes, animal.Record);
                 Actors.Add(animal); _fauna.Add(animal);
             }
-        // The animals attack everyone (message 5 sets war both ways with each settlement).
-        foreach (int animalSlot in new[] { 6, 7 })
-            foreach (int other in new[] { Rules.PlayerSlot, Rules.EnemySlot, Rules.RivalSlot, Rules.HordeSlot }.Where(o => o >= 0))
-                _diplomacyRules.Send(Diplomacy, 5, (byte)other, (byte)animalSlot, (byte)other, 0);
-        _diplomacyRules.Send(Diplomacy, 5, 6, 7, 6, 0);
+        // The beasts of the forest are the allies of the mage Rufin (slot 6): at peace with everyone until somebody declares war on him (see DeclareWarByOrder:
+        // the war on slot 6 brings the war with slot 7 too). User, 23.11.
     }
 
     /// <summary>The development tree (TRE copy) of a settlement's participant.</summary>
@@ -50,7 +47,7 @@ public sealed partial class Skirmish
                 SkirmishActor? prey = null; int best = 13;
                 foreach (var o in Actors)
                 {
-                    if (!o.Alive || o.Structure || o.Scenery || IsAnimal(o)) continue;
+                    if (!o.Alive || o.Structure || o.Scenery || IsAnimal(o) || !Diplomacy.AtWar(animal.Record[3], o.Record[3])) continue;
                     int d = Math.Max(Math.Abs(o.Cell.X - animal.Cell.X), Math.Abs(o.Cell.Y - animal.Cell.Y));
                     if (d < best) { best = d; prey = o; }
                 }

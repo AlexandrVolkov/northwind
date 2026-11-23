@@ -405,7 +405,7 @@ public partial class SkirmishMain : Node2D
         if (Selection.Count == 0) { Battle.Log("Сначала выделите отряды: рамкой или Ctrl+A."); return; }
         var target = Battle.At(point);
         var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
-        if (target?.Team == 1) Battle.Attack(Selection, target.Id);
+        if (target != null && (target.Team == 1 || Skirmish.IsMage(target))) Battle.Attack(Selection, target.Id);
         else if (target?.Source.TemplateName == "Лесопилка" && Battle.DeliverTimber(Selection, target.Id)) { }
         else if (target?.Source.TemplateName == "Шахта" && Battle.WorkMine(Selection, target.Id)) { }
         else if (Battle.Harvestable(cell) && Selection.Any(id => Battle.Find(id)?.Worker == true)) Battle.GatherTimber(Selection, cell);
