@@ -559,7 +559,7 @@ public partial class SkirmishMain : Node2D
                 DrawTextureRectRegion(_spritesHorde, new Rect2(spot - new Vector2(pitFrame.Width, pitFrame.Height) / 2, new Vector2(pitFrame.Width, pitFrame.Height)), new Rect2(pitFrame.X, pitFrame.Y, pitFrame.Width, pitFrame.Height));
         }
         foreach (var actor in Battle.Actors.Where(a => a.Alive && a.Index02 == 7)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);   // bridges lie under everything that walks
-        foreach (var actor in Battle.Actors.Where(a => (a.Alive || a.Dying) && !Skirmish.IsAnimal(a) && a.Index02 != 7).OrderBy(a => a.Position.Y)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);
+        foreach (var actor in Battle.Actors.Where(a => (a.Alive || a.Dying) && !Skirmish.IsHiddenAnimal(a) && a.Index02 != 7).OrderBy(a => a.Position.Y)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);
         if (_showFog)
             for (int y = Math.Max(0, first.Y); y < Math.Min(Battle.Map.Height, last.Y); y++)
             for (int x = Math.Max(0, first.X); x < Math.Min(Battle.Map.Width, last.X); x++)
@@ -849,7 +849,7 @@ public partial class SkirmishMain : Node2D
     {
         if (!_ready) return;
         var rect = MiniRect(); var world = new Vector2(Battle.Map.Width, Battle.Map.Height) * 32;
-        foreach (var actor in Battle.Actors.Where(a => a.Alive && !Skirmish.IsAnimal(a)))
+        foreach (var actor in Battle.Actors.Where(a => a.Alive && !Skirmish.IsHiddenAnimal(a)))
             _markers.DrawCircle(rect.Position + actor.Position / world * rect.Size, actor.Structure ? 3 : 2, TeamColor(actor.Team));
         var view = GetViewportRect().Size / Camera.Zoom;
         _markers.DrawRect(new Rect2(rect.Position + (Camera.Position - view / 2) / world * rect.Size, view / world * rect.Size), new Color("f1da93"), false);

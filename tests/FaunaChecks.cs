@@ -71,3 +71,23 @@ public partial class TestRunner
         Check(Math.Max(Math.Abs(hero.Cell.X - goal.X), Math.Abs(hero.Cell.Y - goal.Y)) <= 3 || hero.ResumeGoal != null || hero.Goal != null, $"After the fight the hero goes on to {goal} (now {hero.Cell})");
     }
 }
+
+public partial class TestRunner
+{
+    /// <summary>The bird generators of the first map keep up to four birds each; the birds fly about and are neutral.</summary>
+    private void BirdChecks()
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json"); rules.Fauna = true;
+        using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        Check(battle.Generators.Count == 6 && battle.Birds.Count == 1, $"Six generators and one bird load ({battle.Generators.Count}, {battle.Birds.Count})");
+        for (int t = 0; t < (int)(600 * 18.2); t++) battle.Advance(1 / 18.2);
+        int alive = battle.Birds.Count(b => b.Alive);
+        Check(alive > 1 && alive <= 24, $"The generators make birds, at most four per generator ({alive})");
+        Check(battle.Birds.All(b => b.Record[3] == 5 && b.Team == 4 && Skirmish.IsBird(b) && !Skirmish.IsHiddenAnimal(b)), "Birds are neutral and drawn");
+        var bird = battle.Birds.First(b => b.Alive); var start = bird.Cell;
+        for (int t = 0; t < 30 * 18; t++) battle.Advance(1 / 18.2);
+        Check(battle.Birds.Any(b => b.Alive && (b.Stepping || b.Goal != null || b.Cell != new Vector2I((int)(b.Source.RawX >> 5), (int)(b.Source.RawY >> 5)))), "Birds fly about");
+        Check(!battle.Actors.Any(a => a.Team == 0 && a.Alive && a.Target != 0 && battle.Find(a.Target) is { } t && Skirmish.IsBird(t)), "Nobody attacks the birds");
+    }
+}

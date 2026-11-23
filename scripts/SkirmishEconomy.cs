@@ -90,7 +90,7 @@ public sealed partial class Skirmish
         var template = _templates.Armies[file].Templates[templateIndex];
         var parameters = Convert.FromHexString(template.RawRecordHex);
         var raw = worker ? Convert.FromHexString(_workerSeed.RawRecordHex) : soldier ? Convert.FromHexString((_soldierSeeds.GetValueOrDefault(templateIndex) ?? _militiaSeed).RawRecordHex).AsSpan(0, template.RuntimeRecordBytes).ToArray() : new byte[template.RuntimeRecordBytes];
-        raw[0] = (byte)(file[7] - '0'); raw[3] = (byte)SlotOfTeam(team); raw[0x0d] = 1; raw[0x0e] = (byte)templateIndex;
+        raw[0] = (byte)(_armyFiles.IndexOf(file) is var armyIndex and >= 0 ? armyIndex : file[7] - '0'); raw[3] = (byte)SlotOfTeam(team); raw[0x0d] = 1; raw[0x0e] = (byte)templateIndex;
         raw[0x14] = 0x80; raw[0x19] = raw[0x1a] = template.InitialCondition; raw[0x20] = 0xff; // A855: visible to every owner
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(1), template.InitialFrame);
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(0x17), 0);
