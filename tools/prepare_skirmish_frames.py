@@ -82,6 +82,9 @@ def prepare(source, output):
         for obj in slot['objects']:
             if obj['template_file'] in ('ARMY__03.DAT','ARMY__00.DAT') and obj['template_index'] in (1,9,10,11,13,24,25,26,29,30,33):
                 wanted.setdefault((obj['template_file'],obj['template_index']),set()).add(struct.unpack_from('<H',bytes.fromhex(obj['raw_record_hex']),1)[0])
+    # Jugs (ARMY__03 1, 30, 33: frames 110h..11Ah, the breaking animation of WRK E4) and the chest (9: 11Ch..127h).
+    for jug in (1,30,33):wanted[('ARMY__03.DAT',jug)]=wanted.get(('ARMY__03.DAT',jug),set())|set(range(0x110,0x11b))
+    wanted[('ARMY__03.DAT',9)]=wanted.get(('ARMY__03.DAT',9),set())|set(range(0x11c,0x128))
     # The birds of the first map (ARMY__05 0): 8 directions of DAT[4A] frames, 32x32.
     bird=bytes.fromhex(tables['ARMY__05.DAT']['templates'][0]['raw_record_hex']);wanted[('ARMY__05.DAT',0)]=set(range(struct.unpack_from('<H',bird,0x48)[0],struct.unpack_from('<H',bird,0x48)[0]+8*bird[0x4a]))
     # The pit trap (ARMY__03 12): 19 opening frames from 289h; its first frame is the closed pit.

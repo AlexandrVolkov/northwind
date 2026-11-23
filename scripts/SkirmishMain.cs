@@ -411,7 +411,8 @@ public partial class SkirmishMain : Node2D
         if (Selection.Count == 0) { Battle.Log("Сначала выделите отряды: рамкой или Ctrl+A."); return; }
         var target = Battle.At(point);
         var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
-        if (target != null && (target.Team == 1 || Skirmish.IsMage(target))) Battle.Attack(Selection, target.Id);
+        if (target != null && Skirmish.IsContainer(target)) { if (target.Record[0x14] == 2) Battle.Visit(Selection, target.Id); else Battle.Attack(Selection, target.Id); }
+        else if (target != null && (target.Team == 1 || Skirmish.IsMage(target))) Battle.Attack(Selection, target.Id);
         else if (target?.Source.TemplateName == "Лесопилка" && Battle.DeliverTimber(Selection, target.Id)) { }
         else if (target?.Source.TemplateName == "Шахта" && Battle.WorkMine(Selection, target.Id)) { }
         else if (Battle.Harvestable(cell) && Selection.Any(id => Battle.Find(id)?.Worker == true)) Battle.GatherTimber(Selection, cell);
@@ -922,6 +923,6 @@ public partial class SkirmishMain : Node2D
         if (PlacingFarm) _status.Text = "Место для фермы\nЛКМ — строить · ПКМ/Esc — отмена";
         if (PlacingMill) _status.Text = "Место для лесопилки\nОставьте проход к жёлтой точке.\nЛКМ — строить · ПКМ/Esc — отмена";
         _pause.Text = Battle.Paused ? "ПРОДОЛЖИТЬ" : "ПАУЗА [ПРОБЕЛ]"; _speed.Text = $"СКОРОСТЬ ×{Speed}";
-        _events.Text = string.Join('\n', Battle.Events.TakeLast(2));
+        _events.Text = string.Join('\n', Battle.Events.TakeLast(2)) + (Battle.Inventory.Any(i => i != 0) ? "\nПредметы: " + string.Join(", ", Battle.Inventory.Where(i => i != 0).Select(i => Battle.ItemName(i))) : "");
     }
 }

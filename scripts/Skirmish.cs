@@ -77,6 +77,8 @@ public sealed class SkirmishActor
     public int GateMode { get; set; }
     /// <summary>A decoration of the first map (jug, chest, manuscript, the mage): drawn, never attacked, not on the minimap (docs/world.md).</summary>
     public bool Scenery { get; set; }
+    /// <summary>The jug or chest this unit walks to in order to take its item (see SkirmishContainers.cs).</summary>
+    public uint VisitTarget { get; set; }
     /// <summary>WorkFlags (+0F) of the building before the repair (the maintenance step uses WorkFlags = 1 inside).</summary>
     public byte RepairFlags { get; set; }
     /// <summary>The last work order (felling or mining) and when the worker became idle (−1: not idle); see Skirmish.WorkerRetryTick.</summary>
@@ -373,8 +375,8 @@ public sealed partial class Skirmish : IDisposable
     }
     public bool Attack(IEnumerable<uint> ids, uint targetId)
     {
-        if (Paused || Outcome != "" || Find(targetId) is not { } foe || !(foe.Team == 1 || IsMage(foe))) return false;
-        if (ids.Distinct().Select(Find).OfType<SkirmishActor>().Any(a => a.Team == 0 && !a.Structure && !a.Worker) && !DeclareWarByOrder(foe)) return false;
+        if (Paused || Outcome != "" || Find(targetId) is not { } foe || !(foe.Team == 1 || IsMage(foe) || IsContainer(foe))) return false;
+        if (ids.Distinct().Select(Find).OfType<SkirmishActor>().Any(a => a.Team == 0 && !a.Structure && !a.Worker) && !IsContainer(foe) && !DeclareWarByOrder(foe)) return false;
         bool accepted = false;
         foreach (var actor in ids.Distinct().Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && !a.Structure && !a.Worker))
         { actor.Target = targetId; actor.Goal = null; actor.ResumeGoal = null; actor.Route.Clear(); actor.ReplanTimer = 0; accepted = true; }
@@ -477,7 +479,7 @@ public sealed partial class Skirmish : IDisposable
             OriginalCombatRules.AfterUpdate(actor.Record, engaged != null ? engaged.Record : ReadOnlySpan<byte>.Empty, _globalTick);
         }
         });
-        TickFauna(); TickPits(); TickRockfalls(); TickTowers(); TickFlow(); TickRepairs(); TickPlayerLabs(); TickBirds();
+        TickFauna(); TickPits(); TickContainers(); TickRockfalls(); TickTowers(); TickFlow(); TickRepairs(); TickPlayerLabs(); TickBirds();
         Prof("fog", TickFog);
         Prof("ai", TickAi); // 1E7EA follows the object update (LE:1 31D6)
         if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";
@@ -924,6 +926,7 @@ public sealed partial class Skirmish : IDisposable
     }
     private void Kill(SkirmishActor target)
     {
+        if (IsContainer(target)) return;   // a broken jug or chest falls apart by its own script (OriginalContainer)
         Occupancy.ClearReference(target.Id);
         ReleaseStep(target.Id); target.Route.Clear(); target.Stepping = false;
         target.Dying = !target.Structure;
