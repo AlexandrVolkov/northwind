@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "6ba7562413fe77f148ffb164b83b5bdec400ce9673146fcb24db1d10175b2dea",
+  "annotation_sha256": "f9d408753c93fc26b90afcbce9a63e4708546a7858e6d1f6d20b71d4d4ab2a3a",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 6123,
-        "ported": 34574,
-        "unreviewed": 106088,
+        "ported": 34814,
+        "unreviewed": 105848,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -623,6 +623,54 @@
         },
         {
           "start": 35783,
+          "end": 35870,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 35870,
+          "end": 35911,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "visit-8c1e"
+          ]
+        },
+        {
+          "start": 35911,
+          "end": 35964,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 35964,
+          "end": 35977,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "visit-8c7c"
+          ]
+        },
+        {
+          "start": 35977,
+          "end": 35992,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 35992,
+          "end": 36001,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "visit-8c98"
+          ]
+        },
+        {
+          "start": 36001,
           "end": 36272,
           "status": "unreviewed",
           "classification": "unknown",
@@ -664,6 +712,15 @@
         },
         {
           "start": 36911,
+          "end": 36964,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "visit-902f"
+          ]
+        },
+        {
+          "start": 36964,
           "end": 37097,
           "status": "unreviewed",
           "classification": "unknown",
@@ -785,9 +842,11 @@
         {
           "start": 38411,
           "end": 38483,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "turn-960b"
+          ]
         },
         {
           "start": 38483,
@@ -795,7 +854,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "motion-turn"
+            "motion-turn",
+            "turn-960b"
           ]
         },
         {
@@ -1976,10 +2036,19 @@
         },
         {
           "start": 74756,
-          "end": 74810,
+          "end": 74758,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 74758,
+          "end": 74810,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "visitor-service-12406"
+          ]
         },
         {
           "start": 74810,

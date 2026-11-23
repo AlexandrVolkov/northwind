@@ -7,7 +7,7 @@ public sealed class OriginalItem { public int Code { get; set; } public int Icon
 
 /// <summary>Jugs and chests of the first map (ARMY__03 1, 9, 10, 11, 30, 33; docs/campaign-items.md): hit by anyone of the player they break open
 /// (<see cref="OriginalContainer"/>), then a visiting unit takes the item (LE:1 902F → 12406 → 1243A): gold items (code 34, handler 11EE6) pay 5000 + 32·random into the
-/// wallet, the others go into the 20 slots of the participant's inventory (+CD). ADAPTERS: the visit is a walk to the object and a range of 56 pixels instead of 9B86/8C1E; the
+/// wallet, the others go into the 20 slots of the participant's inventory (+CD). The visit is the original 902F (OriginalVisit) on a copy of the unit record, the walk to the object is an adapter; the
 /// effects of the stones, staffs and manuscripts (handlers 11F5B…122D6) are not ported — the items are only kept; the dust effect of a broken jug is not drawn.</summary>
 public sealed partial class Skirmish
 {
@@ -34,10 +34,22 @@ public sealed partial class Skirmish
         foreach (var unit in Actors.Where(a => a.VisitTarget != 0 && a.Alive).ToArray())
         {
             if (Find(unit.VisitTarget) is not { } box || !IsContainer(box)) { unit.VisitTarget = 0; continue; }
-            if (unit.Position.DistanceTo(box.Position) > VisitRange) continue;
-            if (OriginalContainer.Visit(box.Record, IsChest(box)) is { Zf: true, Al: not 0 } taken) { PickUp(unit, taken.Al); unit.VisitTarget = 0; }
-            else if (box.Record[0x14] is not (0 or 1)) unit.VisitTarget = 0;   // empty or spent: nothing to wait for
+            if (unit.Stepping) continue;
+            // 902F on a copy of the unit's record: the original's movement requests (+2D, +22) belong to its own action machine, only the turn (+25) is taken over.
+            var visitor = unit.Record.ToArray(); visitor[0x2d] &= 0xf0; visitor[0x2d] = 0;
+            var world = new VisitWorld(this, unit, box);
+            OriginalVisit.Visit(visitor, unit.Parameters, box.Record, box.Parameters, box.Id, world);
+            unit.Record[0x25] = visitor[0x25];
+            if (world.Taken) unit.VisitTarget = 0;
+            else if (box.Record[0x14] is not (0 or 1 or 2)) unit.VisitTarget = 0;   // spent: nothing to wait for
         }
+    }
+
+    private sealed class VisitWorld(Skirmish battle, SkirmishActor unit, SkirmishActor box) : IVisitWorld
+    {
+        public bool Taken;
+        public (byte Al, bool Zf) Service() => OriginalContainer.Visit(box.Record, IsChest(box));
+        public void Pickup(byte item, byte owner) { if (item != 0) { battle.PickUp(unit, item); Taken = true; } }
     }
 
     /// <summary>A right click of the player on a jug or chest: the selected units walk to it and take its item once it is open.</summary>
