@@ -708,6 +708,9 @@ public partial class SkirmishMain : Node2D
         foreach (var (point, left, variant) in Battle.Rocks)   // a rock falls: 16×16 frames 18Ch + 5 per variant, lower as the time runs out
             if (_frames.TryGetValue(("ARMY__00.EFF", 0x18, 0x18c + variant * 5 + left % 5), out var rockFrame))
                 DrawTextureRectRegion(_sprites, new Rect2(point - new Vector2(8, 8 + left * 10), new Vector2(16, 16)), new Rect2(rockFrame.X, rockFrame.Y, 16, 16));
+        foreach (var bolt in Battle.Bolts)   // the mage's lightning: 72×72 frames 1C6h + 4·variant + stage
+            if (_frames.TryGetValue(("ARMY__00.EFF", 0x1e, 0x1c6 + bolt.Variant * 4 + Math.Clamp((8 - bolt.Left) / 2, 0, 3)), out var boltFrame))
+                DrawTextureRectRegion(_sprites, new Rect2(bolt.Point - new Vector2(36, 52), new Vector2(72, 72)), new Rect2(boltFrame.X, boltFrame.Y, 72, 72));
         foreach (var (point, left) in Battle.Dust)   // the puff after the impact: 62×62 frames 170h..179h
             if (_frames.TryGetValue(("ARMY__00.EFF", 0x16, 0x170 + Math.Clamp((Skirmish.DustTicks - left) / 3, 0, 9)), out var dustFrame))
                 DrawTextureRectRegion(_sprites, new Rect2(point - new Vector2(31, 40), new Vector2(62, 62)), new Rect2(dustFrame.X, dustFrame.Y, 62, 62), new Color(1, 1, 1, Math.Min(1f, left / 10f)));

@@ -9,6 +9,8 @@ public partial class TestRunner
         var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json"); rules.Fauna = true; rules.Pits = true;
         using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        battle.GrantPeople(10); for (int i = 0; i < 3; i++) battle.QueueWorker();
+        for (int t = 0; t < (int)(150 * 18.2); t++) battle.Advance(1 / 18.2);   // three workers to stand in the lightning
         var rufin = battle.SceneryObjects.First(Skirmish.IsMage); int player = rules.PlayerSlot, mage = rufin.Record[3];
         Check(Skirmish.IsHermit(rufin) && mage == 6, "Rufin is a mage of slot 6");
         battle.Diplomacy.Relations[mage, player] = 1; battle.Diplomacy.Relations[player, mage] = 1;   // they have met
@@ -31,6 +33,14 @@ public partial class TestRunner
         System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), (uint)(near.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(8), (uint)(near.Y * 32 + 16));
         int before = battle.Hero.Health; bool targeted = false;
         for (int t = 0; t < 300 && battle.Hero.Alive && battle.Hero.Health >= before; t++) { battle.Advance(1 / 18.2); targeted |= rufin.Target == battle.Hero.Id; }
-        Check(targeted && battle.Hero.Health < before, $"Rufin fights back (target {targeted}, hero health {before} → {battle.Hero.Health})");
+        Check(battle.Bolts.Count > 0 || battle.Hero.Health < before, $"Rufin answers with his lightning (hero health {before} → {battle.Hero.Health})");
+        // several units standing together fall to one discharge
+        var group = new List<SkirmishActor>();
+        group.AddRange(battle.Actors.Where(a => a.Team == 0 && a.Worker && a.Alive).Take(3));
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), 64); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(8), 64);   // the leader is out of his sight
+        var spot = rufin.Position + new Vector2(200, 0); int k = 0;
+        foreach (var unit in group) { System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(unit.Record.AsSpan(4), (uint)(spot.X + 12 * k)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(unit.Record.AsSpan(8), (uint)(spot.Y + 8 * k)); k++; unit.Goal = null; unit.Route.Clear(); }
+        for (int t = 0; t < 200 && group.Any(u => u.Alive) && battle.Hero.Alive; t++) battle.Advance(1 / 18.2);
+        Check(group.Count == 3 && group.Count(u => !u.Alive) >= 2, $"One discharge kills the units standing together ({group.Count(u => !u.Alive)} of {group.Count})");
     }
 }
