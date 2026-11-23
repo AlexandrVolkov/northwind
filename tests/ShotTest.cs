@@ -251,6 +251,19 @@ public partial class TestRunner
 }
 public partial class TestRunner
 {
+    private async System.Threading.Tasks.Task InventoryShot()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+        var b = scene.Battle; foreach (byte item in new byte[] { 6, 12, 14, 7, 10, 20, 19, 31, 35, 4 }) b.PickUp(b.Hero, item);
+        scene.InventoryOpen = true; scene.Hud.QueueRedraw();
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-inventory.png");
+        GetTree().Quit();
+    }
     private async System.Threading.Tasks.Task LabShot()
     {
         var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);

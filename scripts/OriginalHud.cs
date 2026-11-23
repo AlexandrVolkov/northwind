@@ -38,7 +38,7 @@ public partial class OriginalHud : Node2D
     public static readonly Vector2 PortraitAt = new(482, 176);
     public InterfaceArmy Army { get; private set; } = null!;
     private InterfaceAtlas _heroes = null!;
-    private Texture2D _portraits = null!, _buttons = null!, _heroAtlas = null!;
+    private Texture2D _portraits = null!, _buttons = null!, _heroAtlas = null!, _itemIcons = null!;
     private Texture2D _frame = null!, _menuPanel = null!, _blankButton = null!;
     private OriginalFont _font = null!, _red = null!;
     private InterfaceAtlas? _cursor;
@@ -62,6 +62,7 @@ public partial class OriginalHud : Node2D
         }
         _frame = InterfaceData.Screen("game_frame"); _menuPanel = InterfaceData.Screen("panel_menu"); _blankButton = InterfaceData.Screen("button_blank");
         Army = data.Armies.Single(a => a.Army == 2); _heroes = data.HeroPortraits;
+        _itemIcons = GD.Load<Texture2D>("res://assets/imported/item_icons.png");
         _portraits = GD.Load<Texture2D>(InterfaceData.Root + Army.Portraits.Atlas); _buttons = GD.Load<Texture2D>(InterfaceData.Root + Army.Buttons.Atlas);
         _heroAtlas = GD.Load<Texture2D>(InterfaceData.Root + _heroes.Atlas);
         _font = OriginalFont.Load(data, "FONT_01.FNT"); _red = OriginalFont.Load(data, "FONT_01.FNT", "font_font_01_red.png");
@@ -175,8 +176,33 @@ public partial class OriginalHud : Node2D
         }
     }
 
+    /// <summary>The inventory window (I): 20 slots of the participant's items (LE:3 table icons = ARMY__02.SPR 364..386), the name of the hovered item on the bottom border.
+    /// The original draws it with 125CE; its positions here are the port's own.</summary>
+    public Rect2 InventorySlotRect(int k) => new(14 + Shift + 42 * (k % 5), 30 + 42 * (k / 5), 40, 40);
+    public int InventorySlotAt(Vector2 logical)
+    {
+        if (Game?.Battle == null || !Game.InventoryOpen || MenuOpen) return -1;
+        for (int k = 0; k < Skirmish.InventorySlots; k++) if (InventorySlotRect(k).HasPoint(logical)) return k;
+        return -1;
+    }
+    private void DrawInventory()
+    {
+        if (!Game.InventoryOpen || MenuOpen) return;
+        DrawRect(new Rect2(8 + Shift, 22, 222, 182), new Color(.1f, .06f, .03f, .92f));
+        _font.Draw(this, new Vector2(14 + Shift, 24), "Предметы");
+        var inventory = Game.Battle.Inventory;
+        for (int k = 0; k < Skirmish.InventorySlots; k++)
+        {
+            var rect = InventorySlotRect(k); DrawRect(rect, new Color(.22f, .14f, .07f, .95f));
+            if (inventory[k] == 0) continue;
+            DrawTextureRectRegion(_itemIcons, new Rect2(rect.Position + Vector2.One, new Vector2(38, 38)), new Rect2(62 * inventory[k], 0, 62, 62));   // the sheet is indexed by the item code
+        }
+        if (InventorySlotAt(GetLocalMousePosition()) is var h and >= 0 && inventory[h] != 0) _font.Draw(this, new Vector2(20, 464), Game.Battle.ItemName(inventory[h]));
+    }
+
     private void DrawBuildList()
     {
+        DrawInventory();
         if (Game.SelectedLab is { } lab && !MenuOpen) { DrawLabList(lab); return; }
         if (!Game.BuildMenuVisible || MenuOpen) return;
         var items = Game.BuildItems();
@@ -333,6 +359,7 @@ public partial class OriginalHud : Node2D
     public bool Click(Vector2 point, MouseButton button)
     {
         if (Game.Battle.Paused) return true;
+        if (button == MouseButton.Left && InventorySlotAt(point) is var slot and >= 0) { Game.ClickInventory(slot); QueueRedraw(); return true; }
         if (button == MouseButton.Left && LabRowAt(point) is { } row) { Game.StartLabResearch(row); QueueRedraw(); return true; }
         if (button == MouseButton.Left && BuildItemAt(point) is { } item) { if (item.Enabled) item.Start(); QueueRedraw(); return true; }
         if (MapRect.HasPoint(point)) return false;
