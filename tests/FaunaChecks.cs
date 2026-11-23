@@ -35,9 +35,19 @@ public partial class TestRunner
         Place(worker, cell); worker.Goal = null; worker.Route.Clear();
         Run(20);
         Check(worker.Health == workerBefore && wolf.Alive, "In peace the wolf does not bite");
+        // In peace the hero does not strike a wolf that stands beside him either (the beasts are Rufin's, user 23.11).
+        Vector2I? spot = null;
+        for (int r = 6; r < 16 && spot == null; r++)
+            for (int dx = -r; dx <= r && spot == null; dx++) { var c = battle.PlayerCastle.Cell + new Vector2I(dx, r); if (battle.Inside(c + Vector2I.Right) && battle.CanStand(hero, c) && battle.CanStand(wolf, c + Vector2I.Right)) spot = c; }
+        Check(spot != null, "A free place for the hero and a wolf beside him");
+        Place(hero, spot!.Value); Place(wolf, spot.Value + Vector2I.Right); hero.Goal = null; hero.Route.Clear(); hero.Target = 0;
+        int heroBefore = hero.Health; bool struck = false;
+        for (int t = 0; t < 30 * 18; t++) { battle.Advance(1 / 18.2); struck |= hero.Target == wolf.Id || wolf.Target == hero.Id; }
+        Check(!struck && wolf.Alive && hero.Health == heroBefore, "In peace the hero and the wolf beside him leave each other alone");
         DeclareWarOnRufin(battle);
         Check(battle.Diplomacy.AtWar(7, 0) && battle.Diplomacy.AtWar(6, 0), "War on Rufin is war with the beasts of both slots");
-        Place(wolf, hero.Cell + new Vector2I(1, 0));
+        foreach (var d in new[] { Vector2I.Right, Vector2I.Left, Vector2I.Down, Vector2I.Up }) if (battle.CanStand(wolf, hero.Cell + d)) { Place(wolf, hero.Cell + d); break; }
+        wolf.Goal = null; wolf.Route.Clear(); wolf.Stepping = false;
         Run(40);
         Check(hero.Health < before || !wolf.Alive, $"A wolf and the hero fight (hero {before} → {hero.Health}, wolf alive {wolf.Alive})");
         var bear = battle.Animals.First(a => a.Source.TemplateName == "Медведь");
