@@ -3,7 +3,7 @@ using Godot;
 namespace Northwind;
 
 public sealed class OriginalItemData { public List<OriginalItem> Items { get; set; } = []; }
-public sealed class OriginalItem { public int Code { get; set; } public int Icon { get; set; } public string Handler { get; set; } = ""; public string Name { get; set; } = ""; public int Class { get; set; } public int Parameter { get; set; } }
+public sealed class OriginalItem { public string StaticHex { get; set; } = ""; public int Code { get; set; } public int Icon { get; set; } public string Handler { get; set; } = ""; public string Name { get; set; } = ""; public int Class { get; set; } public int Parameter { get; set; } }
 
 /// <summary>Jugs and chests of the first map (ARMY__03 1, 9, 10, 11, 30, 33; docs/campaign-items.md): hit by anyone of the player they break open
 /// (<see cref="OriginalContainer"/>), then a visiting unit takes the item (LE:1 902F → 12406 → 1243A): gold items (code 34, handler 11EE6) pay 5000 + 32·random into the
@@ -65,7 +65,7 @@ public sealed partial class Skirmish
     }
 
     private OriginalItemRules? _itemRules; private SkirmishItemWorld? _itemWorld;
-    public OriginalItemRules ItemRules => _itemRules ??= new OriginalItemRules(code => ItemTable[code].Handler);
+    public OriginalItemRules ItemRules => _itemRules ??= new OriginalItemRules(code => ItemTable[code].Handler, code => code < ItemTable.Count && ItemTable[code].StaticHex.Length == 18 ? Convert.FromHexString(ItemTable[code].StaticHex) : null);
     private SkirmishItemWorld ItemWorld => _itemWorld ??= new SkirmishItemWorld(this);
     private void TickItems() { if (Inventory.Any(i => i != 0)) ItemRules.Update(ItemWorld); }
 
@@ -99,5 +99,12 @@ public sealed partial class Skirmish
         public void FleeRequest(byte[] record) => OriginalCombatRules.Flee(record, (byte)battle.Map.Width, (byte)battle.Map.Height, battle._terrainCatalog);
         public void Message() { }
         public void Sound(byte id) { }
+        // ADAPTER: the use of items needs the inventory window and a targeting mode, neither is ported; the world of the use handlers stays inert
+        public ItemTarget Target(uint reference) => battle.Find(reference) is { } a ? new((byte)a.Record[0], (byte)a.Record[0x0e], a.Record[0x0d], (uint)a.Position.X, (uint)a.Position.Y, 0) : default;
+        public bool PlacementFree(byte al, byte ah, byte bl, uint x, uint y) => false;
+        public (bool Created, uint Reference) Create(byte army, byte owner, byte template, byte layer, uint x, uint y) => (false, 0);
+        public void Setup(uint reference) { }
+        public void Effect(byte al, byte type, byte layer, uint x, uint y, uint argument) { }
+        public byte TemplateLayer(byte army, byte template) => 1;
     }
 }

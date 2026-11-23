@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "f9d408753c93fc26b90afcbce9a63e4708546a7858e6d1f6d20b71d4d4ab2a3a",
+  "annotation_sha256": "fb6d175978cdba2e0c89dc78fd4dd9ae5d764a571b7e90a1bf4d5a24827820b4",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 6123,
-        "ported": 34814,
-        "unreviewed": 105848,
+        "ported": 35377,
+        "unreviewed": 105285,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -1979,6 +1979,22 @@
         },
         {
           "start": 73820,
+          "end": 73901,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 73901,
+          "end": 73954,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handler-disease"
+          ]
+        },
+        {
+          "start": 73954,
           "end": 74110,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2011,10 +2027,28 @@
         },
         {
           "start": 74239,
-          "end": 74627,
+          "end": 74326,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 74326,
+          "end": 74518,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handlers-lightnings"
+          ]
+        },
+        {
+          "start": 74518,
+          "end": 74627,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handler-phantom-jug"
+          ]
         },
         {
           "start": 74627,
@@ -2078,6 +2112,33 @@
         },
         {
           "start": 75005,
+          "end": 75078,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-use-124fd"
+          ]
+        },
+        {
+          "start": 75078,
+          "end": 75144,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-drop-12546"
+          ]
+        },
+        {
+          "start": 75144,
+          "end": 75214,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-drop-all-12588"
+          ]
+        },
+        {
+          "start": 75214,
           "end": 124218,
           "status": "unreviewed",
           "classification": "unknown",

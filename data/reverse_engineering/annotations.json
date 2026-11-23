@@ -4028,6 +4028,78 @@
       "evidence": ["docs/campaign-items.md", "tests/fixtures/visit.json", "tools/verify_visit.py", "tests/OriginalVisitChecks.cs"],
       "implementation": ["scripts/OriginalVisit.cs", "scripts/SkirmishContainers.cs"],
       "limitations": "the script call is a recorded stub in the check"
+    },
+    {
+      "id": "items-use-124fd",
+      "module": "LE:1",
+      "start": 75005,
+      "end": 75078,
+      "name": "Use an item at a cell/object: handler AH = 3",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/item-use.json", "tools/verify_item_use.py", "tests/OriginalItemUseChecks.cs"],
+      "implementation": ["scripts/OriginalItems.cs"],
+      "limitations": "the inventory window and the targeting that call it are not ported"
+    },
+    {
+      "id": "items-drop-12546",
+      "module": "LE:1",
+      "start": 75078,
+      "end": 75144,
+      "name": "Drop one item as a map object of ARMY__00 (the entry's class byte)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/item-use.json", "tools/verify_item_use.py", "tests/OriginalItemUseChecks.cs"],
+      "implementation": ["scripts/OriginalItems.cs"],
+      "limitations": "A758 (object creation) and 68A0 as recorded/real; the skirmish does not create the object yet"
+    },
+    {
+      "id": "items-drop-all-12588",
+      "module": "LE:1",
+      "start": 75144,
+      "end": 75214,
+      "name": "Drop all items of a participant on a cell",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/item-use.json", "tools/verify_item_use.py", "tests/OriginalItemUseChecks.cs"],
+      "implementation": ["scripts/OriginalItems.cs"],
+      "limitations": "only called from the death of the leader (8A54), not wired in the skirmish"
+    },
+    {
+      "id": "items-handler-disease",
+      "module": "LE:1",
+      "start": 73901,
+      "end": 73954,
+      "name": "Item handler of the Dread Disease (19): spent on use, cloud effect 9Ah at the object",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/item-use.json", "tools/verify_item_use.py", "tests/OriginalItemUseChecks.cs"],
+      "implementation": ["scripts/OriginalItems.cs"],
+      "limitations": "the effect creation 9727 is a recorded stub"
+    },
+    {
+      "id": "items-handlers-lightnings",
+      "module": "LE:1",
+      "start": 74326,
+      "end": 74518,
+      "name": "Item handlers of the red, green and yellow lightnings (31..33): effects 9Eh, 9Fh, A0h on an object of army class 3, template 1Bh",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/item-use.json", "tools/verify_item_use.py", "tests/OriginalItemUseChecks.cs"],
+      "implementation": ["scripts/OriginalItems.cs"],
+      "limitations": "9727 and 68BD: stub / original; the effect itself is not ported"
+    },
+    {
+      "id": "items-handler-phantom-jug",
+      "module": "LE:1",
+      "start": 74518,
+      "end": 74627,
+      "name": "Item handler of the phantom jug (35): a phantom (army 3, template 3) at the cell, ten uses",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/item-use.json", "tools/verify_item_use.py", "tests/OriginalItemUseChecks.cs"],
+      "implementation": ["scripts/OriginalItems.cs"],
+      "limitations": "10AD2 (placement), A758 (creation) and 43E5 (set-up) are recorded stubs"
     }
   ]
 }
