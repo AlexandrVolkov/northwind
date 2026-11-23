@@ -75,7 +75,6 @@ public sealed class SkirmishActor
     public bool Repairing { get; set; }
     /// <summary>Gate mode (docs/gates.md): 0 closed, 1 open, 2 automatic; GateIsOpen is what is drawn and what blocks the footprint.</summary>
     public int GateMode { get; set; }
-    public bool GateIsOpen { get; set; }
     /// <summary>A decoration of the first map (jug, chest, manuscript, the mage): drawn, never attacked, not on the minimap (docs/world.md).</summary>
     public bool Scenery { get; set; }
     /// <summary>WorkFlags (+0F) of the building before the repair (the maintenance step uses WorkFlags = 1 inside).</summary>
