@@ -249,3 +249,27 @@ public partial class TestRunner
         GetTree().Quit();
     }
 }
+public partial class TestRunner
+{
+    private async System.Threading.Tasks.Task LabShot()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+        var b = scene.Battle; b.GrantPeople(30);
+        SkirmishActor? Build(int index, params Vector2I[] offsets)
+        {
+            foreach (var o in offsets) if (b.BuildIndex(index, b.PlayerCastle.Cell + o) is { } x) { for (int t = 0; t < (int)(300 * 18.2) && x.ConstructionRemaining > 0; t++) b.Advance(1 / 18.2); return x; }
+            return null;
+        }
+        Build(3, new(8, 8), new(-8, 8)); Build(4, new(-8, -8), new(0, -9)); Build(15, new(0, 10), new(10, 0), new(-10, 0));
+        var lab = Build(12, new(12, 12), new(-12, 12), new(12, -12), new(-12, -12), new(0, 13));
+        Array.Fill(b.FogMap, (byte)0); scene.Selection.Clear(); scene.Selection.Add(lab!.Id); scene.FocusWorld(lab.Position);
+        b.StartResearch(lab, b.ResearchRows()[0]);
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-lab.png");
+        GetTree().Quit();
+    }
+}

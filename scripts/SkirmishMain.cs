@@ -156,6 +156,10 @@ public partial class SkirmishMain : Node2D
     };
     /// <summary>A finished factory of the player is selected: its list offers the line buildings (the bridge; fence, gate, tower and the siege engines are not offered yet).</summary>
     public SkirmishActor? SelectedFactory => Selection.Count == 1 && Battle.Find(Selection.Single()) is { } f && Skirmish.IsFactory(f) ? f : null;
+    /// <summary>A finished laboratory of the player is selected: its list offers the researchable items (cost in gold, paid while the research runs).</summary>
+    public SkirmishActor? SelectedLab => Selection.Count == 1 && Battle.Find(Selection.Single()) is { } l && Skirmish.IsPlayerLab(l) ? l : null;
+    public IReadOnlyList<Skirmish.ResearchRow> LabRows() => SelectedLab == null ? [] : Battle.ResearchRows();
+    public void StartLabResearch(Skirmish.ResearchRow row) { if (SelectedLab is { } lab) { Battle.StartResearch(lab, row); RefreshUi(); } }
     public BuildItem[] BuildItems() => SelectedProducer is { } p ? ProducerItems(p) : CastleBuildItems();
     public bool BuildMenuVisible => (BuildMenuOpen && Selection.Count == 1 && Selection.Contains(Battle.PlayerCastle.Id) && Battle.PlayerCastle.Alive) || SelectedProducer != null;
     public TemplateEntry? PlacingTemplate => PlacingFactory ? Battle.TemplateOf(_placingIndex) : PlacingBarracks ? Battle.BarracksTemplate : PlacingMill ? Battle.MillTemplate : PlacingMine ? Battle.MineTemplate : PlacingFarm ? Battle.FarmTemplate : null;

@@ -278,3 +278,33 @@ public partial class TestRunner
         Check(battle.QueueUnit(barracks!, 1) == archer, $"The archer is queued only if the tree allows it ({archer})");
     }
 }
+
+public partial class TestRunner
+{
+    /// <summary>The player chooses a research in his laboratory; the executor pays gold and completes the item, which opens the next buildings and units.</summary>
+    private void LabChecks()
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        battle.GrantPeople(30);
+        SkirmishActor? Build(int index, params Vector2I[] offsets)
+        {
+            foreach (var o in offsets) if (battle.BuildIndex(index, battle.PlayerCastle.Cell + o) is { } b) { for (int t = 0; t < (int)(300 * 18.2) && b.ConstructionRemaining > 0; t++) battle.Advance(1 / 18.2); return b; }
+            return null;
+        }
+        Check(Build(3, new(8, 8), new(-8, 8), new(8, -8)) != null && Build(4, new(-8, -8), new(0, -9), new(9, 0)) != null, "Barracks and sawmill built");
+        Check(Build(15, new(0, 10), new(10, 0), new(-10, 0), new(0, -11)) != null, "The factory is built");
+        var lab = Build(12, new(12, 12), new(-12, 12), new(12, -12), new(-12, -12), new(0, 13));
+        Check(lab != null && Skirmish.IsPlayerLab(lab), "The laboratory is built");
+        var rows = battle.ResearchRows();
+        GD.Print("RESEARCH " + string.Join(" | ", rows.Select(r => $"{r.Id}:{r.Text}:{r.Cost}")));
+        Check(rows.Count > 0 && rows.All(r => r.Text.Length > 0), $"The laboratory lists researchable items ({rows.Count})");
+        var tower = rows.FirstOrDefault(r => r.Text.Contains("башни")) ?? rows[0];
+        double gold = battle.Gold; Check(battle.StartResearch(lab!, tower), "A research starts");
+        Check(!battle.StartResearch(lab!, rows[^1]) , "A busy laboratory takes no second item");
+        for (int t = 0; t < (int)(4000 * 18.2) && lab!.Record[0x15] != 0; t++) battle.Advance(1 / 18.2);
+        Check(lab!.Record[0x15] == 0 && battle.Gold < gold, $"The research is paid and finished (gold {gold} → {battle.Gold})");
+        Check(!battle.ResearchRows().Any(r => r.Id == tower.Id), "A finished item leaves the list");
+    }
+}
