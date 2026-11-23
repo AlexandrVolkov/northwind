@@ -49,6 +49,10 @@ public partial class TestRunner
         Check(Array.IndexOf(battle.Inventory, (byte)6) >= 0, "The hero takes the item into the inventory");
         uint gold = battle.Gold; battle.PickUp(hero, 34);
         Check(battle.Gold >= gold + 5000, "The gold item pays at least 5000");
+        // the curse of Irvil (item 18) takes 100 gold every 256 updates while it is kept
+        battle.PickUp(hero, 18); uint before = battle.Gold;
+        for (int t = 0; t < 520; t++) battle.Advance(1 / 18.2);
+        Check(Array.IndexOf(battle.Inventory, (byte)18) >= 0 && battle.Gold <= before - 100, $"The curse of Irvil drains the gold ({before} → {battle.Gold})");
         // the player attacks a jug: it breaks open by blows
         var jug2 = battle.SceneryObjects.First(a => a.Source.TemplateIndex == 30 && a != chestActor);
         System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(4), (uint)jug2.Position.X); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(8), (uint)jug2.Position.Y + 40);
