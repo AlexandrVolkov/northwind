@@ -494,7 +494,7 @@ public sealed partial class Skirmish : IDisposable
     }
     private void UpdateUnit(SkirmishActor actor, double dt)
     {
-            if (!actor.Alive || actor.Scenery) return;   // decorations do nothing (the mage's own script is not ported)
+            if (!actor.Alive || (actor.Scenery && !MageFights(actor))) return;   // decorations do nothing; a mage at war acts like a unit
             actor.AttackTimer -= dt; actor.ReplanTimer -= dt;
             // OBE[20] is the mask of the owners that can see the object (FFh: all): a unit among trees is seen by its owner only.
             // Seen by whom (OBE[20], checked every fourth update): a unit among trees sees every unit; a unit outside sees a unit among

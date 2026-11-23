@@ -251,6 +251,23 @@ public partial class TestRunner
 }
 public partial class TestRunner
 {
+    private async System.Threading.Tasks.Task MageShot()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+        var b = scene.Battle; var rufin = b.SceneryObjects.First(Skirmish.IsMage);
+        b.Attack([b.Hero.Id], rufin.Id); b.Attack([b.Hero.Id], rufin.Id);
+        var near = rufin.Cell + new Vector2I(2, 0);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(b.Hero.Record.AsSpan(4), (uint)(near.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(b.Hero.Record.AsSpan(8), (uint)(near.Y * 32 + 16));
+        for (int t = 0; t < 60; t++) b.Advance(1 / 18.2);
+        scene.FocusWorld(rufin.Position);
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-mage.png");
+        GetTree().Quit();
+    }
     private async System.Threading.Tasks.Task DialogShot()
     {
         var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
