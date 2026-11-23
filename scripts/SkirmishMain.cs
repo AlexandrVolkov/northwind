@@ -129,17 +129,35 @@ public partial class SkirmishMain : Node2D
     /// <summary>Castle build list opened by the «eye» button (WORK sprite 874) as on DOSBox screenshots: barracks, sawmill, mine,
     /// farm, worker. The original greys the mine with full resources for a reason not found yet; the port greys unaffordable items.</summary>
     public bool BuildMenuOpen { get; set; }
-    public sealed record BuildItem(TemplateEntry Template, int TemplateIndex, Action Start);
+    /// <summary><paramref name="Enabled"/> false: the player's development tree does not allow it yet (greyed, a click does nothing).</summary>
+    public sealed record BuildItem(TemplateEntry Template, int TemplateIndex, Action Start, bool Enabled = true);
     public BuildItem[] CastleBuildItems() =>
     [
-        new(Battle.BarracksTemplate, 3, BeginBarracksPlacement), new(Battle.MillTemplate, 4, BeginMillPlacement),
-        new(Battle.MineTemplate, 6, BeginMinePlacement), new(Battle.FarmTemplate, 9, BeginFarmPlacement), new(Battle.FactoryTemplate, 15, BeginFactoryPlacement), new(Battle.WorkerTemplate, 10, HireWorker),
+        Item(3, BeginBarracksPlacement), Item(4, BeginMillPlacement), Item(6, BeginMinePlacement), Item(9, BeginFarmPlacement), Item(12, () => BeginCastlePlacement(12)),
+        Item(15, BeginFactoryPlacement), Item(22, () => BeginCastlePlacement(22)), Item(23, () => BeginCastlePlacement(23)), Item(24, () => BeginCastlePlacement(24)),
+        new(Battle.WorkerTemplate, 10, HireWorker),
     ];
+    private BuildItem Item(int index, Action start) => new(Battle.TemplateOf(index), index, start, Battle.Available(index));
+    private BuildItem UnitItem(SkirmishActor producer, int index) => new(Battle.TemplateOf(index), index, () => { Battle.QueueUnit(producer, index); RefreshUi(); }, Battle.Available(index));
+    /// <summary>The castle's list: a building of any index of the list is placed like the factory (near the castle, paid up front).</summary>
+    public void BeginCastlePlacement(int index)
+    {
+        if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
+        _placingIndex = index; PlacingFactory = true; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingBridge = false; RefreshUi();
+    }
+    /// <summary>A finished barracks, stable or factory of the player is selected: its list hires the units of its production row.</summary>
+    public SkirmishActor? SelectedProducer => Selection.Count == 1 && Battle.Find(Selection.Single()) is { } p && Skirmish.IsPlayerProducer(p) ? p : null;
+    public BuildItem[] ProducerItems(SkirmishActor producer) => producer.Source.TemplateName switch
+    {
+        "Казарма" => [UnitItem(producer, 0), UnitItem(producer, 1), UnitItem(producer, 17), UnitItem(producer, 18)],
+        "Конюшня" => [UnitItem(producer, 21)],
+        "Завод" => [Item(5, BeginFencePlacement), Item(7, BeginBridgePlacement), Item(13, BeginTowerPlacement), UnitItem(producer, 16), UnitItem(producer, 26)],
+        _ => [],
+    };
     /// <summary>A finished factory of the player is selected: its list offers the line buildings (the bridge; fence, gate, tower and the siege engines are not offered yet).</summary>
     public SkirmishActor? SelectedFactory => Selection.Count == 1 && Battle.Find(Selection.Single()) is { } f && Skirmish.IsFactory(f) ? f : null;
-    public BuildItem[] FactoryBuildItems() => [new(Battle.TemplateOf(5), 5, BeginFencePlacement), new(Battle.BridgeTemplate, 7, BeginBridgePlacement), new(Battle.TowerTemplate, 13, BeginTowerPlacement)];
-    public BuildItem[] BuildItems() => SelectedFactory != null ? FactoryBuildItems() : CastleBuildItems();
-    public bool BuildMenuVisible => (BuildMenuOpen && Selection.Count == 1 && Selection.Contains(Battle.PlayerCastle.Id) && Battle.PlayerCastle.Alive) || SelectedFactory != null;
+    public BuildItem[] BuildItems() => SelectedProducer is { } p ? ProducerItems(p) : CastleBuildItems();
+    public bool BuildMenuVisible => (BuildMenuOpen && Selection.Count == 1 && Selection.Contains(Battle.PlayerCastle.Id) && Battle.PlayerCastle.Alive) || SelectedProducer != null;
     public TemplateEntry? PlacingTemplate => PlacingFactory ? Battle.TemplateOf(_placingIndex) : PlacingBarracks ? Battle.BarracksTemplate : PlacingMill ? Battle.MillTemplate : PlacingMine ? Battle.MineTemplate : PlacingFarm ? Battle.FarmTemplate : null;
     public void HireWorker()
     {

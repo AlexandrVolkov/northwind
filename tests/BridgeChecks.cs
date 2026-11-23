@@ -250,3 +250,31 @@ public partial class TestRunner
         }
     }
 }
+
+public partial class TestRunner
+{
+    /// <summary>The player's development tree decides what the lists offer; a barracks hires the units of its row that the tree allows.</summary>
+    private void ProducerChecks()
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        GD.Print("AVAILABLE " + string.Join(" ", new[] { 0, 1, 3, 4, 5, 6, 7, 9, 10, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 26 }.Select(i => $"{i}:{(battle.Available(i) ? "y" : "n")}")));
+        Check(battle.Available(0) && battle.Available(3), "Militia and the barracks are available at the start");
+        battle.GrantPeople(20);
+        var barracks = battle.BuildIndex(3, battle.PlayerCastle.Cell + new Vector2I(8, 8)) ?? battle.BuildIndex(3, battle.PlayerCastle.Cell + new Vector2I(-8, 8)) ?? battle.BuildIndex(3, battle.PlayerCastle.Cell + new Vector2I(8, -8));
+        Check(barracks != null, "A barracks is placed from the castle list");
+        for (int t = 0; t < (int)(300 * 18.2) && barracks!.ConstructionRemaining > 0; t++) battle.Advance(1 / 18.2);
+        Check(Skirmish.IsPlayerProducer(barracks!), "The barracks is a finished producer");
+        Check(battle.QueueUnit(barracks!, 0), "The barracks queues a militiaman");
+        for (int t = 0; t < (int)(120 * 18.2); t++) battle.Advance(1 / 18.2);
+        Check(battle.Actors.Count(a => a.Team == 0 && a.Alive && a.Source.TemplateName == "Ополченец") >= 2, "The militiaman comes out of the barracks");
+        Check(!battle.Available(15), "The factory needs both the barracks and the sawmill");
+        var mill = battle.BuildIndex(4, battle.PlayerCastle.Cell + new Vector2I(-8, -8)) ?? battle.BuildIndex(4, battle.PlayerCastle.Cell + new Vector2I(0, -9)) ?? battle.BuildIndex(4, battle.PlayerCastle.Cell + new Vector2I(9, 0));
+        for (int t = 0; t < (int)(300 * 18.2) && mill != null && mill.ConstructionRemaining > 0; t++) battle.Advance(1 / 18.2);
+        Check(mill != null && battle.Available(15), "A finished barracks and sawmill open the factory in the player's tree");
+        Check(!battle.Available(12) && !battle.Available(22), "The laboratory and the stable are still closed");
+        bool archer = battle.Available(1);
+        Check(battle.QueueUnit(barracks!, 1) == archer, $"The archer is queued only if the tree allows it ({archer})");
+    }
+}
