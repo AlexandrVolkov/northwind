@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 105285 | 6123 | 97 | 35377 | 44 |
+| LE:1 | 146882 | 104311 | 6123 | 97 | 36351 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
@@ -197,7 +197,11 @@
 | LE:1 `0xEEFA..0xEF3F` | Drop messages between two settlements | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xEF3F..0xEFFE` | Third-party reactions with deferred re-entry | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xF000..0xF072` | War declaration with reputation and reactions | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
+| LE:1 `0xF072..0xF09C` | Dialog handler: alliance joined (relation 3, reaction table E23) | ported | [diplomacy.md](../docs/diplomacy.md); [quest.json](../tests/fixtures/quest.json); [verify_quest.py](../tools/verify_quest.py); [OriginalQuestChecks.cs](../tests/OriginalQuestChecks.cs) | EDD5, 1243A and EF3F are recorded stubs in the check |
+| LE:1 `0xF0F3..0xF154` | Dialog handlers: peace (F0F3, F12B), end of conversation (F14B) | ported | [diplomacy.md](../docs/diplomacy.md); [quest.json](../tests/fixtures/quest.json); [verify_quest.py](../tools/verify_quest.py); [OriginalQuestChecks.cs](../tests/OriginalQuestChecks.cs) | EDD5, 1243A and EF3F are recorded stubs in the check; F09C (vassalage) is not ported |
 | LE:1 `0xF250..0xF28B` | First contact, mutual | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
+| LE:1 `0xF28B..0xF33E` | Dialog handlers: replace the message type by the hermits' stone state (F28B, F29C, F2AD), crystal trades (F2BE, F2DE, F2FE, F31E) | ported | [diplomacy.md](../docs/diplomacy.md); [quest.json](../tests/fixtures/quest.json); [verify_quest.py](../tools/verify_quest.py); [OriginalQuestChecks.cs](../tests/OriginalQuestChecks.cs) | as above |
+| LE:1 `0xF33E..0xF5CE` | Dialog handlers: staff and crystal trades, gifts of the dying hermits, payments | ported | [diplomacy.md](../docs/diplomacy.md); [quest.json](../tests/fixtures/quest.json); [verify_quest.py](../tools/verify_quest.py); [OriginalQuestChecks.cs](../tests/OriginalQuestChecks.cs) | as above; F459..F49B are not message handlers |
 | LE:1 `0x10075..0x100FA` | Lay a formation out around a goal | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x100FA..0x101B4` | Spread members along a formation segment | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x101B4..0x10262` | Nearest free member of a class to a formation point | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |

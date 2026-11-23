@@ -10,7 +10,7 @@ public partial class TestRunner
         using var reference = GameData.Read<JsonDocument>("res://tests/fixtures/diplomacy.json");
         var root = reference.RootElement;
         var data = GameData.Read<OriginalDiplomacyData>("res://data/original_diplomacy.json");
-        Check(data.Types.Count == 30 && data.Reactions.Count == 72 && data.Types[3].Handler == OriginalDiplomacyRules.FirstContactHandler,
+        Check(data.Types.Count == 153 && data.Reactions.Count == 288 && data.Types[3].Handler == OriginalDiplomacyRules.FirstContactHandler,
             "Diplomacy tables are bundled");
         using var digest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         int count = 0;

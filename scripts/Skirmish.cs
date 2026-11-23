@@ -386,6 +386,7 @@ public sealed partial class Skirmish : IDisposable
     /// <summary>Settlement relations, war masks and message queues (docs/diplomacy.md).</summary>
     public DiplomacyState Diplomacy { get; private set; } = new(8);
     private OriginalDiplomacyRules _diplomacyRules = null!;
+    private IQuestWorld ItemWorldForQuest => ItemWorld;
     private uint _warWarning;
     public bool AtWar(SkirmishActor a, SkirmishActor b) => Diplomacy.AtWar(a.Record[3], b.Record[3]);
     private void InitializeDiplomacy(ScenarioData scenario)
@@ -399,6 +400,12 @@ public sealed partial class Skirmish : IDisposable
             for (int q = 0; q < 8; q++) Diplomacy.Relations[slot.SlotIndex, q] = raw[0x3a + q];
         }
         _diplomacyRules = new OriginalDiplomacyRules(GameData.Read<OriginalDiplomacyData>("res://data/original_diplomacy.json"));
+        // the dialog handlers (LE:1 F072..F5CE): the type they leave in the queue may differ from the one sent
+        _diplomacyRules.QuestHandler = (handler, regs, record) =>
+        {
+            byte bl = (byte)(regs & 255), bh = (byte)(regs >> 8);
+            return OriginalQuestRules.Run(ItemWorldForQuest, handler, bl, bh, record.Other, record.Parameter, record.Type);
+        };
     }
     /// <summary>4F04..4F3B: an attack order on another settlement that is not at war first warns, a repeated order on the same
     /// object sends message 5 «Объявляю тебе войну» (F000 sets war both ways and lets third parties react).</summary>

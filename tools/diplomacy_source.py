@@ -8,7 +8,7 @@ from pathlib import Path
 import struct
 from forestry_source import read_le_objects, INNER_MZ, EXE_SHA256
 
-TYPES = 30
+TYPES = 153
 
 
 def extract(game):
@@ -22,7 +22,7 @@ def extract(game):
         raw = payload[text:payload.index(b'\0', text)].decode('cp866')
         types.append({'type': k, 'handler': handler, 'duration': duration, 'parameters': list(payload[0xefb + 0x13 * k + 0x10:0xefb + 0x13 * (k + 1)]),
                       'text': raw})
-    return {'format_version': 1, 'source_sha256': EXE_SHA256, 'types': types, 'reactions': list(payload[0xddb:0xddb + 72])}
+    return {'format_version': 1, 'source_sha256': EXE_SHA256, 'types': types, 'reactions': list(payload[0xddb:0xddb + 72 * 4])}
 
 
 if __name__ == '__main__':
