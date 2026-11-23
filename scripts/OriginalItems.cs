@@ -15,7 +15,15 @@ public interface IItemWorld
     IReadOnlyList<ItemObject> Objects(int owner);                // the owner's object records (participant +0E .. +09)
     void FleeRequest(byte[] record);             // 8E0E
     void Message(); void Sound(byte id);         // 5593, A4A9
+    // the world of the use handlers (AH = 3) and of the drop
+    ItemTarget Target(uint reference);           // an object of the pool (FS:71 = 68BD: its army table and template)
+    bool PlacementFree(byte al, byte ah, byte bl, uint x, uint y);   // 10AD2: ZF
+    (bool Created, uint Reference) Create(byte army, byte owner, byte template, byte layer, uint x, uint y);   // A758: ZF = created; Reference = EDI
+    void Setup(uint reference);                  // 43E5
+    void Effect(byte al, byte type, byte layer, uint x, uint y, uint argument);   // 9727
+    byte TemplateLayer(byte army, byte template);   // DAT[77] of a template
 }
+public readonly record struct ItemTarget(byte Army, byte Template, byte Layer, uint X, uint Y, byte ArmyClass);
 public sealed record ItemObject(byte[] Record, bool Structure);
 
 /// <summary>The item machinery of LE:1 (docs/campaign-items.md): the per-update loop 12383, the pickup 1243A, the search 124D8 and the handlers of the item table (LE:3 +4191).
@@ -27,7 +35,13 @@ public sealed class OriginalItemRules
     /// <summary>The runtime part of the item table entries: +15 (dword: the countdown of a curse; stones keep +15 = [1EC5] and +16 = the owner).</summary>
     public byte[][] Entries { get; } = Enumerable.Range(0, TableEntries).Select(_ => new byte[EntrySize]).ToArray();
     private readonly Func<int, string> _handler;
-    public OriginalItemRules(Func<int, string> handlerOfItem) => _handler = handlerOfItem;
+    /// <param name="handlerOfItem">the handler address of an item code (LE:3 +4191 + 19h·code + 4)</param>
+    /// <param name="staticFields">the bytes +0C..+14 of the table entry (class = the map object of a dropped item, +0E = the phantom counter), or null</param>
+    public OriginalItemRules(Func<int, string> handlerOfItem, Func<int, byte[]?>? staticFields = null)
+    {
+        _handler = handlerOfItem;
+        for (int code = 0; code < TableEntries && staticFields != null; code++) staticFields(code)?.CopyTo(Entries[code], 0x0c);
+    }
 
     /// <summary>12383: every update each held item gets AH = 1.</summary>
     public void Update(IItemWorld world)
@@ -52,6 +66,32 @@ public sealed class OriginalItemRules
         inventory[slot] = item;
         if (owner == world.PlayerOwner) { world.Message(); world.Sound(0x13); }
         return (0, true);
+    }
+
+    /// <summary>124FD: use an item of the participant at a cell (and an object): the handler gets AH = 3 with the cell in +0F/+10 and the object in +11.</summary>
+    public void Use(IItemWorld world, byte item, int owner, byte cellX, byte cellY, uint targetReference)
+    {
+        int slot = Array.IndexOf(world.Inventory(owner), item);
+        if (slot < 0) return;
+        var entry = Entries[item]; entry[0x0f] = cellX; entry[0x10] = cellY; BinaryPrimitives.WriteUInt32LittleEndian(entry.AsSpan(0x11), targetReference);
+        Handle(world, item, 3, owner, slot, 0);
+    }
+
+    /// <summary>12546: the item falls on the cell as an object of ARMY__00 (the template is the entry's class byte); returns ZF = nothing dropped.</summary>
+    public bool DropOne(IItemWorld world, byte item, int owner, byte cellX, byte cellY)
+    {
+        byte template = Entries[item][0x0c];
+        if (template == 0) return true;
+        world.Create(0, (byte)owner, template, (byte)(world.TemplateLayer(0, template) & 3), (uint)(cellX << 5) + 0x10, (uint)(cellY << 5) + 0x10);
+        return false;
+    }
+
+    /// <summary>12588: all items of the participant are dropped on the cell; a slot is emptied when its item became an object.</summary>
+    public void DropAll(IItemWorld world, int owner, byte cellX, byte cellY)
+    {
+        var inventory = world.Inventory(owner);
+        for (int slot = 0; slot < Slots; slot++)
+            if (inventory[slot] != 0 && !DropOne(world, inventory[slot], owner, cellX, cellY)) inventory[slot] = 0;
     }
 
     /// <summary>124D8: the slot holding the item (or −1).</summary>
@@ -97,6 +137,35 @@ public sealed class OriginalItemRules
                         world.SetGold(owner, world.Gold(owner) < 100 ? 0 : world.Gold(owner) - 100); break;
                 }
                 return (0, true);
+            case "12256" or "12296" or "122D6" when ah == 3:   // the lightnings: only at an object of the army class 3, template 1Bh
+            {
+                var t = world.Target(BinaryPrimitives.ReadUInt32LittleEndian(entry.AsSpan(0x11)));
+                if (t.ArmyClass == 3 && t.Template == 0x1b)
+                    world.Effect((byte)(t.Template * 0xab), (byte)(_handler(item) == "12256" ? 0x9e : _handler(item) == "12296" ? 0x9f : 0xa0), (byte)(t.Layer & 3), t.X, t.Y, 3);
+                return (0, true);
+            }
+            case "12256" or "12296" or "122D6" when ah == 2: return (0xff, false);
+            case "120AD" when ah == 3:   // the disease: the item is spent, a cloud (effect 9Ah) appears at the object
+            {
+                world.Inventory(owner)[slot] = 0;
+                uint reference = BinaryPrimitives.ReadUInt32LittleEndian(entry.AsSpan(0x11)); var t = world.Target(reference);
+                world.Effect((byte)reference, 0x9a, (byte)(t.Layer & 3), t.X, t.Y, reference);
+                return (0, true);
+            }
+            case "120AD" when ah == 2: return (0xff, false);
+            case "12316" when ah == 3:   // the phantom jug: a phantom (army 3, template 3) stands up at the cell, ten uses
+            {
+                uint x = (uint)entry[0x0f] << 5, y = (uint)entry[0x10] << 5;
+                if (world.PlacementFree(3, 3, 1, x, y))
+                {
+                    var (created, reference) = world.Create(3, (byte)owner, 3, 1, x, y);
+                    if (created) world.Setup(reference);
+                }
+                if (entry[0x0e] == 0) entry[0x0e] = 9;
+                if (--entry[0x0e] == 0) world.Inventory(owner)[slot] = 0;
+                return (0, true);
+            }
+            case "12316" when ah == 2: return (0xff, false);
             case "1217E" or "121E5":   // stones 6 and 14: the table remembers the update counter and the owner
                 if (ah == 1) { entry[0x15] = world.Global1EC5; entry[0x16] = (byte)owner; }
                 else if (ah == 2) return (0xff, false);

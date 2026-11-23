@@ -7,7 +7,8 @@
    "handler": "0",
    "name": "",
    "class": 0,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "000000000000000000"
   },
   {
    "code": 1,
@@ -15,7 +16,8 @@
    "handler": "11EB0",
    "name": "",
    "class": 0,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "000000000000000000"
   },
   {
    "code": 2,
@@ -23,7 +25,8 @@
    "handler": "11ECB",
    "name": "",
    "class": 0,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "000000000000000000"
   },
   {
    "code": 3,
@@ -31,7 +34,8 @@
    "handler": "E65A",
    "name": "",
    "class": 0,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "000000000000000000"
   },
   {
    "code": 4,
@@ -39,7 +43,8 @@
    "handler": "11EFF",
    "name": "Рукопись",
    "class": 16,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "100000000000000000"
   },
   {
    "code": 5,
@@ -47,7 +52,8 @@
    "handler": "11F5B",
    "name": "Волшебный камень",
    "class": 0,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "000000000000000000"
   },
   {
    "code": 6,
@@ -55,7 +61,8 @@
    "handler": "1217E",
    "name": "Сиреневый камень",
    "class": 12,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "0c0000000000000000"
   },
   {
    "code": 7,
@@ -63,7 +70,8 @@
    "handler": "11F5B",
    "name": "Посох Мирона",
    "class": 4,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "040000000000000000"
   },
   {
    "code": 8,
@@ -71,7 +79,8 @@
    "handler": "121FF",
    "name": "Посох Кочета",
    "class": 5,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "050000000000000000"
   },
   {
    "code": 9,
@@ -79,7 +88,8 @@
    "handler": "11F5B",
    "name": "Посох Ирвила",
    "class": 6,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "060000000000000000"
   },
   {
    "code": 10,
@@ -87,7 +97,8 @@
    "handler": "11F5B",
    "name": "Посох Руфина",
    "class": 2,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "020000000000000000"
   },
   {
    "code": 11,
@@ -95,7 +106,8 @@
    "handler": "11F5B",
    "name": "Посох Ониса",
    "class": 3,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "030000000000000000"
   },
   {
    "code": 12,
@@ -103,7 +115,8 @@
    "handler": "12198",
    "name": "Розовый камень",
    "class": 13,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "0d0000000000000000"
   },
   {
    "code": 13,
@@ -111,7 +124,8 @@
    "handler": "11F5B",
    "name": "Посох Ефила",
    "class": 10,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "0a0000000000000000"
   },
   {
    "code": 14,
@@ -119,7 +133,8 @@
    "handler": "121E5",
    "name": "Хрустальный шар",
    "class": 14,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "0e0000000000000000"
   },
   {
    "code": 15,
@@ -127,7 +142,8 @@
    "handler": "11F64",
    "name": "Проклятие Руфина",
    "class": 0,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "000000000000000000"
   },
   {
    "code": 16,
@@ -135,7 +151,8 @@
    "handler": "1205C",
    "name": "Шар прозрения",
    "class": 28,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "1c010a000000000000"
   },
   {
    "code": 17,
@@ -143,7 +160,8 @@
    "handler": "11FC8",
    "name": "Проклятие Ониса",
    "class": 0,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "000000000000000000"
   },
   {
    "code": 18,
@@ -151,7 +169,8 @@
    "handler": "12022",
    "name": "Проклятие Ирвила",
    "class": 0,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "000000000000000000"
   },
   {
    "code": 19,
@@ -159,7 +178,8 @@
    "handler": "120AD",
    "name": "Страшная Болезнь",
    "class": 15,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "0f0200000000000000"
   },
   {
    "code": 20,
@@ -167,7 +187,8 @@
    "handler": "120E2",
    "name": "Синий камень",
    "class": 11,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "0b0000000000000000"
   },
   {
    "code": 21,
@@ -175,7 +196,8 @@
    "handler": "11F5B",
    "name": "Посох Магуса",
    "class": 7,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "070000000000000000"
   },
   {
    "code": 22,
@@ -183,7 +205,8 @@
    "handler": "11F5B",
    "name": "Посох Кевина",
    "class": 8,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "080000000000000000"
   },
   {
    "code": 23,
@@ -191,7 +214,8 @@
    "handler": "11F5B",
    "name": "Посох Гарика",
    "class": 9,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "090000000000000000"
   },
   {
    "code": 24,
@@ -199,7 +223,8 @@
    "handler": "11EFF",
    "name": "Рукопись",
    "class": 16,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "100000000000000000"
   },
   {
    "code": 25,
@@ -207,7 +232,8 @@
    "handler": "11EFF",
    "name": "Рукопись",
    "class": 17,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "110000000000000000"
   },
   {
    "code": 26,
@@ -215,7 +241,8 @@
    "handler": "11EFF",
    "name": "Рукопись",
    "class": 18,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "120000000000000000"
   },
   {
    "code": 27,
@@ -223,7 +250,8 @@
    "handler": "11EFF",
    "name": "Рукопись",
    "class": 19,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "130000000000000000"
   },
   {
    "code": 28,
@@ -231,7 +259,8 @@
    "handler": "11EFF",
    "name": "Рукопись",
    "class": 20,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "140000000000000000"
   },
   {
    "code": 29,
@@ -239,7 +268,8 @@
    "handler": "11EFF",
    "name": "Рукопись",
    "class": 21,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "150000000000000000"
   },
   {
    "code": 30,
@@ -247,7 +277,8 @@
    "handler": "11EFF",
    "name": "Рукопись",
    "class": 22,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "160000000000000000"
   },
   {
    "code": 31,
@@ -255,7 +286,8 @@
    "handler": "12256",
    "name": "Красная молния",
    "class": 25,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "190200000000000000"
   },
   {
    "code": 32,
@@ -263,7 +295,8 @@
    "handler": "12296",
    "name": "Зеленая молния",
    "class": 26,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "1a0200000000000000"
   },
   {
    "code": 33,
@@ -271,7 +304,8 @@
    "handler": "122D6",
    "name": "Желтая молния",
    "class": 27,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "1b0200000000000000"
   },
   {
    "code": 34,
@@ -279,7 +313,8 @@
    "handler": "11EE6",
    "name": "",
    "class": 0,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "000000000000000000"
   },
   {
    "code": 35,
@@ -287,7 +322,8 @@
    "handler": "12316",
    "name": "Кувшин с фантомом",
    "class": 29,
-   "parameter": 0
+   "parameter": 0,
+   "static_hex": "1d010a000000000000"
   }
  ]
 }

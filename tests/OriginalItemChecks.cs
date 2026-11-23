@@ -20,6 +20,16 @@ public partial class TestRunner
         public IReadOnlyList<ItemObject> Objects(int owner) { foreach (var o in Items) Log.AddRange([(byte)'T', .. BitConverter.GetBytes((uint)(0x100 + 0x40 * Items.IndexOf(o)))]); return Items; }
         public void FleeRequest(byte[] record) => OriginalCombatRules.Flee(record, MapWidth, MapHeight, Random1, Random2);
         public void Message() => Log.Add((byte)'M'); public void Sound(byte id) => Log.AddRange([(byte)'S', id]);
+        // the world of the use handlers (tests/OriginalItemUseChecks.cs)
+        public ItemTarget TargetObject; public bool PlacementOk, CreateOk; public byte[] TemplateLayers = new byte[8];
+        public ItemTarget Target(uint reference) => TargetObject;
+        public bool PlacementFree(byte al, byte ah, byte bl, uint x, uint y)
+        { Log.AddRange([(byte)'K', al, ah, bl]); Log.AddRange(BitConverter.GetBytes(x)); Log.AddRange(BitConverter.GetBytes(y)); return PlacementOk; }
+        public (bool Created, uint Reference) Create(byte army, byte owner, byte template, byte layer, uint x, uint y)
+        { Log.AddRange([(byte)'C', army, owner, template, layer]); Log.AddRange(BitConverter.GetBytes(x)); Log.AddRange(BitConverter.GetBytes(y)); return (CreateOk, 0x800); }
+        public void Setup(uint reference) { Log.Add((byte)'I'); Log.AddRange(BitConverter.GetBytes(reference)); }
+        public void Effect(byte al, byte type, byte layer, uint x, uint y, uint argument) { Log.AddRange([(byte)'E', al, type, layer]); Log.AddRange(BitConverter.GetBytes(x)); Log.AddRange(BitConverter.GetBytes(y)); Log.AddRange(BitConverter.GetBytes(argument > 0xff ? argument + 0x400000 : argument)); }
+        public byte TemplateLayer(byte army, byte template) => template < 8 ? TemplateLayers[template] : (byte)0;   // the oracle writes only eight templates
     }
 
     /// <summary>Replays tests/fixtures/items.json (tools/verify_items.py): the item loop 12383, the pickup 1243A and the handlers of the item table.</summary>

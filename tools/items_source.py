@@ -13,6 +13,6 @@ for code in range(36):
     o = 0x4191 + 0x19 * code
     icon, handler, name_ptr, klass = struct.unpack_from('<IIIB', data, o)
     name = data[name_ptr:name_ptr + 40].split(b'\xff')[0].decode('cp866') if name_ptr else ''
-    items.append({'code': code, 'icon': icon, 'handler': f'{handler:X}', 'name': name, 'class': klass, 'parameter': data[o + 0x10]})
+    items.append({'code': code, 'icon': icon, 'handler': f'{handler:X}', 'name': name, 'class': klass, 'parameter': data[o + 0x10], 'static_hex': data[o + 0x0c:o + 0x15].hex()})
 (root / 'data/original_items.json').write_text(json.dumps({'source': 'LE:3 4191, stride 19h', 'items': items}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
 print(len(items), 'items')
