@@ -4,6 +4,15 @@ using Northwind;
 public partial class TestRunner
 {
     /// <summary>The wolves and bears of slots 6/7 (docs/fauna.md): neutral team at war with everyone, roam, bite, a bear's death opens the ballista research.</summary>
+
+    /// <summary>The player declares war on Rufin (a repeated attack order) and the forest — his allies — goes to war with him too.</summary>
+    private static void DeclareWarOnRufin(Skirmish battle)
+    {
+        var mage = battle.SceneryObjects.First(Skirmish.IsMage); var hero = battle.Hero;
+        battle.Attack([hero.Id], mage.Id); battle.Attack([hero.Id], mage.Id);
+        for (int t = 0; t < 20; t++) battle.Advance(1 / 18.2);
+        hero.Target = 0; hero.Goal = null; hero.Route.Clear();
+    }
     private void FaunaChecks()
     {
         var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json"); rules.Fauna = true;
@@ -12,12 +21,23 @@ public partial class TestRunner
         void Run(double seconds) { for (int t = 0; t < (int)(seconds * 18.2); t++) battle.Advance(1 / 18.2); }
         var wolves = battle.Animals.Count(a => a.Source.TemplateName == "Волк"); var bears = battle.Animals.Count(a => a.Source.TemplateName == "Медведь");
         Check(wolves == 39 && bears == 7, $"39 wolves and 7 bears load from slots 6 and 7 ({wolves}, {bears})");
-        Check(battle.Animals.All(a => a.Team == 4 && !a.Structure && !a.Worker) && battle.Diplomacy.AtWar(7, 0) && battle.Diplomacy.AtWar(6, 3), "The animals are units of team 4 at war with the settlements");
+        Check(battle.Animals.All(a => a.Team == 4 && !a.Structure && !a.Worker), "The animals are units of team 4");
         var wolf = battle.Animals.First(a => a.Source.TemplateName == "Волк");
         var hero = battle.Hero; int before = hero.Health;
-        // A wolf next to the hero bites.
-        var cell = hero.Cell + new Vector2I(1, 0);
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(wolf.Record.AsSpan(4), (uint)(cell.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(wolf.Record.AsSpan(8), (uint)(cell.Y * 32 + 16));
+        Check(!battle.Diplomacy.AtWar(7, 0) && !battle.Diplomacy.AtWar(6, 0), "The beasts are at peace with the player at the start");
+        // In peace a wolf next to a worker (who does not fight) leaves him alone; after the war on Rufin it bites.
+        battle.GrantPeople(5); battle.QueueWorker();
+        for (int t = 0; t < (int)(60 * 18.2); t++) battle.Advance(1 / 18.2);
+        var worker = battle.Actors.First(x => x.Team == 0 && x.Worker && x.Alive); int workerBefore = worker.Health;
+        // At the wolf's own place, away from the soldiers who would strike a wolf in peace too (the beasts bear the DAT flag of a target for all).
+        var wolfCell = wolf.Cell; var cell = wolfCell + new Vector2I(-1, 0);
+        void Place(SkirmishActor a, Vector2I c) { System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(a.Record.AsSpan(4), (uint)(c.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(a.Record.AsSpan(8), (uint)(c.Y * 32 + 16)); }
+        Place(worker, cell); worker.Goal = null; worker.Route.Clear();
+        Run(20);
+        Check(worker.Health == workerBefore && wolf.Alive, "In peace the wolf does not bite");
+        DeclareWarOnRufin(battle);
+        Check(battle.Diplomacy.AtWar(7, 0) && battle.Diplomacy.AtWar(6, 0), "War on Rufin is war with the beasts of both slots");
+        Place(wolf, hero.Cell + new Vector2I(1, 0));
         Run(40);
         Check(hero.Health < before || !wolf.Alive, $"A wolf and the hero fight (hero {before} → {hero.Health}, wolf alive {wolf.Alive})");
         var bear = battle.Animals.First(a => a.Source.TemplateName == "Медведь");
@@ -46,6 +66,7 @@ public partial class TestRunner
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
         void Run(double seconds) { for (int t = 0; t < (int)(seconds * 18.2); t++) battle.Advance(1 / 18.2); }
         var hero = battle.Hero;
+        DeclareWarOnRufin(battle);
         // The nearest wolf in the forest, hero placed 8 cells from it on a standable cell.
         var wolf = battle.Animals.First(a => a.Source.TemplateName == "Волк" && battle.InForest(a));
         Vector2I? spot = null;
@@ -101,7 +122,7 @@ public partial class TestRunner
         using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
         Check(battle.SceneryObjects.Count == 7, $"Seven decorations load: jugs, a chest, a manuscript, the mage ({battle.SceneryObjects.Count})");
-        Check(battle.SceneryObjects.All(a => a.Scenery && a.Record[3] == 5 && a.Alive), "The decorations are neutral");
+        Check(battle.SceneryObjects.All(a => a.Scenery && a.Alive && (a.Record[3] == 5 || Skirmish.IsMage(a) && a.Record[3] == 6)), "The decorations are neutral (the mage belongs to slot 6)");
         for (int t = 0; t < (int)(120 * 18.2); t++) battle.Advance(1 / 18.2);
         Check(battle.SceneryObjects.All(a => a.Alive), "The decorations stay standing");
     }

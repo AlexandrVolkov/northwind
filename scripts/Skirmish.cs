@@ -370,7 +370,7 @@ public sealed partial class Skirmish : IDisposable
     }
     public bool Attack(IEnumerable<uint> ids, uint targetId)
     {
-        if (Paused || Outcome != "" || Find(targetId) is not { Team: 1 } foe) return false;
+        if (Paused || Outcome != "" || Find(targetId) is not { } foe || !(foe.Team == 1 || IsMage(foe))) return false;
         if (ids.Distinct().Select(Find).OfType<SkirmishActor>().Any(a => a.Team == 0 && !a.Structure && !a.Worker) && !DeclareWarByOrder(foe)) return false;
         bool accepted = false;
         foreach (var actor in ids.Distinct().Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && !a.Structure && !a.Worker))
@@ -409,6 +409,7 @@ public sealed partial class Skirmish : IDisposable
         }
         Diplomacy.Time = (uint)(Elapsed * 72.8165);
         _diplomacyRules.Send(Diplomacy, 5, them, me, them, 0);
+        if (them == 6 && Rules.Fauna) _diplomacyRules.Send(Diplomacy, 5, 7, me, 7, 0);   // the beasts are Rufin's allies: war on him is war with the forest
         Log("Вы объявили войну.");
         return Diplomacy.AtWar(me, them);
     }
