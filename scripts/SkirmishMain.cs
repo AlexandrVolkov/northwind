@@ -690,6 +690,12 @@ public partial class SkirmishMain : Node2D
             else if (stone[0] == OriginalBurnRules.Column) DrawCircle(at - new Vector2(0, 20), 7, new Color(.35f, .35f, .35f, stone[0x17] / 28f));
             else DrawCircle(at - new Vector2(0, 16), 6 + (0x12 - stone[0x17]), new Color(.55f, .5f, .45f, stone[0x17] / 36f));
         }
+        foreach (var (point, left, variant) in Battle.Rocks)   // a rock falls: 16×16 frames 18Ch + 5 per variant, lower as the time runs out
+            if (_frames.TryGetValue(("ARMY__00.EFF", 0x18, 0x18c + variant * 5 + left % 5), out var rockFrame))
+                DrawTextureRectRegion(_sprites, new Rect2(point - new Vector2(8, 8 + left * 10), new Vector2(16, 16)), new Rect2(rockFrame.X, rockFrame.Y, 16, 16));
+        foreach (var (point, left) in Battle.Dust)   // the puff after the impact: 62×62 frames 170h..179h
+            if (_frames.TryGetValue(("ARMY__00.EFF", 0x16, 0x170 + Math.Clamp((Skirmish.DustTicks - left) / 3, 0, 9)), out var dustFrame))
+                DrawTextureRectRegion(_sprites, new Rect2(point - new Vector2(31, 40), new Vector2(62, 62)), new Rect2(dustFrame.X, dustFrame.Y, 62, 62), new Color(1, 1, 1, Math.Min(1f, left / 10f)));
         foreach (var effect in Battle.Effects)
         {
             DrawLine(effect.From - new Vector2(0, 16), effect.To - new Vector2(0, 16), new Color(effect.Team == 0 ? "f0d88a" : "f57862"), 2);
