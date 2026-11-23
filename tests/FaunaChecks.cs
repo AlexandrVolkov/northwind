@@ -77,6 +77,7 @@ public partial class TestRunner
         void Run(double seconds) { for (int t = 0; t < (int)(seconds * 18.2); t++) battle.Advance(1 / 18.2); }
         var hero = battle.Hero;
         DeclareWarOnRufin(battle);
+        { var mage = battle.SceneryObjects.First(Skirmish.IsMage); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(mage.Record.AsSpan(4), 48); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(mage.Record.AsSpan(8), 48); }   // the wolves are the subject here: Rufin's lightning stays away
         // The nearest wolf in the forest, hero placed 8 cells from it on a standable cell.
         var wolf = battle.Animals.First(a => a.Source.TemplateName == "Волк" && battle.InForest(a));
         Vector2I? spot = null;

@@ -261,7 +261,7 @@ public partial class TestRunner
         b.Attack([b.Hero.Id], rufin.Id); b.Attack([b.Hero.Id], rufin.Id);
         var near = rufin.Cell + new Vector2I(2, 0);
         System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(b.Hero.Record.AsSpan(4), (uint)(near.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(b.Hero.Record.AsSpan(8), (uint)(near.Y * 32 + 16));
-        for (int t = 0; t < 60; t++) b.Advance(1 / 18.2);
+        for (int t = 0; t < 40; t++) { b.Advance(1 / 18.2); if (b.Bolts.Count > 0 && b.Bolts[0].Left <= 5) break; }
         scene.FocusWorld(rufin.Position);
         for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);

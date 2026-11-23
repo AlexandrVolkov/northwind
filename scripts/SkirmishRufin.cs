@@ -14,21 +14,60 @@ public sealed partial class Skirmish
     /// <summary>A mage at war with the player (the player attacked him or his friends): he fights back like any unit (DAT of ARMY__03 13: reach 10, strike 7).</summary>
     public bool MageFights(SkirmishActor mage) => IsHermit(mage) && Diplomacy.AtWar(mage.Record[3], Rules.PlayerSlot);
 
+    /// <summary>The discharge of a fighting mage: a red lightning (ARMY__00 effect type 1Eh, 72×72, frames 1C6h + 4·variant, four frames of two updates, WRK 13A3, sound 14h)
+    /// at the target; everything hostile within <see cref="BoltRadius"/> is struck. ADAPTER: the strength and the area are described by the player of the original (the unit is
+    /// killed by one hit, several neighbours fall together); the WRK of the mage has no attack of its own — DAT[70] = 0 — so the values are the port's.</summary>
+    public sealed class MageBolt { public Vector2 Point; public int Variant, Left = 8; }
+    public List<MageBolt> Bolts { get; } = [];
+    public const int BoltRadius = 56, BoltDamage = 100, MageReachCells = 9, MageReloadTicks = 50;
+    private readonly Dictionary<uint, uint> _mageTarget = [];
+    public uint MageTargetOf(SkirmishActor mage) => _mageTarget.TryGetValue(mage.Id, out var t) ? t : 0;
+
+    private void MageStrike(SkirmishActor mage, SkirmishActor target)
+    {
+        var point = target.Position; Bolts.Add(new MageBolt { Point = point, Variant = _terrainCatalog.NextRandomByte() & 7 });
+        if (Sounds.Count < 64) Sounds.Add(new("WORK.FX", 0x14, SoundRandom(), point));
+        foreach (var victim in Actors.ToArray())
+        {
+            if (!victim.Alive || victim.Structure || victim.Scenery || IsAnimal(victim) || victim == mage || !Diplomacy.AtWar(mage.Record[3], victim.Record[3])) continue;
+            if (victim.Position.DistanceTo(point) > BoltRadius) continue;
+            victim.Health -= victim.Hero ? Math.Max(1, victim.MaxHealth * 2 / 5) : BoltDamage;   // the leader withstands two discharges
+            if (!victim.Alive) Kill(victim);
+        }
+        Log("Руфин поражает врагов молнией!");
+    }
+
     private void TickMages()
     {
+        foreach (var bolt in Bolts) bolt.Left--;
+        Bolts.RemoveAll(b => b.Left <= 0);
         if (!Rules.Fauna || _scenery.Count == 0) return;
         foreach (var mage in _scenery.Where(IsHermit).ToArray())
         {
             _rufinWorld ??= new SkirmishRufinWorld(this);
             _rufinWorld.Prepare(mage);
             if (mage.Alive) OriginalRufin.Step(_rufinWorld, mage.Record);
-            if (!MageFights(mage)) { mage.Target = 0; continue; }   // at peace he stands
-            // At war: the nearest enemy unit in his sight (DAT[47] cells) becomes his target, as FS:17B (D895) finds it for the script.
-            if (mage.Alive && (mage.Target == 0 || Find(mage.Target) is not { Alive: true }) && (_globalTick & 7) == 0)
+            if (!MageFights(mage)) { mage.Target = 0; _mageTarget.Remove(mage.Id); continue; }   // at peace he stands
+            mage.Target = 0;   // the discharge replaces the melee strike: the unit logic only walks him
+            if (!mage.Alive) continue;
+            SkirmishActor? target = null;
+            if ((_globalTick & 7) == 0 || !_mageTarget.TryGetValue(mage.Id, out uint targetId) || Find(targetId) is not { Alive: true } current || !Diplomacy.AtWar(mage.Record[3], current.Record[3]))
             {
-                var found = OriginalTargetRules.FindEnemy(mage.Id, mage.Record, mage.Parameters, true, new SearchWorld(this, mage.Record[3]));
-                if (Find(found.Target) is { Alive: true, Scenery: false } enemy && Diplomacy.AtWar(mage.Record[3], enemy.Record[3])) { mage.Target = enemy.Id; mage.Goal = null; mage.Route.Clear(); mage.ReplanTimer = 0; }
+                // the nearest enemy in his sight (14 cells)
+                double best = 14 * 32;
+                foreach (var o in Actors)
+                {
+                    if (!o.Alive || o.Structure || o.Scenery || IsAnimal(o) || !Diplomacy.AtWar(mage.Record[3], o.Record[3])) continue;
+                    double d = mage.Position.DistanceTo(o.Position); if (d < best) { best = d; target = o; }
+                }
+                if (target != null) _mageTarget[mage.Id] = target.Id; else _mageTarget.Remove(mage.Id);
             }
+            else target = Find(_mageTarget[mage.Id]);
+            if (target == null) continue;
+            double distance = mage.Position.DistanceTo(target.Position);
+            if (distance > MageReachCells * 32) { if ((_globalTick & 7) == 0) OrderMove(mage, target.Cell, 2); continue; }
+            mage.Route.Clear(); mage.Goal = null;
+            if (mage.AttackTimer <= 0) { MageStrike(mage, target); mage.AttackTimer = MageReloadTicks / 18.2; }
         }
     }
 
