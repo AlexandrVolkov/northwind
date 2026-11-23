@@ -524,6 +524,8 @@ public sealed partial class Skirmish : IDisposable
                     t0 = P0(); var found = OriginalTargetRules.FindEnemy(actor.Id, actor.Record, actor.Parameters, struck, new SearchWorld(this, actor.Record[3])); P1("u.findenemy", t0);
                     target = Find(found.Target);
                     if (target != null && IsAnimal(actor) && (target.Scenery || IsBird(target))) target = null;   // the beasts leave the decorations and the birds alone
+                    // While there is peace with the owner of the beasts (Rufin's forest) nobody strikes them, though their DAT flag makes them a target for all (user, 23.11).
+                    if (target != null && IsAnimal(target) && !IsBird(target) && !actor.Scenery && !Diplomacy.AtWar(actor.Record[3], target.Record[3])) target = null;
                     if (target != null) { if (actor.Goal != null) actor.ResumeGoal = actor.Goal; actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); }
                 }
             }
