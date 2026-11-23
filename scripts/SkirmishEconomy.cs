@@ -298,7 +298,7 @@ public sealed partial class Skirmish
                 var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(building.Record[0x14], building.Record[0x15], building.Record[0x0f]));
                 building.Record[0x14] = completed.EncodedState; building.Record[0x15] = completed.Auxiliary; building.Record[0x0f] = completed.WorkFlags;
                 BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(LineShapeFrames(building) + building.Template.InitialFrame + building.Parameters[0x4a]));
-                if (building.Team == 0) { Log(building.Source.TemplateName + " готова."); var tree0 = TreeOf(Rules.PlayerSlot); if (tree0.Length > 0) OriginalTechRules.Complete(tree0, 1, (byte)building.Source.TemplateIndex); }
+                if (building.Team == 0) { Log(building.Source.TemplateName + " готова."); var tree0 = TreeOf(Rules.PlayerSlot); if (tree0.Length > 0) { OriginalTechRules.Complete(tree0, 1, (byte)building.Source.TemplateIndex); if (Population.FarmSupport is >= 0x28 and <= 0x32) OriginalTechRules.Complete(tree0, 2, 0); } }   // AFDB's end: farm support 28h..32h is event (0, 2), as for the AI
                 if (building.Team != 0) { EnemyBuildingFinished(building); continue; }
             }
             if (building.Source.TemplateName != "Лесопилка") continue;
