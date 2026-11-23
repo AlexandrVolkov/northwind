@@ -34,6 +34,7 @@ public partial class TestRunner : Node
                 case "lab-shot": await LabShot(); break;
                 case "inventory-shot": await InventoryShot(); break;
                 case "dialog-shot": await DialogShot(); break;
+                case "mage-shot": await MageShot(); break;
                 case "collapse-shot": await CollapseShot(); break;
                 case "effects-shot": await EffectsShot(); break;
                 case "draw-perf": await DrawPerf(); break;

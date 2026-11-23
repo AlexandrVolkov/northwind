@@ -11,6 +11,9 @@ public sealed partial class Skirmish
     public byte[] ItemWorldInventory(int participant) => ItemWorld.Inventory(participant);
     public static bool IsHermit(SkirmishActor actor) => actor.Scenery && actor.Source.TemplateFile == "ARMY__03.DAT" && actor.Source.TemplateIndex is >= 13 and <= 21;
 
+    /// <summary>A mage at war with the player (the player attacked him or his friends): he fights back like any unit (DAT of ARMY__03 13: reach 10, strike 7).</summary>
+    public bool MageFights(SkirmishActor mage) => IsHermit(mage) && Diplomacy.AtWar(mage.Record[3], Rules.PlayerSlot);
+
     private void TickMages()
     {
         if (!Rules.Fauna || _scenery.Count == 0) return;
@@ -19,6 +22,13 @@ public sealed partial class Skirmish
             _rufinWorld ??= new SkirmishRufinWorld(this);
             _rufinWorld.Prepare(mage);
             if (mage.Alive) OriginalRufin.Step(_rufinWorld, mage.Record);
+            if (!MageFights(mage)) { mage.Target = 0; continue; }   // at peace he stands
+            // At war: the nearest enemy unit in his sight (DAT[47] cells) becomes his target, as FS:17B (D895) finds it for the script.
+            if (mage.Alive && (mage.Target == 0 || Find(mage.Target) is not { Alive: true }) && (_globalTick & 7) == 0)
+            {
+                var found = OriginalTargetRules.FindEnemy(mage.Id, mage.Record, mage.Parameters, true, new SearchWorld(this, mage.Record[3]));
+                if (Find(found.Target) is { Alive: true, Scenery: false } enemy && Diplomacy.AtWar(mage.Record[3], enemy.Record[3])) { mage.Target = enemy.Id; mage.Goal = null; mage.Route.Clear(); mage.ReplanTimer = 0; }
+            }
         }
     }
 
@@ -43,7 +53,7 @@ public sealed partial class Skirmish
         if (bestSlot < 0) return null;
         var message = Diplomacy.Queue[bestSpeaker, bestSlot]; var type = data.Types[message.Type];
         var answers = new List<(byte, string)>();
-        if (type.Parameters.Count >= 3 && type.Parameters[0] == 0)
+        if (type.Parameters.Count >= 3 && type.Parameters[1] != 0 && type.Parameters[2] != 0)
             foreach (var a in new[] { type.Parameters[1], type.Parameters[2] }) if (a != 0 && a < data.Types.Count) answers.Add(((byte)a, Variant(data.Types[a].Text, 0)));
         return new DialogLine(bestSpeaker, message.Type, Variant(type.Text, (int)(message.Time & 0x7fffffff)).Replace("%n1", PlayerName), answers, message.Deadline);
     }

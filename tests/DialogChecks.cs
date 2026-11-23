@@ -22,5 +22,15 @@ public partial class TestRunner
         battle.AnswerDialog(ask!, 35);
         Check(Array.IndexOf(battle.Inventory, (byte)6) < 0 && Array.IndexOf(battle.ItemWorldInventory(mage), (byte)6) >= 0, "The player gives the stone: it passes to Rufin");
         Check(battle.Diplomacy.Relations[mage, player] == 1 && !battle.Diplomacy.AtWar(mage, player), "and the two settle in peace");
+    
+        // the war: the player attacks Rufin, he and the forest answer
+        battle.Attack([battle.Hero.Id], rufin.Id); battle.Attack([battle.Hero.Id], rufin.Id);
+        for (int t = 0; t < 40; t++) battle.Advance(1 / 18.2);
+        Check(battle.Diplomacy.AtWar(mage, player) && battle.MageFights(rufin), "The attack on Rufin is a war with him");
+        var near = rufin.Cell + new Vector2I(2, 0);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), (uint)(near.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(8), (uint)(near.Y * 32 + 16));
+        int before = battle.Hero.Health; bool targeted = false;
+        for (int t = 0; t < 300 && battle.Hero.Alive && battle.Hero.Health >= before; t++) { battle.Advance(1 / 18.2); targeted |= rufin.Target == battle.Hero.Id; }
+        Check(targeted && battle.Hero.Health < before, $"Rufin fights back (target {targeted}, hero health {before} → {battle.Hero.Health})");
     }
 }

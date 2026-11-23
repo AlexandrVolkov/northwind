@@ -85,6 +85,9 @@ def prepare(source, output):
     # Jugs (ARMY__03 1, 30, 33: frames 110h..11Ah, the breaking animation of WRK E4) and the chest (9: 11Ch..127h).
     for jug in (1,30,33):wanted[('ARMY__03.DAT',jug)]=wanted.get(('ARMY__03.DAT',jug),set())|set(range(0x110,0x11b))
     wanted[('ARMY__03.DAT',9)]=wanted.get(('ARMY__03.DAT',9),set())|set(range(0x11c,0x128))
+    # Rufin (ARMY__03 13, a mage who fights when attacked): 8 directions of DAT[4A] frames, the swings and the death.
+    mage=bytes.fromhex(tables['ARMY__03.DAT']['templates'][13]['raw_record_hex']);mbase=struct.unpack_from('<H',mage,0x48)[0]
+    wanted.setdefault(('ARMY__03.DAT',13),set()).update(range(mbase,mbase+8*mage[0x4a]));wanted[('ARMY__03.DAT',13)].update(action_frames(mage,mbase))
     # The birds of the first map (ARMY__05 0): 8 directions of DAT[4A] frames, 32x32.
     bird=bytes.fromhex(tables['ARMY__05.DAT']['templates'][0]['raw_record_hex']);wanted[('ARMY__05.DAT',0)]=set(range(struct.unpack_from('<H',bird,0x48)[0],struct.unpack_from('<H',bird,0x48)[0]+8*bird[0x4a]))
     # The pit trap (ARMY__03 12): 19 opening frames from 289h; its first frame is the closed pit.
