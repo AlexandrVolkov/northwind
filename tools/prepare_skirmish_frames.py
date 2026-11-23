@@ -131,6 +131,17 @@ def prepare(source, output):
             image.putdata([tuple((c&252)|(c>>6) for c in palette[recolor[v]*3:recolor[v]*3+3])+(255,) if v>=0 else (0,0,0,0) for v in pixels])
             sheet.paste(image,(slot%64*64,slot//64*64))
         sheet.save(output/f'battle_frames_team_{number:02d}.png')
+    # The pictures of the items for the inventory window: the map object a dropped item becomes (the class byte +0C of the item table is its ARMY__00 template; its first frame).
+    items=json.loads((Path(__file__).resolve().parents[1]/'data/original_items.json').read_text(encoding='utf-8'))['items']
+    army0=files['ARMY__00.SPR'].read_bytes();icons=Image.new('RGBA',(62*36,62))
+    for item in items:
+        cls=int(item['static_hex'][:2],16)
+        if not cls:continue
+        entry=tables['ARMY__00.DAT']['templates'][cls];pixels=decode_spr_frame(army0,entry['initial_frame'])
+        if len(pixels)!=entry['width']*entry['height']:continue
+        icon=Image.new('RGBA',(entry['width'],entry['height']));icon.putdata([tuple((c&252)|(c>>6) for c in palette[table[v]*3:table[v]*3+3])+(255,) if v>=0 else (0,0,0,0) for v in pixels])
+        icons.paste(icon,(62*item['code']+(62-entry['width'])//2,(62-entry['height'])//2))
+    icons.save(output/'item_icons.png')
     (output/'battle_frames.json').write_text(json.dumps({'format_version':1,'source_sha256':hashes,'team_tables':tables_used,'frames':entries},indent=2)+'\n',encoding='utf-8')
     print(f'Prepared {len(images)} frames, {len(team)} with owner colours in {len(tables_used)} tables; playback timing and anchors remain experimental.')
 

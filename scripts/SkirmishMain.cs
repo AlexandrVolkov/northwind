@@ -140,6 +140,13 @@ public partial class SkirmishMain : Node2D
     private BuildItem Item(int index, Action start) => new(Battle.TemplateOf(index), index, start, Battle.Available(index));
     private BuildItem UnitItem(SkirmishActor producer, int index) => new(Battle.TemplateOf(index), index, () => { Battle.QueueUnit(producer, index); RefreshUi(); }, Battle.Available(index));
     /// <summary>The castle's list: a building of any index of the list is placed like the factory (near the castle, paid up front).</summary>
+    public bool InventoryOpen;
+    /// <summary>A click on an inventory slot: the item is described in the message line (its use is the campaign's business: the stones and staffs are keys for the hermits' dialogs).</summary>
+    public void ClickInventory(int slot)
+    {
+        byte item = Battle.Inventory[slot]; if (item == 0) return;
+        Battle.Log($"{Battle.ItemName(item)}: предмет нельзя применить в схватке.");
+    }
     public void BeginCastlePlacement(int index)
     {
         if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
@@ -470,6 +477,7 @@ public partial class SkirmishMain : Node2D
             {
                 case Key.Space: TogglePause(); break;
                 case Key.F: FocusHero(); break;
+                case Key.I: InventoryOpen = !InventoryOpen; Hud.QueueRedraw(); break;
                 case Key.End: FocusHero(); break;
                 case Key.T: FocusObjective(); break;
                 case Key.C: SelectCastle(); break;
