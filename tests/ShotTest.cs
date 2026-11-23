@@ -308,3 +308,23 @@ public partial class TestRunner
         GetTree().Quit();
     }
 }
+public partial class TestRunner
+{
+    private async System.Threading.Tasks.Task RockShot()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+        var b = scene.Battle; b.FrameBudgetMs = 0; var fall = b.Rockfalls[0]; var hero = b.Hero;
+        var at = new Vector2I((int)(BitConverter.ToUInt32(fall, 4) >> 5), (int)(BitConverter.ToUInt32(fall, 8) >> 5) + 2);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(4), (uint)(at.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(8), (uint)(at.Y * 32 + 16));
+        Array.Fill(b.FogMap, (byte)0);
+        for (int t = 0; t < 400 && !(b.Rocks.Count > 1 && b.Dust.Count > 0); t++) b.Advance(1 / 18.2);
+        b.Paused = true; scene.FocusWorld(hero.Position + new Vector2(0, 40));
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-rockfall.png");
+        GetTree().Quit();
+    }
+}

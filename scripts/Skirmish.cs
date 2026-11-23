@@ -201,6 +201,7 @@ public sealed partial class Skirmish : IDisposable
         InitializeBirds(scenario, templates);
         InitializeScenery(scenario, templates);
         InitializePits(scenario);
+        InitializeRockfalls(scenario);
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
     }
     // Actors only grows (the fallen stay with Alive = false), so an index over the list is extended lazily with the new tail.
@@ -474,7 +475,7 @@ public sealed partial class Skirmish : IDisposable
             OriginalCombatRules.AfterUpdate(actor.Record, engaged != null ? engaged.Record : ReadOnlySpan<byte>.Empty, _globalTick);
         }
         });
-        TickFauna(); TickPits(); TickTowers(); TickFlow(); TickRepairs(); TickPlayerLabs(); TickBirds();
+        TickFauna(); TickPits(); TickRockfalls(); TickTowers(); TickFlow(); TickRepairs(); TickPlayerLabs(); TickBirds();
         Prof("fog", TickFog);
         Prof("ai", TickAi); // 1E7EA follows the object update (LE:1 31D6)
         if (!Hero.Alive) Outcome = "Поражение — предводитель погиб";

@@ -137,3 +137,23 @@ public partial class TestRunner
         Check(battle.SceneryObjects.All(a => a.Alive), "The decorations stay standing");
     }
 }
+
+public partial class TestRunner
+{
+    /// <summary>The rockfall trap drops rocks on a unit below it and strikes the cell.</summary>
+    private void RockfallChecks()
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json"); rules.Pits = true; rules.Fauna = true;
+        using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        Check(battle.Rockfalls.Count == 1, $"The rockfall of the first map loads ({battle.Rockfalls.Count})");
+        for (int t = 0; t < 100; t++) battle.Advance(1 / 18.2);
+        Check(battle.Rocks.Count == 0, "Without anyone below, no rock falls");
+        var fall = battle.Rockfalls[0]; var hero = battle.Hero;
+        var below = new Vector2I((int)(System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(fall.AsSpan(4)) >> 5), (int)(System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(fall.AsSpan(8)) >> 5) + 2);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(4), (uint)(below.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(hero.Record.AsSpan(8), (uint)(below.Y * 32 + 16));
+        int before = hero.Health, rocks = 0, dust = 0;
+        for (int t = 0; t < 40 * 18; t++) { battle.Advance(1 / 18.2); rocks = Math.Max(rocks, battle.Rocks.Count); dust = Math.Max(dust, battle.Dust.Count); }
+        Check(rocks > 0 && dust > 0, $"Rocks fall on a unit below (up to {rocks} in the air, {dust} puffs)");
+    }
+}
