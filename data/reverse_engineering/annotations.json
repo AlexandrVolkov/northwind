@@ -3917,9 +3917,9 @@
       "name": "Jug script (E4): breaking animation, item visit AH=8, removal",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/campaign-items.md", "tests/ContainerChecks.cs"],
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/container.json", "tools/verify_container.py", "tests/OriginalContainerChecks.cs"],
       "implementation": ["scripts/OriginalContainer.cs", "scripts/SkirmishContainers.cs"],
-      "limitations": "FS services 1D, 15, 19 (dust effect 7) are adapters; no Unicorn fixture, checked by hand-derived unit tests"
+      "limitations": "FS services 1D, 15, 19 (dust effect 7) are recorded stubs in the check; the skirmish removes the object but draws no dust"
     },
     {
       "id": "wrk3-chest-71a",
@@ -3929,9 +3929,9 @@
       "name": "Chest scripts (71A, 7CE, 7DF): opening, item visit AH=8, empty chest decay",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/campaign-items.md", "tests/ContainerChecks.cs"],
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/container.json", "tools/verify_container.py", "tests/OriginalContainerChecks.cs"],
       "implementation": ["scripts/OriginalContainer.cs", "scripts/SkirmishContainers.cs"],
-      "limitations": "FS services 1D, 6D, 15, 19 are adapters; no Unicorn fixture"
+      "limitations": "FS services 1D, 6D, 15 are recorded stubs in the check"
     },
     {
       "id": "wrk2-gate-d85",

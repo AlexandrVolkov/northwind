@@ -18,6 +18,7 @@ public sealed partial class Skirmish
     public byte[] Inventory { get; } = new byte[InventorySlots];   // participant +CD
     public string ItemName(int code) => code > 0 && code < ItemTable.Count ? ItemTable[code].Name : "";
     public static bool IsContainer(SkirmishActor actor) => actor.Scenery && actor.Source.TemplateFile == "ARMY__03.DAT" && actor.Source.TemplateIndex is 1 or 9 or 10 or 11 or 30 or 33;
+    private sealed class ContainerServices : IContainerServices { public bool Removed; public void Redraw() { } public void Remove() => Removed = true; public void Effect(byte army, byte type, byte layer, uint x, uint y) { } }   // the dust effect (type 7) is not drawn
     private static bool IsChest(SkirmishActor actor) => actor.Source.TemplateIndex is 9 or 10 or 11;
 
     private void TickContainers()
@@ -25,7 +26,8 @@ public sealed partial class Skirmish
         if (_scenery.Count == 0) return;
         foreach (var container in _scenery.Where(IsContainer).ToArray())
         {
-            if (OriginalContainer.Step(container.Record, container.Parameters, IsChest(container)) != OriginalContainer.Result.Remove) continue;
+            var services = new ContainerServices(); OriginalContainer.Step(container.Record, BinaryPrimitives.ReadUInt16LittleEndian(container.Parameters.AsSpan(0x48)), IsChest(container), services);
+            if (!services.Removed) continue;
             Occupancy.ClearReference(container.Id); Actors.Remove(container); _scenery.Remove(container);
             foreach (var unit in Actors.Where(a => a.VisitTarget == container.Id)) unit.VisitTarget = 0;
         }
@@ -33,7 +35,7 @@ public sealed partial class Skirmish
         {
             if (Find(unit.VisitTarget) is not { } box || !IsContainer(box)) { unit.VisitTarget = 0; continue; }
             if (unit.Position.DistanceTo(box.Position) > VisitRange) continue;
-            if (OriginalContainer.Visit(box.Record, IsChest(box)) is var item and not 0) { PickUp(unit, item); unit.VisitTarget = 0; }
+            if (OriginalContainer.Visit(box.Record, IsChest(box)) is { Zf: true, Al: not 0 } taken) { PickUp(unit, taken.Al); unit.VisitTarget = 0; }
             else if (box.Record[0x14] is not (0 or 1)) unit.VisitTarget = 0;   // empty or spent: nothing to wait for
         }
     }
