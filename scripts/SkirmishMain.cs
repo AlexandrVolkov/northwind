@@ -151,7 +151,7 @@ public partial class SkirmishMain : Node2D
     {
         "Казарма" => [UnitItem(producer, 0), UnitItem(producer, 1), UnitItem(producer, 17), UnitItem(producer, 18)],
         "Конюшня" => [UnitItem(producer, 21)],
-        "Завод" => [Item(5, BeginFencePlacement), Item(7, BeginBridgePlacement), Item(13, BeginTowerPlacement), UnitItem(producer, 16), UnitItem(producer, 26)],
+        "Завод" => [Item(5, BeginFencePlacement), Item(7, BeginBridgePlacement), Item(13, BeginTowerPlacement), Item(14, () => BeginCastlePlacementFactory(14)), UnitItem(producer, 16), UnitItem(producer, 26)],
         _ => [],
     };
     /// <summary>A finished factory of the player is selected: its list offers the line buildings (the bridge; fence, gate, tower and the siege engines are not offered yet).</summary>
@@ -202,6 +202,11 @@ public partial class SkirmishMain : Node2D
     {
         if (Battle.Paused || Battle.Outcome != "" || SelectedFactory == null) return;
         _placingIndex = 13; PlacingFactory = true; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingBridge = false; RefreshUi();
+    }
+    public void BeginCastlePlacementFactory(int index)
+    {
+        if (Battle.Paused || Battle.Outcome != "" || SelectedFactory == null) return;
+        _placingIndex = index; PlacingFactory = true; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingBridge = false; RefreshUi();
     }
     public void BeginMinePlacement()
     {
@@ -301,6 +306,7 @@ public partial class SkirmishMain : Node2D
             case (8, 7) when unit.Worker: PendingOrder = 8; break;
             case var _ when slot.Sprite == 874 && unit.Id == Battle.PlayerCastle.Id: BuildMenuOpen = !BuildMenuOpen; break;
             case var _ when slot.Label == "Ремонт" && unit.Structure: Battle.StartRepair(unit); break;
+            case var _ when slot.Label is "Открыть" or "Закрыть" or "Автомат" && unit.Source.TemplateName == "Ворота": Battle.SetGateMode(unit, slot.Label == "Открыть" ? 1 : slot.Label == "Закрыть" ? 0 : 2); break;
             case var _ when slot.Label == "Разрушить" && unit.Structure: Battle.Demolish(unit); break;
             default: Battle.Log($"Приказ «{slot.Label}» ещё не перенесён."); break;
         }

@@ -199,7 +199,7 @@ public sealed partial class Skirmish
         if (index == 12) { factory.Record[0x22] = factory.Record[0x23] = 1; factory.Record[0x15] = 0; }   // the laboratory's AH=0
         Actors.Add(factory);
         Occupancy.WriteFootprint(factory.Parameters[3], factory.Parameters[4], factory.Record[0x0d], (uint)factory.Position.X, (uint)factory.Position.Y, factory.Id);
-        Log(index == 15 ? "Завод строится. Мосты и башни строят через него." : "Башня строится."); return factory;
+        Log(index == 15 ? "Завод строится. Мосты и башни строят через него." : index == 14 ? "Ворота строятся." : "Башня строится."); return factory;
     }
     public ConstructionPlacement ProbeBarracks(Vector2I cell) => ProbeEconomyBuilding(cell, BarracksTemplate);
     public SkirmishActor? BuildBarracks(Vector2I cell)
@@ -265,6 +265,7 @@ public sealed partial class Skirmish
     /// the slow decay of a ruin. Debris (9727) is not drawn; a collapsed building (condition below zero) is removed.</summary>
     private void TickBuildingFrames()
     {
+        foreach (var gate in Actors.Where(a => a.Structure && a.Alive && a.Index02 == 14).ToArray()) TickGate(gate);
         foreach (var building in Actors.Where(a => a.Structure && (sbyte)a.Record[0x19] > 0 && a.Index02 is 2 or 3 or 4 or 5 or 6 or 7 or 9 or 12 or 13 or 15 or 22 or 23 or 24).ToArray())
         {
             try { OriginalBuildingFrames.Update(building.Record, building.Parameters, _globalTick, (_, _, _, _) => { }, () => { building.Record[0x19] = 0; Kill(building); }); }
@@ -292,7 +293,7 @@ public sealed partial class Skirmish
                 building.ConstructionRemaining = maintenance.ContinueAction
                     ? ((building.Template.InitialCondition - maintenance.State.Condition + 1) * Math.Max(1, (int)building.Parameters[0x57]) - maintenance.State.Counter) / (double)Rules.TicksPerSecond : 0;
                 // Provisional visual stage binding; the full C88C frame/effects handler is not connected.
-                if (building.Source.TemplateName is "Ферма" or "Казарма" or "Шахта" or "Мост" or "Башня" or "Забор")
+                if (building.Source.TemplateName is "Ферма" or "Казарма" or "Шахта" or "Мост" or "Башня" or "Забор" or "Ворота")
                     BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(LineShapeFrames(building) + building.Template.InitialFrame + Math.Min(building.Parameters[0x4a], building.Record[0x19] * (building.Parameters[0x4a] + 1) / (building.Template.InitialCondition + 1))));
                 if (maintenance.ContinueAction) continue;
                 var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(building.Record[0x14], building.Record[0x15], building.Record[0x0f]));
