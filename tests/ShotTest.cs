@@ -273,3 +273,22 @@ public partial class TestRunner
         GetTree().Quit();
     }
 }
+public partial class TestRunner
+{
+    private async System.Threading.Tasks.Task BirdShot()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+        var b = scene.Battle; b.FrameBudgetMs = 0;
+        for (int t = 0; t < (int)(500 * 18.2); t++) b.Advance(1 / 18.2);
+        var pos = b.Birds.First(x => x.Alive).Position;
+        Array.Fill(b.FogMap, (byte)0); scene.FocusWorld(pos + new Vector2(0, 120)); b.Paused = true;
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-birds.png");
+        GD.Print("BIRDS " + b.Birds.Count(x => x.Alive));
+        GetTree().Quit();
+    }
+}

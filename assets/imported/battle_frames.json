@@ -7,6 +7,7 @@
     "ARMY__01.SPR": "fdd9ad3ae3d4b0eee3560bc25f543d34c0632d8f6e822bf9061700df41f4228c",
     "ARMY__02.SPR": "a684ad0474ad9272ab08b0997753305f9a1297103ba83e054e736542dc00302f",
     "ARMY__03.SPR": "5c26a245dd64ac2c9c969394b4bc3187d727ad58691562ec42d5b92426b52d81",
+    "ARMY__05.SPR": "3e122b8eb30fc32c6b1527ff239f6873eed0534a6328a5cab5ab017a05afbe55",
     "COLOR_01.TAB": "81400309d5d90436876d6e23de5d5488abb30117abde752c152eaf23f29686c8",
     "COLOR_04.TAB": "b6542e57980681b576222799f3d617fa525b7e389c3ed2c39001065b75d52d34",
     "COLOR_05.TAB": "210e45b4cadf329f9ba497a647ebab1ff2b93fe82373c63ca2c36d6221b72a4c"
@@ -57140,6 +57141,806 @@
       "y": 7040,
       "width": 64,
       "height": 64
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 4,
+      "page": 1,
+      "x": 1664,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 5,
+      "page": 1,
+      "x": 1792,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 6,
+      "page": 1,
+      "x": 1920,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 7,
+      "page": 1,
+      "x": 2048,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 8,
+      "page": 1,
+      "x": 2176,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 9,
+      "page": 1,
+      "x": 2304,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 10,
+      "page": 1,
+      "x": 2432,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 11,
+      "page": 1,
+      "x": 2560,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 12,
+      "page": 1,
+      "x": 2688,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 13,
+      "page": 1,
+      "x": 2816,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 14,
+      "page": 1,
+      "x": 2944,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 15,
+      "page": 1,
+      "x": 3072,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 16,
+      "page": 1,
+      "x": 3200,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 17,
+      "page": 1,
+      "x": 3328,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 18,
+      "page": 1,
+      "x": 3456,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 19,
+      "page": 1,
+      "x": 3584,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 20,
+      "page": 1,
+      "x": 3712,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 21,
+      "page": 1,
+      "x": 3840,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 22,
+      "page": 1,
+      "x": 3968,
+      "y": 7040,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 23,
+      "page": 1,
+      "x": 0,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 24,
+      "page": 1,
+      "x": 128,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 25,
+      "page": 1,
+      "x": 256,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 26,
+      "page": 1,
+      "x": 384,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 27,
+      "page": 1,
+      "x": 512,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 28,
+      "page": 1,
+      "x": 640,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 29,
+      "page": 1,
+      "x": 768,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 30,
+      "page": 1,
+      "x": 896,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 31,
+      "page": 1,
+      "x": 1024,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 32,
+      "page": 1,
+      "x": 1152,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 33,
+      "page": 1,
+      "x": 1280,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 34,
+      "page": 1,
+      "x": 1408,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 35,
+      "page": 1,
+      "x": 1536,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 36,
+      "page": 1,
+      "x": 1664,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 37,
+      "page": 1,
+      "x": 1792,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 38,
+      "page": 1,
+      "x": 1920,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 39,
+      "page": 1,
+      "x": 2048,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 40,
+      "page": 1,
+      "x": 2176,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 41,
+      "page": 1,
+      "x": 2304,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 42,
+      "page": 1,
+      "x": 2432,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 43,
+      "page": 1,
+      "x": 2560,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 44,
+      "page": 1,
+      "x": 2688,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 45,
+      "page": 1,
+      "x": 2816,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 46,
+      "page": 1,
+      "x": 2944,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 47,
+      "page": 1,
+      "x": 3072,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 48,
+      "page": 1,
+      "x": 3200,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 49,
+      "page": 1,
+      "x": 3328,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 50,
+      "page": 1,
+      "x": 3456,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 51,
+      "page": 1,
+      "x": 3584,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 52,
+      "page": 1,
+      "x": 3712,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 53,
+      "page": 1,
+      "x": 3840,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 54,
+      "page": 1,
+      "x": 3968,
+      "y": 7168,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 55,
+      "page": 1,
+      "x": 0,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 56,
+      "page": 1,
+      "x": 128,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 57,
+      "page": 1,
+      "x": 256,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 58,
+      "page": 1,
+      "x": 384,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 59,
+      "page": 1,
+      "x": 512,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 60,
+      "page": 1,
+      "x": 640,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 61,
+      "page": 1,
+      "x": 768,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 62,
+      "page": 1,
+      "x": 896,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 63,
+      "page": 1,
+      "x": 1024,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 64,
+      "page": 1,
+      "x": 1152,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 65,
+      "page": 1,
+      "x": 1280,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 66,
+      "page": 1,
+      "x": 1408,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 67,
+      "page": 1,
+      "x": 1536,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 68,
+      "page": 1,
+      "x": 1664,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 69,
+      "page": 1,
+      "x": 1792,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 70,
+      "page": 1,
+      "x": 1920,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 71,
+      "page": 1,
+      "x": 2048,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 72,
+      "page": 1,
+      "x": 2176,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 73,
+      "page": 1,
+      "x": 2304,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 74,
+      "page": 1,
+      "x": 2432,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 75,
+      "page": 1,
+      "x": 2560,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 76,
+      "page": 1,
+      "x": 2688,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 77,
+      "page": 1,
+      "x": 2816,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 78,
+      "page": 1,
+      "x": 2944,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 79,
+      "page": 1,
+      "x": 3072,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 80,
+      "page": 1,
+      "x": 3200,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 81,
+      "page": 1,
+      "x": 3328,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 82,
+      "page": 1,
+      "x": 3456,
+      "y": 7296,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "template_file": "ARMY__05.DAT",
+      "template_index": 0,
+      "frame": 83,
+      "page": 1,
+      "x": 3584,
+      "y": 7296,
+      "width": 32,
+      "height": 32
     }
   ]
 }
