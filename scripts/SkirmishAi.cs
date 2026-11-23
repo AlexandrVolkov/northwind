@@ -87,6 +87,7 @@ public sealed partial class Skirmish
         foreach (int slot in AiSlots) _aiContexts[slot] = new AiContext { Army = armyByte, Templates = templates.Armies[file].Templates.Select(t => Convert.FromHexString(t.RawRecordHex)).ToArray() };
         var tech = GameData.Read<OriginalTechData>("res://data/original_tech.json");
         foreach (int slot in AiSlots) _aiTrees[slot] = tech.Armies[2].Build();
+        _aiTrees[Rules.PlayerSlot] = tech.Armies[2].Build();   // the player's development tree: what he may build and hire follows what he has built and researched
         if (Horde)
         {
             _aiContexts[Rules.HordeSlot] = new AiContext { Army = 1, Templates = templates.Armies[HordeFile].Templates.Select(t => Convert.FromHexString(t.RawRecordHex)).ToArray() };
@@ -140,7 +141,7 @@ public sealed partial class Skirmish
         // A6AE marks a finished building in the development tree; the buildings standing at the start count as finished
         // (assumption: the scenario load path is not ported).
         foreach (var lab in Actors.Where(a => a.Team != 0 && a.Index02 == 12 && a.Record.Length >= 0x29)) { lab.Record[0x22] = lab.Record[0x23] = 1; lab.Record[0x15] = 0; }   // the laboratory's AH=0
-        foreach (var built in Actors.Where(a => a.Team != 0 && a.Structure)) OriginalTechRules.Complete(TreeOf(built.Record[3]), 1, (byte)built.Source.TemplateIndex);
+        foreach (var built in Actors.Where(a => a.Structure && a.Team is 0 or 1 or 2 or 3)) OriginalTechRules.Complete(TreeOf(built.Record[3]), 1, (byte)built.Source.TemplateIndex);
         _aiSquadWorld = new AiSquadWorld(this);
         _aiTurnWorld = new AiTurnWorld(this);
         _arctangent = Convert.FromHexString(data.ArctangentHex);

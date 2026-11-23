@@ -21,6 +21,12 @@ public sealed partial class Skirmish
 {
     private ProductionData _production = null!;
     public SkirmishActor? PlayerBarracks => Actors.FirstOrDefault(a => a.Alive && a.Team == 0 && a.Source.TemplateName == "Казарма");
+    /// <summary>A finished building of the player that hires units from its production row: the barracks, the stable, the factory.</summary>
+    public static bool IsPlayerProducer(SkirmishActor actor) => actor.Alive && actor.Team == 0 && actor.Structure && actor.ConstructionRemaining <= 0 && actor.Source.TemplateName is "Казарма" or "Конюшня" or "Завод";
+    /// <summary>The tree of the player allows the template (building or unit) — A673/223B4 over his TRE copy.</summary>
+    public bool Available(int template) => OriginalTechRules.Available(TreeOf(Rules.PlayerSlot), (byte)template);
+    /// <summary>Queue a unit of the building's production row (the barracks: militia, archer, arsonist, knight; the stable: rider; the factory: catapult, ballista).</summary>
+    public bool QueueUnit(SkirmishActor producer, int template) => IsPlayerProducer(producer) && Available(template) && QueueRecruit(producer, (byte)template);
     public static bool IsBarracks(SkirmishActor actor) => actor.Alive && actor.Team == 0 && actor.Source.TemplateName == "Казарма";
     public bool BarracksReady => PlayerBarracks is { ConstructionRemaining: <= 0 };
     public int RecruitmentCount => CountQueue(PlayerCastle);
@@ -79,7 +85,7 @@ public sealed partial class Skirmish
     private void TickProduction()
     {
         TickProduction(PlayerCastle);
-        foreach (var barracks in Actors.Where(IsBarracks).ToArray()) TickProduction(barracks);
+        foreach (var barracks in Actors.Where(IsPlayerProducer).ToArray()) TickProduction(barracks);
         foreach (var producer in Actors.Where(a => a.Alive && a.Team != 0 && IsEnemyProducer(a)).ToArray()) TickProduction(producer);
     }
     private ResourceQuad Wallet(int team) => team == 0 ? Resources : AiResources(SlotOfTeam(team));
@@ -99,7 +105,7 @@ public sealed partial class Skirmish
             if (!payment.Accepted) return;
             SetWallet(producer.Team, payment.Balances); OriginalProductionRules.StartPaid(record); SetBlocked(producer, false); return;
         }
-        byte interval = producer.Team == 0 ? _production.Interval(producer.Source.TemplateName, record[0x22]) : EnemyInterval(producer, record[0x22]);
+        byte interval = producer.Team == 0 && producer.Source.TemplateName is "Замок" or "Казарма" ? _production.Interval(producer.Source.TemplateName, record[0x22]) : EnemyInterval(producer, record[0x22]);
         if (!OriginalProductionRules.Tick(record, interval, ProductionSpeedShift, template.InitialCondition)) return;
         if (!ReleaseRecruit(producer, template)) { SetBlocked(producer, true); if (producer.Team != 0) EnemyClearExit(producer, template); else ClearExit(producer, template); return; }
         OriginalProductionRules.Complete(record); SetBlocked(producer, false);

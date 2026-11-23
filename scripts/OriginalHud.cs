@@ -143,7 +143,7 @@ public partial class OriginalHud : Node2D
     }
 
     /// <summary>Castle build list: 80×50 portraits at x = 380 (at the right edge of the map window), y = 105 + 50·k (DOSBox screenshots).</summary>
-    public Rect2 BuildItemRect(int k) => new(380 + Shift, 105 + 50 * k, 80, 50);
+    public Rect2 BuildItemRect(int k) => new((k < 5 ? 380 : 296) + Shift, 105 + 50 * (k % 5), 80, 50);   // a second column to the left holds items 6..10
     public SkirmishMain.BuildItem? BuildItemAt(Vector2 logical)
     {
         if (Game?.Battle == null || !Game.BuildMenuVisible || MenuOpen) return null;
@@ -158,7 +158,7 @@ public partial class OriginalHud : Node2D
         var items = Game.BuildItems();
         for (int k = 0; k < items.Length; k++)
         {
-            var tint = Game.Battle.CanAfford(items[k].Template) ? Colors.White : new Color(.45f, .45f, .45f);
+            var tint = !items[k].Enabled ? new Color(.55f, .3f, .3f) : Game.Battle.CanAfford(items[k].Template) ? Colors.White : new Color(.45f, .45f, .45f);
             DrawTextureRectRegion(_portraits, BuildItemRect(k), Army.Portraits.Region(Army.Templates[items[k].TemplateIndex].Portrait), tint);
         }
         if (BuildItemAt(GetLocalMousePosition()) is { } hover) DrawPrice(hover.Template);
@@ -309,7 +309,7 @@ public partial class OriginalHud : Node2D
     public bool Click(Vector2 point, MouseButton button)
     {
         if (Game.Battle.Paused) return true;
-        if (button == MouseButton.Left && BuildItemAt(point) is { } item) { item.Start(); QueueRedraw(); return true; }
+        if (button == MouseButton.Left && BuildItemAt(point) is { } item) { if (item.Enabled) item.Start(); QueueRedraw(); return true; }
         if (MapRect.HasPoint(point)) return false;
         point = ToClassic(point);
         if (button != MouseButton.Left) return true;
