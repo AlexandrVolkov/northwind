@@ -4100,6 +4100,54 @@
       "evidence": ["docs/campaign-items.md", "tests/fixtures/item-use.json", "tools/verify_item_use.py", "tests/OriginalItemUseChecks.cs"],
       "implementation": ["scripts/OriginalItems.cs"],
       "limitations": "10AD2 (placement), A758 (creation) and 43E5 (set-up) are recorded stubs"
+    },
+    {
+      "id": "quest-handlers-f072",
+      "module": "LE:1",
+      "start": 61554,
+      "end": 61596,
+      "name": "Dialog handler: alliance joined (relation 3, reaction table E23)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/diplomacy.md", "tests/fixtures/quest.json", "tools/verify_quest.py", "tests/OriginalQuestChecks.cs"],
+      "implementation": ["scripts/OriginalQuest.cs", "scripts/SkirmishContainers.cs"],
+      "limitations": "EDD5, 1243A and EF3F are recorded stubs in the check"
+    },
+    {
+      "id": "quest-handlers-f0f3",
+      "module": "LE:1",
+      "start": 61683,
+      "end": 61780,
+      "name": "Dialog handlers: peace (F0F3, F12B), end of conversation (F14B)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/diplomacy.md", "tests/fixtures/quest.json", "tools/verify_quest.py", "tests/OriginalQuestChecks.cs"],
+      "implementation": ["scripts/OriginalQuest.cs", "scripts/SkirmishContainers.cs"],
+      "limitations": "EDD5, 1243A and EF3F are recorded stubs in the check; F09C (vassalage) is not ported"
+    },
+    {
+      "id": "quest-handlers-f28b",
+      "module": "LE:1",
+      "start": 62091,
+      "end": 62270,
+      "name": "Dialog handlers: replace the message type by the hermits' stone state (F28B, F29C, F2AD), crystal trades (F2BE, F2DE, F2FE, F31E)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/diplomacy.md", "tests/fixtures/quest.json", "tools/verify_quest.py", "tests/OriginalQuestChecks.cs"],
+      "implementation": ["scripts/OriginalQuest.cs", "scripts/SkirmishContainers.cs"],
+      "limitations": "as above"
+    },
+    {
+      "id": "quest-handlers-f33e",
+      "module": "LE:1",
+      "start": 62270,
+      "end": 62926,
+      "name": "Dialog handlers: staff and crystal trades, gifts of the dying hermits, payments",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/diplomacy.md", "tests/fixtures/quest.json", "tools/verify_quest.py", "tests/OriginalQuestChecks.cs"],
+      "implementation": ["scripts/OriginalQuest.cs", "scripts/SkirmishContainers.cs"],
+      "limitations": "as above; F459..F49B are not message handlers"
     }
   ]
 }

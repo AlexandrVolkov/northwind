@@ -82,7 +82,7 @@ public sealed partial class Skirmish
     }
 
     /// <summary>The participants as the item handlers see them: the player's wallet and inventory, the objects of an owner, the streams of random numbers.</summary>
-    private sealed class SkirmishItemWorld(Skirmish battle) : IItemWorld
+    private sealed class SkirmishItemWorld(Skirmish battle) : IQuestWorld
     {
         private readonly byte[][] _inventories = Enumerable.Range(0, 8).Select(_ => new byte[InventorySlots]).ToArray();
         public byte[] Inventory(int owner) => owner == battle.Rules.PlayerSlot ? battle.Inventory : _inventories[owner & 7];
@@ -99,6 +99,15 @@ public sealed partial class Skirmish
         public void FleeRequest(byte[] record) => OriginalCombatRules.Flee(record, (byte)battle.Map.Width, (byte)battle.Map.Height, battle._terrainCatalog);
         public void Message() { }
         public void Sound(byte id) { }
+        // the dialog handlers (OriginalQuestRules)
+        public DiplomacyState Diplomacy => battle.Diplomacy; public OriginalItemRules Items => battle.ItemRules;
+        public bool Stat5(int owner) => battle.Diplomacy.Dead[owner & 7];
+        public IReadOnlyList<QuestObject> QuestObjects(int owner) => battle.Actors.Where(a => a.Alive && !a.Scenery && a.Record[3] == owner)
+            .Select(a => new QuestObject(a.Record, BitConverter.ToUInt32(a.Parameters, 0x40), a.Parameters[0x46])).ToList();
+        public byte PoolOwnerAt(uint reference) => battle.Find(reference) is { } a ? a.Record[3] : (byte)0;
+        public void Send(byte type, byte other, byte receiver, byte bh, uint parameter) => battle._diplomacyRules.Send(battle.Diplomacy, type, other, receiver, bh, parameter);
+        public void React(byte bl, byte bh, uint table) => battle._diplomacyRules.React(battle.Diplomacy, bl, bh, table);
+        public void Give(byte item, byte owner) => battle.ItemRules.Pickup(this, item, owner);
         // ADAPTER: the use of items needs the inventory window and a targeting mode, neither is ported; the world of the use handlers stays inert
         public ItemTarget Target(uint reference) => battle.Find(reference) is { } a ? new((byte)a.Record[0], (byte)a.Record[0x0e], a.Record[0x0d], (uint)a.Position.X, (uint)a.Position.Y, 0) : default;
         public bool PlacementFree(byte al, byte ah, byte bl, uint x, uint y) => false;
