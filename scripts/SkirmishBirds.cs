@@ -20,6 +20,8 @@ public sealed partial class Skirmish
     private void InitializeBirds(ScenarioData scenario, TemplatesData templates)
     {
         if (!Rules.Fauna) return;
+        // The peaceful slot: at war with nobody (the scenario's relations of the empty slot are not trusted).
+        Diplomacy.Hostile[BirdOwner] = 0; for (int p = 0; p < Diplomacy.Count; p++) Diplomacy.Hostile[p] &= ~(1u << BirdOwner);
         foreach (var obj in scenario.Slots.Where(s => IsFaunaSlot(s.SlotIndex)).SelectMany(s => s.Objects).Where(o => o.TemplateFile == FaunaFile))
         {
             if (obj.TemplateIndex == 1) _generators.Add(Convert.FromHexString(obj.RawRecordHex));
