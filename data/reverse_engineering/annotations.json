@@ -3956,6 +3956,78 @@
       "evidence": ["docs/gates.md", "tests/GateChecks.cs"],
       "implementation": ["scripts/SkirmishGates.cs"],
       "limitations": "AC63 (plane check) is replaced by an occupancy test, D895 (scan) by 'a unit near'; the damage of a blocked gate (D5DF) is not applied; no Unicorn fixture"
+    },
+    {
+      "id": "visit-902f",
+      "module": "LE:1",
+      "start": 36911,
+      "end": 36964,
+      "name": "Action «visit»: gap ≤ 8, facing check, target service, pickup or send to the object",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/visit.json", "tools/verify_visit.py", "tests/OriginalVisitChecks.cs"],
+      "implementation": ["scripts/OriginalVisit.cs", "scripts/SkirmishContainers.cs"],
+      "limitations": "WRK AH=8 call and 1243A are recorded stubs in the check (both verified separately); the skirmish runs it on a copy of the unit record"
+    },
+    {
+      "id": "visit-8c1e",
+      "module": "LE:1",
+      "start": 35870,
+      "end": 35911,
+      "name": "Unit at rest and facing the point (turn request state 1)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/visit.json", "tools/verify_visit.py", "tests/OriginalVisitChecks.cs"],
+      "implementation": ["scripts/OriginalVisit.cs", "scripts/SkirmishContainers.cs"],
+      "limitations": "only the call with the target's point (8C47 variant not ported)"
+    },
+    {
+      "id": "visit-8c7c",
+      "module": "LE:1",
+      "start": 35964,
+      "end": 35977,
+      "name": "Move request to the referenced object (+22 = FF, state 3)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/visit.json", "tools/verify_visit.py", "tests/OriginalVisitChecks.cs"],
+      "implementation": ["scripts/OriginalVisit.cs", "scripts/SkirmishContainers.cs"],
+      "limitations": "the movement itself belongs to the unit action machine (adapter in the skirmish)"
+    },
+    {
+      "id": "visit-8c98",
+      "module": "LE:1",
+      "start": 35992,
+      "end": 36001,
+      "name": "Clear a pending request",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/visit.json", "tools/verify_visit.py", "tests/OriginalVisitChecks.cs"],
+      "implementation": ["scripts/OriginalVisit.cs", "scripts/SkirmishContainers.cs"],
+      "limitations": "none known"
+    },
+    {
+      "id": "turn-960b",
+      "module": "LE:1",
+      "start": 38411,
+      "end": 38536,
+      "name": "Turn one step towards a point: facing +25 and the frame",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/visit.json", "tools/verify_visit.py", "tests/OriginalVisitChecks.cs"],
+      "implementation": ["scripts/OriginalVisit.cs", "scripts/SkirmishContainers.cs"],
+      "limitations": "used by the visit; the skirmish's own unit turning is still an adapter"
+    },
+    {
+      "id": "visitor-service-12406",
+      "module": "LE:1",
+      "start": 74758,
+      "end": 74810,
+      "name": "Visitor service: living target with flag 20000h, script AH=8",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-items.md", "tests/fixtures/visit.json", "tools/verify_visit.py", "tests/OriginalVisitChecks.cs"],
+      "implementation": ["scripts/OriginalVisit.cs", "scripts/SkirmishContainers.cs"],
+      "limitations": "the script call is a recorded stub in the check"
     }
   ]
 }
