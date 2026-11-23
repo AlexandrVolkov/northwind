@@ -849,7 +849,7 @@ public partial class SkirmishMain : Node2D
     {
         if (!_ready) return;
         var rect = MiniRect(); var world = new Vector2(Battle.Map.Width, Battle.Map.Height) * 32;
-        foreach (var actor in Battle.Actors.Where(a => a.Alive && !Skirmish.IsHiddenAnimal(a)))
+        foreach (var actor in Battle.Actors.Where(a => a.Alive && !Skirmish.IsHiddenAnimal(a) && !a.Scenery))
             _markers.DrawCircle(rect.Position + actor.Position / world * rect.Size, actor.Structure ? 3 : 2, TeamColor(actor.Team));
         var view = GetViewportRect().Size / Camera.Zoom;
         _markers.DrawRect(new Rect2(rect.Position + (Camera.Position - view / 2) / world * rect.Size, view / world * rect.Size), new Color("f1da93"), false);

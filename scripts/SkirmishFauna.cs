@@ -50,7 +50,7 @@ public sealed partial class Skirmish
                 SkirmishActor? prey = null; int best = 13;
                 foreach (var o in Actors)
                 {
-                    if (!o.Alive || o.Structure || IsAnimal(o)) continue;
+                    if (!o.Alive || o.Structure || o.Scenery || IsAnimal(o)) continue;
                     int d = Math.Max(Math.Abs(o.Cell.X - animal.Cell.X), Math.Abs(o.Cell.Y - animal.Cell.Y));
                     if (d < best) { best = d; prey = o; }
                 }

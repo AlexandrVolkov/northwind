@@ -73,6 +73,8 @@ public sealed class SkirmishActor
     public bool Detached { get; set; }
     /// <summary>The building is being repaired: the maintenance step C80D pays its price at every condition step (WorkFlags = 1).</summary>
     public bool Repairing { get; set; }
+    /// <summary>A decoration of the first map (jug, chest, manuscript, the mage): drawn, never attacked, not on the minimap (docs/world.md).</summary>
+    public bool Scenery { get; set; }
     /// <summary>WorkFlags (+0F) of the building before the repair (the maintenance step uses WorkFlags = 1 inside).</summary>
     public byte RepairFlags { get; set; }
     /// <summary>The last work order (felling or mining) and when the worker became idle (−1: not idle); see Skirmish.WorkerRetryTick.</summary>
@@ -197,6 +199,7 @@ public sealed partial class Skirmish : IDisposable
         InitializeHorde(scenario);
         InitializeFauna(scenario, templates);
         InitializeBirds(scenario, templates);
+        InitializeScenery(scenario, templates);
         InitializePits(scenario);
         Log("Выделите войско и атакуйте красный замок. Берегите предводителя.");
     }
@@ -478,7 +481,7 @@ public sealed partial class Skirmish : IDisposable
     }
     private void UpdateUnit(SkirmishActor actor, double dt)
     {
-            if (!actor.Alive) return;
+            if (!actor.Alive || actor.Scenery) return;   // decorations do nothing (the mage's own script is not ported)
             actor.AttackTimer -= dt; actor.ReplanTimer -= dt;
             // OBE[20] is the mask of the owners that can see the object (FFh: all): a unit among trees is seen by its owner only.
             // Seen by whom (OBE[20], checked every fourth update): a unit among trees sees every unit; a unit outside sees a unit among
@@ -519,6 +522,7 @@ public sealed partial class Skirmish : IDisposable
                     if (struck) actor.Record[0x17] &= 0xfd;
                     t0 = P0(); var found = OriginalTargetRules.FindEnemy(actor.Id, actor.Record, actor.Parameters, struck, new SearchWorld(this, actor.Record[3])); P1("u.findenemy", t0);
                     target = Find(found.Target);
+                    if (target != null && IsAnimal(actor) && (target.Scenery || IsBird(target))) target = null;   // the beasts leave the decorations and the birds alone
                     if (target != null) { if (actor.Goal != null) actor.ResumeGoal = actor.Goal; actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); }
                 }
             }

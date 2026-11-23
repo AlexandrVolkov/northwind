@@ -91,3 +91,18 @@ public partial class TestRunner
         Check(!battle.Actors.Any(a => a.Team == 0 && a.Alive && a.Target != 0 && battle.Find(a.Target) is { } t && Skirmish.IsBird(t)), "Nobody attacks the birds");
     }
 }
+
+public partial class TestRunner
+{
+    /// <summary>The decorations of slots 6 and 7 load as neutral scenery and survive a few minutes.</summary>
+    private void SceneryChecks()
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json"); rules.Fauna = true;
+        using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        Check(battle.SceneryObjects.Count == 7, $"Seven decorations load: jugs, a chest, a manuscript, the mage ({battle.SceneryObjects.Count})");
+        Check(battle.SceneryObjects.All(a => a.Scenery && a.Record[3] == 5 && a.Alive), "The decorations are neutral");
+        for (int t = 0; t < (int)(120 * 18.2); t++) battle.Advance(1 / 18.2);
+        Check(battle.SceneryObjects.All(a => a.Alive), "The decorations stay standing");
+    }
+}

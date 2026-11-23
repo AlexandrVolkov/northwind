@@ -76,6 +76,12 @@ def prepare(source, output):
             wanted.setdefault(key,set()).update(range(base,base+raw[0x4a]+1))
             continue
         wanted.setdefault(key,set()).update(range(base,base+8*raw[0x4a]));wanted[key].update(action_frames(raw,base))
+    # The scenery of the first map (slots 6 and 7: jugs, chests, manuscripts, the mage): the frame each object stands on.
+    for slot in scenario['slots']:
+        if slot['slot_index'] not in (6,7):continue
+        for obj in slot['objects']:
+            if obj['template_file'] in ('ARMY__03.DAT','ARMY__00.DAT') and obj['template_index'] in (1,9,10,11,13,24,25,26,29,30,33):
+                wanted.setdefault((obj['template_file'],obj['template_index']),set()).add(struct.unpack_from('<H',bytes.fromhex(obj['raw_record_hex']),1)[0])
     # The birds of the first map (ARMY__05 0): 8 directions of DAT[4A] frames, 32x32.
     bird=bytes.fromhex(tables['ARMY__05.DAT']['templates'][0]['raw_record_hex']);wanted[('ARMY__05.DAT',0)]=set(range(struct.unpack_from('<H',bird,0x48)[0],struct.unpack_from('<H',bird,0x48)[0]+8*bird[0x4a]))
     # The pit trap (ARMY__03 12): 19 opening frames from 289h; its first frame is the closed pit.

@@ -27,6 +27,7 @@ public partial class TestRunner : Node
                 case "tower-shot": await TowerShot(); break;
                 case "fence-shot": await FenceShot(); break;
                 case "list-shot": await ListShot(); break;
+                case "scenery-shot": await SceneryShot(); break;
                 case "bird-shot": await BirdShot(); break;
                 case "research-chain": ResearchChainChecks(); break;
                 case "lab-shot": await LabShot(); break;
@@ -73,7 +74,7 @@ public partial class TestRunner : Node
                 case "original-ai": OriginalAiChecks(); OriginalAiInitChecks(); OriginalAiTurnChecks(); OriginalAiPlanChecks(); OriginalAiUpkeepChecks(); OriginalAiResearchChecks(); OriginalAiSquadChecks(); OriginalAiSquadStepChecks(); OriginalAiSquadStateChecks(); OriginalAiMilitaryChecks(); OriginalAiGarrisonChecks(); OriginalAiOrderChecks(); OriginalAiEconomyChecks(); OriginalAiWorkerChecks(); OriginalAiFormationChecks(); break;
                 case "missing-assets": MissingAssetsChecks(); break;
                 case "aiperf": Perf(); break;
-                case "skirmish-ai": DebrisChecks(); BridgeChecks(); FenceChecks(); RepairChecks(); FlowChecks(); ChopNearbyChecks(); TreeFallChecks(); ProducerChecks(); LabChecks(); FaunaChecks(); BirdChecks(); FaunaBehaviourChecks(); TowerChecks(); PitChecks(); SkirmishHordeChecks(); SkirmishAiChecks(); SkirmishRivalChecks(); SkirmishImprovedChecks(); break;
+                case "skirmish-ai": DebrisChecks(); BridgeChecks(); FenceChecks(); RepairChecks(); FlowChecks(); ChopNearbyChecks(); TreeFallChecks(); ProducerChecks(); LabChecks(); FaunaChecks(); BirdChecks(); SceneryChecks(); FaunaBehaviourChecks(); TowerChecks(); PitChecks(); SkirmishHordeChecks(); SkirmishAiChecks(); SkirmishRivalChecks(); SkirmishImprovedChecks(); break;
                 default: throw new ArgumentException($"Unknown test mode: {mode}");
             }
             GD.Print($"C# {mode}: PASS ({_checks} checks)"); GetTree().Quit();
