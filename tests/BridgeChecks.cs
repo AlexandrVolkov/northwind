@@ -308,3 +308,48 @@ public partial class TestRunner
         Check(!battle.ResearchRows().Any(r => r.Id == tower.Id), "A finished item leaves the list");
     }
 }
+
+public partial class TestRunner
+{
+    /// <summary>Diagnostic: the whole research chain of the player's laboratory (what each item opens and how long it takes).</summary>
+    private void ResearchChainChecks()
+    {
+        var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json"); rules.PlayerStartBoost = 20;
+        using var battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"), GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
+            GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
+        battle.GrantPeople(30);
+        SkirmishActor? Build(int index, params Vector2I[] offsets)
+        {
+            foreach (var o in offsets) if (battle.BuildIndex(index, battle.PlayerCastle.Cell + o) is { } b) { for (int t = 0; t < (int)(300 * 18.2) && b.ConstructionRemaining > 0; t++) battle.Advance(1 / 18.2); return b; }
+            return null;
+        }
+        Build(3, new(8, 8), new(-8, 8)); Build(4, new(-8, -8), new(0, -9)); Build(15, new(0, 10), new(10, 0), new(-10, 0));
+        var lab = Build(12, new(12, 12), new(-12, 12), new(12, -12), new(-12, -12), new(0, 13));
+        Check(lab != null, "Lab built");
+        int farms = 0;
+        for (int r = 6; r < 19 && farms < 30; r++)
+            for (int dy = -r; dy <= r && farms < 30; dy += 2)
+                for (int dx = -r; dx <= r && farms < 30; dx += 2)
+                {
+                    if (Math.Max(Math.Abs(dx), Math.Abs(dy)) != r) continue;
+                    var c = battle.PlayerCastle.Cell + new Vector2I(dx, dy);
+                    if (battle.ProbeIndex(9, c).Status != ConstructionPlacementStatus.Clear) continue;
+                    var f = battle.BuildIndex(9, c); if (f == null) continue;
+                    for (int t = 0; t < (int)(300 * 18.2) && f.ConstructionRemaining > 0; t++) battle.Advance(1 / 18.2);
+                    farms++; if (farms % 5 == 0) GD.Print($"CHAIN farms {farms} support {battle.Population.FarmSupport}");
+                }
+        int[] watch = [13, 14, 16, 17, 18, 19, 22, 23, 24, 26];
+        double total = 0;
+        for (int step = 0; step < 12; step++)
+        {
+            var rows = battle.ResearchRows(); if (rows.Count == 0) break;
+            var row = rows[0]; double t0 = battle.Elapsed;
+            battle.StartResearch(lab!, row);
+            for (int t = 0; t < (int)(6000 * 18.2) && lab!.Record[0x15] != 0; t++) battle.Advance(1 / 18.2);
+            total += battle.Elapsed - t0;
+            GD.Print($"CHAIN {step}: {row.Text} ({row.Cost}) took {battle.Elapsed - t0:0} s; open: {string.Join(",", watch.Where(battle.Available))}; next: {string.Join(" | ", battle.ResearchRows().Select(r => r.Text))}");
+        }
+        GD.Print($"CHAIN total {total:0} s");
+        Check(battle.Available(22) || battle.Available(23) || battle.Available(24), "The chain opens the stable, the mill or the church");
+    }
+}
