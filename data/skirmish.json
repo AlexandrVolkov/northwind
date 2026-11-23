@@ -132,6 +132,12 @@
       "range": 0,
       "cooldown": 1
     },
+    "Ворота": {
+      "health": 50,
+      "damage": 0,
+      "range": 0,
+      "cooldown": 1
+    },
     "Забор": {
       "health": 50,
       "damage": 0,
