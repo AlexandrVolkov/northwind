@@ -65,7 +65,7 @@ public sealed partial class Skirmish
     }
 
     private OriginalItemRules? _itemRules; private SkirmishItemWorld? _itemWorld;
-    public OriginalItemRules ItemRules => _itemRules ??= new OriginalItemRules(code => ItemTable[code].Handler, code => code < ItemTable.Count && ItemTable[code].StaticHex.Length == 18 ? Convert.FromHexString(ItemTable[code].StaticHex) : null);
+    public OriginalItemRules ItemRules => _itemRules ??= new OriginalItemRules(code => ItemTable[code].Handler, code => code < ItemTable.Count && ItemTable[code].StaticHex.Length == 26 ? Convert.FromHexString(ItemTable[code].StaticHex) : null);
     private SkirmishItemWorld ItemWorld => _itemWorld ??= new SkirmishItemWorld(this);
     private void TickItems() { if (Inventory.Any(i => i != 0)) ItemRules.Update(ItemWorld); }
 
