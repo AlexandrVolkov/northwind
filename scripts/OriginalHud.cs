@@ -152,8 +152,32 @@ public partial class OriginalHud : Node2D
         return null;
     }
 
+    /// <summary>The laboratory's research list: a status row, then one row per researchable item (text of the TRE record and its cost).</summary>
+    public Rect2 LabRowRect(int k) => new(262 + Shift, 105 + 22 * k, 198, 20);
+    public Skirmish.ResearchRow? LabRowAt(Vector2 logical)
+    {
+        if (Game?.Battle == null || Game.SelectedLab == null || MenuOpen) return null;
+        var rows = Game.LabRows();
+        for (int k = 0; k < rows.Count; k++) if (LabRowRect(k + 1).HasPoint(logical)) return rows[k];
+        return null;
+    }
+    private void DrawLabList(SkirmishActor lab)
+    {
+        var running = Game.Battle.Researching(lab);
+        DrawRect(LabRowRect(0), new Color(.12f, .07f, .03f, .9f));
+        _font.Draw(this, LabRowRect(0).Position + new Vector2(4, 3), running is { } r ? $"{r.Text}: {r.Remaining}" : "Лаборатория: выберите исследование");
+        var rows = Game.LabRows();
+        for (int k = 0; k < rows.Count; k++)
+        {
+            var rect = LabRowRect(k + 1);
+            DrawRect(rect, running == null ? new Color(.25f, .15f, .07f, .9f) : new Color(.14f, .1f, .07f, .9f));
+            _font.Draw(this, rect.Position + new Vector2(4, 3), $"{rows[k].Text} {rows[k].Cost}");
+        }
+    }
+
     private void DrawBuildList()
     {
+        if (Game.SelectedLab is { } lab && !MenuOpen) { DrawLabList(lab); return; }
         if (!Game.BuildMenuVisible || MenuOpen) return;
         var items = Game.BuildItems();
         for (int k = 0; k < items.Length; k++)
@@ -309,6 +333,7 @@ public partial class OriginalHud : Node2D
     public bool Click(Vector2 point, MouseButton button)
     {
         if (Game.Battle.Paused) return true;
+        if (button == MouseButton.Left && LabRowAt(point) is { } row) { Game.StartLabResearch(row); QueueRedraw(); return true; }
         if (button == MouseButton.Left && BuildItemAt(point) is { } item) { if (item.Enabled) item.Start(); QueueRedraw(); return true; }
         if (MapRect.HasPoint(point)) return false;
         point = ToClassic(point);
