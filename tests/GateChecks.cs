@@ -20,15 +20,26 @@ public partial class TestRunner
                 }
         Check(gate != null && gate.Source.TemplateName == "Ворота", "The player builds a gate");
         for (int t = 0; t < (int)(400 * 18.2) && gate!.ConstructionRemaining > 0; t++) battle.Advance(1 / 18.2);
-        Check(gate!.ConstructionRemaining <= 0 && !gate.GateIsOpen && battle.Occupancy.Cells.Contains(gate.Id), "The finished gate is closed and blocks its cells");
-        battle.SetGateMode(gate, 1); battle.Advance(1 / 18.2);
-        Check(gate.GateIsOpen && !battle.Occupancy.Cells.Contains(gate.Id), "«Открыть» frees the cells");
-        battle.SetGateMode(gate, 0); battle.Advance(1 / 18.2);
-        Check(!gate.GateIsOpen && battle.Occupancy.Cells.Contains(gate.Id), "«Закрыть» blocks them again");
+        Check(gate!.ConstructionRemaining <= 0, "The gate is built");
+        for (int t = 0; t < 2; t++) battle.Advance(1 / 18.2);
+        // a finished gate starts in the automatic mode (WRK 0xDE5); switch to closed to test the commands
+        battle.SetGateMode(gate, 0); for (int t = 0; t < 5; t++) battle.Advance(1 / 18.2);
+        Check(!battle.GateIsOpen(gate) && battle.Occupancy.Cells.Contains(gate.Id) && gate.Record[0x22] == 0, "The closed gate is in plane 1, not lifted, and blocks its cells");
+        battle.SetGateMode(gate, 1);
+        int lifted = 0;
+        for (int t = 0; t < 40; t++) { battle.Advance(1 / 18.2); lifted = Math.Max(lifted, (int)battle.GateLift(gate)); }
+        Check(lifted > 0, "«Открыть» raises the gate step by step");
+        for (int t = 0; t < 32 * 4 + 10; t++) battle.Advance(1 / 18.2);
+        Check(battle.GateIsOpen(gate) && gate.Record[0x22] == 0x20 && gate.Record[0x0d] == 2, "The open gate stands at 32 pixels in plane 2");
+        battle.SetGateMode(gate, 0);
+        for (int t = 0; t < 32 * 4 + 10; t++) battle.Advance(1 / 18.2);
+        Check(!battle.GateIsOpen(gate) && gate.Record[0x22] == 0 && gate.Record[0x0d] == 1, "«Закрыть» lowers it back to plane 1");
         battle.SetGateMode(gate, 2);
-        var worker = battle.Hero;
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(worker.Record.AsSpan(4), (uint)gate.Position.X); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(worker.Record.AsSpan(8), (uint)gate.Position.Y + 40);
-        for (int t = 0; t < 20; t++) battle.Advance(1 / 18.2);
-        Check(gate.GateIsOpen, "The automatic gate opens for a unit nearby");
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), (uint)gate.Position.X); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(8), (uint)gate.Position.Y + 48);
+        for (int t = 0; t < 32 * 5 + 32 * 4; t++) battle.Advance(1 / 18.2);
+        Check(battle.GateIsOpen(gate), "The automatic gate opens for a unit nearby");
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), (uint)gate.Position.X + 2000);
+        for (int t = 0; t < 32 * 5 + 32 * 4; t++) battle.Advance(1 / 18.2);
+        Check(!battle.GateIsOpen(gate), "and closes once the unit is gone");
     }
 }

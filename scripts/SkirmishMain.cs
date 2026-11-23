@@ -764,9 +764,9 @@ public partial class SkirmishMain : Node2D
             var size = new Vector2(frame.Width, frame.Height);
             // The owner's colour (COLOR_NN.TAB of the owner's slot) only changes the sprite indices 240..255.
             if (frame.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(actor.Record[3]), out var sheet))
-                DrawTextureRectRegion(sheet, new Rect2(point - new Vector2(size.X / 2, size.Y - (actor.Structure ? actor.Parameters[4] * 16 + 16 : 16)), size), new Rect2(frame.TeamSlot % 64 * 64, frame.TeamSlot / 64 * 64, frame.Width, frame.Height));
+                DrawTextureRectRegion(sheet, new Rect2(point - new Vector2(size.X / 2, size.Y - (actor.Structure ? actor.Parameters[4] * 16 + 16 : 16) + Battle.GateLift(actor)), size), new Rect2(frame.TeamSlot % 64 * 64, frame.TeamSlot / 64 * 64, frame.Width, frame.Height));
             else
-                DrawTextureRectRegion(frame.Page == 1 ? _spritesHorde : _sprites, new Rect2(point - new Vector2(size.X / 2, size.Y - (actor.Structure ? actor.Parameters[4] * 16 + 16 : 16)), size), new Rect2(frame.X, frame.Y, frame.Width, frame.Height));
+                DrawTextureRectRegion(frame.Page == 1 ? _spritesHorde : _sprites, new Rect2(point - new Vector2(size.X / 2, size.Y - (actor.Structure ? actor.Parameters[4] * 16 + 16 : 16) + Battle.GateLift(actor)), size), new Rect2(frame.X, frame.Y, frame.Width, frame.Height));
         }
         else if (!actor.Dying) DrawCircle(point - Vector2.Down * 12, 9, color);
         if (actor.Dying) return; // death frames only, no ring or health bar
