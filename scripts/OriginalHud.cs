@@ -200,8 +200,25 @@ public partial class OriginalHud : Node2D
         if (InventorySlotAt(GetLocalMousePosition()) is var h and >= 0 && inventory[h] != 0) _font.Draw(this, new Vector2(20, 464), Game.Battle.ItemName(inventory[h]));
     }
 
+    /// <summary>The dialog window of the mages (the messages of the forest settlement to the player, docs/diplomacy.md): the speech over the map and a button per answer.</summary>
+    private Rect2 DialogRect(Skirmish.DialogLine line) => new(24 + Shift, 28, 420, 18 + 16 * (line.Text.Split('\n').Length) + (line.Answers.Count > 0 ? 8 + 20 * line.Answers.Count : 0));
+    public Rect2 DialogAnswerRect(Skirmish.DialogLine line, int k) => new(32 + Shift, 28 + 14 + 16 * line.Text.Split('\n').Length + 8 + 20 * k, 404, 18);
+    private void DrawDialog()
+    {
+        if (MenuOpen || Game?.Battle == null || Game.Battle.CurrentDialog() is not { } line) return;
+        var rect = DialogRect(line); DrawRect(rect, new Color(.1f, .06f, .03f, .94f)); DrawRect(new Rect2(rect.Position, new Vector2(rect.Size.X, 1)), new Color("c09a52"));
+        var lines = line.Text.Split('\n');
+        for (int k = 0; k < lines.Length; k++) _font.Draw(this, rect.Position + new Vector2(8, 6 + 16 * k), lines[k].Trim());
+        for (int k = 0; k < line.Answers.Count; k++)
+        {
+            var button = DialogAnswerRect(line, k); DrawRect(button, new Color(.25f, .15f, .07f, .95f));
+            _font.Draw(this, button.Position + new Vector2(6, 3), line.Answers[k].Text.Split('\n')[0].Trim());
+        }
+    }
+
     private void DrawBuildList()
     {
+        DrawDialog();
         DrawInventory();
         if (Game.SelectedLab is { } lab && !MenuOpen) { DrawLabList(lab); return; }
         if (!Game.BuildMenuVisible || MenuOpen) return;
@@ -359,6 +376,8 @@ public partial class OriginalHud : Node2D
     public bool Click(Vector2 point, MouseButton button)
     {
         if (Game.Battle.Paused) return true;
+        if (button == MouseButton.Left && !MenuOpen && Game.Battle.CurrentDialog() is { } dialog)
+            for (int k = 0; k < dialog.Answers.Count; k++) if (DialogAnswerRect(dialog, k).HasPoint(point)) { Game.Battle.AnswerDialog(dialog, dialog.Answers[k].Type); QueueRedraw(); return true; }
         if (button == MouseButton.Left && InventorySlotAt(point) is var slot and >= 0) { Game.ClickInventory(slot); QueueRedraw(); return true; }
         if (button == MouseButton.Left && LabRowAt(point) is { } row) { Game.StartLabResearch(row); QueueRedraw(); return true; }
         if (button == MouseButton.Left && BuildItemAt(point) is { } item) { if (item.Enabled) item.Start(); QueueRedraw(); return true; }

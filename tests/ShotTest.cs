@@ -251,6 +251,21 @@ public partial class TestRunner
 }
 public partial class TestRunner
 {
+    private async System.Threading.Tasks.Task DialogShot()
+    {
+        var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);
+        for (int i = 0; i < 5; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        GetTree().Root.Size = new Vector2I(1280, 720);
+        DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("res://build"));
+        var b = scene.Battle; var rufin = b.SceneryObjects.First(Skirmish.IsMage);
+        b.Diplomacy.Relations[6, 0] = 1; b.Diplomacy.Relations[0, 6] = 1; b.PickUp(b.Hero, 6);
+        for (int t = 0; t < 120 && b.CurrentDialog() is not { Type: 34 }; t++) b.Advance(1 / 18.2);
+        scene.FocusWorld(rufin.Position);
+        for (int i = 0; i < 3; i++) await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+        GetViewport().GetTexture().GetImage().SavePng("res://build/shot-dialog.png");
+        GetTree().Quit();
+    }
     private async System.Threading.Tasks.Task InventoryShot()
     {
         var scene = GD.Load<PackedScene>("res://scenes/skirmish.tscn").Instantiate<SkirmishMain>(); AddChild(scene);

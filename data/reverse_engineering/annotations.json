@@ -4148,6 +4148,18 @@
       "evidence": ["docs/diplomacy.md", "tests/fixtures/quest.json", "tools/verify_quest.py", "tests/OriginalQuestChecks.cs"],
       "implementation": ["scripts/OriginalQuest.cs", "scripts/SkirmishContainers.cs"],
       "limitations": "as above; F459..F49B are not message handlers"
+    },
+    {
+      "id": "wrk3-rufin-8ec",
+      "module": "ARMY__03.WRK",
+      "start": 2284,
+      "end": 3353,
+      "name": "Quest script of the mage Rufin: init, voice, the speeches to every participant and the answers in the queue, the territory scan",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/rufin.json", "tools/verify_rufin.py", "tests/OriginalRufinChecks.cs"],
+      "implementation": ["scripts/OriginalRufin.cs", "scripts/SkirmishRufin.cs"],
+      "limitations": "the FS services that act on the world (143, 167, 16F, 17B, 45, 18F, 15, 1D, 163, DD, E1, 111, 4D) are recorded stubs in the check; FS:167 is treated as register-preserving; the unit step after the quest (D19..DBF) is not part of the port"
     }
   ]
 }
