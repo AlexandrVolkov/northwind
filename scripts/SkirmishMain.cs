@@ -748,6 +748,7 @@ public partial class SkirmishMain : Node2D
     private float StructureBottom(int templateIndex) => Battle.StructureFootprintHeight(templateIndex) * 16 + 16;
     private void DrawActor(SkirmishActor actor)
     {
+        if (Skirmish.IsHidden(actor)) return;   // the hurt mage has vanished
         var point = actor.Position; var color = TeamColor(actor.Team);
         bool debug = _ui.Visible;
         if (debug && !actor.Structure && !actor.Dying)
@@ -767,7 +768,7 @@ public partial class SkirmishMain : Node2D
             }
             return;
         }
-        int frameIndex = actor.Frame;
+        int frameIndex = Skirmish.IsHermit(actor) && Battle.VanishFrame(actor) is { } vanishing ? vanishing : actor.Frame;
         if (actor.Stepping && !actor.Turning) frameIndex += (int)(Battle.Elapsed * 8) % Math.Max(1, (int)actor.Parameters[0x4a]);
         if (!_frames.TryGetValue((actor.Source.TemplateFile, actor.Source.TemplateIndex, frameIndex), out var frame))
             _frames.TryGetValue((actor.Source.TemplateFile, actor.Source.TemplateIndex, actor.Frame), out frame);

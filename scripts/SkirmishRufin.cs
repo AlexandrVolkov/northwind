@@ -37,6 +37,55 @@ public sealed partial class Skirmish
         Log("Руфин поражает врагов молнией!");
     }
 
+    // ---- the vanishing of the hurt mage (docs/rufin.md): the continuation of the unit step and the action FS:105
+    public const int VanishTicks = 24;   // ADAPTER: 8D0B plays DAT[78] = 12 frames; the pace of two updates per frame is assumed
+    private readonly Dictionary<uint, int> _vanish = [];
+    private sealed class MageDrop(Skirmish battle) : IMageWorld
+    { public void DropItems(byte cellX, byte cellY, byte owner) => battle.ItemRules.DropAll(battle.ItemWorld, owner, cellX, cellY); }
+    private MageDrop? _mageDrop;
+
+    public void MageVitals(SkirmishActor mage) { (_vitalsWorld ??= new(this)).Current = mage; OriginalCombatRules.Vitals(mage.Record, mage.Parameters, (byte)_globalTick, (byte)Map.Width, (byte)Map.Height, Map.Cells, _properties, _terrainCatalog, _vitalsWorld); }
+
+    /// <summary>FS:E1 (8227): the counter +2E, the state machine of the unit (state 3 is the vanishing, FS:105; a pending request — bit 40h of +14 — ends any other state at once),
+    /// then the continuation of the script (<see cref="OriginalMageCloak"/>). The other actions (ED, E9, F1: stand, walk, strike) are done by UpdateUnit.</summary>
+    public void MageStandardStep(SkirmishActor mage)
+    {
+        var r = mage.Record; if (!MageFights(mage)) r[0x2e]++;   // UpdateUnit counts the updates of a fighting mage (8227)
+        if ((sbyte)r[0x19] > 0 && (r[0x17] & 0x80) == 0)
+        {
+            bool done = false;
+            if ((r[0x14] & 7) == 3) done = VanishStep(mage);
+            else if ((r[0x14] & 0x40) != 0) done = true;
+            if (done) { r[0x14] = (byte)((r[0x14] >> 3) & 7); r[0x30] = 0; r[0x15] = 0; _vanish.Remove(mage.Id); }
+        }
+        _mageDrop ??= new MageDrop(this);
+        bool rufin = mage.Source.TemplateIndex == 13;
+        OriginalMageCloak.Step(_mageDrop, r, rufin ? OriginalMageCloak.RufinLow : OriginalMageCloak.FirstMageLow, rufin ? OriginalMageCloak.RufinHigh : OriginalMageCloak.FirstMageHigh, rufin);
+    }
+
+    /// <summary>FS:105 (878D): at the start +15 = 1 (vanish: the frames run forwards) or 2 (return: backwards); at the end of the frames a vanishing mage gets +32 = FF (hidden), a returning one +32 = 0 and +20 = FF.</summary>
+    private bool VanishStep(SkirmishActor mage)
+    {
+        var r = mage.Record;
+        if (!_vanish.TryGetValue(mage.Id, out int progress)) { r[0x15] = (byte)(r[0x32] == 0 ? 1 : 2); r[0x25] = 0x24; progress = 0; }
+        _vanish[mage.Id] = ++progress;
+        if (progress < VanishTicks) return false;
+        if (r[0x15] == 1) { r[0x32] = 0xff; r[0x18] |= 0x02; }   // +17 |= 200h (the word's high byte is +18)
+        else { r[0x32] = 0; r[0x20] = 0xff; }
+        return true;
+    }
+
+    /// <summary>The frame of the vanishing animation to draw for a mage in state 3 (null otherwise).</summary>
+    public int? VanishFrame(SkirmishActor mage)
+    {
+        if (!_vanish.TryGetValue(mage.Id, out int progress) || (mage.Record[0x14] & 7) != 3) return null;
+        var p = mage.Parameters; int frames = p[0x78], start = BinaryPrimitives.ReadUInt16LittleEndian(p.AsSpan(0x48)) + 8 * (p[0x4a] + p[0x4b]) + 4 * (p[0x4f] + p[0x50] + p[0x51] + p[0x52]);
+        int k = Math.Clamp(progress * frames / VanishTicks, 0, frames - 1);
+        return start + (mage.Record[0x15] == 2 ? frames - 1 - k : k);
+    }
+    /// <summary>A hidden mage (+32 ≠ 0, visibility mask +20 = 0) is seen and targeted by nobody.</summary>
+    public static bool IsHidden(SkirmishActor actor) => IsHermit(actor) && actor.Record[0x20] == 0;
+
     private void TickMages()
     {
         foreach (var bolt in Bolts) bolt.Left--;
@@ -49,7 +98,7 @@ public sealed partial class Skirmish
             if (mage.Alive) OriginalRufin.Step(_rufinWorld, mage.Record);
             if (!MageFights(mage)) { mage.Target = 0; _mageTarget.Remove(mage.Id); continue; }   // at peace he stands
             mage.Target = 0;   // the discharge replaces the melee strike: the unit logic only walks him
-            if (!mage.Alive) continue;
+            if (!mage.Alive || (mage.Record[0x14] & 7) == 3 || mage.Record[0x32] != 0) { mage.Route.Clear(); mage.Goal = null; continue; }   // vanishing or hidden: he does nothing
             SkirmishActor? target = null;
             if ((_globalTick & 7) == 0 || !_mageTarget.TryGetValue(mage.Id, out uint targetId) || Find(targetId) is not { Alive: true } current || !Diplomacy.AtWar(mage.Record[3], current.Record[3]))
             {
@@ -155,8 +204,8 @@ public sealed partial class Skirmish
             threshold = 0; if (!_byRecord.TryGetValue(record, out var a)) return false;
             threshold = a.Parameters[0x46]; uint flags = BinaryPrimitives.ReadUInt32LittleEndian(a.Parameters.AsSpan(0x40)); return (flags & 8) != 0 && (flags & 0x20) == 0;
         }
-        public void StandardVitals() { }
-        public void StandardActions() { }
+        public void StandardVitals() { if (!battle.MageFights(_mage)) battle.MageVitals(_mage); }   // FS:DD (UpdateUnit runs it for a fighting mage)
+        public void StandardActions() => battle.MageStandardStep(_mage);                              // FS:E1 and the continuation after its table
         public void Voice(ushort id) { }
         public void Appearance(byte army) { }
         public byte Random() => battle._terrainCatalog.NextRandomByte();

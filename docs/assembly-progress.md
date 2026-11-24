@@ -10,7 +10,7 @@
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
 | ARMY__02.WRK | 6930 | 5671 | 855 | 0 | 404 | 7 |
-| ARMY__03.WRK | 13412 | 11712 | 0 | 0 | 1700 | 1 |
+| ARMY__03.WRK | 13412 | 11606 | 0 | 0 | 1806 | 1 |
 | ARMY__04.WRK | 411 | 411 | 0 | 0 | 0 | 0 |
 | ARMY__05.WRK | 882 | 882 | 0 | 0 | 0 | 2 |
 
@@ -57,6 +57,7 @@
 | ARMY__03.WRK `0x71A..0x7F0` | Chest scripts (71A, 7CE, 7DF): opening, item visit AH=8, empty chest decay | ported | [campaign-items.md](../docs/campaign-items.md); [container.json](../tests/fixtures/container.json); [verify_container.py](../tools/verify_container.py); [OriginalContainerChecks.cs](../tests/OriginalContainerChecks.cs) | FS services 1D, 6D, 15 are recorded stubs in the check |
 | ARMY__03.WRK `0x7F0..0x8EC` | Pit trap (template 12): detect, open, crush, close | ported | [campaign-items.md](../docs/campaign-items.md); [pit.json](../tests/fixtures/pit.json); [verify_pit.py](../tools/verify_pit.py) | Services FS:14B and FS:157 are recorded stubs in the check; not yet wired into the skirmish |
 | ARMY__03.WRK `0x8EC..0xD19` | Quest script of the mage Rufin: init, voice, the speeches to every participant and the answers in the queue, the territory scan | ported | [rufin.md](../docs/rufin.md); [rufin.json](../tests/fixtures/rufin.json); [verify_rufin.py](../tools/verify_rufin.py); [OriginalRufinChecks.cs](../tests/OriginalRufinChecks.cs) | the FS services that act on the world (143, 167, 16F, 17B, 45, 18F, 15, 1D, 163, DD, E1, 111, 4D) are recorded stubs in the check; FS:167 is treated as register-preserving; the unit step after the quest (D19..DBF) is not part of the port |
+| ARMY__03.WRK `0xD3D..0xDA7` | Continuation of the mages' update: vanishing below a health threshold (first mage 79..C5, Rufin D3D..DA6), the dropped items of a dead Rufin | ported | [rufin.md](../docs/rufin.md); [mage-cloak.json](../tests/fixtures/mage-cloak.json); [verify_mage_cloak.py](../tools/verify_mage_cloak.py); [OriginalMageCloakChecks.cs](../tests/OriginalMageCloakChecks.cs) | FS:197 is a recorded stub; the vanishing action FS:105 (LE:1 878D) is an adapter in the skirmish (pace of the frames assumed) |
 | LE:1 `0x2F03..0x2F1B` | Copy four initial resource stocks from SCN | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json) | Только извлечение четырёх dword SCN +15..24; прочие поля владельца, DOS-загрузка и цикл всех слотов вне перенесённого участка. |
 | LE:1 `0x3593..0x35A8` | DAT header and record stride | partial | [executable-analysis.md](../docs/executable-analysis.md) | Статически подтверждён участок чтения заголовка и шага 171; полный загрузчик, ошибки и релокации не перенесены. |
 | LE:1 `0x35B9..0x35C2` | WRK base assignment | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждено сохранение адреса WRK; это не весь загрузчик. |

@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "851952bfb906876d4a4c3c6db13bc1f389fabf4d077f85e00a2cd01986d192d4",
+  "annotation_sha256": "0f79160b22329f0a7114f3410a409b3cb08187f4f42072ccb735a881fcd429ac",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3552,8 +3552,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 1700,
-        "unreviewed": 11712
+        "ported": 1806,
+        "unreviewed": 11606
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -3615,6 +3615,22 @@
         },
         {
           "start": 3353,
+          "end": 3389,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 3389,
+          "end": 3495,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-mage-cloak"
+          ]
+        },
+        {
+          "start": 3495,
           "end": 13412,
           "status": "unreviewed",
           "classification": "unknown",
