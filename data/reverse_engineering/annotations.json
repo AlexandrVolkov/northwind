@@ -4556,6 +4556,30 @@
       "evidence": ["docs/bridges.md", "tests/fixtures/gate-motion.json", "tools/verify_gate_motion.py", "tests/OriginalGateMotionChecks.cs"],
       "implementation": ["scripts/OriginalGateMotion.cs"],
       "limitations": "AC63, 43B0 and D895 are recorded stubs in the check; the skirmish keeps its own bridge animation (adapter) until this is wired"
+    },
+    {
+      "id": "le1-unit-orders-8ca1",
+      "module": "LE:1",
+      "start": 36001,
+      "end": 36083,
+      "name": "Unit order helpers: move request (8CA1) and following the referenced object (8CBB)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["tests/fixtures/unit-orders.json", "tools/verify_unit_orders.py", "tests/OriginalUnitOrdersChecks.cs"],
+      "implementation": ["scripts/OriginalUnitOrders.cs"],
+      "limitations": "8120, D895 and DA7F are recorded stubs in the check; the skirmish keeps its own order handling (adapter)"
+    },
+    {
+      "id": "le1-unit-orders-8d0b",
+      "module": "LE:1",
+      "start": 36107,
+      "end": 36272,
+      "name": "Unit order helpers: state-5 request (8D0B), enemy scans (8D1A, 8D3E), decoding of the motion nibbles (8D89)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["tests/fixtures/unit-orders.json", "tools/verify_unit_orders.py", "tests/OriginalUnitOrdersChecks.cs"],
+      "implementation": ["scripts/OriginalUnitOrders.cs"],
+      "limitations": "8120, D895 and DA7F are recorded stubs in the check; the skirmish keeps its own order handling (adapter)"
     }
   ]
 }
