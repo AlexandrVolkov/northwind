@@ -1859,4 +1859,13 @@ public static class OriginalUnitActions
         } while (outer != 0);
         g.Al = g.Bl; g.Eax &= 0xff; g.Esi = esi0; g.Edi = edi0; g.Edx = edx0; g.Ecx = ecx0; g.Cf = false; g.Zf = true;
     }
+
+    /// <summary>7A03: the direction (0..7) from the point (DS:274E, 274F) to (DS:2791, 2792) by the angle function 6996: (angle + 10h) >> 5 in AL; EBX, ECX, EDX are kept, the upper part of EAX too.</summary>
+    public static void F7A03(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint a0 = g.Eax, b0 = g.Ebx, c0 = g.Ecx, d0 = g.Edx;
+        g.Eax = d[0x274e]; g.Ebx = d[0x274f]; g.Ecx = d[0x2791]; g.Edx = d[0x2792]; w.Call(0x6996, g);
+        g.Al = (byte)(g.Al + 0x10); g.Al = (byte)g.Shr(g.Al, 5, 8); g.Bl = g.Al;
+        g.Eax = a0; g.Al = g.Bl; g.Ebx = b0; g.Ecx = c0; g.Edx = d0;
+    }
 }
