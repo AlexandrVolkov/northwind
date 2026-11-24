@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the bridge-building units' actions (LE:1 D5B1 raise one step, D61D lower one step, D689 the unit's update) with Unicorn. AC63 (is the place free: ZF free, CF blocked/limit),
+"""Verify the gates' actions (LE:1 D5B1 raise one step, D61D lower one step, D689 the unit's update) with Unicorn. AC63 (is the place free: ZF free, CF blocked/limit),
 43B0 (occupancy) and D895 (search an enemy) are recorded stubs."""
 import argparse
 import hashlib
