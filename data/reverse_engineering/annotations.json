@@ -4220,6 +4220,30 @@
       "evidence": ["docs/rufin.md", "tests/fixtures/phantom.json", "tools/verify_phantom.py", "tests/OriginalPhantomChecks.cs"],
       "implementation": ["scripts/OriginalPhantom.cs", "scripts/SkirmishRufin.cs"],
       "limitations": "FS:4D, FS:1D, FS:DD and FS:E1 are recorded stubs in the check; FS:105 (vanishing/appearing action) is an adapter in the skirmish"
+    },
+    {
+      "id": "le1-frame-range-94d1",
+      "module": "LE:1",
+      "start": 38097,
+      "end": 38173,
+      "name": "Unit machine state 5: playback of a frame range (+22..+23), two updates per frame, backwards when reversed",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/frame-range.json", "tools/verify_frame_range.py", "tests/OriginalFrameRangeChecks.cs"],
+      "implementation": ["scripts/OriginalFrameRange.cs"],
+      "limitations": "the finishing 9275 is a recorded stub in the check"
+    },
+    {
+      "id": "le1-vanish-action-878d",
+      "module": "LE:1",
+      "start": 34701,
+      "end": 34843,
+      "name": "Vanishing action of the mages (FS:105): starts the frame range, ends when it has played (vanish) or begun (return)",
+      "classification": "code",
+      "status": "partial",
+      "evidence": ["docs/rufin.md", "tests/DialogChecks.cs"],
+      "implementation": ["scripts/OriginalVanishAction.cs", "scripts/SkirmishRufin.cs"],
+      "limitations": "the action is ported from the disassembly and exercised by DialogChecks, not Unicorn-verified; 9210 around state 5 is an adapter"
     }
   ]
 }

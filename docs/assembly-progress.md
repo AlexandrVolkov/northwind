@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 104178 | 6123 | 97 | 36484 | 44 |
+| LE:1 | 146882 | 103960 | 6265 | 97 | 36560 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
@@ -102,6 +102,7 @@
 | LE:1 `0x8585..0x85CC` | Worker strike requests and timber-load counter | partial | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Проверены ожидание/запрос взмаха и завершение младшего счётчика. Нужны внешние 8AF4/8C89, завершение анимации и вызовы изменения леса/выдачи груза; весь внешний автомат рабочего не перенесён. |
 | LE:1 `0x85D5..0x85E2` | Worker signed-result modifier increment | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Точная байтовая операция; полное игровое назначение поля +16 пока не утверждается. |
 | LE:1 `0x86B6..0x877F` | Ore carrier phases: mine, receiver, back-off | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | 8F70/C439 подключены отдельно; 8B0F (отход) остаётся мостом. Глобальная запись [522] из 8D89 не переносится. |
+| LE:1 `0x878D..0x881B` | Vanishing action of the mages (FS:105): starts the frame range, ends when it has played (vanish) or begun (return) | partial | [rufin.md](../docs/rufin.md); [DialogChecks.cs](../tests/DialogChecks.cs) | the action is ported from the disassembly and exercised by DialogChecks, not Unicorn-verified; 9210 around state 5 is an adapter |
 | LE:1 `0x8ABF..0x8AF4` | Dead target check and experience reward | ported | [combat.md](../docs/combat.md); [attack.json](../tests/fixtures/attack.json) |  |
 | LE:1 `0x8AF4..0x8B0F` | Swing delay against DAT[75] and experience | ported | [combat.md](../docs/combat.md); [attack.json](../tests/fixtures/attack.json) |  |
 | LE:1 `0x8B5E..0x8BC7` | Attack reach: pierce, plane mask, distance band, water | ported | [combat.md](../docs/combat.md); [attack.json](../tests/fixtures/attack.json) |  |
@@ -121,6 +122,7 @@
 | LE:1 `0x93DF..0x9406` | Swing start with an object target | ported | [combat.md](../docs/combat.md); [attack.json](../tests/fixtures/attack.json) | Ветка без цели (9275) не перенесена. |
 | LE:1 `0x9429..0x945C` | Advance worker strike frames | ported | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Стационарный взмах состояния 3, включая байтовые/словные переполнения; внешняя обработка эффекта отдельна. |
 | LE:1 `0x945C..0x9498` | Prepare worker strike effect arguments | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Возвращаются аргументы на границе вызова 9727; сам полный обработчик эффекта и его дальнейшие действия не перенесены. |
+| LE:1 `0x94D1..0x951D` | Unit machine state 5: playback of a frame range (+22..+23), two updates per frame, backwards when reversed | ported | [rufin.md](../docs/rufin.md); [frame-range.json](../tests/fixtures/frame-range.json); [verify_frame_range.py](../tools/verify_frame_range.py); [OriginalFrameRangeChecks.cs](../tests/OriginalFrameRangeChecks.cs) | the finishing 9275 is a recorded stub in the check |
 | LE:1 `0x95D3..0x960B` | Death dispatch: special path, death voice, animation | ported | [combat.md](../docs/combat.md); [death.json](../tests/fixtures/death.json) | 12D08 не перенесена. |
 | LE:1 `0x960B..0x9688` | Turn one step towards a point: facing +25 and the frame | ported | [campaign-items.md](../docs/campaign-items.md); [visit.json](../tests/fixtures/visit.json); [verify_visit.py](../tools/verify_visit.py); [OriginalVisitChecks.cs](../tests/OriginalVisitChecks.cs) | used by the visit; the skirmish's own unit turning is still an adapter |
 | LE:1 `0x9653..0x9688` | Turn one heading sector | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Включает исходный ZF от расчёта кадра; общий таймер обновлений задаётся вызывающей стороной. |
