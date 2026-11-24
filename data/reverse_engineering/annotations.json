@@ -6656,6 +6656,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "9E41, 9E55 and AC63 are recorded stubs; the exact boundary 20h of the map edge is not hit by the cases"
+    },
+    {
+      "id": "le1-unit-actions-9064",
+      "module": "LE:1",
+      "start": 36964,
+      "end": 37097,
+      "name": "FS:16B: free spot next to an object, eight directions (9064)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "9E41 and AC63 are recorded stubs; template 0 of armies 0..2"
     }
   ]
 }

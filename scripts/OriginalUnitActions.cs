@@ -1807,4 +1807,31 @@ public static class OriginalUnitActions
     done:
         g.Eax = a0; g.Ebx = b0;
     }
+
+    /// <summary>9064 = FS:16B: looks for a free spot (AC63) for the template AL of the army AH next to the object ESI: the 8 directions (the table of signed bytes at DS:19C7) are tried from a random one (9E41), the distance is the
+    /// sum of the half sizes of both templates. ZF = 0 and BH = the direction when found (ECX, EDX = the spot); ZF = 1 when none fits. EAX is kept.</summary>
+    public static void FS16B(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; uint a0 = g.Eax; F68A0(w, g); var t1 = w.ObjectAt(g.Edi); uint first = g.Edi;
+        g.Bl = (byte)(t1[0x77] & 3); g.Logic(g.Bl, 8); uint s1 = g.Ebx; g.Edx = first;
+        F6885(w, g, r); var t2 = w.ObjectAt(g.Edi);
+        g.Ah = (byte)((t2[4] + t1[4]) << 4); g.Al = (byte)((t2[3] + t1[3]) << 4); uint s2 = g.Eax;
+        w.Call(0x9e41, g); g.Al = (byte)(g.Al & 7); g.Bl = g.Al; g.Bh = g.Al;
+        for (; ; )
+        {
+            uint s3 = g.Ebx; int idx = (int)(g.Ebx & 7); g.Ebx = (uint)idx;
+            g.Al = (byte)(s2 >> 8); short p = (short)((sbyte)g.Al * (sbyte)d[0x19c8 + idx * 2]); g.Eax = (g.Eax & 0xffff0000) | (ushort)p;
+            g.Edx = U32(r, 8); uint lo = g.Edx & 0xffff; g.Add(lo << 16, (g.Eax & 0xffff) << 16); g.Edx = (g.Edx & 0xffff0000) | ((lo + g.Eax) & 0xffff);
+            g.Al = (byte)s2; p = (short)((sbyte)g.Al * (sbyte)d[0x19c7 + idx * 2]); g.Eax = (g.Eax & 0xffff0000) | (ushort)p;
+            g.Ecx = U32(r, 4); lo = g.Ecx & 0xffff; g.Add(lo << 16, (g.Eax & 0xffff) << 16); g.Ecx = (g.Ecx & 0xffff0000) | ((lo + g.Eax) & 0xffff);
+            g.Ebx = s1; g.Eax = a0; uint se = g.Esi, sc = g.Ecx, sd = g.Edx; w.Call(0xac63, g); g.Edx = sd; g.Ecx = sc; g.Esi = se; g.Ebx = s3;
+            if (g.Zf)
+            {
+                g.Al = 0xff; g.Logic(g.Al, 8); g.Al = g.Bl; g.Ebx = s1; g.Bh = g.Al; g.Eax = a0; return;
+            }
+            g.Bl--; g.Bl = (byte)(g.Bl & 7); g.Logic(g.Bl, 8); g.Cmp(g.Bl, g.Bh, 8);
+            if (g.Zf) break;
+        }
+        g.Ebx = s1; g.Eax = a0;
+    }
 }
