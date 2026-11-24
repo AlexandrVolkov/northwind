@@ -85,3 +85,7 @@
 ## 7A03
 
 `F7A03` turns the two points (DS:274E/274F and DS:2791/2792) into a direction 0..7 with the angle function 6996: (angle + 10h) >> 5 in AL; EBX, ECX, EDX and the upper bytes of EAX are kept. Verified against x86. (The annotation of FS:18B was corrected to end at 11D2E.)
+
+## AE3A
+
+`FAE3A` makes the unit face the direction AL: the low 3 bits of +25 take it and the frame +1 = direction * DAT[4A] + DAT[48] (the template through 6885). Verified against x86.

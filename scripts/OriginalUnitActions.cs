@@ -1868,4 +1868,13 @@ public static class OriginalUnitActions
         g.Al = (byte)(g.Al + 0x10); g.Al = (byte)g.Shr(g.Al, 5, 8); g.Bl = g.Al;
         g.Eax = a0; g.Al = g.Bl; g.Ebx = b0; g.Ecx = c0; g.Edx = d0;
     }
+
+    /// <summary>AE3A: the unit faces the direction AL (0..7): +25 low bits, the frame +1 = direction * DAT[4A] + DAT[48].</summary>
+    public static void FAE3A(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        uint a0 = g.Eax; F6885(w, g, r); var t = w.ObjectAt(g.Edi); g.Eax = a0; g.Eax &= 7; g.Logic(g.Eax, 32);
+        r[0x25] &= 0xf8; r[0x25] |= g.Al; Mul8(g, g.Al, t[0x4a]);
+        uint lo = g.Eax & 0xffff, add = U16(t, 0x48); g.Add(lo << 16, add << 16); g.Eax = (g.Eax & 0xffff0000) | ((lo + add) & 0xffff);
+        r[1] = (byte)g.Eax; r[2] = (byte)(g.Eax >> 8);
+    }
 }

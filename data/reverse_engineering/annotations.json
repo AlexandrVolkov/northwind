@@ -6692,6 +6692,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "6996 is a recorded stub"
+    },
+    {
+      "id": "le1-unit-actions-ae3a",
+      "module": "LE:1",
+      "start": 44602,
+      "end": 44631,
+      "name": "Face a direction (AE3A)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "Template 0 of armies 0..2"
     }
   ]
 }
