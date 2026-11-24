@@ -48,6 +48,9 @@ public partial class TestRunner
         public byte[]? ObjectAt(uint reference) => reference == 0x140 ? Obj1 : (reference == 0x180 ? Obj2 : new byte[0x40]);
         public byte Parent25 => (byte)c.GetProperty("parent25").GetInt32();
         public byte Bl => (byte)c.GetProperty("bl").GetInt32();
+        public (bool Zf, uint Flags) Service119(ushort ax) { log.Add((byte)'H'); log.AddRange(BitConverter.GetBytes(ax)); return (c.GetProperty("a1").GetArrayLength() == 0 || c.GetProperty("a1")[0][0].GetInt32() != 0, (uint)(c.GetProperty("strength").GetInt64() & 0x1f)); }
+        public int K => c.GetProperty("k").GetInt32();
+        public uint MapWidthPx => (uint)c.GetProperty("dim4").GetInt32(); public uint MapHeightPx => (uint)c.GetProperty("dim0").GetInt32(); public uint FoundFlags => (uint)(c.GetProperty("strength").GetInt64() & 0x1f);
         public void Service25(uint parent, byte bl) { log.Add((byte)'a'); log.AddRange(BitConverter.GetBytes(parent)); log.Add(bl); }
         public void Service29(byte bl) { log.Add((byte)'b'); log.Add(bl); }
         public void Sound35(uint id) { log.Add((byte)'S'); log.AddRange(BitConverter.GetBytes(id)); }
@@ -170,6 +173,8 @@ public partial class TestRunner
         ObjectScriptReplay("obj-fxb62", "fxb62", "The effect ARMY__00.WRK B62", (w, r, ah) => OriginalObjectScripts.Fx54aKind16(w, r, ah, Enumerable.Range(0, 0x40).Select(i => i == 0x25 ? ((ObjectReplay)w).Parent25 : (byte)0).ToArray()), 0);
         ObjectScriptReplay("obj-fxfd1", "fxfd1", "The effect ARMY__00.WRK FD1", (w, r, ah) => OriginalObjectScripts.FxKind17(w, r, ah, Enumerable.Range(0, 0x40).Select(i => i == 0x25 ? ((ObjectReplay)w).Parent25 : (byte)0).ToArray()), 0);
         ObjectScriptReplay("obj-fx1012", "fx1012", "The burst ARMY__00.WRK 1012", (w, r, ah) => OriginalObjectScripts.Fx1012(w, r, ah, 0xa00), 0);
+        ObjectScriptReplay("obj-fx10b3", "fx10b3", "The hit spark ARMY__00.WRK 10B3", (w, r, ah) => { var p = new byte[0x40]; BitConverter.GetBytes((uint)new[] { 0, 0x100, 0x140 }[((ObjectReplay)w).K % 3]).CopyTo(p, 0x1c); OriginalObjectScripts.FxHit(w, r, p); }, 0);
+        ObjectScriptReplay("obj-fx1105", "fx1105", "The wandering charm ARMY__00.WRK 1105", (w, r, ah) => OriginalObjectScripts.Fx1105(w, r, ah, (uint)((ObjectReplay)w).Bl, 0x400000), 0, true);
         ObjectScriptReplay("obj-face", "face", "The stone face script ARMY__03.WRK 2B9", OriginalObjectScripts.Face);
     }
 }

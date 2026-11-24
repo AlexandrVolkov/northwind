@@ -25,6 +25,9 @@ public interface IObjectScriptWorld
     (bool Zf, byte Al, byte[] Object, uint Reference) ServiceA1();   // FS:A1 (ZF = nothing found)
     byte ServiceA9(ushort ax);                        // FS:A9
     byte[]? ObjectAt(uint reference);                 // the object of a reference
+    (bool Zf, uint Flags) Service119(ushort ax);       // FS:119: the template of the target (EDX): ZF = none
+    uint MapWidthPx { get; } uint MapHeightPx { get; }   // FS:4 and FS:0
+    uint FoundFlags { get; }                          // the template flags (+40h) of the object FS:11 found (EBX)
     void Service25(uint parent, byte bl);             // FS:25
     void Service29(byte bl);                          // FS:29
     void Sound35(uint id);                            // FS:35
@@ -526,6 +529,53 @@ public static class OriginalObjectScripts
         }
         r[0x17]--;
         if (r[0x17] == 0) r[0] = 0xff;
+    }
+
+    /// <summary>10B3: the creation of the spark of a hit: the target of the creator (+1C) is looked up (FS:119); without one the effect is removed; the target's template flag 10h picks the hard spark
+    /// (kind 5) over the soft one (kind 4); the sound 17h plays.</summary>
+    public static void FxHit(IObjectScriptWorld w, byte[] r, byte[] parent)
+    {
+        if (U32(parent, 0x1c) == 0) { r[0] = 0xff; return; }
+        var (zf, flags) = w.Service119(3);
+        if (zf) { r[0] = 0xff; return; }
+        w.Sound35(0x17);
+        Spark(w, r, 0, (flags & 0x10) != 0);
+    }
+
+    private static readonly int[] Around = [0, -32, 32, -32, 32, 0, 32, 32, 0, 32, -32, 32, -32, 0, -32, -32];
+
+    /// <summary>The wandering charm (1105): +12 the referenced target (EBX − pool in AH = 0), +18 its life (1388h updates). Every 8 updates the effect moves one cell around (the table of eight steps of
+    /// 32 px at 1227) and, when FS:11 finds something there that is no building and the target is not already marked, throws effect 9Ah at the target; always it follows the target, marks it
+    /// (+17 bit 100h) and, every 32 updates, one time in 4 by FS:10D and one in 4 by FS:109 makes the target wander: it forgets its state (clears the request +2D), turns by half a circle or is sent to
+    /// a random cell (+22, +23, state 48h). The effect ends when its life is over (the target's health set to 0) or the target is dead.</summary>
+    public static void Fx1105(IObjectScriptWorld w, byte[] r, int ah, uint parentPointer, uint poolBase)
+    {
+        if (ah != 1) { Put(r, 0x12, parentPointer - poolBase); Put(r, 0x18, 0x1388); return; }
+        byte[]? target = w.ObjectAt(U32(r, 0x12));
+        if ((w.Tick & 7) == 0)
+        {
+            int k = w.Random() & 7;
+            uint x = (uint)(Around[2 * k] + (int)U32(r, 7)), y = (uint)(Around[2 * k + 1] + (int)U32(r, 0xc));
+            if (x < w.MapWidthPx && y < w.MapHeightPx)
+            {
+                Put(r, 7, x); Put(r, 0xc, y);
+                var (zf, al) = w.Service11(x);   // EAX still holds the new x
+                if (!zf && (w.FoundFlags & 0x18) == 0 && (Word(r, 0x17) & 0x100) == 0)   // EDI: the effect record itself
+                    w.EffectAt(al, 0x9a, (byte)(r[0x0d] & 3), U32(r, 4), U32(r, 8));
+            }
+        }
+        var t = w.ObjectAt(U32(r, 0x12))!;
+        if ((sbyte)t[0x19] <= 0) { r[0] = 0xff; return; }
+        Word(t, 0x17, (ushort)(Word(t, 0x17) | 0x100)); Put(r, 7, U32(t, 4)); Put(r, 0xc, U32(t, 8));
+        if ((w.Tick & 0x1f) == 0 && (w.Random2() & 3) == 0)
+        {
+            if ((t[0x2d] & 0xf) != 0) t[0x2d] &= 0x0f;
+            else if ((w.Random() & 3) == 0) { t[0x22] = (byte)(w.Random() & 0x7f); t[0x23] = (byte)(w.Random2() & 0x7f); t[0x14] = (byte)((t[0x14] & 7) | 0x48); }
+            else { byte turn = (byte)(((t[0x25] + 4) & 7) << 3); t[0x25] = (byte)((t[0x25] & 7) | turn); t[0x2d] = (byte)((t[0x2d] & 0x0f) | 0x10); }
+        }
+        Put(r, 0x18, U32(r, 0x18) - 1);
+        if (U32(r, 0x18) != 0) return;
+        t[0x19] = 0; r[0] = 0xff;
     }
 
     public static void Fx54aKind16(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)   // B62
