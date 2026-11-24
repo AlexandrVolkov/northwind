@@ -5348,6 +5348,42 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS:4D, FS:D1, FS:1D, FS:DD, FS:E1 (unit step with its inline table) and FS:19 are recorded stubs in the check"
+    },
+    {
+      "id": "army__02-worker-7f5",
+      "module": "ARMY__02.WRK",
+      "start": 2037,
+      "end": 2302,
+      "name": "Worker (peasant): init, step, voice, table AH=6, AH=7 takes the cargo",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS:4D, FS:D1, FS:1D, FS:DD, FS:E1 (unit step with its inline table), FS:19 and FS:1BB are recorded stubs in the check; the 16-byte table at 841 stays in the module"
+    },
+    {
+      "id": "army__02-worker-8fe",
+      "module": "ARMY__02.WRK",
+      "start": 2302,
+      "end": 2541,
+      "name": "Worker carrying cargo 3: init, step, effect 1Ah",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS:4D, FS:D1, FS:1D, FS:DD, FS:E1 (unit step with its inline table), FS:19 and FS:1BB are recorded stubs in the check; the 16-byte table at 841 stays in the module"
+    },
+    {
+      "id": "army__02-worker-9ed",
+      "module": "ARMY__02.WRK",
+      "start": 2541,
+      "end": 2766,
+      "name": "Worker carrying cargo 1/2: init, step, effect 26h",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS:4D, FS:D1, FS:1D, FS:DD, FS:E1 (unit step with its inline table), FS:19 and FS:1BB are recorded stubs in the check; the 16-byte table at 841 stays in the module"
     }
   ]
 }

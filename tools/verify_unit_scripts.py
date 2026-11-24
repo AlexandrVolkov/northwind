@@ -13,7 +13,7 @@ from analyze_executable import analyze
 from verify_combat import CombatOracle
 from forestry_source import source_constants
 
-ENTRIES = [('ARMY__01.WRK', 0x0, 0x7f), ('ARMY__01.WRK', 0x7f, 0xfe), ('ARMY__01.WRK', 0x4f0, 0x569), ('ARMY__02.WRK', 0x0, 0x7f), ('ARMY__02.WRK', 0x7f, 0xfe), ('ARMY__02.WRK', 0x11b4, 0x122d), ('ARMY__01.WRK', 0xa77, 0xb4f), ('ARMY__01.WRK', 0xb4f, 0xc1c), ('ARMY__01.WRK', 0xc1c, 0xce3)]
+ENTRIES = [('ARMY__01.WRK', 0x0, 0x7f), ('ARMY__01.WRK', 0x7f, 0xfe), ('ARMY__01.WRK', 0x4f0, 0x569), ('ARMY__02.WRK', 0x0, 0x7f), ('ARMY__02.WRK', 0x7f, 0xfe), ('ARMY__02.WRK', 0x11b4, 0x122d), ('ARMY__01.WRK', 0xa77, 0xb4f), ('ARMY__01.WRK', 0xb4f, 0xc1c), ('ARMY__01.WRK', 0xc1c, 0xce3), ('ARMY__02.WRK', 0x7f5, 0x8fe), ('ARMY__02.WRK', 0x8fe, 0x9ed), ('ARMY__02.WRK', 0x9ed, 0xace)]
 
 
 class UnitOracle(CombatOracle):
@@ -30,7 +30,7 @@ def cases():
     out = []
     for n in range(900):
         k = rng.randrange(len(ENTRIES))
-        out.append({'entry': k, 'ah': rng.choice([0, 1, 1, 2, 7]) if k == 6 else rng.choice([0, 1, 1, 2]), 'bl': rng.randrange(256), 'seed': rng.randrange(256), 'f14': rng.choice([0, 0x80, 0x81, rng.randrange(256)]), 'f2d': rng.randrange(256), 'f0f': rng.randrange(256), 'f2e': rng.randrange(256), 'f31': rng.choice([0, 0, 1, rng.randrange(256)]), 'f19': rng.choice([0, 1, 5, 0x80, 0xff, rng.randrange(256)]), 'f25': rng.randrange(256), 'f00': rng.randrange(256), 'f0e': rng.randrange(256), 'x': rng.randrange(1 << 32), 'y': rng.randrange(1 << 32), 'al': rng.choice([0, 1, 2, 3, 3, 5, rng.randrange(256)])})
+        out.append({'entry': k, 'ah': rng.choice([0, 1, 1, 2, 7]) if k == 6 else (rng.choice([0, 1, 1, 2, 6, 7]) if k == 9 else rng.choice([0, 1, 1, 2])), 'bl': rng.randrange(256), 'seed': rng.randrange(256), 'f14': rng.choice([0, 0x80, 0x81, rng.randrange(256)]), 'f2d': rng.randrange(256), 'f0f': rng.randrange(256), 'f2e': rng.randrange(256), 'f31': rng.choice([0, 0, 1, rng.randrange(256)]), 'f19': rng.choice([0, 1, 5, 0x80, 0xff, rng.randrange(256)]), 'f25': rng.randrange(256), 'f00': rng.randrange(256), 'f0e': rng.randrange(256), 'x': rng.randrange(1 << 32), 'y': rng.randrange(1 << 32), 'al': rng.choice([0, 1, 2, 3, 3, 5, rng.randrange(256)])})
     return out
 
 
@@ -47,19 +47,20 @@ def generate(game):
         return f
     def appearance(): log.append(b'N' + struct.pack('<I', reg(UC_X86_REG_EAX) & 255)); o.ret()
     def effect(): log.append(b'E' + struct.pack('<BBBII', reg(UC_X86_REG_EAX) & 255, reg(UC_X86_REG_EBX) & 255, (reg(UC_X86_REG_EBX) >> 8) & 255, reg(UC_X86_REG_ECX), reg(UC_X86_REG_EDX))); o.ret()
+    def note1bb(): log.append(b'B'); o.ret()
     def actions(): log.append(b'U'); o.cpu.emu_stop()
-    o.stubs = {slots[0x4d]: appearance, slots[0xd1]: note(b'Y'), slots[0x1d]: note(b'D'), slots[0xdd]: note(b'V'), slots[0xe1]: actions, slots[0x19]: effect}
+    o.stubs = {slots[0x4d]: appearance, slots[0xd1]: note(b'Y'), slots[0x1d]: note(b'D'), slots[0xdd]: note(b'V'), slots[0xe1]: actions, slots[0x19]: effect, slots[0x1bb]: note1bb}
     digest = hashlib.sha256(); all_cases = cases()
     for case in all_cases:
         log.clear(); o.prepare(32, 32); o.mode = 'unit'
         module, a, e = ENTRIES[case['entry']]
-        o.cpu.mem_write(o.WRK, wrks[module]); o.cpu.mem_write(o.POOL, bytes(0x1000)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x19eb, bytes([case['seed']]))
+        o.cpu.mem_write(o.WRK, wrks[module]); o.cpu.ctl_flush_tb(); o.cpu.mem_write(o.POOL, bytes(0x1000)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x19eb, bytes([case['seed']]))
         r = bytearray(0x50); r[0x14] = case['f14']; r[0x2d] = case['f2d']; r[0x0f] = case['f0f']; r[0x2e] = case['f2e']; r[0x31] = case['f31']; r[0x19] = case['f19']; r[0x25] = case['f25']; r[0] = case['f00']; r[0x0e] = case['f0e']; struct.pack_into('<II', r, 4, case['x'], case['y'])
         o.cpu.mem_write(o.POOL + 0x800, bytes(r))
         for q in (UC_X86_REG_ESI, UC_X86_REG_EDI): o.cpu.reg_write(q, o.POOL + 0x800)
         o.cpu.reg_write(UC_X86_REG_EAX, (case['ah'] << 8) | (case['al'] if case['ah'] == 7 else 0)); o.cpu.reg_write(UC_X86_REG_EBX, case['bl'])
         o.run(o.WRK + a)
-        out = bytes(o.cpu.mem_read(o.POOL + 0x800, 0x50)) + bytes(o.cpu.mem_read(0x19eb, 1)) + b''.join(log)
+        out = bytes(o.cpu.mem_read(o.POOL + 0x800, 0x50)) + (struct.pack('<I', (reg(UC_X86_REG_EDX) - o.WRK) & 0xffffffff) if case['entry'] == 9 and case['ah'] == 6 else b'') + bytes(o.cpu.mem_read(0x19eb, 1)) + b''.join(log)
         if os.environ.get('DEBUG_CASE') == str(all_cases.index(case)): print('PYTHON', out.hex())
         digest.update(out); case['sha256_prefix'] = hashlib.sha256(out).hexdigest()[:10]
     return {'format_version': 1, 'source_sha256': {k: report['source_sha256'][k] for k in ['NORWIND.EXE']} | {m: hashlib.sha256(b).hexdigest() for m, b in wrks.items()}, 'random_values': constants['random_values'],

@@ -945,6 +945,7 @@ public interface IUnitScriptWorld
     void Redraw();                    // FS:1D
     void Vitals(); void Actions();    // FS:DD, FS:E1
     void Effect(byte al, byte bl, byte bh, uint ecx, uint edx);    // FS:19 with registers
+    void Service1BB();                // FS:1BB
 }
 
 /// <summary>The standard unit script of ARMY__01.WRK and ARMY__02.WRK (the swordsman 0, the archer 7F, the horseman 4F0 / 11B4 and their kin): AH = 0 the first frame state (+0F = 0Fh, the horseman
@@ -974,6 +975,35 @@ public static class OriginalUnitScript
         {
             r[0x0e] = 0x0f; Worker(w, r, 0, r[0x25], 0);
             if (r[0x31] != 0) { r[0x31] = 0; w.Effect(r[0], kind == 1 ? (byte)0x1b : (byte)0x1c, 1, BitConverter.ToUInt32(r, 4), BitConverter.ToUInt32(r, 8)); }
+        }
+        w.Vitals(); w.Actions();
+    }
+
+    /// <summary>The offset of the table returned by the AH = 6 of the worker 7F5 of ARMY__02.WRK (the bytes stay in the module).</summary>
+    public const uint Worker2Table = 0x841;
+
+    /// <summary>The worker of ARMY__02.WRK (7F5 the peasant, 8FE the carrier of 3, 9ED the carrier of 1 and 2): as <see cref="Worker"/>, but the init gives +0F = 3Fh to the worker, AH = 2 first calls FS:1BB,
+    /// AH = 6 returns the table <see cref="Worker2Table"/>, the cargo 3 sets +0E = 0Bh and 1 or 2 +0E = 08h; the carrier of 3 sets +14 = 58h and +15 = 0 on every return to the worker, the effects are 1Ah and 26h.</summary>
+    public static void Worker2(IUnitScriptWorld w, byte[] r, int ah, byte bl, int kind, byte cargo = 0)
+    {
+        if (ah == 0) { r[0x20] = 0xff; r[0x0f] = kind == 0 ? (byte)0x3f : (byte)0x13; w.Appearance(bl); r[0x2e] = w.Random(); return; }
+        if (ah == 2) { if (kind != 0) w.Service1BB(); w.Voice(); return; }
+        if (ah == 7 && kind == 0)
+        {
+            if (r[0x31] != 0) return;
+            r[0x31] = cargo;
+            if (cargo == 3) { r[0x0e] = 0x0b; Worker2(w, r, 0, r[0x25], 1); r[0x14] = (byte)((r[0x14] & 7) | 0x60); }
+            else if (cargo is 1 or 2) { r[0x0e] = 0x08; Worker2(w, r, 0, r[0x25], 2); }
+            else r[0x31] = 0;
+            return;
+        }
+        if (ah != 1) return;
+        if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); }
+        if (kind != 0 && ((sbyte)r[0x19] <= 0 || r[0x31] == 0))
+        {
+            r[0x0e] = 0x0a; Worker2(w, r, 0, r[0x25], 0);
+            if (kind == 1) { r[0x14] = 0x58; r[0x15] = 0; }
+            if (r[0x31] != 0) { r[0x31] = 0; w.Effect(r[0], kind == 1 ? (byte)0x1a : (byte)0x26, 1, BitConverter.ToUInt32(r, 4), BitConverter.ToUInt32(r, 8)); }
         }
         w.Vitals(); w.Actions();
     }
