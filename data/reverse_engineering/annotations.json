@@ -5720,6 +5720,18 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
       "implementation": ["scripts/OriginalBuildingScripts.cs"],
       "limitations": "The services (FS:A1 with a fixed template, FS:6D, FS:19, FS:1D) are recorded stubs; FS:109 runs as original code and returns the byte zero-extended in EAX"
+    },
+    {
+      "id": "army__02-effects-16dd",
+      "module": "ARMY__02.WRK",
+      "start": 5853,
+      "end": 6930,
+      "name": "Effect scripts 16DD..end: kinds 7, 9, 16h..18h, 1Ah, 1Ch, 1Dh, 20h..28h",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/army01-effects.json", "tools/verify_army01_effects.py", "tests/OriginalArmy01EffectChecks.cs"],
+      "implementation": ["scripts/OriginalArmy02Effects.cs"],
+      "limitations": "FS:A5, FS:A9, FS:AD, FS:35 are recorded stubs; the object behind +12h and the template of FS:71 are fixed buffers"
     }
   ]
 }
