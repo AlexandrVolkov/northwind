@@ -5312,6 +5312,42 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fenceB.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS:41 (the dispatcher C88C with the inline table) and FS:55 are recorded stubs in the check; the shape tables are data of the ported Reshape (BB8B)"
+    },
+    {
+      "id": "army__01-worker-a77",
+      "module": "ARMY__01.WRK",
+      "start": 2679,
+      "end": 2895,
+      "name": "Worker (peasant): init, step, voice, AH=7 takes the cargo",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS:4D, FS:D1, FS:1D, FS:DD, FS:E1 (unit step with its inline table) and FS:19 are recorded stubs in the check"
+    },
+    {
+      "id": "army__01-worker-b4f",
+      "module": "ARMY__01.WRK",
+      "start": 2895,
+      "end": 3100,
+      "name": "Worker carrying cargo 3: init, step, effect 1Bh",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS:4D, FS:D1, FS:1D, FS:DD, FS:E1 (unit step with its inline table) and FS:19 are recorded stubs in the check"
+    },
+    {
+      "id": "army__01-worker-c1c",
+      "module": "ARMY__01.WRK",
+      "start": 3100,
+      "end": 3299,
+      "name": "Worker carrying cargo 1/2: init, step, effect 1Ch",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS:4D, FS:D1, FS:1D, FS:DD, FS:E1 (unit step with its inline table) and FS:19 are recorded stubs in the check"
     }
   ]
 }

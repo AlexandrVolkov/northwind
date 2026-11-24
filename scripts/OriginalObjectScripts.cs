@@ -944,6 +944,7 @@ public interface IUnitScriptWorld
     void Voice();                     // FS:D1
     void Redraw();                    // FS:1D
     void Vitals(); void Actions();    // FS:DD, FS:E1
+    void Effect(byte al, byte bl, byte bh, uint ecx, uint edx);    // FS:19 with registers
 }
 
 /// <summary>The standard unit script of ARMY__01.WRK and ARMY__02.WRK (the swordsman 0, the archer 7F, the horseman 4F0 / 11B4 and their kin): AH = 0 the first frame state (+0F = 0Fh, the horseman
@@ -951,6 +952,32 @@ public interface IUnitScriptWorld
 /// tests/fixtures/unit-scripts.json (tools/verify_unit_scripts.py).</summary>
 public static class OriginalUnitScript
 {
+    /// <summary>The worker of ARMY__01.WRK (a77 the peasant, b4f the carrier of 3, c1c the carrier of 1 and 2): AH = 0 the init (+0F = 1Fh for the worker, 13h for the carriers), AH = 1 the step —
+    /// the carriers go back to the worker script (BE9 / CB0) and may release the carried cargo with the effect 1Bh / 1Ch —, AH = 7 takes the cargo AL: 3 switches to b4f (+0E = 10h, +2D = (+2D and 7) or 60h),
+    /// 1 and 2 to c1c (+0E = 11h). kind 0, 1, 2 select the script.</summary>
+    public static void Worker(IUnitScriptWorld w, byte[] r, int ah, byte bl, int kind, byte cargo = 0)
+    {
+        if (ah == 0) { r[0x20] = 0xff; r[0x0f] = kind == 0 ? (byte)0x1f : (byte)0x13; w.Appearance(bl); r[0x2e] = w.Random(); return; }
+        if (ah == 2) { w.Voice(); return; }
+        if (ah == 7 && kind == 0)
+        {
+            if (r[0x31] != 0) return;
+            r[0x31] = cargo;
+            if (cargo == 3) { r[0x0e] = 0x10; Worker(w, r, 0, r[0x25], 1); r[0x14] = (byte)((r[0x14] & 7) | 0x60); }
+            else if (cargo is 1 or 2) { r[0x0e] = 0x11; Worker(w, r, 0, r[0x25], 2); }
+            else r[0x31] = 0;
+            return;
+        }
+        if (ah != 1) return;
+        if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); }
+        if (kind != 0 && ((sbyte)r[0x19] <= 0 || r[0x31] == 0))
+        {
+            r[0x0e] = 0x0f; Worker(w, r, 0, r[0x25], 0);
+            if (r[0x31] != 0) { r[0x31] = 0; w.Effect(r[0], kind == 1 ? (byte)0x1b : (byte)0x1c, 1, BitConverter.ToUInt32(r, 4), BitConverter.ToUInt32(r, 8)); }
+        }
+        w.Vitals(); w.Actions();
+    }
+
     public static void Run(IUnitScriptWorld w, byte[] r, int ah, byte bl, bool horseman)
     {
         if (ah == 0) { r[0x0f] = horseman ? (byte)7 : (byte)0x0f; w.Appearance(bl); r[0x2e] = w.Random(); return; }
