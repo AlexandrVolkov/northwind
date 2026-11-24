@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 103960 | 6265 | 97 | 36560 | 44 |
+| LE:1 | 146882 | 103587 | 6265 | 97 | 36933 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
@@ -117,6 +117,7 @@
 | LE:1 `0x90E9..0x9124` | Common worker animation update prefix | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md) | Известны вызов перед диспетчером рабочего, префикс состояния и RNG; остальные ветви общего обновления до 9210 не размечены как обработанные. |
 | LE:1 `0x90E9..0x9210` | Unit prefix: death dispatch, regeneration, bleeding, rest, flee, wound voice, experience, terrain death | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Гибель на местности отключена в схватке до проверки на оригинале; звуки не воспроизводятся. |
 | LE:1 `0x9210..0x92FC` | Worker stationary animation dispatch | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Состояния 0/1/3 и их запросы; движение, специальные состояния и общий префикс 90E9 не входят в этот контракт. |
+| LE:1 `0x9210..0x95D3` | Unit motion machine: rest/turn/walk/swing/move/frame range/resting states of +2D and the state switch 9275 | ported | [unit-motion.md](../docs/unit-motion.md); [unit-motion.json](../tests/fixtures/unit-motion.json); [verify_unit_motion.py](../tools/verify_unit_motion.py); [OriginalUnitMotionChecks.cs](../tests/OriginalUnitMotionChecks.cs) | the services 70B0, 12930, 9653, D12C, 10799, 9727 and 95D3 are recorded stubs in the check; the module is verified but not yet the driver of the skirmish units |
 | LE:1 `0x9354..0x937F` | Worker stationary turn timer | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Поворотное состояние 1, с первым немедленным уменьшением таймера; эффекты и другие состояния анимации не включены. |
 | LE:1 `0x93AD..0x9429` | Initialize worker strike animation | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Ветвь цели-клетки и цель-объект с обнулённым OBE[1C] (возврат в 9275). Цель-объект с живым объектом и специальные варианты не сверены. |
 | LE:1 `0x93DF..0x9406` | Swing start with an object target | ported | [combat.md](../docs/combat.md); [attack.json](../tests/fixtures/attack.json) | Ветка без цели (9275) не перенесена. |
