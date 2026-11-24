@@ -150,6 +150,7 @@ public partial class TestRunner
                         g.Eax = new[] { 0x900u, 0xa00u, 0u, 0x900u }[sel]; g.Ebx = new[] { 0xa00u, 0x900u, r3, 0u }[(sel + r2) & 3]; g.Ecx = r2; g.Edx = r3;
                         OriginalUnitActions.FD2D1(w, g, r); break;
                     }
+                case "fs14b": if (c.GetProperty("sel").GetInt32() != 0) { w.Obj1[0x20] = 0xff; w.Obj1[0x19] = 0x7f; w.Obj1[3] %= 8; w.Obj2[0x20] = 0xff; w.Obj2[0x19] = 0x7f; w.Obj2[3] %= 8; w.Template[0x46] = 5; w.Template[0x74] = 0xf; w.Template[0x40] &= 0xdf; w.Template[0x41] &= 0x7f; } OriginalUnitActions.FS14B(w, g, r); break;
                 case "fb319": if (c.GetProperty("sel").GetInt32() != 0) { w.Template[0x46] = 5; w.Template[0x4e] = 0x10; w.Template[0x40] |= 8; } OriginalUnitActions.FB319(w, g, r); break;
                 case "fcccb": OriginalUnitActions.FCCCB(w, g, r); break;
                 case "fcb21": OriginalUnitActions.FCB21(w, g, r); break;
@@ -201,7 +202,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 74, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 75, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }

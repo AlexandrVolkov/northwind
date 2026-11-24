@@ -6632,6 +6632,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "The skirmish pit still uses its own adapter; the check keeps the unit away from the edge of the 32 x 32 map (the original wraps BL/AL)"
+    },
+    {
+      "id": "le1-unit-actions-11dde",
+      "module": "LE:1",
+      "start": 73182,
+      "end": 73392,
+      "name": "FS:14B: hostile and other objects in the area, the nearest hostile (11DDE)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "21A00, D7B1, C344 and D157 are recorded stubs; the skirmish pit still uses its own adapter"
     }
   ]
 }
