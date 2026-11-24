@@ -5156,6 +5156,42 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-m340f.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army03-mblast-2f75",
+      "module": "ARMY__03.WRK",
+      "start": 12149,
+      "end": 12299,
+      "name": "Mage blasts 2F75, 2FA7, 2FD9: the object hit hears a message",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-mblast.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army03-mspray-300b",
+      "module": "ARMY__03.WRK",
+      "start": 12299,
+      "end": 12448,
+      "name": "Mage spray (300B) and its prelude 307F",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-mspray.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army03-mspray2-3118",
+      "module": "ARMY__03.WRK",
+      "start": 12568,
+      "end": 12700,
+      "name": "Mage spray preludes 3118, 3139, 315A, 317B",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-mspray.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
     }
   ]
 }
