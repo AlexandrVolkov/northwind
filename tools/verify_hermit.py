@@ -15,8 +15,15 @@ from verify_combat import CombatOracle
 from forestry_source import source_constants
 
 
+PRESETS = {
+    'onis': {'entry': 0xdbf, 'end': 0x11fd, 'items': [0xc, 0xd, 8, 9, 0xb, 10, 12, 13], 'queue': [0x11, 0x50, 0x26, 0x43, 0x59, 0x5a, 0x4a, 0x4d], 'templates': [2, 5, 0x1a], 'owner_items': [0xc, 0xd], 'scripted': [2, 0x1a, 5, 5, 5, 5, 5, 5]},
+    'irvil': {'entry': 0x1297, 'end': 0x162e, 'items': [0xb, 0xa, 0xe, 0xd, 8, 0x10], 'queue': [0x11, 0x60, 0x26, 0x54, 0x59, 0x5a], 'templates': [2, 0x19], 'owner_items': [0xe, 0xd], 'scripted': [2, 0x19, 0x19]},
+}
+PRESET = PRESETS['onis']
+
+
 class HermitOracle(CombatOracle):
-    RANGES = {'hermit': ([(0x124d8, 0x124fd), (0xee69, 0xeea3), (0x11be0, 0x11c1a), (0x6877, 0x68a0), (0x68bd, 0x68d8), (0x9e41, 0x9e55)], [(0xdbf, 0x11fd)])}
+    RANGES = {'hermit': ([(0x124d8, 0x124fd), (0xee69, 0xeea3), (0x11be0, 0x11c1a), (0x6877, 0x68a0), (0x68bd, 0x68d8), (0x9e41, 0x9e55)], [(PRESET['entry'], PRESET['end'])])}
 
     def run(self, address):
         self.stopped = False
@@ -27,38 +34,39 @@ class HermitOracle(CombatOracle):
 
 
 def cases():
-    rng = random.Random(0xdbf)
+    rng = random.Random(PRESET['entry'])
     out = []
     for n in range(400):
         count = rng.choice([2, 3, 4])
         case = {'count': count, 'owner': rng.randrange(count), 'tick': rng.choice([0, 32, 64, 1, 17, 255, 96]), 'ah': rng.choice([1, 1, 1, 1, 0, 2]),
                 'condition': rng.choice([100, 100, 60, 61, 50, 0x78, 1, 0, 0xfe]), 'flags14': rng.choice([0, 0x80, 0x81]), 'flags17': rng.randrange(65536),
                 'relations': [[rng.choice([0, 1, 1, 2, 3]) for _ in range(8)] for _ in range(count)],
-                'inventory': [[rng.choice([0, 0, 0, 0xc, 0xd, 8, 9, 0xb, 10, 12, 13]) for _ in range(20)] for _ in range(count)],
-                'queue': [[[rng.choice([0xff, 0xff, 0x11, 0x50, 0x26, 0x43, 0x59, 0x5a, 0x4a, 0x4d]), rng.randrange(count)] for _ in range(8)] for _ in range(count)],
+                'inventory': [[rng.choice([0, 0, 0] + PRESET['items']) for _ in range(20)] for _ in range(count)],
+                'queue': [[[rng.choice([0xff, 0xff] + PRESET['queue']), rng.randrange(count)] for _ in range(8)] for _ in range(count)],
                 'seed': rng.randrange(256), 'masks': {k: rng.choice([0, 0, rng.randrange(16), rng.randrange(1 << 8)]) for k in ('33', '35', '37', '39', '3f', '41', '43', '45', '49', '4b')},
                 'word47': rng.choice([0, 0, 0, 1]),
-                'objects': [{'owner': rng.randrange(count), 'army': rng.choice([0, 1, 2]), 'template': rng.choice([2, 2, 5, 5, 0x1a, 1, 3]), 'layer': rng.choice([0, 1]), 'mask22': rng.randrange(256), 'mask28': rng.randrange(256),
+                'objects': [{'owner': rng.randrange(count), 'army': rng.choice([0, 1, 2]), 'template': rng.choice(PRESET['templates'] + [2, 1, 3]), 'layer': rng.choice([0, 1]), 'mask22': rng.randrange(256), 'mask28': rng.randrange(256),
                              'condition': rng.choice([100, 5, 50]), 'flags': rng.choice([0, 8, 0x28, 0x20])} for _ in range(rng.choice([0, 3, 6]))],
                 'scan': {'zf': rng.choice([0, 1]), 'object': rng.randrange(6)}, 'create_zf': rng.choice([0, 1]), 'territory': [rng.randrange(6) for _ in range(rng.choice([0, 2, 4]))]}
         if rng.random() < 0.6:   # a scripted conversation: the answers of the participants and the staffs
             owner = case['owner']
             case['tick'] = rng.choice([0, 32, 64, 0])
             case['ah'] = 1; case['condition'] = 100; case['flags17'] = rng.randrange(65536)
-            case['inventory'][owner] = [0xc, 0xd] + [0] * 18
+            case['inventory'][owner] = PRESET['owner_items'] + [0] * 18
             for p in range(count):
                 if p != owner:
                     case['relations'][owner][p] = rng.choice([1, 1, 3, 2]); case['relations'][p][owner] = 1
                     if rng.random() < 0.7: case['inventory'][p] = [8, 9 if rng.random() < 0.2 else 0] + [0] * 18
-                    for s_ in range(3): case['queue'][p][s_] = [rng.choice([0x11, 0x50, 0x26, 0x43, 0x5a, 0x59, 0x4a, 0x4d, 0xff]), owner]
+                    for s_ in range(3): case['queue'][p][s_] = [rng.choice(PRESET['queue'] + [0xff]), owner]
             for g in case['objects']: g['army'] = rng.choice([3, 3, 1])
             case['word47'] = 0
-            for t in (2, 0x1a, 5, 5, 5, 5, 5, 5): case['objects'].append({'owner': owner, 'army': 3, 'template': t, 'layer': 0, 'mask22': rng.randrange(256), 'mask28': rng.randrange(256), 'condition': 100, 'flags': 0})
+            for t in PRESET['scripted']: case['objects'].append({'owner': owner, 'army': 3, 'template': t, 'layer': 0, 'mask22': rng.randrange(256), 'mask28': rng.randrange(256), 'condition': 100, 'flags': 0})
         out.append(case)
     return out
 
 
 def generate(game):
+    HermitOracle.RANGES = {'hermit': (HermitOracle.RANGES['hermit'][0], [(PRESET['entry'], PRESET['end'])])}
     constants = source_constants(game); report, code = analyze(game)
     o = HermitOracle(code, report['fs_assignments'], constants)
     wrk = (game / 'ARMY__03.WRK').read_bytes(); o.cpu.mem_write(o.WRK, wrk)
@@ -121,18 +129,23 @@ def generate(game):
         struct.pack_into('<H', rufin, 0x47, case['word47'])
         o.cpu.mem_write(o.POOL + 0x1000, bytes(rufin))
         o.cpu.reg_write(UC_X86_REG_ESI, o.POOL + 0x1000); o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 0x1000); o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, 7)
-        o.run(o.WRK + 0xdbf)
+        o.run(o.WRK + PRESET['entry'])
         out = bytes(o.cpu.mem_read(o.POOL + 0x1000, 0x50)) + bytes(o.cpu.mem_read(o.POOL, 0x40 * count)) + bytes(o.cpu.mem_read(o.POOL + 0x600, 0x40)) \
             + b''.join(bytes(o.cpu.mem_read(0x97a + 0xf5 * p + 0x34, 14 * 8)) for p in range(case['count'])) + b''.join(log)
         if __import__('os').environ.get('DEBUG_CASE') == str(all_cases.index(case)): print(out.hex())
         digest.update(out); case['sha256_prefix'] = hashlib.sha256(out).hexdigest()[:10]
     return {'format_version': 1, 'source_sha256': {k: report['source_sha256'][k] for k in ['NORWIND.EXE']} | {'ARMY__03.WRK': hashlib.sha256(wrk).hexdigest()},
-            'random_values': constants['random_values'], 'cases': all_cases, 'results': {'onis': {'case_count': len(all_cases), 'sha256': digest.hexdigest()}}}
+            'random_values': constants['random_values'], 'cases': all_cases, 'results': {PRESET_NAME: {'case_count': len(all_cases), 'sha256': digest.hexdigest()}}}
+
+
+PRESET_NAME = 'onis'
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--game', type=Path, required=True)
     parser.add_argument('--fixture', type=Path, required=True)
+    parser.add_argument('--script', choices=sorted(PRESETS), default='onis')
     args = parser.parse_args()
+    PRESET_NAME = args.script; PRESET = PRESETS[args.script]; globals().update(PRESET_NAME=PRESET_NAME, PRESET=PRESET)
     args.fixture.write_text(json.dumps(generate(args.game)) + '\n', encoding='utf-8')

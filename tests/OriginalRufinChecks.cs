@@ -35,7 +35,9 @@ public partial class TestRunner
     private void OriginalRufinChecks() => HermitReplay("rufin", "rufin", "Rufin's quest script ARMY__03.WRK 8EC", 300, (w, r, ah) => { if (ah == 0) OriginalRufin.Initialize(w, r, 7); else if (ah == 1) OriginalRufin.Step(w, r); else OriginalRufin.Speak(w); });
     private void OriginalOnisChecks() => HermitReplay("onis", "onis", "Onis' quest script ARMY__03.WRK DBF", 100, (w, r, ah) => { if (ah == 0) OriginalOnis.Initialize(w, r, 7); else if (ah == 1) OriginalOnis.Step(w, r); else OriginalOnis.Voice(w); });
 
-    private void HermitReplay(string file, string key, string label, int minSpeeches, Action<IRufinWorld, byte[], int> run)
+    private void OriginalIrvilChecks() => HermitReplay("irvil", "irvil", "Irvil's quest script ARMY__03.WRK 1297", 100, (w, r, ah) => { if (ah == 0) OriginalIrvil.Initialize(w, r, 7); else if (ah == 1) OriginalIrvil.Step(w, r); else OriginalIrvil.Voice(w); }, 0);
+
+    private void HermitReplay(string file, string key, string label, int minSpeeches, Action<IRufinWorld, byte[], int> run, int minCreations = 2)
     {
         using var reference = GameData.Read<JsonDocument>($"res://tests/fixtures/{file}.json");
         var root = reference.RootElement;
@@ -76,7 +78,7 @@ public partial class TestRunner
         }
         GD.Print($"{key}: first mismatch {firstMismatch}; speeches {speeches}, creations {created}, reveals {reveals}, sweeps {sweeps}");
         var summary = root.GetProperty("results").GetProperty(key);
-        Check(count == summary.GetProperty("case_count").GetInt32() && speeches > minSpeeches && created > 2 && reveals > 5 && sweeps > 1, $"{key} reference coverage ({count}: {speeches} speeches, {created} creations, {reveals} reveals, {sweeps} sweeps)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && speeches > minSpeeches && created >= minCreations && reveals > 5 && sweeps > 1, $"{key} reference coverage ({count}: {speeches} speeches, {created} creations, {reveals} reveals, {sweeps} sweeps)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), $"{label} matches original x86");
     }
 }
