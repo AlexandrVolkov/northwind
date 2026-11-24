@@ -26,6 +26,8 @@ public partial class TestRunner
         public void Appearance(byte army) { log.Add((byte)'N'); log.AddRange(BitConverter.GetBytes((uint)army)); }
         public void Voice() => log.Add((byte)'Y');
         public void Vitals() => log.Add((byte)'V');
+        public uint ParentAddress => 0x400900;
+        public uint TemplateFlagsA1() => c.GetProperty("tflags").GetUInt32();
         public void Service115() => log.Add((byte)'I');
         public void ServiceC5(byte[] r) { log.Add((byte)'5'); log.AddRange(r[0x48..0x4c]); }
         public void Actions() => log.Add((byte)'U');
@@ -55,10 +57,11 @@ public partial class TestRunner
             BitConverter.GetBytes(c.GetProperty("x").GetUInt32()).CopyTo(r, 4); BitConverter.GetBytes(c.GetProperty("y").GetUInt32()).CopyTo(r, 8);
             var log = new List<byte>(); var world = new BuildingScriptReplay(c, log);
             world.Tmpl[0x79] = (byte)c.GetProperty("t79").GetInt32(); world.Tmpl[0x45] = (byte)c.GetProperty("t45").GetInt32(); world.Tmpl[0x46] = (byte)c.GetProperty("t46").GetInt32(); BitConverter.GetBytes(c.GetProperty("t78").GetUInt32()).CopyTo(world.Tmpl, 0x78); BitConverter.GetBytes(c.GetProperty("p2c").GetUInt32()).CopyTo(world.Part, 0x2c);
-            r[0x31] = (byte)c.GetProperty("f31").GetInt32(); r[0x15] = (byte)c.GetProperty("f15").GetInt32(); BitConverter.GetBytes(c.GetProperty("f48").GetUInt32()).CopyTo(r, 0x48); r[0x23] = (byte)c.GetProperty("f23").GetInt32(); r[0x24] = (byte)c.GetProperty("f24").GetInt32(); BitConverter.GetBytes(c.GetProperty("p1c").GetUInt32()).CopyTo(world.Part, 0x1c);
+            { int q = 0; foreach (var b in c.GetProperty("pb").EnumerateArray()) world.Part[0x34 + 14 * q++] = (byte)b.GetInt32(); }
+            r[0x2e] = (byte)c.GetProperty("f2e").GetInt32(); r[0x18] = (byte)c.GetProperty("f18b").GetInt32(); r[0x31] = (byte)c.GetProperty("f31").GetInt32(); r[0x15] = (byte)c.GetProperty("f15").GetInt32(); BitConverter.GetBytes(c.GetProperty("f48").GetUInt32()).CopyTo(r, 0x48); r[0x23] = (byte)c.GetProperty("f23").GetInt32(); r[0x24] = (byte)c.GetProperty("f24").GetInt32(); BitConverter.GetBytes(c.GetProperty("p1c").GetUInt32()).CopyTo(world.Part, 0x1c);
             world.Found[0x31] = (byte)c.GetProperty("fo31").GetInt32(); BitConverter.GetBytes((ushort)c.GetProperty("fo17").GetInt32()).CopyTo(world.Found, 0x17);
             BitConverter.GetBytes(c.GetProperty("e1a10").GetUInt32()).CopyTo(world.Big, 0x1a10);
-            var other = new byte[0x50]; other[3] = (byte)c.GetProperty("o3").GetInt32();
+            var other = new byte[0x50]; Convert.FromHexString(c.GetProperty("oraw").GetString()!).CopyTo(other, 0); other[3] = (byte)c.GetProperty("o3").GetInt32();
             int ah = c.GetProperty("ah").GetInt32(), k = c.GetProperty("entry").GetInt32(); if (ah == 1) { steps++; handlers.Add(k * 8 + (r[0x14] & 7)); }
             uint result = OriginalBuildingScripts.Run(world, r, ah, (byte)c.GetProperty("bl").GetInt32(), k, other, out bool rzf);
             byte[] output = [.. r, .. world.Part[0x28..0x30], world.Index, .. (ah == 6 ? BitConverter.GetBytes(result) : []), .. (ah == 5 ? new[] { (byte)result, rzf ? (byte)1 : (byte)0 } : []), .. (ah == 4 ? new[] { rzf ? (byte)1 : (byte)0 } : []), .. world.Found, .. world.Part[0x18..0x20], .. world.Big[0x1a10..0x1a14], .. log];

@@ -5684,6 +5684,42 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
       "implementation": ["scripts/OriginalBuildingScripts.cs"],
       "limitations": "The services are recorded stubs; FS:109 runs as original code"
+    },
+    {
+      "id": "army__02-script-154e",
+      "module": "ARMY__02.WRK",
+      "start": 5454,
+      "end": 5661,
+      "name": "Unit script 154E: participant scan for kinds 5/0Ah/0Bh/10h, effect 8Bh",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "The services (FS:A1 with a fixed template, FS:6D, FS:19, FS:1D) are recorded stubs; FS:109 runs as original code and returns the byte zero-extended in EAX"
+    },
+    {
+      "id": "army__02-script-161d",
+      "module": "ARMY__02.WRK",
+      "start": 5661,
+      "end": 5853,
+      "name": "Debris effect 161D (frame 235h)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "The services (FS:A1 with a fixed template, FS:6D, FS:19, FS:1D) are recorded stubs; FS:109 runs as original code and returns the byte zero-extended in EAX"
+    },
+    {
+      "id": "army__01-script-102d",
+      "module": "ARMY__01.WRK",
+      "start": 4141,
+      "end": 4333,
+      "name": "Debris effect 102D (frame 221h)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "The services (FS:A1 with a fixed template, FS:6D, FS:19, FS:1D) are recorded stubs; FS:109 runs as original code and returns the byte zero-extended in EAX"
     }
   ]
 }

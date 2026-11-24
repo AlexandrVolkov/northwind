@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "eb1533fafe811dc604a5ec84b77f2e638a67a66bd23c347a290a088840469f9f",
+  "annotation_sha256": "0a8f090827ead121238730052ed11162de8b53c2dfd684d6ec2a6ad6bd17d6e8",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3511,8 +3511,8 @@
       "zero_fill_bytes": 0,
       "sha256": "d2554037e3a135ce7c06530cf2ee85e89ae240aa31a00c7c72a9b3cb251c46de",
       "byte_status": {
-        "ported": 4267,
-        "unreviewed": 684
+        "ported": 4459,
+        "unreviewed": 492
       },
       "linear_rows": 1625,
       "flow_candidate_instructions": 1129,
@@ -3700,10 +3700,19 @@
         },
         {
           "start": 4049,
-          "end": 4333,
+          "end": 4141,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 4141,
+          "end": 4333,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-script-102d"
+          ]
         },
         {
           "start": 4333,
@@ -3726,8 +3735,8 @@
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
         "partial": 855,
-        "ported": 4273,
-        "unreviewed": 1802
+        "ported": 4480,
+        "unreviewed": 1595
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -4242,9 +4251,11 @@
         {
           "start": 5454,
           "end": 5661,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-script-154e"
+          ]
         },
         {
           "start": 5661,
@@ -4252,7 +4263,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "unit-corpse"
+            "unit-corpse",
+            "army__02-script-161d"
           ]
         },
         {

@@ -30,6 +30,10 @@ public interface IBuildingScriptWorld
     void Voice();
     void Vitals();
     void Service115();
+    /// <summary>FS:A1: after it EDX points to a template, whose dword at +40h the script tests.</summary>
+    uint TemplateFlagsA1();
+    /// <summary>The pointer of the creator record as the effect scripts hold it in EBX.</summary>
+    uint ParentAddress { get; }
     /// <summary>FS:C5 (reads the dword at +48h of the record).</summary>
     void ServiceC5(byte[] r);
     void Actions();
@@ -61,6 +65,8 @@ public static class OriginalBuildingScripts
         int kd = k; k = Base(k);
         if (k == 20) return Unit20(w, r, g, ah, bl, kd == 21, out zf);
         if (k == 22) return Script1078(w, r, g, ah, out zf);
+        if (k == 23) return Unit154E(w, r, g, ah, bl);
+        if (k is 24 or 25) return Debris(w, r, g, ah, other!, kd == 24 ? 0x235u : 0x221u);
         if (k == 5) return Script7A0(w, r, g, ah, kd == 15);
         if (k == 13 && ah != 5) return Script524(w, r, g, ah, out zf);
         if (ah == 0)
@@ -411,5 +417,61 @@ public static class OriginalBuildingScripts
         if (r[0x15] != 4 || (sbyte)r[0x19] > 0) return 0;
         r[0x19]--; if (r[0x19] > 0xfa) return 0;
         w.Service(0x15, g); return 0;
+    }
+
+    /// <summary>The unit script 154E of ARMY__02.WRK: AH = 0 +0F = 7, appearance, +2E random; AH = 2 the voice; AH = 1 keeps +19 at 64h while it is positive, every 32 updates (+2E &amp; 1Fh = 0) looks through the
+    /// eight 0Eh-byte entries at +34h of the participant for the kinds 5, 0Ah, 0Bh, 10h (then +19 = 0); with +19 = 0 it clears +20 and throws the effect 8Bh; then the vitals and the unit step.</summary>
+    private static uint Unit154E(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int ah, byte bl)
+    {
+        if (ah == 2) { w.Voice(); return 0; }
+        if (ah == 0) { r[0x0f] = 7; w.Appearance(bl); r[0x2e] = w.Random(); return 0; }
+        if (ah != 1) return 0;
+        if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Service(0x1d, g); }
+        if ((sbyte)r[0x19] > 0) r[0x19] = 0x64;
+        if ((r[0x2e] & 0x1f) == 0)
+        {
+            var (p, _, ptr) = w.Participant6D(); g.Ecx = ptr;
+            for (int i = 0; i < 8; i++)
+            {
+                byte v = p[0x34 + 14 * i]; g.Eax = (g.Eax & 0xffffff00) | v;
+                if (v is 5 or 0xa or 0xb or 0x10) { r[0x19] = 0; break; }
+            }
+        }
+        if (r[0x19] == 0)
+        {
+            r[0x20] = 0; g.Ebx = (g.Ebx & 0xffff0000) | 0x18b; g.Ecx = Dword(r, 4); g.Edx = Dword(r, 8); w.Service(0x19, g);
+        }
+        w.Vitals(); w.Actions(); return 0;
+    }
+
+    /// <summary>The debris effects 102D (ARMY__01.WRK) and 161D (ARMY__02.WRK, frame 235h instead of 221h): AH = 1 counts 258h updates per frame of a 4-frame animation (+17), AH = 0 creates it from the record of the creator
+    /// (EBX): FS:A1 decides whether it is made at all (kind 2 of the answer only when the template flag 2 is missing), the frame, the animation variant and, unless the creator's +17 &amp; 18h = 18h, a random
+    /// spark (effect 83h at a spot up to 7 cells around).</summary>
+    private static uint Debris(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int ah, byte[] parent, uint frame)
+    {
+        if (ah == 1)
+        {
+            Put(r, 0x18, Dword(r, 0x18) - 1); if (Dword(r, 0x18) != 0) return 0;
+            Put(r, 0x18, 0x258);
+            if (r[0x17] == 4) { uint e = r[6]; BitConverter.GetBytes((ushort)(e * 3 + frame)).CopyTo(r, 3); }
+            BitConverter.GetBytes((ushort)(BitConverter.ToUInt16(r, 3) + 1)).CopyTo(r, 3);
+            r[0x17]--; if (r[0x17] == 0) r[0] = 0xff; return 0;
+        }
+        g.Ebx = w.ParentAddress; uint ebx = g.Ebx;
+        w.Service(0xa1, g); g.Ebx = ebx;
+        bool skip = !g.Zf && (w.TemplateFlagsA1() & 2) != 0;
+        if (!skip && (byte)g.Eax == 2) { r[0] = 0xff; return 0; }
+        BitConverter.GetBytes(BitConverter.ToUInt16(parent, 1)).CopyTo(r, 3); r[2] = parent[3];
+        ushort word = BitConverter.ToUInt16(parent, 0x17);
+        byte cl = (byte)word, al = (byte)((byte)word >> 2 & 4), ah2 = (byte)((parent[0x25] & 7) >> 1);
+        r[6] = (byte)(al + ah2); g.Eax = (g.Eax & 0xffff0000) | ((uint)ah2 << 8) | (byte)(al + ah2); Put(r, 0x18, 0x258); r[0] = 1; r[0x17] = 4;
+        if ((cl & 0x18) == 0x18) return 0;
+        g.Eax = w.Random();   // FS:109 returns the byte zero-extended in EAX
+        uint ecx = g.Eax, edx = ecx;
+        edx = (edx & 0xffffff00) | (byte)((byte)edx >> 4); ecx = (ecx & 0xffffff00) | (byte)((byte)ecx & 0xf);
+        edx -= 7; ecx -= 7;
+        g.Eax = (g.Eax & 0xffffff00) | parent[0]; g.Ebx = (g.Ebx & 0xffff0000) | 0x83;
+        g.Ecx = ecx + Dword(r, 7); g.Edx = edx + Dword(r, 0xc);
+        w.Service(0x19, g); return 0;
     }
 }
