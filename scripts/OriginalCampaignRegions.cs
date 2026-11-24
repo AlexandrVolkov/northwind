@@ -95,3 +95,76 @@ public static class OriginalCampaignRegions
         return U32(regions, third + 1 + 0x17) <= 0x7cf ? (byte)3 : state;
     }
 }
+
+/// <summary>10FDE: casualties of an army taken while it was away from its mission. The units of the army are weakened to the minimum condition of their template (DAT[46]) until the
+/// strength budget is spent: the population of the army shrinks by <c>loss</c>; units that carry weight (DAT[76]) count against the new population, soldiers (flags &amp; 28h = 8) against the
+/// share of strength lost. Verified by tests/fixtures/campaign-losses.json (tools/verify_campaign_losses.py; 68BD is a stub).</summary>
+public static class OriginalCampaignLosses
+{
+    public static void Apply(byte[] state, uint loss, IEnumerable<(byte[] Unit, byte[] Template)> units)
+    {
+        if (loss == 0) return;
+        uint population = BinaryPrimitives.ReadUInt32LittleEndian(state.AsSpan(0x19e9)); byte strength = state[0x5c];
+        uint remaining = population >= loss ? population - loss : 0;
+        uint half = (population >> 1) + 1, lost = 0;
+        if (loss > half) lost = (uint)(((ulong)(loss - half) * strength) / half);
+        uint budget = strength >= lost ? strength - lost : 0, accumulated = 0, counter = 0;
+        foreach (var (unit, template) in units)
+        {
+            sbyte minimum = (sbyte)template[0x46];
+            if ((sbyte)unit[0x19] <= minimum) continue;
+            if (accumulated >= remaining && template[0x76] != 0) { unit[0x19] = (byte)minimum; continue; }
+            accumulated += template[0x76];
+            if ((BinaryPrimitives.ReadUInt32LittleEndian(template.AsSpan(0x40)) & 0x28) != 8) continue;
+            if (counter >= budget) { unit[0x19] = (byte)minimum; continue; }
+            counter++;
+        }
+    }
+}
+
+/// <summary>The services of the catch-up (recorded stubs in tools/verify_campaign_catchup.py).</summary>
+public interface ICampaignCatchupWorld
+{
+    void Casualties(uint loss, int army);        // 10FDE
+    void ResetMission();                         // 1E6C2
+    void System(byte army, byte mode);           // 1E740
+    void RunWorld(uint updates);                 // 11087: that many updates of the world
+}
+
+/// <summary>10E19 and 10ECE: the time the campaign has spent elsewhere is applied when a region is entered. <see cref="Away"/> takes 800h from the budget [3E83], adds the rest to the global time,
+/// restores the relations of the participants from the region record and gives the army the casualties it took (state population above the recorded one); <see cref="Budget"/> runs the
+/// budget as world updates in chunks of 400h. Verified by tests/fixtures/campaign-catchup.json.</summary>
+public static class OriginalCampaignCatchup
+{
+    public static void Away(byte[] regions, byte[] states, byte[] participants, int armies, ref uint budget, ref uint time, byte row, byte columns, byte column, byte player, ICampaignCatchupWorld world, byte[]? padded = null)
+    {
+        uint old = budget; budget -= 0x800;
+        if (old > 0x800)
+        {
+            time += budget;
+            int product = row * columns; int index = (product & 0xff00) | (byte)((byte)product + column); int region = index * OriginalCampaignRegions.Region;
+            if (region < regions.Length && (regions[region] & 1) != 0)
+            {
+                int rec = region + 1;
+                for (int a = 0; a < armies; a++, rec += OriginalCampaignRegions.Record)
+                {
+                    for (int j = 0; j < 0x10; j++) participants[a * OriginalCampaignRegions.Participant + 0xb9 + j] = regions[rec + 1 + j];
+                    uint population = BitConverter.ToUInt32(states, a * OriginalCampaignRegions.State + 0x19e9), recorded = BitConverter.ToUInt32(regions, rec + 0x11);
+                    if (population > recorded) world.Casualties(population - recorded, a);
+                }
+            }
+        }
+        world.ResetMission(); world.System(player, 1); world.RunWorld(0x800);
+    }
+
+    public static void Budget(ref uint budget, ICampaignCatchupWorld world)
+    {
+        uint remaining = budget;
+        do
+        {
+            uint chunk = Math.Min(remaining, 0x400u); budget = chunk; world.RunWorld(chunk);
+            if (remaining <= 0x400) break;
+            remaining -= 0x400;
+        } while (remaining > 0);
+    }
+}

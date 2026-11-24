@@ -4316,6 +4316,30 @@
       "evidence": ["docs/campaign-layer.md", "tests/fixtures/campaign-regions.json", "tools/verify_campaign_regions.py", "tests/OriginalCampaignRegionChecks.cs"],
       "implementation": ["scripts/OriginalCampaignRegions.cs"],
       "limitations": "1ECA0 is a recorded stub in the check; field names of the region record are descriptive guesses; not yet connected to the campaign screens"
+    },
+    {
+      "id": "le1-campaign-losses-10fde",
+      "module": "LE:1",
+      "start": 69598,
+      "end": 69767,
+      "name": "Campaign: casualties of an army away from its mission (units drop to the minimum condition)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-layer.md", "tests/fixtures/campaign-losses.json", "tools/verify_campaign_losses.py", "tests/OriginalCampaignLossChecks.cs"],
+      "implementation": ["scripts/OriginalCampaignRegions.cs"],
+      "limitations": "68BD is a recorded stub in the check"
+    },
+    {
+      "id": "le1-campaign-catchup-10e19",
+      "module": "LE:1",
+      "start": 69145,
+      "end": 69598,
+      "name": "Campaign: catch-up of the time spent elsewhere (10E19) and the chunked world budget (10ECE)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-layer.md", "tests/fixtures/campaign-catchup.json", "tools/verify_campaign_catchup.py", "tests/OriginalCampaignCatchupChecks.cs"],
+      "implementation": ["scripts/OriginalCampaignRegions.cs"],
+      "limitations": "10FDE, 1E6C2, 1E740 and 11087 are recorded stubs in the check; the middle of 10ECE (10EF0..10FC1) is dead code (the budget is capped at 400h before the test against 800h) and is not ported"
     }
   ]
 }
