@@ -1562,4 +1562,33 @@ public static class OriginalUnitActions
             g.Bl = 1; g.Al = 0xff; g.Logic(g.Al, 8);
         }
     }
+
+    /// <summary>CCCB: the unit pays its upkeep (A716 gives the count, +15 = 1 once started): every tick the participant loses (10 * +23 * +22) of +20 (down to 0, then +23 = 1), the unit loses it from +24; when +24 runs out A6AE is called
+    /// and the statistics value +73 of the owner falls by 271h (the original also writes +73 of the unit record itself when it is not positive).</summary>
+    public static void FCCCB(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds;
+        g.Cmp(r[0x15], 0, 8);
+        if (g.Zf)
+        {
+            g.Al = r[3]; g.Ah = r[0]; w.Call(0xa716, g); g.Test(g.Al, g.Al, 8);
+            if (g.Zf) return;
+            g.Bl = g.Al; w.Call(0x9e41, g); Mul8(g, g.Al, g.Bl); g.Al = 0x10; Mul8(g, g.Al, g.Ah);
+            g.Edi = g.Eax + 0x1f45; g.Al = d[g.Edi + 1]; r[0x28] = g.Al; g.Eax = U32(d, (int)g.Edi + 7); Put(r, 0x24, g.Eax); r[0x15]++;
+        }
+        g.Test(d[0x19ea], 0xff, 8);
+        if (!g.Zf) return;
+        g.Eax = 0xf5; Mul8(g, 0xf5, r[3]); g.Ecx = 0x97a + (g.Eax & 0xffff); var p = w.PartOf(r[3]);
+        g.Eax = 0xa; Mul8(g, g.Al, r[0x23]); Mul8(g, g.Al, r[0x22]);
+        uint a = U32(p, 0x20); g.Cmp(a, g.Eax, 32); Put(p, 0x20, a - g.Eax);
+        if (g.Cf) { g.Eax = U32(p, 0x20); Put(p, 0x20, 0); r[0x23] = 1; }
+        a = U32(r, 0x24); g.Cmp(a, g.Eax, 32); Put(r, 0x24, a - g.Eax);
+        if (!g.Cf && !g.Zf) return;
+        g.Al = r[0x28]; g.Ah = 0; w.Call(0xa6ae, g); r[0x15]--;
+        g.Eax = 0x1a35; g.Ebx = r[3]; g.Eax *= g.Ebx; g.Edx = 0; g.Eax += U32(d, 0x6ba);
+        int at = r[3] * 0x1a35 + 0x73; var st = w.Stats; uint v = BitConverter.ToUInt32(st, at); g.Cmp(v, 0x271, 32); Put(st, at, v - 0x271);
+        g.Cmp(U32(r, 0x73), 0, 32);
+        if (g.Jg) return;
+        Put(r, 0x73, 0);
+    }
 }
