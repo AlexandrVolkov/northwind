@@ -58,6 +58,12 @@ public interface IUnitActionWorld
     uint G50E { get; set; }
     /// <summary>The participant record of the owner (the bytes at +0CDh are read by 89F1).</summary>
     byte[] PartOf(byte owner);
+    byte G525 { get; } byte G526 { get; }
+    byte G1C61 { get; set; }
+    uint G2730 { get; }
+    /// <summary>The route bytes ([6B6] points to them) and the first dword of the descriptor of a map tile.</summary>
+    byte[] Route { get; }
+    uint TileDescriptor(uint tile);
     /// <summary>The byte [1CCB + 16h · owner] written by 8A54.</summary>
     void SetG1CCB(int index, byte value);
 }
@@ -771,5 +777,88 @@ public static class OriginalUnitActions
         g.Cmp(r[0x32], g.Al, 8);
         if (g.Zf) { g.Cmp(r[0x33], g.Bl, 8); if (g.Zf) { Xor0(g); g.Bl = 1; return; } }
         r[0x32] = g.Al; r[0x33] = g.Bl; r[0x15] = 0; End(w, g);
+    }
+
+    /// <summary>7FA7: reads the next step of the route (the nibbles at the cursor +28; bit 8 ends the path); at the end the route is released (8120) and the unit looks for a new one (73F5) within the
+    /// allowance [1C61]; a step goes through the admission 7C63 (DL 0 = free, 2 = wait, 3 = contact — the occupant is hit —, FF = blocked).</summary>
+    public static void F7FA7(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Ebx = U32(r, 0x28); g.Cmp(g.Ebx, 0xffffffff, 32);
+        if (!g.Zf)
+        {
+            g.Al = g.Bl; bool odd = (g.Ebx & 1) != 0; g.Ebx >>= 1; g.Ebx += 0x401000;
+            byte b = w.Route[g.Ebx - 0x401000]; g.Al = b; if (odd) g.Al = (byte)(b >> 4); g.Al = (byte)(g.Al & 0xf);
+            g.Test(g.Al, 8, 8);
+            if (g.Zf) { Step(w, g, r); return; }
+            w.Call(0x8120, g);
+            g.Eax = U32(r, 4) >> 5; g.Cmp(g.Al, w.G525, 8);
+            if (g.Zf)
+            {
+                g.Eax = U32(r, 8) >> 5; g.Cmp(g.Al, w.G526, 8);
+                if (g.Zf) { g.Ah = 0; g.Logic(g.Ah, 8); return; }
+            }
+        }
+        Rebuild(w, g, r);
+    }
+
+    private static void Rebuild(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        w.Call(0x8120, g); g.Cmp(w.G1C61, 0, 8);
+        if (g.Zf) { Blocked(g, r); return; }
+        w.G1C61--; g.Eax = 0; w.Call(0x43b0, g); w.Call(0x73f5, g); g.Eax = g.Esi - w.PoolBase; w.Call(0x43b0, g);
+        g.Cmp(w.G2730, 0xffffffff, 32); g.Ah = 1;
+        if (g.Zf) return;
+        w.Call(0x802c, g);   // falls into the route storage (802C..809B), which has its own port
+    }
+
+    private static void Blocked(ActionRegs g, byte[] r) { g.Al = (byte)(r[0x25] & 7); g.Logic(g.Al, 8); g.Ah = 2; }
+
+    private static void Step(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        uint eax = g.Eax; g.Eax = 0; w.Call(0x43b0, g); g.Eax = eax; w.Call(0x7c63, g);
+        uint pushedEbx = g.Ebx, pushedEcx = g.Ecx; g.Eax = g.Esi - w.PoolBase; w.Call(0x43b0, g);
+        g.Ebx = pushedEcx; g.Edx = pushedEbx; g.Eax = eax;
+        g.Cmp(g.Dl, 0xff, 8);
+        if (g.Zf) { Rebuild(w, g, r); return; }
+        g.Cmp(g.Dl, 3, 8);
+        if (g.Zf)
+        {
+            g.Edi = w.PoolBase + 0xc00; g.Bl = g.Al; w.Call(0xbb26, g);
+            g.Eax = eax;
+            if (g.Zf) { g.Ah = 2; return; }
+            var o = w.ObjectAt(g.Ecx); g.Cmp(o[0x19], 0, 8);
+            if (g.Jle) { g.Ah = 2; return; }
+            o[0x19] = 0; o[0x17] &= 0xe0; o[0x17] |= 0x11; g.Ah = 2; return;
+        }
+        g.Cmp(g.Dl, 2, 8);
+        if (g.Zf) { g.Ah = 2; return; }
+        g.Test(g.Dl, g.Dl, 8);
+        if (!g.Zf) { g.Ah = 2; return; }
+        g.Edx = g.Esi - w.PoolBase; w.Call(0x43b7, g); g.Eax = eax;
+        uint cur = U32(r, 0x28) + 1; Put(r, 0x28, cur); g.Zf = cur == 0; g.Sf = (cur & 0x80000000) != 0; g.Of = cur == 0x80000000; g.Ah = 0x20;
+    }
+
+    /// <summary>902F: the unit near its target (up to 8 cells: 9B86) tries the pick-up (12406) or the order (8C7C, 1243A) of the item.</summary>
+    public static void F902F(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        w.Call(0x9b86, g); g.Cmp(g.Eax, 8, 32);
+        if (g.Cf == false && g.Zf == false) return;
+        w.Call(0x8c1e, g);
+        if (!g.Zf) return;
+        w.Call(0x12406, g);
+        if (g.Zf) { g.Ah = r[3]; w.Call(0x1243a, g); return; }
+        g.Cmp(g.Al, 1, 8);
+        if (!g.Zf) return;
+        g.Edi -= w.PoolBase; Put(r, 0x1c, g.Edi); w.Call(0x8c7c, g);
+    }
+
+    /// <summary>81D9: the unit's fog and occupancy update (813E, 6885, 43E5) and the descriptor of its tile in EAX.</summary>
+    public static void F81D9(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        w.Call(0x813e, g); w.Call(0x6885, g);
+        var o = w.ObjectAt(g.Edi); g.Test(U32(o, 0x40), 0x40000, 32);
+        if (g.Zf) { g.Eax = g.Esi - w.PoolBase; w.Call(0x43e5, g); }
+        g.Eax = U32(r, 8) >> 5; g.Ebx = U32(r, 4) >> 5; g.Eax = (g.Eax & 0xffff0000) | (ushort)(g.Al * 32); g.Add(g.Eax, g.Ebx); g.Eax += g.Ebx;
+        g.Ebx = 0xf00000; g.Eax = w.TileDescriptor(g.Eax);   // EBX = [18FE], the descriptor table
     }
 }
