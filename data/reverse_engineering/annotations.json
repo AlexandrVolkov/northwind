@@ -4280,6 +4280,42 @@
       "evidence": ["docs/unit-motion.md", "tests/fixtures/unit-move.json", "tools/verify_unit_move.py", "tests/OriginalUnitMoveChecks.cs"],
       "implementation": ["scripts/OriginalUnitMove.cs"],
       "limitations": "the services 6996, 43B0, AC63, 813E, 12BF2 are recorded stubs in the check; not yet the driver of the skirmish units"
+    },
+    {
+      "id": "le1-campaign-tick-10bd4",
+      "module": "LE:1",
+      "start": 68564,
+      "end": 68768,
+      "name": "Campaign regions: every 1024 updates growth of populations and war losses",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-layer.md", "tests/fixtures/campaign-regions.json", "tools/verify_campaign_regions.py", "tests/OriginalCampaignRegionChecks.cs"],
+      "implementation": ["scripts/OriginalCampaignRegions.cs"],
+      "limitations": "1ECA0 is a recorded stub in the check; field names of the region record are descriptive guesses; not yet connected to the campaign screens"
+    }    },
+    {
+      "id": "le1-campaign-snapshot-10ca0",
+      "module": "LE:1",
+      "start": 68768,
+      "end": 69145,
+      "name": "Campaign regions: snapshot of the running mission into its region",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-layer.md", "tests/fixtures/campaign-regions.json", "tools/verify_campaign_regions.py", "tests/OriginalCampaignRegionChecks.cs"],
+      "implementation": ["scripts/OriginalCampaignRegions.cs"],
+      "limitations": "1ECA0 is a recorded stub in the check; field names of the region record are descriptive guesses; not yet connected to the campaign screens"
+    }    },
+    {
+      "id": "le1-campaign-end-110c8",
+      "module": "LE:1",
+      "start": 69832,
+      "end": 69968,
+      "name": "Campaign regions: victory check (regions without enemies)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/campaign-layer.md", "tests/fixtures/campaign-regions.json", "tools/verify_campaign_regions.py", "tests/OriginalCampaignRegionChecks.cs"],
+      "implementation": ["scripts/OriginalCampaignRegions.cs"],
+      "limitations": "1ECA0 is a recorded stub in the check; field names of the region record are descriptive guesses; not yet connected to the campaign screens"
     }
   ]
 }
