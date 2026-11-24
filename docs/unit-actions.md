@@ -57,3 +57,7 @@
 ## B6F1
 
 `FB6F1` runs BA2E and 6EC1 for the object ESI ([1969] holds it meanwhile) and then walks the chain (ESI .. EBP): for the objects whose +1B equals [1C87] the 6 slots of 12 bytes at DS:1978 are cleared (+2) unless bit k of +0F is set and the byte +7 of the slot equals the byte of the template entry and is not zero. The slot table joins the compared DS windows. Verified against x86; clearing the wrong field is caught.
+
+## 6EB2, 6EC1
+
+`F6EB2` clears the slot table (6 slots of 12 bytes at DS:1978); `F6EC1` fills it from the template of the object [1969]: the word, the bytes +6/+7, the pointer to the entry data (+2, entry + 4 + dword) with the word behind it, and the first byte of the object. B6F1 later compares the slots. Verified against x86.
