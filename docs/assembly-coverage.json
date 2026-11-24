@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "ab416886c9e459ff92224fdafa833cb1792b9a36225d4d63f67a44436ff7b3df",
+  "annotation_sha256": "d30263a92ef05065968a7274c873392e0b6acd2e9ef7d535ef8882e65b78733c",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 6265,
-        "ported": 41985,
-        "unreviewed": 98535,
+        "ported": 42249,
+        "unreviewed": 98271,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -674,9 +674,11 @@
         {
           "start": 34393,
           "end": 34486,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8659"
+          ]
         },
         {
           "start": 34486,
@@ -1972,10 +1974,21 @@
         },
         {
           "start": 55104,
+          "end": 55162,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-d740"
+          ]
+        },
+        {
+          "start": 55162,
           "end": 55217,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-d77a"
+          ]
         },
         {
           "start": 55217,
@@ -2007,9 +2020,11 @@
         {
           "start": 55877,
           "end": 55935,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-da45"
+          ]
         },
         {
           "start": 55935,
