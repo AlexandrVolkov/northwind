@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "2cad2e83c282c3704ad53539f748f54b35f3f26ec8e63bff20b5cd8af8af18b8",
+  "annotation_sha256": "56ac5201ffb6a7a077ec5747e290ec820b9b0fe810cce47dd3f85a08e8d472b8",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3790,8 +3790,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 11359,
-        "unreviewed": 2053
+        "ported": 11456,
+        "unreviewed": 1956
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -3803,6 +3803,15 @@
       "regions": [
         {
           "start": 0,
+          "end": 97,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-mage0-0"
+          ]
+        },
+        {
+          "start": 97,
           "end": 228,
           "status": "unreviewed",
           "classification": "unknown",

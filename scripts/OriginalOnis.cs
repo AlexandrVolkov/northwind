@@ -117,3 +117,15 @@ public static class OriginalOnis
         }
     }
 }
+
+/// <summary>The first mage (templates 0, 22 and 23: Mag, Farih, Zakir; ARMY__03.WRK 0..61): the init and voice of the hermits (<see cref="OriginalRufin"/>) and the plain step — the redraw,
+/// the vitals and the unit step; the continuation (79..C5) is <see cref="OriginalMageCloak"/>. Verified by tests/fixtures/mage0.json (tools/verify_hermit.py).</summary>
+public static class OriginalMage0
+{
+    public static void Step(IRufinWorld w, byte[] r)
+    {
+        BinaryPrimitives.WriteUInt16LittleEndian(r.AsSpan(0x17), (ushort)(BinaryPrimitives.ReadUInt16LittleEndian(r.AsSpan(0x17)) & 0xffe7));
+        if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); }
+        OriginalRufin.Standard(w);
+    }
+}

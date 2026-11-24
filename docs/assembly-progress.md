@@ -10,7 +10,7 @@
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
 | ARMY__01.WRK | 4951 | 4576 | 0 | 0 | 375 | 7 |
 | ARMY__02.WRK | 6930 | 5296 | 855 | 0 | 779 | 7 |
-| ARMY__03.WRK | 13412 | 2053 | 0 | 0 | 11359 | 1 |
+| ARMY__03.WRK | 13412 | 1956 | 0 | 0 | 11456 | 1 |
 | ARMY__04.WRK | 411 | 411 | 0 | 0 | 0 | 0 |
 | ARMY__05.WRK | 882 | 882 | 0 | 0 | 0 | 2 |
 
@@ -59,6 +59,7 @@
 | ARMY__02.WRK `0xD85..0xE7B` | Gate script (D85): command states 2/3/4, completion in automatic mode, half-damage closing | partial | [gates.md](../docs/gates.md); [GateChecks.cs](../tests/GateChecks.cs) | effects 7 at completion (FS:19) and FS:8D (building common) are not part of the port; no Unicorn fixture |
 | ARMY__02.WRK `0x11B4..0x122D` | Standard unit script (horseman): init, step, voice | ported | [object-scripts.md](../docs/object-scripts.md); [unit-scripts.json](../tests/fixtures/unit-scripts.json); [verify_unit_scripts.py](../tools/verify_unit_scripts.py); [OriginalUnitScriptChecks.cs](../tests/OriginalUnitScriptChecks.cs) | FS services are recorded stubs in the check; the skirmish drives the units by its own adapters |
 | ARMY__02.WRK `0x161D..0x16DD` | Unit corpse effect (type 1) | ported | [combat.md](../docs/combat.md); [corpse.json](../tests/fixtures/corpse.json) |  |
+| ARMY__03.WRK `0x0..0x61` | First mage (templates 0, 22, 23): init, voice and the plain step | ported | [rufin.md](../docs/rufin.md); [mage0.json](../tests/fixtures/mage0.json); [verify_hermit.py](../tools/verify_hermit.py); [OriginalRufinChecks.cs](../tests/OriginalRufinChecks.cs) | FS services are recorded stubs in the check; the continuation 79..C5 is OriginalMageCloak |
 | ARMY__03.WRK `0xE4..0x189` | Jug script (E4): breaking animation, item visit AH=8, removal | ported | [campaign-items.md](../docs/campaign-items.md); [container.json](../tests/fixtures/container.json); [verify_container.py](../tools/verify_container.py); [OriginalContainerChecks.cs](../tests/OriginalContainerChecks.cs) | FS services 1D, 15, 19 (dust effect 7) are recorded stubs in the check; the skirmish removes the object but draws no dust |
 | ARMY__03.WRK `0x189..0x212` | Rockfall trap (template 2) | ported | [object-scripts.md](../docs/object-scripts.md); [obj-rockfall.json](../tests/fixtures/obj-rockfall.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; not yet wired into the skirmish |
 | ARMY__03.WRK `0x212..0x2B9` | Phantom script: init (visible, life counter, appearing by the reversed vanishing action) and the life-counter continuation | ported | [rufin.md](../docs/rufin.md); [phantom.json](../tests/fixtures/phantom.json); [verify_phantom.py](../tools/verify_phantom.py); [OriginalPhantomChecks.cs](../tests/OriginalPhantomChecks.cs) | FS:4D, FS:1D, FS:DD and FS:E1 are recorded stubs in the check; FS:105 (vanishing/appearing action) is an adapter in the skirmish |
