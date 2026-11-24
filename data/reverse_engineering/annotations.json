@@ -5264,6 +5264,54 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-leader.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services are recorded stubs in the check; the inline table of FS:E1 and the table at 11A8 are data of the original; the skirmish uses its own adapters"
+    },
+    {
+      "id": "army__01-fenceA-569",
+      "module": "ARMY__01.WRK",
+      "start": 1385,
+      "end": 1748,
+      "name": "Fence (569) and bridge (61E) sections: init, step, action table",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fenceA.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS:41 (the dispatcher C88C with the inline table) and FS:55 are recorded stubs in the check; the shape tables are data of the ported Reshape (BB8B)"
+    },
+    {
+      "id": "army__02-fenceB1-454",
+      "module": "ARMY__02.WRK",
+      "start": 1108,
+      "end": 1316,
+      "name": "Fence (template 5): init, step, shape table",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fenceB.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS:41 (the dispatcher C88C with the inline table) and FS:55 are recorded stubs in the check; the shape tables are data of the ported Reshape (BB8B)"
+    },
+    {
+      "id": "army__02-fenceB2-6a1",
+      "module": "ARMY__02.WRK",
+      "start": 1697,
+      "end": 1878,
+      "name": "Bridge (template 7): init, step, shape table",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fenceB.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS:41 (the dispatcher C88C with the inline table) and FS:55 are recorded stubs in the check; the shape tables are data of the ported Reshape (BB8B)"
+    },
+    {
+      "id": "army__02-fenceB3-13d6",
+      "module": "ARMY__02.WRK",
+      "start": 5078,
+      "end": 5218,
+      "name": "Fence (template 25): init, step, shape table",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fenceB.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS:41 (the dispatcher C88C with the inline table) and FS:55 are recorded stubs in the check; the shape tables are data of the ported Reshape (BB8B)"
     }
   ]
 }
