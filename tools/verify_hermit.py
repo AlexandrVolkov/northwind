@@ -24,6 +24,7 @@ for _p in PRESETS.values(): _p.setdefault('record', 0x50)
 PRESETS['kevin'] = {'entry': 0x1d72, 'end': 0x1ed3, 'items': [0, 0], 'queue': [0x59, 0x5a, 0x85], 'templates': [2], 'owner_items': [0], 'scripted': [2], 'record': 0x50}
 PRESETS['garik'] = {'entry': 0x1f39, 'end': 0x2077, 'items': [0, 0], 'queue': [0x59, 0x5a], 'templates': [2], 'owner_items': [0], 'scripted': [2], 'record': 0x50}
 PRESETS['magus'] = {'entry': 0x1a6e, 'end': 0x1cd8, 'items': [0x14, 0x14], 'queue': [0x59, 0x5a, 0x7b, 0x81], 'templates': [1, 0x17], 'owner_items': [0], 'scripted': [], 'record': 0x50}
+PRESETS['efil'] = {'entry': 0x2111, 'end': 0x2433, 'items': [9, 0xa, 0x13, 0xc], 'queue': [0x50, 0x65, 0x6b, 0x59, 0x5a], 'templates': [7, 3], 'owner_items': [9, 0xa], 'scripted': [7] * 8, 'record': 0x54}
 PRESET = PRESETS['onis']
 
 

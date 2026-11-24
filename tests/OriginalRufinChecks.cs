@@ -48,6 +48,7 @@ public partial class TestRunner
     private void OriginalKevinChecks() => HermitReplay("kevin", "kevin", "Kevin's script ARMY__03.WRK 1D72", 50, (w, r, ah) => { if (ah == 0) OriginalKevin.Initialize(w, r, 7); else if (ah == 1) OriginalKevin.Step(w, r); else OriginalKevin.Voice(w); }, 0, 0, 0);
     private void OriginalGarikChecks() => HermitReplay("garik", "garik", "Garik's script ARMY__03.WRK 1F39", 20, (w, r, ah) => { if (ah == 0) OriginalGarik.Initialize(w, r, 7); else if (ah == 1) OriginalGarik.Step(w, r); else OriginalGarik.Voice(w); }, 0, 0, 0);
     private void OriginalMagusChecks() => HermitReplay("magus", "magus", "Magus' script ARMY__03.WRK 1A6E", 50, (w, r, ah) => { if (ah == 0) OriginalMagus.Initialize(w, r, 7); else if (ah == 1) OriginalMagus.Step(w, r); else OriginalMagus.Voice(w); }, 0, 0, 0);
+    private void OriginalEfilChecks() => HermitReplay("efil", "efil", "Efil's script ARMY__03.WRK 2111", 50, (w, r, ah) => { if (ah == 0) OriginalEfil.Initialize(w, r, 7); else if (ah == 1) OriginalEfil.Step(w, r); else OriginalEfil.Voice(w); }, 0, 0, 0);
     private void OriginalIrvilChecks() => HermitReplay("irvil", "irvil", "Irvil's quest script ARMY__03.WRK 1297", 100, (w, r, ah) => { if (ah == 0) OriginalIrvil.Initialize(w, r, 7); else if (ah == 1) OriginalIrvil.Step(w, r); else OriginalIrvil.Voice(w); }, 0);
 
     private void HermitReplay(string file, string key, string label, int minSpeeches, Action<RufinTestWorld, byte[], int> run, int minCreations = 2, int minSweeps = 2, int minReveals = 6)
