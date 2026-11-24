@@ -30,6 +30,7 @@ public partial class TestRunner
         public void Remove(byte[] record) { Log.Add((byte)'R'); Log.AddRange(BitConverter.GetBytes(0x600u)); }
         public void Redraw() => Log.Add((byte)'D');
         public IReadOnlyList<byte[]> Territory() { Log.Add((byte)'T'); return TerritoryIndices.Select(i => Pool[i]).ToList(); }
+        public uint ObjectFlags(byte[] record, out byte threshold) { threshold = 10; return Flags[(record[0], record[0x0e])]; }
         public bool IsBuilding(byte[] record, out byte threshold) { threshold = 10; uint f = Flags[(record[0], record[0x0e])]; return (f & 8) != 0 && (f & 0x20) == 0; }
         public void StandardVitals() => Log.Add((byte)'V'); public void StandardActions() => Log.Add((byte)'U');
         public void Voice(ushort id) { Log.Add((byte)'Y'); Log.AddRange(BitConverter.GetBytes((uint)id)); }
@@ -42,9 +43,11 @@ public partial class TestRunner
     private void OriginalOnisChecks() => HermitReplay("onis", "onis", "Onis' quest script ARMY__03.WRK DBF", 100, (w, r, ah) => { if (ah == 0) OriginalOnis.Initialize(w, r, 7); else if (ah == 1) OriginalOnis.Step(w, r); else OriginalOnis.Voice(w); });
 
     private void OriginalMironChecks() => HermitReplay("miron", "miron", "Miron's quest script ARMY__03.WRK 16C8", 50, (w, r, ah) => { if (ah == 0) OriginalMiron.Initialize(w, r, 7); else if (ah == 1) OriginalMiron.Step(w, r); else OriginalMiron.Voice(w); }, 0, 0);
+    private void OriginalKevinChecks() => HermitReplay("kevin", "kevin", "Kevin's script ARMY__03.WRK 1D72", 50, (w, r, ah) => { if (ah == 0) OriginalKevin.Initialize(w, r, 7); else if (ah == 1) OriginalKevin.Step(w, r); else OriginalKevin.Voice(w); }, 0, 0, 0);
+    private void OriginalGarikChecks() => HermitReplay("garik", "garik", "Garik's script ARMY__03.WRK 1F39", 20, (w, r, ah) => { if (ah == 0) OriginalGarik.Initialize(w, r, 7); else if (ah == 1) OriginalGarik.Step(w, r); else OriginalGarik.Voice(w); }, 0, 0, 0);
     private void OriginalIrvilChecks() => HermitReplay("irvil", "irvil", "Irvil's quest script ARMY__03.WRK 1297", 100, (w, r, ah) => { if (ah == 0) OriginalIrvil.Initialize(w, r, 7); else if (ah == 1) OriginalIrvil.Step(w, r); else OriginalIrvil.Voice(w); }, 0);
 
-    private void HermitReplay(string file, string key, string label, int minSpeeches, Action<RufinTestWorld, byte[], int> run, int minCreations = 2, int minSweeps = 2)
+    private void HermitReplay(string file, string key, string label, int minSpeeches, Action<RufinTestWorld, byte[], int> run, int minCreations = 2, int minSweeps = 2, int minReveals = 6)
     {
         using var reference = GameData.Read<JsonDocument>($"res://tests/fixtures/{file}.json");
         var root = reference.RootElement;
@@ -91,7 +94,7 @@ public partial class TestRunner
         }
         GD.Print($"{key}: first mismatch {firstMismatch}; speeches {speeches}, creations {created}, reveals {reveals}, sweeps {sweeps}");
         var summary = root.GetProperty("results").GetProperty(key);
-        Check(count == summary.GetProperty("case_count").GetInt32() && speeches > minSpeeches && created >= minCreations && reveals > 5 && sweeps >= minSweeps, $"{key} reference coverage ({count}: {speeches} speeches, {created} creations, {reveals} reveals, {sweeps} sweeps)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && speeches > minSpeeches && created >= minCreations && reveals >= minReveals && sweeps >= minSweeps, $"{key} reference coverage ({count}: {speeches} speeches, {created} creations, {reveals} reveals, {sweeps} sweeps)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), $"{label} matches original x86");
     }
 }

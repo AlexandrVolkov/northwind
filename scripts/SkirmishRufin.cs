@@ -295,6 +295,11 @@ public sealed partial class Skirmish
             foreach (var a in battle.Actors.Where(a => a.Alive && a.Structure && a.Position.DistanceTo(_mage.Position) < 20 * 32)) _byRecord[a.Record] = a;
             return _byRecord.Keys.ToList();
         }
+        public uint ObjectFlags(byte[] record, out byte threshold)
+        {
+            threshold = 0; if (!_byRecord.TryGetValue(record, out var a)) return 0;
+            threshold = a.Parameters[0x46]; return BinaryPrimitives.ReadUInt32LittleEndian(a.Parameters.AsSpan(0x40));
+        }
         public bool IsBuilding(byte[] record, out byte threshold)
         {
             threshold = 0; if (!_byRecord.TryGetValue(record, out var a)) return false;
