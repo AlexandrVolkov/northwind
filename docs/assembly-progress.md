@@ -7,7 +7,7 @@
 | LE:1 | 146882 | 101186 | 6265 | 97 | 39334 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 509 | 100 | 0 | 4794 | 0 |
+| ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
 | ARMY__01.WRK | 4951 | 27 | 0 | 0 | 4924 | 7 |
 | ARMY__02.WRK | 6930 | 518 | 855 | 0 | 5557 | 7 |
 | ARMY__03.WRK | 13412 | 963 | 0 | 0 | 12449 | 1 |
@@ -53,6 +53,7 @@
 | ARMY__00.WRK `0x1012..0x10B3` | Effect kind 18h: a burst of 5 frames | ported | [object-scripts.md](../docs/object-scripts.md); [obj-fx1012.json](../tests/fixtures/obj-fx1012.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; not wired into the skirmish |
 | ARMY__00.WRK `0x10B3..0x1105` | Effect creation: the spark of a hit (kind 4 or 5 by the target's template flag) | ported | [object-scripts.md](../docs/object-scripts.md); [obj-fx10b3.json](../tests/fixtures/obj-fx10b3.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; EDI of the update is assumed to be the effect itself; not wired into the skirmish |
 | ARMY__00.WRK `0x1105..0x1267` | Wandering charm: follows a target and makes it wander (with the table of eight steps) | ported | [object-scripts.md](../docs/object-scripts.md); [obj-fx1105.json](../tests/fixtures/obj-fx1105.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; EDI of the update is assumed to be the effect itself; not wired into the skirmish |
+| ARMY__00.WRK `0x1267..0x151B` | Effect scripts 1267..end: guardian 1Bh, impacts 129D/1481/14CE, fragment fountain 12EC, animations 1Eh..20h | ported | [object-scripts.md](../docs/object-scripts.md); [army01-effects.json](../tests/fixtures/army01-effects.json); [verify_army01_effects.py](../tools/verify_army01_effects.py); [OriginalArmy01EffectChecks.cs](../tests/OriginalArmy01EffectChecks.cs) | The services (FS:A1, 119, 25, 29, 39, 69, 19, 35, 10D, A5) and the jumps into 6FE, 735, A44 are recorded stubs; FS:109 runs as original code |
 | ARMY__00.WRK `0x12EC..0x13A3` | Ballista bolt effect (type 1Dh) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | ARMY__01.WRK `0x0..0x7F` | Standard unit script (swordsman): init, step, voice | ported | [object-scripts.md](../docs/object-scripts.md); [unit-scripts.json](../tests/fixtures/unit-scripts.json); [verify_unit_scripts.py](../tools/verify_unit_scripts.py); [OriginalUnitScriptChecks.cs](../tests/OriginalUnitScriptChecks.cs) | FS services are recorded stubs in the check; the skirmish drives the units by its own adapters |
 | ARMY__01.WRK `0x7F..0xFE` | Standard unit script (archer): init, step, voice | ported | [object-scripts.md](../docs/object-scripts.md); [unit-scripts.json](../tests/fixtures/unit-scripts.json); [verify_unit_scripts.py](../tools/verify_unit_scripts.py); [OriginalUnitScriptChecks.cs](../tests/OriginalUnitScriptChecks.cs) | FS services are recorded stubs in the check; the skirmish drives the units by its own adapters |
