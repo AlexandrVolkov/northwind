@@ -4916,6 +4916,54 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-itemobj.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services are recorded stubs in the check; the skirmish keeps the item objects in OriginalItems/SkirmishContainers (adapter for the claim and the animation)"
+    },
+    {
+      "id": "army00-fx54a-54a",
+      "module": "ARMY__00.WRK",
+      "start": 1354,
+      "end": 1427,
+      "name": "Effect kind 1: a flame at its creator",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fx54a.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services (11, A5, AD, 35) are recorded stubs in the check; the skirmish draws sparks with its own adapter list"
+    },
+    {
+      "id": "army00-fx6fe-6fe",
+      "module": "ARMY__00.WRK",
+      "start": 1790,
+      "end": 1845,
+      "name": "Effect kind 4: a spark (8 frames)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fx6fe.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services (11, A5, AD, 35) are recorded stubs in the check; the skirmish draws sparks with its own adapter list"
+    },
+    {
+      "id": "army00-fx735-735",
+      "module": "ARMY__00.WRK",
+      "start": 1845,
+      "end": 1890,
+      "name": "Effect kind 5: a hard spark (8 frames)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fx735.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services (11, A5, AD, 35) are recorded stubs in the check; the skirmish draws sparks with its own adapter list"
+    },
+    {
+      "id": "army00-fx7fe-7fe",
+      "module": "ARMY__00.WRK",
+      "start": 2046,
+      "end": 2138,
+      "name": "Effect kind 7: smoke",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fx7fe.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services (11, A5, AD, 35) are recorded stubs in the check; the skirmish draws sparks with its own adapter list"
     }
   ]
 }

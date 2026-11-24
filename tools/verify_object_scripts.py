@@ -32,6 +32,10 @@ PRESETS = {
     'switch2': {'entry': 0x371, 'end': 0x3a9, 'module': 'ARMY__00.WRK', 'extra': True},
     'exit': {'entry': 0x3a9, 'end': 0x3f0, 'module': 'ARMY__00.WRK', 'extra2': True},
     'itemobj': {'entry': 0x86, 'end': 0x4f3, 'module': 'ARMY__00.WRK', 'visitor': True, 'dat': True, 'entries': [0x86, 0xf1, 0xfb, 0x105, 0x10f, 0x120, 0x131, 0x142, 0x153, 0x164, 0x1f2, 0x203, 0x214, 0x488, 0x29b, 0x311, 0x3f0, 0x46a, 0x477, 0x499]},
+    'fx54a': {'entry': 0x54a, 'end': 0x593, 'module': 'ARMY__00.WRK', 'effect': True},
+    'fx6fe': {'entry': 0x6fe, 'end': 0x735, 'module': 'ARMY__00.WRK', 'effect': True},
+    'fx735': {'entry': 0x735, 'end': 0x762, 'module': 'ARMY__00.WRK', 'effect': True},
+    'fx7fe': {'entry': 0x7fe, 'end': 0x85a, 'module': 'ARMY__00.WRK', 'effect': True},
     'manuscript': {'entry': 0x2710, 'end': 0x279a, 'entries': [0x2710, 0x2780, 0x278d], 'visitor': True},
     'dragon': {'entry': 0x279a, 'end': 0x29f1, 'regs_effect': True, 'extra': True},
 }
@@ -53,7 +57,7 @@ def cases():
     for n in range(800):
         out.append({'ah': rng.choice([0, 1, 1, 1, 1, 8, 8, 8]) if NAME == 'manuscript' else rng.choice([0, 1, 1, 1, 1]), 'x': rng.randrange(0, 4000), 'y': rng.randrange(0, 4000), 'f15': rng.choice([0, 0, 1, 2, 3, rng.randrange(256)]), 'f26': rng.choice([0, 1, 3, 0x1f, 0x20, rng.randrange(1 << 32)]),
                     'f2a': rng.choice([0, 9, 10, 0x14, 0x15, 0xb, 1, rng.randrange(256)]), 'w1': rng.choice([0x1b2, 0x1b3, 0x1b6, 0x1ab, rng.randrange(65536)]), 'f14': rng.choice([0, 0x80, 0x81, rng.randrange(256)]), 'f0d': rng.randrange(4), 'f19': rng.choice([100, 0, 0x80, 0xff, 0xfb, 0xfa, 1, rng.randrange(256)]), 'f27': rng.choice([0x18, 0x20, 0x28, rng.randrange(256)]), 'f28': rng.choice([0, 3, 0xb, 0x18, rng.randrange(256)]), 'f2d': rng.randrange(256), 'tick': rng.choice([0, 1, 7, 8, 0x1f, 0x20, rng.randrange(256)]), 'f22': rng.randrange(1 << 32), 'seed': rng.randrange(256),
-                    'area': [[rng.choice([0, 0, 1, 5]), rng.choice([0, 0, 3]), rng.choice([0, 0, 1, 2]), rng.randrange(1 << 30), rng.randrange(1 << 30)] for _ in range(3)], 'claim': [rng.choice([0, 1]) for _ in range(3)], 'zf': [rng.choice([0, 1, 1]) for _ in range(2)], 'spot': [[rng.choice([0, 1]), rng.randrange(4000), rng.randrange(4000)] for _ in range(10)], 'beside': [[rng.choice([0, 1]), rng.randrange(256), rng.randrange(256), rng.randrange(256)] for _ in range(2)], 'create': [rng.choice([0, 1]) for _ in range(10)], 'units': [rng.choice([8, 0x1c, 3, 8, 5]) for _ in range(rng.randrange(0, 14))], 'finds': [rng.choice([0, 1, 2]) for _ in range(12)], 'objbytes': bytes(rng.randrange(256) for _ in range(0x80)).hex(), 'part12': rng.randrange(1 << 32), 'dat3': rng.randrange(256), 'dat48': rng.randrange(65536), 'k': rng.randrange(20 if NAME == 'itemobj' else 3), 'bl': rng.randrange(256), 'vowner': rng.randrange(8), 'mask28': rng.randrange(256), 'f31': rng.randrange(256), 'strength': rng.choice([0, 0x7cf, 0x7d0, rng.randrange(1 << 20)]), 'count': rng.randrange(2, 8), 'datsound': rng.randrange(1 << 20), 'dist': [rng.randrange(256) for _ in range(3)]})
+                    'area': [[rng.choice([0, 0, 1, 5]), rng.choice([0, 0, 3]), rng.choice([0, 0, 1, 2]), rng.randrange(1 << 30), rng.randrange(1 << 30)] for _ in range(3)], 'claim': [rng.choice([0, 1]) for _ in range(3)], 'zf': [rng.choice([0, 1, 1]) for _ in range(2)], 'spot': [[rng.choice([0, 1]), rng.randrange(4000), rng.randrange(4000)] for _ in range(10)], 'beside': [[rng.choice([0, 1]), rng.randrange(256), rng.randrange(256), rng.randrange(256)] for _ in range(2)], 'create': [rng.choice([0, 1]) for _ in range(10)], 'units': [rng.choice([8, 0x1c, 3, 8, 5]) for _ in range(rng.randrange(0, 14))], 'finds': [rng.choice([0, 1, 2]) for _ in range(12)], 'objbytes': bytes(rng.randrange(256) for _ in range(0x80)).hex(), 'part12': rng.randrange(1 << 32), 'dat3': rng.randrange(256), 'dat48': rng.randrange(65536), 'k': rng.randrange(20 if NAME == 'itemobj' else 3), 'bl': rng.randrange(256), 'vowner': rng.randrange(8), 'mask28': rng.randrange(256), 'svc11': [[rng.choice([0, 1]), rng.choice([0, 4, 4, 1, 7])] for _ in range(2)], 'svca5': [rng.choice([0, 1]) for _ in range(3)], 'parent25': rng.randrange(256), 'e0': rng.randrange(256), 'e12': rng.choice([0, 1, 2, rng.randrange(1 << 32)]), 'f31': rng.randrange(256), 'strength': rng.choice([0, 0x7cf, 0x7d0, rng.randrange(1 << 20)]), 'count': rng.randrange(2, 8), 'datsound': rng.randrange(1 << 20), 'dist': [rng.randrange(256) for _ in range(3)]})
     if NAME == 'switch':
         for c in out:
             c['f22'] = rng.randrange(16) | (rng.randrange(4) << 8) | (rng.randrange(8) << 16) | (rng.randrange(9) << 24); c['f26'] = rng.randrange(32); c['ah'] = rng.choice([1, 1, 1, 0])
@@ -138,6 +142,17 @@ def generate(game):
     def remove(): log.append(b'R'); o.ret()
     def vitals(): log.append(b'V'); o.ret()
     def actions(): log.append(b'U'); o.cpu.emu_stop()
+    def svc11():   # FS:11
+        log.append(b'Q' + struct.pack('<I', reg(UC_X86_REG_EAX)))
+        zf, al = state['svc11'].pop(0) if state['svc11'] else (1, 0)
+        o.cpu.reg_write(UC_X86_REG_EAX, (reg(UC_X86_REG_EAX) & ~0xff) | al)
+        o.cpu.reg_write(UC_X86_REG_EFLAGS, (reg(UC_X86_REG_EFLAGS) & ~0x40) | (0x40 if zf else 0)); o.ret()
+    def svca5():   # FS:A5
+        log.append(b'W')
+        z = state['svca5'].pop(0) if state['svca5'] else 1
+        o.cpu.reg_write(UC_X86_REG_EFLAGS, (reg(UC_X86_REG_EFLAGS) & ~0x40) | (0x40 if z else 0)); o.ret()
+    def svcad(): log.append(b'M' + struct.pack('<BB', reg(UC_X86_REG_EAX) & 255, reg(UC_X86_REG_EBX) & 255)); o.ret()
+    def sound35(): log.append(b'S' + struct.pack('<I', reg(UC_X86_REG_EAX))); o.ret()
     def level_exit(): log.append(b'X' + struct.pack('<B', reg(UC_X86_REG_EAX) & 255)); o.ret()
     def sound():    # FS:31
         log.append(b'S' + struct.pack('<I', reg(UC_X86_REG_EAX))); o.ret()
@@ -145,14 +160,16 @@ def generate(game):
     slots = {x['fs_slot']: x['target_offset'] for x in report['fs_assignments']}
     o.stubs[slots[0x14b]] = area; o.stubs[slots[0x19]] = effect_regs if PRESET.get('regs_effect') else effect; o.stubs[slots[0x14f]] = find; o.stubs[slots[0x31]] = sound; o.stubs[slots[0x157]] = claim; o.stubs[slots[0x15b]] = distance; o.stubs[slots[0x69]] = spawn
     o.stubs[slots[0x1bf]] = zf_service(b'Z', 'zf'); o.stubs[slots[0x187]] = spot; o.stubs[slots[0x16b]] = beside; o.stubs[slots[0x45]] = create; o.stubs[slots[0x19b]] = occupy; o.stubs[slots[0x6d]] = participant
-    o.stubs[slots[0x1a3]] = level_exit; o.stubs[slots[0x1d]] = redraw; o.stubs[slots[0x4d]] = appearance; o.stubs[slots[0x17b]] = scan_masked; o.stubs[slots[0x1b7]] = strength
+    o.stubs[slots[0x1a3]] = level_exit; o.stubs[slots[0x11]] = svc11; o.stubs[slots[0xa5]] = svca5; o.stubs[slots[0xad]] = svcad; o.stubs[slots[0x35]] = sound35; o.stubs[slots[0x1d]] = redraw; o.stubs[slots[0x4d]] = appearance; o.stubs[slots[0x17b]] = scan_masked; o.stubs[slots[0x1b7]] = strength
     if PRESET.get('stop_jumps'): o.stubs[slots[0xed]] = stopper(b'H')
     o.stubs[slots[0x1d]] = redraw; o.stubs[slots[0x15]] = remove; o.stubs[slots[0xdd]] = vitals; o.stubs[slots[0xe1]] = actions
     digest = hashlib.sha256(); all_cases = cases()
     for case in all_cases:
-        log.clear(); state['area'] = [list(a) for a in case['area']]; state['claim'] = list(case['claim']); state['finds'] = list(case['finds']); state['zf'] = list(case['zf']); state['spot'] = [list(x) for x in case['spot']]; state['beside'] = [list(x) for x in case['beside']]; state['create'] = list(case['create']); state['dist'] = list(case['dist']); o.prepare(32, 32); o.mode = 'object'
+        log.clear(); state['area'] = [list(a) for a in case['area']]; state['claim'] = list(case['claim']); state['svc11'] = [list(x) for x in case['svc11']]; state['svca5'] = list(case['svca5']); state['finds'] = list(case['finds']); state['zf'] = list(case['zf']); state['spot'] = [list(x) for x in case['spot']]; state['beside'] = [list(x) for x in case['beside']]; state['create'] = list(case['create']); state['dist'] = list(case['dist']); o.prepare(32, 32); o.mode = 'object'
         o.cpu.mem_write(o.POOL, bytes(0x2000)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x19eb, bytes([case['seed']])); o.cpu.mem_write(o.FS + 0x10, bytes([case['tick']])); o.cpu.mem_write(o.FS + 8, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x19ec, bytes([case['seed'] ^ 0x5a]))
         r = bytearray(0x50); struct.pack_into('<II', r, 4, case['x'], case['y']); r[0x15] = case['f15']; struct.pack_into('<I', r, 0x26, case['f26']); r[0x2a] = case['f2a']; r[0x14] = case['f14']; r[0x0d] = case['f0d']; r[0x19] = case['f19']; r[0x27] = case['f27']; r[0x28] = case['f28']; r[0x2d] = case['f2d']; struct.pack_into('<H', r, 1, case['w1']); struct.pack_into('<I', r, 0x22, case['f22'])
+        r[0] = case['e0']; struct.pack_into('<I', r, 0x12, case['e12'])
+        pr = bytearray(0x40); pr[0x25] = case['parent25']; o.cpu.mem_write(o.POOL + 0xa00, bytes(pr))
         o.cpu.mem_write(o.POOL + 0x800, bytes(r))
         if PRESET.get('extra'):
             o.cpu.mem_write(o.POOL + 0x140, bytes.fromhex(case['objbytes'])); o.cpu.mem_write(0x97a + 0x12, struct.pack('<I', case['part12']))
@@ -169,7 +186,7 @@ def generate(game):
         if PRESET.get('extra') or PRESET.get('extra2'): o.cpu.mem_write(0x97a + 0x12, struct.pack('<I', case['part12']))
         o.cpu.reg_write(UC_X86_REG_ESI, o.POOL + 0x800); o.cpu.mem_write(o.POOL + 0x900, bytes([0, 0, 0, case['vowner']])); o.cpu.mem_write(o.POOL + 0x800 + 0x28, bytes([case['mask28']]))
         o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 0x900 if (PRESET.get('visitor') and case['ah'] == 8) else (o.DAT if (PRESET.get('dat') and case['ah'] != 0) else o.POOL + 0x800))
-        o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, case['bl']); o.cpu.reg_write(UC_X86_REG_ECX, 0); o.cpu.reg_write(UC_X86_REG_EDX, 0)
+        o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, (o.POOL + 0xa00) if (PRESET.get('effect') and case['ah'] == 0 and PRESET['entry'] in (0x54a,)) else case['bl']); o.cpu.reg_write(UC_X86_REG_ECX, 0); o.cpu.reg_write(UC_X86_REG_EDX, 0)
         o.run(o.WRK + (PRESET['entries'][case['k']] if PRESET.get('entries') else PRESET['entry']))
         out = (struct.pack('<H', (reg(UC_X86_REG_EAX) & 0xffff) if case['ah'] == 8 else 0) if PRESET.get('visitor') else b'') + bytes(o.cpu.mem_read(o.POOL + 0x800, 0x50)) + bytes(o.cpu.mem_read(0x19eb, 2)) + (bytes(o.cpu.mem_read(o.POOL + 0x140, 0x80)) + bytes(o.cpu.mem_read(0x97a + 0x12, 4)) if PRESET.get('extra') else (bytes(o.cpu.mem_read(0x97a + 0x12, 4)) if PRESET.get('extra2') else b'')) + b''.join(log)
         if os.environ.get('DEBUG_CASE') == str(all_cases.index(case)): print('PYTHON', out.hex())

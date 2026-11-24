@@ -22,6 +22,10 @@ public interface IObjectScriptWorld
     void EffectAt(byte army, byte type, byte layer, uint x, uint y);   // FS:19 called with registers only
     byte[]? FindObject(byte owner, byte army, byte template, byte skip);   // FS:14F = 11BE0
     void ClearQuestField(byte[] record);              // [participant of the owner + 12h] = 0 (FS:6D)
+    void Sound35(uint id);                            // FS:35
+    (bool Zf, byte Al) Service11(uint eax);           // FS:11
+    bool ServiceA5();                                 // FS:A5: ZF
+    void ServiceAD(byte al, byte bl);                 // FS:AD
     void LevelExit(byte mode);                        // FS:1A3
     void Appearance(byte army);                       // FS:4D
     (bool Found, uint Reference) ScanMasked(byte mode, uint mask);   // FS:17B = D895 with the participants of the mask excluded (the quest field +12 of the participant is lent for it)
@@ -448,6 +452,41 @@ public static class OriginalObjectScripts
         r[0x19]--;
         if (r[0x19] > 0xfa) return 0x100;
         w.Remove(r); return 0x100;
+    }
+
+    /// <summary>The effect scripts of ARMY__00.WRK (records of 22h bytes: +0 the kind, +3 the frame, +16/+17 counters, +12 the lifetime). 54A (kind 1, a flame at the point of its creator, lives 2BCh updates
+    /// or until FS:11 says it is over), 6FE and 735 (the kinds 4 and 5, sparks of 8 frames of 2 updates, 6FE starts on 62h or 6Ah), 7FE (kind 7, a smoke whose frame runs between 39h and 48h
+    /// and back by the parity of its random +16; it ends when FS:A5 says so). <paramref name="parent"/> is the creator (EBX in AH = 0), <paramref name="bl"/> EBX.</summary>
+    public static void Fx54a(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)
+    {
+        if (ah == 1) { Put(r, 0x12, U32(r, 0x12) - 1); if (U32(r, 0x12) == 0) r[0] = 0xff; return; }
+        Word(r, 3, (ushort)((parent[0x25] & 7) + 9)); Put(r, 0x12, 0x2bc); r[0] = 1;
+        w.Sound35(0x10); var (zf, al) = w.Service11(0x10);
+        if (!zf || al != 4) r[0] = 0xff;
+    }
+
+    public static void Spark(IObjectScriptWorld w, byte[] r, int ah, bool kind5)
+    {
+        if (ah == 1)
+        {
+            r[0x16]--; if (r[0x16] != 0) return;
+            r[0x16] = 2; Word(r, 3, (ushort)(Word(r, 3) + 1)); r[0x17]--; if (r[0x17] == 0) r[0] = 0xff; return;
+        }
+        if (kind5) { Word(r, 3, 0x7d); r[0] = 5; }
+        else { Word(r, 3, (ushort)((w.Random() & 8) + 0x62)); r[0] = 4; }
+        r[0x16] = 2; r[0x17] = 8;
+    }
+
+    public static void Fx7fe(IObjectScriptWorld w, byte[] r, int ah, byte bl)
+    {
+        if (ah == 1)
+        {
+            if ((r[0x16] & 1) == 0) { Word(r, 3, (ushort)(Word(r, 3) + 1)); if (Word(r, 3) == 0x49) Word(r, 3, 0x39); }
+            else { Word(r, 3, (ushort)(Word(r, 3) - 1)); if (Word(r, 3) == 0x38) Word(r, 3, 0x48); }
+            if (w.ServiceA5()) r[0] = 0xff;
+            return;
+        }
+        Word(r, 3, (ushort)((bl & 0xf) + 0x39)); r[0] = 7; r[0x16] = w.Random(); w.ServiceAD(3, 0x0e);
     }
 
     private static void Redraw(IObjectScriptWorld w, byte[] r) { if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); } }
