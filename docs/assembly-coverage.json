@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "87d7113d677edd96f95267c473c6ca8c271a0027acd32d83ea3d0b2b3e767902",
+  "annotation_sha256": "d7b25dc0679853ed9c32d34d13c05e9c1a23434a315cda74904e6a7eb78e3c31",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3554,8 +3554,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 2135,
-        "unreviewed": 11277
+        "ported": 2302,
+        "unreviewed": 11110
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -3583,6 +3583,22 @@
         },
         {
           "start": 393,
+          "end": 530,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 530,
+          "end": 697,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-phantom-212"
+          ]
+        },
+        {
+          "start": 697,
           "end": 1818,
           "status": "unreviewed",
           "classification": "unknown",

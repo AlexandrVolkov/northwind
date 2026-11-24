@@ -9,10 +9,13 @@ public sealed partial class Skirmish
 {
     private SkirmishRufinWorld? _rufinWorld;
     public byte[] ItemWorldInventory(int participant) => ItemWorld.Inventory(participant);
+    public static bool IsPhantom(SkirmishActor actor) => actor.Source.TemplateFile == "ARMY__03.DAT" && actor.Source.TemplateIndex is 3 or 32;
+    /// <summary>A mage or his phantom: the units of the mage's script (the discharge, the vanishing action).</summary>
+    public static bool IsMageUnit(SkirmishActor actor) => IsHermit(actor) || IsPhantom(actor);
     public static bool IsHermit(SkirmishActor actor) => actor.Scenery && actor.Source.TemplateFile == "ARMY__03.DAT" && actor.Source.TemplateIndex is >= 13 and <= 21;
 
     /// <summary>A mage at war with the player (the player attacked him or his friends): he fights back like any unit (DAT of ARMY__03 13: reach 10, strike 7).</summary>
-    public bool MageFights(SkirmishActor mage) => IsHermit(mage) && Diplomacy.AtWar(mage.Record[3], Rules.PlayerSlot);
+    public bool MageFights(SkirmishActor mage) => IsMageUnit(mage) && Diplomacy.AtWar(mage.Record[3], Rules.PlayerSlot);
 
     /// <summary>The flashes of the mages' strikes (ARMY__03 effect type 0, 22h-byte records): 72×72, F0h + 4·heading + stage.</summary>
     public List<byte[]> MageFlashes { get; } = [];
@@ -70,7 +73,7 @@ public sealed partial class Skirmish
             return (spot.Found, spot.Layer, spot.X, spot.Y);
         }
         public byte[]? CreateObject(byte army, byte owner, byte template, byte layer, uint x, uint y)
-        { battle.Log("Руфин призывает фантома."); return null; }   // ADAPTER: the phantom (ARMY__03 3, WRK 212) is not ported
+        { var phantom = battle.SpawnPhantom(owner, template, layer, x, y); if (phantom != null) battle.Log("Руфин призывает фантома."); return null; }   // A758; the set-up 43E5 is the script's AH = 0
         public void Setup(byte[] created) { }
         public byte Random() => battle._terrainCatalog.NextRandomByte();
         public byte[] Inventory(int owner) => battle.ItemWorld.Inventory(owner);
@@ -89,7 +92,7 @@ public sealed partial class Skirmish
     /// then the continuation of the script (<see cref="OriginalMageCloak"/>). The other actions (ED, E9, F1: stand, walk, strike) are done by UpdateUnit.</summary>
     public void MageStandardStep(SkirmishActor mage)
     {
-        var r = mage.Record; if (!MageFights(mage)) r[0x2e]++;   // UpdateUnit counts the updates of a fighting mage (8227)
+        var r = mage.Record; if (IsHermit(mage) && !MageFights(mage)) r[0x2e]++;   // UpdateUnit counts the updates of a fighting mage and of a phantom (8227)
         if ((sbyte)r[0x19] > 0 && (r[0x17] & 0x80) == 0)
         {
             bool done = false;
@@ -97,6 +100,7 @@ public sealed partial class Skirmish
             else if ((r[0x14] & 0x40) != 0) done = true;
             if (done) { r[0x14] = (byte)((r[0x14] >> 3) & 7); r[0x30] = 0; r[0x15] = 0; _vanish.Remove(mage.Id); }
         }
+        if (IsPhantom(mage)) { OriginalPhantom.Continuation(r); return; }
         _mageDrop ??= new MageDrop(this);
         bool rufin = mage.Source.TemplateIndex == 13;
         OriginalMageCloak.Step(_mageDrop, r, rufin ? OriginalMageCloak.RufinLow : OriginalMageCloak.FirstMageLow, rufin ? OriginalMageCloak.RufinHigh : OriginalMageCloak.FirstMageHigh, rufin);
@@ -124,6 +128,8 @@ public sealed partial class Skirmish
     }
     /// <summary>A hidden mage (+32 ≠ 0, visibility mask +20 = 0) is seen and targeted by nobody.</summary>
     public static bool IsHidden(SkirmishActor actor) => IsHermit(actor) && actor.Record[0x20] == 0;
+    /// <summary>A mage or a phantom in state 3 (the vanishing action): UpdateUnit leaves him alone.</summary>
+    public bool IsVanishing(SkirmishActor actor) => IsMageUnit(actor) && (actor.Record[0x14] & 7) == 3;
 
     private void TickMages()
     {
@@ -136,20 +142,64 @@ public sealed partial class Skirmish
             if (mage.Alive) OriginalRufin.Step(_rufinWorld, mage.Record);
             if (!MageFights(mage)) { mage.Target = 0; continue; }   // at peace he stands
             if (!mage.Alive || (mage.Record[0x14] & 7) == 3 || mage.Record[0x32] != 0) { mage.Route.Clear(); mage.Goal = null; continue; }   // vanishing or hidden: he does nothing
-            // At war the nearest enemy in his sight (14 cells) becomes his target; UpdateUnit approaches to the reach of DAT[72] and strikes (8B5E, the swing), the impact is MageDischarge.
-            if ((_globalTick & 7) == 0 || Find(mage.Target) is not { Alive: true })
-            {
-                SkirmishActor? best = null; double nearest = 14 * 32;
-                foreach (var o in Actors)
-                {
-                    if (!o.Alive || o.Structure || o.Scenery || IsAnimal(o) || !Diplomacy.AtWar(mage.Record[3], o.Record[3])) continue;
-                    double d = mage.Position.DistanceTo(o.Position); if (d < nearest) { nearest = d; best = o; }
-                }
-                if (best != null) { if (mage.Target != best.Id) { mage.Target = best.Id; mage.Goal = null; mage.Route.Clear(); mage.ReplanTimer = 0; } } else mage.Target = 0;
-            }
+            MageSeek(mage);
+        }
+        foreach (var phantom in _phantoms.ToArray())
+        {
+            if (!phantom.Alive) { _phantoms.Remove(phantom); continue; }
+            MageStandardStep(phantom);
+            if ((phantom.Record[0x14] & 7) == 3) { phantom.Route.Clear(); phantom.Goal = null; continue; }   // still appearing
+            MageSeek(phantom);
         }
     }
 
+    /// <summary>At war the nearest enemy in his sight (14 cells) becomes his target; UpdateUnit approaches to the reach of DAT[72] and strikes (8B5E, the swing), the impact is MageDischarge.</summary>
+    private void MageSeek(SkirmishActor mage)
+    {
+        if ((_globalTick & 7) != 0 && Find(mage.Target) is { Alive: true }) return;
+        SkirmishActor? best = null; double nearest = 14 * 32;
+        foreach (var o in Actors)
+        {
+            if (!o.Alive || o.Structure || o.Scenery || IsAnimal(o) || IsPhantom(o) && o.Record[3] == mage.Record[3] || !Diplomacy.AtWar(mage.Record[3], o.Record[3])) continue;
+            double d = mage.Position.DistanceTo(o.Position); if (d < nearest) { nearest = d; best = o; }
+        }
+        if (best != null) { if (mage.Target != best.Id) { mage.Target = best.Id; mage.Goal = null; mage.Route.Clear(); mage.ReplanTimer = 0; } } else mage.Target = 0;
+    }
+
+    /// <summary>The summoning of the discharge (1 in 8 of the strikes): a phantom stands up beside the mage (FS:16B then FS:45).</summary>
+    public SkirmishActor? SummonPhantom(SkirmishActor mage)
+    {
+        _spellWorld ??= new SkirmishSpellWorld(this); _spellWorld.Attacker = mage;
+        var spot = _spellWorld.FindSpot(3, mage.Record[0]);
+        return spot.Found ? SpawnPhantom(mage.Record[3], 3, spot.Layer, spot.X, spot.Y) : null;
+    }
+    public IReadOnlyList<SkirmishActor> Phantoms => _phantoms;
+    private readonly List<SkirmishActor> _phantoms = [];
+    private sealed class PhantomWorld(Skirmish battle) : IPhantomWorld
+    {
+        public void Appearance(byte army) { }   // FS:4D (AE3A): the pictures of the object, not needed
+        public void Redraw() { }
+        public void Vitals() { }               // FS:DD is run by UpdateUnit
+        public void UnitStep() { }             // FS:E1 is MageStandardStep
+        public byte Random() => battle._terrainCatalog.NextRandomByte();
+    }
+    private PhantomWorld? _phantomWorld;
+
+    /// <summary>FS:45 (A758) for the phantom: a new unit of the mage's settlement at the point, then AH = 0 of its script (<see cref="OriginalPhantom"/>).</summary>
+    private SkirmishActor? SpawnPhantom(byte owner, byte template, byte layer, uint x, uint y)
+    {
+        if (x >= Map.Width * 32 || y >= Map.Height * 32) return null;
+        var cell = new Vector2I((int)(x >> 5), (int)(y >> 5));
+        var phantom = NewEconomyActor(template, cell, false, true, 4, "ARMY__03.DAT");
+        var r = phantom.Record; r[3] = owner; r[0x0d] = layer;
+        BinaryPrimitives.WriteUInt32LittleEndian(r.AsSpan(4), x); BinaryPrimitives.WriteUInt32LittleEndian(r.AsSpan(8), y);
+        _phantomWorld ??= new PhantomWorld(this);
+        OriginalPhantom.Initialize(_phantomWorld, r, owner);
+        phantom.Route.Attach(_routes, r);
+        Actors.Add(phantom); _phantoms.Add(phantom);
+        Occupancy.WriteFootprint(phantom.Parameters[3], phantom.Parameters[4], r[0x0d], x, y, phantom.Id);
+        return phantom;
+    }
     /// <summary>The line of a message the player has to answer (or read): the text of the type with the player's name, the answers the type offers, the update at which it fades.</summary>
     public sealed record DialogLine(int Speaker, byte Type, string Text, IReadOnlyList<(byte Type, string Text)> Answers, uint Deadline);
     private readonly Dictionary<(int, byte), int> _dialogVariant = [];

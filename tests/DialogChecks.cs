@@ -53,5 +53,16 @@ public partial class TestRunner
         for (int t = 0; t < 400 && Skirmish.IsHidden(rufin); t++) battle.Advance(1 / 18.2);
 
         Check(!Skirmish.IsHidden(rufin) && rufin.Record[0x32] == 0, $"He returns when his health is above 5Ah (+32 = {rufin.Record[0x32]:X}, mask {rufin.Record[0x20]:X})");
+    
+        // the phantom: summoned beside Rufin, it appears (the vanishing run backwards), fights for his settlement and fades when its life counter is spent
+        rufin.Record[0x19] = 100;
+        var phantom = battle.SummonPhantom(rufin);
+        Check(phantom != null && Skirmish.IsPhantom(phantom) && phantom.Record[3] == mage, "A phantom stands up beside Rufin");
+        for (int t = 0; t < 60; t++) battle.Advance(1 / 18.2);
+        Check(phantom!.Record[0x32] == 0 && phantom.Record[0x20] == 0xff && (phantom.Record[0x14] & 7) == 0, $"The phantom has appeared (+32 = {phantom.Record[0x32]:X}, state {phantom.Record[0x14]:X})");
+        Check(battle.MageFights(phantom), "and fights the enemies of its settlement");
+        phantom.Record[0x31] = 2;
+        for (int t = 0; t < 400 && phantom.Alive; t++) battle.Advance(1 / 18.2);
+        Check(!phantom.Alive, "A phantom whose life counter ran out dies");
     }
 }
