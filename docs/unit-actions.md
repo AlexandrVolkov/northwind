@@ -73,3 +73,7 @@
 ## 10AD2 (FS:187)
 
 `FS187` looks for a free spot for the template AL of the army AH around (ECX, EDX): the point is snapped to 32 and moved by half the template size (+3, +4); ring k (k = 1, 2, ...; the squares of 1, 4, 9, ... spots until the product does not fit a byte) tries k * k random cells (9E41, 9E55), keeps those inside the map border (DS:18E6 / 18EA minus 32) and asks AC63. ZF = found; ECX/EDX = the spot; EAX/EBX are restored. Verified against x86.
+
+## 9064 (FS:16B)
+
+`FS16B` looks for a free spot for the template AL of the army AH next to the object ESI: the distance is the sum of the half sizes (+3, +4) of both templates times 16, the 8 directions come from the table of signed bytes at DS:19C7 and are tried from a random one (9E41, called once) round the ring until AC63 accepts a spot. ZF = 0, BH = the direction and ECX/EDX = the spot when found (the `OR AL,FFh` sets the flags); ZF = 1 when none fits. EAX is restored. Verified against x86.
