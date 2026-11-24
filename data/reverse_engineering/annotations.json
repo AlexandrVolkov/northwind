@@ -6404,6 +6404,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "The callees 8CA1, 9653, 43B0, D363, A758 are recorded stubs; only template 0 of armies 0..2 is checked"
+    },
+    {
+      "id": "le1-object-transfer-d1ba",
+      "module": "LE:1",
+      "start": 53690,
+      "end": 53969,
+      "name": "Hand an object over to another owner (D1BA)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-allocator.md", "tests/fixtures/object-transfer.json", "tools/verify_object_transfer.py", "tests/OriginalObjectTransferChecks.cs"],
+      "implementation": ["scripts/OriginalObjectAllocator.cs"],
+      "limitations": "The notification 9A8E and the change message 43B0 are recorded callbacks; the skirmish does not use the ported pool yet (the hand-over there is still a log entry)"
     }
   ]
 }
