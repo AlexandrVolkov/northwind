@@ -4748,6 +4748,18 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-generator.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-dragon-279a",
+      "module": "ARMY__03.WRK",
+      "start": 10138,
+      "end": 10737,
+      "name": "Dragon (template 27): wakes, breathes fire, falls and switches off the traps of its side",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-dragon.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
     }
   ]
 }

@@ -35,6 +35,17 @@ public partial class TestRunner
         private readonly Queue<(bool, uint, uint)> _spot = new(c.GetProperty("spot").EnumerateArray().Select(a => (a[0].GetInt32() != 0, (uint)a[1].GetInt32(), (uint)a[2].GetInt32())));
         private readonly Queue<(bool, byte, byte, byte)> _beside = new(c.GetProperty("beside").EnumerateArray().Select(a => (a[0].GetInt32() != 0, (byte)a[1].GetInt32(), (byte)a[2].GetInt32(), (byte)a[3].GetInt32())));
         private readonly Queue<bool> _create = new(c.GetProperty("create").EnumerateArray().Select(a => a.GetInt32() != 0));
+        public uint Part12 = (uint)c.GetProperty("part12").GetInt64();
+        private readonly Queue<int> _finds = new(c.GetProperty("finds").EnumerateArray().Select(a => a.GetInt32()));
+        public byte[] ObjectBytes = Convert.FromHexString(c.GetProperty("objbytes").GetString()!);
+        public void EffectAt(byte army, byte type, byte layer, uint x, uint y) { log.Add((byte)'E'); log.AddRange([army, type, layer]); log.AddRange(BitConverter.GetBytes(x)); log.AddRange(BitConverter.GetBytes(y)); }
+        public byte[]? FindObject(byte owner, byte army, byte template, byte skip)
+        {
+            log.Add((byte)'F'); log.AddRange([template, army, owner, skip]); int k = _finds.Count > 0 ? _finds.Dequeue() : 0;
+            return k == 0 ? null : (k == 1 ? Obj1 : Obj2);
+        }
+        public byte[] Obj1 = new byte[0x40], Obj2 = new byte[0x40];
+        public void ClearQuestField(byte[] record) => Part12 = 0;
         public byte TemplateByte3 => (byte)c.GetProperty("dat3").GetInt32();
         public ushort TemplateBase => (ushort)c.GetProperty("dat48").GetInt32();
         public bool Service1BF(uint edx) { log.Add((byte)'Z'); log.AddRange(BitConverter.GetBytes(edx)); return _zf.Count > 0 ? _zf.Dequeue() : true; }
@@ -59,7 +70,7 @@ public partial class TestRunner
         public void Sound(uint id) { log.Add((byte)'S'); log.AddRange(BitConverter.GetBytes(id)); }
     }
 
-    private void ObjectScriptReplay(string file, string key, string label, Action<IObjectScriptWorld, byte[], int> script, int minEffects = 5)
+    private void ObjectScriptReplay(string file, string key, string label, Action<IObjectScriptWorld, byte[], int> script, int minEffects = 5, bool extra = false)
     {
         using var reference = GameData.Read<JsonDocument>($"res://tests/fixtures/{file}.json");
         var root = reference.RootElement;
@@ -73,9 +84,9 @@ public partial class TestRunner
             r[0x15] = (byte)c.GetProperty("f15").GetInt32(); r[0x14] = (byte)c.GetProperty("f14").GetInt32(); r[0x0d] = (byte)c.GetProperty("f0d").GetInt32(); r[0x19] = (byte)c.GetProperty("f19").GetInt32(); r[0x2d] = (byte)c.GetProperty("f2d").GetInt32(); BitConverter.GetBytes((uint)c.GetProperty("f26").GetInt64()).CopyTo(r, 0x26); r[0x2a] = (byte)c.GetProperty("f2a").GetInt32();
             BitConverter.GetBytes((ushort)c.GetProperty("w1").GetInt32()).CopyTo(r, 1); BitConverter.GetBytes((uint)c.GetProperty("f22").GetInt64()).CopyTo(r, 0x22);
             r[0x27] = (byte)c.GetProperty("f27").GetInt32(); r[0x28] = (byte)c.GetProperty("f28").GetInt32(); r[0x31] = (byte)c.GetProperty("f31").GetInt32();
-            var log = new List<byte>(); var world = new ObjectReplay(c, random, log);
+            var log = new List<byte>(); var world = new ObjectReplay(c, random, log); Array.Copy(world.ObjectBytes, 0, world.Obj1, 0, 0x40); Array.Copy(world.ObjectBytes, 0x40, world.Obj2, 0, 0x40);
             script(world, r, c.GetProperty("ah").GetInt32());
-            byte[] output = [.. r, world.I, world.J, .. log];
+            byte[] output = extra ? [.. r, world.I, world.J, .. world.Obj1, .. world.Obj2, .. BitConverter.GetBytes(world.Part12), .. log] : [.. r, world.I, world.J, .. log];
             digest.AppendData(output); if (log.Contains((byte)'E')) effects++;
             string hex = Convert.ToHexStringLower(SHA256.HashData(output))[..10];
             if (hex != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; if (only == count) GD.Print("CSHARP " + Convert.ToHexStringLower(output)); }
@@ -96,6 +107,7 @@ public partial class TestRunner
         ObjectScriptReplay("obj-raven", "raven", "The raven script ARMY__03.WRK 6BA", OriginalObjectScripts.Raven, 0);
         ObjectScriptReplay("obj-chest", "chest", "The chest with the birds ARMY__03.WRK 2A6B", OriginalObjectScripts.Chest, 0);
         ObjectScriptReplay("obj-generator", "generator", "The generator script ARMY__03.WRK 29F1", OriginalObjectScripts.Generator, 0);
+        ObjectScriptReplay("obj-dragon", "dragon", "The dragon script ARMY__03.WRK 279A", OriginalObjectScripts.Dragon, 5, true);
         ObjectScriptReplay("obj-face", "face", "The stone face script ARMY__03.WRK 2B9", OriginalObjectScripts.Face);
     }
 }

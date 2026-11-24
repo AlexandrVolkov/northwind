@@ -19,6 +19,9 @@ public interface IObjectScriptWorld
     void Sound(uint id);                              // FS:31
     byte TemplateByte3 { get; }                       // DAT[3] of the object (EDI in AH = 1)
     ushort TemplateBase { get; }                      // DAT[48], the base frame
+    void EffectAt(byte army, byte type, byte layer, uint x, uint y);   // FS:19 called with registers only
+    byte[]? FindObject(byte owner, byte army, byte template, byte skip);   // FS:14F = 11BE0
+    void ClearQuestField(byte[] record);              // [participant of the owner + 12h] = 0 (FS:6D)
     bool Service1BF(uint edx);                        // FS:1BF: ZF (true = skip)
     (bool Found, uint X, uint Y) FreeSpot(byte al, byte ah, byte bl, uint x, uint y);   // FS:187 = 10AD2
     (bool Found, byte Al, byte Ah, byte Bl) Beside(byte al, byte ah);   // FS:16B = 9064
@@ -153,6 +156,79 @@ public static class OriginalObjectScripts
         if (!found) return;
         var (_, created) = w.Create(ahOut, r[3], al, bl, birds, others << 2);   // ECX and EDX still hold the two counts
         if (created != null) w.Occupy(created);
+    }
+
+    /// <summary>The dragon (template 27, 279A): a guard that wakes when somebody comes within 4 cells (+15: 0 asleep, 1 rising, 2 breathing frames 2E5h..303h and looking 9 cells around, 3 the fire
+    /// breath on frame 317h (effect 10h at x−43h, y+4Ah, sounds 7 and 8), 4 lying down after its health is below 0Bh, 5 dead). Its death switches off all the trees (template 7) and pits
+    /// (template 0Ch) of its side and clears +12h of its participant (the quest of the dragon). Verified by tests/fixtures/obj-dragon.json.</summary>
+    public static void Dragon(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah == 0) { Put(r, 0x22, 0xffffffff); Word(r, 1, 0x2e5); Put(r, 8, U32(r, 8) - 0x10); Put(r, 4, U32(r, 4) + 0x10); return; }
+        if (ah != 1) return;
+        if ((r[0x14] & 0x80) != 0) { r[0x14] = 0; Word(r, 0x17, (ushort)(Word(r, 0x17) | 0x80)); Word(r, 1, 0x2bd); }
+        if ((sbyte)r[0x19] <= 0)
+        {
+            r[0x19]--; Word(r, 1, 0x32a);
+            if ((sbyte)r[0x19] > unchecked((sbyte)0xfa)) return;
+            w.Sound(9); w.EffectAt(r[0], 0x11, 1, U32(r, 4), U32(r, 8)); w.Remove(r);
+            Collapse(w, r); return;
+        }
+        if (r[0x15] == 0)
+        {
+            if ((w.Tick & 0x1f) != 0) return;
+            var (count, _, _) = w.Area(CornerMinus(r, 4, 0), 0x405);
+            if (count == 0) return;
+            r[0x15]++; Word(r, 0x17, (ushort)(Word(r, 0x17) & 0xff7f)); w.Sound(7);
+        }
+        if (r[0x15] == 1)
+        {
+            if ((w.Tick & 1) == 0) return;
+            Word(r, 1, (ushort)(Word(r, 1) + 1));
+            uint claimed = w.Claim(w.Reference(r), 0, 0x00ff);
+            if (Word(r, 1) < 0x2e5) return;
+            Word(r, 1, (ushort)(Word(r, 1) - 1));
+            if (claimed != 0) return;
+            r[0x15]++;
+        }
+        if (r[0x15] == 2)
+        {
+            if (r[0x19] <= 0x0a) { Collapse(w, r); return; }
+            if ((w.Tick & 1) == 0) return;
+            Word(r, 1, (ushort)(Word(r, 1) + 1));
+            if (Word(r, 1) < 0x303) return;
+            Word(r, 1, 0x2e5);
+            var (count, _, _) = w.Area(CornerMinus(r, 9, 0), 0xa0b);
+            if (count == 0) return;
+            r[0x15]++; Word(r, 1, 0x303);
+        }
+        if (r[0x15] == 3)
+        {
+            if ((w.Tick & 1) == 0) return;
+            Word(r, 1, (ushort)(Word(r, 1) + 1));
+            if (Word(r, 1) == 0x317) { w.EffectAt(r[0], 0x10, 1, U32(r, 4) - 0x43, U32(r, 8) + 0x4a); w.Sound(8); }
+            if (Word(r, 1) < 0x32b) return;
+            Word(r, 1, 0x303); r[0x15]--; return;
+        }
+        if (r[0x15] == 4)
+        {
+            if ((w.Tick & 1) == 0) return;
+            Word(r, 1, (ushort)(Word(r, 1) - 1));
+            if (Word(r, 1) != 0x2bd) return;
+            Word(r, 0x17, (ushort)(Word(r, 0x17) | 0x280)); r[0x15]++;
+            w.Claim(0, w.Reference(r), 0);
+        }
+    }
+
+    /// <summary>292B: the dragon falls: state 4, the sound 7, the quest field cleared, the trees and the pits of its side switched off.</summary>
+    private static void Collapse(IObjectScriptWorld w, byte[] r)
+    {
+        r[0x15] = 4; w.Sound(7); w.ClearQuestField(r);
+        foreach (byte template in new byte[] { 7, 0x0c })
+            for (byte skip = 0; ; skip++)
+            {
+                var o = w.FindObject(r[3], r[0], template, skip); if (o == null) break;
+                Put(o, 0x22, 0);
+            }
     }
 
     private static void Redraw(IObjectScriptWorld w, byte[] r) { if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); } }
