@@ -89,6 +89,7 @@ FUNCS = {
     'f6ec1': (0x6ec1, 0x6f18, []),
     'fd2d1': (0xd2d1, 0xd363, []),
     'fs14b': (0x11dde, 0x11eb0, [0x21a00, 0xd7b1, 0xc344, 0xd157]),
+    'fs187': (0x10ad2, 0x10b75, [0x9e41, 0x9e55, 0xac63]),
     'fc439': (0xc439, 0xc4cd, []),
     'f84aa': (0x84aa, 0x8659, [0x8d89, 0x8c98, 0x8ca1, 0xc331, 0x8c47, 0x8af4, 0x8c89, 0xcfac, 0x123d3, 0xd101, 0x8b0f, 0xc35f]),
 }
@@ -133,6 +134,7 @@ def cases(names):
                     'calls': [[rng.choice([0, 1, 1]), rng.choice([0, 1, 2, 3, rng.randrange(256)]) | (rng.choice([0, 1, 2, 3, 4]) << 8), rng.randrange(1 << 20) if rng.random() < 0.4 else rng.choice([0, 1, 2, 3, 0xff]), rng.randrange(1 << 20) if rng.random() < 0.5 else rng.choice([0, 1, 2]), rng.randrange(1 << 20), rng.choice([0, 0x400900, 0x400a00])] for _ in range(8)]})
     for n, c in enumerate(out):
         if c['fn'] == 'fcccb' and n % 2 == 0: c['z19'] = 1; c['f15'] = 1; c['f22'] = (n // 2) % 5; c['f23'] = (n // 3) % 4; c['f24'] = (n // 5) % 40
+        if c['fn'] == 'fs187': c['regs'][2] = n * 37 % 0x400; c['regs'][3] = n * 53 % 0x400
         if c['fn'] == 'fd2d1': c['px'] = 160 + n * 7 % 340; c['py'] = 160 + n * 13 % 340
         if c['fn'] == 'fb319': c['px'] = n % 40; c['py'] = (n // 3) % 40
         if c['fn'] == 'fcb77': c['f22'] = [0x31, 0x31, 0x3b, 0, 0x40, 0x31][n % 6]; c['f19'] = rng.choice([1, 5, 0x80])
@@ -206,6 +208,7 @@ def generate(game, names):
         o.cpu.mem_write(0x273f, bytes([case['g273'], case['g274']]))
         o.cpu.mem_write(0x525, bytes([case['g525'], case['g526']])); o.cpu.mem_write(0x1c61, bytes([case['g1c61']])); o.cpu.mem_write(0x2730, struct.pack('<I', case['g2730'])); o.cpu.mem_write(0x6b6, struct.pack('<I', o.POOL + 0x1000)); o.cpu.mem_write(o.POOL + 0x1000, prng(case['rt'], 0x800))
         o.cpu.mem_write(o.POOL + 0xa000, prng(case['map'] + 9, 8 * 0x1a35)); o.cpu.mem_write(0x6ba, struct.pack('<I', o.POOL + 0xa000))
+        o.cpu.mem_write(0x18e6, struct.pack('<II', 1024, 1024))
         o.terrain(32, 32, [b % 8 for b in prng(case['map'], 1024)])
         o.cpu.mem_write(0x1c9f, bytes([case['g1c9f']])); o.cpu.mem_write(0x512, struct.pack('<I', case['g512'])); o.cpu.mem_write(0x51a, struct.pack('<I', case['g51a'])); o.cpu.mem_write(0x51e, struct.pack('<I', case['g51e'])); o.cpu.mem_write(0x522, bytes([case['g522']]))
         o.cpu.reg_write(UC_X86_REG_ESI, o.POOL + POOLREC); o.cpu.reg_write(UC_X86_REG_EBP, o.POOL + TMPL)
@@ -251,6 +254,7 @@ def generate(game, names):
             o.cpu.reg_write(UC_X86_REG_EAX, (0x900, 0xa00, 0, 0x900)[sel]); o.cpu.reg_write(UC_X86_REG_EBX, (0xa00, 0x900, r3, 0)[(sel + r2) & 3])
         if case['fn'] == 'fs14b' and case['sel'] != 0:
             tb = bytearray(o.cpu.mem_read(o.POOL + TMPL, 0x100)); tb[0x46] = 5; tb[0x74] = 0xf; tb[0x40] &= ~0x20 & 0xff; tb[0x41] &= 0x7f; o.cpu.mem_write(o.POOL + TMPL, bytes(tb))
+        if case['fn'] == 'fs187': o.cpu.reg_write(UC_X86_REG_EAX, (case['regs'][0] & 0xffff0000) | ((((case['regs'][0] >> 8) & 0xff) % 3) << 8))
         if case['fn'] == 'fc439':
             tf = struct.unpack('<I', prng(case['tm'], 0x100)[0x40:0x44])[0]; o.cpu.reg_write(UC_X86_REG_EBX, case['bm']); o.cpu.reg_write(UC_X86_REG_EAX, (tf & case['bm']) if case['sel'] else case['regs'][0])
         if case['fn'] == 'fd157': o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + OBJ2)

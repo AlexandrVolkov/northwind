@@ -69,3 +69,7 @@
 ## 11DDE (FS:14B)
 
 `FS14B` walks the list at DS:1F45 (21A00 fills it) for the unit ESI: the living objects (health above the template +46) that are not the unit, whose template has none of 8020h, which the unit owner can see (+20), whose layer is allowed ([1CA6] from template +74). Hostile ones (the owner bit in +22 of the unit; the bit test is the memory form, so the owners 8..255 reach the next dwords) are counted in [1F39], the nearest one (C344; D157 = 1 limits the distance to 30h) is [1F31]; the others count in [1F3D]. Verified against x86.
+
+## 10AD2 (FS:187)
+
+`FS187` looks for a free spot for the template AL of the army AH around (ECX, EDX): the point is snapped to 32 and moved by half the template size (+3, +4); ring k (k = 1, 2, ...; the squares of 1, 4, 9, ... spots until the product does not fit a byte) tries k * k random cells (9E41, 9E55), keeps those inside the map border (DS:18E6 / 18EA minus 32) and asks AC63. ZF = found; ECX/EDX = the spot; EAX/EBX are restored. Verified against x86.
