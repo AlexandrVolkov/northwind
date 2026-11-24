@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "283877af661743ea7af47c667179da76bc5fd2ae79721e7ee4764dd7dfe4f4a2",
+  "annotation_sha256": "91ecece4ba685bfa974583d6da43f16eb1e7e25efccccc23ae72c7201c951b30",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -1727,7 +1727,8 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "le1-gate-d5b1"
+            "le1-gate-d5b1",
+            "le1-bridge-builder-d5b1"
           ]
         },
         {

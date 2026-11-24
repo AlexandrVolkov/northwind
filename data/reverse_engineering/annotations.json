@@ -4544,6 +4544,18 @@
       "evidence": ["docs/participant-stats.md", "tests/fixtures/participant-stats.json", "tools/verify_participant_stats.py", "tests/OriginalParticipantStatsChecks.cs"],
       "implementation": ["scripts/OriginalParticipantStats.cs"],
       "limitations": "68BD, 219C3, EEBB and 1188F are recorded stubs in the check; not yet driving the skirmish (the AI keeps its own bookkeeping)"
+    },
+    {
+      "id": "le1-bridge-builder-d5b1",
+      "module": "LE:1",
+      "start": 54705,
+      "end": 55014,
+      "name": "Bridge builders: raise one step (D5B1), lower one step (D61D), the unit's update (D689)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/bridges.md", "tests/fixtures/bridge-builder.json", "tools/verify_bridge_builder.py", "tests/OriginalBridgeBuilderChecks.cs"],
+      "implementation": ["scripts/OriginalBridgeBuilder.cs"],
+      "limitations": "AC63, 43B0 and D895 are recorded stubs in the check; the skirmish keeps its own bridge animation (adapter) until this is wired"
     }
   ]
 }
