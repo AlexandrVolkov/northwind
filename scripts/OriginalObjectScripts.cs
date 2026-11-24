@@ -28,6 +28,8 @@ public interface IObjectScriptWorld
     (bool Zf, uint Flags) Service119(ushort ax);       // FS:119: the template of the target (EDX): ZF = none
     uint MapWidthPx { get; } uint MapHeightPx { get; }   // FS:4 and FS:0
     uint FoundFlags { get; }                          // the template flags (+40h) of the object FS:11 found (EBX)
+    (bool Found, byte[]? Object) Scan17B(uint eax, uint ebx, uint ecx, uint edx, uint esi);   // FS:17B (D895) with the registers set by the script
+    void Say143(byte message, byte participant, byte speakerOwner);   // FS:143
     void Service25(uint parent, byte bl);             // FS:25
     void Service29(byte bl);                          // FS:29
     void Sound35(uint id);                            // FS:35
@@ -640,6 +642,31 @@ public static class OriginalObjectScripts
         Word(r, 3, (ushort)(((bl & 7) << 2) + 0xf0)); r[0] = 0x14; r[0x16] = 2; r[0x17] = 4;
         w.EffectAt(r[1], 0x93, r[5], 0, 0);   // ECX and EDX are not set by the script (zero in the check)
         w.Sound35(0);
+    }
+
+    /// <summary>The blasts of the mages (2F75, 2FA7, 2FD9: BL = 2, 3, 6): the effect disappears at once and the object hit at the creator's point (FS:17B) hears the message 5Eh, 62h or 63h from the creator's owner.</summary>
+    public static void MageBlast(IObjectScriptWorld w, byte[] r, byte[] parent, uint parentPointer, int k)
+    {
+        r[0] = 0xff;
+        byte bl = new byte[] { 2, 3, 6 }[k];
+        var (found, o) = w.Scan17B(0, (parentPointer & 0xffff0000) | 0x100 | bl, U32(parent, 4), U32(parent, 8), parentPointer - 0x400000);
+        if (!found) return;
+        w.Say143(new byte[] { 0x5e, 0x62, 0x63 }[k], o![3], parent[3]);
+    }
+
+    /// <summary>The spray of the mages (300B and the preludes 307F, 3118, 3139, 315A, 317B): kind 5 for 14h strokes at the creator's point; every 4th update it throws an effect (14h) at a random point
+    /// within ±256 px (FS:19) and counts its life down.</summary>
+    public static void MageSpray(IObjectScriptWorld w, byte[] r, int ah, byte[] parent, int k)
+    {
+        if (k != 0 || ah != 1) { r[0] = 5; r[0x16] = 0x14; Put(r, 7, U32(parent, 4)); Put(r, 0xc, U32(parent, 8)); }
+        if ((w.Tick & 3) != 0) return;
+        uint x = U32(r, 7) + (uint)((sbyte)w.Random() * 2);
+        if (x < w.MapWidthPx)
+        {
+            uint y = U32(r, 0xc) + (uint)((sbyte)w.Random2() * 2);
+            if (y < w.MapHeightPx) { w.Random2(); w.EffectAt(r[1], 0x14, 1, x, y); }
+        }
+        r[0x16]--; if (r[0x16] == 0) r[0] = 0xff;
     }
 
     public static void Fx54aKind16(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)   // B62
