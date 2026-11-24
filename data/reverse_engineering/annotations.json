@@ -5240,6 +5240,30 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-siege.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services (4D, DD, E1, 115, 71, 19) are recorded stubs in the check; the skirmish drives the siege weapons by its own adapters"
+    },
+    {
+      "id": "army__01-shackled-f64",
+      "module": "ARMY__01.WRK",
+      "start": 3940,
+      "end": 4049,
+      "name": "Shackled warrior (template 20): frames and liberation of a warrior",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-shackled.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; the inline table of FS:E1 and the table at 11A8 are data of the original; the skirmish uses its own adapters"
+    },
+    {
+      "id": "army__02-leader-10f1",
+      "module": "ARMY__02.WRK",
+      "start": 4337,
+      "end": 4532,
+      "name": "Leader (template 20): init, step with FS:13E, voice, table, continuation",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-leader.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; the inline table of FS:E1 and the table at 11A8 are data of the original; the skirmish uses its own adapters"
     }
   ]
 }

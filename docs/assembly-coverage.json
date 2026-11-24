@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "9ec37b405152bbd96ead758504c6edff09b03983b975efc13bd953267b65cba1",
+  "annotation_sha256": "37af9b589cef88b92ec9edc59121844f9696323b1143029470b91c1d392b8891",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3511,8 +3511,8 @@
       "zero_fill_bytes": 0,
       "sha256": "d2554037e3a135ce7c06530cf2ee85e89ae240aa31a00c7c72a9b3cb251c46de",
       "byte_status": {
-        "ported": 375,
-        "unreviewed": 4576
+        "ported": 484,
+        "unreviewed": 4467
       },
       "linear_rows": 1625,
       "flow_candidate_instructions": 1129,
@@ -3558,6 +3558,22 @@
         },
         {
           "start": 1385,
+          "end": 3940,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 3940,
+          "end": 4049,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-shackled-f64"
+          ]
+        },
+        {
+          "start": 4049,
           "end": 4951,
           "status": "unreviewed",
           "classification": "unknown",
@@ -3575,8 +3591,8 @@
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
         "partial": 855,
-        "ported": 1257,
-        "unreviewed": 4818
+        "ported": 1452,
+        "unreviewed": 4623
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -3881,10 +3897,19 @@
         },
         {
           "start": 4216,
-          "end": 4532,
+          "end": 4337,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 4337,
+          "end": 4532,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-leader-10f1"
+          ]
         },
         {
           "start": 4532,
