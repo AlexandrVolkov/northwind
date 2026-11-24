@@ -4268,6 +4268,18 @@
       "evidence": ["docs/unit-motion.md", "tests/fixtures/unit-walk.json", "tools/verify_unit_walk.py", "tests/OriginalUnitWalkChecks.cs"],
       "implementation": ["scripts/OriginalUnitWalk.cs"],
       "limitations": "the services 7FA7, 9653, 9B0D, 9727, 813E, 8120, D895 and the terrain tables are recorded stubs in the check; not yet the driver of the skirmish units"
+    },
+    {
+      "id": "le1-unit-move-12930",
+      "module": "LE:1",
+      "start": 76080,
+      "end": 76513,
+      "name": "Move step of units (state 4): turn toward the goal every fourth update, pixel move along the heading, free-place check",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-motion.md", "tests/fixtures/unit-move.json", "tools/verify_unit_move.py", "tests/OriginalUnitMoveChecks.cs"],
+      "implementation": ["scripts/OriginalUnitMove.cs"],
+      "limitations": "the services 6996, 43B0, AC63, 813E, 12BF2 are recorded stubs in the check; the sine table DS:4790 is filled at run time (not located yet) and is part of the case; not yet the driver of the skirmish units"
     }
   ]
 }
