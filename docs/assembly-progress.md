@@ -7,7 +7,7 @@
 | LE:1 | 146882 | 101186 | 6265 | 97 | 39334 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
+| ARMY__00.WRK | 5403 | 2893 | 100 | 0 | 2410 | 0 |
 | ARMY__01.WRK | 4951 | 4576 | 0 | 0 | 375 | 7 |
 | ARMY__02.WRK | 6930 | 5296 | 855 | 0 | 779 | 7 |
 | ARMY__03.WRK | 13412 | 1956 | 0 | 0 | 11456 | 1 |
@@ -20,6 +20,9 @@
 
 | Модуль / полуоткрытый диапазон | Имя | Статус | Доказательства | Ограничения |
 | --- | --- | --- | --- | --- |
+| ARMY__00.WRK `0x52..0x86` | Switch object (template 1): opens a way for a participant (clears his bit in the masks of the traps) | ported | [object-scripts.md](../docs/object-scripts.md); [obj-switch.json](../tests/fixtures/obj-switch.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; the switch is run by the skirmish when a hermit's script removes it, the other two are not wired |
+| ARMY__00.WRK `0x371..0x3A9` | Second switch (template 23): blanks +31 of the objects 16h and 17h | ported | [object-scripts.md](../docs/object-scripts.md); [obj-switch2.json](../tests/fixtures/obj-switch2.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; the switch is run by the skirmish when a hermit's script removes it, the other two are not wired |
+| ARMY__00.WRK `0x3A9..0x3F0` | Exit (template 24): ends the level when somebody stands near | ported | [object-scripts.md](../docs/object-scripts.md); [obj-exit.json](../tests/fixtures/obj-exit.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; the switch is run by the skirmish when a hermit's script removes it, the other two are not wired |
 | ARMY__00.WRK `0x4F3..0x54A` | Melee strike effect: experience attack, lookup, hit, sound | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Объект-эффект и его анимация в схватке не создаются. |
 | ARMY__00.WRK `0x593..0x6C7` | Arrow effect: launch, flight, early and arrival hits | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) | Обработчики 7FE/AEB не перенесены. |
 | ARMY__00.WRK `0x6C7..0x6FE` | Blood splash effect (type 3) | ported | [combat.md](../docs/combat.md); [corpse.json](../tests/fixtures/corpse.json) |  |

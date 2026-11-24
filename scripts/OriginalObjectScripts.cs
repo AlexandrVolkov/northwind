@@ -22,6 +22,7 @@ public interface IObjectScriptWorld
     void EffectAt(byte army, byte type, byte layer, uint x, uint y);   // FS:19 called with registers only
     byte[]? FindObject(byte owner, byte army, byte template, byte skip);   // FS:14F = 11BE0
     void ClearQuestField(byte[] record);              // [participant of the owner + 12h] = 0 (FS:6D)
+    void LevelExit(byte mode);                        // FS:1A3
     void Appearance(byte army);                       // FS:4D
     (bool Found, uint Reference) ScanMasked(byte mode, uint mask);   // FS:17B = D895 with the participants of the mask excluded (the quest field +12 of the participant is lent for it)
     uint QuestField(byte[] record);                   // [participant of the owner + 12h]
@@ -350,6 +351,43 @@ public static class OriginalObjectScripts
         r[0x19]--;
         if (r[0x19] > 0xfa) return 0x100;
         w.Remove(r); return 0x100;
+    }
+
+    /// <summary>The switch object of ARMY__00 (template 1, WRK 52) that a hermit creates when he opens a way: +22 the template, +23 the army, +24 the owner, +25 the count, +26 the participant. Within
+    /// one update it visits the objects of that template and army (count + 1 of them) and clears the participant's bit in their mask +22 (the trap no longer touches him); then it removes itself.</summary>
+    public static void Switch(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah != 1) return;
+        RunSwitch(w.FindObject, r); w.Remove(r);
+    }
+
+    /// <summary>The body of the switch: the objects it opens are looked up through <paramref name="find"/> (owner, army, template, skip).</summary>
+    public static void RunSwitch(Func<byte, byte, byte, byte, byte[]?> find, byte[] r)
+    {
+        do
+        {
+            var o = find(r[0x24], r[0x23], r[0x22], r[0x25]);
+            if (o != null) Put(o, 0x22, U32(o, 0x22) & ~(1u << (r[0x26] & 31)));
+            r[0x25]--;
+        } while ((sbyte)r[0x25] >= 0);
+        Word(r, 0x17, (ushort)(Word(r, 0x17) | 0x80));
+    }
+
+    /// <summary>The second switch (template 23, WRK 371): every 32 updates it blanks +31 of the objects 16h and 17h of army 3 and owner 4.</summary>
+    public static void Switch2(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah != 1 || (w.Tick & 0x1f) != 0) return;
+        foreach (byte template in new byte[] { 0x16, 0x17 })
+            if (w.FindObject(4, 3, template, 0) is { } o) o[0x31] = 0;
+    }
+
+    /// <summary>The exit (template 24, WRK 3A9): every 64 updates, when somebody stands in the square of 15×15 cells around, the level ends (FS:1A3, mode 3).</summary>
+    public static void Exit(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah == 0) { Put(r, 0x22, 7); return; }
+        if (ah != 1 || (w.Tick & 0x3f) != 0) return;
+        var (count, _, _) = w.Area(Corner(r) - 0x707, 0xe0e);
+        if (count != 0) w.LevelExit(3);
     }
 
     private static void Redraw(IObjectScriptWorld w, byte[] r) { if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); } }
