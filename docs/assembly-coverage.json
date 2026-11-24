@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "f52a6607a3ec5ab49ebe46a781b3dc26ee72a4c8ff53350b3b8db414075f51db",
+  "annotation_sha256": "5e83e01096d82c2d79c3729e7ff84e733559391baac4d14c78b272d5f7999d3e",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3698,8 +3698,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 5147,
-        "unreviewed": 8265
+        "ported": 7715,
+        "unreviewed": 5697
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -3841,6 +3841,86 @@
         },
         {
           "start": 6664,
+          "end": 6766,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 6766,
+          "end": 7384,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-magus-1a6e"
+          ]
+        },
+        {
+          "start": 7384,
+          "end": 7538,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 7538,
+          "end": 7891,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-kevin-1d72"
+          ]
+        },
+        {
+          "start": 7891,
+          "end": 7993,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 7993,
+          "end": 8311,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-garik-1f39"
+          ]
+        },
+        {
+          "start": 8311,
+          "end": 8465,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 8465,
+          "end": 9267,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-efil-2111"
+          ]
+        },
+        {
+          "start": 9267,
+          "end": 9369,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 9369,
+          "end": 9846,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-kochet-2499"
+          ]
+        },
+        {
+          "start": 9846,
           "end": 11852,
           "status": "unreviewed",
           "classification": "unknown",

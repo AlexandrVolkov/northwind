@@ -25,6 +25,7 @@ PRESETS['kevin'] = {'entry': 0x1d72, 'end': 0x1ed3, 'items': [0, 0], 'queue': [0
 PRESETS['garik'] = {'entry': 0x1f39, 'end': 0x2077, 'items': [0, 0], 'queue': [0x59, 0x5a], 'templates': [2], 'owner_items': [0], 'scripted': [2], 'record': 0x50}
 PRESETS['magus'] = {'entry': 0x1a6e, 'end': 0x1cd8, 'items': [0x14, 0x14], 'queue': [0x59, 0x5a, 0x7b, 0x81], 'templates': [1, 0x17], 'owner_items': [0], 'scripted': [], 'record': 0x50}
 PRESETS['efil'] = {'entry': 0x2111, 'end': 0x2433, 'items': [9, 0xa, 0x13, 0xc], 'queue': [0x50, 0x65, 0x6b, 0x59, 0x5a], 'templates': [7, 3], 'owner_items': [9, 0xa], 'scripted': [7] * 8, 'record': 0x54}
+PRESETS['kochet'] = {'entry': 0x2499, 'end': 0x2676, 'items': [0x14, 0x14], 'queue': [0x59, 0x5a, 0x7b, 0x81], 'templates': [2], 'owner_items': [0], 'scripted': [], 'record': 0x50}
 PRESET = PRESETS['onis']
 
 
@@ -68,6 +69,7 @@ def cases():
             case['word47'] = 0
             for t in PRESET['scripted']: case['objects'].append({'owner': owner, 'army': 3, 'template': t, 'layer': 0, 'mask22': rng.randrange(256), 'mask28': rng.randrange(256), 'condition': 100, 'flags': 0})
         case['time'] = rng.choice([0, 100, 0x2710, 5000, rng.randrange(1 << 20)]); case['dim4'] = rng.choice([1024, 2048, 3000]); case['dim0'] = rng.choice([1024, 1536, 2048]); case['deadline'] = rng.choice([0, 3000, 5000, rng.randrange(1 << 20)])
+        case['near'] = [[rng.choice([0, 0, 1]), rng.randrange(4)] for _ in range(30)]
         case['free'] = rng.choice([0, 3, 4, 5, 6, 7, 8, 12])
         case['spot'] = {'ok': rng.choice([0, 1, 1]), 'x': rng.randrange(0, 2048), 'y': rng.randrange(0, 2048)}
         for k in ('3b', '3d'): case['masks'][k] = rng.choice([0, 0, rng.randrange(16)])
@@ -103,6 +105,13 @@ def generate(game):
         o.cpu.reg_write(UC_X86_REG_EFLAGS, (reg(UC_X86_REG_EFLAGS) & ~0x40) | (0x40 if state['spot']['ok'] else 0)); o.ret()
     def free_regions():   # FS:18B = 11CC9
         log.append(b'K' + struct.pack('<B', reg(UC_X86_REG_EAX) & 255)); o.cpu.reg_write(UC_X86_REG_EAX, state['free']); o.ret()
+    def nearest():   # FS:75 = C439
+        log.append(b'N' + struct.pack('<BI', o.cpu.mem_read(reg(UC_X86_REG_ESI) + 3, 1)[0], reg(UC_X86_REG_EBX)))
+        zf, idx = state['near'].pop(0) if state['near'] else (1, 0)
+        o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 0x40 * idx)
+        o.cpu.reg_write(UC_X86_REG_EFLAGS, (reg(UC_X86_REG_EFLAGS) & ~0x40) | (0x40 if zf else 0)); o.ret()
+    def convert():   # FS:193 = D1BA
+        log.append(b'X' + struct.pack('<BI', reg(UC_X86_REG_EAX) & 255, reg(UC_X86_REG_ESI) - o.POOL)); o.ret()
     def occupy():  # FS:19B = 43E5
         log.append(b'O' + struct.pack('<I', reg(UC_X86_REG_EAX))); o.ret()
     def create():  # FS:45 = A758
@@ -117,11 +126,11 @@ def generate(game):
         log.append(b'V'); o.ret()
     def standard_actions():
         log.append(b'U'); o.cpu.emu_stop(); o.stopped = True
-    o.stubs = {0x11cc9: free_regions, 0x10ad2: spot, 0x43e5: occupy, 0xee38: say, 0x11c3d: reveal, 0x11c73: stub_log(b'S', UC_X86_REG_EAX, mask=0xff), 0xd895: scan, 0xa758: create, 0x103ec: init,
+    o.stubs = {0xc439: nearest, 0xd1ba: convert, 0x11cc9: free_regions, 0x10ad2: spot, 0x43e5: occupy, 0xee38: say, 0x11c3d: reveal, 0x11c73: stub_log(b'S', UC_X86_REG_EAX, mask=0xff), 0xd895: scan, 0xa758: create, 0x103ec: init,
                0x98cc: stub_log(b'R', UC_X86_REG_ESI, rel=True), 0x81d9: stub_log(b'D'), 0x11c1a: territory, 0x90e9: standard_vitals, 0x8227: standard_actions, 0xbebb: stub_log(b'Y', UC_X86_REG_EAX, mask=0xffff), 0xae3a: stub_log(b'N', UC_X86_REG_EAX, mask=0xff)}
     digest = hashlib.sha256(); all_cases = cases()
     for case in all_cases:
-        log.clear(); state.update(scan=case['scan'], create_zf=case['create_zf'], spot=case['spot'], free=case['free']); o.prepare(32, 32); o.mode = 'hermit'; o.boundary = None
+        log.clear(); state.update(scan=case['scan'], create_zf=case['create_zf'], spot=case['spot'], free=case['free'], near=[list(x) for x in case['near']]); o.prepare(32, 32); o.mode = 'hermit'; o.boundary = None
         o.cpu.mem_write(0x6ba, struct.pack('<I', o.PARTICIPANTS)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x6c6, bytes([case['count']]))
         o.cpu.mem_write(o.FS + 0x142, bytes([case['count']])); o.cpu.mem_write(o.FS + 0x10, bytes([case['tick']])); o.cpu.mem_write(o.FS + 0x17f, struct.pack('<I', case['time'])); o.cpu.mem_write(o.FS + 4, struct.pack('<I', case['dim4'])); o.cpu.mem_write(o.FS + 0, struct.pack('<I', case['dim0'])); o.cpu.mem_write(o.FS + 8, struct.pack('<I', o.POOL))
         o.cpu.mem_write(o.POOL, bytes(0x2000)); o.cpu.mem_write(0x19eb, bytes([case['seed']])); o.cpu.mem_write(0x19ec, bytes([case['seed'] ^ 0x5a]))
