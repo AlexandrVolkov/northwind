@@ -19,11 +19,13 @@ PRESETS = {
     'onis': {'entry': 0xdbf, 'end': 0x11fd, 'items': [0xc, 0xd, 8, 9, 0xb, 10, 12, 13], 'queue': [0x11, 0x50, 0x26, 0x43, 0x59, 0x5a, 0x4a, 0x4d], 'templates': [2, 5, 0x1a], 'owner_items': [0xc, 0xd], 'scripted': [2, 0x1a, 5, 5, 5, 5, 5, 5]},
     'irvil': {'entry': 0x1297, 'end': 0x162e, 'items': [0xb, 0xa, 0xe, 0xd, 8, 0x10], 'queue': [0x11, 0x60, 0x26, 0x54, 0x59, 0x5a], 'templates': [2, 0x19], 'owner_items': [0xe, 0xd], 'scripted': [2, 0x19, 0x19]},
 }
+PRESETS['miron'] = {'entry': 0x16c8, 'end': 0x1a08, 'items': [9, 0xb, 0xc], 'queue': [0x50, 0x74, 0x65, 0x6b, 0x59, 0x5a], 'templates': [4, 3], 'owner_items': [9, 0xb], 'scripted': [4, 4], 'record': 0x54}
+for _p in PRESETS.values(): _p.setdefault('record', 0x50)
 PRESET = PRESETS['onis']
 
 
 class HermitOracle(CombatOracle):
-    RANGES = {'hermit': ([(0x124d8, 0x124fd), (0xee69, 0xeea3), (0x11be0, 0x11c1a), (0x6877, 0x68a0), (0x68bd, 0x68d8), (0x9e41, 0x9e55)], [(PRESET['entry'], PRESET['end'])])}
+    RANGES = {'hermit': ([(0x124d8, 0x124fd), (0xee69, 0xeea3), (0x11be0, 0x11c1a), (0x6877, 0x68a0), (0x68bd, 0x68d8), (0x9e41, 0x9e69)], [(PRESET['entry'], PRESET['end'])])}
 
     def run(self, address):
         self.stopped = False
@@ -61,6 +63,9 @@ def cases():
             for g in case['objects']: g['army'] = rng.choice([3, 3, 1])
             case['word47'] = 0
             for t in PRESET['scripted']: case['objects'].append({'owner': owner, 'army': 3, 'template': t, 'layer': 0, 'mask22': rng.randrange(256), 'mask28': rng.randrange(256), 'condition': 100, 'flags': 0})
+        case['time'] = rng.choice([0, 100, 0x2710, 5000, rng.randrange(1 << 20)]); case['dim4'] = rng.choice([1024, 2048, 3000]); case['dim0'] = rng.choice([1024, 1536, 2048]); case['deadline'] = rng.choice([0, 3000, 5000, rng.randrange(1 << 20)])
+        case['spot'] = {'ok': rng.choice([0, 1, 1]), 'x': rng.randrange(0, 2048), 'y': rng.randrange(0, 2048)}
+        for k in ('3b', '3d'): case['masks'][k] = rng.choice([0, 0, rng.randrange(16)])
         out.append(case)
     return out
 
@@ -87,6 +92,12 @@ def generate(game):
         log.append(b'F' + struct.pack('<B', reg(UC_X86_REG_EAX) & 255))
         o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 0x40 * state['scan']['object'])
         o.cpu.reg_write(UC_X86_REG_EFLAGS, (reg(UC_X86_REG_EFLAGS) & ~0x40) | (0x40 if state['scan']['zf'] else 0)); o.ret()
+    def spot():   # FS:187 = 10AD2
+        log.append(b'P' + struct.pack('<BBBII', reg(UC_X86_REG_EAX) & 255, (reg(UC_X86_REG_EAX) >> 8) & 255, reg(UC_X86_REG_EBX) & 255, reg(UC_X86_REG_ECX), reg(UC_X86_REG_EDX)))
+        o.cpu.reg_write(UC_X86_REG_ECX, state['spot']['x']); o.cpu.reg_write(UC_X86_REG_EDX, state['spot']['y'])
+        o.cpu.reg_write(UC_X86_REG_EFLAGS, (reg(UC_X86_REG_EFLAGS) & ~0x40) | (0x40 if state['spot']['ok'] else 0)); o.ret()
+    def occupy():  # FS:19B = 43E5
+        log.append(b'O' + struct.pack('<I', reg(UC_X86_REG_EAX))); o.ret()
     def create():  # FS:45 = A758
         log.append(b'C' + struct.pack('<BBBBII', reg(UC_X86_REG_EAX) & 255, (reg(UC_X86_REG_EAX) >> 8) & 255, reg(UC_X86_REG_EBX) & 255, (reg(UC_X86_REG_EBX) >> 8) & 255, reg(UC_X86_REG_ECX), reg(UC_X86_REG_EDX)))
         o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 0x600)
@@ -99,14 +110,14 @@ def generate(game):
         log.append(b'V'); o.ret()
     def standard_actions():
         log.append(b'U'); o.cpu.emu_stop(); o.stopped = True
-    o.stubs = {0xee38: say, 0x11c3d: reveal, 0x11c73: stub_log(b'S', UC_X86_REG_EAX, mask=0xff), 0xd895: scan, 0xa758: create, 0x103ec: init,
+    o.stubs = {0x10ad2: spot, 0x43e5: occupy, 0xee38: say, 0x11c3d: reveal, 0x11c73: stub_log(b'S', UC_X86_REG_EAX, mask=0xff), 0xd895: scan, 0xa758: create, 0x103ec: init,
                0x98cc: stub_log(b'R', UC_X86_REG_ESI, rel=True), 0x81d9: stub_log(b'D'), 0x11c1a: territory, 0x90e9: standard_vitals, 0x8227: standard_actions, 0xbebb: stub_log(b'Y', UC_X86_REG_EAX, mask=0xffff), 0xae3a: stub_log(b'N', UC_X86_REG_EAX, mask=0xff)}
     digest = hashlib.sha256(); all_cases = cases()
     for case in all_cases:
-        log.clear(); state.update(scan=case['scan'], create_zf=case['create_zf']); o.prepare(32, 32); o.mode = 'hermit'; o.boundary = None
+        log.clear(); state.update(scan=case['scan'], create_zf=case['create_zf'], spot=case['spot']); o.prepare(32, 32); o.mode = 'hermit'; o.boundary = None
         o.cpu.mem_write(0x6ba, struct.pack('<I', o.PARTICIPANTS)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x6c6, bytes([case['count']]))
-        o.cpu.mem_write(o.FS + 0x142, bytes([case['count']])); o.cpu.mem_write(o.FS + 0x10, bytes([case['tick']]))
-        o.cpu.mem_write(o.POOL, bytes(0x2000)); o.cpu.mem_write(0x19eb, bytes([case['seed']]))
+        o.cpu.mem_write(o.FS + 0x142, bytes([case['count']])); o.cpu.mem_write(o.FS + 0x10, bytes([case['tick']])); o.cpu.mem_write(o.FS + 0x17f, struct.pack('<I', case['time'])); o.cpu.mem_write(o.FS + 4, struct.pack('<I', case['dim4'])); o.cpu.mem_write(o.FS + 0, struct.pack('<I', case['dim0'])); o.cpu.mem_write(o.FS + 8, struct.pack('<I', o.POOL))
+        o.cpu.mem_write(o.POOL, bytes(0x2000)); o.cpu.mem_write(0x19eb, bytes([case['seed']])); o.cpu.mem_write(0x19ec, bytes([case['seed'] ^ 0x5a]))
         for army in range(4):
             o.cpu.mem_write(0x6ca + 0x56 * army + 4, struct.pack('<I', o.DAT + army * 0x2000))
             for index in range(0x20):
@@ -124,18 +135,19 @@ def generate(game):
             struct.pack_into('<I', part, 0x0e, 0); struct.pack_into('<I', part, 0x09, 0x40 * count)
             for s, (t, other) in enumerate(case['queue'][p]): part[0x34 + 14 * s] = t; part[0x34 + 14 * s + 9] = other
             o.cpu.mem_write(0x97a + 0xf5 * p, bytes(part))
-        rufin = bytearray(0x50); rufin[0] = 3; rufin[3] = case['owner']; rufin[0x14] = case['flags14']; struct.pack_into('<H', rufin, 0x17, case['flags17']); rufin[0x19] = case['condition']
+        rufin = bytearray(PRESET['record']); rufin[0] = 3; rufin[3] = case['owner']; rufin[0x14] = case['flags14']; struct.pack_into('<H', rufin, 0x17, case['flags17']); rufin[0x19] = case['condition']
         for k, v in case['masks'].items(): struct.pack_into('<I', rufin, int(k, 16), v)
         struct.pack_into('<H', rufin, 0x47, case['word47'])
+        if PRESET['record'] > 0x50: struct.pack_into('<I', rufin, 0x4d, case['deadline'])
         o.cpu.mem_write(o.POOL + 0x1000, bytes(rufin))
         o.cpu.reg_write(UC_X86_REG_ESI, o.POOL + 0x1000); o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 0x1000); o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, 7)
         o.run(o.WRK + PRESET['entry'])
-        out = bytes(o.cpu.mem_read(o.POOL + 0x1000, 0x50)) + bytes(o.cpu.mem_read(o.POOL, 0x40 * count)) + bytes(o.cpu.mem_read(o.POOL + 0x600, 0x40)) \
+        out = bytes(o.cpu.mem_read(o.POOL + 0x1000, PRESET['record'])) + bytes(o.cpu.mem_read(o.POOL, 0x40 * count)) + bytes(o.cpu.mem_read(o.POOL + 0x600, 0x40)) \
             + b''.join(bytes(o.cpu.mem_read(0x97a + 0xf5 * p + 0x34, 14 * 8)) for p in range(case['count'])) + b''.join(log)
         if __import__('os').environ.get('DEBUG_CASE') == str(all_cases.index(case)): print(out.hex())
         digest.update(out); case['sha256_prefix'] = hashlib.sha256(out).hexdigest()[:10]
     return {'format_version': 1, 'source_sha256': {k: report['source_sha256'][k] for k in ['NORWIND.EXE']} | {'ARMY__03.WRK': hashlib.sha256(wrk).hexdigest()},
-            'random_values': constants['random_values'], 'cases': all_cases, 'results': {PRESET_NAME: {'case_count': len(all_cases), 'sha256': digest.hexdigest()}}}
+            'random_values': constants['random_values'], 'record_size': PRESET['record'], 'cases': all_cases, 'results': {PRESET_NAME: {'case_count': len(all_cases), 'sha256': digest.hexdigest()}}}
 
 
 PRESET_NAME = 'onis'

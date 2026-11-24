@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "6cdf1641a56e0c1da8af054da22e6264905ee83f2d3405f382d153e97077da5c",
+  "annotation_sha256": "f52a6607a3ec5ab49ebe46a781b3dc26ee72a4c8ff53350b3b8db414075f51db",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3698,8 +3698,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 4315,
-        "unreviewed": 9097
+        "ported": 5147,
+        "unreviewed": 8265
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -3825,6 +3825,22 @@
         },
         {
           "start": 5686,
+          "end": 5832,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 5832,
+          "end": 6664,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-miron-16c8"
+          ]
+        },
+        {
+          "start": 6664,
           "end": 11852,
           "status": "unreviewed",
           "classification": "unknown",

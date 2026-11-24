@@ -134,6 +134,7 @@ public sealed partial class Skirmish
                 {
                     case 14: OriginalOnis.Step(_rufinWorld, mage.Record); break;
                     case 15: OriginalIrvil.Step(_rufinWorld, mage.Record); break;
+                    case 16: OriginalMiron.Step(_rufinWorld, mage.Record); break;
                     default: OriginalRufin.Step(_rufinWorld, mage.Record); break;
                 }
             }
@@ -241,8 +242,22 @@ public sealed partial class Skirmish
         for (int s = 0; s < 8; s++) if (Diplomacy.Queue[line.Speaker, s].Type == line.Type && Diplomacy.Queue[line.Speaker, s].Other == Rules.PlayerSlot) Diplomacy.Queue[line.Speaker, s].Type = 0xff;
     }
 
-    private sealed class SkirmishRufinWorld(Skirmish battle) : IRufinWorld
+    private sealed class SkirmishRufinWorld(Skirmish battle) : IMironWorld
     {
+        public uint Time => (uint)(battle.Elapsed * 72.8165);
+        public uint Dim4 => (uint)battle.Map.Width * 32; public uint Dim0 => (uint)battle.Map.Height * 32;   // ADAPTER: FS:4 and FS:0 are taken as the map size in pixels (x from FS:4, y from FS:0)
+        public byte Random2() => battle._terrainCatalog.NextSecondaryByte();
+        public (bool Found, uint X, uint Y) FreeSpot(byte radius, byte army, byte flag, uint x, uint y)
+        {
+            var template = Convert.FromHexString(battle._templates.Armies["ARMY__03.DAT"].Templates[3].RawRecordHex);
+            var found = OriginalCreationPlacement.Search(battle._terrainCatalog.NextRandomByte, battle._terrainCatalog.NextSecondaryByte, (uint)battle.Map.Width * 32, (uint)battle.Map.Height * 32, template, x, y, (px, py) =>
+            {   // ADAPTER: AC63 is a free cell of the layer in the occupancy
+                int cx = (int)(px >> 5), cy = (int)(py >> 5);
+                return cx >= 0 && cy >= 0 && cx < battle.Map.Width && cy < battle.Map.Height && battle.Occupancy.Cells[(flag & 3) * battle.Occupancy.Width * battle.Occupancy.Height + cy * battle.Occupancy.Width + cx] == 0 ? BuilderProbe.Clear : BuilderProbe.Blocked;
+            });
+            return found;
+        }
+        public void Occupy(byte[] record) { }   // 43E5: SpawnPhantom registers the footprint itself
         private SkirmishActor _mage = null!;
         private Dictionary<byte[], SkirmishActor> _byRecord = new(ReferenceEqualityComparer.Instance);
         public void Prepare(SkirmishActor mage) { _mage = mage; }
@@ -266,7 +281,11 @@ public sealed partial class Skirmish
             var found = OriginalTargetRules.FindEnemy(_mage.Id, _mage.Record, _mage.Parameters, true, new SearchWorld(battle, _mage.Record[3]));
             var target = battle.Find(found.Target); return (target != null, target?.Record);
         }
-        public (bool Created, byte[]? Object) Create(byte army, byte owner, byte template, byte layer, uint x, uint y) => (false, null);   // ADAPTER: the switch object of ARMY__00
+        public (bool Created, byte[]? Object) Create(byte army, byte owner, byte template, byte layer, uint x, uint y)
+        {
+            if (army == 3 && template == 3 && layer == 1) { var phantom = battle.SpawnPhantom(owner, template, layer, x, y); return (phantom != null, phantom?.Record); }   // Miron's phantom
+            return (false, null);   // ADAPTER: the switch object of ARMY__00
+        }
         public void Initialize(byte[] record, uint eax, uint ecx) { }
         public void Remove(byte[] record) { }
         public void Redraw() { }
