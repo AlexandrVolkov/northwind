@@ -4844,6 +4844,18 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-manuscript.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS:1B7 and the other services are recorded stubs in the check; the page items (18h, 19h, 1Bh) are given by the visit handler of OriginalItems in the skirmish"
+    },
+    {
+      "id": "army03-mage0-0",
+      "module": "ARMY__03.WRK",
+      "start": 0,
+      "end": 97,
+      "name": "First mage (templates 0, 22, 23): init, voice and the plain step",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/mage0.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
+      "implementation": ["scripts/OriginalOnis.cs", "scripts/OriginalRufin.cs"],
+      "limitations": "FS services are recorded stubs in the check; the continuation 79..C5 is OriginalMageCloak"
     }
   ]
 }
