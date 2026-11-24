@@ -1719,4 +1719,45 @@ public static class OriginalUnitActions
         } while (g.Ch != 0);
         g.Zf = true; g.Eax = U32(d, 0x1f31);
     }
+
+    /// <summary>11DDE = FS:14B: the objects of the list at DS:1F45 (21A00 fills it) around the unit ESI: the living, visible ones that are not the unit and whose template has none of 8020h and which the owner of the unit can see (+20 bit of its owner)
+    /// and whose layer is allowed ([1CA6] from the template +74). Hostile ones (the owner's bit in +22 of the unit) are counted in [1F39] and the nearest (C344; D157 = 1 limits it to 30h) is [1F31]; the others are counted in [1F3D].
+    /// EDI = the nearest, EAX = the hostile count, EBX = the others.</summary>
+    public static void FS14B(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; w.Call(0x21a00, g); uint esi = g.Esi; w.Call(0xd7b1, g); g.Esi = esi;
+        g.Edi = U32(d, 0x1c49); d[0x1ca6] = w.ObjectAt(g.Edi)[0x74];
+        g.Eax = 0; Put(d, 0x1f31, 0); Put(d, 0x1f39, 0); Put(d, 0x1f3d, 0); g.Eax--; Put(d, 0x1f35, g.Eax); g.Ebp = 0x1f45;
+        for (; ; )
+        {
+            g.Edi = U32(d, (int)g.Ebp); g.Test(g.Edi, g.Edi, 32);
+            if (g.Zf) break;
+            Candidate();
+            g.Ebp += 4;
+        }
+        g.Edi = U32(d, 0x1f31); g.Eax = U32(d, 0x1f39); g.Ebx = U32(d, 0x1f3d); g.Test(g.Edi, g.Edi, 32);
+
+        void Candidate()
+        {
+            g.Cmp(g.Edi, g.Esi, 32);
+            if (g.Zf) return;
+            w.Call(0x68bd, g); var t = w.ObjectAt(g.Edx); var o = w.ObjectAt(g.Edi);
+            g.Test(U32(t, 0x40), 0x8020, 32);
+            if (!g.Zf) return;
+            g.Eax = o[0x20]; g.Ebx = r[3]; g.Cf = ((g.Eax >> (int)(g.Ebx & 31)) & 1) != 0;
+            if (!g.Cf) return;
+            g.Al = t[0x46]; g.Cmp(o[0x19], g.Al, 8);
+            if (g.Jle) return;
+            g.Al = o[0xd]; g.Eax &= 3; g.Cf = ((d[0x1ca6] >> (int)g.Eax) & 1) != 0;
+            if (!g.Cf) return;
+            g.Eax = o[3]; g.Cf = ((r[0x22 + 4 * (int)(g.Eax >> 5) + (int)((g.Eax & 31) >> 3)] >> (int)(g.Eax & 7)) & 1) != 0;
+            if (!g.Cf) { Put(d, 0x1f3d, U32(d, 0x1f3d) + 1); return; }
+            Put(d, 0x1f39, U32(d, 0x1f39) + 1); w.Call(0xc344, g);
+            uint saved = g.Eax; w.Call(0xd157, g); g.Cmp(g.Al, 1, 8); g.Eax = saved;
+            if (g.Zf) { g.Cmp(g.Eax, 0x30, 32); if (!g.Cf) return; }
+            g.Cmp(g.Eax, U32(d, 0x1f35), 32);
+            if (!g.Cf && !g.Zf) return;
+            Put(d, 0x1f31, g.Edi); Put(d, 0x1f35, g.Eax);
+        }
+    }
 }

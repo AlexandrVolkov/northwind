@@ -65,3 +65,7 @@
 ## D2D1 (FS:157)
 
 `FD2D1` claims the rectangle of the occupancy plane (DS:273F x DS:2740 cells centred on the unit, plane +0D; the pointer part is 4409): the cells equal to EBX take the value EAX, the objects in the other cells are counted in [1F31] and, when CL is not 0, killed (health 0, +17 &= E7h, |= CH * 8). The four planes (written cells) join the compared output. Verified against x86; changed flag mask and misplaced write are caught.
+
+## 11DDE (FS:14B)
+
+`FS14B` walks the list at DS:1F45 (21A00 fills it) for the unit ESI: the living objects (health above the template +46) that are not the unit, whose template has none of 8020h, which the unit owner can see (+20), whose layer is allowed ([1CA6] from template +74). Hostile ones (the owner bit in +22 of the unit; the bit test is the memory form, so the owners 8..255 reach the next dwords) are counted in [1F39], the nearest one (C344; D157 = 1 limits the distance to 30h) is [1F31]; the others count in [1F3D]. Verified against x86.
