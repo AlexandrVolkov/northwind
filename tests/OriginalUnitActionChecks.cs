@@ -23,8 +23,10 @@ public partial class TestRunner
         public uint G51E => c.GetProperty("g51e").GetUInt32();
         public byte G1C9F { get; set; } = (byte)c.GetProperty("g1c9f").GetInt32();
         public uint G50E { get; set; }
+        public byte[] Ds { get; } = new byte[0x10000];
+        public byte Fs13D { get; set; } = (byte)c.GetProperty("fs13d").GetInt32();
         public byte G525 => (byte)c.GetProperty("g525").GetInt32(); public byte G526 => (byte)c.GetProperty("g526").GetInt32();
-        public byte G1C61 { get; set; } = (byte)c.GetProperty("g1c61").GetInt32();
+        public byte G1C61 { get => Ds[0x1c61]; set => Ds[0x1c61] = value; }
         public uint G2730 => c.GetProperty("g2730").GetUInt32();
         public byte[] Route { get; } = ActionPrng(c.GetProperty("rt").GetUInt32(), 0x800);
         public uint TileDescriptor(uint tile) => (uint)(ActionPrng(c.GetProperty("map").GetUInt32(), 1024)[tile] % 8);
@@ -58,7 +60,7 @@ public partial class TestRunner
             string fn = c.GetProperty("fn").GetString()!; seen.Add(fn);
             var r = ActionPrng(c.GetProperty("r").GetUInt32(), 0x50); r[3] = (byte)c.GetProperty("f3").GetInt32(); BitConverter.GetBytes(c.GetProperty("px").GetUInt32()).CopyTo(r, 4); BitConverter.GetBytes(c.GetProperty("py").GetUInt32()).CopyTo(r, 8); BitConverter.GetBytes(c.GetProperty("cur").GetUInt32()).CopyTo(r, 0x28); r[0x14] = (byte)c.GetProperty("f14").GetInt32(); r[0x19] = (byte)c.GetProperty("f19").GetInt32(); r[0x15] = (byte)c.GetProperty("f15").GetInt32(); r[0x31] = (byte)c.GetProperty("f31").GetInt32(); r[0x30] = (byte)c.GetProperty("f30").GetInt32();
             BitConverter.GetBytes((ushort)c.GetProperty("f17").GetInt32()).CopyTo(r, 0x17); BitConverter.GetBytes(c.GetProperty("f1c").GetUInt32()).CopyTo(r, 0x1c);
-            var log = new List<byte>(); var w = new UnitActionReplay(c, log); w.Part = ActionPrng(c.GetProperty("pt").GetUInt32(), 0xf5);
+            var log = new List<byte>(); var w = new UnitActionReplay(c, log); w.Part = ActionPrng(c.GetProperty("pt").GetUInt32(), 0xf5); { var dsb = ActionPrng(c.GetProperty("ds").GetUInt32(), 0xa0); int at = 0; foreach (var (a, n) in new[] { (0x19c0, 0x40), (0x1c30, 0x40), (0x4160, 0x10), (0x9080, 0x10) }) { Array.Copy(dsb, at, w.Ds, a, n); at += n; } BitConverter.GetBytes(0x400c00u).CopyTo(w.Ds, 0x1c49); w.G1C61 = (byte)c.GetProperty("g1c61").GetInt32(); }
             var regs = c.GetProperty("regs").EnumerateArray().Select(e => e.GetUInt32()).ToArray();
             var g = new ActionRegs { Eax = regs[0], Ebx = regs[1], Ecx = regs[2], Edx = regs[3], Edi = regs[4] };
             switch (fn)
@@ -94,12 +96,14 @@ public partial class TestRunner
                 case "f8c89": OriginalUnitActions.F8C89(w, g, r); break;
                 case "f8cf3": OriginalUnitActions.F8CF3(w, g, r); break;
                 case "f84aa": OriginalUnitActions.F84AA(w, g, r); break;
+                case "fa10b": OriginalUnitActions.FA10B(w, g); break;
+                case "f9a8e": OriginalUnitActions.F9A8E(w, g, r); break;
                 case "f7fa7": OriginalUnitActions.F7FA7(w, g, r); break;
                 case "f902f": OriginalUnitActions.F902F(w, g, r); break;
                 case "f81d9": OriginalUnitActions.F81D9(w, g, r); break;
             }
             uint Rel(uint v) => v >= 0x400000 && v < 0x402000 ? v - 0x400000 : v;
-            byte[] output = [.. r, .. w.Obj1, .. w.Obj2, w.G1C9F, .. BitConverter.GetBytes(w.G512), .. BitConverter.GetBytes(w.G50E), w.G1CCB, w.G525, w.G526, w.G1C61, .. BitConverter.GetBytes(Rel(g.Eax)), .. BitConverter.GetBytes(Rel(g.Ebx)), .. BitConverter.GetBytes(Rel(g.Ecx)), .. BitConverter.GetBytes(Rel(g.Edx)), .. BitConverter.GetBytes(Rel(g.Edi)),
+            byte[] output = [.. r, .. w.Obj1, .. w.Obj2, w.G1C9F, .. BitConverter.GetBytes(w.G512), .. BitConverter.GetBytes(w.G50E), w.G1CCB, w.G525, w.G526, w.G1C61, .. w.Ds[0x19c0..0x1a00], .. w.Ds[0x1c30..0x1c70], .. w.Ds[0x4160..0x4170], .. w.Ds[0x9080..0x9090], w.Fs13D, .. BitConverter.GetBytes(Rel(g.Eax)), .. BitConverter.GetBytes(Rel(g.Ebx)), .. BitConverter.GetBytes(Rel(g.Ecx)), .. BitConverter.GetBytes(Rel(g.Edx)), .. BitConverter.GetBytes(Rel(g.Edi)),
                 g.Zf ? (byte)1 : (byte)0, g.Cf ? (byte)1 : (byte)0, .. log];
             digest.AppendData(output);
             if (Convert.ToHexStringLower(SHA256.HashData(output))[..10] != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; if (only == count) GD.Print("CSHARP " + Convert.ToHexStringLower(output)); }
@@ -107,7 +111,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 34, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 36, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }

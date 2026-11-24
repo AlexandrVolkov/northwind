@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 98662 | 6265 | 97 | 41858 | 44 |
+| LE:1 | 146882 | 98535 | 6265 | 97 | 41985 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -289,12 +289,14 @@
 | LE:1 `0x98CC..0x996F` | Detach object from owner chain | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Корректная монотонная цепочка с достижимым объектом; момент смерти, порождение эффекта и повторное выделение записи не включены. |
 | LE:1 `0x996F..0x9A1B` | Missile distance, 24.8 velocity and arc speed | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) | Деление на ноль/переполнение DIV при вырожденных расстояниях не воспроизводится. |
 | LE:1 `0x9A1B..0x9A8E` | Missile aim scatter by distance and experience | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) |  |
+| LE:1 `0x9A8E..0x9B0D` | End of the walk step: the rest of the step along the heading, occupancy carry-over (9A8E) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The callees outside the function are recorded stubs in the check; the skirmish keeps its own pace gate and walk end |
 | LE:1 `0x9B0D..0x9B86` | Transfer occupancy at step midpoint | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Области и плоскости корректны; особый соседний вариант 9A97..9B0C не покрыт. Полное исходное размещение крупных движущихся объектов ещё не подключено в схватке. |
 | LE:1 `0x9B86..0x9BF9` | Gap between object footprints | ported | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Сохранены байтовые сдвиги размеров и u32-переполнения; игровое использование включает лишь проверенные ветви подхода. |
 | LE:1 `0x9E41..0x9E69` | Random byte streams [19EB]/[19EC] over table DS:297E | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | third stream 9E69 ([19ED]) is not covered |
 | LE:1 `0x9E69..0x9E7D` | Random byte stream [19ED] over table DS:297E | ported | [ai.md](../docs/ai.md); [ai-garrison.json](../tests/fixtures/ai-garrison.json) |  |
 | LE:1 `0x9E7D..0x9F38` | Wind vector, direction and random acceleration | ported | [combat.md](../docs/combat.md); [wind.json](../tests/fixtures/wind.json) |  |
 | LE:1 `0xA10B..0xA1D1` | Game speed gate and slow-tick flags | partial | [game-timing.md](../docs/game-timing.md) | Перенесены частота и шаг по умолчанию; клавиши смены скорости и флаги [19E7] не подключены. |
+| LE:1 `0xA10B..0xA1D1` | Game speed gate and slow-tick flags (A10B) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The callees outside the function are recorded stubs in the check; the skirmish keeps its own pace gate and walk end |
 | LE:1 `0xA4C2..0xA4DF` | Shared-bank sound at a squad centre (AI squad message) | ported | [ai.md](../docs/ai.md); [sound.md](../docs/sound.md); [SkirmishRivalChecks.cs](../tests/SkirmishRivalChecks.cs) | Playback by the scene; the mixer (1416B) is not ported |
 | LE:1 `0xA4DF..0xA5B8` | Death frames by hit kind, corpse object and removal | ported | [combat.md](../docs/combat.md); [death.json](../tests/fixtures/death.json) | Объект-труп (9727) и удаление 98DB исполняет мост схватки. |
 | LE:1 `0xA5B8..0xA5F4` | Sixteen-way missile direction frame | ported | [combat.md](../docs/combat.md); [arrow.json](../tests/fixtures/arrow.json) |  |

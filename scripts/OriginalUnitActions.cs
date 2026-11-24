@@ -5,7 +5,7 @@ namespace Northwind;
 /// <summary>The registers and the flags of the unit action handlers (LE:1 8227..9210). The flag helpers follow the x86 semantics, the jumps of the handlers test them as the original does.</summary>
 public sealed class ActionRegs
 {
-    public uint Eax, Ebx, Ecx, Edx, Edi, Esi = 0x400800;
+    public uint Eax, Ebx, Ecx, Edx, Edi, Esi = 0x400800, Ebp;
     public bool Zf, Cf, Sf, Of;
     public byte Al { get => (byte)Eax; set => Eax = (Eax & 0xffffff00) | value; }
     public byte Ah { get => (byte)(Eax >> 8); set => Eax = (Eax & 0xffff00ff) | ((uint)value << 8); }
@@ -58,6 +58,9 @@ public interface IUnitActionWorld
     uint G50E { get; set; }
     /// <summary>The participant record of the owner (the bytes at +0CDh are read by 89F1).</summary>
     byte[] PartOf(byte owner);
+    /// <summary>The data segment (the windows 19C0, 1C30, 4160, 9080 hold the globals of A10B and 9A8E) and fs:[13Dh].</summary>
+    byte[] Ds { get; }
+    byte Fs13D { get; set; }
     byte G525 { get; } byte G526 { get; }
     byte G1C61 { get; set; }
     uint G2730 { get; }
@@ -860,5 +863,63 @@ public static class OriginalUnitActions
         if (g.Zf) { g.Eax = g.Esi - w.PoolBase; w.Call(0x43e5, g); }
         g.Eax = U32(r, 8) >> 5; g.Ebx = U32(r, 4) >> 5; g.Eax = (g.Eax & 0xffff0000) | (ushort)(g.Al * 32); g.Add(g.Eax, g.Ebx); g.Eax += g.Ebx;
         g.Ebx = 0xf00000; g.Eax = w.TileDescriptor(g.Eax);   // EBX = [18FE], the descriptor table
+    }
+
+    private static ushort DsW(IUnitActionWorld w, uint a) => BitConverter.ToUInt16(w.Ds, (int)a);
+
+    /// <summary>A10B: the game speed gate: the update counter [19E4] against the allowance ([908E] raised or lowered by the keys 4Eh / 4Ah) decides [1C4E] (whether the world steps), every 5 and every 2
+    /// counts raise the bits of [19E7] that fs:[13Dh] mirrors.</summary>
+    public static void FA10B(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds;
+        g.Cmp(d[0x4169], 0, 8);
+        if (!g.Zf) return;
+        g.Test(d[0x19e7], 1, 8);
+        if (!g.Zf)
+        {
+            g.Cmp(DsW(w, 0x1c35), 0x4a, 16);
+            if (g.Zf) { g.Cmp(d[0x908e], 0xf0, 8); if (!g.Zf) d[0x908e]--; }
+            g.Cmp(DsW(w, 0x1c35), 0x4e, 16);
+            if (g.Zf) { g.Cmp(d[0x908e], 0xfe, 8); if (!g.Zf) d[0x908e]++; }
+        }
+        g.Ebx = (g.Ebx & 0xffff0000) | 0xff; g.Bl = (byte)(g.Bl - d[0x908e]);
+        g.Al = d[0x19e4]; g.Ah = g.Al; g.Al = (byte)(g.Al - d[0x1c4d]); g.Cmp(g.Al, g.Bl, 8);
+        if (!g.Jb) { g.Bh++; d[0x1c4d] = g.Ah; }
+        d[0x1c4e] = g.Bh; d[0x19e7] &= 0xfe;
+        g.Al = d[0x19e4]; g.Ah = g.Al; g.Al = (byte)(g.Al - d[0x19e5]); g.Cmp(g.Al, 5, 8);
+        if (!g.Jb) { d[0x19e5] = g.Ah; d[0x19e7] |= 1; }
+        d[0x19e7] &= 0xfd;
+        g.Al = d[0x19e4]; g.Ah = g.Al; g.Al = (byte)(g.Al - d[0x19e6]); g.Cmp(g.Al, 2, 8);
+        if (!g.Jb) { d[0x19e6] = g.Ah; d[0x19e7] |= 2; }
+        g.Al = d[0x19e7]; w.Fs13D = g.Al;
+    }
+
+    /// <summary>9A8E: the end of the move of state 2: the unit is moved by the rest of its step (+2C of 20h) along its heading (the vectors at 19C7), the occupancy is carried over (4442, 43B7, 43B0) and the route released.</summary>
+    public static void F9A8E(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Al = (byte)(r[0x2d] & 0xf); g.Cmp(g.Al, 2, 8);
+        if (!g.Zf) return;
+        uint ebp = r[0x2c]; g.Ecx = 0x20 - ebp; g.Cmp(0x20, ebp, 32);
+        g.Dl = (byte)(r[0x25] >> 3); g.Edx = (uint)(g.Dl & 7); g.Eax = U32(r, 4);
+        sbyte vx = (sbyte)w.Ds[0x19c7 + g.Edx * 2], vy = (sbyte)w.Ds[0x19c8 + g.Edx * 2];
+        g.Cmp((byte)vx, g.Dh, 8);
+        if (!g.Zf)
+        {
+            if (!(g.Sf != g.Of)) { Put(r, 4, U32(r, 4) + ebp); g.Eax -= g.Ecx; }
+            else { Put(r, 4, U32(r, 4) - ebp); g.Eax += g.Ecx; }
+        }
+        g.Ebx = U32(r, 8); g.Cmp((byte)vy, g.Dh, 8);
+        if (!g.Zf)
+        {
+            if (!(g.Sf != g.Of)) { Put(r, 8, U32(r, 8) + ebp); g.Ebx -= g.Ecx; }
+            else { Put(r, 8, U32(r, 8) - ebp); g.Ebx += g.Ecx; }
+        }
+        g.Ebp = ebp; g.Cmp(ebp, 0x10, 32);
+        if (!g.Jb)
+        {
+            g.Cl = (byte)(r[0xd] & 3); w.Call(0x4442, g); g.Edx = 0; w.Call(0x43b7, g);
+            g.Eax = g.Esi - w.PoolBase; w.Call(0x43b0, g);
+        }
+        r[0x24] &= 0xf8; w.Call(0x8120, g);
     }
 }
