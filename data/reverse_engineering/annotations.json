@@ -5432,6 +5432,66 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
       "implementation": ["scripts/OriginalBuildingScripts.cs"],
       "limitations": "FS:41 (C88C) is emulated only as far as its front half (state, EBX, handler); the services 85, 121, 197, 3D, 51, 49, 129, 99, 12D, CD, 19, 1D are recorded stubs; FS:6D and FS:71 are stubs with fixed buffers; the data tables returned by AH=6 stay in the module"
+    },
+    {
+      "id": "army__01-building-6d4",
+      "module": "ARMY__01.WRK",
+      "start": 1748,
+      "end": 1919,
+      "name": "Tower script: init, step with FS:9D (ranged attack), visitor test, state handlers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs (FS:79 and FS:6D/71 with fixed buffers); the block 077F..079A is not referenced by the table of the script and is not ported"
+    },
+    {
+      "id": "army__01-building-79a",
+      "module": "ARMY__01.WRK",
+      "start": 1946,
+      "end": 1952,
+      "name": "Tower script: tail call of the state 5 handler",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs (FS:79 and FS:6D/71 with fixed buffers); the block 077F..079A is not referenced by the table of the script and is not ported"
+    },
+    {
+      "id": "army__01-building-7a0",
+      "module": "ARMY__01.WRK",
+      "start": 1952,
+      "end": 2198,
+      "name": "Countdown script 7A0: init, step with the 80h redraw effects and the state machine on +14",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs (FS:79 and FS:6D/71 with fixed buffers); the block 077F..079A is not referenced by the table of the script and is not ported"
+    },
+    {
+      "id": "army__01-building-896",
+      "module": "ARMY__01.WRK",
+      "start": 2198,
+      "end": 2438,
+      "name": "Building script 896: step, visitor test, state handlers with the waiting handler FS:79",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs (FS:79 and FS:6D/71 with fixed buffers); the block 077F..079A is not referenced by the table of the script and is not ported"
+    },
+    {
+      "id": "army__01-building-986",
+      "module": "ARMY__01.WRK",
+      "start": 2438,
+      "end": 2679,
+      "name": "Building script 986: init, step, voice, table AH=6, six state handlers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs (FS:79 and FS:6D/71 with fixed buffers); the block 077F..079A is not referenced by the table of the script and is not ported"
     }
   ]
 }
