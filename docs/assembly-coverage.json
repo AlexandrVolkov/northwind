@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "d8a87bf6276569e484f147971b0ff70d3bdd938fdac96506c72004da4b1ad674",
+  "annotation_sha256": "1cbfee8ab7910aad9983f6a003401352fe323864b05175a911764f01c6b2e07e",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 6265,
-        "ported": 44732,
-        "unreviewed": 95788,
+        "ported": 44761,
+        "unreviewed": 95759,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -1521,6 +1521,15 @@
         },
         {
           "start": 44602,
+          "end": 44631,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-ae3a"
+          ]
+        },
+        {
+          "start": 44631,
           "end": 44807,
           "status": "unreviewed",
           "classification": "unknown",
