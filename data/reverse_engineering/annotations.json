@@ -6392,6 +6392,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "Chain objects use army 0..2 and template index 0; the chain holds up to 4 objects"
+    },
+    {
+      "id": "le1-unit-actions-c0f6",
+      "module": "LE:1",
+      "start": 49398,
+      "end": 49969,
+      "name": "Action of the building worker: walk, pay, create, build (C0F6)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees 8CA1, 9653, 43B0, D363, A758 are recorded stubs; only template 0 of armies 0..2 is checked"
     }
   ]
 }
