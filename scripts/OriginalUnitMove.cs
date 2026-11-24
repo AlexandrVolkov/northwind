@@ -10,7 +10,6 @@ public interface IMoveWorld
     void RevealFog();                                      // 813E
     void Finish();                                         // 12BF2: the end of the move
     uint LimitX { get; } uint LimitY { get; }              // 18E6 / 18EA: the map size in pixels
-    sbyte Trig(int index);                                 // DS:4790: the 32 (cos, sin) pairs of the headings, scaled by 16
 }
 
 /// <summary>The move step (state 4 of <see cref="OriginalUnitMotion"/>), LE:1 12930..12AE1: the unit turns by one 32nd of the circle every fourth update toward the goal cell, moves by its speed
@@ -18,6 +17,13 @@ public interface IMoveWorld
 /// Verified against the original x86 by tests/fixtures/unit-move.json (tools/verify_unit_move.py).</summary>
 public sealed class OriginalUnitMove(IMoveWorld world)
 {
+    /// <summary>DS:4790: the (x, y) step of each of the 32 headings (a square ring of half-side 4, scaled by 16 in the move).</summary>
+    public static readonly sbyte[] Heading =
+    [
+        0, -4, 1, -4, 2, -4, 3, -4, 4, -4, 4, -3, 4, -2, 4, -1, 4, 0, 4, 1, 4, 2, 4, 3, 4, 4, 3, 4, 2, 4, 1, 4,
+        0, 4, -1, 4, -2, 4, -3, 4, -4, 4, -4, 3, -4, 2, -4, 1, -4, 0, -4, -1, -4, -2, -4, -3, -4, -4, -3, -4, -2, -4, -1, -4
+    ];
+
     public byte Flags { get; private set; }
     private static uint U32(byte[] b, int o) => BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(o));
     private static void Put(byte[] b, int o, uint v) => BinaryPrimitives.WriteUInt32LittleEndian(b.AsSpan(o), v);
@@ -42,7 +48,7 @@ public sealed class OriginalUnitMove(IMoveWorld world)
         byte speed = r[0x26]; int sum = r[0x26] + (byte)(speed << 6); r[0x26] = (byte)sum;
         if (sum > 0xff) speed += 4;
         int s = speed & 0x3f; int h = r[0x31] * 2;
-        int dy = (s * world.Trig(h + 1)) >> 4, dx = (s * world.Trig(h)) >> 4;
+        int dy = (s * Heading[h + 1]) >> 4, dx = (s * Heading[h]) >> 4;
         uint nx = (uint)(dx + (int)U32(r, 4)), ny = (uint)(dy + (int)U32(r, 8));
         if (nx >= world.LimitX || ny >= world.LimitY) { Flags |= 0x80; Finish(r); return End(r, t); }
         world.Occupancy(0);

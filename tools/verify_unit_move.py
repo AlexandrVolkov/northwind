@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Verify the move step of units (LE:1 12930..12AE1, state 4 of the motion machine: a unit that moves toward a cell by pixels along the heading of the 32-step circle) with Unicorn.
-Services are recorded stubs: 6996 (direction byte to the goal), 43B0 (occupancy update), AC63 (is the place free), 813E (fog), 12BF2 (the end of the move). The sine table at DS:4790 is filled at
-run time, so its 64 signed bytes are part of the case."""
+Services are recorded stubs: 6996 (direction byte to the goal), 43B0 (occupancy update), AC63 (is the place free), 813E (fog), 12BF2 (the end of the move). The table DS:4790 of the 32 heading steps is the real one from the EXE."""
 import argparse
 import hashlib
 import json
@@ -12,6 +11,7 @@ from unicorn.x86_const import *
 from analyze_executable import analyze
 from verify_combat import CombatOracle
 from forestry_source import source_constants
+import analyze_executable
 
 
 class MoveOracle(CombatOracle):
@@ -32,7 +32,6 @@ def cases():
                     'f25': rng.randrange(256), 'f26': rng.randrange(256), 'f27': rng.choice([0, 1, 5, rng.randrange(256)]), 'f2c': rng.randrange(256), 'f2e': rng.randrange(256),
                     'f31': rng.randrange(32), 'x': rng.randrange(0, limit + 40), 'y': rng.randrange(0, limit + 40), 'f0d': rng.randrange(256), 'f0e': rng.randrange(256), 'army': rng.randrange(256),
                     'limit': [limit, rng.choice([1024, 2048, 100])], 'angle': rng.randrange(256), 'free_zf': rng.choice([0, 1, 1]),
-                    'trig': [rng.randrange(-90, 91) for _ in range(64)],
                     'template': {'base': rng.randrange(3000), 'n4a': rng.choice([1, 4, 8, 13]), 'n4b': rng.choice([1, 4, 10]), 'n4f': rng.randrange(4), 'n58': rng.randrange(256)}})
     return out
 
@@ -51,12 +50,13 @@ def generate(game):
     def fog(): log.append(b'V'); o.ret()
     def finish(): log.append(b'R'); o.ret()
     o.stubs = {0x6996: angle, 0x43b0: occupancy, 0xac63: free, 0x813e: fog, 0x12bf2: finish}
+    objects = analyze_executable.read_le_objects((game / 'NORWIND.EXE').read_bytes(), analyze_executable.INNER_MZ)[1]; table = bytes(objects[2]['payload'][0x4790:0x47d0])   # DS:4790, the 32 (x, y) steps of the headings
     digest = hashlib.sha256(); all_cases = cases()
     for case in all_cases:
         log.clear(); state.update(case); o.prepare(32, 32); o.mode = 'move'
         t = case['template']; raw = bytearray(0xab); raw[0x4a] = t['n4a']; raw[0x4b] = t['n4b']; raw[0x4f] = t['n4f']; raw[0x58] = t['n58']; struct.pack_into('<H', raw, 0x48, t['base'])
         o.cpu.mem_write(o.DAT, bytes(raw)); o.cpu.mem_write(0x1c49, struct.pack('<I', o.DAT)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL))
-        o.cpu.mem_write(0x4790, bytes(v & 255 for v in case['trig'])); o.cpu.mem_write(0x18e6, struct.pack('<I', case['limit'][0])); o.cpu.mem_write(0x18ea, struct.pack('<I', case['limit'][1]))
+        o.cpu.mem_write(0x4790, table); o.cpu.mem_write(0x18e6, struct.pack('<I', case['limit'][0])); o.cpu.mem_write(0x18ea, struct.pack('<I', case['limit'][1]))
         o.cpu.mem_write(o.POOL, bytes(0x1000))
         r = bytearray(0x40); r[0] = case['army']; r[0x24] = case['f24']; r[0x25] = case['f25']; r[0x26] = case['f26']; r[0x27] = case['f27']; r[0x2c] = case['f2c']; r[0x2e] = case['f2e']; r[0x31] = case['f31']
         r[0x0d] = case['f0d']; r[0x0e] = case['f0e']; struct.pack_into('<II', r, 4, case['x'], case['y'])

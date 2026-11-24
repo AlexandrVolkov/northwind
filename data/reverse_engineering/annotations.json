@@ -4279,7 +4279,7 @@
       "status": "ported",
       "evidence": ["docs/unit-motion.md", "tests/fixtures/unit-move.json", "tools/verify_unit_move.py", "tests/OriginalUnitMoveChecks.cs"],
       "implementation": ["scripts/OriginalUnitMove.cs"],
-      "limitations": "the services 6996, 43B0, AC63, 813E, 12BF2 are recorded stubs in the check; the sine table DS:4790 is filled at run time (not located yet) and is part of the case; not yet the driver of the skirmish units"
+      "limitations": "the services 6996, 43B0, AC63, 813E, 12BF2 are recorded stubs in the check; not yet the driver of the skirmish units"
     }
   ]
 }
