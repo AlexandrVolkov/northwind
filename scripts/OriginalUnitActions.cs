@@ -49,6 +49,8 @@ public interface IUnitActionWorld
     /// <summary>The object behind an absolute pointer (the pool base is <see cref="PoolBase"/>).</summary>
     byte[] ObjectAt(uint pointer);
     byte[] Template { get; }
+    /// <summary>The statistics records of the participants ([6BA] + 1A35h * owner).</summary>
+    byte[] Stats { get; }
     uint PoolBase { get; }
     uint G512 { get; set; }
     uint G51A { get; }
@@ -1471,5 +1473,93 @@ public static class OriginalUnitActions
         g.Cmp(g.Al, g.Ah, 8);
         if (!g.Cf && !g.Zf) return;
         g.Al = r[0]; g.Bh = 2; g.Add(g.Ecx, U32(r, 4)); g.Ecx += U32(r, 4); g.Add(g.Edx, U32(r, 8)); g.Edx += U32(r, 8); w.Call(0x9727, g);
+    }
+
+    /// <summary>CB21: the unit ESI turns the object of its target (+1C) to the opposite side when AC63 allows it (marks it as moving, clears +14/+15, announces it with 43E5). Flags: ZF = done or no target.</summary>
+    public static void FCB21(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        uint saved = g.Esi; uint target = U32(r, 0x1c); g.Esi = target; g.Test(g.Esi, g.Esi, 32);
+        if (g.Zf) { g.Esi = saved; return; }
+        g.Esi += w.PoolBase; var o = w.ObjectAt(g.Esi);
+        g.Al = o[0xe]; g.Ah = o[0]; g.Bl = (byte)(o[0xd] & 3); g.Logic(g.Bl, 8); g.Ecx = U32(o, 4); g.Edx = U32(o, 8); w.Call(0xac63, g);
+        if (!g.Zf) { g.Esi = saved; return; }
+        g.Al = (byte)(o[0x25] + 4); g.Al &= 7; w.Call(0xae3a, g);
+        Put16(o, 0x17, (ushort)((U16(o, 0x17) | 0x20) & 0xfd3f));
+        g.Al = 0; o[0x14] = 0; o[0x15] = 0; g.Eax = g.Esi - w.PoolBase; w.Call(0x43e5, g); g.Al = 0; g.Logic(0, 8); g.Esi = saved;
+    }
+    private static void Put16(byte[] b, int o, ushort v) { b[o] = (byte)v; b[o + 1] = (byte)(v >> 8); }
+
+    /// <summary>CC7B: the unit asks for a target (C4CD): with the template flag 20000h its owner gets the item +31 of the target (1243A) and the target loses +31; every 16th tick the target is marked (+17 bit 20h).</summary>
+    public static void FCC7B(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        bool Skip = false;
+        g.Test(U16(r, 0x17), 0x40, 16);
+        if (!g.Zf)
+        {
+            w.Call(0xc4cd, g);
+            if (!g.Zf)
+            {
+                g.Test(U32(w.ObjectAt(g.Edx), 0x40), 0x20000, 32);
+                if (g.Zf) Skip = true;
+                else
+                {
+                    var e = w.ObjectAt(g.Edi); Put16(e, 0x17, (ushort)(U16(e, 0x17) & 0xffbf)); g.Al = e[0x31]; g.Ah = r[3]; w.Call(0x1243a, g);
+                    if (g.Zf) w.ObjectAt(g.Edi)[0x31] = 0;
+                }
+            }
+            if (!Skip) Put16(r, 0x17, (ushort)(U16(r, 0x17) & 0xffbf));
+        }
+        g.Test(w.Ds[0x19ea], 0xf, 8);
+        if (!g.Zf) return;
+        w.Call(0xc4cd, g);
+        if (g.Zf) return;
+        var t = w.ObjectAt(g.Edi); Put16(t, 0x17, (ushort)(U16(t, 0x17) | 0x20));
+    }
+
+    /// <summary>CCC4: health 1, AL = 0.</summary>
+    public static void FCCC4(ActionRegs g, byte[] r) { r[0x19] = 1; g.Al = 0; g.Logic(0, 8); }
+
+    /// <summary>CB77: the unit converts the target (+22 counts the ticks: 1 at the start, 32h hands the object over (D1BA), 3Ch ends). BL = 1 when the target changed owner, 2 when it was lost, AL = FFh while it goes on.</summary>
+    public static void FCB77(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        void Clear40() => Put16(r, 0x17, (ushort)(U16(r, 0x17) & 0xffbf));
+        void Continue() { g.Bl = 0; g.Logic(g.Bl, 8); g.Al = 0xff; g.Logic(g.Al, 8); }       // CBAE
+        void Lost() { g.Bl = 0; g.Logic(g.Bl, 8); }                                         // CBB8
+        g.Cmp(r[0x22], 0, 8);
+        if (g.Zf)
+        {
+            g.Test(U16(r, 0x17), 0x40, 16);
+            if (g.Zf) { Lost(); return; }
+            w.Call(0xc4cd, g);
+            if (g.Zf) { Clear40(); Lost(); return; }
+            g.Eax = U32(w.ObjectAt(g.Edx), 0x40); g.Test(g.Eax, 0x1000, 32);
+            if (g.Zf) { Lost(); return; }
+            g.Cmp(g.Edi, w.PoolBase, 32); g.Edi -= w.PoolBase; Put(r, 0x1c, g.Edi); w.Call(0xcaee, g);
+            if (!g.Zf) { Clear40(); Lost(); return; }
+            r[0x22]++; Clear40(); Continue(); return;
+        }
+        g.Cmp(r[0x19], 0, 8);
+        if (g.Jle) { Handed(); return; }
+        r[0x22]++; g.Cmp(r[0x22], 0x32, 8);
+        if (g.Zf) { Convert(); return; }
+        g.Cmp(r[0x22], 0x3c, 8);
+        if (!g.Zf) { Continue(); return; }
+        w.Call(0xcb21, g);
+        if (g.Zf) { Finish(); return; }
+        if (g.Jae) { Handed(); return; }
+        r[0x22]--; var f = w.ObjectAt(g.Edi); Put16(f, 0x17, (ushort)(U16(f, 0x17) | 0x20)); Continue(); return;
+
+        void Handed() { g.Eax = U32(r, 0x1c) + w.PoolBase; w.ObjectAt(g.Eax)[0x19] = 0; Finish(); }
+        void Finish() { r[0x22] = 0; r[0x14] &= 7; r[0x14] |= 0x48; g.Bl = 2; Lost(); }
+        void Convert()
+        {
+            Put16(r, 0x17, (ushort)(U16(r, 0x17) | 0x200)); Put16(r, 0x17, (ushort)(U16(r, 0x17) & 0xfeff));
+            g.Eax = U32(r, 0x1c) + w.PoolBase; g.Al = w.ObjectAt(g.Eax)[3]; uint esi = g.Esi; w.Call(0xd1ba, g); g.Edi = g.Esi; g.Esi = esi;
+            if (!g.Zf) { Continue(); return; }
+            r[0x22] = 0; var n = w.ObjectAt(g.Edi); var st = w.Stats; int owner = n[3];
+            st[owner * 0x1a35 + 0x17b + 3 * r[3]]++; g.Eax = (uint)(r[3] * 0x1a35); g.Ebx = 0x1a35; g.Edx = 0;
+            uint at = U32(w.Ds, 0x6ba) + (uint)(r[3] * 0x1a35) + 0x1ab; g.Ebp = g.Edi - w.PoolBase; uint edi = g.Edi; g.Edi = at; g.Al = 9; g.Bl = 0; w.Call(0x1eaed, g); g.Edi = edi;
+            g.Bl = 1; g.Al = 0xff; g.Logic(g.Al, 8);
+        }
     }
 }

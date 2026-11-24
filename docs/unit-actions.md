@@ -41,3 +41,7 @@
 ## BE2E, BE6F
 
 `FBE2E` asks whether the participant can pay the four costs of a template (AL = 0 when yes); `FBE6F` creates the effect 9727 with the chance of 9E41 when the health is more than a quarter below the template health. Verified against x86 (the ADD flags of ECX/EDX reach the caller).
+
+## CB21, CB77, CC7B, CCC4
+
+`FCB77` is the conversion of a target (the priest-like action): +22 counts the ticks, at 32h the target is handed over (D1BA) and the statistics byte [6BA] + 1A35h * owner + 17Bh + 3 * converter is counted, at 3Ch CB21 turns the target; BL ends 0 as the original (the `MOV BL,2` before `JMP CBB8` is dead). `FCB21` turns the target, `FCC7B` takes its item (1243A), `FCCC4` sets health 1. The fixture gains the statistics records ([6BA]) in the compared output; sabotaging the counter offset is caught.

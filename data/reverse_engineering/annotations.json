@@ -6512,6 +6512,54 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "9E41 and 9727 are recorded stubs"
+    },
+    {
+      "id": "le1-unit-actions-cb21",
+      "module": "LE:1",
+      "start": 52001,
+      "end": 52087,
+      "name": "Turn the target of the unit (CB21)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "AC63, AE3A, 43E5, C4CD, CAEE, D1BA, 1EAED, 1243A are recorded stubs"
+    },
+    {
+      "id": "le1-unit-actions-cb77",
+      "module": "LE:1",
+      "start": 52087,
+      "end": 52347,
+      "name": "Conversion of the target: ticks, hand-over, statistics (CB77)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "AC63, AE3A, 43E5, C4CD, CAEE, D1BA, 1EAED, 1243A are recorded stubs"
+    },
+    {
+      "id": "le1-unit-actions-cc7b",
+      "module": "LE:1",
+      "start": 52347,
+      "end": 52420,
+      "name": "Take the item of the target (CC7B)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "AC63, AE3A, 43E5, C4CD, CAEE, D1BA, 1EAED, 1243A are recorded stubs"
+    },
+    {
+      "id": "le1-unit-actions-ccc4",
+      "module": "LE:1",
+      "start": 52420,
+      "end": 52427,
+      "name": "Health 1 (CCC4)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "none"
     }
   ]
 }
