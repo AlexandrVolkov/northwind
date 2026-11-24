@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 101472 | 6265 | 97 | 39048 | 44 |
+| LE:1 | 146882 | 101433 | 6265 | 97 | 39087 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
@@ -210,6 +210,7 @@
 | LE:1 `0xD2D1..0xD363` | Conditional occupancy registration | partial | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Перенесена ветвь CL=0 с заменой совпавших ячеек и подсчётом конфликтов. Ветка повреждения чужих объектов не перенесена. |
 | LE:1 `0xD2D1..0xD363` | FS:157: claim a rectangle of the occupancy plane for an object, or crush the objects in it | partial | [campaign-items.md](../docs/campaign-items.md) | Identified from the loader's FS table and disassembly; rectangle set up by 4409; not ported |
 | LE:1 `0xD363..0xD3E5` | May template N be placed in a cell: creation check, range rules, template check | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [buildcheck.json](../tests/fixtures/buildcheck.json); [verify_buildcheck.py](../tools/verify_buildcheck.py) | The template check (WRK AH=4) is the world's (the skirmish: the mine needs ore, others allow) |
+| LE:1 `0xD3E5..0xD5B1` | Participant statistics: strength, worker weight, territory rectangle (every 32 updates) and the growth +24 (every update) | ported | [participant-stats.md](../docs/participant-stats.md); [participant-stats.json](../tests/fixtures/participant-stats.json); [verify_participant_stats.py](../tools/verify_participant_stats.py); [OriginalParticipantStatsChecks.cs](../tests/OriginalParticipantStatsChecks.cs) | 68BD, 219C3, EEBB and 1188F are recorded stubs in the check; not yet driving the skirmish (the AI keeps its own bookkeeping) |
 | LE:1 `0xD40C..0xD453` | Owner free population growth | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |
 | LE:1 `0xD453..0xD5B1` | Owner population demand, support and limit recount | partial | [population-farms.md](../docs/population-farms.md); [population.json](../tests/fixtures/population.json) | Подтверждён контракт одного участника: три итоговых счётчика +28/+2C/+30 и четыре байта границ +C9..+CC, а также числовой шаг прироста +24. Полный глобальный такт, общие min/max-глобалы, буквальный обход native owner-chain, полный WRK фермы и бунт не перенесены. |
 | LE:1 `0xD5B1..0xD6E6` | Gate services: open (FS:91), close (FS:95), automatic (FS:C1) | partial | [gates.md](../docs/gates.md); [GateChecks.cs](../tests/GateChecks.cs) | AC63 (plane check) is replaced by an occupancy test, D895 (scan) by 'a unit near'; the damage of a blocked gate (D5DF) is not applied; no Unicorn fixture |

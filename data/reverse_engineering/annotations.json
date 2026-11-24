@@ -4532,6 +4532,18 @@
       "evidence": ["docs/rufin.md", "tests/fixtures/mage-cloak.json", "tools/verify_mage_cloak.py", "tests/OriginalMageCloakChecks.cs"],
       "implementation": ["scripts/OriginalMageCloak.cs"],
       "limitations": "FS:197 is a recorded stub in the check"
+    },
+    {
+      "id": "le1-participant-stats-d3e5",
+      "module": "LE:1",
+      "start": 54245,
+      "end": 54705,
+      "name": "Participant statistics: strength, worker weight, territory rectangle (every 32 updates) and the growth +24 (every update)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/participant-stats.md", "tests/fixtures/participant-stats.json", "tools/verify_participant_stats.py", "tests/OriginalParticipantStatsChecks.cs"],
+      "implementation": ["scripts/OriginalParticipantStats.cs"],
+      "limitations": "68BD, 219C3, EEBB and 1188F are recorded stubs in the check; not yet driving the skirmish (the AI keeps its own bookkeeping)"
     }
   ]
 }
