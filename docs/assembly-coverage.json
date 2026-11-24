@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "c966938d817c63c3ac3d2ba9931e0917742e6242696c1a83c6263ec99e528094",
+  "annotation_sha256": "9629ebe136c6cbb7f70d3c32acd29f906cad6b86ff7265a85b9881f0c08da055",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3721,8 +3721,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 8407,
-        "unreviewed": 5005
+        "ported": 9620,
+        "unreviewed": 3792
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -3751,9 +3751,11 @@
         {
           "start": 393,
           "end": 530,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-rockfall-189"
+          ]
         },
         {
           "start": 530,
@@ -3766,6 +3768,51 @@
         },
         {
           "start": 697,
+          "end": 1016,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-face-2b9"
+          ]
+        },
+        {
+          "start": 1016,
+          "end": 1314,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-wall-3f8"
+          ]
+        },
+        {
+          "start": 1314,
+          "end": 1572,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-head-522"
+          ]
+        },
+        {
+          "start": 1572,
+          "end": 1722,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-tree-624"
+          ]
+        },
+        {
+          "start": 1722,
+          "end": 1773,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-raven-6ba"
+          ]
+        },
+        {
+          "start": 1773,
           "end": 1818,
           "status": "unreviewed",
           "classification": "unknown",

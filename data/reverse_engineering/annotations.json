@@ -4580,6 +4580,78 @@
       "evidence": ["tests/fixtures/unit-orders.json", "tools/verify_unit_orders.py", "tests/OriginalUnitOrdersChecks.cs"],
       "implementation": ["scripts/OriginalUnitOrders.cs"],
       "limitations": "8120, D895 and DA7F are recorded stubs in the check; the skirmish keeps its own order handling (adapter)"
+    },
+    {
+      "id": "army03-rockfall-189",
+      "module": "ARMY__03.WRK",
+      "start": 393,
+      "end": 530,
+      "name": "Rockfall trap (template 2)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-rockfall.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-face-2b9",
+      "module": "ARMY__03.WRK",
+      "start": 697,
+      "end": 1016,
+      "name": "Stone face (template 4)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-face.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-wall-3f8",
+      "module": "ARMY__03.WRK",
+      "start": 1016,
+      "end": 1314,
+      "name": "Stone wall (template 5)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-wall.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-head-522",
+      "module": "ARMY__03.WRK",
+      "start": 1314,
+      "end": 1572,
+      "name": "Knight's head (template 6)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-head.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-tree-624",
+      "module": "ARMY__03.WRK",
+      "start": 1572,
+      "end": 1722,
+      "name": "Living fir (template 7)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-tree.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-raven-6ba",
+      "module": "ARMY__03.WRK",
+      "start": 1722,
+      "end": 1773,
+      "name": "Raven (template 8): init and the standard step",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-raven.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
     }
   ]
 }

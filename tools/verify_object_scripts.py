@@ -16,6 +16,10 @@ from forestry_source import source_constants
 PRESETS = {
     'rockfall': {'entry': 0x189, 'end': 0x212},
     'face': {'entry': 0x2b9, 'end': 0x3f8},
+    'wall': {'entry': 0x3f8, 'end': 0x522},
+    'head': {'entry': 0x522, 'end': 0x624},
+    'tree': {'entry': 0x624, 'end': 0x6ba},
+    'raven': {'entry': 0x6ba, 'end': 0x6ed},
 }
 PRESET = PRESETS['rockfall']; NAME = 'rockfall'
 
@@ -34,8 +38,8 @@ def cases():
     out = []
     for n in range(800):
         out.append({'ah': rng.choice([0, 1, 1, 1, 1]), 'x': rng.randrange(0, 4000), 'y': rng.randrange(0, 4000), 'f15': rng.choice([0, 0, 1, 2, 3, rng.randrange(256)]), 'f26': rng.choice([0, 1, 3, 0x1f, 0x20, rng.randrange(1 << 32)]),
-                    'f2a': rng.choice([0, 9, 10, 0x14, 0x15, 0xb, 1, rng.randrange(256)]), 'w1': rng.randrange(65536), 'f22': rng.randrange(1 << 32), 'seed': rng.randrange(256),
-                    'area': [[rng.choice([0, 0, 1, 5]), rng.choice([0, 0, 3])] for _ in range(3)]})
+                    'f2a': rng.choice([0, 9, 10, 0x14, 0x15, 0xb, 1, rng.randrange(256)]), 'w1': rng.choice([0x1b2, 0x1b3, 0x1b6, 0x1ab, rng.randrange(65536)]), 'f14': rng.choice([0, 0x80, 0x81, rng.randrange(256)]), 'f0d': rng.randrange(4), 'f19': rng.choice([100, 0, 0x80, 0xff, 0xfb, 0xfa, 1, rng.randrange(256)]), 'f27': rng.choice([0x18, 0x20, 0x28, rng.randrange(256)]), 'f28': rng.choice([0, 3, 0xb, 0x18, rng.randrange(256)]), 'f2d': rng.randrange(256), 'tick': rng.choice([0, 1, 7, 8, 0x1f, 0x20, rng.randrange(256)]), 'f22': rng.randrange(1 << 32), 'seed': rng.randrange(256),
+                    'area': [[rng.choice([0, 0, 1, 5]), rng.choice([0, 0, 3]), rng.choice([0, 0, 1, 2]), rng.randrange(1 << 30), rng.randrange(1 << 30)] for _ in range(3)], 'claim': [rng.choice([0, 1]) for _ in range(3)], 'dist': [rng.randrange(256) for _ in range(3)]})
     return out
 
 
@@ -48,22 +52,38 @@ def generate(game):
     def reg(r): return o.cpu.reg_read(r)
     def area():   # FS:14B = 11DDE
         log.append(b'A' + struct.pack('<II', reg(UC_X86_REG_ECX), reg(UC_X86_REG_EDX)))
-        a = state['area'].pop(0) if state['area'] else [0, 0]
-        o.cpu.reg_write(UC_X86_REG_EAX, a[0]); o.cpu.reg_write(UC_X86_REG_EBX, a[1]); o.ret()
+        a = state['area'].pop(0) if state['area'] else [0, 0, 0, 0, 0]
+        o.cpu.reg_write(UC_X86_REG_EAX, a[0]); o.cpu.reg_write(UC_X86_REG_EBX, a[1])
+        o.cpu.reg_write(UC_X86_REG_EDI, 0 if a[2] == 0 else o.POOL + 0x100 + 0x40 * a[2])
+        o.ret()
     def effect():   # FS:19
         esp = reg(UC_X86_REG_ESP); args = struct.unpack('<III', bytes(o.cpu.mem_read(esp + 4, 12)))
         log.append(b'E' + struct.pack('<BBIII', reg(UC_X86_REG_EBX) & 255, (reg(UC_X86_REG_EBX) >> 8) & 255, args[0] - o.POOL, args[1], args[2])); o.ret()
+    def claim():    # FS:157
+        log.append(b'C' + struct.pack('<IIH', reg(UC_X86_REG_EAX), reg(UC_X86_REG_EBX), reg(UC_X86_REG_ECX) & 0xffff))
+        o.cpu.reg_write(UC_X86_REG_EAX, state['claim'].pop(0) if state['claim'] else 0); o.ret()
+    def distance():  # FS:15B
+        log.append(b'L' + struct.pack('<II', reg(UC_X86_REG_EAX), reg(UC_X86_REG_EBX)))
+        o.cpu.reg_write(UC_X86_REG_EAX, (reg(UC_X86_REG_EAX) & ~0xff) | (state['dist'].pop(0) if state['dist'] else 0)); o.ret()
+    def spawn():     # FS:69
+        log.append(b'N' + struct.pack('<HBHI', reg(UC_X86_REG_EAX) & 0xffff, reg(UC_X86_REG_EBX) & 255, reg(UC_X86_REG_ECX) & 0xffff, reg(UC_X86_REG_EDX))); o.ret()
+    def redraw(): log.append(b'D'); o.ret()
+    def remove(): log.append(b'R'); o.ret()
+    def vitals(): log.append(b'V'); o.ret()
+    def actions(): log.append(b'U'); o.cpu.emu_stop()
     def sound():    # FS:31
         log.append(b'S' + struct.pack('<I', reg(UC_X86_REG_EAX))); o.ret()
     o.stubs = {}
     slots = {x['fs_slot']: x['target_offset'] for x in report['fs_assignments']}
-    o.stubs[slots[0x14b]] = area; o.stubs[slots[0x19]] = effect; o.stubs[slots[0x31]] = sound
+    o.stubs[slots[0x14b]] = area; o.stubs[slots[0x19]] = effect; o.stubs[slots[0x31]] = sound; o.stubs[slots[0x157]] = claim; o.stubs[slots[0x15b]] = distance; o.stubs[slots[0x69]] = spawn
+    o.stubs[slots[0x1d]] = redraw; o.stubs[slots[0x15]] = remove; o.stubs[slots[0xdd]] = vitals; o.stubs[slots[0xe1]] = actions
     digest = hashlib.sha256(); all_cases = cases()
     for case in all_cases:
-        log.clear(); state['area'] = [list(a) for a in case['area']]; o.prepare(32, 32); o.mode = 'object'
-        o.cpu.mem_write(o.POOL, bytes(0x2000)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x19eb, bytes([case['seed']])); o.cpu.mem_write(0x19ec, bytes([case['seed'] ^ 0x5a]))
-        r = bytearray(0x50); struct.pack_into('<II', r, 4, case['x'], case['y']); r[0x15] = case['f15']; struct.pack_into('<I', r, 0x26, case['f26']); r[0x2a] = case['f2a']; struct.pack_into('<H', r, 1, case['w1']); struct.pack_into('<I', r, 0x22, case['f22'])
+        log.clear(); state['area'] = [list(a) for a in case['area']]; state['claim'] = list(case['claim']); state['dist'] = list(case['dist']); o.prepare(32, 32); o.mode = 'object'
+        o.cpu.mem_write(o.POOL, bytes(0x2000)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x19eb, bytes([case['seed']])); o.cpu.mem_write(o.FS + 0x10, bytes([case['tick']])); o.cpu.mem_write(o.FS + 8, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x19ec, bytes([case['seed'] ^ 0x5a]))
+        r = bytearray(0x50); struct.pack_into('<II', r, 4, case['x'], case['y']); r[0x15] = case['f15']; struct.pack_into('<I', r, 0x26, case['f26']); r[0x2a] = case['f2a']; r[0x14] = case['f14']; r[0x0d] = case['f0d']; r[0x19] = case['f19']; r[0x27] = case['f27']; r[0x28] = case['f28']; r[0x2d] = case['f2d']; struct.pack_into('<H', r, 1, case['w1']); struct.pack_into('<I', r, 0x22, case['f22'])
         o.cpu.mem_write(o.POOL + 0x800, bytes(r))
+        for k in range(1, 3): o.cpu.mem_write(o.POOL + 0x100 + 0x40 * k, struct.pack('<II', 0, 0)[:0] + bytes(4) + struct.pack('<II', case['area'][0][3] >> k, case['area'][0][4] >> k))
         for q in (UC_X86_REG_ESI, UC_X86_REG_EDI): o.cpu.reg_write(q, o.POOL + 0x800)
         o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, 7)
         o.run(o.WRK + PRESET['entry'])
