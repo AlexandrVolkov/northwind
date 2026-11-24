@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 103244 | 6265 | 97 | 37276 | 44 |
+| LE:1 | 146882 | 102811 | 6265 | 97 | 37709 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
@@ -242,6 +242,7 @@
 | LE:1 `0x124FD..0x12546` | Use an item at a cell/object: handler AH = 3 | ported | [campaign-items.md](../docs/campaign-items.md); [item-use.json](../tests/fixtures/item-use.json); [verify_item_use.py](../tools/verify_item_use.py); [OriginalItemUseChecks.cs](../tests/OriginalItemUseChecks.cs) | the inventory window and the targeting that call it are not ported |
 | LE:1 `0x12546..0x12588` | Drop one item as a map object of ARMY__00 (the entry's class byte) | ported | [campaign-items.md](../docs/campaign-items.md); [item-use.json](../tests/fixtures/item-use.json); [verify_item_use.py](../tools/verify_item_use.py); [OriginalItemUseChecks.cs](../tests/OriginalItemUseChecks.cs) | A758 (object creation) and 68A0 as recorded/real; the skirmish does not create the object yet |
 | LE:1 `0x12588..0x125CE` | Drop all items of a participant on a cell | ported | [campaign-items.md](../docs/campaign-items.md); [item-use.json](../tests/fixtures/item-use.json); [verify_item_use.py](../tools/verify_item_use.py); [OriginalItemUseChecks.cs](../tests/OriginalItemUseChecks.cs) | only called from the death of the leader (8A54), not wired in the skirmish |
+| LE:1 `0x12930..0x12AE1` | Move step of units (state 4): turn toward the goal every fourth update, pixel move along the heading, free-place check | ported | [unit-motion.md](../docs/unit-motion.md); [unit-move.json](../tests/fixtures/unit-move.json); [verify_unit_move.py](../tools/verify_unit_move.py); [OriginalUnitMoveChecks.cs](../tests/OriginalUnitMoveChecks.cs) | the services 6996, 43B0, AC63, 813E, 12BF2 are recorded stubs in the check; the sine table DS:4790 is filled at run time (not located yet) and is part of the case; not yet the driver of the skirmish units |
 | LE:1 `0x1E53A..0x1E6C2` | AI block initialisation from character table | ported | [ai.md](../docs/ai.md); [ai-init.json](../tests/fixtures/ai-init.json); [original_ai.json](../data/original_ai.json) |  |
 | LE:1 `0x1E7EA..0x1E87A` | AI main loop of a settlement | ported | [ai.md](../docs/ai.md); [SkirmishAiChecks.cs](../tests/SkirmishAiChecks.cs) | Order of the calls as in LE:1 31D6; run per AI settlement |
 | LE:1 `0x1E87A..0x1EAD8` | AI settlement census | ported | [ai.md](../docs/ai.md); [ai-census.json](../tests/fixtures/ai-census.json) |  |
