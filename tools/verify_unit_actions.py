@@ -41,6 +41,12 @@ FUNCS = {
     'f8b0f': (0x8b0f, 0x8b37, [0xa38a, 0x8120]),
     'f8b37': (0x8b37, 0x8b4c, [0x8b0f]),
     'f8b4c': (0x8b4c, 0x8b5e, [0xb5ab]),
+    'f8bc7': (0x8bc7, 0x8bea, [0x9b86]),
+    'f8bea': (0x8bea, 0x8c1e, [0x8c98, 0x960b]),
+    'f8c47': (0x8c47, 0x8c7c, [0x8c98, 0x960b]),
+    'f8c89': (0x8c89, 0x8c98, []),
+    'f8cf3': (0x8cf3, 0x8d0b, [0x8bc7, 0x8cbb]),
+    'f84aa': (0x84aa, 0x8659, [0x8d89, 0x8c98, 0x8ca1, 0xc331, 0x8c47, 0x8af4, 0x8c89, 0xcfac, 0x123d3, 0xd101, 0x8b0f, 0xc35f]),
 }
 POOLREC, OBJ1, OBJ2, TMPL = 0x800, 0x900, 0xa00, 0xc00
 
@@ -103,7 +109,7 @@ def generate(game, names):
         o.cpu.mem_write(o.POOL + POOLREC, bytes(r)); o.cpu.mem_write(o.POOL + OBJ1, prng(case['o1'], 0x50)); o.cpu.mem_write(o.POOL + OBJ2, prng(case['o2'], 0x50)); o.cpu.mem_write(o.POOL + TMPL, prng(case['tm'], 0x100))
         o.cpu.mem_write(0x97a + 0xf5 * r[3], prng(case['pt'], 0xf5)); o.cpu.mem_write(0x1ccb, bytes(0x16 * 256 + 4))
         o.cpu.mem_write(0x1c9f, bytes([case['g1c9f']])); o.cpu.mem_write(0x512, struct.pack('<I', case['g512'])); o.cpu.mem_write(0x51a, struct.pack('<I', case['g51a'])); o.cpu.mem_write(0x51e, struct.pack('<I', case['g51e'])); o.cpu.mem_write(0x522, bytes([case['g522']]))
-        o.cpu.reg_write(UC_X86_REG_ESI, o.POOL + POOLREC)
+        o.cpu.reg_write(UC_X86_REG_ESI, o.POOL + POOLREC); o.cpu.reg_write(UC_X86_REG_EBP, o.POOL + TMPL)
         o.RET = None; o.cpu.mem_write(0x50e, bytes(4))
         if case['fn'] == 'f8227':
             table = o.STACK + 0x7e8; o.RET = table

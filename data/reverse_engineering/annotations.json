@@ -6092,6 +6092,78 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "The callees outside the function are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-84aa",
+      "module": "LE:1",
+      "start": 33962,
+      "end": 34393,
+      "name": "Unit action 84AA (herd: cell, distance, sub-state, wander 85E2)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-8bc7",
+      "module": "LE:1",
+      "start": 35783,
+      "end": 35818,
+      "name": "Target out of reach 8BC7",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-8bea",
+      "module": "LE:1",
+      "start": 35818,
+      "end": 35870,
+      "name": "Move to the target 8BEA",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-8c47",
+      "module": "LE:1",
+      "start": 35911,
+      "end": 35964,
+      "name": "Move to a cell 8C47",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-8c89",
+      "module": "LE:1",
+      "start": 35977,
+      "end": 35992,
+      "name": "Walk request 8C89",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-8cf3",
+      "module": "LE:1",
+      "start": 36083,
+      "end": 36107,
+      "name": "Reach and follow 8CF3",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
     }
   ]
 }

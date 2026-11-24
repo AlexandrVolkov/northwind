@@ -82,6 +82,12 @@ public partial class TestRunner
                 case "f8b0f": OriginalUnitActions.F8B0F(w, g, r); break;
                 case "f8b37": OriginalUnitActions.F8B37(w, g, r); break;
                 case "f8b4c": OriginalUnitActions.F8B4C(w, g, r); break;
+                case "f8bc7": OriginalUnitActions.F8BC7(w, g, r); break;
+                case "f8bea": OriginalUnitActions.F8BEA(w, g, r); break;
+                case "f8c47": OriginalUnitActions.F8C47(w, g, r); break;
+                case "f8c89": OriginalUnitActions.F8C89(w, g, r); break;
+                case "f8cf3": OriginalUnitActions.F8CF3(w, g, r); break;
+                case "f84aa": OriginalUnitActions.F84AA(w, g, r); break;
             }
             uint Rel(uint v) => v >= 0x400000 && v < 0x402000 ? v - 0x400000 : v;
             byte[] output = [.. r, .. w.Obj1, .. w.Obj2, w.G1C9F, .. BitConverter.GetBytes(w.G512), .. BitConverter.GetBytes(w.G50E), w.G1CCB, .. BitConverter.GetBytes(Rel(g.Eax)), .. BitConverter.GetBytes(Rel(g.Ebx)), .. BitConverter.GetBytes(Rel(g.Ecx)), .. BitConverter.GetBytes(Rel(g.Edx)), .. BitConverter.GetBytes(Rel(g.Edi)),
@@ -92,7 +98,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 25, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 31, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }

@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "646944a76a8d10ceff111a3e7c1b6ddbd93c0a4772ddd3093cc987b78c0222fa",
+  "annotation_sha256": "b08848b878e6f06ef6031f8925b6cf757661cb7bba39d22678dd41735d2a5263",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 6265,
-        "ported": 41023,
-        "unreviewed": 99497,
+        "ported": 41531,
+        "unreviewed": 98989,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -604,9 +604,11 @@
         {
           "start": 33962,
           "end": 34114,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-84aa"
+          ]
         },
         {
           "start": 34114,
@@ -614,15 +616,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "forestry-prepare"
+            "forestry-prepare",
+            "le1-unit-actions-84aa"
           ]
         },
         {
           "start": 34132,
           "end": 34181,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-84aa"
+          ]
         },
         {
           "start": 34181,
@@ -630,15 +635,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "forestry-work"
+            "forestry-work",
+            "le1-unit-actions-84aa"
           ]
         },
         {
           "start": 34252,
           "end": 34261,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-84aa"
+          ]
         },
         {
           "start": 34261,
@@ -646,11 +654,21 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "forestry-modifier"
+            "forestry-modifier",
+            "le1-unit-actions-84aa"
           ]
         },
         {
           "start": 34274,
+          "end": 34393,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-84aa"
+          ]
+        },
+        {
+          "start": 34393,
           "end": 34486,
           "status": "unreviewed",
           "classification": "unknown",
@@ -796,10 +814,21 @@
         },
         {
           "start": 35783,
+          "end": 35818,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8bc7"
+          ]
+        },
+        {
+          "start": 35818,
           "end": 35870,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8bea"
+          ]
         },
         {
           "start": 35870,
@@ -813,9 +842,11 @@
         {
           "start": 35911,
           "end": 35964,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8c47"
+          ]
         },
         {
           "start": 35964,
@@ -829,9 +860,11 @@
         {
           "start": 35977,
           "end": 35992,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8c89"
+          ]
         },
         {
           "start": 35992,
@@ -854,9 +887,11 @@
         {
           "start": 36083,
           "end": 36107,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8cf3"
+          ]
         },
         {
           "start": 36107,
