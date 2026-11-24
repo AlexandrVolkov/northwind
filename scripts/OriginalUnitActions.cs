@@ -1591,4 +1591,38 @@ public static class OriginalUnitActions
         if (g.Jg) return;
         Put(r, 0x73, 0);
     }
+
+    /// <summary>B319: every object of the chain of the owner of ESI whose template has flag 8 and a defined +4E, is alive and is more than 25 cells away from ESI is handed over (D1BA) to the owner [6C6] - 1.</summary>
+    public static void FB319(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Eax = 0xf5; Mul8(g, 0xf5, r[3]); var part = w.PartOf(r[3]);
+        uint edi = U32(part, 0xe) + w.PoolBase, ebp = U32(part, 9) + w.PoolBase;
+        g.Edi = edi; g.Ebp = ebp; g.Cmp(edi, ebp, 32);
+        while (!g.Zf)
+        {
+            g.Edi = edi; w.Call(0x68bd, g); var t = w.ObjectAt(g.Edx); var o = w.ObjectAt(edi);
+            g.Test(U32(t, 0x40), 8, 32);
+            if (!g.Zf)
+            {
+                g.Cmp(t[0x4e], 0xff, 8);
+                if (!g.Zf)
+                {
+                    g.Al = t[0x46]; g.Cmp(o[0x19], g.Al, 8);
+                    if (!g.Jle)
+                    {
+                        g.Eax = U32(o, 4); g.Ebx = U32(o, 8);
+                        g.Cmp(g.Eax, U32(r, 4), 32); g.Eax -= U32(r, 4); if (g.Sf) g.Eax = (uint)-(int)g.Eax;
+                        g.Cmp(g.Ebx, U32(r, 8), 32); g.Ebx -= U32(r, 8); if (g.Sf) g.Ebx = (uint)-(int)g.Ebx;
+                        g.Cmp(g.Eax, g.Ebx, 32); if (g.Cf || g.Zf) g.Eax = g.Ebx;
+                        g.Eax = g.Shr(g.Eax, 5, 32); g.Cmp(g.Al, 0x19, 8);
+                        if (!g.Cf && !g.Zf)
+                        {
+                            uint esi = g.Esi; g.Esi = edi; g.Al = (byte)(d[0x6c6] - 1); w.Call(0xd1ba, g); g.Esi = esi; g.Edi = edi; g.Ebp = ebp;
+                        }
+                    }
+                }
+            }
+            edi += U32(o, 0x10); g.Edi = edi; g.Cmp(edi, ebp, 32);
+        }
+    }
 }

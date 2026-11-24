@@ -6572,6 +6572,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "A716, 9E41 and A6AE are recorded stubs; the original also writes +73 of the unit record (kept)"
+    },
+    {
+      "id": "le1-unit-actions-b319",
+      "module": "LE:1",
+      "start": 45849,
+      "end": 45972,
+      "name": "Hand over distant objects of the chain to another owner (B319)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "D1BA is a recorded stub here (it is ported in OriginalObjectAllocator.Transfer)"
     }
   ]
 }
