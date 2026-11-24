@@ -4652,6 +4652,78 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-raven.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army__01-unit-script-0",
+      "module": "ARMY__01.WRK",
+      "start": 0,
+      "end": 127,
+      "name": "Standard unit script (swordsman): init, step, voice",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; the skirmish drives the units by its own adapters"
+    },
+    {
+      "id": "army__01-unit-script-7f",
+      "module": "ARMY__01.WRK",
+      "start": 127,
+      "end": 254,
+      "name": "Standard unit script (archer): init, step, voice",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; the skirmish drives the units by its own adapters"
+    },
+    {
+      "id": "army__01-unit-script-4f0",
+      "module": "ARMY__01.WRK",
+      "start": 1264,
+      "end": 1385,
+      "name": "Standard unit script (horseman): init, step, voice",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; the skirmish drives the units by its own adapters"
+    },
+    {
+      "id": "army__02-unit-script-0",
+      "module": "ARMY__02.WRK",
+      "start": 0,
+      "end": 127,
+      "name": "Standard unit script (militiaman): init, step, voice",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; the skirmish drives the units by its own adapters"
+    },
+    {
+      "id": "army__02-unit-script-7f",
+      "module": "ARMY__02.WRK",
+      "start": 127,
+      "end": 254,
+      "name": "Standard unit script (archer): init, step, voice",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; the skirmish drives the units by its own adapters"
+    },
+    {
+      "id": "army__02-unit-script-11b4",
+      "module": "ARMY__02.WRK",
+      "start": 4532,
+      "end": 4653,
+      "name": "Standard unit script (horseman): init, step, voice",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; the skirmish drives the units by its own adapters"
     }
   ]
 }

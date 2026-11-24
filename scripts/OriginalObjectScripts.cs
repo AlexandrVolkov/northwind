@@ -198,3 +198,28 @@ public static class OriginalObjectScripts
         Redraw(w, r); w.Vitals(); w.Actions();
     }
 }
+
+/// <summary>The services of the standard unit scripts (recorded stubs in tools/verify_unit_scripts.py).</summary>
+public interface IUnitScriptWorld
+{
+    byte Random();                    // FS:109
+    void Appearance(byte army);       // FS:4D
+    void Voice();                     // FS:D1
+    void Redraw();                    // FS:1D
+    void Vitals(); void Actions();    // FS:DD, FS:E1
+}
+
+/// <summary>The standard unit script of ARMY__01.WRK and ARMY__02.WRK (the swordsman 0, the archer 7F, the horseman 4F0 / 11B4 and their kin): AH = 0 the first frame state (+0F = 0Fh, the horseman
+/// 07h), the appearance of the army BL and the first random update counter +2E; AH = 1 the redraw, the vitals and the unit step; AH = 2 the voice. Verified against the original x86 by
+/// tests/fixtures/unit-scripts.json (tools/verify_unit_scripts.py).</summary>
+public static class OriginalUnitScript
+{
+    public static void Run(IUnitScriptWorld w, byte[] r, int ah, byte bl, bool horseman)
+    {
+        if (ah == 0) { r[0x0f] = horseman ? (byte)7 : (byte)0x0f; w.Appearance(bl); r[0x2e] = w.Random(); return; }
+        if (ah == 2) { w.Voice(); return; }
+        if (ah != 1) return;
+        if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); }
+        w.Vitals(); w.Actions();
+    }
+}

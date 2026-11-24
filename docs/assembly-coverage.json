@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "9629ebe136c6cbb7f70d3c32acd29f906cad6b86ff7265a85b9881f0c08da055",
+  "annotation_sha256": "8a3b560418a6b6bd30fecbfc4ed79ba0b47d2bfc3d54f745424d8ab64d67da07",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3388,7 +3388,8 @@
       "zero_fill_bytes": 0,
       "sha256": "d2554037e3a135ce7c06530cf2ee85e89ae240aa31a00c7c72a9b3cb251c46de",
       "byte_status": {
-        "unreviewed": 4951
+        "ported": 375,
+        "unreviewed": 4576
       },
       "linear_rows": 1625,
       "flow_candidate_instructions": 1129,
@@ -3400,6 +3401,40 @@
       "regions": [
         {
           "start": 0,
+          "end": 127,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-unit-script-0"
+          ]
+        },
+        {
+          "start": 127,
+          "end": 254,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-unit-script-7f"
+          ]
+        },
+        {
+          "start": 254,
+          "end": 1264,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1264,
+          "end": 1385,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-unit-script-4f0"
+          ]
+        },
+        {
+          "start": 1385,
           "end": 4951,
           "status": "unreviewed",
           "classification": "unknown",
@@ -3417,8 +3452,8 @@
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
         "partial": 855,
-        "ported": 404,
-        "unreviewed": 5671
+        "ported": 779,
+        "unreviewed": 5296
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -3430,6 +3465,24 @@
       "regions": [
         {
           "start": 0,
+          "end": 127,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-unit-script-0"
+          ]
+        },
+        {
+          "start": 127,
+          "end": 254,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-unit-script-7f"
+          ]
+        },
+        {
+          "start": 254,
           "end": 315,
           "status": "unreviewed",
           "classification": "unknown",
@@ -3689,6 +3742,22 @@
         },
         {
           "start": 3707,
+          "end": 4532,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 4532,
+          "end": 4653,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-unit-script-11b4"
+          ]
+        },
+        {
+          "start": 4653,
           "end": 5661,
           "status": "unreviewed",
           "classification": "unknown",
