@@ -30,6 +30,8 @@ public interface IBuildingScriptWorld
     void Voice();
     void Vitals();
     void Service115();
+    /// <summary>FS:C5 (reads the dword at +48h of the record).</summary>
+    void ServiceC5(byte[] r);
     void Actions();
     /// <summary>The address of the record (esi) as the script stores it.</summary>
     uint RecordAddress { get; }
@@ -45,8 +47,8 @@ public interface IBuildingScriptWorld
 public static class OriginalBuildingScripts
 {
     /// <summary>The offsets of the data tables returned by AH = 6 (A, B, none, D).</summary>
-    public static readonly uint[] Tables = [0x21b, 0x336, 0, 0x4c6, 0, 0, 0, 0xa65, 0xdcd, 0x221, 0x336, 0, 0, 0, 0, 0, 0xf54, 0x130c, 0, 0, 0];
-    private static readonly int[][] Handlers = [[0x1ef, 0x1b5, 0x1b2, 0x203, 0x23b, 0x247], [0x316, 0x2c6, 0x2c3, 0x2c3, 0x32a, 0x34e], [0x3c1, 0x3bb, 0x3b8, 0x3b8, 0x3b8, 0x3e7], [0x474, 0x466, 0x463, 0x4ae, 0x4de, 0x4ea], [0x771, 0x73b, 0x738, 0x738, 0x738, 0x79a], [], [0x909, 0x903, 0x900, 0x900, 0x900, 0x980], [0xa33, 0x9f9, 0x9f6, 0x9f6, 0xa59, 0xa71], [0xdad, 0xd73, 0xd70, 0xd70, 0xdc1, 0xde9], [0x1f5, 0x1bb, 0x1b8, 0x209, 0x251, 0x25d], [0x316, 0x2dc, 0x2d9, 0x2d9, 0x32a, 0x34e], [0x3c7, 0x3c1, 0x3be, 0x3be, 0x3be, 0x44e], [0x7c3, 0x7bd, 0x7ba, 0x7ba, 0x7ba, 0x7ef], [0x67d, 0x647, 0x644, 0x644, 0x644, 0x69b], [0xd56, 0xd20, 0xd1d, 0xd1d, 0xd1d, 0xd7f], [], [0xf02, 0xef4, 0xef1, 0xf3c, 0xf74, 0xf80], [0x12da, 0x12a0, 0x129d, 0x129d, 0x1300, 0x1318], [0x135c, 0x136e, 0x1359, 0x1359, 0x1359, 0x1374], [0x13b8, 0x13ca, 0x13b5, 0x13b5, 0x13b5, 0x13d0], []];
+    public static readonly uint[] Tables = [0x21b, 0x336, 0, 0x4c6, 0, 0, 0, 0xa65, 0xdcd, 0x221, 0x336, 0, 0, 0, 0, 0, 0xf54, 0x130c, 0, 0, 0, 0, 0];
+    private static readonly int[][] Handlers = [[0x1ef, 0x1b5, 0x1b2, 0x203, 0x23b, 0x247], [0x316, 0x2c6, 0x2c3, 0x2c3, 0x32a, 0x34e], [0x3c1, 0x3bb, 0x3b8, 0x3b8, 0x3b8, 0x3e7], [0x474, 0x466, 0x463, 0x4ae, 0x4de, 0x4ea], [0x771, 0x73b, 0x738, 0x738, 0x738, 0x79a], [], [0x909, 0x903, 0x900, 0x900, 0x900, 0x980], [0xa33, 0x9f9, 0x9f6, 0x9f6, 0xa59, 0xa71], [0xdad, 0xd73, 0xd70, 0xd70, 0xdc1, 0xde9], [0x1f5, 0x1bb, 0x1b8, 0x209, 0x251, 0x25d], [0x316, 0x2dc, 0x2d9, 0x2d9, 0x32a, 0x34e], [0x3c7, 0x3c1, 0x3be, 0x3be, 0x3be, 0x44e], [0x7c3, 0x7bd, 0x7ba, 0x7ba, 0x7ba, 0x7ef], [0x67d, 0x647, 0x644, 0x644, 0x644, 0x69b], [0xd56, 0xd20, 0xd1d, 0xd1d, 0xd1d, 0xd7f], [], [0xf02, 0xef4, 0xef1, 0xf3c, 0xf74, 0xf80], [0x12da, 0x12a0, 0x129d, 0x129d, 0x1300, 0x1318], [0x135c, 0x136e, 0x1359, 0x1359, 0x1359, 0x1374], [0x13b8, 0x13ca, 0x13b5, 0x13b5, 0x13b5, 0x13d0], [], [], []];
 
     private static uint Dword(byte[] r, int i) => BitConverter.ToUInt32(r, i);
     private static void SetBl(BuildingRegs g, uint v) => g.Ebx = (g.Ebx & 0xffffff00) | (v & 0xff);
@@ -57,7 +59,8 @@ public static class OriginalBuildingScripts
         zf = false;
         var g = new BuildingRegs { Eax = (uint)ah << 8, Ebx = bl };
         int kd = k; k = Base(k);
-        if (k == 20) return Unit20(w, r, g, ah, bl, out zf);
+        if (k == 20) return Unit20(w, r, g, ah, bl, kd == 21, out zf);
+        if (k == 22) return Script1078(w, r, g, ah, out zf);
         if (k == 5) return Script7A0(w, r, g, ah, kd == 15);
         if (k == 13 && ah != 5) return Script524(w, r, g, ah, out zf);
         if (ah == 0)
@@ -125,7 +128,7 @@ public static class OriginalBuildingScripts
         w.Service(0x19, g);
     }
 
-    private static int Base(int k) => k == 14 ? 4 : k == 15 ? 5 : k == 16 ? 3 : k == 17 ? 7 : k;
+    private static int Base(int k) => k == 14 ? 4 : k == 15 ? 5 : k == 16 ? 3 : k == 17 ? 7 : k == 21 ? 20 : k;
 
     private static void Handler(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int k, int state, bool second)
     {
@@ -359,7 +362,7 @@ public static class OriginalBuildingScripts
 
     /// <summary>The unit-like script F86 of ARMY__02.WRK: AH = 0 +0F = 7, appearance, +2E random, +32 = its template; AH = 2 the voice; AH = 5 tests a visitor (+31 = FFh passes the template flag 1000h of the other);
     /// AH = 1 on death (+19 = 0 and +17 & 18h = 10h) throws the effects 16h, 17h, 18h, then redraws, the vitals, FS:115 and (+31 ≠ FFh) the unit step with +0F = 7.</summary>
-    private static uint Unit20(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int ah, byte bl, out bool zf)
+    private static uint Unit20(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int ah, byte bl, bool noMiddle, out bool zf)
     {
         zf = false;
         if (ah == 2) { w.Voice(); return 0; }
@@ -376,6 +379,7 @@ public static class OriginalBuildingScripts
             foreach (uint kind in new uint[] { 0x16, 0x17, 0x18 })
             {
                 g.Eax = (g.Eax & 0xffffff00) | r[0]; g.Ebx = (g.Ebx & 0xffff0000) | 0x100 | kind; g.Ecx = Dword(r, 4); g.Edx = Dword(r, 8);
+                if (noMiddle && kind == 0x17) continue;   // 1462: the call of the second effect is missing in the original
                 w.Service(0x19, g);
             }
         }
@@ -383,5 +387,29 @@ public static class OriginalBuildingScripts
         w.Vitals(); w.Service115();
         if (r[0x31] == 0xff) return 0;
         r[0x0f] = 7; w.Actions(); return 0;
+    }
+
+    /// <summary>The script 1078 of ARMY__02.WRK: AH = 0 +20 = FFh; AH = 4 tail-calls FS:D5 with EBX = 404h; AH = 1 on the redraw takes +23 (20h for the state 3, 10h for 4, else 0) from the redraw, otherwise
+    /// lets FS:C5 see +48 raised by +23 and, with +15 = 4 and +19 ≤ 0, counts +19 down and removes the object.</summary>
+    private static uint Script1078(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int ah, out bool zf)
+    {
+        zf = false;
+        if (ah == 0) { r[0x20] = 0xff; return 0; }
+        if (ah == 4) { g.Ebx = 0x404; w.Service(0xd5, g); zf = g.Zf; return 0; }
+        if (ah != 1) return 0;
+        if ((r[0x14] & 0x80) != 0)
+        {
+            r[0x14] &= 0x7f; w.Service(0x1d, g);
+            uint al = g.Eax & 7; r[0x23] = 0x20; if (al == 3) return 0;
+            r[0x23] = 0x10; if (al == 4) return 0;
+            r[0x23] = 0; return 0;
+        }
+        uint saved = Dword(r, 0x48); g.Eax = r[0x23];
+        BitConverter.GetBytes((ushort)(BitConverter.ToUInt16(r, 0x48) + r[0x23])).CopyTo(r, 0x48);
+        w.ServiceC5(r);
+        BitConverter.GetBytes(saved).CopyTo(r, 0x48);
+        if (r[0x15] != 4 || (sbyte)r[0x19] > 0) return 0;
+        r[0x19]--; if (r[0x19] > 0xfa) return 0;
+        w.Service(0x15, g); return 0;
     }
 }
