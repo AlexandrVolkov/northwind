@@ -45,6 +45,13 @@ PRESETS = {
     'fx1012': {'entry': 0x1012, 'end': 0x10b3, 'module': 'ARMY__00.WRK', 'effect': True},
     'fx10b3': {'entry': 0x10b3, 'end': 0x1105, 'module': 'ARMY__00.WRK', 'effect': True, 'more': [(0x6fe, 0x762)]},
     'fx1105': {'entry': 0x1105, 'end': 0x1227, 'module': 'ARMY__00.WRK', 'effect': True, 'regs_effect': True, 'extra': True},
+    'm2f4e': {'entry': 0x2f4e, 'end': 0x2f75, 'effect': True},
+    'm30a0': {'entry': 0x30a0, 'end': 0x30d1, 'effect': True},
+    'm31e7': {'entry': 0x31e7, 'end': 0x324c, 'effect': True},
+    'm333a': {'entry': 0x333a, 'end': 0x336e, 'effect': True},
+    'm336e': {'entry': 0x336e, 'end': 0x33e0, 'effect': True},
+    'm33e0': {'entry': 0x33e0, 'end': 0x340f, 'effect': True},
+    'm340f': {'entry': 0x340f, 'end': 0x3464, 'effect': True, 'regs_effect': True},
     'manuscript': {'entry': 0x2710, 'end': 0x279a, 'entries': [0x2710, 0x2780, 0x278d], 'visitor': True},
     'dragon': {'entry': 0x279a, 'end': 0x29f1, 'regs_effect': True, 'extra': True},
 }
@@ -168,7 +175,7 @@ def generate(game):
     def svca1():   # FS:A1
         log.append(b'V')
         zf, al, k = state['a1'].pop(0) if state['a1'] else (1, 0, 0)
-        o.cpu.reg_write(UC_X86_REG_EAX, (reg(UC_X86_REG_EAX) & ~0xff) | al); o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 0x100 + 0x40 * k)
+        o.cpu.reg_write(UC_X86_REG_EAX, (reg(UC_X86_REG_EAX) & ~0xff) | al); o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 0x100 + 0x40 * k); o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + 0xb00)
         o.cpu.reg_write(UC_X86_REG_EFLAGS, (reg(UC_X86_REG_EFLAGS) & ~0x40) | (0x40 if zf else 0)); o.ret()
     def svca9():   # FS:A9
         log.append(b'Y' + struct.pack('<H', reg(UC_X86_REG_EAX) & 0xffff))
@@ -216,7 +223,7 @@ def generate(game):
         if PRESET.get('extra') or PRESET.get('extra2'): o.cpu.mem_write(0x97a + 0x12, struct.pack('<I', case['part12']))
         o.cpu.reg_write(UC_X86_REG_ESI, o.POOL + 0x800); o.cpu.mem_write(o.POOL + 0x900, bytes([0, 0, 0, case['vowner']])); o.cpu.mem_write(o.POOL + 0x800 + 0x28, bytes([case['mask28']]))
         o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 0x900 if (PRESET.get('visitor') and case['ah'] == 8) else (o.DAT if (PRESET.get('dat') and case['ah'] != 0) else o.POOL + 0x800))
-        o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, (o.POOL + 0xa00) if (PRESET.get('effect') and (case['ah'] == 0 or PRESET['entry'] == 0x10b3) and PRESET['entry'] in (0x54a, 0xb62, 0xfd1, 0x1012, 0x10b3)) else case['bl']); o.cpu.reg_write(UC_X86_REG_ECX, 0); o.cpu.reg_write(UC_X86_REG_EDX, 0)
+        o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, (o.POOL + 0xa00) if (PRESET.get('effect') and (case['ah'] == 0 or PRESET['entry'] == 0x10b3) and PRESET['entry'] in (0x54a, 0xb62, 0xfd1, 0x1012, 0x10b3, 0x2f4e, 0x31e7)) else (case['bl'] | (case['ef1'] << 8))); o.cpu.reg_write(UC_X86_REG_ECX, 0); o.cpu.reg_write(UC_X86_REG_EDX, 0)
         o.run(o.WRK + (PRESET['entries'][case['k']] if PRESET.get('entries') else PRESET['entry']))
         out = (struct.pack('<H', (reg(UC_X86_REG_EAX) & 0xffff) if case['ah'] == 8 else 0) if PRESET.get('visitor') else b'') + bytes(o.cpu.mem_read(o.POOL + 0x800, 0x50)) + bytes(o.cpu.mem_read(0x19eb, 2)) + (bytes(o.cpu.mem_read(o.POOL + 0x140, 0x80)) + bytes(o.cpu.mem_read(0x97a + 0x12, 4)) if PRESET.get('extra') else (bytes(o.cpu.mem_read(0x97a + 0x12, 4)) if PRESET.get('extra2') else b'')) + b''.join(log)
         if os.environ.get('DEBUG_CASE') == str(all_cases.index(case)): print('PYTHON', out.hex())

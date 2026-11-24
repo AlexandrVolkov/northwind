@@ -578,6 +578,70 @@ public static class OriginalObjectScripts
         t[0x19] = 0; r[0] = 0xff;
     }
 
+    // The effects of the mages (ARMY__03.WRK 2F4E..3464): small scripts of the flashes and clouds that the mages' spells leave.
+    public static void MageFx2f4e(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)
+    {
+        if (ah == 1) { Put(r, 0x18, U32(r, 0x18) - 1); if (U32(r, 0x18) == 0) r[0] = 0xff; return; }
+        Word(r, 3, Word(parent, 1)); r[2] = parent[3]; Put(r, 0x18, 1000); r[0] = 1;
+    }
+
+    public static void MageFx30a0(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah == 1) { Put(r, 0x18, U32(r, 0x18) - 1); if (U32(r, 0x18) == 0) r[0] = 0xff; return; }
+        var (_, al, _, _) = w.ServiceA1();
+        if (al == 2 || al == 1) { r[0] = 0xff; return; }
+        Word(r, 3, 0x11b); r[0] = 7; Put(r, 0x18, 1000);
+    }
+
+    public static void MageFx31e7(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)
+    {
+        if (ah == 1)
+        {
+            Put(r, 0x18, U32(r, 0x18) - 1); if (U32(r, 0x18) != 0) return;
+            Put(r, 0x18, 0x258); Word(r, 3, (ushort)(Word(r, 3) + 1)); r[0x17]--; if (r[0x17] == 0) r[0] = 0xff; return;
+        }
+        var (zf, al, _, _) = w.ServiceA1();
+        if (!((!zf) && (w.FoundFlags & 2) != 0) && al == 2) { r[0] = 0xff; return; }
+        r[2] = parent[3]; Word(r, 3, (ushort)(((parent[0x25] & 6) * 2) + 0x29d)); Put(r, 0x18, 0x258); r[0] = 0x0f; r[0x17] = 4;
+    }
+
+    public static void MageFx333a(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah != 1) { Word(r, 3, 0x3a3); Put(r, 0x18, 0x400); r[0] = 0x11; return; }
+        if (Word(r, 3) != 0x3bc && (w.Tick & 3) == 0) Word(r, 3, (ushort)(Word(r, 3) + 1));
+        Put(r, 0x18, U32(r, 0x18) - 1); if (U32(r, 0x18) == 0) r[0] = 0xff;
+    }
+
+    public static void MageFx336e(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah != 1) { r[0] = 0x12; Word(r, 3, (ushort)(0x2ad + (w.Random() & 7))); w.Service29(5); Word(r, 0x20, 0); return; }
+        Put(r, 0x18, U32(r, 0x18) + 0x0a); if ((int)U32(r, 0x18) >= 0) Put(r, 0x18, 0);
+        Put(r, 0x1c, U32(r, 0x1c) - 0x0a); if ((int)U32(r, 0x1c) < 0) Put(r, 0x1c, 0);
+        if (w.ServiceA9(0x308) != 0 || w.ServiceA5()) { r[0] = 0xff; return; }
+        if ((w.Tick & 3) != 0) return;
+        Word(r, 3, (ushort)(Word(r, 3) + 1));
+        if (Word(r, 3) >= 0x2bc) r[0] = 0xff;
+    }
+
+    public static void MageFx33e0(IObjectScriptWorld w, byte[] r, int ah, byte bl, byte bh)
+    {
+        if (ah != 1) { r[0x16] = bh; Word(r, 3, (ushort)(bl + 0x33f)); r[0] = 0x13; return; }
+        if ((w.Tick & 1) != 0) return;
+        Word(r, 3, (ushort)(Word(r, 3) + 1)); r[0x16]--; if (r[0x16] == 0) r[0] = 0xff;
+    }
+
+    public static void MageFx340f(IObjectScriptWorld w, byte[] r, int ah, byte bl)
+    {
+        if (ah == 1)
+        {
+            r[0x16]--; if (r[0x16] != 0) return;
+            r[0x16] = 2; Word(r, 3, (ushort)(Word(r, 3) + 1)); r[0x17]--; if (r[0x17] == 0) r[0] = 0xff; return;
+        }
+        Word(r, 3, (ushort)(((bl & 7) << 2) + 0xf0)); r[0] = 0x14; r[0x16] = 2; r[0x17] = 4;
+        w.EffectAt(r[1], 0x93, r[5], 0, 0);   // ECX and EDX are not set by the script (zero in the check)
+        w.Sound35(0);
+    }
+
     public static void Fx54aKind16(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)   // B62
     {
         if (ah == 1) { Put(r, 0x12, U32(r, 0x12) - 1); if (U32(r, 0x12) == 0) r[0] = 0xff; return; }
