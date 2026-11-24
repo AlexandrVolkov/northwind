@@ -30,9 +30,13 @@ public partial class TestRunner
         public static byte[] RandomTable = [];
         public byte Random() => RandomTable[Index++];
         public byte Random10D() { int v = r10d.Count > 0 ? r10d[0] : 0; if (r10d.Count > 0) r10d.RemoveAt(0); log.Add((byte)'R'); log.Add((byte)v); return (byte)v; }
-        public bool Effect19(uint ebx, uint ecx, uint edx, uint a, uint b, uint cc)
+        public byte[] PartRec = new byte[0xf5], Ai = new byte[0x19f5];
+        public (byte[] Part, uint Ptr) Part6D() { log.Add((byte)'P'); return (PartRec, 0xe00); }
+        public byte[] Service1B7(byte al) { log.Add((byte)'Q'); log.Add(al); return Ai; }
+        public byte Tick => (byte)c.GetProperty("tick").GetInt32();
+        public bool Effect19(uint eax, uint ebx, uint ecx, uint edx, uint a, uint b, uint cc)
         {
-            log.Add((byte)'W'); foreach (var v in new[] { Rel(ebx), Rel(ecx), Rel(edx), a, b, cc }) log.AddRange(BitConverter.GetBytes(v));
+            log.Add((byte)'W'); foreach (var v in new[] { Rel(eax), Rel(ebx), Rel(ecx), Rel(edx), a, b, cc }) log.AddRange(BitConverter.GetBytes(v));
             bool zf = svc.Count > 0 ? svc[0].Zf : true; if (svc.Count > 0) svc.RemoveAt(0); return zf;
         }
         public void Jump(uint target, uint eax, uint ebx) { log.Add((byte)'J'); log.AddRange(BitConverter.GetBytes(target)); log.AddRange(BitConverter.GetBytes(eax)); log.AddRange(BitConverter.GetBytes(Rel(ebx))); }
@@ -56,11 +60,13 @@ public partial class TestRunner
             BitConverter.GetBytes(c.GetProperty("x").GetUInt32()).CopyTo(r, 7); BitConverter.GetBytes(c.GetProperty("y").GetUInt32()).CopyTo(r, 0xc); r[0x16] = (byte)c.GetProperty("f16").GetInt32(); r[0x17] = (byte)c.GetProperty("f17").GetInt32();
             BitConverter.GetBytes(c.GetProperty("f18").GetUInt32()).CopyTo(r, 0x18); BitConverter.GetBytes(c.GetProperty("f1c").GetUInt32()).CopyTo(r, 0x1c); BitConverter.GetBytes(c.GetProperty("f12").GetUInt32()).CopyTo(r, 0x12);
             var log = new List<byte>(); var world = new Army01EffectReplay(c, log);
-            BitConverter.GetBytes((ushort)c.GetProperty("o1").GetInt32()).CopyTo(world.Found, 1); BitConverter.GetBytes((ushort)c.GetProperty("o17").GetInt32()).CopyTo(world.Found, 0x17); world.Found[0x19] = (byte)c.GetProperty("o19").GetInt32();
+            world.Found[0] = (byte)c.GetProperty("o0").GetInt32(); world.Found[6] = (byte)c.GetProperty("o6").GetInt32(); BitConverter.GetBytes((ushort)c.GetProperty("o1").GetInt32()).CopyTo(world.Found, 1); BitConverter.GetBytes((ushort)c.GetProperty("o17").GetInt32()).CopyTo(world.Found, 0x17); world.Found[0x19] = (byte)c.GetProperty("o19").GetInt32();
             BitConverter.GetBytes(c.GetProperty("t40").GetUInt32()).CopyTo(world.Template, 0x40); world.Template[0x45] = (byte)c.GetProperty("t45").GetInt32(); BitConverter.GetBytes((ushort)c.GetProperty("t48").GetInt32()).CopyTo(world.Template, 0x48); world.Template[0x4a] = (byte)c.GetProperty("t4a").GetInt32(); world.Template[0x4b] = (byte)c.GetProperty("t4b").GetInt32(); world.Wind = (byte)c.GetProperty("wind").GetInt32();
             var parent = new byte[0x40]; BitConverter.GetBytes((ushort)c.GetProperty("p1").GetInt32()).CopyTo(parent, 1); parent[3] = (byte)c.GetProperty("p3").GetInt32(); BitConverter.GetBytes((ushort)c.GetProperty("p17").GetInt32()).CopyTo(parent, 0x17); parent[0x25] = (byte)c.GetProperty("p25").GetInt32();
             int ah = c.GetProperty("ah").GetInt32(), k = c.GetProperty("entry").GetInt32(); seen.Add(k); if (ah == 1) steps++;
-            world.Parent = parent; if (k >= 28) OriginalArmy00Effects.Run(world, r, ah, k - 28, parent, 0xa00, (uint)c.GetProperty("bl7").GetInt32());
+            world.Parent = parent; if (k >= 37) { BitConverter.GetBytes(c.GetProperty("p12").GetUInt32()).CopyTo(world.PartRec, 0x12); BitConverter.GetBytes(c.GetProperty("ai").GetUInt32()).CopyTo(world.Ai, 0x19f1); OriginalArmy03Effects.Wrapper(world, r, ah, k - 37, (uint)0xa00); }
+            else if (k == 36) OriginalArmy03Effects.Run(world, r, ah);
+            else if (k >= 28) OriginalArmy00Effects.Run(world, r, ah, k - 28, parent, 0xa00, (uint)c.GetProperty("bl7").GetInt32());
             else if (k >= 11) OriginalArmy02Effects.Run(world, r, ah, k - 11, parent, 0xa00); else OriginalArmy01Effects.Run(world, r, ah, k, parent, 0xa00);
             byte[] output = [.. r, .. world.Found, .. log];
             digest.AppendData(output);
@@ -69,7 +75,7 @@ public partial class TestRunner
         }
         GD.Print($"ARMY__01 effects: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("unit");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 36 && steps > 500, $"ARMY__01 effect reference coverage ({count} cases, {steps} steps)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 39 && steps > 500, $"ARMY__01 effect reference coverage ({count} cases, {steps} steps)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "ARMY__01.WRK effect scripts match original x86");
     }
 }
