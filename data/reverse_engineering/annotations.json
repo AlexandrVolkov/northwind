@@ -6212,6 +6212,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "The callees outside the function (8120, 43B0, 73F5, 7C63, BB26, 43B7, 802C, ...) are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-effect-pool-96cd",
+      "module": "LE:1",
+      "start": 38605,
+      "end": 38854,
+      "name": "Effect pool: update every live effect (96CD) and create an effect FS:19 (9727)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/effect-pool.md", "tests/fixtures/effect-pool.json", "tools/verify_effect_pool.py", "tests/OriginalEffectPoolChecks.cs"],
+      "implementation": ["scripts/OriginalEffectPool.cs"],
+      "limitations": "The effect scripts are a recorded stub in the check; the skirmish keeps its own effect lists"
     }
   ]
 }

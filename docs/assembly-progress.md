@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 98911 | 6265 | 97 | 41609 | 44 |
+| LE:1 | 146882 | 98662 | 6265 | 97 | 41858 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -283,6 +283,7 @@
 | LE:1 `0x9653..0x9688` | Turn one heading sector | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Включает исходный ZF от расчёта кадра; общий таймер обновлений задаётся вызывающей стороной. |
 | LE:1 `0x9688..0x96CD` | Direction toward world coordinates | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Исходная u32-арифметика и переполнения; правило отличается от направления локального поиска 79C0. |
 | LE:1 `0x9688..0x96CD` | Direction (0..7) from a point to a target by sign classes and the 2:1 ratio | ported | [tower.json](../tests/fixtures/tower.json); [verify_tower.py](../tools/verify_tower.py) | The table DS:19D7 is embedded; the same point returns FFh |
+| LE:1 `0x96CD..0x97C6` | Effect pool: update every live effect (96CD) and create an effect FS:19 (9727) | ported | [effect-pool.md](../docs/effect-pool.md); [effect-pool.json](../tests/fixtures/effect-pool.json); [verify_effect_pool.py](../tools/verify_effect_pool.py); [OriginalEffectPoolChecks.cs](../tests/OriginalEffectPoolChecks.cs) | The effect scripts are a recorded stub in the check; the skirmish keeps its own effect lists |
 | LE:1 `0x97C6..0x982B` | Object in an effect's cell and the terrain class | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) |  |
 | LE:1 `0x982B..0x98CC` | Object under an effect point with footprint containment | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Схватка пока бьёт явную цель вместо точки удара. |
 | LE:1 `0x98CC..0x996F` | Detach object from owner chain | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Корректная монотонная цепочка с достижимым объектом; момент смерти, порождение эффекта и повторное выделение записи не включены. |
