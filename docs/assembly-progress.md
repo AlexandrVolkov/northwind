@@ -7,7 +7,7 @@
 | LE:1 | 146882 | 101186 | 6265 | 97 | 39334 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 1722 | 100 | 0 | 3581 | 0 |
+| ARMY__00.WRK | 5403 | 1253 | 100 | 0 | 4050 | 0 |
 | ARMY__01.WRK | 4951 | 4576 | 0 | 0 | 375 | 7 |
 | ARMY__02.WRK | 6930 | 5296 | 855 | 0 | 779 | 7 |
 | ARMY__03.WRK | 13412 | 1956 | 0 | 0 | 11456 | 1 |
@@ -35,10 +35,15 @@
 | ARMY__00.WRK `0x762..0x7FE` | Effect type 6: hit on the object in the cell of the point (attack from experience) | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json); [verify_combat.py](../tools/verify_combat.py) | Who creates effects of type 6 in the campaign is not traced; the spark tail 6FE/735 is shared with the strike |
 | ARMY__00.WRK `0x7FE..0x85A` | Effect kind 7: smoke | ported | [object-scripts.md](../docs/object-scripts.md); [obj-fx7fe.json](../tests/fixtures/obj-fx7fe.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services (11, A5, AD, 35) are recorded stubs in the check; the skirmish draws sparks with its own adapter list |
 | ARMY__00.WRK `0x85A..0x8DA` | Catapult stone effect (type 8) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
+| ARMY__00.WRK `0x8DA..0x986` | Effect kind 9: a flame that plays 9 frames and goes out | ported | [object-scripts.md](../docs/object-scripts.md); [obj-fx8da.json](../tests/fixtures/obj-fx8da.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services (11, A1, A5, A9, AD, 35, 19) are recorded stubs in the check; not wired into the skirmish |
 | ARMY__00.WRK `0x986..0x9D5` | Explosion effect (type 10) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) | drift vector 9E7D not ported |
 | ARMY__00.WRK `0x9D5..0xA44` | Smoke column effect (type 0Bh) | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) |  |
 | ARMY__00.WRK `0xA44..0xA6C` | Big explosion effect (type 0Ch) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
+| ARMY__00.WRK `0xA6C..0xAB4` | Effect kind 0Dh: an explosion with 3 fragments | ported | [object-scripts.md](../docs/object-scripts.md); [obj-fxa6c.json](../tests/fixtures/obj-fxa6c.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services (11, A1, A5, A9, AD, 35, 19) are recorded stubs in the check; not wired into the skirmish |
+| ARMY__00.WRK `0xAB4..0xAEB` | Effect kind 0Eh: a large explosion with 5 fragments | ported | [object-scripts.md](../docs/object-scripts.md); [obj-fxab4.json](../tests/fixtures/obj-fxab4.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services (11, A1, A5, A9, AD, 35, 19) are recorded stubs in the check; not wired into the skirmish |
 | ARMY__00.WRK `0xAD5..0xAEB` | Two-tick frame loop of explosions | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
+| ARMY__00.WRK `0xAEB..0xB62` | Effect kind 0Fh: a mark that follows an object (FS:A1) | ported | [object-scripts.md](../docs/object-scripts.md); [obj-fxaeb.json](../tests/fixtures/obj-fxaeb.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services (11, A1, A5, A9, AD, 35, 19) are recorded stubs in the check; not wired into the skirmish |
+| ARMY__00.WRK `0xB62..0xBAB` | Effect kind 10h: a flame at its creator | ported | [object-scripts.md](../docs/object-scripts.md); [obj-fxb62.json](../tests/fixtures/obj-fxb62.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services (11, A1, A5, A9, AD, 35, 19) are recorded stubs in the check; not wired into the skirmish |
 | ARMY__00.WRK `0xBAB..0xC8A` | Fire shot effect (type 11h) | ported | [combat.md](../docs/combat.md); [fire.json](../tests/fixtures/fire.json) | CE3 fire and FA4 deflection are continuations |
 | ARMY__00.WRK `0xC8A..0xCE3` | Smoke trail effect (type 12h) | ported | [combat.md](../docs/combat.md); [fire.json](../tests/fixtures/fire.json) |  |
 | ARMY__00.WRK `0xCE3..0xFA4` | Fire effect (types 13h..15h) | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) | 9727, A47E and CFAC are calls of the caller |

@@ -4964,6 +4964,66 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fx7fe.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services (11, A5, AD, 35) are recorded stubs in the check; the skirmish draws sparks with its own adapter list"
+    },
+    {
+      "id": "army00-fx8da-8da",
+      "module": "ARMY__00.WRK",
+      "start": 2266,
+      "end": 2438,
+      "name": "Effect kind 9: a flame that plays 9 frames and goes out",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fx8da.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services (11, A1, A5, A9, AD, 35, 19) are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army00-fxa6c-a6c",
+      "module": "ARMY__00.WRK",
+      "start": 2668,
+      "end": 2740,
+      "name": "Effect kind 0Dh: an explosion with 3 fragments",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fxa6c.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services (11, A1, A5, A9, AD, 35, 19) are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army00-fxab4-ab4",
+      "module": "ARMY__00.WRK",
+      "start": 2740,
+      "end": 2795,
+      "name": "Effect kind 0Eh: a large explosion with 5 fragments",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fxab4.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services (11, A1, A5, A9, AD, 35, 19) are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army00-fxaeb-aeb",
+      "module": "ARMY__00.WRK",
+      "start": 2795,
+      "end": 2914,
+      "name": "Effect kind 0Fh: a mark that follows an object (FS:A1)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fxaeb.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services (11, A1, A5, A9, AD, 35, 19) are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army00-fxb62-b62",
+      "module": "ARMY__00.WRK",
+      "start": 2914,
+      "end": 2987,
+      "name": "Effect kind 10h: a flame at its creator",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fxb62.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services (11, A1, A5, A9, AD, 35, 19) are recorded stubs in the check; not wired into the skirmish"
     }
   ]
 }
