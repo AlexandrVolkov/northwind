@@ -18,7 +18,8 @@ public interface IRufinWorld
     void Remove(byte[] record);                   // FS:15 = 98CC
     void Redraw();                                // FS:1D
     IReadOnlyList<byte[]> Territory();            // FS:163: the objects of the mage's territory
-    bool IsBuilding(byte[] record, out byte threshold);                  // the template of the object: flag 8 and not 20h, DAT[46]
+    bool IsBuilding(byte[] record, out byte threshold);
+    uint ObjectFlags(byte[] record, out byte threshold);   // the template flags (DAT[40]) and the condition threshold (DAT[46]) of the object                  // the template of the object: flag 8 and not 20h, DAT[46]
     void StandardVitals(); void StandardActions();   // FS:DD, FS:E1 (the unit step of every object)
     void Voice(ushort id);                        // FS:111 (AH = 2)
     void Appearance(byte army);                   // FS:4D (AH = 0)

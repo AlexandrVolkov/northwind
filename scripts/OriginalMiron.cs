@@ -37,7 +37,7 @@ public static class OriginalMiron
         OriginalRufin.Standard(w);
     }
 
-    private static void Grudge(IMironWorld w, byte[] r, uint ticks) => BinaryPrimitives.WriteUInt32LittleEndian(r.AsSpan(0x4d), w.Time + ticks);
+    internal static void Grudge(IMironWorld w, byte[] r, uint ticks) => BinaryPrimitives.WriteUInt32LittleEndian(r.AsSpan(0x4d), w.Time + ticks);
 
     /// <summary>1748..1827: the answers; false: the iteration ends (1980).</summary>
     private static bool Answers(IMironWorld w, byte[] r, int owner, int p)
@@ -102,7 +102,7 @@ public static class OriginalMiron
     }
 
     /// <summary>1992..19FC: once in 256 updates a phantom appears at a free spot near a random point of the map.</summary>
-    private static void Summon(IMironWorld w, byte[] r)
+    internal static void Summon(IMironWorld w, byte[] r)
     {
         uint x = (uint)(((w.Random() * (byte)(w.Dim4 >> 5)) >> 8) << 5);
         uint y = (uint)(((w.Random2() * (byte)(w.Dim0 >> 5)) >> 8) << 5);

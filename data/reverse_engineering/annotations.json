@@ -4376,6 +4376,66 @@
       "evidence": ["docs/rufin.md", "tests/fixtures/miron.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
       "implementation": ["scripts/OriginalMiron.cs"],
       "limitations": "FS services (including FS:187 and FS:19B) are recorded stubs; FS:0/FS:4 are taken as the map size in pixels; the continuation after the FS:E1 table (1A20.., a different vanish trigger by +17 bit 0) is not ported; in the skirmish FS:19B is done by the phantom spawn"
+    },
+    {
+      "id": "army03-magus-1a6e",
+      "module": "ARMY__03.WRK",
+      "start": 6766,
+      "end": 7384,
+      "name": "Script of the hermit Magus (template 17)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/magus.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
+      "implementation": ["scripts/OriginalMagus.cs"],
+      "limitations": "FS services are recorded stubs (as for Rufin); the continuation after the FS:E1 table is shared with Rufin's cloak (OriginalMageCloak) or not ported; FS:18B (regions of the campaign) is 0 in the skirmish"
+    },
+    {
+      "id": "army03-kevin-1d72",
+      "module": "ARMY__03.WRK",
+      "start": 7538,
+      "end": 7891,
+      "name": "Script of the hermit Kevin (template 18)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/kevin.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
+      "implementation": ["scripts/OriginalKevin.cs"],
+      "limitations": "FS services are recorded stubs (as for Rufin); the continuation after the FS:E1 table is shared with Rufin's cloak (OriginalMageCloak) or not ported"
+    },
+    {
+      "id": "army03-garik-1f39",
+      "module": "ARMY__03.WRK",
+      "start": 7993,
+      "end": 8311,
+      "name": "Script of the hermit Garik (template 19)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/garik.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
+      "implementation": ["scripts/OriginalGarik.cs"],
+      "limitations": "FS services are recorded stubs (as for Rufin); the continuation after the FS:E1 table is shared with Rufin's cloak (OriginalMageCloak) or not ported"
+    },
+    {
+      "id": "army03-efil-2111",
+      "module": "ARMY__03.WRK",
+      "start": 8465,
+      "end": 9267,
+      "name": "Script of the hermit Efil (template 20)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/efil.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
+      "implementation": ["scripts/OriginalEfil.cs"],
+      "limitations": "FS services are recorded stubs (as for Rufin); the continuation after the FS:E1 table is shared with Rufin's cloak (OriginalMageCloak) or not ported; as Miron, FS:0/FS:4 taken as the map size"
+    },
+    {
+      "id": "army03-kochet-2499",
+      "module": "ARMY__03.WRK",
+      "start": 9369,
+      "end": 9846,
+      "name": "Script of the hermit Kochet (template 21): thanks, the take-over of thirty units (FS:75, FS:193)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/kochet.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
+      "implementation": ["scripts/OriginalKochet.cs"],
+      "limitations": "FS services are recorded stubs (as for Rufin); the continuation after the FS:E1 table is shared with Rufin's cloak (OriginalMageCloak) or not ported; the transfer of ownership D1BA is not ported in the skirmish (log only)"
     }
   ]
 }

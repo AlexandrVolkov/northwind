@@ -129,12 +129,17 @@ public sealed partial class Skirmish
             _rufinWorld.Prepare(mage);
             if (mage.Alive)
             {
-                // each hermit has his own script (ARMY__03.WRK); those not ported yet (16..21) still run Rufin's (adapter)
+                // each hermit has his own script (ARMY__03.WRK); all eight hermits (13..21) run their own
                 switch (mage.Source.TemplateIndex)
                 {
                     case 14: OriginalOnis.Step(_rufinWorld, mage.Record); break;
                     case 15: OriginalIrvil.Step(_rufinWorld, mage.Record); break;
                     case 16: OriginalMiron.Step(_rufinWorld, mage.Record); break;
+                    case 17: OriginalMagus.Step(_rufinWorld, mage.Record); break;
+                    case 18: OriginalKevin.Step(_rufinWorld, mage.Record); break;
+                    case 19: OriginalGarik.Step(_rufinWorld, mage.Record); break;
+                    case 20: OriginalEfil.Step(_rufinWorld, mage.Record); break;
+                    case 21: OriginalKochet.Step(_rufinWorld, mage.Record); break;
                     default: OriginalRufin.Step(_rufinWorld, mage.Record); break;
                 }
             }
@@ -242,8 +247,16 @@ public sealed partial class Skirmish
         for (int s = 0; s < 8; s++) if (Diplomacy.Queue[line.Speaker, s].Type == line.Type && Diplomacy.Queue[line.Speaker, s].Other == Rules.PlayerSlot) Diplomacy.Queue[line.Speaker, s].Type = 0xff;
     }
 
-    private sealed class SkirmishRufinWorld(Skirmish battle) : IMironWorld
+    private sealed class SkirmishRufinWorld(Skirmish battle) : IMironWorld, IMagusWorld, IKochetWorld
     {
+        public byte CountFreeRegions(byte army) => 0;   // ADAPTER: FS:18B counts regions of the campaign layer (OriginalCampaignRegions); a skirmish has none
+        public byte[]? NearestUnit(byte[] hermit, uint mask, uint value)   // C439: the nearest living object of the participant in +3 whose template flags & mask = value
+        {
+            var self = battle.Actors.FirstOrDefault(a => ReferenceEquals(a.Record, hermit)); if (self == null) return null;
+            return battle.Actors.Where(a => a.Alive && a.Record[3] == hermit[3] && !ReferenceEquals(a, self) && (BinaryPrimitives.ReadUInt32LittleEndian(a.Parameters.AsSpan(0x40)) & mask) == value && (sbyte)a.Record[0x19] > (sbyte)a.Parameters[0x46])
+                .OrderBy(a => Math.Max(Math.Abs(a.Position.X - self.Position.X), Math.Abs(a.Position.Y - self.Position.Y))).FirstOrDefault()?.Record;
+        }
+        public void TakeOver(byte[] unit, byte newOwner) => battle.Log("Кочет переманивает бойца.");   // ADAPTER: the transfer of ownership D1BA is not ported
         public uint Time => (uint)(battle.Elapsed * 72.8165);
         public uint Dim4 => (uint)battle.Map.Width * 32; public uint Dim0 => (uint)battle.Map.Height * 32;   // ADAPTER: FS:4 and FS:0 are taken as the map size in pixels (x from FS:4, y from FS:0)
         public byte Random2() => battle._terrainCatalog.NextSecondaryByte();
@@ -294,6 +307,11 @@ public sealed partial class Skirmish
             _byRecord.Clear();
             foreach (var a in battle.Actors.Where(a => a.Alive && a.Structure && a.Position.DistanceTo(_mage.Position) < 20 * 32)) _byRecord[a.Record] = a;
             return _byRecord.Keys.ToList();
+        }
+        public uint ObjectFlags(byte[] record, out byte threshold)
+        {
+            threshold = 0; if (!_byRecord.TryGetValue(record, out var a)) return 0;
+            threshold = a.Parameters[0x46]; return BinaryPrimitives.ReadUInt32LittleEndian(a.Parameters.AsSpan(0x40));
         }
         public bool IsBuilding(byte[] record, out byte threshold)
         {

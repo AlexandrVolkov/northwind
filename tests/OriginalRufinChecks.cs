@@ -5,8 +5,18 @@ using Northwind;
 
 public partial class TestRunner
 {
-    private sealed class RufinTestWorld : IMironWorld
+    private sealed class RufinTestWorld : IMironWorld, IMagusWorld, IKochetWorld
     {
+        public List<(int Zf, int Index)> Near = []; public int LastNear;
+        public byte[]? NearestUnit(byte[] hermit, uint mask, uint value)
+        {
+            Log.Add((byte)'N'); Log.Add(hermit[3]); Log.AddRange(BitConverter.GetBytes(mask));
+            if (Near.Count == 0) return null; var (zf, index) = Near[0]; Near.RemoveAt(0); LastNear = index;
+            return zf != 0 ? null : (index < Pool.Count ? Pool[index] : new byte[0x40]);
+        }
+        public void TakeOver(byte[] unit, byte newOwner) { Log.Add((byte)'X'); Log.Add(newOwner); Log.AddRange(BitConverter.GetBytes((uint)(0x40 * LastNear))); }
+        public byte FreeRegions;
+        public byte CountFreeRegions(byte army) { Log.Add((byte)'K'); Log.Add(army); return FreeRegions; }
         public uint Time { get; set; } public uint Dim0 { get; set; } public uint Dim4 { get; set; }
         public bool SpotOk; public uint SpotX, SpotY;
         public byte RandomIndex2; public byte Random2() => RandomTable[RandomIndex2++];
@@ -30,6 +40,7 @@ public partial class TestRunner
         public void Remove(byte[] record) { Log.Add((byte)'R'); Log.AddRange(BitConverter.GetBytes(0x600u)); }
         public void Redraw() => Log.Add((byte)'D');
         public IReadOnlyList<byte[]> Territory() { Log.Add((byte)'T'); return TerritoryIndices.Select(i => Pool[i]).ToList(); }
+        public uint ObjectFlags(byte[] record, out byte threshold) { threshold = 10; return Flags[(record[0], record[0x0e])]; }
         public bool IsBuilding(byte[] record, out byte threshold) { threshold = 10; uint f = Flags[(record[0], record[0x0e])]; return (f & 8) != 0 && (f & 0x20) == 0; }
         public void StandardVitals() => Log.Add((byte)'V'); public void StandardActions() => Log.Add((byte)'U');
         public void Voice(ushort id) { Log.Add((byte)'Y'); Log.AddRange(BitConverter.GetBytes((uint)id)); }
@@ -42,9 +53,14 @@ public partial class TestRunner
     private void OriginalOnisChecks() => HermitReplay("onis", "onis", "Onis' quest script ARMY__03.WRK DBF", 100, (w, r, ah) => { if (ah == 0) OriginalOnis.Initialize(w, r, 7); else if (ah == 1) OriginalOnis.Step(w, r); else OriginalOnis.Voice(w); });
 
     private void OriginalMironChecks() => HermitReplay("miron", "miron", "Miron's quest script ARMY__03.WRK 16C8", 50, (w, r, ah) => { if (ah == 0) OriginalMiron.Initialize(w, r, 7); else if (ah == 1) OriginalMiron.Step(w, r); else OriginalMiron.Voice(w); }, 0, 0);
+    private void OriginalKevinChecks() => HermitReplay("kevin", "kevin", "Kevin's script ARMY__03.WRK 1D72", 50, (w, r, ah) => { if (ah == 0) OriginalKevin.Initialize(w, r, 7); else if (ah == 1) OriginalKevin.Step(w, r); else OriginalKevin.Voice(w); }, 0, 0, 0);
+    private void OriginalGarikChecks() => HermitReplay("garik", "garik", "Garik's script ARMY__03.WRK 1F39", 20, (w, r, ah) => { if (ah == 0) OriginalGarik.Initialize(w, r, 7); else if (ah == 1) OriginalGarik.Step(w, r); else OriginalGarik.Voice(w); }, 0, 0, 0);
+    private void OriginalMagusChecks() => HermitReplay("magus", "magus", "Magus' script ARMY__03.WRK 1A6E", 50, (w, r, ah) => { if (ah == 0) OriginalMagus.Initialize(w, r, 7); else if (ah == 1) OriginalMagus.Step(w, r); else OriginalMagus.Voice(w); }, 0, 0, 0);
+    private void OriginalEfilChecks() => HermitReplay("efil", "efil", "Efil's script ARMY__03.WRK 2111", 50, (w, r, ah) => { if (ah == 0) OriginalEfil.Initialize(w, r, 7); else if (ah == 1) OriginalEfil.Step(w, r); else OriginalEfil.Voice(w); }, 0, 0, 0);
+    private void OriginalKochetChecks() => HermitReplay("kochet", "kochet", "Kochet's script ARMY__03.WRK 2499", 30, (w, r, ah) => { if (ah == 0) OriginalKochet.Initialize(w, r, 7); else if (ah == 1) OriginalKochet.Step(w, r); else OriginalKochet.Voice(w); }, 0, 0, 0);
     private void OriginalIrvilChecks() => HermitReplay("irvil", "irvil", "Irvil's quest script ARMY__03.WRK 1297", 100, (w, r, ah) => { if (ah == 0) OriginalIrvil.Initialize(w, r, 7); else if (ah == 1) OriginalIrvil.Step(w, r); else OriginalIrvil.Voice(w); }, 0);
 
-    private void HermitReplay(string file, string key, string label, int minSpeeches, Action<RufinTestWorld, byte[], int> run, int minCreations = 2, int minSweeps = 2)
+    private void HermitReplay(string file, string key, string label, int minSpeeches, Action<RufinTestWorld, byte[], int> run, int minCreations = 2, int minSweeps = 2, int minReveals = 6)
     {
         using var reference = GameData.Read<JsonDocument>($"res://tests/fixtures/{file}.json");
         var root = reference.RootElement;
@@ -74,6 +90,8 @@ public partial class TestRunner
             foreach (var m in c.GetProperty("masks").EnumerateObject()) BitConverter.GetBytes((uint)m.Value.GetInt32()).CopyTo(r, Convert.ToInt32(m.Name, 16));
             BitConverter.GetBytes((ushort)c.GetProperty("word47").GetInt32()).CopyTo(r, 0x47);
             int ah = c.GetProperty("ah").GetInt32();
+            if (c.TryGetProperty("near", out var near)) world.Near = near.EnumerateArray().Select(e => (e[0].GetInt32(), e[1].GetInt32())).ToList();
+            if (c.TryGetProperty("free", out var free)) world.FreeRegions = (byte)free.GetInt32();
             if (c.TryGetProperty("time", out var time))
             {
                 world.Time = (uint)time.GetInt64(); world.Dim4 = (uint)c.GetProperty("dim4").GetInt32(); world.Dim0 = (uint)c.GetProperty("dim0").GetInt32();
@@ -91,7 +109,7 @@ public partial class TestRunner
         }
         GD.Print($"{key}: first mismatch {firstMismatch}; speeches {speeches}, creations {created}, reveals {reveals}, sweeps {sweeps}");
         var summary = root.GetProperty("results").GetProperty(key);
-        Check(count == summary.GetProperty("case_count").GetInt32() && speeches > minSpeeches && created >= minCreations && reveals > 5 && sweeps >= minSweeps, $"{key} reference coverage ({count}: {speeches} speeches, {created} creations, {reveals} reveals, {sweeps} sweeps)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && speeches > minSpeeches && created >= minCreations && reveals >= minReveals && sweeps >= minSweeps, $"{key} reference coverage ({count}: {speeches} speeches, {created} creations, {reveals} reveals, {sweeps} sweeps)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), $"{label} matches original x86");
     }
 }
