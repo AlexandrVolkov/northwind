@@ -31,6 +31,9 @@ public interface IObjectScriptWorld
     (bool Found, byte[]? Object) Scan17B(uint eax, uint ebx, uint ecx, uint edx, uint esi);   // FS:17B (D895) with the registers set by the script
     void Say143(byte message, byte participant, byte speakerOwner);   // FS:143
     void Jump131();                                   // the tail jump to FS:131
+    void Voice();                                     // FS:D1
+    void Service115();                                // FS:115
+    uint TemplateFlagsOf71();                         // FS:71: DAT[40] of the template of EDI
     void Service25(uint parent, byte bl);             // FS:25
     void Service29(byte bl);                          // FS:29
     void Sound35(uint id);                            // FS:35
@@ -692,6 +695,23 @@ public static class OriginalObjectScripts
         if ((uint)ax > (uint)bx) dl = (byte)(dl + cl); else dl = (byte)(4 + ch);
         r[0x22] = (byte)(dl & 7);
         Put(r, 0x23, (uint)(w.Random() + 0x2710));
+    }
+
+    /// <summary>The siege weapons (the catapult WRK F86 and the ballista 1462 of ARMY__02.WRK; the same code): AH = 0 the first state, the appearance BL, the random +2E and the army in +32; AH = 1 the debris
+    /// (effects 16h, 17h, 18h at its point) when its health is gone while it is dying (+17 bits 18h = 10h), the redraw, the vitals, FS:115 and — unless +31 = FF — the unit step; AH = 2 the voice;
+    /// AH = 5 (can it be loaded?): with +31 = FF the template flag 1000h of the object. Returns ZF of AH = 5.</summary>
+    public static bool Siege(IObjectScriptWorld w, byte[] r, int ah, byte bl, bool ballista = false)
+    {
+        if (ah == 0) { r[0x0f] = 7; w.Appearance(bl); r[0x2e] = w.Random(); r[0x32] = r[0]; return false; }
+        if (ah == 2) { w.Voice(); return false; }
+        if (ah == 5) { if (r[0x31] != 0xff) return false; return (~w.TemplateFlagsOf71() & 0x1000) == 0; }
+        if (ah != 1) return false;
+        if (r[0x19] == 0 && (r[0x17] & 0x18) == 0x10)
+            foreach (byte kind in ballista ? new byte[] { 0x16, 0x18 } : new byte[] { 0x16, 0x17, 0x18 }) w.EffectAt(r[0], kind, 1, U32(r, 4), U32(r, 8));   // the ballista throws two kinds of debris
+        if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); }
+        w.Vitals(); w.Service115();
+        if (r[0x31] == 0xff) return false;
+        r[0x0f] = 7; w.Actions(); return false;
     }
 
     public static void Fx54aKind16(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)   // B62

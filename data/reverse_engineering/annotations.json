@@ -5216,6 +5216,30 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-camp.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army02-catapult-f86",
+      "module": "ARMY__02.WRK",
+      "start": 3974,
+      "end": 4216,
+      "name": "Catapult (template 16): init, debris, step, voice, loading check",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-siege.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services (4D, DD, E1, 115, 71, 19) are recorded stubs in the check; the skirmish drives the siege weapons by its own adapters"
+    },
+    {
+      "id": "army02-ballista-1462",
+      "module": "ARMY__02.WRK",
+      "start": 5218,
+      "end": 5454,
+      "name": "Ballista (template 26): as the catapult with two kinds of debris",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-siege.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services (4D, DD, E1, 115, 71, 19) are recorded stubs in the check; the skirmish drives the siege weapons by its own adapters"
     }
   ]
 }
