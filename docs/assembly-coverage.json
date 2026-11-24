@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "a34dabff3bed7050c77f603c5e578f8ebbffde56fc20e06b298a3df198ab83ef",
+  "annotation_sha256": "a799af6aa942e1b3c2e2eea305f5ad57ac65bc7127899df542467ba876fba052",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3175,8 +3175,8 @@
       "sha256": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33",
       "byte_status": {
         "partial": 100,
-        "ported": 3581,
-        "unreviewed": 1722
+        "ported": 4050,
+        "unreviewed": 1253
       },
       "linear_rows": 1709,
       "flow_candidate_instructions": 416,
@@ -3324,9 +3324,11 @@
         {
           "start": 2266,
           "end": 2438,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fx8da-8da"
+          ]
         },
         {
           "start": 2438,
@@ -3357,10 +3359,21 @@
         },
         {
           "start": 2668,
+          "end": 2740,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fxa6c-a6c"
+          ]
+        },
+        {
+          "start": 2740,
           "end": 2773,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fxab4-ab4"
+          ]
         },
         {
           "start": 2773,
@@ -3368,15 +3381,27 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "frame-loop-2"
+            "frame-loop-2",
+            "army00-fxab4-ab4"
           ]
         },
         {
           "start": 2795,
+          "end": 2914,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fxaeb-aeb"
+          ]
+        },
+        {
+          "start": 2914,
           "end": 2987,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fxb62-b62"
+          ]
         },
         {
           "start": 2987,

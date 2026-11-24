@@ -22,6 +22,9 @@ public interface IObjectScriptWorld
     void EffectAt(byte army, byte type, byte layer, uint x, uint y);   // FS:19 called with registers only
     byte[]? FindObject(byte owner, byte army, byte template, byte skip);   // FS:14F = 11BE0
     void ClearQuestField(byte[] record);              // [participant of the owner + 12h] = 0 (FS:6D)
+    (bool Zf, byte Al, byte[] Object, uint Reference) ServiceA1();   // FS:A1 (ZF = nothing found)
+    byte ServiceA9(ushort ax);                        // FS:A9
+    byte[]? ObjectAt(uint reference);                 // the object of a reference
     void Sound35(uint id);                            // FS:35
     (bool Zf, byte Al) Service11(uint eax);           // FS:11
     bool ServiceA5();                                 // FS:A5: ZF
@@ -487,6 +490,72 @@ public static class OriginalObjectScripts
             return;
         }
         Word(r, 3, (ushort)((bl & 0xf) + 0x39)); r[0] = 7; r[0x16] = w.Random(); w.ServiceAD(3, 0x0e);
+    }
+
+    public static void Fx54aKind16(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)   // B62
+    {
+        if (ah == 1) { Put(r, 0x12, U32(r, 0x12) - 1); if (U32(r, 0x12) == 0) r[0] = 0xff; return; }
+        Word(r, 3, (ushort)((parent[0x25] & 7) + 1)); Put(r, 0x12, 0x2bc); r[0] = 0x10; Put(r, 7, U32(r, 7) + 1); Put(r, 0xc, U32(r, 0xc) + 0x0b);
+        w.Sound35(0x0f); var (zf, al) = w.Service11(0x0f);
+        if (!zf || al != 4) r[0] = 0xff;
+    }
+
+    /// <summary>Kind 9 (8DA): a burning flame of two frame sets (17Ah and 183h) with its own life: on layer 0 it only burns down; otherwise it plays 9 frames, asks FS:A5 and FS:A9 what stands there and goes out.</summary>
+    public static void Fx8da(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah == 0)
+        {
+            Word(r, 3, (w.Random() & 1) != 0 ? (ushort)0x17a : (ushort)0x183); r[0] = 9; r[0x16] = 9; r[0x17] = 1; w.ServiceAD(5, 4); return;
+        }
+        if (r[5] == 0) { r[0x16]--; if (r[0x16] == 0) r[0] = 0xff; return; }
+        r[0x17] = (byte)(r[0x17] + 0x80);
+        if ((r[0x17] & 0x80) != 0)
+        {
+            Word(r, 3, (ushort)(Word(r, 3) + 1)); r[0x16]--;
+            if (r[0x16] == 0) { Word(r, 3, (ushort)(Word(r, 3) - 9)); r[0x16] = 9; }
+        }
+        if (!w.ServiceA5()) return;
+        w.Sound35(0x13);
+        byte al = w.ServiceA9(4); al--;
+        if (al == 0) { r[0] = 0xff; return; }
+        al--;
+        if (al == 0) { w.Sound35(0x12); r[0] = 0xff; return; }
+        if ((r[0x17] & 1) != 0) { r[0x17] &= 0xfe; w.ServiceAD(1, 2); return; }
+        r[0x16] = 0; r[5] = 0;
+    }
+
+    /// <summary>Kinds 0Dh and 0Eh (A6C, AB4): an explosion — the frames from 97h (0A9h), two updates each, 12h of them; at BL ≥ 4 it throws 3 (5) fragments (effect 9).</summary>
+    public static void Explosion(IObjectScriptWorld w, byte[] r, int ah, byte bl, bool large)
+    {
+        if (ah == 1)
+        {
+            r[0x16]--; if (r[0x16] != 0) return;
+            r[0x16] = 2; Word(r, 3, (ushort)(Word(r, 3) + 1)); r[0x17]--; if (r[0x17] == 0) r[0] = 0xff; return;
+        }
+        Word(r, 3, large ? (ushort)0xa9 : (ushort)0x97); r[0] = large ? (byte)0x0e : (byte)0x0d; w.Sound35(large ? 0x0bu : 0x0au);
+        r[0x16] = 2; r[0x17] = 0x12;
+        if (bl < 4) return;
+        for (int i = large ? 5 : 3; i > 0; i--) w.EffectAt(r[1], 9, 1, U32(r, 7), U32(r, 0xc));
+    }
+
+    /// <summary>Kind 0Fh (AEB): a mark that follows an object (FS:A1): it takes the frame and the health of the found object and disappears when the object is gone, changed or dead, or after +16 updates.</summary>
+    public static void Fxaeb(IObjectScriptWorld w, byte[] r, int ah, byte bl)
+    {
+        if (ah == 1)
+        {
+            uint reference = U32(r, 0x18);
+            if (reference != 0)
+            {
+                var o = w.ObjectAt(reference)!;
+                if ((sbyte)o[0x19] <= 0) { r[0] = 0xff; return; }
+                if (o[0x19] != r[0x17] && Word(o, 1) != U32(r, 0x1c)) { r[0] = 0xff; return; }
+            }
+            r[0x16]--; if (r[0x16] == 0) r[0] = 0xff; return;
+        }
+        Word(r, 3, (ushort)((bl & 0xf) + 0x39)); r[0] = 0x0f; r[0x16] = 0; Put(r, 0x18, 0);
+        var (zf, al, obj, reference2) = w.ServiceA1();
+        if (!zf) { Put(r, 0x1c, Word(obj, 1)); r[0x17] = obj[0x19]; Put(r, 0x18, reference2); return; }
+        if (al == 1 || al == 2) r[0] = 0xff; else r[5] = 1;
     }
 
     private static void Redraw(IObjectScriptWorld w, byte[] r) { if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); } }
