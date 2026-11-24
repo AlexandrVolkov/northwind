@@ -7,7 +7,7 @@
 | LE:1 | 146882 | 101186 | 6265 | 97 | 39334 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 1253 | 100 | 0 | 4050 | 0 |
+| ARMY__00.WRK | 5403 | 1027 | 100 | 0 | 4276 | 0 |
 | ARMY__01.WRK | 4951 | 4576 | 0 | 0 | 375 | 7 |
 | ARMY__02.WRK | 6930 | 5296 | 855 | 0 | 779 | 7 |
 | ARMY__03.WRK | 13412 | 1956 | 0 | 0 | 11456 | 1 |
@@ -48,6 +48,8 @@
 | ARMY__00.WRK `0xC8A..0xCE3` | Smoke trail effect (type 12h) | ported | [combat.md](../docs/combat.md); [fire.json](../tests/fixtures/fire.json) |  |
 | ARMY__00.WRK `0xCE3..0xFA4` | Fire effect (types 13h..15h) | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) | 9727, A47E and CFAC are calls of the caller |
 | ARMY__00.WRK `0xFA4..0xFD1` | Embers effect (type 16h) | ported | [combat.md](../docs/combat.md); [burn.json](../tests/fixtures/burn.json) |  |
+| ARMY__00.WRK `0xFD1..0x1012` | Effect kind 17h: a flame at its creator | ported | [object-scripts.md](../docs/object-scripts.md); [obj-fxfd1.json](../tests/fixtures/obj-fxfd1.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; not wired into the skirmish |
+| ARMY__00.WRK `0x1012..0x10B3` | Effect kind 18h: a burst of 5 frames | ported | [object-scripts.md](../docs/object-scripts.md); [obj-fx1012.json](../tests/fixtures/obj-fx1012.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; not wired into the skirmish |
 | ARMY__00.WRK `0x12EC..0x13A3` | Ballista bolt effect (type 1Dh) | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | ARMY__01.WRK `0x0..0x7F` | Standard unit script (swordsman): init, step, voice | ported | [object-scripts.md](../docs/object-scripts.md); [unit-scripts.json](../tests/fixtures/unit-scripts.json); [verify_unit_scripts.py](../tools/verify_unit_scripts.py); [OriginalUnitScriptChecks.cs](../tests/OriginalUnitScriptChecks.cs) | FS services are recorded stubs in the check; the skirmish drives the units by its own adapters |
 | ARMY__01.WRK `0x7F..0xFE` | Standard unit script (archer): init, step, voice | ported | [object-scripts.md](../docs/object-scripts.md); [unit-scripts.json](../tests/fixtures/unit-scripts.json); [verify_unit_scripts.py](../tools/verify_unit_scripts.py); [OriginalUnitScriptChecks.cs](../tests/OriginalUnitScriptChecks.cs) | FS services are recorded stubs in the check; the skirmish drives the units by its own adapters |

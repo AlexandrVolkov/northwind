@@ -25,6 +25,8 @@ public interface IObjectScriptWorld
     (bool Zf, byte Al, byte[] Object, uint Reference) ServiceA1();   // FS:A1 (ZF = nothing found)
     byte ServiceA9(ushort ax);                        // FS:A9
     byte[]? ObjectAt(uint reference);                 // the object of a reference
+    void Service25(uint parent, byte bl);             // FS:25
+    void Service29(byte bl);                          // FS:29
     void Sound35(uint id);                            // FS:35
     (bool Zf, byte Al) Service11(uint eax);           // FS:11
     bool ServiceA5();                                 // FS:A5: ZF
@@ -490,6 +492,40 @@ public static class OriginalObjectScripts
             return;
         }
         Word(r, 3, (ushort)((bl & 0xf) + 0x39)); r[0] = 7; r[0x16] = w.Random(); w.ServiceAD(3, 0x0e);
+    }
+
+    public static void FxKind17(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)   // FD1
+    {
+        if (ah == 1) { Put(r, 0x12, U32(r, 0x12) - 1); if (U32(r, 0x12) == 0) r[0] = 0xff; return; }
+        Word(r, 3, (ushort)((parent[0x25] & 7) + 0x11)); Put(r, 0x12, 0x2bc); r[0] = 0x17;
+        w.Sound35(0x11); var (zf, al) = w.Service11(0x11);
+        if (!zf || al != 4) r[0] = 0xff;
+    }
+
+    /// <summary>Kind 18h (1012): a burst of 5 frames (18Ch + 5·k) played 3 updates each at the point of the creator, who is told twice (FS:25, FS:29); after the frames it looks what stands there (FS:A5, FS:A9) and burns out.</summary>
+    public static void Fx1012(IObjectScriptWorld w, byte[] r, int ah, uint parentReference)
+    {
+        if (ah == 0)
+        {
+            int k = (w.Random() * 5) >> 8; Word(r, 3, (ushort)(5 * k + 0x18c)); r[0] = 0x18; r[0x16] = 3; r[0x17] = 5;
+            w.Service25(parentReference, 0); w.Service29(8); return;
+        }
+        if (r[0x16] < 0x0a)
+        {
+            if ((w.Tick & 1) == 0)
+            {
+                Word(r, 3, (ushort)(Word(r, 3) + 1)); r[0x17]--;
+                if (r[0x17] == 0) { Word(r, 3, (ushort)(Word(r, 3) - 5)); r[0x17] = 5; }
+            }
+            if (!w.ServiceA5()) return;
+            byte al = w.ServiceA9(0x010a);
+            if (al == 1 || al == 2) { r[0] = 0xff; return; }
+            r[0x16]--;
+            if (r[0x16] != 0) { w.ServiceAD(1, 2); return; }
+            r[0x16] = 0x0a; r[0x17] = 0; r[5] = 0;
+        }
+        r[0x17]--;
+        if (r[0x17] == 0) r[0] = 0xff;
     }
 
     public static void Fx54aKind16(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)   // B62
