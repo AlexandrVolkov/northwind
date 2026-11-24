@@ -1253,4 +1253,84 @@ public static class OriginalUnitActions
         }
         g.Test(g.Edi, g.Edi, 32);
     }
+
+    /// <summary>C0F6: the action of the unit that builds (the worker of the camp, +15: 0 order the walk, 1 walk to the cell, 2 pay and create the building, 3 build it, others wait); BL = the result (C0h finished, 40h failed, else the value of [1C9F]).</summary>
+    public static void FC0F6(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; w.G1C9F = g.Bl; d[0x79a] = g.Al; var t = w.Template;
+        void Done() => g.Bl = w.G1C9F;
+        void Finish()
+        {
+            g.Eax = (uint)(r[0x25] & 7); g.Logic(g.Eax, 32); Mul8(g, (byte)g.Eax, t[0x4a]);
+            uint lo = g.Eax & 0xffff, add = U16(t, 0x48); g.Add(lo << 16, add << 16); g.Eax = (g.Eax & 0xffff0000) | ((lo + add) & 0xffff);
+            r[1] = (byte)g.Eax; r[2] = (byte)(g.Eax >> 8); Put(r, 0x1c, 0);
+        }
+        void Fail() { g.Bl = 0x40; Finish(); }
+        void Dec2f()   // C156
+        {
+            r[0x2f]--; g.Zf = r[0x2f] == 0; g.Sf = (r[0x2f] & 0x80) != 0; g.Of = r[0x2f] == 0x7f;
+            if (g.Zf) { Fail(); return; }
+            r[0x27] = 0x32; g.Al = r[0x15]; r[0x34] = g.Al; r[0x15] = 0xa; Done();
+        }
+        g.Cmp(r[0x15], 0, 8);
+        if (g.Zf) { g.Al = r[0x32]; g.Ah = r[0x33]; w.Call(0x8ca1, g); r[0x15] = 1; r[0x2f] = 3; Done(); return; }
+        g.Cmp(r[0x15], 1, 8);
+        if (g.Zf)
+        {
+            g.Al = (byte)(r[0x2d] & 0xf); g.Logic(g.Al, 8); g.Cmp(g.Al, 2, 8);
+            if (g.Zf) { Done(); return; }
+            g.Eax = g.Shr(U32(r, 4), 5, 32); g.Ebx = g.Shr(U32(r, 8), 5, 32);
+            g.Cmp(g.Al, r[0x32], 8);
+            if (g.Zf) { g.Cmp(g.Bl, r[0x33], 8); if (g.Zf) { r[0x15]++; g.Zf = r[0x15] == 0; g.Sf = (r[0x15] & 0x80) != 0; g.Of = r[0x15] == 0x80; Done(); return; } }
+            Dec2f(); return;
+        }
+        g.Cmp(r[0x15], 2, 8);
+        if (g.Zf)
+        {
+            g.Ah = 7; w.Call(0x9653, g);
+            if (!g.Zf) { Done(); return; }
+            g.Eax = 0; g.Logic(0, 32); w.Call(0x43b0, g);
+            g.Al = d[0x79a]; g.Ah = r[0]; g.Bl = r[3]; g.Cl = r[0x32]; g.Ch = r[0x33];
+            uint esi = g.Esi; w.Call(0xd363, g); Put(d, 0x79b, g.Ecx); Put(d, 0x79f, g.Edx); g.Esi = esi;
+            bool zf = g.Zf, cf = g.Cf, sf = g.Sf, of = g.Of;
+            g.Eax = g.Esi - w.PoolBase; w.Call(0x43b0, g);
+            g.Zf = zf; g.Cf = cf; g.Sf = sf; g.Of = of;
+            if (g.Jb) { var e = w.ObjectAt(g.Edi); Put(e, 0x17, (uint)(U16(e, 0x17) | 0x20) | (U32(e, 0x17) & 0xffff0000)); g.Logic(U16(e, 0x17), 16); Dec2f(); return; }
+            if (!g.Zf) { Fail(); return; }
+            g.Al = d[0x79a]; g.Ah = r[0]; F68A0(w, g);
+            g.Eax = 0xf5; Mul8(g, 0xf5, r[3]); g.Ecx = 0x97a + (g.Eax & 0xffff); var p = w.PartOf(r[3]); var tt = w.ObjectAt(g.Edi);
+            foreach (var (a, b) in new[] { (0x7c, 0x18), (0x80, 0x1c), (0x84, 0x20), (0x88, 0x24) })
+            {
+                g.Eax = U32(tt, a); g.Cmp(g.Eax, U32(p, b), 32);
+                if (!g.Cf && !g.Zf) { Fail(); return; }
+            }
+            Put(p, 0x24, U32(p, 0x24) - U32(tt, 0x88)); g.Eax = U32(tt, 0x84); Put(p, 0x20, U32(p, 0x20) - g.Eax);
+            g.Eax = U32(tt, 0x7c); Put(p, 0x18, U32(p, 0x18) - g.Eax); g.Eax = U32(tt, 0x80); Put(p, 0x1c, U32(p, 0x1c) - g.Eax);
+            g.Ecx = U32(d, 0x79b); g.Edx = U32(d, 0x79f); g.Al = r[0]; g.Ah = r[3]; g.Bh = (byte)(tt[0x77] & 3); g.Logic(g.Bh, 8); g.Bl = d[0x79a];
+            w.Call(0xa758, g);
+            if (!g.Zf) { Fail(); return; }
+            var o = w.ObjectAt(g.Edi); o[0x19] = 1; o[0x1a] = 1; g.Cmp(g.Edi, w.PoolBase, 32); g.Edi -= w.PoolBase; Put(r, 0x1c, g.Edi); r[0x15] = 3; r[0x2f] = 0;
+            g.Eax = (uint)(r[0x25] & 7); g.Logic(g.Eax, 32); Mul8(g, (byte)g.Eax, t[0x4b]); g.Ebx = 0; g.Logic(0, 32); g.Bl = t[0x4a]; g.Eax += g.Ebx << 3;
+            uint lo = g.Eax & 0xffff, add = U16(t, 0x48); g.Add(lo << 16, add << 16); g.Eax = (g.Eax & 0xffff0000) | ((lo + add) & 0xffff);
+            r[1] = (byte)g.Eax; r[2] = (byte)(g.Eax >> 8); Done(); return;
+        }
+        g.Cmp(r[0x15], 3, 8);
+        if (g.Zf)
+        {
+            g.Edi = 0; g.Logic(0, 32); g.Edi = U32(r, 0x1c); g.Add(g.Edi, w.PoolBase); g.Edi += w.PoolBase; var o = w.ObjectAt(g.Edi);
+            g.Cmp(o[0x19], 0, 8); if (g.Jle) { Fail(); return; }
+            g.Test(U16(r, 0x17), 1, 16); if (!g.Zf) { Fail(); return; }
+            g.Test(r[0x2e], 1, 8); if (!g.Zf) { Done(); return; }
+            ushort pos = (ushort)(U16(r, 1) + 1); r[1] = (byte)pos; r[2] = (byte)(pos >> 8); r[0x2f]++;
+            g.Eax = t[0x4b]; g.Cmp(r[0x2f], g.Al, 8); if (g.Jb) { Done(); return; }
+            pos = (ushort)(U16(r, 1) - g.Eax); r[1] = (byte)pos; r[2] = (byte)(pos >> 8); r[0x2f] = g.Ah;
+            g.Al = t[0x79]; g.Add((uint)o[0x19] << 24, (uint)g.Al << 24); o[0x19] += g.Al; w.Call(0x68bd, g);
+            g.Al = ObjectAtTemplate(w, g.Edx)[0x45]; g.Cmp(o[0x19], g.Al, 8); if (g.Jb) { Done(); return; }
+            o[0x19] = g.Al; g.Bl = 0xc0; Finish(); return;
+        }
+        r[0x27]--; g.Zf = r[0x27] == 0; g.Sf = (r[0x27] & 0x80) != 0; g.Of = r[0x27] == 0x7f;
+        if (g.Zf) { g.Al = r[0x34]; r[0x15] = g.Al; }
+        Done();
+    }
+    private static byte[] ObjectAtTemplate(IUnitActionWorld w, uint p) => w.ObjectAt(p);
 }
