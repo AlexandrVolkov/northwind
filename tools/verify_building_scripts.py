@@ -15,11 +15,11 @@ from analyze_executable import analyze
 from verify_combat import CombatOracle
 from forestry_source import source_constants
 
-ENTRIES = [('ARMY__01.WRK', 0xfe, 0x24d), ('ARMY__01.WRK', 0x24d, 0x354), ('ARMY__01.WRK', 0x354, 0x3ed), ('ARMY__01.WRK', 0x3ed, 0x4f0)]
-TABLES = [0x179, 0x2a1, 0x381, 0x441]      # the inline table after the call of FS:41 in the step of each building
-SLOTS = [0x85, 0x121, 0x197, 0x3d, 0x51, 0x49, 0x129, 0x99, 0x12d, 0xcd, 0x19, 0x1d]
+ENTRIES = [('ARMY__01.WRK', 0xfe, 0x24d), ('ARMY__01.WRK', 0x24d, 0x354), ('ARMY__01.WRK', 0x354, 0x3ed), ('ARMY__01.WRK', 0x3ed, 0x4f0), ('ARMY__01.WRK', 0x6d4, 0x7a0), ('ARMY__01.WRK', 0x7a0, 0x896), ('ARMY__01.WRK', 0x896, 0x986), ('ARMY__01.WRK', 0x986, 0xa77)]
+TABLES = [0x179, 0x2a1, 0x381, 0x441, 0x71e, 0, 0x8e6, 0x9d4]      # the inline table after the call of FS:41 in the step of each building
+SLOTS = [0x85, 0x121, 0x197, 0x3d, 0x51, 0x49, 0x129, 0x99, 0x12d, 0xcd, 0x19, 0x1d, 0xbd, 0x9d, 0x8d, 0x91, 0x95, 0xc1, 0x15]
 KEEP = {0x19, 0x1d}                        # services that leave the registers alone
-TMPL, PART, OTHER, TFLAGS = 0xc00, 0xd00, 0x900, 0xb00
+TMPL, PART, OTHER, TFLAGS, FOUND = 0xc00, 0xd00, 0x900, 0xb00, 0xe00
 
 
 class BuildingOracle(CombatOracle):
@@ -36,13 +36,13 @@ def cases():
     out = []
     for n in range(1500):
         k = rng.randrange(len(ENTRIES))
-        ahs = {0: [0, 1, 1, 1, 1, 2, 5, 6], 1: [0, 1, 1, 1, 1, 2, 6], 2: [0, 1, 1, 1, 1], 3: [0, 1, 1, 1, 1, 2, 6]}[k]
+        ahs = {0: [0, 1, 1, 1, 1, 2, 5, 6], 1: [0, 1, 1, 1, 1, 2, 6], 2: [0, 1, 1, 1, 1], 3: [0, 1, 1, 1, 1, 2, 6], 4: [0, 1, 1, 1, 1, 5, 5], 5: [0, 1, 1, 1, 1, 1], 6: [0, 1, 1, 1, 1, 5], 7: [0, 1, 1, 1, 1, 2, 6]}[k]
         out.append({'entry': k, 'ah': rng.choice(ahs), 'bl': rng.randrange(256), 'f14': rng.choice([0x80, 0x81, 0x40, 0x41, 0x42, 0, 1, 2, 3, 4, 5, 0x43, 0xc4, 0xc5, 0xc2]) if rng.random() < 0.9 else (rng.randrange(256) & ~7) | rng.randrange(6),
                     'f0f': rng.choice([0, 0x10, 0x20, rng.randrange(256)]), 'f22': rng.choice([0xff, 0xff, 0, rng.randrange(256)]), 'f26': rng.randrange(256), 'f27': rng.randrange(256), 'f17': rng.choice([0, 0x100, 0x180, rng.randrange(1 << 16)]),
                     'f19': rng.choice([0, 1, 0x10, 0x80, 0xff, rng.randrange(256)]), 'f1a': rng.choice([0, 1, 0x10, 0x7f, 0x80, 0xff, rng.randrange(256)]), 'f3': rng.randrange(8), 'f0': rng.randrange(256),
                     'x': rng.randrange(1 << 16), 'y': rng.randrange(1 << 16), 't45': rng.choice([0, 0x10, 0x20, 0xff, rng.randrange(256)]), 't46': rng.choice([0, 0x10, 0x20, 0x7f, 0x80, rng.randrange(256)]), 't78': rng.choice([0, 5, 100, rng.randrange(1 << 32)]),
                     'p2c': rng.choice([0, 3, 100, 0xffffffff, rng.randrange(1 << 32)]), 'o3': rng.choice([0, 1, 2, 3, rng.randrange(8)]), 'tflags': rng.choice([0, 0x20000, 0x20000, rng.randrange(1 << 32)]),
-                    'svc': [[rng.choice([0, 1, 1]), rng.randrange(1 << 32) if rng.random() < 0.4 else rng.randrange(256), rng.choice([0, 1, 0x40, rng.randrange(1 << 16)])] for _ in range(8)], 'zf': rng.choice([0, 1, 1]), 'seed': rng.randrange(256)})
+                    'svc': [[rng.choice([0, 1, 1]), rng.randrange(1 << 32) if rng.random() < 0.4 else rng.randrange(256), rng.choice([0, 1, 0x40, rng.randrange(1 << 16)])] for _ in range(8)], 'zf': rng.choice([0, 1, 1]), 'seed': rng.randrange(256), 'f24': rng.choice([0, 1, 2, rng.randrange(256)]), 'f23': rng.choice([0, 1, 2, rng.randrange(256)]), 't79': rng.choice([0, 1, 5, rng.randrange(256)]), 'fo31': rng.choice([0, 3, 3, rng.randrange(256)]), 'fo17': rng.choice([0, 0x40, 0xffff, rng.randrange(1 << 16)]), 'ftf': rng.choice([0, 0x20000, 0x20000, rng.randrange(1 << 32)]), 'p1c': rng.randrange(1 << 32)})
     return out
 
 
@@ -68,6 +68,9 @@ def generate(game):
         return f
     def svc6d():
         log.append(b'P'); o.cpu.reg_write(UC_X86_REG_ECX, o.POOL + PART); o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + TMPL); o.ret()
+    def svc79():
+        log.append(b'N'); zf = state['svc'].pop(0)[0] if state['svc'] else 1
+        o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + FOUND); o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + TFLAGS + 0x100); setzf(zf); o.ret()
     def svc71():
         log.append(b'T'); o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + TFLAGS); o.ret()
     def dispatch():
@@ -87,25 +90,25 @@ def generate(game):
     def handler_return():
         log.append(b'H' + struct.pack('<B', o.zf())); setzf(state['zf']); o.ret()
     o.stubs = {slots[s]: service(s) for s in SLOTS}
-    o.stubs[slots[0x6d]] = svc6d; o.stubs[slots[0x71]] = svc71; o.stubs[slots[0x41]] = dispatch; o.stubs[0x20] = handler_return
+    o.stubs[slots[0x6d]] = svc6d; o.stubs[slots[0x71]] = svc71; o.stubs[slots[0x79]] = svc79; o.stubs[slots[0x41]] = dispatch; o.stubs[0x20] = handler_return
     digest = hashlib.sha256(); all_cases = cases()
     for case in all_cases:
         log.clear(); o.prepare(32, 32); o.mode = 'unit'
         module, a, e = ENTRIES[case['entry']]
         o.cpu.mem_write(o.WRK, wrks[module]); o.cpu.ctl_flush_tb(); o.cpu.mem_write(o.POOL, bytes(0x2000)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x19eb, bytes([case['seed']]))
         state['svc'] = [list(x) for x in case['svc']]; state['zf'] = case['zf']
-        r = bytearray(0x50); r[0] = case['f0']; r[3] = case['f3']; r[0x14] = case['f14']; r[0x0f] = case['f0f']; r[0x22] = case['f22']; r[0x26] = case['f26']; r[0x27] = case['f27']; struct.pack_into('<H', r, 0x17, case['f17']); r[0x19] = case['f19']; r[0x1a] = case['f1a']
+        r = bytearray(0x50); r[0] = case['f0']; r[3] = case['f3']; r[0x14] = case['f14']; r[0x0f] = case['f0f']; r[0x22] = case['f22']; r[0x26] = case['f26']; r[0x27] = case['f27']; struct.pack_into('<H', r, 0x17, case['f17']); r[0x19] = case['f19']; r[0x1a] = case['f1a']; r[0x23] = case['f23']; r[0x24] = case['f24']
         struct.pack_into('<II', r, 4, case['x'], case['y'])
         o.cpu.mem_write(o.POOL + 0x800, bytes(r))
-        t = bytearray(0x100); t[0x45] = case['t45']; t[0x46] = case['t46']; struct.pack_into('<I', t, 0x78, case['t78']); o.cpu.mem_write(o.POOL + TMPL, bytes(t))
-        p = bytearray(0xf5); struct.pack_into('<I', p, 0x2c, case['p2c']); o.cpu.mem_write(o.POOL + PART, bytes(p))
-        ob = bytearray(0x50); ob[3] = case['o3']; o.cpu.mem_write(o.POOL + OTHER, bytes(ob)); o.cpu.mem_write(o.POOL + TFLAGS + 0x40, struct.pack('<I', case['tflags']))
+        t = bytearray(0x100); t[0x79] = case['t79']; t[0x45] = case['t45']; t[0x46] = case['t46']; struct.pack_into('<I', t, 0x78, case['t78']); o.cpu.mem_write(o.POOL + TMPL, bytes(t))
+        p = bytearray(0xf5); struct.pack_into('<I', p, 0x2c, case['p2c']); struct.pack_into('<I', p, 0x1c, case['p1c']); o.cpu.mem_write(o.POOL + PART, bytes(p))
+        ob = bytearray(0x50); ob[3] = case['o3']; o.cpu.mem_write(o.POOL + OTHER, bytes(ob)); o.cpu.mem_write(o.POOL + TFLAGS + 0x40, struct.pack('<I', case['tflags'])); o.cpu.mem_write(o.POOL + TFLAGS + 0x140, struct.pack('<I', case['ftf'])); fo = bytearray(0x50); fo[0x31] = case['fo31']; struct.pack_into('<H', fo, 0x17, case['fo17']); o.cpu.mem_write(o.POOL + FOUND, bytes(fo))
         for q in (UC_X86_REG_ESI, UC_X86_REG_EDI): o.cpu.reg_write(q, o.POOL + 0x800)
         for q in (UC_X86_REG_ECX, UC_X86_REG_EDX): o.cpu.reg_write(q, 0)
         if case['ah'] == 5: o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + OTHER)
         o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, case['bl'])
         o.run(o.WRK + a)
-        out = bytes(o.cpu.mem_read(o.POOL + 0x800, 0x50)) + bytes(o.cpu.mem_read(o.POOL + PART + 0x28, 8)) + bytes(o.cpu.mem_read(0x19eb, 1)) + (struct.pack('<I', (reg(UC_X86_REG_EDX) - o.WRK) & 0xffffffff) if case['ah'] == 6 else b'') + (bytes([reg(UC_X86_REG_EAX) & 255]) if case['ah'] == 5 else b'') + b''.join(log)
+        out = bytes(o.cpu.mem_read(o.POOL + 0x800, 0x50)) + bytes(o.cpu.mem_read(o.POOL + PART + 0x28, 8)) + bytes(o.cpu.mem_read(0x19eb, 1)) + (struct.pack('<I', (reg(UC_X86_REG_EDX) - o.WRK) & 0xffffffff) if case['ah'] == 6 else b'') + (bytes([reg(UC_X86_REG_EAX) & 255, o.zf()]) if case['ah'] == 5 else b'') + bytes(o.cpu.mem_read(o.POOL + FOUND, 0x50)) + bytes(o.cpu.mem_read(o.POOL + PART + 0x18, 8)) + b''.join(log)
         if os.environ.get('DEBUG_CASE') == str(all_cases.index(case)): print('PYTHON', out.hex())
         digest.update(out); case['sha256_prefix'] = hashlib.sha256(out).hexdigest()[:10]
     return {'format_version': 1, 'source_sha256': {k: report['source_sha256'][k] for k in ['NORWIND.EXE']} | {m: hashlib.sha256(b).hexdigest() for m, b in wrks.items()}, 'random_values': constants['random_values'],
