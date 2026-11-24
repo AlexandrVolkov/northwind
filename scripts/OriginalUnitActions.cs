@@ -1448,4 +1448,28 @@ public static class OriginalUnitActions
         } while (g.Ch != 0);
         g.Zf = true; g.Eax = U32(d, 0x1f31);
     }
+
+    /// <summary>BE2E: can the participant of the unit pay the costs of template AL of its army (template +7C/+80/+84/+88 against participant +18/+1C/+20/+24)? AL = 0 when yes, else EAX = the cost that is too high.</summary>
+    public static void FBE2E(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Ah = r[0]; F68A0(w, g); g.Eax = 0xf5; Mul8(g, 0xf5, r[3]); g.Ecx = 0x97a + (g.Eax & 0xffff);
+        var p = w.PartOf(r[3]); var t = w.ObjectAt(g.Edi);
+        foreach (var (a, b) in new[] { (0x7c, 0x18), (0x80, 0x1c), (0x84, 0x20), (0x88, 0x24) })
+        {
+            g.Eax = U32(t, a); g.Cmp(g.Eax, U32(p, b), 32);
+            if (!g.Cf && !g.Zf) return;
+        }
+        g.Al = 0; g.Logic(0, 8);
+    }
+
+    /// <summary>BE6F: a random chance (9E41 AND BH = 0) to create the effect 9727 of the unit when its health fell by more than a quarter of the template health.</summary>
+    public static void FBE6F(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Edi = U32(w.Ds, 0x1c49); w.Call(0x9e41, g); g.Al = (byte)(g.Al & g.Bh); g.Logic(g.Al, 8);
+        if (!g.Zf) return;
+        var t = w.ObjectAt(g.Edi); g.Al = t[0x45]; g.Ah = g.Al; g.Ah = (byte)g.Shr(g.Ah, 2, 8); g.Al = (byte)(g.Al - r[0x19]);
+        g.Cmp(g.Al, g.Ah, 8);
+        if (!g.Cf && !g.Zf) return;
+        g.Al = r[0]; g.Bh = 2; g.Add(g.Ecx, U32(r, 4)); g.Ecx += U32(r, 4); g.Add(g.Edx, U32(r, 8)); g.Edx += U32(r, 8); w.Call(0x9727, g);
+    }
 }
