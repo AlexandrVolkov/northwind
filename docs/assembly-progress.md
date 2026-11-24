@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 101186 | 6265 | 97 | 39334 | 44 |
+| LE:1 | 146882 | 101177 | 6265 | 97 | 39343 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -268,6 +268,7 @@
 | LE:1 `0xA6F9..0xA716` | Find development record | ported | [tech.md](../docs/tech.md); [tech.json](../tests/fixtures/tech.json); [original_tech.json](../data/original_tech.json) |  |
 | LE:1 `0xA716..0xA758` | List open research items | ported | [tech.md](../docs/tech.md); [tech.json](../tests/fixtures/tech.json); [original_tech.json](../data/original_tech.json) |  |
 | LE:1 `0xA758..0xA870` | Allocate and initialize object record | partial | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [building-lifecycle.json](../tests/fixtures/building-lifecycle.json) | Перенесён лишь путь новой пустой цепочки для 49-байтового замка; поиск дыр, универсальный аллокатор и ошибки не покрыты. |
+| LE:1 `0xA758..0xA879` | FS:45 object allocator: first-fit search in the chain of the owner, carving, clearing, filling, script call | ported | [object-allocator.md](../docs/object-allocator.md); [object-alloc.json](../tests/fixtures/object-alloc.json); [verify_object_alloc.py](../tools/verify_object_alloc.py); [OriginalObjectAllocChecks.cs](../tests/OriginalObjectAllocChecks.cs) | The call of the template script is a recorded stub; the skirmish still creates objects with its own code |
 | LE:1 `0xA8BB..0xA90F` | Check and debit all four recruitment prices | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json); [recruitment-production.md](../docs/recruitment-production.md) | Только проверка и списание запасов до изменения фазы производителя. Оплата первого заказа и ожидание выхода подключены через отдельные проверенные операции; полный исходный диспетчер и аллокатор не перенесены. |
 | LE:1 `0xA90F..0xA920` | Initialize paid production phase and counters | ported | [recruitment-production.md](../docs/recruitment-production.md); [production.json](../tests/fixtures/production.json) | Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора. |
 | LE:1 `0xA920..0xA934` | Production cancellation gate and participant speed lookup | partial | [recruitment-production.md](../docs/recruitment-production.md) | Подтверждены внешние переходы и получение интервала/модификатора. Полный A879/C88C и исходный пересчёт AI не перенесены; адаптер использует модификатор 0 для текущего поселения. |
