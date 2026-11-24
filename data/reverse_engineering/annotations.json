@@ -5756,6 +5756,42 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/army01-effects.json", "tools/verify_army01_effects.py", "tests/OriginalArmy01EffectChecks.cs"],
       "implementation": ["scripts/OriginalArmy00Effects.cs"],
       "limitations": "The services (FS:A1, 119, 25, 29, 39, 69, 19, 35, 10D, A5) and the jumps into 6FE, 735, A44 are recorded stubs; FS:109 runs as original code"
+    },
+    {
+      "id": "army__03-rest-324c",
+      "module": "ARMY__03.WRK",
+      "start": 12876,
+      "end": 13114,
+      "name": "Mage explosion 324C (kind 10h): fragments and the 6x6 field of strikes",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/army01-effects.json", "tools/verify_army01_effects.py", "tests/OriginalArmy01EffectChecks.cs"],
+      "implementation": ["scripts/OriginalArmy03Effects.cs"],
+      "limitations": "FS:19 (with a result and the hit object), FS:10D are recorded stubs; FS:109 runs as original code"
+    },
+    {
+      "id": "army__03-rest-2b63",
+      "module": "ARMY__03.WRK",
+      "start": 11107,
+      "end": 11175,
+      "name": "Wrappers 2B63 and 2B74 of the jug and the pit trap",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/army01-effects.json", "tools/verify_army01_effects.py", "tests/OriginalArmy01EffectChecks.cs"],
+      "implementation": ["scripts/OriginalArmy03Effects.cs"],
+      "limitations": "FS:6D and FS:1B7 are recorded stubs; the jumps into E8 and 7F0 are handed to the world"
+    },
+    {
+      "id": "army__03-rest-79",
+      "module": "ARMY__03.WRK",
+      "start": 121,
+      "end": 198,
+      "name": "Continuation of the first mage's update after the FS:E1 table (vanishing below a health threshold)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/mage-cloak.json", "tools/verify_mage_cloak.py", "tests/OriginalMageCloakChecks.cs"],
+      "implementation": ["scripts/OriginalMageCloak.cs"],
+      "limitations": "FS:105 (the vanishing action) is an adapter in the skirmish"
     }
   ]
 }

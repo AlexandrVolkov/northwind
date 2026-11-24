@@ -25,7 +25,12 @@ public interface IArmy01EffectWorld
     uint Limit0 { get; }
     uint Limit4 { get; }
     /// <summary>FS:19 with three stack arguments; ZF in the result.</summary>
-    bool Effect19(uint ebx, uint ecx, uint edx, uint a, uint b, uint c);
+    bool Effect19(uint eax, uint ebx, uint ecx, uint edx, uint a, uint b, uint c);
+    /// <summary>FS:6D: the participant record (ECX, an opaque token) and FS:1B7: the AI record of the owner AL.</summary>
+    (byte[] Part, uint Ptr) Part6D();
+    byte[] Service1B7(byte al);
+    /// <summary>fs:[10h], the update counter.</summary>
+    byte Tick { get; }
     /// <summary>The jump into another script (6FE, 735, A44) with EAX and EBX.</summary>
     void Jump(uint target, uint eax, uint ebx);
 }

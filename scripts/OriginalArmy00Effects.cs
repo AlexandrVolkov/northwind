@@ -88,7 +88,7 @@ public static class OriginalArmy00Effects
                 if (ex <= w.Limit4)
                 {
                     g.Ecx = U32(r, 7); g.Edx = U32(r, 0xc);
-                    bool zf = w.Effect19(0x191, g.Ecx, g.Edx, 0, ex, ey);
+                    bool zf = w.Effect19(ex, 0x191, g.Ecx, g.Edx, 0, ex, ey);
                     g.Ebx = 0x191; g.Eax = ey; g.Zf = zf;
                     if (!zf) w.Found[2] = r[2];
                 }

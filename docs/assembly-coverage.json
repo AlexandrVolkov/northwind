@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "7d5f507b4cd7c6d9eff01629093da0ad3e265d423fbe7a09e11b10c9ad2d0270",
+  "annotation_sha256": "39b42617003643f85e8c07078fe04fb290e6f7ad11ddb5b4cab3fa226e9dd553",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -4296,8 +4296,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 12449,
-        "unreviewed": 963
+        "ported": 12832,
+        "unreviewed": 580
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -4318,6 +4318,22 @@
         },
         {
           "start": 97,
+          "end": 121,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 121,
+          "end": 198,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__03-rest-79"
+          ]
+        },
+        {
+          "start": 198,
           "end": 228,
           "status": "unreviewed",
           "classification": "unknown",
@@ -4747,9 +4763,11 @@
         {
           "start": 11107,
           "end": 11175,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__03-rest-2b63"
+          ]
         },
         {
           "start": 11175,
@@ -4903,9 +4921,11 @@
         {
           "start": 12876,
           "end": 13114,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__03-rest-324c"
+          ]
         },
         {
           "start": 13114,
