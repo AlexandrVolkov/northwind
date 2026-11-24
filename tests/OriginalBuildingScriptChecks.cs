@@ -19,6 +19,8 @@ public partial class TestRunner
         }
         public (byte[] Participant, byte[] Template, uint Pointer) Participant6D() { log.Add((byte)'P'); return (Part, Tmpl, 0xd00); }
         public byte[] DispatchTemplate() => Tmpl;
+        public byte[] Big = new byte[0x1a14];
+        public byte[] Service1B7(byte al) { log.Add((byte)'Q'); log.Add(al); return Big; }
         public byte[] Found = new byte[0x50];
         public (bool Zf, byte[] Object, uint Flags) Service79() { log.Add((byte)'N'); var z = svc.Count > 0 ? svc[0].Zf : true; if (svc.Count > 0) svc.RemoveAt(0); return (z, Found, c.GetProperty("ftf").GetUInt32()); }
         public uint TemplateFlags71() { log.Add((byte)'T'); return c.GetProperty("tflags").GetUInt32(); }
@@ -44,10 +46,11 @@ public partial class TestRunner
             world.Tmpl[0x79] = (byte)c.GetProperty("t79").GetInt32(); world.Tmpl[0x45] = (byte)c.GetProperty("t45").GetInt32(); world.Tmpl[0x46] = (byte)c.GetProperty("t46").GetInt32(); BitConverter.GetBytes(c.GetProperty("t78").GetUInt32()).CopyTo(world.Tmpl, 0x78); BitConverter.GetBytes(c.GetProperty("p2c").GetUInt32()).CopyTo(world.Part, 0x2c);
             r[0x23] = (byte)c.GetProperty("f23").GetInt32(); r[0x24] = (byte)c.GetProperty("f24").GetInt32(); BitConverter.GetBytes(c.GetProperty("p1c").GetUInt32()).CopyTo(world.Part, 0x1c);
             world.Found[0x31] = (byte)c.GetProperty("fo31").GetInt32(); BitConverter.GetBytes((ushort)c.GetProperty("fo17").GetInt32()).CopyTo(world.Found, 0x17);
+            BitConverter.GetBytes(c.GetProperty("e1a10").GetUInt32()).CopyTo(world.Big, 0x1a10);
             var other = new byte[0x50]; other[3] = (byte)c.GetProperty("o3").GetInt32();
             int ah = c.GetProperty("ah").GetInt32(), k = c.GetProperty("entry").GetInt32(); if (ah == 1) { steps++; handlers.Add(k * 8 + (r[0x14] & 7)); }
             uint result = OriginalBuildingScripts.Run(world, r, ah, (byte)c.GetProperty("bl").GetInt32(), k, other, out bool rzf);
-            byte[] output = [.. r, .. world.Part[0x28..0x30], (byte)c.GetProperty("seed").GetInt32(), .. (ah == 6 ? BitConverter.GetBytes(result) : []), .. (ah == 5 ? new[] { (byte)result, rzf ? (byte)1 : (byte)0 } : []), .. world.Found, .. world.Part[0x18..0x20], .. log];
+            byte[] output = [.. r, .. world.Part[0x28..0x30], (byte)c.GetProperty("seed").GetInt32(), .. (ah == 6 ? BitConverter.GetBytes(result) : []), .. (ah == 5 ? new[] { (byte)result, rzf ? (byte)1 : (byte)0 } : []), .. world.Found, .. world.Part[0x18..0x20], .. world.Big[0x1a10..0x1a14], .. log];
             digest.AppendData(output);
             if (Convert.ToHexStringLower(SHA256.HashData(output))[..10] != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; if (only == count) GD.Print("CSHARP " + Convert.ToHexStringLower(output)); }
             count++;

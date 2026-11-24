@@ -22,6 +22,8 @@ public interface IBuildingScriptWorld
     uint TemplateFlags71();
     /// <summary>FS:79 (EDI the template): ZF, the object found (EDI) and its template flags (EDX +40h).</summary>
     (bool Zf, byte[] Object, uint Flags) Service79();
+    /// <summary>FS:1B7 (AL the owner): a record of the owner whose dword at +1A10h the script raises.</summary>
+    byte[] Service1B7(byte al);
     /// <summary>The dispatcher C88C before the handler: the state, EBX, the handler offset and ECX.</summary>
     void BeforeHandler(int state, uint ebx, uint handler, uint ecx);
     /// <summary>The dispatcher C88C after the handler: ZF of the handler in, ZF for the rest of the script out.</summary>
@@ -34,8 +36,8 @@ public interface IBuildingScriptWorld
 public static class OriginalBuildingScripts
 {
     /// <summary>The offsets of the data tables returned by AH = 6 (A, B, none, D).</summary>
-    public static readonly uint[] Tables = [0x21b, 0x336, 0, 0x4c6, 0, 0, 0, 0xa65, 0xdcd];
-    private static readonly int[][] Handlers = [[0x1ef, 0x1b5, 0x1b2, 0x203, 0x23b, 0x247], [0x316, 0x2c6, 0x2c3, 0x2c3, 0x32a, 0x34e], [0x3c1, 0x3bb, 0x3b8, 0x3b8, 0x3b8, 0x3e7], [0x474, 0x466, 0x463, 0x4ae, 0x4de, 0x4ea], [0x771, 0x73b, 0x738, 0x738, 0x738, 0x79a], [], [0x909, 0x903, 0x900, 0x900, 0x900, 0x980], [0xa33, 0x9f9, 0x9f6, 0x9f6, 0xa59, 0xa71], [0xdad, 0xd73, 0xd70, 0xd70, 0xdc1, 0xde9]];
+    public static readonly uint[] Tables = [0x21b, 0x336, 0, 0x4c6, 0, 0, 0, 0xa65, 0xdcd, 0x221, 0x336, 0];
+    private static readonly int[][] Handlers = [[0x1ef, 0x1b5, 0x1b2, 0x203, 0x23b, 0x247], [0x316, 0x2c6, 0x2c3, 0x2c3, 0x32a, 0x34e], [0x3c1, 0x3bb, 0x3b8, 0x3b8, 0x3b8, 0x3e7], [0x474, 0x466, 0x463, 0x4ae, 0x4de, 0x4ea], [0x771, 0x73b, 0x738, 0x738, 0x738, 0x79a], [], [0x909, 0x903, 0x900, 0x900, 0x900, 0x980], [0xa33, 0x9f9, 0x9f6, 0x9f6, 0xa59, 0xa71], [0xdad, 0xd73, 0xd70, 0xd70, 0xdc1, 0xde9], [0x1f5, 0x1bb, 0x1b8, 0x209, 0x251, 0x25d], [0x316, 0x2dc, 0x2d9, 0x2d9, 0x32a, 0x34e], [0x3c7, 0x3c1, 0x3be, 0x3be, 0x3be, 0x44e]];
 
     private static uint Dword(byte[] r, int i) => BitConverter.ToUInt32(r, i);
     private static void SetBl(BuildingRegs g, uint v) => g.Ebx = (g.Ebx & 0xffffff00) | (v & 0xff);
@@ -48,14 +50,16 @@ public static class OriginalBuildingScripts
         if (k == 5) return Script7A0(w, r, g, ah);
         if (ah == 0)
         {
-            if (k == 6) { r[0x23] = 0x64; return 0; }
+            if (k is 6 or 11) { r[0x23] = 0x64; return 0; }
             if (k is not (2 or 4)) { r[0x27] = 0xff; for (int i = 0; i < 4; i++) r[0x22 + i] = 0xff; r[0x26] = 0xff; }
             return 0;
         }
-        if (ah == 2) { if (k is 0 or 1 or 3 or 7 or 8) w.Service(0xcd, g); return 0; }
+        if (ah == 2) { if (k is 0 or 1 or 3 or 7 or 8 or 9 or 10) w.Service(0xcd, g); return 0; }
         if (ah == 6) return Tables[k];
         if (ah == 5)
         {
+            if (k is 9) k = 0;
+            if (k is 11) k = 6;
             if (k is 4) { uint e = 0x1000; if (r[0x19] <= 0x23) e = ~w.TemplateFlags71(); zf = (e & 0x1000) == 0; return e & 0xff; }
             if (k is 6) { uint f = w.TemplateFlags71(); if ((f & 0x1000) != 0) { zf = true; return 0; } f &= 0xf00; zf = f == 0x300; return f & 0xff; }
             if (k != 0 || other == null) return 0;
@@ -67,12 +71,12 @@ public static class OriginalBuildingScripts
         if ((r[0x14] & 0x80) != 0)
         {
             r[0x14] &= 0x7f; w.Service(0x1d, g);
-            if (k is 4 or 6 or 7) { }
+            if (k is 4 or 6 or 7 or 11) { }
             else if (k == 2) { var (p, t, ptr) = w.Participant6D(); g.Ecx = ptr; BitConverter.GetBytes(Dword(p, 0x2c) + Dword(t, 0x78)).CopyTo(p, 0x2c); }
-            else w.Service(0x85, g);
+            else { w.Service(0x85, g); if (k == 9) w.Service(0x19f, g); }
         }
-        if (k == 0) w.Service(0x121, g);
-        if (k is 4 or 6) w.Service(0xbd, g);
+        if (k is 0 or 9) w.Service(0x121, g);
+        if (k is 4 or 6 or 11) w.Service(0xbd, g);
         Dispatch(w, r, g, k);
         if (!g.Zf) return 0;
         Continue(w, r, g, k);
@@ -166,9 +170,9 @@ public static class OriginalBuildingScripts
             }
             return;
         }
-        if (k is 4 or 6) return;
+        if (k is 4 or 6 or 11) return;
         r[0x22] = 0xff; r[0x27] = 0xff;
-        if (k == 8)
+        if (k is 8 or 9)
         {
             g.Eax = Dword(r, 8) >> 5; g.Ecx = Dword(r, 4) >> 5;
             g.Ecx = (g.Ecx & 0xffff00ff) | ((g.Eax & 0xff) << 8); g.Eax = (g.Eax & 0xffff00ff) | ((uint)r[3] << 8);
@@ -190,8 +194,9 @@ public static class OriginalBuildingScripts
                 w.Service(0x3d, g); if (!g.Zf) return;
                 if ((g.Ebx & 0xff) == 0 && (Word(r, 0x17) & 0x100) == 0) { Effect(w, r, g, 6, 0x2f, 0x1d); SetWord(r, 0x17, Word(r, 0x17) | 0x100); }
                 Done(g); return;
-            case (6, 0): Barracks(w, r, g); return;
-            case (6, 1): w.Service(0x3d, g); return;
+            case (6, 0): Barracks(w, r, g, false); return;
+            case (11, 0): Barracks(w, r, g, true); return;
+            case (6, 1) or (11, 1): w.Service(0x3d, g); return;
             case (7, 0):
                 { uint saved = g.Ebx; g.Eax = 7; g.Ebx = 0x11f; w.Service(0x129, g); g.Ebx = saved; Idle(r, g); return; }
             case (7, 1):
@@ -200,30 +205,40 @@ public static class OriginalBuildingScripts
                 if ((g.Ebx & 0xff) == 0 && (Word(r, 0x17) & 0x100) == 0) { Effect(w, r, g, 0xfffffffe, 10, 0x1d); SetWord(r, 0x17, Word(r, 0x17) | 0x100); }
                 Done(g); return;
             case (7, 4): g.Edx = 1; w.Service(0x49, g); return;
-            case (8, 0): Idle(r, g); return;
+            case (8, 0) or (9, 0) or (10, 0): Idle(r, g); return;
             case (8, 1):
                 w.Service(0x3d, g); if (!g.Zf) return;
                 r[0x0f] = 0x24;
                 if ((g.Ebx & 0xff) == 0 && (Word(r, 0x17) & 0x100) == 0) { Effect(w, r, g, 2, 0x43, 0x1d); SetWord(r, 0x17, Word(r, 0x17) | 0x100); }
                 Done(g); return;
+            case (9, 1) or (10, 1):
+                w.Service(0x3d, g); if (!g.Zf) return;
+                r[0x0f] = 0x24;
+                if ((g.Ebx & 0xff) == 0 && (Word(r, 0x17) & 0x100) == 0) { if (k == 9) Effect(w, r, g, 0x28, 0x33, 0x1c); else Effect(w, r, g, 0xc, 0xd, 0x1c); SetWord(r, 0x17, Word(r, 0x17) | 0x100); }
+                Done(g); return;
+            case (9, 3):
+                g.Edx = 0xd; w.Service(0x51, g); for (int i = 0; i < 4; i++) r[0x22 + i] = 0xff; r[0x26] = 0xff; Done(g); return;
+            case (9, 4): g.Edx = 0xffffffc5; w.Service(0x49, g); return;
+            case (10, 4): g.Edx = 1; w.Service(0x49, g); return;
             case (8, 4): g.Edx = 1; w.Service(0x49, g); return;
-            case (4, 5) or (6, 5) or (7, 5) or (8, 5): w.Service(0x12d, g); return;
+            case (4, 5) or (6, 5) or (7, 5) or (8, 5) or (9, 5) or (10, 5) or (11, 5): w.Service(0x12d, g); return;
             default: Done(g); return;
         }
     }
 
     /// <summary>The state 0 handler of the script 896 (909): the waiting building spends time on the cargo, and looks for an object in reach (FS:79).</summary>
-    private static void Barracks(IBuildingScriptWorld w, byte[] r, BuildingRegs g)
+    private static void Barracks(IBuildingScriptWorld w, byte[] r, BuildingRegs g, bool second)
     {
         if ((g.Ebx & 0x40) != 0) { Done(g); return; }
         var t = w.DispatchTemplate();
         if ((sbyte)r[0x19] > (sbyte)t[0x46])
         {
-            g.Eax = 0; g.Ebx = 0xf; w.Service(0x129, g);
+            g.Eax = second ? 0xau : 0; g.Ebx = 0xf; w.Service(0x129, g);
             if (r[0x24] != 0 && --r[0x23] == 0)
             {
                 r[0x23] = t[0x79]; r[0x24]--;
                 var (p, _, ptr) = w.Participant6D(); g.Ecx = ptr; BitConverter.GetBytes(Dword(p, 0x1c) + 0xa).CopyTo(p, 0x1c);
+                if (second) { g.Eax = (g.Eax & 0xffffff00) | r[3]; var e = w.Service1B7(r[3]); BitConverter.GetBytes(Dword(e, 0x1a10) + 0xa).CopyTo(e, 0x1a10); }
             }
             var (zf, obj, flags) = w.Service79();
             if (!zf)
