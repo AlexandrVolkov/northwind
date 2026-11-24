@@ -70,6 +70,9 @@ FUNCS = {
     'fc344': (0xc344, 0xc35f, []),
     'fc35f': (0xc35f, 0xc439, []),
     'fc0f6': (0xc0f6, 0xc331, [0x8ca1, 0x9653, 0x43b0, 0xd363, 0xa758]),
+    'fb9eb': (0xb9eb, 0xba2e, []),
+    'fba2e': (0xba2e, 0xba60, []),
+    'fbc15': (0xbc15, 0xbc2e, [0x43b0, 0xbb8e, 0x98db]),
     'fc439': (0xc439, 0xc4cd, []),
     'f84aa': (0x84aa, 0x8659, [0x8d89, 0x8c98, 0x8ca1, 0xc331, 0x8c47, 0x8af4, 0x8c89, 0xcfac, 0x123d3, 0xd101, 0x8b0f, 0xc35f]),
 }
@@ -155,7 +158,9 @@ def generate(game, names):
             tb = bytearray(0x56); struct.pack_into('<I', tb, 4, o.POOL + TMPL); o.cpu.mem_write(0x6ca + 0x56 * ar, bytes(tb))
         n = case['nch']; st = min(case['st'], n)
         for k in range(n):
-            ob = bytearray(constrain(prng(case['o1'] + 7 + k, 0x50))); struct.pack_into('<I', ob, 0x10, 0x60); o.cpu.mem_write(o.POOL + 0x8000 + 0x60 * k, bytes(ob))
+            ob = bytearray(constrain(prng(case['o1'] + 7 + k, 0x50))); struct.pack_into('<I', ob, 0x10, 0x60)
+            if ob[0x1c] & 1: ob[0x1b] = case['regs'][1] & 0xff
+            o.cpu.mem_write(o.POOL + 0x8000 + 0x60 * k, bytes(ob))
         for ow in range(8):
             pb = bytearray(prng(case['pt'] + ow, 0xf5)); struct.pack_into('<I', pb, 9, 0x8000 + 0x60 * n); struct.pack_into('<I', pb, 0xe, 0x8000 + 0x60 * st); o.cpu.mem_write(0x97a + 0xf5 * ow, bytes(pb))
         lst = [o.POOL + OBJ1 if (case['pt'] >> k) & 1 else o.POOL + OBJ2 for k in range(case['pt'] % 7)] + [0]
@@ -192,6 +197,7 @@ def generate(game, names):
             for k in (0x18, 0x1c, 0x20, 0x24):
                 if case['sel'] & 2: struct.pack_into('<I', pb, k, struct.unpack_from('<I', pb, k)[0] | 0x10000)
             o.cpu.mem_write(o.POOL + TMPL, bytes(tb)); o.cpu.mem_write(pa, bytes(pb))
+        if case['fn'] in ('fb9eb', 'fba2e'): o.cpu.reg_write(UC_X86_REG_EAX, (case['regs'][0] & 0xffffff00) | (case['regs'][0] & 7))
         if case['fn'] == 'fc439':
             tf = struct.unpack('<I', prng(case['tm'], 0x100)[0x40:0x44])[0]; o.cpu.reg_write(UC_X86_REG_EBX, case['bm']); o.cpu.reg_write(UC_X86_REG_EAX, (tf & case['bm']) if case['sel'] else case['regs'][0])
         if case['fn'] == 'fd157': o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + OBJ2)

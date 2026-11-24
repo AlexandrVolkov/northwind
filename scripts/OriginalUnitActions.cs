@@ -1333,4 +1333,37 @@ public static class OriginalUnitActions
         Done();
     }
     private static byte[] ObjectAtTemplate(IUnitActionWorld w, uint p) => w.ObjectAt(p);
+
+    /// <summary>B9EB: counts the objects of the chain of the owner AL (from the hint to the end) whose +1B equals BL; EAX = the count, CL = a checksum of their +0E / +0F.</summary>
+    public static void FB9EB(IUnitActionWorld w, ActionRegs g)
+    {
+        var part = w.PartOf((byte)g.Eax); uint end = U32(part, 9) + w.PoolBase, esi = U32(part, 0xe) + w.PoolBase;
+        g.Eax = 0; g.Ecx = 0; g.Cmp(esi, end, 32);
+        while (!g.Zf)
+        {
+            var o = w.ObjectAt(esi);
+            if (g.Bl == o[0x1b]) { g.Eax++; g.Cl ^= o[0xe]; g.Cl = (byte)(g.Cl + o[0xe]); g.Cl ^= o[0xf]; g.Cl = (byte)(g.Cl + o[0xf]); }
+            esi += U32(o, 0x10); g.Cmp(esi, end, 32);
+        }
+    }
+
+    /// <summary>BA2E: AL = FFh when an object of the chain of the owner AL has +1B equal to BL (else EAX = owner * F5h).</summary>
+    public static void FBA2E(IUnitActionWorld w, ActionRegs g)
+    {
+        var part = w.PartOf((byte)g.Eax); g.Eax = (g.Eax & 0xff) * 0xf5; uint end = U32(part, 9) + w.PoolBase, esi = U32(part, 0xe) + w.PoolBase;
+        g.Cmp(esi, end, 32);
+        while (!g.Zf)
+        {
+            var o = w.ObjectAt(esi);
+            if (g.Bl == o[0x1b]) { g.Al = 0xff; g.Logic(g.Al, 8); return; }
+            esi += U32(o, 0x10); g.Cmp(esi, end, 32);
+        }
+    }
+
+    /// <summary>BC15: the tail of the reshaping BB8B: the change message 43B0 for the record at EDX + [ESP], then BB8E and 98DB.</summary>
+    public static void FBC15(IUnitActionWorld w, ActionRegs g, uint stackTop)
+    {
+        g.Edx += stackTop; uint saved = g.Edx; g.Eax = 0; g.Logic(0, 32); w.Call(0x43b0, g); g.Edx = saved;
+        g.Al = 0; g.Logic(0, 8); w.Call(0xbb8e, g); w.Call(0x98db, g);
+    }
 }
