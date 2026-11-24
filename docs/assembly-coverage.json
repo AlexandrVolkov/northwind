@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "d7b25dc0679853ed9c32d34d13c05e9c1a23434a315cda74904e6a7eb78e3c31",
+  "annotation_sha256": "bf06d357a05a25b0ba189e7dd1e9c217fd3f12333bcb7141ac65b2179f523ee5",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,9 +32,9 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 6123,
-        "ported": 36484,
-        "unreviewed": 104178,
+        "partial": 6265,
+        "ported": 36560,
+        "unreviewed": 103960,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -582,6 +582,22 @@
         },
         {
           "start": 34687,
+          "end": 34701,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 34701,
+          "end": 34843,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "le1-vanish-action-878d"
+          ]
+        },
+        {
+          "start": 34843,
           "end": 35519,
           "status": "unreviewed",
           "classification": "unknown",
@@ -827,6 +843,22 @@
         },
         {
           "start": 38040,
+          "end": 38097,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 38097,
+          "end": 38173,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-frame-range-94d1"
+          ]
+        },
+        {
+          "start": 38173,
           "end": 38355,
           "status": "unreviewed",
           "classification": "unknown",

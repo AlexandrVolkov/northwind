@@ -80,8 +80,6 @@ public sealed partial class Skirmish
     }
 
     // ---- the vanishing of the hurt mage (docs/rufin.md): the continuation of the unit step and the action FS:105
-    public const int VanishTicks = 24;   // ADAPTER: 8D0B plays DAT[78] = 12 frames; the pace of two updates per frame is assumed
-    private readonly Dictionary<uint, int> _vanish = [];
     private sealed class MageDrop(Skirmish battle) : IMageWorld
     { public void DropItems(byte cellX, byte cellY, byte owner) => battle.ItemRules.DropAll(battle.ItemWorld, owner, cellX, cellY); }
     private MageDrop? _mageDrop;
@@ -96,40 +94,30 @@ public sealed partial class Skirmish
         if ((sbyte)r[0x19] > 0 && (r[0x17] & 0x80) == 0)
         {
             bool done = false;
-            if ((r[0x14] & 7) == 3) done = VanishStep(mage);
+            if ((r[0x14] & 7) == 3)
+            {
+                if ((r[0x2d] & 15) == 2) { mage.Stepping = false; r[0x2d] &= 0xf0; }   // the walk is cut short (MoveTick does not run while the action goes)
+                done = VanishStep(mage);
+            }
             else if ((r[0x14] & 0x40) != 0) done = true;
-            if (done) { r[0x14] = (byte)((r[0x14] >> 3) & 7); r[0x30] = 0; r[0x15] = 0; _vanish.Remove(mage.Id); }
+            if (done) { r[0x14] = (byte)((r[0x14] >> 3) & 7); r[0x30] = 0; r[0x15] = 0; }
         }
+        OriginalVanishAction.Motion.Step(mage.Record, mage.Parameters);
         if (IsPhantom(mage)) { OriginalPhantom.Continuation(r); return; }
         _mageDrop ??= new MageDrop(this);
         bool rufin = mage.Source.TemplateIndex == 13;
         OriginalMageCloak.Step(_mageDrop, r, rufin ? OriginalMageCloak.RufinLow : OriginalMageCloak.FirstMageLow, rufin ? OriginalMageCloak.RufinHigh : OriginalMageCloak.FirstMageHigh, rufin);
     }
 
-    /// <summary>FS:105 (878D): at the start +15 = 1 (vanish: the frames run forwards) or 2 (return: backwards); at the end of the frames a vanishing mage gets +32 = FF (hidden), a returning one +32 = 0 and +20 = FF.</summary>
-    private bool VanishStep(SkirmishActor mage)
-    {
-        var r = mage.Record;
-        if (!_vanish.TryGetValue(mage.Id, out int progress)) { r[0x15] = (byte)(r[0x32] == 0 ? 1 : 2); r[0x25] = 0x24; progress = 0; }
-        _vanish[mage.Id] = ++progress;
-        if (progress < VanishTicks) return false;
-        if (r[0x15] == 1) { r[0x32] = 0xff; r[0x18] |= 0x02; }   // +17 |= 200h (the word's high byte is +18)
-        else { r[0x32] = 0; r[0x20] = 0xff; }
-        return true;
-    }
+    /// <summary>FS:105 (<see cref="OriginalVanishAction"/>) and the playback of its frames (the state-5 slice of 9210).</summary>
+    private bool VanishStep(SkirmishActor mage) => OriginalVanishAction.Step(mage.Record, mage.Parameters);
 
-    /// <summary>The frame of the vanishing animation to draw for a mage in state 3 (null otherwise).</summary>
-    public int? VanishFrame(SkirmishActor mage)
-    {
-        if (!_vanish.TryGetValue(mage.Id, out int progress) || (mage.Record[0x14] & 7) != 3) return null;
-        var p = mage.Parameters; int frames = p[0x78], start = BinaryPrimitives.ReadUInt16LittleEndian(p.AsSpan(0x48)) + 8 * (p[0x4a] + p[0x4b]) + 4 * (p[0x4f] + p[0x50] + p[0x51] + p[0x52]);
-        int k = Math.Clamp(progress * frames / VanishTicks, 0, frames - 1);
-        return start + (mage.Record[0x15] == 2 ? frames - 1 - k : k);
-    }
+    /// <summary>The frame of the vanishing animation while it plays (state 5 of the motion byte), null otherwise.</summary>
+    public int? VanishFrame(SkirmishActor mage) => IsMageUnit(mage) && (mage.Record[0x2d] & 15) == 5 ? BinaryPrimitives.ReadUInt16LittleEndian(mage.Record.AsSpan(1)) : null;
     /// <summary>A hidden mage (+32 ≠ 0, visibility mask +20 = 0) is seen and targeted by nobody.</summary>
     public static bool IsHidden(SkirmishActor actor) => IsHermit(actor) && actor.Record[0x20] == 0;
     /// <summary>A mage or a phantom in state 3 (the vanishing action): UpdateUnit leaves him alone.</summary>
-    public bool IsVanishing(SkirmishActor actor) => IsMageUnit(actor) && (actor.Record[0x14] & 7) == 3;
+    public bool IsVanishing(SkirmishActor actor) => IsMageUnit(actor) && ((actor.Record[0x14] & 7) == 3 || (actor.Record[0x2d] & 15) == 5 || (actor.Record[0x2d] >> 4) == 5);
 
     private void TickMages()
     {
