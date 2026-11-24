@@ -4340,6 +4340,30 @@
       "evidence": ["docs/campaign-layer.md", "tests/fixtures/campaign-catchup.json", "tools/verify_campaign_catchup.py", "tests/OriginalCampaignCatchupChecks.cs"],
       "implementation": ["scripts/OriginalCampaignRegions.cs"],
       "limitations": "10FDE, 1E6C2, 1E740 and 11087 are recorded stubs in the check; the middle of 10ECE (10EF0..10FC1) is dead code (the budget is capped at 400h before the test against 800h) and is not ported"
+    },
+    {
+      "id": "army03-onis-dbf",
+      "module": "ARMY__03.WRK",
+      "start": 3519,
+      "end": 4605,
+      "name": "Quest script of the hermit Onis (template 14): init, voice, speeches and answers, the territory scan",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/onis.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
+      "implementation": ["scripts/OriginalOnis.cs"],
+      "limitations": "FS services are recorded stubs (as for Rufin); FS:E1 table and the cloak continuation 1215.. are shared with Rufin (OriginalMageCloak); when wall 0 is missing the reveal point is (0, 0)"
+    },
+    {
+      "id": "army03-irvil-1297",
+      "module": "ARMY__03.WRK",
+      "start": 4759,
+      "end": 5686,
+      "name": "Quest script of the hermit Irvil (template 15)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/irvil.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
+      "implementation": ["scripts/OriginalIrvil.cs"],
+      "limitations": "FS services are recorded stubs (as for Rufin); the cloak continuation 1646.. is shared with Rufin"
     }
   ]
 }

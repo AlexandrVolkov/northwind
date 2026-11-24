@@ -41,10 +41,10 @@ public static class OriginalRufin
     /// <summary>AH = 2: the mage's voice.</summary>
     public static void Speak(IRufinWorld w) => w.Voice(0x9031);
 
-    private static bool Bt(byte[] r, int offset, int bit) => (BinaryPrimitives.ReadUInt32LittleEndian(r.AsSpan(offset)) & (1u << (bit & 31))) != 0;
-    private static bool Bts(byte[] r, int offset, int bit) { bool was = Bt(r, offset, bit); BinaryPrimitives.WriteUInt32LittleEndian(r.AsSpan(offset), BinaryPrimitives.ReadUInt32LittleEndian(r.AsSpan(offset)) | (1u << (bit & 31))); return was; }
-    private static void Btr(byte[] r, int offset, int bit) => BinaryPrimitives.WriteUInt32LittleEndian(r.AsSpan(offset), BinaryPrimitives.ReadUInt32LittleEndian(r.AsSpan(offset)) & ~(1u << (bit & 31)));
-    private static uint U32(byte[] r, int o) => BinaryPrimitives.ReadUInt32LittleEndian(r.AsSpan(o));
+    internal static bool Bt(byte[] r, int offset, int bit) => (BinaryPrimitives.ReadUInt32LittleEndian(r.AsSpan(offset)) & (1u << (bit & 31))) != 0;
+    internal static bool Bts(byte[] r, int offset, int bit) { bool was = Bt(r, offset, bit); BinaryPrimitives.WriteUInt32LittleEndian(r.AsSpan(offset), BinaryPrimitives.ReadUInt32LittleEndian(r.AsSpan(offset)) | (1u << (bit & 31))); return was; }
+    internal static void Btr(byte[] r, int offset, int bit) => BinaryPrimitives.WriteUInt32LittleEndian(r.AsSpan(offset), BinaryPrimitives.ReadUInt32LittleEndian(r.AsSpan(offset)) & ~(1u << (bit & 31)));
+    internal static uint U32(byte[] r, int o) => BinaryPrimitives.ReadUInt32LittleEndian(r.AsSpan(o));
 
     /// <summary>AH = 1, one update.</summary>
     public static void Step(IRufinWorld w, byte[] r)
@@ -67,14 +67,14 @@ public static class OriginalRufin
         }
         Standard(w);
     }
-    private static void Standard(IRufinWorld w) { w.StandardVitals(); w.StandardActions(); }
+    internal static void Standard(IRufinWorld w) { w.StandardVitals(); w.StandardActions(); }
 
-    private static bool FindQueue(IRufinWorld w, int participant, byte type, int speaker, out int slot)
+    internal static bool FindQueue(IRufinWorld w, int participant, byte type, int speaker, out int slot)
     {
         for (slot = 0; slot < 8; slot++) if (w.Diplomacy.Queue[participant, slot].Type == type && w.Diplomacy.Queue[participant, slot].Other == speaker) return true;
         return false;
     }
-    private static void Consume(IRufinWorld w, int participant, int slot) => w.Diplomacy.Queue[participant, slot].Type = 0xff;
+    internal static void Consume(IRufinWorld w, int participant, int slot) => w.Diplomacy.Queue[participant, slot].Type = 0xff;
 
     /// <summary>The speech part (every 32 updates); false: the script goes to the next participant without the answers (the CB0 exits).</summary>
     private static bool Dialog(IRufinWorld w, byte[] r, int owner, int p)
@@ -127,7 +127,7 @@ public static class OriginalRufin
     }
 
     /// <summary>C83: the answer was given: the mage stops asking and his health is set to 78h.</summary>
-    private static void Forgive(IRufinWorld w, byte[] r, int p)
+    internal static void Forgive(IRufinWorld w, byte[] r, int p)
     {
         if (!Bt(r, 0x45, p))
         {
