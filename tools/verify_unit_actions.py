@@ -91,6 +91,7 @@ FUNCS = {
     'fs14b': (0x11dde, 0x11eb0, [0x21a00, 0xd7b1, 0xc344, 0xd157]),
     'fs187': (0x10ad2, 0x10b75, [0x9e41, 0x9e55, 0xac63]),
     'fs16b': (0x9064, 0x90e9, [0x9e41, 0xac63]),
+    'fs18b': (0x11cc9, 0x11d2e, []),
     'fc439': (0xc439, 0xc4cd, []),
     'f84aa': (0x84aa, 0x8659, [0x8d89, 0x8c98, 0x8ca1, 0xc331, 0x8c47, 0x8af4, 0x8c89, 0xcfac, 0x123d3, 0xd101, 0x8b0f, 0xc35f]),
 }
@@ -237,7 +238,7 @@ def generate(game, names):
             r2, r3 = case['regs'][2], case['regs'][3]; b1 = prng(case['o1'], 0x50)[3]; b2 = prng(case['o2'], 0x50)[3]
             o.cpu.reg_write(UC_X86_REG_ECX, (r2 & 0xffff0000) | (r2 & 31) | (((r2 >> 8) & 31) << 8)); o.cpu.reg_write(UC_X86_REG_EDX, (r3 & 0xffff0000) | (r3 & 31) | (((r3 >> 8) & 31) << 8))
             o.cpu.reg_write(UC_X86_REG_EAX, (case['regs'][0] & 0xffffff00) | (b1 if case['sel'] & 1 else b2 if case['sel'] & 2 else case['regs'][0] & 0xff))
-        if case['fn'] in ('fb9eb', 'fba2e', 'fb5d8'): o.cpu.reg_write(UC_X86_REG_EAX, (case['regs'][0] & 0xffffff00) | (case['regs'][0] & 7))
+        if case['fn'] in ('fb9eb', 'fba2e', 'fb5d8', 'fda45'): o.cpu.reg_write(UC_X86_REG_EAX, (case['regs'][0] & 0xffffff00) | (case['regs'][0] & 7))
         if case['fn'] == 'fb319' and case['sel'] != 0:
             tb = bytearray(o.cpu.mem_read(o.POOL + TMPL, 0x100)); tb[0x46] = 5; tb[0x4e] = 0x10; tb[0x40] |= 8; o.cpu.mem_write(o.POOL + TMPL, bytes(tb))
         if case['fn'] == 'fb6f1':
@@ -256,6 +257,11 @@ def generate(game, names):
         if case['fn'] == 'fs14b' and case['sel'] != 0:
             tb = bytearray(o.cpu.mem_read(o.POOL + TMPL, 0x100)); tb[0x46] = 5; tb[0x74] = 0xf; tb[0x40] &= ~0x20 & 0xff; tb[0x41] &= 0x7f; o.cpu.mem_write(o.POOL + TMPL, bytes(tb))
         if case['fn'] in ('fs187', 'fs16b'): o.cpu.reg_write(UC_X86_REG_EAX, (case['regs'][0] & 0xffff0000) | ((((case['regs'][0] >> 8) & 0xff) % 3) << 8))
+        o.cpu.mem_write(0x6c6, bytes(1)); o.cpu.mem_write(0x6c9, bytes(1)); o.cpu.mem_write(0x3e87, bytes(4))
+        if case['fn'] == 'fs18b':
+            a1, a2 = prng(case['ds'] + 11, 0x3000), prng(case['ds'] + 12, 0x3000)
+            blk = bytes(((a1[k] | a2[k]) if k % 3 == 0 else (a1[k] & a2[k])) & (0 if k % 0x84 in (0x59, 0x17) else 0xff) for k in range(0x3000))
+            o.cpu.mem_write(0x5000, blk); o.cpu.mem_write(0x3e87, struct.pack('<I', 0x5000)); o.cpu.mem_write(0x6c9, bytes([1 + case['sel'] % 4])); o.cpu.mem_write(0x6c6, bytes([1 + case['g273'] % 4]))
         if case['fn'] == 'fc439':
             tf = struct.unpack('<I', prng(case['tm'], 0x100)[0x40:0x44])[0]; o.cpu.reg_write(UC_X86_REG_EBX, case['bm']); o.cpu.reg_write(UC_X86_REG_EAX, (tf & case['bm']) if case['sel'] else case['regs'][0])
         if case['fn'] == 'fd157': o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + OBJ2)
