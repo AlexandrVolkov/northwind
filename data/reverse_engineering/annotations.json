@@ -6416,6 +6416,42 @@
       "evidence": ["docs/object-allocator.md", "tests/fixtures/object-transfer.json", "tools/verify_object_transfer.py", "tests/OriginalObjectTransferChecks.cs"],
       "implementation": ["scripts/OriginalObjectAllocator.cs"],
       "limitations": "The notification 9A8E and the change message 43B0 are recorded callbacks; the skirmish does not use the ported pool yet (the hand-over there is still a log entry)"
+    },
+    {
+      "id": "le1-unit-actions-b9eb",
+      "module": "LE:1",
+      "start": 47595,
+      "end": 47662,
+      "name": "Count the objects of the chain with a given +1B (B9EB)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The chain has up to 4 objects"
+    },
+    {
+      "id": "le1-unit-actions-ba2e",
+      "module": "LE:1",
+      "start": 47662,
+      "end": 47712,
+      "name": "Is there an object of the chain with a given +1B (BA2E)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The chain has up to 4 objects"
+    },
+    {
+      "id": "le1-unit-actions-bc15",
+      "module": "LE:1",
+      "start": 48149,
+      "end": 48174,
+      "name": "Tail of the reshaping BB8B (BC15)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "43B0, BB8E and 98DB are recorded stubs"
     }
   ]
 }

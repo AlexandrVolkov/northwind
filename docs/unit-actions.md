@@ -29,3 +29,7 @@
 ## C0F6: the action of the building worker
 
 `FC0F6` (LE:1 C0F6..C331) is the action of the unit that builds: state 0 orders the walk (8CA1), 1 waits until the unit stands on the cell, 2 asks the order service (9653), pays the template costs from the participant (+18/+1C/+20/+24) and creates the building through the allocator A758, 3 builds it (health grows by DAT[79] every DAT[4B] steps up to the template maximum, then BL = C0h); every failure ends with BL = 40h. The flags of D363 survive 43B0 through PUSHFD/POPFD. Verified against x86 on 262 cases (19 with the full payment, 96 in the building state); the participant record of the owner is part of the compared output.
+
+## B9EB, BA2E, BC15
+
+`FB9EB` counts the objects of the chain of an owner whose +1B equals BL (and folds their +0E/+0F into CL), `FBA2E` only asks whether one exists (AL = FFh), `FBC15` is the tail of the reshaping BB8B (43B0 for the record, BB8E, 98DB). Verified against x86 on the random chains of the unit-action fixture.
