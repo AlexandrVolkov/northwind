@@ -35,6 +35,14 @@ public partial class TestRunner
         private readonly Queue<(bool, uint, uint)> _spot = new(c.GetProperty("spot").EnumerateArray().Select(a => (a[0].GetInt32() != 0, (uint)a[1].GetInt32(), (uint)a[2].GetInt32())));
         private readonly Queue<(bool, byte, byte, byte)> _beside = new(c.GetProperty("beside").EnumerateArray().Select(a => (a[0].GetInt32() != 0, (byte)a[1].GetInt32(), (byte)a[2].GetInt32(), (byte)a[3].GetInt32())));
         private readonly Queue<bool> _create = new(c.GetProperty("create").EnumerateArray().Select(a => a.GetInt32() != 0));
+        private readonly Queue<(bool, byte)> _s11 = new(c.GetProperty("svc11").EnumerateArray().Select(a => (a[0].GetInt32() != 0, (byte)a[1].GetInt32())));
+        private readonly Queue<bool> _a5 = new(c.GetProperty("svca5").EnumerateArray().Select(a => a.GetInt32() != 0));
+        public byte Parent25 => (byte)c.GetProperty("parent25").GetInt32();
+        public byte Bl => (byte)c.GetProperty("bl").GetInt32();
+        public void Sound35(uint id) { log.Add((byte)'S'); log.AddRange(BitConverter.GetBytes(id)); }
+        public (bool Zf, byte Al) Service11(uint eax) { log.Add((byte)'Q'); log.AddRange(BitConverter.GetBytes(eax)); return _s11.Count > 0 ? _s11.Dequeue() : (true, (byte)0); }
+        public bool ServiceA5() { log.Add((byte)'W'); return _a5.Count > 0 ? _a5.Dequeue() : true; }
+        public void ServiceAD(byte al, byte bl) { log.Add((byte)'M'); log.Add(al); log.Add(bl); }
         public void LevelExit(byte mode) { log.Add((byte)'X'); log.Add(mode); }
         public void Appearance(byte army) { log.Add((byte)'N'); log.Add(army); }
         public (bool Found, uint Reference) ScanMasked(byte mode, uint mask)
@@ -98,6 +106,7 @@ public partial class TestRunner
             r[0x15] = (byte)c.GetProperty("f15").GetInt32(); r[0x14] = (byte)c.GetProperty("f14").GetInt32(); r[0x0d] = (byte)c.GetProperty("f0d").GetInt32(); r[0x19] = (byte)c.GetProperty("f19").GetInt32(); r[0x2d] = (byte)c.GetProperty("f2d").GetInt32(); BitConverter.GetBytes((uint)c.GetProperty("f26").GetInt64()).CopyTo(r, 0x26); r[0x2a] = (byte)c.GetProperty("f2a").GetInt32();
             BitConverter.GetBytes((ushort)c.GetProperty("w1").GetInt32()).CopyTo(r, 1); BitConverter.GetBytes((uint)c.GetProperty("f22").GetInt64()).CopyTo(r, 0x22);
             r[0x27] = (byte)c.GetProperty("f27").GetInt32(); r[0x28] = (byte)c.GetProperty("mask28").GetInt32(); r[0x31] = (byte)c.GetProperty("f31").GetInt32();
+            r[0] = (byte)c.GetProperty("e0").GetInt32(); BitConverter.GetBytes((uint)c.GetProperty("e12").GetInt64()).CopyTo(r, 0x12);
             var log = new List<byte>(); var world = new ObjectReplay(c, random, log); Array.Copy(world.ObjectBytes, 0, world.Obj1, 0, 0x40); Array.Copy(world.ObjectBytes, 0x40, world.Obj2, 0, 0x40);
             ushort ax = 0;
             if (itemobj) { ax = OriginalObjectScripts.Pickup(world, r, c.GetProperty("ah").GetInt32(), c.GetProperty("k").GetInt32(), (byte)c.GetProperty("bl").GetInt32()); }
@@ -137,6 +146,10 @@ public partial class TestRunner
         ObjectScriptReplay("obj-switch2", "switch2", "The second switch ARMY__00.WRK 371", OriginalObjectScripts.Switch2, 0, true);
         ObjectScriptReplay("obj-exit", "exit", "The exit ARMY__00.WRK 3A9", OriginalObjectScripts.Exit, 0, false, true);
         ObjectScriptReplay("obj-itemobj", "itemobj", "The item objects ARMY__00.WRK 86..4F3", (w, r, ah) => { }, 0, false, false, false, false, true);
+        ObjectScriptReplay("obj-fx54a", "fx54a", "The effect ARMY__00.WRK 54A", (w, r, ah) => { var parent = new byte[0x40]; parent[0x25] = ((ObjectReplay)w).Parent25; OriginalObjectScripts.Fx54a(w, r, ah, parent); }, 0);
+        ObjectScriptReplay("obj-fx6fe", "fx6fe", "The spark ARMY__00.WRK 6FE", (w, r, ah) => OriginalObjectScripts.Spark(w, r, ah, false), 0);
+        ObjectScriptReplay("obj-fx735", "fx735", "The hard spark ARMY__00.WRK 735", (w, r, ah) => OriginalObjectScripts.Spark(w, r, ah, true), 0);
+        ObjectScriptReplay("obj-fx7fe", "fx7fe", "The smoke ARMY__00.WRK 7FE", (w, r, ah) => OriginalObjectScripts.Fx7fe(w, r, ah, ((ObjectReplay)w).Bl), 0);
         ObjectScriptReplay("obj-face", "face", "The stone face script ARMY__03.WRK 2B9", OriginalObjectScripts.Face);
     }
 }
