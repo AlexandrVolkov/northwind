@@ -5,7 +5,7 @@ using Northwind;
 
 public partial class TestRunner
 {
-    private sealed class BridgeReplay(JsonElement c, List<byte> log, byte[] blocker) : IBridgeBuilderWorld
+    private sealed class BridgeReplay(JsonElement c, List<byte> log, byte[] blocker) : IGateMotionWorld
     {
         public uint Reference => 0x800;
         public (bool Free, bool Blocked, byte[] Blocker) Place(byte template, byte army, byte mode, uint x, uint y)
@@ -17,10 +17,10 @@ public partial class TestRunner
         public bool SearchEnemy(byte mode) { log.Add((byte)'S'); log.Add(mode); return c.GetProperty("search_zf").GetInt32() == 0; }
     }
 
-    /// <summary>Replays tests/fixtures/bridge-builder.json (tools/verify_bridge_builder.py): LE:1 D5B1, D61D and D689.</summary>
-    private void OriginalBridgeBuilderChecks()
+    /// <summary>Replays tests/fixtures/gate-motion.json (tools/verify_gate_motion.py): LE:1 D5B1, D61D and D689.</summary>
+    private void OriginalGateMotionChecks()
     {
-        using var reference = GameData.Read<JsonDocument>("res://tests/fixtures/bridge-builder.json");
+        using var reference = GameData.Read<JsonDocument>("res://tests/fixtures/gate-motion.json");
         var root = reference.RootElement;
         using var digest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         int count = 0, firstMismatch = -1, done = 0, hurt = 0;
@@ -33,9 +33,9 @@ public partial class TestRunner
             var blocker = new byte[0x40]; blocker[0x19] = (byte)c.GetProperty("blocker").GetInt32(); var log = new List<byte>(); var world = new BridgeReplay(c, log, blocker);
             byte bl = c.GetProperty("fn").GetString() switch
             {
-                "raise" => OriginalBridgeBuilder.Raise(r, world),
-                "lower" => OriginalBridgeBuilder.Lower(r, world),
-                _ => OriginalBridgeBuilder.Step(r, world, () => world.SearchEnemy(0)),
+                "raise" => OriginalGateMotion.Raise(r, world),
+                "lower" => OriginalGateMotion.Lower(r, world),
+                _ => OriginalGateMotion.Step(r, world, () => world.SearchEnemy(0)),
             };
             byte[] output = [.. r, .. blocker, bl, .. log];
             digest.AppendData(output); if ((bl & 0x40) != 0) done++; if (blocker[0x19] != (byte)c.GetProperty("blocker").GetInt32()) hurt++;
@@ -43,9 +43,9 @@ public partial class TestRunner
             if (hex != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; if (only == count) GD.Print("CSHARP " + Convert.ToHexStringLower(output)); }
             count++;
         }
-        GD.Print($"Bridge: first mismatch {firstMismatch}; {done} finished, {hurt} hurt");
+        GD.Print($"Gate: first mismatch {firstMismatch}; {done} finished, {hurt} hurt");
         var summary = root.GetProperty("results").GetProperty("bridge");
-        Check(count == summary.GetProperty("case_count").GetInt32() && done > 50 && hurt > 10, $"Bridge builder reference coverage ({count} cases, {done} finished, {hurt} hurt)");
-        Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Bridge builder actions LE:1 D5B1/D61D/D689 match original x86");
+        Check(count == summary.GetProperty("case_count").GetInt32() && done > 50 && hurt > 10, $"Gate motion reference coverage ({count} cases, {done} finished, {hurt} hurt)");
+        Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Gate actions LE:1 D5B1/D61D/D689 match original x86");
     }
 }

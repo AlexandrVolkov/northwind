@@ -1,8 +1,8 @@
 using System.Buffers.Binary;
 namespace Northwind;
 
-/// <summary>The services of the bridge builders (recorded stubs in tools/verify_bridge_builder.py).</summary>
-public interface IBridgeBuilderWorld
+/// <summary>The services of the gates (recorded stubs in tools/verify_gate_motion.py).</summary>
+public interface IGateMotionWorld
 {
     /// <summary>AC63: the plane check of the place (bl = 2 for raising, 1 for lowering): Free (ZF), else Limit (CF clear: the unit may not go on) with the object in the way.</summary>
     (bool Free, bool Blocked, byte[] Blocker) Place(byte template, byte army, byte mode, uint x, uint y);
@@ -11,19 +11,19 @@ public interface IBridgeBuilderWorld
     uint Reference { get; }              // the unit's reference (ESI − [6AA])
 }
 
-/// <summary>The actions of the units that raise and lower a bridge, LE:1 D5B1 (raise one step), D61D (lower one step) and D689 (the update). The step counter +22 runs to 20h (the height of the
-/// bridge, +0C follows it); at the middle (10h) the place is checked and the footprint moves to the next plane (+0D); a blocked step waits 1Eh updates and hurts the object in the way by 10;
+/// <summary>The actions of the gates (FS:91 open, FS:95 close, FS:C1 the automaton), LE:1 D5B1 (raise one step), D61D (lower one step) and D689 (the update). The step counter +22 runs to 20h (the lift of the
+/// gate, +0C follows it); at the middle (10h) the place is checked and the footprint moves to the next plane (+0D); a blocked step waits 1Eh updates and hurts the object in the way by 10;
 /// +15 is the delay between the steps. D689: the unit rests until an enemy is near (+23: 0 look every 32 updates, 1 raising, 2 lowering). Verified against the original x86 by
-/// tests/fixtures/bridge-builder.json (tools/verify_bridge_builder.py).</summary>
-public static class OriginalBridgeBuilder
+/// tests/fixtures/gate-motion.json (tools/verify_gate_motion.py).</summary>
+public static class OriginalGateMotion
 {
     private static void Alarm(byte[] r) => BinaryPrimitives.WriteUInt16LittleEndian(r.AsSpan(0x17), (ushort)(BinaryPrimitives.ReadUInt16LittleEndian(r.AsSpan(0x17)) | 0x200));
 
     /// <returns>BL: 0 going on, 40h done.</returns>
-    public static byte Raise(byte[] r, IBridgeBuilderWorld w) => Move(r, w, 2, +1, 0x20);
-    public static byte Lower(byte[] r, IBridgeBuilderWorld w) => Move(r, w, 1, -1, 0);
+    public static byte Raise(byte[] r, IGateMotionWorld w) => Move(r, w, 2, +1, 0x20);
+    public static byte Lower(byte[] r, IGateMotionWorld w) => Move(r, w, 1, -1, 0);
 
-    private static byte Move(byte[] r, IBridgeBuilderWorld w, byte mode, int direction, int limit)
+    private static byte Move(byte[] r, IGateMotionWorld w, byte mode, int direction, int limit)
     {
         if (r[0x15] != 0) { r[0x15]--; return 0; }
         if (r[0x22] == 0x10)
@@ -45,7 +45,7 @@ public static class OriginalBridgeBuilder
     }
 
     /// <returns>BL after the update.</returns>
-    public static byte Step(byte[] r, IBridgeBuilderWorld w, Func<bool> searchEnemy)
+    public static byte Step(byte[] r, IGateMotionWorld w, Func<bool> searchEnemy)
     {
         r[0x0f] &= 0xef; byte bl = 0;
         if (r[0x23] == 0)

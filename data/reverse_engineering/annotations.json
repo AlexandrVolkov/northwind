@@ -4546,15 +4546,15 @@
       "limitations": "68BD, 219C3, EEBB and 1188F are recorded stubs in the check; not yet driving the skirmish (the AI keeps its own bookkeeping)"
     },
     {
-      "id": "le1-bridge-builder-d5b1",
+      "id": "le1-gate-motion-d5b1",
       "module": "LE:1",
       "start": 54705,
       "end": 55014,
-      "name": "Bridge builders: raise one step (D5B1), lower one step (D61D), the unit's update (D689)",
+      "name": "Gates: open one step (D5B1, FS:91), close one step (D61D, FS:95), the automaton (D689, FS:C1)",
       "classification": "code",
       "status": "ported",
-      "evidence": ["docs/bridges.md", "tests/fixtures/bridge-builder.json", "tools/verify_bridge_builder.py", "tests/OriginalBridgeBuilderChecks.cs"],
-      "implementation": ["scripts/OriginalBridgeBuilder.cs"],
+      "evidence": ["docs/bridges.md", "tests/fixtures/gate-motion.json", "tools/verify_gate_motion.py", "tests/OriginalGateMotionChecks.cs"],
+      "implementation": ["scripts/OriginalGateMotion.cs"],
       "limitations": "AC63, 43B0 and D895 are recorded stubs in the check; the skirmish keeps its own bridge animation (adapter) until this is wired"
     }
   ]
