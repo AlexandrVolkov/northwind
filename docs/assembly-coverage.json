@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "99afcd4f3f8a53545f34e81c3b1bff45cc016cabf5c1b2e51a9ace2d66d039a9",
+  "annotation_sha256": "9ec37b405152bbd96ead758504c6edff09b03983b975efc13bd953267b65cba1",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3575,8 +3575,8 @@
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
         "partial": 855,
-        "ported": 779,
-        "unreviewed": 5296
+        "ported": 1257,
+        "unreviewed": 4818
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -3865,6 +3865,22 @@
         },
         {
           "start": 3707,
+          "end": 3974,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 3974,
+          "end": 4216,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army02-catapult-f86"
+          ]
+        },
+        {
+          "start": 4216,
           "end": 4532,
           "status": "unreviewed",
           "classification": "unknown",
@@ -3881,6 +3897,22 @@
         },
         {
           "start": 4653,
+          "end": 5218,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 5218,
+          "end": 5454,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army02-ballista-1462"
+          ]
+        },
+        {
+          "start": 5454,
           "end": 5661,
           "status": "unreviewed",
           "classification": "unknown",

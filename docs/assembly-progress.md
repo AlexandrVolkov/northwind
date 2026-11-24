@@ -9,7 +9,7 @@
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 509 | 100 | 0 | 4794 | 0 |
 | ARMY__01.WRK | 4951 | 4576 | 0 | 0 | 375 | 7 |
-| ARMY__02.WRK | 6930 | 5296 | 855 | 0 | 779 | 7 |
+| ARMY__02.WRK | 6930 | 4818 | 855 | 0 | 1257 | 7 |
 | ARMY__03.WRK | 13412 | 963 | 0 | 0 | 12449 | 1 |
 | ARMY__04.WRK | 411 | 411 | 0 | 0 | 0 | 0 |
 | ARMY__05.WRK | 882 | 882 | 0 | 0 | 0 | 2 |
@@ -76,7 +76,9 @@
 | ARMY__02.WRK `0x9ED..0xA9B` | Ore worker handler header, init and action table | partial | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Перенесены инициализация A09 и переход A37..A43; общий префикс 90E9 и диспетчер 8227 не перенесены. |
 | ARMY__02.WRK `0xA9B..0xAB3` | Empty ore worker becomes template 10 | ported | [ore-extraction.md](../docs/ore-extraction.md); [ore-extraction.json](../tests/fixtures/ore-extraction.json) | Ветка сброса груза AB3..ACE (объект 26h) не перенесена. |
 | ARMY__02.WRK `0xD85..0xE7B` | Gate script (D85): command states 2/3/4, completion in automatic mode, half-damage closing | partial | [gates.md](../docs/gates.md); [GateChecks.cs](../tests/GateChecks.cs) | effects 7 at completion (FS:19) and FS:8D (building common) are not part of the port; no Unicorn fixture |
+| ARMY__02.WRK `0xF86..0x1078` | Catapult (template 16): init, debris, step, voice, loading check | ported | [object-scripts.md](../docs/object-scripts.md); [obj-siege.json](../tests/fixtures/obj-siege.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services (4D, DD, E1, 115, 71, 19) are recorded stubs in the check; the skirmish drives the siege weapons by its own adapters |
 | ARMY__02.WRK `0x11B4..0x122D` | Standard unit script (horseman): init, step, voice | ported | [object-scripts.md](../docs/object-scripts.md); [unit-scripts.json](../tests/fixtures/unit-scripts.json); [verify_unit_scripts.py](../tools/verify_unit_scripts.py); [OriginalUnitScriptChecks.cs](../tests/OriginalUnitScriptChecks.cs) | FS services are recorded stubs in the check; the skirmish drives the units by its own adapters |
+| ARMY__02.WRK `0x1462..0x154E` | Ballista (template 26): as the catapult with two kinds of debris | ported | [object-scripts.md](../docs/object-scripts.md); [obj-siege.json](../tests/fixtures/obj-siege.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services (4D, DD, E1, 115, 71, 19) are recorded stubs in the check; the skirmish drives the siege weapons by its own adapters |
 | ARMY__02.WRK `0x161D..0x16DD` | Unit corpse effect (type 1) | ported | [combat.md](../docs/combat.md); [corpse.json](../tests/fixtures/corpse.json) |  |
 | ARMY__03.WRK `0x0..0x61` | First mage (templates 0, 22, 23): init, voice and the plain step | ported | [rufin.md](../docs/rufin.md); [mage0.json](../tests/fixtures/mage0.json); [verify_hermit.py](../tools/verify_hermit.py); [OriginalRufinChecks.cs](../tests/OriginalRufinChecks.cs) | FS services are recorded stubs in the check; the continuation 79..C5 is OriginalMageCloak |
 | ARMY__03.WRK `0xE4..0x189` | Jug script (E4): breaking animation, item visit AH=8, removal | ported | [campaign-items.md](../docs/campaign-items.md); [container.json](../tests/fixtures/container.json); [verify_container.py](../tools/verify_container.py); [OriginalContainerChecks.cs](../tests/OriginalContainerChecks.cs) | FS services 1D, 15, 19 (dust effect 7) are recorded stubs in the check; the skirmish removes the object but draws no dust |
