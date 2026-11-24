@@ -4256,6 +4256,18 @@
       "evidence": ["docs/unit-motion.md", "tests/fixtures/unit-motion.json", "tools/verify_unit_motion.py", "tests/OriginalUnitMotionChecks.cs"],
       "implementation": ["scripts/OriginalUnitMotion.cs"],
       "limitations": "the services 70B0, 12930, 9653, D12C, 10799, 9727 and 95D3 are recorded stubs in the check; the module is verified but not yet the driver of the skirmish units"
+    },
+    {
+      "id": "le1-unit-walk-70b0",
+      "module": "LE:1",
+      "start": 28848,
+      "end": 29438,
+      "name": "Walk step of units (state 2): route step, turn, speed from terrain and DAT[58+type], movement, stride effects",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-motion.md", "tests/fixtures/unit-walk.json", "tools/verify_unit_walk.py", "tests/OriginalUnitWalkChecks.cs"],
+      "implementation": ["scripts/OriginalUnitWalk.cs"],
+      "limitations": "the services 7FA7, 9653, 9B0D, 9727, 813E, 8120, D895 and the terrain tables are recorded stubs in the check; not yet the driver of the skirmish units"
     }
   ]
 }

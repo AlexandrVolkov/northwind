@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 103587 | 6265 | 97 | 36933 | 44 |
+| LE:1 | 146882 | 103244 | 6265 | 97 | 37276 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
@@ -83,6 +83,7 @@
 | LE:1 `0x69FE..0x6A73` | Step along a line of segments (bridge, fence) | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [builder.json](../tests/fixtures/builder.json); [verify_builder.py](../tools/verify_builder.py) | The toggle [50D] is a field of the builder |
 | LE:1 `0x6DEF..0x6EB2` | Rasterize a column-filled status gauge | ported | [interface.md](../docs/interface.md); [status-bars.json](../tests/fixtures/status-bars.json) | Сверены индексы всех пикселей 1314 изображений в трёх размерах, current<=maximum и особый нулевой предел. DOS framebuffer и dirty-cache заменены отрисовкой Godot; опасные размеры и DIV за пределами контракта не перенесены. |
 | LE:1 `0x6EC1..0x6F18` | Single selection command panel filtered by WorkFlags | partial | [interface.md](../docs/interface.md); [command-panel.json](../tests/fixtures/command-panel.json) | Маски одиночной панели проверены для пяти DAT-шаблонов и всех 256 WorkFlags. Исходный runtime-буфер указателей, группа выделения и полный диспетчер кликов не перенесены. |
+| LE:1 `0x70B0..0x72FE` | Walk step of units (state 2): route step, turn, speed from terrain and DAT[58+type], movement, stride effects | ported | [unit-motion.md](../docs/unit-motion.md); [unit-walk.json](../tests/fixtures/unit-walk.json); [verify_unit_walk.py](../tools/verify_unit_walk.py); [OriginalUnitWalkChecks.cs](../tests/OriginalUnitWalkChecks.cs) | the services 7FA7, 9653, 9B0D, 9727, 813E, 8120, D895 and the terrain tables are recorded stubs in the check; not yet the driver of the skirmish units |
 | LE:1 `0x7165..0x7180` | Pending turn and motion entry | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Связка с поворотом и подготовкой движения, до анимации/эффектов; полный диспетчер состояний 70B0 не переносится этим статусом. |
 | LE:1 `0x7180..0x71F5` | DAT and SEG movement accumulator | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Координаты внутри карты, свойства SEG присутствуют; назначение всех DAT/SEG полей вне операции ещё не установлено. |
 | LE:1 `0x71F5..0x725C` | Fractional motion step | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Граница 725C до анимации, эффектов и завершения действия; специальные варианты движения не включены. |
