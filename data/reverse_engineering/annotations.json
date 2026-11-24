@@ -6620,6 +6620,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "The template of the check is one 100h-byte buffer; the pointers of the entries are small offsets inside it"
+    },
+    {
+      "id": "le1-unit-actions-d2d1",
+      "module": "LE:1",
+      "start": 53969,
+      "end": 54115,
+      "name": "FS:157: claim a rectangle of the occupancy plane or crush the objects in it (D2D1)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The skirmish pit still uses its own adapter; the check keeps the unit away from the edge of the 32 x 32 map (the original wraps BL/AL)"
     }
   ]
 }
