@@ -4292,7 +4292,7 @@
       "evidence": ["docs/campaign-layer.md", "tests/fixtures/campaign-regions.json", "tools/verify_campaign_regions.py", "tests/OriginalCampaignRegionChecks.cs"],
       "implementation": ["scripts/OriginalCampaignRegions.cs"],
       "limitations": "1ECA0 is a recorded stub in the check; field names of the region record are descriptive guesses; not yet connected to the campaign screens"
-    }    },
+    },
     {
       "id": "le1-campaign-snapshot-10ca0",
       "module": "LE:1",
@@ -4304,7 +4304,7 @@
       "evidence": ["docs/campaign-layer.md", "tests/fixtures/campaign-regions.json", "tools/verify_campaign_regions.py", "tests/OriginalCampaignRegionChecks.cs"],
       "implementation": ["scripts/OriginalCampaignRegions.cs"],
       "limitations": "1ECA0 is a recorded stub in the check; field names of the region record are descriptive guesses; not yet connected to the campaign screens"
-    }    },
+    },
     {
       "id": "le1-campaign-end-110c8",
       "module": "LE:1",
