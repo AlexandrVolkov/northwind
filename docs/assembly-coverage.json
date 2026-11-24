@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "6619335cd53d40dbbaba25e67caac7b1a53edbd017e69f5eb1cbc12d97b1c723",
+  "annotation_sha256": "a0dad55357e652af82e557abab2f4c9421ad68eb2deaeb6278ccec5f060792d1",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3175,8 +3175,8 @@
       "sha256": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33",
       "byte_status": {
         "partial": 100,
-        "ported": 2410,
-        "unreviewed": 2893
+        "ported": 3416,
+        "unreviewed": 1887
       },
       "linear_rows": 1709,
       "flow_candidate_instructions": 416,
@@ -3205,9 +3205,11 @@
         {
           "start": 134,
           "end": 881,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-staffs-stones-ball-disease-manuscripts-86"
+          ]
         },
         {
           "start": 881,
@@ -3230,9 +3232,11 @@
         {
           "start": 1008,
           "end": 1267,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-lightnings-vision-ball-jug-3f0"
+          ]
         },
         {
           "start": 1267,

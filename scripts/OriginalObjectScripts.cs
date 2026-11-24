@@ -390,6 +390,66 @@ public static class OriginalObjectScripts
         if (count != 0) w.LevelExit(3);
     }
 
+    /// <summary>The map objects that hold an item (ARMY__00.WRK 86..4F3): the staffs of the hermits (86, F1..153: the item +31, the frame shifted by BL/2 of the owner), the stones (164, 1F2, 203),
+    /// the crystal ball (214, 488), the disease (29B), the manuscripts (311), the lightnings (3F0, 46A, 477) and the jug of the phantom (499). AH = 0 gives the item and the health 64h; AH = 8 (a
+    /// visitor) hands the item over and empties the object; AH = 1 releases the square after the redraw (FS:157), animates the object and fades it after the health is gone (the removal after FAh).
+    /// <paramref name="entry"/> numbers the entry points of tests/fixtures/obj-itemobj.json. Returns AX as the original leaves it.</summary>
+    public static readonly byte[] PickupItems = [0x0a, 0x0b, 0x07, 0x08, 0x09, 0x15, 0x16, 0x17, 0x0d, 0x14, 0x06, 0x0c, 0x0e, 0x10, 0x13, 0, 0x1f, 0x20, 0x21, 0x23];
+    public static ushort Pickup(IObjectScriptWorld w, byte[] r, int ah, int entry, byte bl)
+    {
+        bool staff = entry <= 8, stone = entry is 9 or 10 or 11, ball = entry is 12 or 13, disease = entry == 14, lightning = entry is 16 or 17 or 18;
+        if (ah == 0)
+        {
+            r[0x31] = entry == 15 ? (byte)((byte)(r[0x0e] - 0x10) + 0x18) : PickupItems[entry];
+            if (staff) Word(r, 1, (ushort)(Word(r, 1) + ((bl & 7) >> 1)));
+            r[0x19] = 0x64; return 0;
+        }
+        if (ah == 8) { byte al = r[0x31]; r[0x31] = 0; r[0x19] = 0; return al; }
+        if (ah != 1) return (ushort)(ah << 8);
+        if ((r[0x14] & 0x80) != 0)
+        {
+            if (staff) r[0x20] = 0;
+            uint claimed = w.Claim(w.Reference(r), 0, 0);
+            if (claimed != 0) return 0x100;
+            r[0x14] = 0; if (staff) r[0x20] = 0xff;
+        }
+        bool alive = (sbyte)r[0x19] > 0;
+        if (alive)
+        {
+            if (stone)
+            {
+                ushort bx = w.TemplateBase;
+                if (Word(r, 1) == bx && (w.Tick & 0x7f) != 0) return 0x100;
+                if ((w.Tick & 1) != 0) return 0x100;
+                Word(r, 1, (ushort)(Word(r, 1) + 1));
+                if (Word(r, 1) == (ushort)(bx + 6)) Word(r, 1, bx);
+            }
+            else if (ball)
+            {
+                if (Word(r, 1) == 0x1bb && (w.Tick & 0x7f) != 0) return 0x100;
+                if ((w.Tick & 1) != 0) return 0x100;
+                Word(r, 1, (ushort)(Word(r, 1) + 1));
+                if (Word(r, 1) == 0x1c0) Word(r, 1, 0x1bb);
+            }
+            else if (disease)
+            {
+                if ((w.Tick & 1) != 0) return 0x100;
+                Word(r, 1, (ushort)(Word(r, 1) + 1));
+                if (Word(r, 1) == 0x1c5) Word(r, 1, 0x1c0);
+            }
+            else if (lightning)
+            {
+                if ((w.Tick & 1) != 0) return 0x100;
+                Word(r, 1, (ushort)(Word(r, 1) + 1)); r[0x15]++;
+                if (r[0x15] == 8) { r[0x15] = 0; Word(r, 1, (ushort)(Word(r, 1) - 8)); }
+            }
+            return 0x100;
+        }
+        r[0x19]--;
+        if (r[0x19] > 0xfa) return 0x100;
+        w.Remove(r); return 0x100;
+    }
+
     private static void Redraw(IObjectScriptWorld w, byte[] r) { if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); } }
     private static uint CornerMinus(byte[] r, int dx, int dy)
     {
