@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 98271 | 6265 | 97 | 42249 | 44 |
+| LE:1 | 146882 | 98133 | 6265 | 97 | 42387 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -332,6 +332,7 @@
 | LE:1 `0xB942..0xB977` | Squad members drop their commands | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0xBA60..0xBADF` | Nearest living squad member to a point | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0xBADF..0xBB8B` | Neighbours of a segment of the same template (mask of directions) | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [neighbors.json](../tests/fixtures/neighbors.json); [verify_neighbors.py](../tools/verify_neighbors.py); [export_line_neighbors.py](../tools/export_line_neighbors.py) | Only the mask is used by BC2E; the store into the buffer [1F45] is not modelled |
+| LE:1 `0xBB8B..0xBC15` | FS:55 reshape of a building line segment and its neighbours (BB8B with BBE4) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The neighbour search BADF and the template lookup 6885 are recorded stubs in the check (BADF is already ported as the line neighbours) |
 | LE:1 `0xBC2E..0xBD0F` | Neighbour rule of lines (fence, bridge segments) | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [neighbors.json](../tests/fixtures/neighbors.json); [verify_neighbors.py](../tools/verify_neighbors.py); [export_line_neighbors.py](../tools/export_line_neighbors.py) | Tables of templates 5, 7 and 25 from the WRK entries AH=9; one map layer per template |
 | LE:1 `0xBD0F..0xBE2E` | Hit objects in an area with a fixed attack | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | LE:1 `0xBE04..0xBE2E` | Apply damage to one prepared target | ported | [building-condition-kernel.md](../docs/building-condition-kernel.md); [building-kernel.json](../tests/fixtures/building-kernel.json) | Хвост после подготовки шаблона и силы; выбор цели, генерация силы, площадное действие и смерть с эффектами вне контракта. |

@@ -60,6 +60,8 @@ public interface IUnitActionWorld
     byte[] PartOf(byte owner);
     /// <summary>The data segment (the windows 19C0, 1C30, 4160, 9080 hold the globals of A10B and 9A8E) and fs:[13Dh].</summary>
     byte[] Ds { get; }
+    /// <summary>A byte of the table that follows the call of BB8B (pairs value, key; FFh ends it).</summary>
+    byte TableByte(uint address);
     byte Fs13D { get; set; }
     byte G525 { get; } byte G526 { get; }
     byte G1C61 { get; set; }
@@ -991,5 +993,54 @@ public static class OriginalUnitActions
         g.Cmp(r[0x31], 0, 8);
         if (!g.Zf) { Xor0(g); return; }
         r[0x14] = (byte)((r[0x14] & 7) | 0x58); Xor0(g);
+    }
+
+    /// <summary>BBE4: looks up the key AL &amp; [1F0A] in the table [1F31] (pairs of a frame offset and a key; the value FFh ends the table and the search starts again with AL = [1F43]), and moves the frame +1 of
+    /// the record by the difference of the offsets times [1F44].</summary>
+    private static void Bbe4(IUnitActionWorld w, ActionRegs g, byte[] rec)
+    {
+        var d = w.Ds; g.Al = (byte)(g.Al & d[0x1f0a]);
+        for (int guard = 0; guard < 4096; guard++)
+        {
+            uint edi = BitConverter.ToUInt32(d, 0x1f31) - 2;
+            for (; ; )
+            {
+                edi += 2;
+                if (w.TableByte(edi) == 0xff) { g.Al = (byte)(d[0x1f43] & d[0x1f0a]); break; }
+                if (g.Al == w.TableByte(edi + 1)) { Frame(w, g, rec, edi); return; }
+            }
+        }
+        throw new InvalidOperationException("BBE4: no entry for the key");
+    }
+
+    private static void Frame(IUnitActionWorld w, ActionRegs g, byte[] rec, uint edi)
+    {
+        g.Edi = edi; byte cur = rec[0x22], off = w.TableByte(edi);
+        g.Al = (byte)(cur - off); int product = (sbyte)g.Al * (sbyte)w.Ds[0x1f44]; g.Eax = (g.Eax & 0xffff0000) | (ushort)product;
+        g.Cf = g.Of = product != (sbyte)product;
+        ushort before = U16(rec, 1); PutW(rec, 1, (ushort)(before - (ushort)product)); g.Cmp(before, (ushort)product, 16);
+        g.Al = off; rec[0x22] = g.Al;
+    }
+
+    /// <summary>BB8B (FS:55): the reshaping of a building line segment by its neighbours: the table behind the call (EDX bytes after the return address) maps the neighbour mask (AL of BADF masked by AH) to
+    /// a frame offset; the segment and every neighbour BADF names are moved to it. The neighbour list is behind EDX of BADF.</summary>
+    public static void FBB8B(IUnitActionWorld w, ActionRegs g, byte[] r, uint returnAddress)
+    {
+        var d = w.Ds; g.Edx += returnAddress;
+        d[0x1f0a] = g.Ah; BitConverter.GetBytes(g.Edx).CopyTo(d, 0x1f31); d[0x1f43] = g.Al;
+        w.Call(0x6885, g);
+        var t = w.Template; g.Al = (byte)(t[0x4a] + t[0x4a]); g.Al = (byte)(g.Al + t[0x4b]); d[0x1f44] = g.Al;
+        g.Al = 1; w.Call(0xbadf, g); g.Cl = g.Ah; Bbe4(w, g, r);
+        g.Test(g.Cl, g.Cl, 8);
+        if (g.Zf) return;
+        uint esi = g.Esi;
+        for (; ; )
+        {
+            g.Edx -= 4; uint ptr = ((g.Edx - 0x401900) / 4) % 2 == 0 ? 0x400900u : 0x400a00u; g.Esi = ptr;
+            uint edx = g.Edx, ecx = g.Ecx; g.Al = 0; w.Call(0xbadf, g); Bbe4(w, g, w.ObjectAt(ptr));
+            g.Ecx = ecx; g.Edx = edx; byte c = g.Cl; c--; g.Cl = c; g.Zf = c == 0; g.Sf = (c & 0x80) != 0;
+            if (c == 0) break;
+        }
+        g.Esi = esi;
     }
 }
