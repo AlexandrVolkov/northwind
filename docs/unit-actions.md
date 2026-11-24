@@ -37,3 +37,7 @@
 ## B5AB, B5D8, B616
 
 `FB5AB` turns the facing of the unit by one step according to the random number of 9E41, `FB5D8` finds the smallest number from 1 not used in +1B by the chain of an owner, `FB616` (with B6B2) walks a rectangle of the three cell planes and writes BL into +1B of the objects of the owner whose template has none of the flags 0Ch and whose +0F is not 0. Verified against x86; sabotaging the template test or the number comparison is caught by the fixture.
+
+## BE2E, BE6F
+
+`FBE2E` asks whether the participant can pay the four costs of a template (AL = 0 when yes); `FBE6F` creates the effect 9727 with the chance of 9E41 when the health is more than a quarter below the template health. Verified against x86 (the ADD flags of ECX/EDX reach the caller).

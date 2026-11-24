@@ -76,6 +76,8 @@ FUNCS = {
     'fb5ab': (0xb5ab, 0xb5d8, [0x9e41]),
     'fb5d8': (0xb5d8, 0xb616, []),
     'fb616': (0xb616, 0xb6f1, []),
+    'fbe2e': (0xbe2e, 0xbe6f, []),
+    'fbe6f': (0xbe6f, 0xbe9d, [0x9e41, 0x9727]),
     'fc439': (0xc439, 0xc4cd, []),
     'f84aa': (0x84aa, 0x8659, [0x8d89, 0x8c98, 0x8ca1, 0xc331, 0x8c47, 0x8af4, 0x8c89, 0xcfac, 0x123d3, 0xd101, 0x8b0f, 0xc35f]),
 }
@@ -193,8 +195,9 @@ def generate(game, names):
         if case['fn'] == 'fd19c': o.cpu.reg_write(UC_X86_REG_EBX, ((((case['regs'][1] >> 8) & 0xff) % 3) << 8))
         if case['fn'] == 'fc35f': o.cpu.reg_write(UC_X86_REG_EDX, case['regs'][3] & 3)
         if case['fn'] == 'fc344': o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + OBJ1)
-        if case['fn'] == 'fc0f6':
-            o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + TMPL); o.cpu.reg_write(UC_X86_REG_EAX, case['regs'][0] & 0xffffff00)
+        if case['fn'] in ('fc0f6', 'fbe2e'):
+            if case['fn'] == 'fc0f6': o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + TMPL)
+            o.cpu.reg_write(UC_X86_REG_EAX, case['regs'][0] & 0xffffff00)
             tb = bytearray(o.cpu.mem_read(o.POOL + TMPL, 0x100)); pa = 0x97a + 0xf5 * case['f3']; pb = bytearray(o.cpu.mem_read(pa, 0xf5))
             for k in (0x7c, 0x80, 0x84, 0x88):
                 if case['sel'] & 1: struct.pack_into('<I', tb, k, struct.unpack_from('<I', tb, k)[0] & 0xff)

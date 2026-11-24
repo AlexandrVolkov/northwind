@@ -128,12 +128,14 @@ public partial class TestRunner
                 case "f6885": OriginalUnitActions.F6885(w, g, r); break;
                 case "f68a0": g.Eax = (regs[0] & 0xffff00ffu) | ((((regs[0] >> 8) & 0xffu) % 3) << 8); OriginalUnitActions.F68A0(w, g); break;
                 case "f68bd": g.Edi = 0x400a00; OriginalUnitActions.F68BD(w, g); break;
+                case "fbe6f": OriginalUnitActions.FBE6F(w, g, r); break;
+                case "fbe2e":
                 case "fc0f6":
                     {
-                        g.Edi = 0x400c00; g.Eax = regs[0] & 0xffffff00u; var tb = w.Template; var pb = w.PartOf(r[3]); int sel = c.GetProperty("sel").GetInt32();
+                        if (fn == "fc0f6") g.Edi = 0x400c00; g.Eax = regs[0] & 0xffffff00u; var tb = w.Template; var pb = w.PartOf(r[3]); int sel = c.GetProperty("sel").GetInt32();
                         foreach (int k in new[] { 0x7c, 0x80, 0x84, 0x88 }) if ((sel & 1) != 0) Put32(tb, k, BitConverter.ToUInt32(tb, k) & 0xff);
                         foreach (int k in new[] { 0x18, 0x1c, 0x20, 0x24 }) if ((sel & 2) != 0) Put32(pb, k, BitConverter.ToUInt32(pb, k) | 0x10000);
-                        OriginalUnitActions.FC0F6(w, g, r); break;
+                        if (fn == "fbe2e") OriginalUnitActions.FBE2E(w, g, r); else OriginalUnitActions.FC0F6(w, g, r); break;
                     }
                 case "fb5ab": OriginalUnitActions.FB5AB(w, g, r); break;
                 case "fb616":
@@ -171,7 +173,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 62, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 64, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }
