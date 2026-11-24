@@ -843,6 +843,7 @@ public sealed partial class Skirmish : IDisposable
     {
         if (impact.X >= Map.Width * 32 || impact.Y >= Map.Height * 32) return; // 9727 rejects points outside the map
         Effects.Add(new BattleEffect { From = actor.Position, To = new Vector2(impact.X, impact.Y), Team = actor.Team });
+        if (impact.Code == 0 && impact.Army == 3 && IsHermit(actor)) { MageDischarge(actor, impact); return; }   // 9727: BL = 0, the effect table of army 3
         if (impact.Code >= 128 && (impact.Code & 0x7f) == 0)
         {
             int plane = Occupancy.Width * Occupancy.Height;

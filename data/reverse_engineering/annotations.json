@@ -4172,6 +4172,42 @@
       "evidence": ["docs/rufin.md", "tests/fixtures/mage-cloak.json", "tools/verify_mage_cloak.py", "tests/OriginalMageCloakChecks.cs"],
       "implementation": ["scripts/OriginalMageCloak.cs", "scripts/SkirmishRufin.cs"],
       "limitations": "FS:197 is a recorded stub; the vanishing action FS:105 (LE:1 878D) is an adapter in the skirmish (pace of the frames assumed)"
+    },
+    {
+      "id": "wrk3-mage-spell-flash",
+      "module": "ARMY__03.WRK",
+      "start": 11852,
+      "end": 12110,
+      "name": "Mage discharge, effect type 0 of ARMY__03: the flash and the choice of the following effect (blast, fire, phantom)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/mage-spell.json", "tools/verify_mage_spell.py", "tests/OriginalMageSpellChecks.cs"],
+      "implementation": ["scripts/OriginalMageSpell.cs", "scripts/SkirmishRufin.cs"],
+      "limitations": "FS:19, 35, 69, 16B, 45, 19B are recorded stubs in the check; the phantom is not created in the skirmish"
+    },
+    {
+      "id": "wrk3-mage-spell-blast",
+      "module": "ARMY__03.WRK",
+      "start": 12497,
+      "end": 12568,
+      "name": "Mage blast, effect type 8: BD0F around the point, side = distance in cells (1..3)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/mage-spell.json", "tools/verify_mage_spell.py", "tests/OriginalMageSpellChecks.cs"],
+      "implementation": ["scripts/OriginalMageSpell.cs", "scripts/SkirmishRufin.cs"],
+      "limitations": "FS:69 (BD0F) is a recorded stub in the check; it is verified separately (catapult.json)"
+    },
+    {
+      "id": "le1-spot-9064",
+      "module": "LE:1",
+      "start": 36964,
+      "end": 37097,
+      "name": "Free place beside an object for a new object (FS:16B): random start direction, counter-clockwise turns, placement check AC63",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/spot.json", "tools/verify_spot.py", "tests/OriginalSpotChecks.cs"],
+      "implementation": ["scripts/OriginalSpotFinder.cs"],
+      "limitations": "AC63 is a recorded stub in the check"
     }
   ]
 }

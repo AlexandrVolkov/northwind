@@ -4,13 +4,13 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 104311 | 6123 | 97 | 36351 | 44 |
+| LE:1 | 146882 | 104178 | 6123 | 97 | 36484 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
 | ARMY__02.WRK | 6930 | 5671 | 855 | 0 | 404 | 7 |
-| ARMY__03.WRK | 13412 | 11606 | 0 | 0 | 1806 | 1 |
+| ARMY__03.WRK | 13412 | 11277 | 0 | 0 | 2135 | 1 |
 | ARMY__04.WRK | 411 | 411 | 0 | 0 | 0 | 0 |
 | ARMY__05.WRK | 882 | 882 | 0 | 0 | 0 | 2 |
 
@@ -58,6 +58,8 @@
 | ARMY__03.WRK `0x7F0..0x8EC` | Pit trap (template 12): detect, open, crush, close | ported | [campaign-items.md](../docs/campaign-items.md); [pit.json](../tests/fixtures/pit.json); [verify_pit.py](../tools/verify_pit.py) | Services FS:14B and FS:157 are recorded stubs in the check; not yet wired into the skirmish |
 | ARMY__03.WRK `0x8EC..0xD19` | Quest script of the mage Rufin: init, voice, the speeches to every participant and the answers in the queue, the territory scan | ported | [rufin.md](../docs/rufin.md); [rufin.json](../tests/fixtures/rufin.json); [verify_rufin.py](../tools/verify_rufin.py); [OriginalRufinChecks.cs](../tests/OriginalRufinChecks.cs) | the FS services that act on the world (143, 167, 16F, 17B, 45, 18F, 15, 1D, 163, DD, E1, 111, 4D) are recorded stubs in the check; FS:167 is treated as register-preserving; the unit step after the quest (D19..DBF) is not part of the port |
 | ARMY__03.WRK `0xD3D..0xDA7` | Continuation of the mages' update: vanishing below a health threshold (first mage 79..C5, Rufin D3D..DA6), the dropped items of a dead Rufin | ported | [rufin.md](../docs/rufin.md); [mage-cloak.json](../tests/fixtures/mage-cloak.json); [verify_mage_cloak.py](../tools/verify_mage_cloak.py); [OriginalMageCloakChecks.cs](../tests/OriginalMageCloakChecks.cs) | FS:197 is a recorded stub; the vanishing action FS:105 (LE:1 878D) is an adapter in the skirmish (pace of the frames assumed) |
+| ARMY__03.WRK `0x2E4C..0x2F4E` | Mage discharge, effect type 0 of ARMY__03: the flash and the choice of the following effect (blast, fire, phantom) | ported | [rufin.md](../docs/rufin.md); [mage-spell.json](../tests/fixtures/mage-spell.json); [verify_mage_spell.py](../tools/verify_mage_spell.py); [OriginalMageSpellChecks.cs](../tests/OriginalMageSpellChecks.cs) | FS:19, 35, 69, 16B, 45, 19B are recorded stubs in the check; the phantom is not created in the skirmish |
+| ARMY__03.WRK `0x30D1..0x3118` | Mage blast, effect type 8: BD0F around the point, side = distance in cells (1..3) | ported | [rufin.md](../docs/rufin.md); [mage-spell.json](../tests/fixtures/mage-spell.json); [verify_mage_spell.py](../tools/verify_mage_spell.py); [OriginalMageSpellChecks.cs](../tests/OriginalMageSpellChecks.cs) | FS:69 (BD0F) is a recorded stub in the check; it is verified separately (catapult.json) |
 | LE:1 `0x2F03..0x2F1B` | Copy four initial resource stocks from SCN | ported | [scenario-resources.md](../docs/scenario-resources.md); [resources.json](../tests/fixtures/resources.json) | Только извлечение четырёх dword SCN +15..24; прочие поля владельца, DOS-загрузка и цикл всех слотов вне перенесённого участка. |
 | LE:1 `0x3593..0x35A8` | DAT header and record stride | partial | [executable-analysis.md](../docs/executable-analysis.md) | Статически подтверждён участок чтения заголовка и шага 171; полный загрузчик, ошибки и релокации не перенесены. |
 | LE:1 `0x35B9..0x35C2` | WRK base assignment | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждено сохранение адреса WRK; это не весь загрузчик. |
@@ -109,6 +111,7 @@
 | LE:1 `0x8E0E..0x8E3C` | Request a move to a random map cell | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
 | LE:1 `0x8F70..0x902F` | Approach and handoff state machine | partial | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Все фазы проверены с валидатором лесопилки. Произвольные WRK-валидаторы, путь и вызывающий диспетчер не заменены полным исходным автоматом. |
 | LE:1 `0x902F..0x9064` | Action «visit»: gap ≤ 8, facing check, target service, pickup or send to the object | ported | [campaign-items.md](../docs/campaign-items.md); [visit.json](../tests/fixtures/visit.json); [verify_visit.py](../tools/verify_visit.py); [OriginalVisitChecks.cs](../tests/OriginalVisitChecks.cs) | WRK AH=8 call and 1243A are recorded stubs in the check (both verified separately); the skirmish runs it on a copy of the unit record |
+| LE:1 `0x9064..0x90E9` | Free place beside an object for a new object (FS:16B): random start direction, counter-clockwise turns, placement check AC63 | ported | [rufin.md](../docs/rufin.md); [spot.json](../tests/fixtures/spot.json); [verify_spot.py](../tools/verify_spot.py); [OriginalSpotChecks.cs](../tests/OriginalSpotChecks.cs) | AC63 is a recorded stub in the check |
 | LE:1 `0x90E9..0x9124` | Common worker animation update prefix | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md) | Известны вызов перед диспетчером рабочего, префикс состояния и RNG; остальные ветви общего обновления до 9210 не размечены как обработанные. |
 | LE:1 `0x90E9..0x9210` | Unit prefix: death dispatch, regeneration, bleeding, rest, flee, wound voice, experience, terrain death | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) | Гибель на местности отключена в схватке до проверки на оригинале; звуки не воспроизводятся. |
 | LE:1 `0x9210..0x92FC` | Worker stationary animation dispatch | partial | [worker-strike-animation.md](../docs/worker-strike-animation.md); [worker-animation.json](../tests/fixtures/worker-animation.json) | Состояния 0/1/3 и их запросы; движение, специальные состояния и общий префикс 90E9 не входят в этот контракт. |

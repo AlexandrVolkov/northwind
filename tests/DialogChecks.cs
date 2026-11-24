@@ -31,21 +31,20 @@ public partial class TestRunner
         Check(battle.Diplomacy.AtWar(mage, player) && battle.MageFights(rufin), "The attack on Rufin is a war with him");
         var near = rufin.Cell + new Vector2I(2, 0);
         System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), (uint)(near.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(8), (uint)(near.Y * 32 + 16));
+        battle.Hero.Health = 120;   // the leader of the original has little health: one discharge hurts a lot, the test needs him alive
         int before = battle.Hero.Health; bool targeted = false;
         for (int t = 0; t < 300 && battle.Hero.Alive && battle.Hero.Health >= before; t++) { battle.Advance(1 / 18.2); targeted |= rufin.Target == battle.Hero.Id; }
-        Check(battle.Bolts.Count > 0 || battle.Hero.Health < before, $"Rufin answers with his lightning (hero health {before} → {battle.Hero.Health})");
-        // several units standing together fall to one discharge
-        var group = new List<SkirmishActor>();
-        group.AddRange(battle.Actors.Where(a => a.Team == 0 && a.Worker && a.Alive).Take(3));
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), 64); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(8), 64);   // the leader is out of his sight
+        Check(battle.Hero.Health < before || battle.MageFlashes.Count > 0, $"Rufin strikes back with his discharge (hero health {before} → {battle.Hero.Health})");
+        // the blast hits every unit in its square: three workers standing together all lose health (BD0F, attack 14h minus the armour)
+        var group = new List<SkirmishActor>(battle.Actors.Where(x => x.Team == 0 && x.Worker && x.Alive).Take(3));
+        var home = rufin.Position - new Vector2(640, 0); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), (uint)home.X); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(8), (uint)home.Y);   // the leader is out of his sight, at home
         var spot = rufin.Position + new Vector2(200, 0); int k = 0;
         foreach (var unit in group) { System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(unit.Record.AsSpan(4), (uint)(spot.X + 12 * k)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(unit.Record.AsSpan(8), (uint)(spot.Y + 8 * k)); k++; unit.Goal = null; unit.Route.Clear(); }
-        for (int t = 0; t < 200 && group.Any(u => u.Alive) && battle.Hero.Alive; t++) battle.Advance(1 / 18.2);
-        Check(group.Count == 3 && group.Count(u => !u.Alive) >= 2, $"One discharge kills the units standing together ({group.Count(u => !u.Alive)} of {group.Count})");
-    
+        var before3 = group.Select(u => u.Health).ToArray();
+        for (int t = 0; t < 1500 && group.Count(u => u.Health < before3[group.IndexOf(u)] || !u.Alive) < 2 && battle.Hero.Alive; t++) { battle.Hero.Health = 127; battle.Advance(1 / 18.2); }
+        Check(group.Count == 3 && group.Count(u => u.Health < before3[group.IndexOf(u)] || !u.Alive) >= 2, $"One discharge hurts the units standing together ({string.Join(", ", group.Select(u => u.Health))} from {string.Join(", ", before3)})");
         // the hurt mage vanishes (ARMY__03.WRK D3D, FS:105) and returns when he has recovered
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), 64); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(8), 64);
-        foreach (var w in group) { }
+        var home2 = rufin.Position - new Vector2(640, 0); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), (uint)home2.X); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(8), (uint)home2.Y);
         rufin.Record[0x19] = 40;
         for (int t = 0; t < 120 && !Skirmish.IsHidden(rufin); t++) battle.Advance(1 / 18.2);
         Check(Skirmish.IsHidden(rufin) && rufin.Record[0x32] == 0xff, $"A mage hurt below 3Ch vanishes (+32 = {rufin.Record[0x32]:X}, mask {rufin.Record[0x20]:X})");

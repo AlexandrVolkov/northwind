@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "0f79160b22329f0a7114f3410a409b3cb08187f4f42072ccb735a881fcd429ac",
+  "annotation_sha256": "87d7113d677edd96f95267c473c6ca8c271a0027acd32d83ea3d0b2b3e767902",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 6123,
-        "ported": 36351,
-        "unreviewed": 104311,
+        "ported": 36484,
+        "unreviewed": 104178,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -722,9 +722,11 @@
         {
           "start": 36964,
           "end": 37097,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-spot-9064"
+          ]
         },
         {
           "start": 37097,
@@ -3552,8 +3554,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 1806,
-        "unreviewed": 11606
+        "ported": 2135,
+        "unreviewed": 11277
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -3631,6 +3633,38 @@
         },
         {
           "start": 3495,
+          "end": 11852,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 11852,
+          "end": 12110,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-mage-spell-flash"
+          ]
+        },
+        {
+          "start": 12110,
+          "end": 12497,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 12497,
+          "end": 12568,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-mage-spell-blast"
+          ]
+        },
+        {
+          "start": 12568,
           "end": 13412,
           "status": "unreviewed",
           "classification": "unknown",
