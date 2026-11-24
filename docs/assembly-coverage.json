@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "82800fe2b4e9c4cb4eec7226cb3b1aa5edbeb1190b3bc13b713429757b9f9fa3",
+  "annotation_sha256": "6cdf1641a56e0c1da8af054da22e6264905ee83f2d3405f382d153e97077da5c",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3698,8 +3698,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 2302,
-        "unreviewed": 11110
+        "ported": 4315,
+        "unreviewed": 9097
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -3793,6 +3793,38 @@
         },
         {
           "start": 3495,
+          "end": 3519,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 3519,
+          "end": 4605,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-onis-dbf"
+          ]
+        },
+        {
+          "start": 4605,
+          "end": 4759,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 4759,
+          "end": 5686,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-irvil-1297"
+          ]
+        },
+        {
+          "start": 5686,
           "end": 11852,
           "status": "unreviewed",
           "classification": "unknown",
