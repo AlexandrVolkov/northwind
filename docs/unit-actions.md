@@ -61,3 +61,7 @@
 ## 6EB2, 6EC1
 
 `F6EB2` clears the slot table (6 slots of 12 bytes at DS:1978); `F6EC1` fills it from the template of the object [1969]: the word, the bytes +6/+7, the pointer to the entry data (+2, entry + 4 + dword) with the word behind it, and the first byte of the object. B6F1 later compares the slots. Verified against x86.
+
+## D2D1 (FS:157)
+
+`FD2D1` claims the rectangle of the occupancy plane (DS:273F x DS:2740 cells centred on the unit, plane +0D; the pointer part is 4409): the cells equal to EBX take the value EAX, the objects in the other cells are counted in [1F31] and, when CL is not 0, killed (health 0, +17 &= E7h, |= CH * 8). The four planes (written cells) join the compared output. Verified against x86; changed flag mask and misplaced write are caught.

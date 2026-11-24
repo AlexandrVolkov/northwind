@@ -65,6 +65,7 @@ public interface IUnitActionWorld
     /// <summary>The occupancy planes: the pointer of plane k ([18CE + 4k]) and a dword of one (a reference relative to the pool, 0 = empty).</summary>
     uint PlanePointer(uint k);
     uint PlaneRead(uint address);
+    void PlaneWrite(uint address, uint value);
     /// <summary>The template table pointer [army entry + 4] of an army (0 for armies without a table).</summary>
     uint ArmyTable(byte army);
     /// <summary>A byte of the table that follows the call of BB8B (pairs value, key; FFh ends it).</summary>
@@ -1678,5 +1679,44 @@ public static class OriginalUnitActions
             }
             g.Edi += 8; g.Add(g.Ebx, 0xc); g.Ebx += 0xc; g.Cl--; g.Zf = g.Cl == 0;
         } while (g.Cl != 0);
+    }
+
+    /// <summary>D2D1 = FS:157: claims the rectangle (DS:273F x DS:2740 cells, centred on the unit ESI, in the plane +0D) of the occupancy planes for the value EAX: the cells equal to EBX are set to it, the other cells with an object
+    /// (not equal to it) count in [1F31] and, when CL is not 0, the object is killed and gets the flags CH * 8 in +17. EAX = the count.</summary>
+    public static void FD2D1(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; Put(d, 0x1f31, 0); d[0x1f41] = g.Cl; g.Ch = (byte)(g.Ch << 3); d[0x1f42] = g.Ch; g.Ebp = g.Ebx; g.Edx = g.Eax;
+        g.Ecx = U32(d, 0x273f); g.Eax = U32(r, 8); g.Ch = (byte)(g.Ch >> 1); g.Eax >>= 5; g.Al = (byte)(g.Al - g.Ch); g.Ah = d[0x18de]; Mul8(g, g.Al, g.Ah);
+        g.Ebx = U32(r, 4); g.Cl = (byte)(g.Cl >> 1); g.Ebx >>= 5; g.Bl = (byte)(g.Bl - g.Cl); g.Ebx += g.Eax; g.Ebx *= 4; g.Al = r[0xd]; g.Eax &= 3; g.Ebx += w.PlanePointer(g.Eax);
+        g.Eax = U32(d, 0x18de); g.Al = (byte)(g.Al - d[0x273f]); g.Eax *= 4; g.Ch = d[0x2740];
+        do
+        {
+            g.Cl = d[0x273f];
+            do
+            {
+                uint v = w.PlaneRead(g.Ebx); g.Cmp(v, g.Ebp, 32);
+                if (g.Zf) w.PlaneWrite(g.Ebx, g.Edx);
+                else
+                {
+                    g.Cmp(v, g.Edx, 32);
+                    if (!g.Zf)
+                    {
+                        g.Edi = v; g.Test(g.Edi, g.Edi, 32);
+                        if (!g.Zf)
+                        {
+                            Put(d, 0x1f31, U32(d, 0x1f31) + 1); g.Cmp(d[0x1f41], 0, 8);
+                            if (!g.Zf)
+                            {
+                                g.Edi += w.PoolBase; var o = w.ObjectAt(g.Edi); g.Cmp(o[0x19], 0, 8);
+                                if (!g.Jle) { o[0x19] = 0; o[0x17] &= 0xe7; o[0x17] |= d[0x1f42]; g.Logic(o[0x17], 8); }
+                            }
+                        }
+                    }
+                }
+                g.Ebx += 4; g.Cl--;
+            } while (g.Cl != 0);
+            g.Add(g.Ebx, g.Eax); g.Ebx += g.Eax; g.Ch--;
+        } while (g.Ch != 0);
+        g.Zf = true; g.Eax = U32(d, 0x1f31);
     }
 }
