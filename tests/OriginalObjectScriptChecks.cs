@@ -31,6 +31,30 @@ public partial class TestRunner
         public void Remove(byte[] record) => log.Add((byte)'R');
         public void Vitals() => log.Add((byte)'V');
         public void Actions() => log.Add((byte)'U');
+        private readonly Queue<bool> _zf = new(c.GetProperty("zf").EnumerateArray().Select(a => a.GetInt32() != 0));
+        private readonly Queue<(bool, uint, uint)> _spot = new(c.GetProperty("spot").EnumerateArray().Select(a => (a[0].GetInt32() != 0, (uint)a[1].GetInt32(), (uint)a[2].GetInt32())));
+        private readonly Queue<(bool, byte, byte, byte)> _beside = new(c.GetProperty("beside").EnumerateArray().Select(a => (a[0].GetInt32() != 0, (byte)a[1].GetInt32(), (byte)a[2].GetInt32(), (byte)a[3].GetInt32())));
+        private readonly Queue<bool> _create = new(c.GetProperty("create").EnumerateArray().Select(a => a.GetInt32() != 0));
+        public byte TemplateByte3 => (byte)c.GetProperty("dat3").GetInt32();
+        public ushort TemplateBase => (ushort)c.GetProperty("dat48").GetInt32();
+        public bool Service1BF(uint edx) { log.Add((byte)'Z'); log.AddRange(BitConverter.GetBytes(edx)); return _zf.Count > 0 ? _zf.Dequeue() : true; }
+        public (bool Found, uint X, uint Y) FreeSpot(byte al, byte ah, byte bl, uint x, uint y)
+        {
+            log.Add((byte)'P'); log.AddRange([al, ah, bl]); log.AddRange(BitConverter.GetBytes(x)); log.AddRange(BitConverter.GetBytes(y));
+            var (ok, sx, sy) = _spot.Count > 0 ? _spot.Dequeue() : (true, 0u, 0u); return (!ok, sx, sy);   // the stub's ZF = 'found' of the service is the inverse
+        }
+        public (bool Found, byte Al, byte Ah, byte Bl) Beside(byte al, byte ah)
+        {
+            log.Add((byte)'B'); log.AddRange([al, ah]);
+            var (zf, a, h, b) = _beside.Count > 0 ? _beside.Dequeue() : (true, (byte)0, (byte)0, (byte)0); return (!zf, a, h, b);
+        }
+        public (bool Created, byte[]? Object) Create(byte army, byte owner, byte template, byte layer, uint x, uint y)
+        {
+            log.Add((byte)'K'); log.AddRange([army, owner, template, layer]); log.AddRange(BitConverter.GetBytes(x)); log.AddRange(BitConverter.GetBytes(y));
+            bool zf = _create.Count > 0 ? _create.Dequeue() : true; return (!zf, new byte[0x40]);
+        }
+        public void Occupy(byte[] record) { log.Add((byte)'O'); log.AddRange(BitConverter.GetBytes(0x600u)); }
+        public IEnumerable<byte> OwnTemplates(byte[] record) => c.GetProperty("units").EnumerateArray().Select(a => (byte)a.GetInt32());
         public void Effect(byte[] record, byte type, byte layer, uint x, uint y) { log.Add((byte)'E'); log.Add(type); log.Add(layer); log.AddRange(BitConverter.GetBytes(0x800u)); log.AddRange(BitConverter.GetBytes(x)); log.AddRange(BitConverter.GetBytes(y)); }
         public void Sound(uint id) { log.Add((byte)'S'); log.AddRange(BitConverter.GetBytes(id)); }
     }
@@ -48,7 +72,7 @@ public partial class TestRunner
             var r = new byte[0x50]; BitConverter.GetBytes((uint)c.GetProperty("x").GetInt32()).CopyTo(r, 4); BitConverter.GetBytes((uint)c.GetProperty("y").GetInt32()).CopyTo(r, 8);
             r[0x15] = (byte)c.GetProperty("f15").GetInt32(); r[0x14] = (byte)c.GetProperty("f14").GetInt32(); r[0x0d] = (byte)c.GetProperty("f0d").GetInt32(); r[0x19] = (byte)c.GetProperty("f19").GetInt32(); r[0x2d] = (byte)c.GetProperty("f2d").GetInt32(); BitConverter.GetBytes((uint)c.GetProperty("f26").GetInt64()).CopyTo(r, 0x26); r[0x2a] = (byte)c.GetProperty("f2a").GetInt32();
             BitConverter.GetBytes((ushort)c.GetProperty("w1").GetInt32()).CopyTo(r, 1); BitConverter.GetBytes((uint)c.GetProperty("f22").GetInt64()).CopyTo(r, 0x22);
-            r[0x27] = (byte)c.GetProperty("f27").GetInt32(); r[0x28] = (byte)c.GetProperty("f28").GetInt32();
+            r[0x27] = (byte)c.GetProperty("f27").GetInt32(); r[0x28] = (byte)c.GetProperty("f28").GetInt32(); r[0x31] = (byte)c.GetProperty("f31").GetInt32();
             var log = new List<byte>(); var world = new ObjectReplay(c, random, log);
             script(world, r, c.GetProperty("ah").GetInt32());
             byte[] output = [.. r, world.I, world.J, .. log];
@@ -70,6 +94,8 @@ public partial class TestRunner
         ObjectScriptReplay("obj-head", "head", "The knight's head script ARMY__03.WRK 522", OriginalObjectScripts.Head, 0);
         ObjectScriptReplay("obj-tree", "tree", "The living fir script ARMY__03.WRK 624", OriginalObjectScripts.Tree, 0);
         ObjectScriptReplay("obj-raven", "raven", "The raven script ARMY__03.WRK 6BA", OriginalObjectScripts.Raven, 0);
+        ObjectScriptReplay("obj-chest", "chest", "The chest with the birds ARMY__03.WRK 2A6B", OriginalObjectScripts.Chest, 0);
+        ObjectScriptReplay("obj-generator", "generator", "The generator script ARMY__03.WRK 29F1", OriginalObjectScripts.Generator, 0);
         ObjectScriptReplay("obj-face", "face", "The stone face script ARMY__03.WRK 2B9", OriginalObjectScripts.Face);
     }
 }

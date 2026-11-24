@@ -17,6 +17,14 @@ public interface IObjectScriptWorld
     void Vitals(); void Actions();                    // FS:DD, FS:E1
     void Effect(byte[] record, byte type, byte layer, uint x, uint y);   // FS:19 with the three stack arguments (the object, x, y)
     void Sound(uint id);                              // FS:31
+    byte TemplateByte3 { get; }                       // DAT[3] of the object (EDI in AH = 1)
+    ushort TemplateBase { get; }                      // DAT[48], the base frame
+    bool Service1BF(uint edx);                        // FS:1BF: ZF (true = skip)
+    (bool Found, uint X, uint Y) FreeSpot(byte al, byte ah, byte bl, uint x, uint y);   // FS:187 = 10AD2
+    (bool Found, byte Al, byte Ah, byte Bl) Beside(byte al, byte ah);   // FS:16B = 9064
+    (bool Created, byte[]? Object) Create(byte army, byte owner, byte template, byte layer, uint x, uint y);   // FS:45 = A758
+    void Occupy(byte[] record);                       // FS:19B = 43E5
+    IEnumerable<byte> OwnTemplates(byte[] record);    // FS:6D: the templates of the objects of the owner's participant
 }
 
 /// <summary>The scripts of the map objects of ARMY__03.WRK. The rockfall (template 2, WRK 189): AH = 0 sets +22 = FFFFFFBF; AH = 1: every 4th random draw looks at the rectangle of 4×4 cells
@@ -92,6 +100,59 @@ public static class OriginalObjectScripts
         var (_, still, _) = w.Area(CornerLeft(r), 0x404);
         if (still != 0) return;
         r[0x15] = 0;
+    }
+
+    /// <summary>The chest with the birds (template 29, 2A6B): the chest hurt below 100 opens by its frames (+15 counts two updates per frame), then ten ravens (template 8, layer 2) fly up at free spots
+    /// around it; opened it lies and its health runs down every 50 updates. DAT[3] is the owner of the birds, DAT[48] the base frame.</summary>
+    public static void Chest(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        byte dat3 = w.TemplateByte3; ushort dat48 = w.TemplateBase;
+        if (ah == 0) { r[0x19] = 0x64; r[0x31] = 0x22; return; }
+        if (ah != 1) return;
+        if ((sbyte)r[0x19] <= 0) { r[0x19]--; if (r[0x19] > 0xfa) return; w.Remove(r); return; }
+        if ((r[0x14] & 0x80) != 0) { r[0x14] = 0; w.Redraw(); }
+        if (r[0x14] == 0)
+        {
+            if ((sbyte)r[0x19] >= 0x64) return;
+            r[0x14] = 1; r[0x15] = 0;
+        }
+        if (r[0x14] == 1)
+        {
+            r[0x15]++;
+            if ((sbyte)r[0x15] < 2) return;
+            r[0x15] = 0; Word(r, 1, (ushort)(Word(r, 1) + 1));
+            if (Word(r, 1) < (ushort)(dat48 + 0x0a)) return;
+            if (!w.Service1BF(0x505))
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    var (found, x, y) = w.FreeSpot(8, r[0], 2, U32(r, 4), U32(r, 8));
+                    if (!found) continue;
+                    var (created, bird) = w.Create(r[0], dat3, 8, 2, x, y);
+                    if (created) w.Occupy(bird!);
+                }
+            }
+            r[0x14] = 3; r[0x31] = 0;
+        }
+        if (r[0x14] == 3)
+        {
+            r[0x15]--;
+            if (r[0x15] != 0) return;
+            r[0x19]--; r[0x15] = 0x32;
+        }
+    }
+
+    /// <summary>The generator (template 28, 29F1): every 256 updates creates a raven (template 8) beside itself while there are fewer ravens than four times the number of the objects of template 1Ch.</summary>
+    public static void Generator(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah != 1 || w.Tick != 0) return;
+        uint birds = 0, others = 0;
+        foreach (byte t in w.OwnTemplates(r)) { if (t == 8) birds++; if (t == 0x1c) others++; }
+        if (birds >= others << 2) return;
+        var (found, al, ahOut, bl) = w.Beside(8, r[0]);
+        if (!found) return;
+        var (_, created) = w.Create(ahOut, r[3], al, bl, birds, others << 2);   // ECX and EDX still hold the two counts
+        if (created != null) w.Occupy(created);
     }
 
     private static void Redraw(IObjectScriptWorld w, byte[] r) { if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); } }

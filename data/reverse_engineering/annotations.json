@@ -4724,6 +4724,30 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services are recorded stubs in the check; the skirmish drives the units by its own adapters"
+    },
+    {
+      "id": "army03-chest-2a6b",
+      "module": "ARMY__03.WRK",
+      "start": 10859,
+      "end": 11107,
+      "name": "Chest with the birds (template 29): opens and lets ten ravens fly up",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-chest.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-generator-29f1",
+      "module": "ARMY__03.WRK",
+      "start": 10737,
+      "end": 10859,
+      "name": "Generator (template 28): creates ravens beside itself every 256 updates",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-generator.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
     }
   ]
 }
