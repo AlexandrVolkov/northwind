@@ -53,3 +53,7 @@
 ## B319
 
 `FB319` walks the chain of the owner of the unit and hands every living object whose template has flag 8 and a defined +4E and that is more than 25 cells away (Chebyshev distance >> 5) over to the owner [6C6] - 1 (D1BA). Verified against x86; the fixture drives it with far objects and a suitable template (a changed threshold is caught).
+
+## B6F1
+
+`FB6F1` runs BA2E and 6EC1 for the object ESI ([1969] holds it meanwhile) and then walks the chain (ESI .. EBP): for the objects whose +1B equals [1C87] the 6 slots of 12 bytes at DS:1978 are cleared (+2) unless bit k of +0F is set and the byte +7 of the slot equals the byte of the template entry and is not zero. The slot table joins the compared DS windows. Verified against x86; clearing the wrong field is caught.
