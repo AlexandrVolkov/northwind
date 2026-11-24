@@ -5792,6 +5792,18 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/mage-cloak.json", "tools/verify_mage_cloak.py", "tests/OriginalMageCloakChecks.cs"],
       "implementation": ["scripts/OriginalMageCloak.cs"],
       "limitations": "FS:105 (the vanishing action) is an adapter in the skirmish"
+    },
+    {
+      "id": "le1-object-allocator-a758",
+      "module": "LE:1",
+      "start": 42840,
+      "end": 43129,
+      "name": "FS:45 object allocator: first-fit search in the chain of the owner, carving, clearing, filling, script call",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-allocator.md", "tests/fixtures/object-alloc.json", "tools/verify_object_alloc.py", "tests/OriginalObjectAllocChecks.cs"],
+      "implementation": ["scripts/OriginalObjectAllocator.cs"],
+      "limitations": "The call of the template script is a recorded stub; the skirmish still creates objects with its own code"
     }
   ]
 }
