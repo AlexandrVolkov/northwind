@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "2837897bd81c7ef081dca7c0abdf13695408ce424bacb2d8be1b3b84aa7b4cf6",
+  "annotation_sha256": "b2276fbf0f19801e2c994c880cd624556e373fa764cf42d752cffa57fb4c9070",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3726,8 +3726,8 @@
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
         "partial": 855,
-        "ported": 2954,
-        "unreviewed": 3121
+        "ported": 3283,
+        "unreviewed": 2792
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -3911,15 +3911,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "mine-event-dispatch"
+            "mine-event-dispatch",
+            "army__02-building-524"
           ]
         },
         {
           "start": 1346,
           "end": 1427,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-524"
+          ]
         },
         {
           "start": 1427,
@@ -3927,15 +3930,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "mine-visitor-check"
+            "mine-visitor-check",
+            "army__02-building-524"
           ]
         },
         {
           "start": 1459,
           "end": 1494,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-524"
+          ]
         },
         {
           "start": 1494,
@@ -3943,15 +3949,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "mine-deposit-initialization"
+            "mine-deposit-initialization",
+            "army__02-building-524"
           ]
         },
         {
           "start": 1566,
           "end": 1697,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-524"
+          ]
         },
         {
           "start": 1697,
@@ -3968,15 +3977,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "farm-event-and-counter"
+            "farm-event-and-counter",
+            "army__02-building-756"
           ]
         },
         {
           "start": 1923,
           "end": 1949,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-756"
+          ]
         },
         {
           "start": 1949,
@@ -3984,15 +3996,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "farm-counter-decrement"
+            "farm-counter-decrement",
+            "army__02-building-756"
           ]
         },
         {
           "start": 1981,
           "end": 2037,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-756"
+          ]
         },
         {
           "start": 2037,
