@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "79c5d3269ba633c91cd874ff9f0a15af60558c6f62311d4cab1d740b180ec8cb",
+  "annotation_sha256": "283877af661743ea7af47c667179da76bc5fd2ae79721e7ee4764dd7dfe4f4a2",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 6265,
-        "ported": 39048,
-        "unreviewed": 101472,
+        "ported": 39087,
+        "unreviewed": 101433,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -1695,9 +1695,11 @@
         {
           "start": 54245,
           "end": 54284,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-participant-stats-d3e5"
+          ]
         },
         {
           "start": 54284,
@@ -1705,7 +1707,8 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "owner-population-growth"
+            "owner-population-growth",
+            "le1-participant-stats-d3e5"
           ]
         },
         {
@@ -1714,7 +1717,8 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "owner-population-recount"
+            "owner-population-recount",
+            "le1-participant-stats-d3e5"
           ]
         },
         {
