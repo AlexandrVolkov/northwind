@@ -86,9 +86,10 @@ def prepare(source, output):
     for jug in (1,30,33):wanted[('ARMY__03.DAT',jug)]=wanted.get(('ARMY__03.DAT',jug),set())|set(range(0x110,0x11b))
     wanted[('ARMY__03.DAT',9)]=wanted.get(('ARMY__03.DAT',9),set())|set(range(0x11c,0x128))
     # Rufin (ARMY__03 13, a mage who fights when attacked): 8 directions of DAT[4A] frames, the swings and the death.
-    mage=bytes.fromhex(tables['ARMY__03.DAT']['templates'][13]['raw_record_hex']);mbase=struct.unpack_from('<H',mage,0x48)[0]
-    wanted.setdefault(('ARMY__03.DAT',13),set()).update(range(mbase,mbase+8*mage[0x4a]));wanted[('ARMY__03.DAT',13)].update(action_frames(mage,mbase))
-    mvanish=mbase+8*(mage[0x4a]+mage[0x4b])+4*sum(mage[0x4f:0x53]);wanted[('ARMY__03.DAT',13)].update(range(mvanish,mvanish+mage[0x78]))   # FS:105 (878D): the vanishing action plays DAT[78] frames after the death block
+    for mi in (13,3):   # the mage and his phantom (ARMY__03 3): walking, swings, death and the vanishing frames
+        mage=bytes.fromhex(tables['ARMY__03.DAT']['templates'][mi]['raw_record_hex']);mbase=struct.unpack_from('<H',mage,0x48)[0]
+        wanted.setdefault(('ARMY__03.DAT',mi),set()).update(range(mbase,mbase+8*mage[0x4a]));wanted[('ARMY__03.DAT',mi)].update(action_frames(mage,mbase))
+        mvanish=mbase+8*(mage[0x4a]+mage[0x4b])+4*sum(mage[0x4f:0x53]);wanted[('ARMY__03.DAT',mi)].update(range(mvanish,mvanish+mage[0x78]))   # FS:105 (878D): the vanishing action plays DAT[78] frames after the death block
     # The discharge of the mages (ARMY__03 effect 0, 72x72): F0h + 4 per heading, four frames each.
     wanted[('ARMY__03.EFF',0)]=set(range(0xf0,0x110))
     # The birds of the first map (ARMY__05 0): 8 directions of DAT[4A] frames, 32x32.

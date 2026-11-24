@@ -10,7 +10,7 @@
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
 | ARMY__01.WRK | 4951 | 4951 | 0 | 0 | 0 | 7 |
 | ARMY__02.WRK | 6930 | 5671 | 855 | 0 | 404 | 7 |
-| ARMY__03.WRK | 13412 | 11277 | 0 | 0 | 2135 | 1 |
+| ARMY__03.WRK | 13412 | 11110 | 0 | 0 | 2302 | 1 |
 | ARMY__04.WRK | 411 | 411 | 0 | 0 | 0 | 0 |
 | ARMY__05.WRK | 882 | 882 | 0 | 0 | 0 | 2 |
 
@@ -54,6 +54,7 @@
 | ARMY__02.WRK `0xD85..0xE7B` | Gate script (D85): command states 2/3/4, completion in automatic mode, half-damage closing | partial | [gates.md](../docs/gates.md); [GateChecks.cs](../tests/GateChecks.cs) | effects 7 at completion (FS:19) and FS:8D (building common) are not part of the port; no Unicorn fixture |
 | ARMY__02.WRK `0x161D..0x16DD` | Unit corpse effect (type 1) | ported | [combat.md](../docs/combat.md); [corpse.json](../tests/fixtures/corpse.json) |  |
 | ARMY__03.WRK `0xE4..0x189` | Jug script (E4): breaking animation, item visit AH=8, removal | ported | [campaign-items.md](../docs/campaign-items.md); [container.json](../tests/fixtures/container.json); [verify_container.py](../tools/verify_container.py); [OriginalContainerChecks.cs](../tests/OriginalContainerChecks.cs) | FS services 1D, 15, 19 (dust effect 7) are recorded stubs in the check; the skirmish removes the object but draws no dust |
+| ARMY__03.WRK `0x212..0x2B9` | Phantom script: init (visible, life counter, appearing by the reversed vanishing action) and the life-counter continuation | ported | [rufin.md](../docs/rufin.md); [phantom.json](../tests/fixtures/phantom.json); [verify_phantom.py](../tools/verify_phantom.py); [OriginalPhantomChecks.cs](../tests/OriginalPhantomChecks.cs) | FS:4D, FS:1D, FS:DD and FS:E1 are recorded stubs in the check; FS:105 (vanishing/appearing action) is an adapter in the skirmish |
 | ARMY__03.WRK `0x71A..0x7F0` | Chest scripts (71A, 7CE, 7DF): opening, item visit AH=8, empty chest decay | ported | [campaign-items.md](../docs/campaign-items.md); [container.json](../tests/fixtures/container.json); [verify_container.py](../tools/verify_container.py); [OriginalContainerChecks.cs](../tests/OriginalContainerChecks.cs) | FS services 1D, 6D, 15 are recorded stubs in the check |
 | ARMY__03.WRK `0x7F0..0x8EC` | Pit trap (template 12): detect, open, crush, close | ported | [campaign-items.md](../docs/campaign-items.md); [pit.json](../tests/fixtures/pit.json); [verify_pit.py](../tools/verify_pit.py) | Services FS:14B and FS:157 are recorded stubs in the check; not yet wired into the skirmish |
 | ARMY__03.WRK `0x8EC..0xD19` | Quest script of the mage Rufin: init, voice, the speeches to every participant and the answers in the queue, the territory scan | ported | [rufin.md](../docs/rufin.md); [rufin.json](../tests/fixtures/rufin.json); [verify_rufin.py](../tools/verify_rufin.py); [OriginalRufinChecks.cs](../tests/OriginalRufinChecks.cs) | the FS services that act on the world (143, 167, 16F, 17B, 45, 18F, 15, 1D, 163, DD, E1, 111, 4D) are recorded stubs in the check; FS:167 is treated as register-preserving; the unit step after the quest (D19..DBF) is not part of the port |

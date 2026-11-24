@@ -4208,6 +4208,18 @@
       "evidence": ["docs/rufin.md", "tests/fixtures/spot.json", "tools/verify_spot.py", "tests/OriginalSpotChecks.cs"],
       "implementation": ["scripts/OriginalSpotFinder.cs"],
       "limitations": "AC63 is a recorded stub in the check"
+    },
+    {
+      "id": "wrk3-phantom-212",
+      "module": "ARMY__03.WRK",
+      "start": 530,
+      "end": 697,
+      "name": "Phantom script: init (visible, life counter, appearing by the reversed vanishing action) and the life-counter continuation",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/phantom.json", "tools/verify_phantom.py", "tests/OriginalPhantomChecks.cs"],
+      "implementation": ["scripts/OriginalPhantom.cs", "scripts/SkirmishRufin.cs"],
+      "limitations": "FS:4D, FS:1D, FS:DD and FS:E1 are recorded stubs in the check; FS:105 (vanishing/appearing action) is an adapter in the skirmish"
     }
   ]
 }
