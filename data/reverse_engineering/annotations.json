@@ -5192,6 +5192,30 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-mspray.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army03-mclear-319c",
+      "module": "ARMY__03.WRK",
+      "start": 12700,
+      "end": 12775,
+      "name": "Mage wall clearing (319C, 31D0)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-mclear.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army00-camp-0",
+      "module": "ARMY__00.WRK",
+      "start": 0,
+      "end": 82,
+      "name": "Camp (template 0): the direction from the middle of the map and a random time",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-camp.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
     }
   ]
 }
