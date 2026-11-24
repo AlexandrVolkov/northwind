@@ -49,3 +49,7 @@
 ## CCCB
 
 `FCCCB` is the upkeep of a unit: A716 gives the count, the participant pays 10 * +23 * +22 from +20 (floored at 0, then +23 = 1), the unit pays it from +24; when that runs out A6AE is called and the statistics value +73 of the owner falls by 271h. The original also tests and clears `+73` of the unit record itself (kept; the record of the check is 80h long). Verified against x86; sabotaging 271h is caught.
+
+## B319
+
+`FB319` walks the chain of the owner of the unit and hands every living object whose template has flag 8 and a defined +4E and that is more than 25 cells away (Chebyshev distance >> 5) over to the owner [6C6] - 1 (D1BA). Verified against x86; the fixture drives it with far objects and a suitable template (a changed threshold is caught).
