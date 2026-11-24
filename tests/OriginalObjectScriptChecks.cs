@@ -35,6 +35,19 @@ public partial class TestRunner
         private readonly Queue<(bool, uint, uint)> _spot = new(c.GetProperty("spot").EnumerateArray().Select(a => (a[0].GetInt32() != 0, (uint)a[1].GetInt32(), (uint)a[2].GetInt32())));
         private readonly Queue<(bool, byte, byte, byte)> _beside = new(c.GetProperty("beside").EnumerateArray().Select(a => (a[0].GetInt32() != 0, (byte)a[1].GetInt32(), (byte)a[2].GetInt32(), (byte)a[3].GetInt32())));
         private readonly Queue<bool> _create = new(c.GetProperty("create").EnumerateArray().Select(a => a.GetInt32() != 0));
+        public void Appearance(byte army) { log.Add((byte)'N'); log.Add(army); }
+        public (bool Found, uint Reference) ScanMasked(byte mode, uint mask)
+        {
+            log.Add((byte)'F'); log.Add(mode); log.AddRange(BitConverter.GetBytes(Part12 != 0 || true ? QuestMask(mask) : mask));
+            int k = _finds.Count > 0 ? _finds.Dequeue() : 0; return (k != 0, (uint)(0x100 + 0x40 * k));
+        }
+        private static uint QuestMask(uint mask) => mask;
+        public uint QuestField(byte[] record) => Part12;
+        public uint AiStrength(byte owner) { log.Add((byte)'T'); log.Add(owner); return (uint)c.GetProperty("strength").GetInt64(); }
+        public byte ParticipantCount => (byte)c.GetProperty("count").GetInt32();
+        public uint TemplateSound => (uint)c.GetProperty("datsound").GetInt64();
+        public void OccupyRef(uint reference) { log.Add((byte)'O'); log.AddRange(BitConverter.GetBytes(reference)); }
+        public void Handler(byte slot) => log.Add((byte)'H');
         public uint Part12 = (uint)c.GetProperty("part12").GetInt64();
         private readonly Queue<int> _finds = new(c.GetProperty("finds").EnumerateArray().Select(a => a.GetInt32()));
         public byte[] ObjectBytes = Convert.FromHexString(c.GetProperty("objbytes").GetString()!);
@@ -52,7 +65,7 @@ public partial class TestRunner
         public (bool Found, uint X, uint Y) FreeSpot(byte al, byte ah, byte bl, uint x, uint y)
         {
             log.Add((byte)'P'); log.AddRange([al, ah, bl]); log.AddRange(BitConverter.GetBytes(x)); log.AddRange(BitConverter.GetBytes(y));
-            var (ok, sx, sy) = _spot.Count > 0 ? _spot.Dequeue() : (true, 0u, 0u); return (!ok, sx, sy);   // the stub's ZF = 'found' of the service is the inverse
+            var (ok, sx, sy) = _spot.Count > 0 ? _spot.Dequeue() : (true, 0u, 0u); return (ok, sx, sy);   // the stub's ZF = success of the service
         }
         public (bool Found, byte Al, byte Ah, byte Bl) Beside(byte al, byte ah)
         {
@@ -62,7 +75,7 @@ public partial class TestRunner
         public (bool Created, byte[]? Object) Create(byte army, byte owner, byte template, byte layer, uint x, uint y)
         {
             log.Add((byte)'K'); log.AddRange([army, owner, template, layer]); log.AddRange(BitConverter.GetBytes(x)); log.AddRange(BitConverter.GetBytes(y));
-            bool zf = _create.Count > 0 ? _create.Dequeue() : true; return (!zf, new byte[0x40]);
+            bool zf = _create.Count > 0 ? _create.Dequeue() : true; return (zf, new byte[0x40]);   // ZF = created
         }
         public void Occupy(byte[] record) { log.Add((byte)'O'); log.AddRange(BitConverter.GetBytes(0x600u)); }
         public IEnumerable<byte> OwnTemplates(byte[] record) => c.GetProperty("units").EnumerateArray().Select(a => (byte)a.GetInt32());
@@ -70,7 +83,7 @@ public partial class TestRunner
         public void Sound(uint id) { log.Add((byte)'S'); log.AddRange(BitConverter.GetBytes(id)); }
     }
 
-    private void ObjectScriptReplay(string file, string key, string label, Action<IObjectScriptWorld, byte[], int> script, int minEffects = 5, bool extra = false)
+    private void ObjectScriptReplay(string file, string key, string label, Action<IObjectScriptWorld, byte[], int> script, int minEffects = 5, bool extra = false, bool part = false, bool idle = false)
     {
         using var reference = GameData.Read<JsonDocument>($"res://tests/fixtures/{file}.json");
         var root = reference.RootElement;
@@ -86,7 +99,7 @@ public partial class TestRunner
             r[0x27] = (byte)c.GetProperty("f27").GetInt32(); r[0x28] = (byte)c.GetProperty("f28").GetInt32(); r[0x31] = (byte)c.GetProperty("f31").GetInt32();
             var log = new List<byte>(); var world = new ObjectReplay(c, random, log); Array.Copy(world.ObjectBytes, 0, world.Obj1, 0, 0x40); Array.Copy(world.ObjectBytes, 0x40, world.Obj2, 0, 0x40);
             script(world, r, c.GetProperty("ah").GetInt32());
-            byte[] output = extra ? [.. r, world.I, world.J, .. world.Obj1, .. world.Obj2, .. BitConverter.GetBytes(world.Part12), .. log] : [.. r, world.I, world.J, .. log];
+            byte[] output = part ? [.. r, world.I, world.J, .. BitConverter.GetBytes(world.Part12), .. log] : extra ? [.. r, world.I, world.J, .. world.Obj1, .. world.Obj2, .. BitConverter.GetBytes(world.Part12), .. log] : [.. r, world.I, world.J, .. log];
             digest.AppendData(output); if (log.Contains((byte)'E')) effects++;
             string hex = Convert.ToHexStringLower(SHA256.HashData(output))[..10];
             if (hex != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; if (only == count) GD.Print("CSHARP " + Convert.ToHexStringLower(output)); }
@@ -108,6 +121,12 @@ public partial class TestRunner
         ObjectScriptReplay("obj-chest", "chest", "The chest with the birds ARMY__03.WRK 2A6B", OriginalObjectScripts.Chest, 0);
         ObjectScriptReplay("obj-generator", "generator", "The generator script ARMY__03.WRK 29F1", OriginalObjectScripts.Generator, 0);
         ObjectScriptReplay("obj-dragon", "dragon", "The dragon script ARMY__03.WRK 279A", OriginalObjectScripts.Dragon, 5, true);
+        ObjectScriptReplay("obj-phantom32", "phantom32", "The phantom 32 script ARMY__03.WRK 2BA7", OriginalObjectScripts.Phantom32, 0, false, true);
+        ObjectScriptReplay("obj-phantom32idle", "phantom32idle", "The phantom 32 idle handler ARMY__03.WRK 2C1D", (w, r, ah) => OriginalObjectScripts.Phantom32Idle(w, r), 0, false, true, true);
+        ObjectScriptReplay("obj-jugphantom", "jugphantom", "The jug with the phantom ARMY__03.WRK 2C6D", OriginalObjectScripts.JugPhantom, 0, false, true);
+        ObjectScriptReplay("obj-talking", "talking", "The talking object ARMY__03.WRK 2D08", OriginalObjectScripts.Talking, 0, false, true);
+        ObjectScriptReplay("obj-faceb", "faceb", "The second face ARMY__03.WRK 2D52", OriginalObjectScripts.FaceB, 0, false, true);
+        ObjectScriptReplay("obj-rockfallq", "rockfallq", "The quest rockfall ARMY__03.WRK 2E19", OriginalObjectScripts.RockfallQuest, 0, false, true);
         ObjectScriptReplay("obj-face", "face", "The stone face script ARMY__03.WRK 2B9", OriginalObjectScripts.Face);
     }
 }
