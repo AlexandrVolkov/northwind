@@ -5,8 +5,10 @@ using Northwind;
 
 public partial class TestRunner
 {
-    private sealed class RufinTestWorld : IMironWorld
+    private sealed class RufinTestWorld : IMironWorld, IMagusWorld
     {
+        public byte FreeRegions;
+        public byte CountFreeRegions(byte army) { Log.Add((byte)'K'); Log.Add(army); return FreeRegions; }
         public uint Time { get; set; } public uint Dim0 { get; set; } public uint Dim4 { get; set; }
         public bool SpotOk; public uint SpotX, SpotY;
         public byte RandomIndex2; public byte Random2() => RandomTable[RandomIndex2++];
@@ -45,6 +47,7 @@ public partial class TestRunner
     private void OriginalMironChecks() => HermitReplay("miron", "miron", "Miron's quest script ARMY__03.WRK 16C8", 50, (w, r, ah) => { if (ah == 0) OriginalMiron.Initialize(w, r, 7); else if (ah == 1) OriginalMiron.Step(w, r); else OriginalMiron.Voice(w); }, 0, 0);
     private void OriginalKevinChecks() => HermitReplay("kevin", "kevin", "Kevin's script ARMY__03.WRK 1D72", 50, (w, r, ah) => { if (ah == 0) OriginalKevin.Initialize(w, r, 7); else if (ah == 1) OriginalKevin.Step(w, r); else OriginalKevin.Voice(w); }, 0, 0, 0);
     private void OriginalGarikChecks() => HermitReplay("garik", "garik", "Garik's script ARMY__03.WRK 1F39", 20, (w, r, ah) => { if (ah == 0) OriginalGarik.Initialize(w, r, 7); else if (ah == 1) OriginalGarik.Step(w, r); else OriginalGarik.Voice(w); }, 0, 0, 0);
+    private void OriginalMagusChecks() => HermitReplay("magus", "magus", "Magus' script ARMY__03.WRK 1A6E", 50, (w, r, ah) => { if (ah == 0) OriginalMagus.Initialize(w, r, 7); else if (ah == 1) OriginalMagus.Step(w, r); else OriginalMagus.Voice(w); }, 0, 0, 0);
     private void OriginalIrvilChecks() => HermitReplay("irvil", "irvil", "Irvil's quest script ARMY__03.WRK 1297", 100, (w, r, ah) => { if (ah == 0) OriginalIrvil.Initialize(w, r, 7); else if (ah == 1) OriginalIrvil.Step(w, r); else OriginalIrvil.Voice(w); }, 0);
 
     private void HermitReplay(string file, string key, string label, int minSpeeches, Action<RufinTestWorld, byte[], int> run, int minCreations = 2, int minSweeps = 2, int minReveals = 6)
@@ -77,6 +80,7 @@ public partial class TestRunner
             foreach (var m in c.GetProperty("masks").EnumerateObject()) BitConverter.GetBytes((uint)m.Value.GetInt32()).CopyTo(r, Convert.ToInt32(m.Name, 16));
             BitConverter.GetBytes((ushort)c.GetProperty("word47").GetInt32()).CopyTo(r, 0x47);
             int ah = c.GetProperty("ah").GetInt32();
+            if (c.TryGetProperty("free", out var free)) world.FreeRegions = (byte)free.GetInt32();
             if (c.TryGetProperty("time", out var time))
             {
                 world.Time = (uint)time.GetInt64(); world.Dim4 = (uint)c.GetProperty("dim4").GetInt32(); world.Dim0 = (uint)c.GetProperty("dim0").GetInt32();
