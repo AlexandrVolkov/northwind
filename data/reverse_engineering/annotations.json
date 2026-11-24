@@ -6308,6 +6308,54 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "The neighbour search BADF and the template lookup 6885 are recorded stubs in the check (BADF is already ported as the line neighbours)"
+    },
+    {
+      "id": "le1-unit-actions-c4cd",
+      "module": "LE:1",
+      "start": 50381,
+      "end": 50647,
+      "name": "Find the waiting worker at the building (C4CD with C591)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check; the template lookups 6885 / 68BD run as ported code over one template buffer"
+    },
+    {
+      "id": "le1-unit-actions-caee",
+      "module": "LE:1",
+      "start": 51950,
+      "end": 52001,
+      "name": "Mark the target object as handled (CAEE)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check; the template lookups 6885 / 68BD run as ported code over one template buffer"
+    },
+    {
+      "id": "le1-unit-actions-d12c",
+      "module": "LE:1",
+      "start": 53548,
+      "end": 53634,
+      "name": "Terrain class of the cell of a unit / object (D12C, D157)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check; the template lookups 6885 / 68BD run as ported code over one template buffer"
+    },
+    {
+      "id": "le1-unit-actions-d182",
+      "module": "LE:1",
+      "start": 53634,
+      "end": 53690,
+      "name": "Call the script of a template (D182, D19C)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check; the template lookups 6885 / 68BD run as ported code over one template buffer"
     }
   ]
 }
