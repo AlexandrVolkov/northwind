@@ -1366,4 +1366,86 @@ public static class OriginalUnitActions
         g.Edx += stackTop; uint saved = g.Edx; g.Eax = 0; g.Logic(0, 32); w.Call(0x43b0, g); g.Edx = saved;
         g.Al = 0; g.Logic(0, 8); w.Call(0xbb8e, g); w.Call(0x98db, g);
     }
+
+    /// <summary>B5AB: the unit turns (9E41 gives a random number): the direction +25 moves by one step (0: back, 1: forth, 2, 3: unchanged apart from the cell), the position +1 = direction * DAT[4A] + DAT[48].</summary>
+    public static void FB5AB(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var t = w.Template; w.Call(0x9e41, g);
+        g.Ah = g.Al; g.Al = r[0x25]; g.Ah = (byte)(g.Ah & 3); g.Logic(g.Ah, 8);
+        if (!g.Zf)
+        {
+            g.Cmp(g.Ah, 1, 8);
+            if (!g.Zf) return;
+            g.Al = (byte)(g.Al + 2);
+        }
+        g.Al = (byte)(g.Al - 1); g.Al = (byte)(g.Al & 7); r[0x25] = (byte)((r[0x25] & 0xf8) | g.Al);
+        Mul8(g, g.Al, t[0x4a]); uint lo = g.Eax & 0xffff, add = U16(t, 0x48); g.Add(lo << 16, add << 16); g.Eax = (g.Eax & 0xffff0000) | ((lo + add) & 0xffff);
+        r[1] = (byte)g.Eax; r[2] = (byte)(g.Eax >> 8);
+    }
+
+    /// <summary>B5D8: AL = the smallest number from 1 that no object of the chain of the owner AL has in +1B (0 when all 255 are taken); EBX = the first object.</summary>
+    public static void FB5D8(IUnitActionWorld w, ActionRegs g)
+    {
+        var part = w.PartOf((byte)g.Eax); g.Eax = (g.Eax & 0xff) * 0xf5; uint end = U32(part, 9) + w.PoolBase, esi = U32(part, 0xe) + w.PoolBase;
+        g.Al = 0; g.Ebx = esi; g.Cmp(esi, end, 32);
+        if (!g.Zf)
+        {
+            for (; ; )
+            {
+                g.Al++; if (g.Al == 0) break;
+                esi = g.Ebx; bool again = false;
+                do
+                {
+                    var o = w.ObjectAt(esi);
+                    if (g.Al == o[0x1b]) { again = true; break; }
+                    esi += U32(o, 0x10);
+                } while (esi != end);
+                if (!again) break;
+            }
+        }
+        g.Test(g.Al, g.Al, 8);
+    }
+
+    /// <summary>B616: the rectangle (CL, CH) .. (DL, DH) of the map is searched in the three planes of the cells for objects of the owner AL (+3) whose template has none of the flags C and +0F is not 0; +1B of those becomes BL.
+    /// EAX = their number.</summary>
+    public static void FB616(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds;
+        g.Cmp(g.Cl, g.Dl, 8); if (!(g.Cf || g.Zf)) { byte x = g.Cl; g.Cl = g.Dl; g.Dl = x; }
+        g.Cmp(g.Ch, g.Dh, 8); if (!(g.Cf || g.Zf)) { byte x = g.Ch; g.Ch = g.Dh; g.Dh = x; }
+        g.Bh = g.Al; uint swap = g.Ecx; g.Ecx = g.Edx; g.Edx = swap;
+        g.Cl = (byte)(g.Cl - g.Dl + 1); g.Ch = (byte)(g.Ch - g.Dh + 1);
+        uint width = U32(d, 0x18de), height = U32(d, 0x18e2);
+        g.Eax = width; Mul8(g, g.Al, g.Dh); g.Edx &= 0xff; g.Eax += g.Edx;
+        uint esi = w.PlanePointer(0) + g.Eax * 4;
+        g.Eax = width; Mul8(g, g.Al, (byte)height); g.Edx = g.Eax * 4;
+        g.Eax = width; g.Al = (byte)(g.Al - g.Cl); uint ebp = g.Eax * 4;
+        d[0x1f41] = g.Cl; Put(d, 0x1f31, 0);
+        void Mark()   // B6B2
+        {
+            g.Eax += w.PoolBase; var o = w.ObjectAt(g.Eax); g.Cmp(o[3], g.Bh, 8);
+            if (!g.Zf) return;
+            g.Eax = 0x56; Mul8(g, 0x56, o[0]); g.Eax = 0xab; Mul8(g, 0xab, o[0xe]); g.Edi = w.ArmyTable(o[0]) + (g.Eax & 0xffff);
+            var t = w.ObjectAt(g.Edi); g.Test(U32(t, 0x40), 0xc, 32);
+            if (!g.Zf) return;
+            g.Cmp(o[0xf], 0, 8);
+            if (g.Zf) return;
+            o[0x1b] = g.Bl; Put(d, 0x1f31, U32(d, 0x1f31) + 1);
+        }
+        do
+        {
+            g.Cl = d[0x1f41];
+            do
+            {
+                foreach (uint plane in new[] { 2u, 1u, 0u })
+                {
+                    g.Eax = w.PlaneRead(esi + plane * g.Edx); g.Test(g.Eax, g.Eax, 32);
+                    if (!g.Zf) Mark();
+                }
+                esi += 4; g.Cl--;
+            } while (g.Cl != 0);
+            g.Add(esi, ebp); esi += ebp; g.Ch--;
+        } while (g.Ch != 0);
+        g.Zf = true; g.Eax = U32(d, 0x1f31);
+    }
 }

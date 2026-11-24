@@ -6452,6 +6452,42 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "43B0, BB8E and 98DB are recorded stubs"
+    },
+    {
+      "id": "le1-unit-actions-b5ab",
+      "module": "LE:1",
+      "start": 46507,
+      "end": 46552,
+      "name": "Turn the unit by one step (B5AB)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "9E41 is a recorded stub"
+    },
+    {
+      "id": "le1-unit-actions-b5d8",
+      "module": "LE:1",
+      "start": 46552,
+      "end": 46614,
+      "name": "The smallest free number in +1B of the chain (B5D8)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The chain has up to 4 objects"
+    },
+    {
+      "id": "le1-unit-actions-b616",
+      "module": "LE:1",
+      "start": 46614,
+      "end": 46833,
+      "name": "Mark the objects of an owner in a rectangle of the map (B616, B6B2)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The map is 32 x 32; the objects are two records of army 0..2"
     }
   ]
 }
