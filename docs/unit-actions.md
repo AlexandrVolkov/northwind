@@ -33,3 +33,7 @@
 ## B9EB, BA2E, BC15
 
 `FB9EB` counts the objects of the chain of an owner whose +1B equals BL (and folds their +0E/+0F into CL), `FBA2E` only asks whether one exists (AL = FFh), `FBC15` is the tail of the reshaping BB8B (43B0 for the record, BB8E, 98DB). Verified against x86 on the random chains of the unit-action fixture.
+
+## B5AB, B5D8, B616
+
+`FB5AB` turns the facing of the unit by one step according to the random number of 9E41, `FB5D8` finds the smallest number from 1 not used in +1B by the chain of an owner, `FB616` (with B6B2) walks a rectangle of the three cell planes and writes BL into +1B of the objects of the owner whose template has none of the flags 0Ch and whose +0F is not 0. Verified against x86; sabotaging the template test or the number comparison is caught by the fixture.
