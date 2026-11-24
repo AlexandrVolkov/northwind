@@ -6644,6 +6644,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "21A00, D7B1, C344 and D157 are recorded stubs; the skirmish pit still uses its own adapter"
+    },
+    {
+      "id": "le1-unit-actions-10ad2",
+      "module": "LE:1",
+      "start": 68306,
+      "end": 68469,
+      "name": "FS:187: ring search for a free spot (10AD2)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "9E41, 9E55 and AC63 are recorded stubs; the exact boundary 20h of the map edge is not hit by the cases"
     }
   ]
 }

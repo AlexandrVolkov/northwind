@@ -1760,4 +1760,51 @@ public static class OriginalUnitActions
             Put(d, 0x1f31, g.Edi); Put(d, 0x1f35, g.Eax);
         }
     }
+
+    /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
+    /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
+    public static void FS187(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint a0 = g.Eax, b0 = g.Ebx;
+        F68A0(w, g); var t = w.ObjectAt(g.Edi);
+        g.Al = (byte)(t[3] << 4); g.Eax = (uint)(g.Al & 0x10); g.Ecx = (g.Ecx & 0xffffffe0u) + g.Eax;
+        g.Al = (byte)(t[4] << 4); g.Eax = (uint)(g.Al & 0x10); g.Edx = (g.Edx & 0xffffffe0u) + g.Eax;
+        uint ecx0 = g.Ecx, edx0 = g.Edx; g.Bh = 1;
+        for (; ; )
+        {
+            g.Eax = 0; g.Al = g.Bh; Mul8(g, g.Al, g.Bh); g.Test(g.Ah, g.Ah, 8);
+            if (!g.Zf) break;
+            g.Bl = g.Al;
+            for (; ; )
+            {
+                uint pushed = g.Ebx;
+                w.Call(0x9e41, g); Mul8(g, g.Al, g.Bh); g.Al = g.Bh; g.Al = (byte)g.Shr(g.Al, 1, 8); g.Cmp(g.Ah, g.Al, 8); g.Ah = (byte)(g.Ah - g.Al);
+                g.Edx = (uint)(int)(sbyte)g.Ah << 5; g.Edx += edx0;
+                w.Call(0x9e55, g); Mul8(g, g.Al, g.Bh); g.Bh = (byte)g.Shr(g.Bh, 1, 8); g.Cmp(g.Ah, g.Bh, 8); g.Ah = (byte)(g.Ah - g.Bh);
+                g.Ecx = (uint)(int)(sbyte)g.Ah << 5; g.Ecx += ecx0;
+                g.Cmp(g.Ecx, 0x20, 32);
+                if (!g.Cf)
+                {
+                    g.Eax = U32(d, 0x18e6) - 0x20; g.Cmp(g.Ecx, g.Eax, 32);
+                    if (g.Cf)
+                    {
+                        g.Cmp(g.Edx, 0x20, 32);
+                        if (!g.Cf)
+                        {
+                            g.Eax = U32(d, 0x18ea) - 0x20; g.Cmp(g.Edx, g.Eax, 32);
+                            if (g.Cf) { g.Ebx = b0; g.Eax = a0; uint sc = g.Ecx, sd = g.Edx; w.Call(0xac63, g); g.Edx = sd; g.Ecx = sc; }
+                        }
+                    }
+                }
+                g.Ebx = pushed;
+                if (g.Zf) goto done;
+                g.Bl--; g.Zf = g.Bl == 0; g.Sf = (g.Bl & 0x80) != 0;
+                if (g.Bl != 0) continue;
+                break;
+            }
+            g.Bh++;
+        }
+    done:
+        g.Eax = a0; g.Ebx = b0;
+    }
 }
