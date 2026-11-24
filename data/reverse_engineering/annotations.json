@@ -5660,6 +5660,30 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
       "implementation": ["scripts/OriginalBuildingScripts.cs"],
       "limitations": "FS:4D, FS:D1, FS:DD, FS:115, FS:E1, FS:19, FS:1D and FS:71 are recorded stubs; FS:109 runs as original code"
+    },
+    {
+      "id": "army__02-unit-1078",
+      "module": "ARMY__02.WRK",
+      "start": 4216,
+      "end": 4337,
+      "name": "Script 1078: init, FS:D5 tail call, step with the FS:C5 frame offset",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "The services are recorded stubs; FS:109 runs as original code"
+    },
+    {
+      "id": "army__02-unit-1462",
+      "module": "ARMY__02.WRK",
+      "start": 5218,
+      "end": 5454,
+      "name": "Unit script 1462: death effects 16h and 18h (the call of the effect 17h is missing in the original)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "The services are recorded stubs; FS:109 runs as original code"
     }
   ]
 }

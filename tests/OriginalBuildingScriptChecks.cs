@@ -13,7 +13,7 @@ public partial class TestRunner
         public void Service(int slot, BuildingRegs g)
         {
             log.Add((byte)'S'); log.AddRange(BitConverter.GetBytes((ushort)slot)); log.AddRange(BitConverter.GetBytes(g.Eax)); log.AddRange(BitConverter.GetBytes(g.Ebx)); log.AddRange(BitConverter.GetBytes(g.Ecx)); log.AddRange(BitConverter.GetBytes(g.Edx));
-            if (slot is 0x19 or 0x1d) return;
+            if (slot == 0x19 || (slot == 0x1d && c.GetProperty("entry").GetInt32() != 22)) return;
             var (zf, eax, ebx) = svc.Count > 0 ? svc[0] : (true, 0u, 0u); if (svc.Count > 0) svc.RemoveAt(0);
             g.Eax = eax; g.Ebx = ebx; g.Zf = zf;
         }
@@ -27,6 +27,7 @@ public partial class TestRunner
         public void Voice() => log.Add((byte)'Y');
         public void Vitals() => log.Add((byte)'V');
         public void Service115() => log.Add((byte)'I');
+        public void ServiceC5(byte[] r) { log.Add((byte)'5'); log.AddRange(r[0x48..0x4c]); }
         public void Actions() => log.Add((byte)'U');
         public byte[] Big = new byte[0x1a14];
         public byte[] Service1B7(byte al) { log.Add((byte)'Q'); log.Add(al); return Big; }
@@ -54,7 +55,7 @@ public partial class TestRunner
             BitConverter.GetBytes(c.GetProperty("x").GetUInt32()).CopyTo(r, 4); BitConverter.GetBytes(c.GetProperty("y").GetUInt32()).CopyTo(r, 8);
             var log = new List<byte>(); var world = new BuildingScriptReplay(c, log);
             world.Tmpl[0x79] = (byte)c.GetProperty("t79").GetInt32(); world.Tmpl[0x45] = (byte)c.GetProperty("t45").GetInt32(); world.Tmpl[0x46] = (byte)c.GetProperty("t46").GetInt32(); BitConverter.GetBytes(c.GetProperty("t78").GetUInt32()).CopyTo(world.Tmpl, 0x78); BitConverter.GetBytes(c.GetProperty("p2c").GetUInt32()).CopyTo(world.Part, 0x2c);
-            r[0x31] = (byte)c.GetProperty("f31").GetInt32(); r[0x23] = (byte)c.GetProperty("f23").GetInt32(); r[0x24] = (byte)c.GetProperty("f24").GetInt32(); BitConverter.GetBytes(c.GetProperty("p1c").GetUInt32()).CopyTo(world.Part, 0x1c);
+            r[0x31] = (byte)c.GetProperty("f31").GetInt32(); r[0x15] = (byte)c.GetProperty("f15").GetInt32(); BitConverter.GetBytes(c.GetProperty("f48").GetUInt32()).CopyTo(r, 0x48); r[0x23] = (byte)c.GetProperty("f23").GetInt32(); r[0x24] = (byte)c.GetProperty("f24").GetInt32(); BitConverter.GetBytes(c.GetProperty("p1c").GetUInt32()).CopyTo(world.Part, 0x1c);
             world.Found[0x31] = (byte)c.GetProperty("fo31").GetInt32(); BitConverter.GetBytes((ushort)c.GetProperty("fo17").GetInt32()).CopyTo(world.Found, 0x17);
             BitConverter.GetBytes(c.GetProperty("e1a10").GetUInt32()).CopyTo(world.Big, 0x1a10);
             var other = new byte[0x50]; other[3] = (byte)c.GetProperty("o3").GetInt32();

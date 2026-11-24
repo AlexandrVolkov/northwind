@@ -15,9 +15,9 @@ from analyze_executable import analyze
 from verify_combat import CombatOracle
 from forestry_source import source_constants
 
-ENTRIES = [('ARMY__01.WRK', 0xfe, 0x24d), ('ARMY__01.WRK', 0x24d, 0x354), ('ARMY__01.WRK', 0x354, 0x3ed), ('ARMY__01.WRK', 0x3ed, 0x4f0), ('ARMY__01.WRK', 0x6d4, 0x7a0), ('ARMY__01.WRK', 0x7a0, 0x896), ('ARMY__01.WRK', 0x896, 0x986), ('ARMY__01.WRK', 0x986, 0xa77), ('ARMY__01.WRK', 0xce3, 0xdef), ('ARMY__02.WRK', 0xfe, 0x263), ('ARMY__02.WRK', 0x263, 0x354), ('ARMY__02.WRK', 0x354, 0x454), ('ARMY__02.WRK', 0x756, 0x7f5), ('ARMY__02.WRK', 0x524, 0x6a1), ('ARMY__02.WRK', 0xcb9, 0xd85), ('ARMY__02.WRK', 0xd85, 0xe7b), ('ARMY__02.WRK', 0xe7b, 0xf86), ('ARMY__02.WRK', 0x122d, 0x131e), ('ARMY__02.WRK', 0x131e, 0x137a), ('ARMY__02.WRK', 0x137a, 0x13d6), ('ARMY__02.WRK', 0xf86, 0x1078)]
-TABLES = [0x179, 0x2a1, 0x381, 0x441, 0x71e, 0, 0x8e6, 0x9d4, 0xd37, 0, 0, 0, 0, 0, 0, 0, 0xf54, 0x130c, 0, 0, 0]      # the inline table after the call of FS:41 in the step of each building
-SLOTS = [0x85, 0x121, 0x197, 0x3d, 0x51, 0x49, 0x129, 0x99, 0x12d, 0xcd, 0x19, 0x1d, 0xbd, 0x9d, 0x8d, 0x91, 0x95, 0xc1, 0x15, 0x19f, 0x59, 0x5d, 0xd9, 0x65]
+ENTRIES = [('ARMY__01.WRK', 0xfe, 0x24d), ('ARMY__01.WRK', 0x24d, 0x354), ('ARMY__01.WRK', 0x354, 0x3ed), ('ARMY__01.WRK', 0x3ed, 0x4f0), ('ARMY__01.WRK', 0x6d4, 0x7a0), ('ARMY__01.WRK', 0x7a0, 0x896), ('ARMY__01.WRK', 0x896, 0x986), ('ARMY__01.WRK', 0x986, 0xa77), ('ARMY__01.WRK', 0xce3, 0xdef), ('ARMY__02.WRK', 0xfe, 0x263), ('ARMY__02.WRK', 0x263, 0x354), ('ARMY__02.WRK', 0x354, 0x454), ('ARMY__02.WRK', 0x756, 0x7f5), ('ARMY__02.WRK', 0x524, 0x6a1), ('ARMY__02.WRK', 0xcb9, 0xd85), ('ARMY__02.WRK', 0xd85, 0xe7b), ('ARMY__02.WRK', 0xe7b, 0xf86), ('ARMY__02.WRK', 0x122d, 0x131e), ('ARMY__02.WRK', 0x131e, 0x137a), ('ARMY__02.WRK', 0x137a, 0x13d6), ('ARMY__02.WRK', 0xf86, 0x1078), ('ARMY__02.WRK', 0x1462, 0x154e), ('ARMY__02.WRK', 0x1078, 0x10f1)]
+TABLES = [0x179, 0x2a1, 0x381, 0x441, 0x71e, 0, 0x8e6, 0x9d4, 0xd37, 0, 0, 0, 0, 0, 0, 0, 0xf54, 0x130c, 0, 0, 0, 0, 0]      # the inline table after the call of FS:41 in the step of each building
+SLOTS = [0x85, 0x121, 0x197, 0x3d, 0x51, 0x49, 0x129, 0x99, 0x12d, 0xcd, 0x19, 0x1d, 0xbd, 0x9d, 0x8d, 0x91, 0x95, 0xc1, 0x15, 0x19f, 0xd5, 0x59, 0x5d, 0xd9, 0x65]
 KEEP = {0x19, 0x1d}                        # services that leave the registers alone
 TMPL, PART, OTHER, TFLAGS, FOUND = 0xc00, 0xd00, 0x900, 0xb00, 0xe00
 
@@ -36,13 +36,13 @@ def cases():
     out = []
     for n in range(1500):
         k = rng.randrange(len(ENTRIES))
-        ahs = {0: [0, 1, 1, 1, 1, 2, 5, 6], 1: [0, 1, 1, 1, 1, 2, 6], 2: [0, 1, 1, 1, 1], 3: [0, 1, 1, 1, 1, 2, 6], 4: [0, 1, 1, 1, 1, 5, 5], 5: [0, 1, 1, 1, 1, 1], 6: [0, 1, 1, 1, 1, 5], 7: [0, 1, 1, 1, 1, 2, 6], 8: [0, 1, 1, 1, 1, 2, 6], 9: [0, 1, 1, 1, 1, 2, 5, 6], 10: [0, 1, 1, 1, 1, 2, 6], 11: [0, 1, 1, 1, 1, 5], 12: [0, 1, 1, 1, 1], 13: [0, 1, 1, 1, 1, 2, 4, 5], 14: [0, 1, 1, 1, 1, 5, 5], 15: [0, 1, 1, 1, 1, 1], 16: [0, 1, 1, 1, 1, 2, 6], 17: [0, 1, 1, 1, 1, 2, 6], 18: [0, 1, 1, 1, 1], 19: [0, 1, 1, 1, 1], 20: [0, 1, 1, 1, 1, 2, 5]}[k]
+        ahs = {0: [0, 1, 1, 1, 1, 2, 5, 6], 1: [0, 1, 1, 1, 1, 2, 6], 2: [0, 1, 1, 1, 1], 3: [0, 1, 1, 1, 1, 2, 6], 4: [0, 1, 1, 1, 1, 5, 5], 5: [0, 1, 1, 1, 1, 1], 6: [0, 1, 1, 1, 1, 5], 7: [0, 1, 1, 1, 1, 2, 6], 8: [0, 1, 1, 1, 1, 2, 6], 9: [0, 1, 1, 1, 1, 2, 5, 6], 10: [0, 1, 1, 1, 1, 2, 6], 11: [0, 1, 1, 1, 1, 5], 12: [0, 1, 1, 1, 1], 13: [0, 1, 1, 1, 1, 2, 4, 5], 14: [0, 1, 1, 1, 1, 5, 5], 15: [0, 1, 1, 1, 1, 1], 16: [0, 1, 1, 1, 1, 2, 6], 17: [0, 1, 1, 1, 1, 2, 6], 18: [0, 1, 1, 1, 1], 19: [0, 1, 1, 1, 1], 20: [0, 1, 1, 1, 1, 2, 5], 21: [0, 1, 1, 1, 1, 2, 5], 22: [0, 1, 1, 1, 1, 1, 4]}[k]
         out.append({'entry': k, 'ah': rng.choice(ahs), 'bl': rng.randrange(256), 'f14': rng.choice([0x80, 0x81, 0x40, 0x41, 0x42, 0, 1, 2, 3, 4, 5, 0x43, 0xc4, 0xc5, 0xc2]) if rng.random() < 0.9 else (rng.randrange(256) & ~7) | rng.randrange(6),
                     'f0f': rng.choice([0, 0x10, 0x20, rng.randrange(256)]), 'f22': rng.choice([0xff, 0xff, 0, rng.randrange(256)]), 'f26': rng.randrange(256), 'f27': rng.randrange(256), 'f17': rng.choice([0, 0x100, 0x180, rng.randrange(1 << 16)]),
                     'f19': rng.choice([0, 1, 0x10, 0x80, 0xff, rng.randrange(256)]), 'f1a': rng.choice([0, 1, 0x10, 0x7f, 0x80, 0xff, rng.randrange(256)]), 'f3': rng.randrange(8), 'f0': rng.randrange(256),
                     'x': rng.randrange(1 << 16), 'y': rng.randrange(1 << 16), 't45': rng.choice([0, 0x10, 0x20, 0xff, rng.randrange(256)]), 't46': rng.choice([0, 0x10, 0x20, 0x7f, 0x80, rng.randrange(256)]), 't78': rng.choice([0, 5, 100, rng.randrange(1 << 32)]),
                     'p2c': rng.choice([0, 3, 100, 0xffffffff, rng.randrange(1 << 32)]), 'o3': rng.choice([0, 1, 2, 3, rng.randrange(8)]), 'tflags': rng.choice([0, 0x20000, 0x20000, rng.randrange(1 << 32)]),
-                    'svc': [[rng.choice([0, 1, 1]), rng.randrange(1 << 32) if rng.random() < 0.4 else rng.randrange(256), rng.choice([0, 1, 0x40, rng.randrange(1 << 16)])] for _ in range(8)], 'zf': rng.choice([0, 1, 1]), 'seed': rng.randrange(256), 'f24': rng.choice([0, 1, 2, rng.randrange(256)]), 'f23': rng.choice([0, 1, 2, rng.randrange(256)]), 't79': rng.choice([0, 1, 5, rng.randrange(256)]), 'fo31': rng.choice([0, 3, 3, rng.randrange(256)]), 'fo17': rng.choice([0, 0x40, 0xffff, rng.randrange(1 << 16)]), 'ftf': rng.choice([0, 0x20000, 0x20000, rng.randrange(1 << 32)]), 'p1c': rng.randrange(1 << 32), 'e1a10': rng.randrange(1 << 32), 'f31': rng.choice([0xff, 0xff, 0, rng.randrange(256)])})
+                    'svc': [[rng.choice([0, 1, 1]), rng.randrange(1 << 32) if rng.random() < 0.4 else rng.randrange(256), rng.choice([0, 1, 0x40, rng.randrange(1 << 16)])] for _ in range(8)], 'zf': rng.choice([0, 1, 1]), 'seed': rng.randrange(256), 'f24': rng.choice([0, 1, 2, rng.randrange(256)]), 'f23': rng.choice([0, 1, 2, rng.randrange(256)]), 't79': rng.choice([0, 1, 5, rng.randrange(256)]), 'fo31': rng.choice([0, 3, 3, rng.randrange(256)]), 'fo17': rng.choice([0, 0x40, 0xffff, rng.randrange(1 << 16)]), 'ftf': rng.choice([0, 0x20000, 0x20000, rng.randrange(1 << 32)]), 'p1c': rng.randrange(1 << 32), 'e1a10': rng.randrange(1 << 32), 'f31': rng.choice([0xff, 0xff, 0, rng.randrange(256)]), 'f15': rng.choice([4, 4, 0, rng.randrange(256)]), 'f48': rng.randrange(1 << 32)})
     return out
 
 
@@ -61,7 +61,7 @@ def generate(game):
     def service(slot):
         def f():
             log.append(b'S' + struct.pack('<HIIII', slot, reg(UC_X86_REG_EAX), reg(UC_X86_REG_EBX), rel(reg(UC_X86_REG_ECX)), rel(reg(UC_X86_REG_EDX))))
-            if slot not in KEEP:
+            if slot not in KEEP or (slot == 0x1d and state['entry'] == 22):
                 zf, eax, ebx = state['svc'].pop(0) if state['svc'] else (1, 0, 0)
                 o.cpu.reg_write(UC_X86_REG_EAX, eax & 0xffffffff); o.cpu.reg_write(UC_X86_REG_EBX, ebx); setzf(zf)
             o.ret()
@@ -76,6 +76,8 @@ def generate(game):
             log.append(letter + (struct.pack('<I', reg(UC_X86_REG_EAX) & 255) if with_eax else b'')); o.ret()
         return f
     def actions(): log.append(b'U'); o.cpu.emu_stop()
+    def svcc5():
+        log.append(b'5' + bytes(o.cpu.mem_read(reg(UC_X86_REG_EDI) + 0x48, 4))); o.ret()
     def svc1b7():
         log.append(b'Q' + struct.pack('<B', reg(UC_X86_REG_EAX) & 255)); o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + 0x400); o.ret()
     def svc71():
@@ -97,14 +99,14 @@ def generate(game):
     def handler_return():
         log.append(b'H' + struct.pack('<B', o.zf())); setzf(state['zf']); o.ret()
     o.stubs = {slots[s]: service(s) for s in SLOTS}
-    o.stubs[slots[0x6d]] = svc6d; o.stubs[slots[0x71]] = svc71; o.stubs[slots[0x79]] = svc79; o.stubs[slots[0x1b7]] = svc1b7; o.stubs[slots[0x4d]] = note(b'N', True); o.stubs[slots[0xd1]] = note(b'Y'); o.stubs[slots[0xdd]] = note(b'V'); o.stubs[slots[0x115]] = note(b'I'); o.stubs[slots[0xe1]] = actions; o.stubs[slots[0x41]] = dispatch; o.stubs[0x20] = handler_return
+    o.stubs[slots[0x6d]] = svc6d; o.stubs[slots[0x71]] = svc71; o.stubs[slots[0x79]] = svc79; o.stubs[slots[0x1b7]] = svc1b7; o.stubs[slots[0xc5]] = svcc5; o.stubs[slots[0x4d]] = note(b'N', True); o.stubs[slots[0xd1]] = note(b'Y'); o.stubs[slots[0xdd]] = note(b'V'); o.stubs[slots[0x115]] = note(b'I'); o.stubs[slots[0xe1]] = actions; o.stubs[slots[0x41]] = dispatch; o.stubs[0x20] = handler_return
     digest = hashlib.sha256(); all_cases = cases()
     for case in all_cases:
         log.clear(); o.prepare(32, 32); o.mode = 'unit'
         module, a, e = ENTRIES[case['entry']]
         o.cpu.mem_write(o.WRK, wrks[module]); o.cpu.ctl_flush_tb(); o.cpu.mem_write(o.POOL, bytes(0x2000)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x19eb, bytes([case['seed']]))
-        state['svc'] = [list(x) for x in case['svc']]; state['zf'] = case['zf']
-        r = bytearray(0x50); r[0] = case['f0']; r[3] = case['f3']; r[0x14] = case['f14']; r[0x0f] = case['f0f']; r[0x22] = case['f22']; r[0x26] = case['f26']; r[0x27] = case['f27']; struct.pack_into('<H', r, 0x17, case['f17']); r[0x19] = case['f19']; r[0x1a] = case['f1a']; r[0x23] = case['f23']; r[0x24] = case['f24']; r[0x31] = case['f31']
+        state['svc'] = [list(x) for x in case['svc']]; state['zf'] = case['zf']; state['entry'] = case['entry']
+        r = bytearray(0x50); r[0] = case['f0']; r[3] = case['f3']; r[0x14] = case['f14']; r[0x0f] = case['f0f']; r[0x22] = case['f22']; r[0x26] = case['f26']; r[0x27] = case['f27']; struct.pack_into('<H', r, 0x17, case['f17']); r[0x19] = case['f19']; r[0x1a] = case['f1a']; r[0x23] = case['f23']; r[0x24] = case['f24']; r[0x31] = case['f31']; r[0x15] = case['f15']; struct.pack_into('<I', r, 0x48, case['f48'])
         struct.pack_into('<II', r, 4, case['x'], case['y'])
         o.cpu.mem_write(o.POOL + 0x800, bytes(r))
         t = bytearray(0x100); t[0x79] = case['t79']; t[0x45] = case['t45']; t[0x46] = case['t46']; struct.pack_into('<I', t, 0x78, case['t78']); o.cpu.mem_write(o.POOL + TMPL, bytes(t))

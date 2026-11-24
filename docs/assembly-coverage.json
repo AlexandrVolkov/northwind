@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "736b9f0dc3dcf474d69a8afeefb97eb2332e59fc3fc7d9e2e1a224e32270c82d",
+  "annotation_sha256": "eb1533fafe811dc604a5ec84b77f2e638a67a66bd23c347a290a088840469f9f",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3726,8 +3726,8 @@
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
         "partial": 855,
-        "ported": 4152,
-        "unreviewed": 1923
+        "ported": 4273,
+        "unreviewed": 1802
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -4178,9 +4178,11 @@
         {
           "start": 4216,
           "end": 4337,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-unit-1078"
+          ]
         },
         {
           "start": 4337,
@@ -4233,7 +4235,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "army02-ballista-1462"
+            "army02-ballista-1462",
+            "army__02-unit-1462"
           ]
         },
         {
