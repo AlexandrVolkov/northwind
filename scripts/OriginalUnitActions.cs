@@ -637,4 +637,139 @@ public static class OriginalUnitActions
         if (!g.Zf) return;
         w.Call(0xb5ab, g);
     }
+
+    /// <summary>8BC7: the target is out of the reach of the unit (distance of 9B86 / 32 above DAT[47]) — ZF = 0 when it is.</summary>
+    public static void F8BC7(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Edi = U32(r, 0x1c); g.Test(g.Edi, g.Edi, 32);
+        if (g.Zf) return;
+        g.Edi += w.PoolBase; w.Call(0x9b86, g);
+        g.Eax = g.Shr(g.Eax, 5, 32); g.Cmp(g.Al, w.Template[0x47], 8);
+        if (g.Cf || g.Zf) { Xor0(g); }
+    }
+
+    /// <summary>8BEA: the unit moves to its target (960B) when it rests.</summary>
+    public static void F8BEA(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Al = (byte)(r[0x2d] & 0xf); g.Cmp(g.Al, 0, 8);
+        if (!g.Zf) { w.Call(0x8c98, g); OrFF(g); return; }
+        g.Edi = U32(r, 0x1c); g.Test(g.Edi, g.Edi, 32);
+        if (g.Zf) return;
+        g.Edi += w.PoolBase; var o = w.ObjectAt(g.Edi); g.Eax = U32(o, 4); g.Ebx = U32(o, 8); w.Call(0x960b, g);
+        if (g.Zf) return;
+        r[0x2d] &= 0xf; r[0x2d] |= 0x10; g.Logic(r[0x2d], 8);
+    }
+
+    /// <summary>8C47: the unit moves to the cell (AL, AH) when it rests.</summary>
+    public static void F8C47(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Edx = g.Eax; g.Al = (byte)(r[0x2d] & 0xf); g.Cmp(g.Al, 0, 8);
+        if (!g.Zf) { w.Call(0x8c98, g); OrFF(g); return; }
+        g.Eax = g.Dl; g.Ebx = g.Dh; g.Eax <<= 5; g.Ebx <<= 5; g.Eax += 0x10; g.Ebx += 0x10; w.Call(0x960b, g);
+        if (g.Zf) return;
+        r[0x2d] &= 0xf; r[0x2d] |= 0x10; g.Logic(r[0x2d], 8);
+    }
+
+    /// <summary>8C89: the walk target +22/+23 = (AL, AH), request 3 of the motion nibbles.</summary>
+    public static void F8C89(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        r[0x22] = g.Al; r[0x23] = g.Ah; r[0x2d] &= 0xf; r[0x2d] |= 0x30; g.Logic(r[0x2d], 8);
+    }
+
+    /// <summary>8CF3: 8BC7 and the follow request 8CBB.</summary>
+    public static void F8CF3(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        w.Call(0x8bc7, g); g.Bl = 0;
+        if (g.Zf) return;
+        w.Call(0x8cbb, g);
+        if (!g.Zf) return;
+        g.Al = (byte)(r[0x2d] & 0xf); g.Cmp(g.Al, 0, 8);
+    }
+
+    /// <summary>84AA: the action of the herdsman / escort: the cell (+32, +33) it keeps to, the distance to it (C331), the sub-state +34 (the counter and DAT[78]).</summary>
+    public static void F84AA(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var t = w.Template;
+        w.G1C9F = g.Bl; w.Call(0x8d89, g); g.Test(g.Al, g.Al, 8);
+        if (g.Zf)
+        {
+            g.Cmp(g.Dl, 0, 8);
+            if (g.Zf) { g.Al = r[0x32]; g.Ah = r[0x33]; w.Call(0x8ca1, g); r[0x15]++; }
+            else w.Call(0x8c98, g);
+            End(w, g); return;
+        }
+        g.Cmp(g.Al, 1, 8);
+        if (g.Zf)
+        {
+            uint savedDx = g.Edx; g.Eax = U32(r, 4); g.Ebx = U32(r, 8); g.Ecx = r[0x32]; g.Edx = r[0x33]; g.Ecx <<= 5; g.Edx <<= 5; g.Ecx += 0x10; g.Edx += 0x10;
+            w.Call(0xc331, g);
+            g.Ebx = t[3]; g.Ebx <<= 4; g.Bl = (byte)(g.Bl + 0x10); g.Eax -= g.Ebx; g.Edx = savedDx;
+            g.Cmp(g.Dl, g.Dh, 8);
+            if (!g.Zf) { Distance(w, g, r); return; }
+            g.Cmp(g.Dl, 0, 8);
+            if (!g.Zf) { Distance(w, g, r); return; }
+            g.Cmp(g.Eax, 0, 32);
+            if (!g.Zf) { Wander(w, g, r); return; }
+            g.Al = r[0x32]; g.Ah = r[0x33]; w.Call(0x8c47, g);
+            if (!g.Zf) { End(w, g); return; }
+            g.Al = t[0x78]; r[0x34] = (byte)((r[0x34] & 0xe0) | g.Al); r[0x15]++; End(w, g); return;
+        }
+        g.Cmp(g.Al, 2, 8);
+        if (!g.Zf) { Xor0(g); g.Bl = 1; return; }
+        g.Test(U16(r, 0x17), 1, 16);
+        if (!g.Zf) { Xor0(g); g.Bl = 1; return; }
+        g.Cmp(g.Dl, 3, 8);
+        if (g.Zf) { End(w, g); return; }
+        g.Cl = r[0x32]; g.Ch = r[0x33]; w.Call(0xd101, g); g.Cmp(g.Eax, 1, 32);
+        if (!g.Zf) { Wander(w, g, r); return; }
+        g.Test(r[0x34], 0x1f, 8);
+        if (g.Zf)
+        {
+            r[0x34] += 0x20; g.Cmp(r[0x34], 0xe0, 8);
+            if (!g.Jb)
+            {
+                r[0x34] = 0; g.Dl = r[0x32]; g.Dh = r[0x33]; g.Eax = 0x201; g.Ecx = 0x101; w.Call(0xcfac, g);
+            }
+            g.Edi = g.Esi; g.Al = 3; w.Call(0x123d3, g);
+            r[0x16] = (byte)(r[0x16] + 5); g.Logic(r[0x16], 8);
+            if (g.Sf) r[0x16] = 0x7f;
+            g.Bl = 0; g.Logic(0, 8); return;
+        }
+        w.Call(0x8af4, g);
+        if (!g.Zf) { End(w, g); return; }
+        g.Al = r[0x32]; g.Ah = r[0x33]; w.Call(0x8c89, g); r[0x34]--; End(w, g);
+    }
+
+    private static void End(IUnitActionWorld w, ActionRegs g) { NotTest40(w, g); g.Bl = 1; }
+
+    /// <summary>8554: the distance to the cell is up to 5: the unit stops (8C98).</summary>
+    private static void Distance(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Cmp(g.Eax, 5, 32);
+        if (g.Jg) { End(w, g); return; }
+        w.Call(0x8c98, g); End(w, g);
+    }
+
+    /// <summary>85E2: looks for a place of the herd (C35F with DL = 1, then DAT[47]) and sets the cell +32/+33.</summary>
+    private static void Wander(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var t = w.Template;
+        g.Test(w.G1C9F, 0x40, 8);
+        if (!g.Zf) { Xor0(g); g.Bl = 1; return; }
+        g.Dl = 1; g.Al = 1; w.Call(0xc35f, g);
+        if (!g.Zf)
+        {
+            r[0x32] = g.Al; r[0x33] = g.Bl; r[0x15] = 1;
+            g.Eax = U32(r, 4) >> 5; g.Cmp(g.Al, r[0x32], 8);
+            if (!g.Zf) { End(w, g); return; }
+            g.Eax = U32(r, 8) >> 5; g.Cmp(g.Al, r[0x33], 8);
+            if (!g.Zf) { End(w, g); return; }
+            w.Call(0x8b0f, g); End(w, g); return;
+        }
+        g.Dl = t[0x47]; g.Al = 1; w.Call(0xc35f, g);
+        if (g.Zf) { Xor0(g); g.Bl = 1; return; }
+        g.Cmp(r[0x32], g.Al, 8);
+        if (g.Zf) { g.Cmp(r[0x33], g.Bl, 8); if (g.Zf) { Xor0(g); g.Bl = 1; return; } }
+        r[0x32] = g.Al; r[0x33] = g.Bl; r[0x15] = 0; End(w, g);
+    }
 }
