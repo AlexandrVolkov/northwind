@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "b66dbe16b099466775451eed3752e45a226b37c12e6ee0d4705c4d7bb135bb12",
+  "annotation_sha256": "2e289a6f93d42db764a890e53cc11709c1cae23045668cc3e38f4a66c08c2e63",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3790,8 +3790,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 10589,
-        "unreviewed": 2823
+        "ported": 11221,
+        "unreviewed": 2191
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -4222,10 +4222,78 @@
         },
         {
           "start": 11107,
-          "end": 11852,
+          "end": 11175,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 11175,
+          "end": 11260,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-phantom32-2ba7"
+          ]
+        },
+        {
+          "start": 11260,
+          "end": 11293,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 11293,
+          "end": 11361,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-phantom32idle-2c1d"
+          ]
+        },
+        {
+          "start": 11361,
+          "end": 11373,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 11373,
+          "end": 11528,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-jugphantom-2c6d"
+          ]
+        },
+        {
+          "start": 11528,
+          "end": 11602,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-talking-2d08"
+          ]
+        },
+        {
+          "start": 11602,
+          "end": 11801,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-faceb-2d52"
+          ]
+        },
+        {
+          "start": 11801,
+          "end": 11852,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-rockfallq-2e19"
+          ]
         },
         {
           "start": 11852,

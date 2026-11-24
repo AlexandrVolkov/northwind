@@ -4760,6 +4760,78 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-dragon.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-phantom32-2ba7",
+      "module": "ARMY__03.WRK",
+      "start": 11175,
+      "end": 11260,
+      "name": "Phantom 32 (template 32): init and the standard step",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-phantom32.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-phantom32idle-2c1d",
+      "module": "ARMY__03.WRK",
+      "start": 11293,
+      "end": 11361,
+      "name": "Phantom 32: idle handler (looks for an enemy every 8 updates)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-phantom32idle.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-jugphantom-2c6d",
+      "module": "ARMY__03.WRK",
+      "start": 11373,
+      "end": 11528,
+      "name": "Jug with the phantom (template 33)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-jugphantom.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-talking-2d08",
+      "module": "ARMY__03.WRK",
+      "start": 11528,
+      "end": 11602,
+      "name": "Talking object: says its sound when somebody is near",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-talking.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-faceb-2d52",
+      "module": "ARMY__03.WRK",
+      "start": 11602,
+      "end": 11801,
+      "name": "Second stone face (script 2D52)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-faceb.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-rockfallq-2e19",
+      "module": "ARMY__03.WRK",
+      "start": 11801,
+      "end": 11852,
+      "name": "Rockfall of a participant's quest (the mask from +12 of the participant)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-rockfallq.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
     }
   ]
 }

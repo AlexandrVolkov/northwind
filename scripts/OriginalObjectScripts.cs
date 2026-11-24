@@ -22,6 +22,14 @@ public interface IObjectScriptWorld
     void EffectAt(byte army, byte type, byte layer, uint x, uint y);   // FS:19 called with registers only
     byte[]? FindObject(byte owner, byte army, byte template, byte skip);   // FS:14F = 11BE0
     void ClearQuestField(byte[] record);              // [participant of the owner + 12h] = 0 (FS:6D)
+    void Appearance(byte army);                       // FS:4D
+    (bool Found, uint Reference) ScanMasked(byte mode, uint mask);   // FS:17B = D895 with the participants of the mask excluded (the quest field +12 of the participant is lent for it)
+    uint QuestField(byte[] record);                   // [participant of the owner + 12h]
+    uint AiStrength(byte owner);                      // FS:1B7: the strength +19F1 of the owner's AI state
+    byte ParticipantCount { get; }                    // FS:142
+    uint TemplateSound { get; }                       // DAT[A3]
+    void OccupyRef(uint reference);                   // FS:19B with a reference
+    void Handler(byte slot);                          // the end of a state handler: a jump to FS:ED
     bool Service1BF(uint edx);                        // FS:1BF: ZF (true = skip)
     (bool Found, uint X, uint Y) FreeSpot(byte al, byte ah, byte bl, uint x, uint y);   // FS:187 = 10AD2
     (bool Found, byte Al, byte Ah, byte Bl) Beside(byte al, byte ah);   // FS:16B = 9064
@@ -229,6 +237,100 @@ public static class OriginalObjectScripts
                 var o = w.FindObject(r[3], r[0], template, skip); if (o == null) break;
                 Put(o, 0x22, 0);
             }
+    }
+
+    /// <summary>The phantom 32 (template 32, 2BA7): a hidden phantom (+32 = FF, state +14 = D8) that every 8 updates looks for an enemy among the participants other than its own and
+    /// attacks him (state request 50h, the target +1C). AH = 0: init; AH = 1: the redraw and the standard step; <see cref="Phantom32Idle"/> is its idle handler (2C1D).</summary>
+    public static void Phantom32(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah == 0) { r[0x20] = 0xff; r[0x31] = 0x7f; r[0x32] = 0xff; r[0x0f] = 7; r[0x14] = 0xd8; w.Appearance(4); r[0x2e] = w.Random(); return; }
+        if (ah != 1) return;
+        Word(r, 0x17, (ushort)(Word(r, 0x17) & 0xffe7));
+        Redraw(w, r); w.Vitals(); w.Actions();
+    }
+
+    public static void Phantom32Idle(IObjectScriptWorld w, byte[] r)
+    {
+        if ((r[0x2e] & 7) == 0)
+        {
+            var (found, reference) = w.ScanMasked(0, ~(1u << (r[3] & 31)));
+            if (found) { Put(r, 0x1c, reference); r[0x14] = (byte)((r[0x14] & 7) | 0x50); }
+        }
+        w.Handler(0xed);
+    }
+
+    /// <summary>The jug with the phantom (template 33, 2C6D): a whole jug stays; broken it releases a phantom of the last participant (template 20h) at a free spot and dust (effect 7), then goes.</summary>
+    public static void JugPhantom(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah == 0) { r[0x31] = 0x22; r[0x19] = 0x64; return; }
+        if (ah != 1) return;
+        if ((sbyte)r[0x19] > 0) { if ((r[0x14] & 0x80) != 0) { r[0x14] = 0; w.Redraw(); } return; }
+        r[0x19]--;
+        if (r[0x19] > 0xfa) return;
+        Word(r, 0x17, (ushort)(Word(r, 0x17) | 0x80));
+        w.OccupyRef(0);
+        var (found, x, y) = w.FreeSpot(0x20, r[0], 1, U32(r, 4), U32(r, 8));
+        if (found)
+        {
+            var (created, phantom) = w.Create(r[0], (byte)(w.ParticipantCount - 1), 0x20, 1, x, y);
+            if (created) w.Occupy(phantom!);
+        }
+        w.EffectAt(r[0], 7, 0, U32(r, 4), U32(r, 8)); w.Remove(r);
+    }
+
+    /// <summary>The talking object (2D08): when somebody is near (FS:1BF), says its sound DAT[A3] once.</summary>
+    public static void Talking(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah != 1 || (w.Tick & 0x3f) != 0) return;
+        if (r[0x15] == 0)
+        {
+            if (w.Service1BF(0x505)) return;
+            r[0x15] = 1; w.Sound(w.TemplateSound);
+        }
+        if (w.Service1BF(0x505)) r[0x15] = 0;
+    }
+
+    /// <summary>The second face (2D52): wakes when somebody is near (+15: 1 plays the frames 140h..154h with the counter +0F, the sound DAT[A3] at 10, up to 3Ch; 2 plays back; 3 waits for the place to empty).</summary>
+    public static void FaceB(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah == 0) { r[0x15] = 0; Put(r, 8, U32(r, 8) + 0x10); Put(r, 4, U32(r, 4) + 4); return; }
+        if (ah != 1) return;
+        if (r[0x15] == 0)
+        {
+            if ((w.Tick & 0x3f) != 0) return;
+            if (w.Service1BF(0x505)) return;
+            r[0x15] = 1; r[0x0f] = 0; Word(r, 1, 0x140);
+        }
+        if ((w.Tick & 3) != 0) return;
+        if (r[0x15] == 1)
+        {
+            Word(r, 1, (ushort)(Word(r, 1) + 1));
+            if (Word(r, 1) > 0x154) Word(r, 1, 0x14b);
+            r[0x0f]++;
+            if (r[0x0f] == 0x0a) w.Sound(w.TemplateSound);
+            if (r[0x0f] < 0x3c) return;
+            r[0x15] = 2; r[0x0f] = 0x0b; Word(r, 1, 0x14b);
+        }
+        if (r[0x15] == 2)
+        {
+            Word(r, 1, (ushort)(Word(r, 1) - 1)); r[0x0f]--;
+            if (r[0x0f] != 0) return;
+            r[0x15] = 3;
+        }
+        if ((w.Tick & 0x3f) != 0) return;
+        if (w.Service1BF(0x505)) r[0x15] = 0;
+    }
+
+    /// <summary>The rockfall of a participant's quest (2E19): the trap's mask +22 is the participant's quest field +12 while his strength is above 7CFh (zero otherwise); then the rockfall.</summary>
+    public static void RockfallQuest(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah == 1)
+        {
+            uint field = w.QuestField(r); uint strength = w.AiStrength(r[3]);
+            if (strength <= 0x7cf) field = 0;
+            Put(r, 0x22, field);
+        }
+        Rockfall(w, r, ah);
     }
 
     private static void Redraw(IObjectScriptWorld w, byte[] r) { if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); } }
