@@ -89,6 +89,8 @@ def prepare(source, output):
     mage=bytes.fromhex(tables['ARMY__03.DAT']['templates'][13]['raw_record_hex']);mbase=struct.unpack_from('<H',mage,0x48)[0]
     wanted.setdefault(('ARMY__03.DAT',13),set()).update(range(mbase,mbase+8*mage[0x4a]));wanted[('ARMY__03.DAT',13)].update(action_frames(mage,mbase))
     mvanish=mbase+8*(mage[0x4a]+mage[0x4b])+4*sum(mage[0x4f:0x53]);wanted[('ARMY__03.DAT',13)].update(range(mvanish,mvanish+mage[0x78]))   # FS:105 (878D): the vanishing action plays DAT[78] frames after the death block
+    # The discharge of the mages (ARMY__03 effect 0, 72x72): F0h + 4 per heading, four frames each.
+    wanted[('ARMY__03.EFF',0)]=set(range(0xf0,0x110))
     # The birds of the first map (ARMY__05 0): 8 directions of DAT[4A] frames, 32x32.
     bird=bytes.fromhex(tables['ARMY__05.DAT']['templates'][0]['raw_record_hex']);wanted[('ARMY__05.DAT',0)]=set(range(struct.unpack_from('<H',bird,0x48)[0],struct.unpack_from('<H',bird,0x48)[0]+8*bird[0x4a]))
     # The pit trap (ARMY__03 12): 19 opening frames from 289h; its first frame is the closed pit.
@@ -103,6 +105,7 @@ def prepare(source, output):
     for (filename,index),frames in sorted(wanted.items()):
         if filename=='ARMY__00.EFF':entry={'width':eff[t0+7*index],'height':eff[t0+7*index+1]};sprite_name='ARMY__00.SPR'
         elif filename=='ARMY__02.EFF':entry={'width':62,'height':62};sprite_name='ARMY__02.SPR'
+        elif filename=='ARMY__03.EFF':entry={'width':72,'height':72};sprite_name='ARMY__03.SPR'
         else:entry=tables[filename]['templates'][index];sprite_name=filename.replace('.DAT','.SPR')
         data=files[sprite_name].read_bytes();hashes[sprite_name]=hashlib.sha256(data).hexdigest()
         for frame in sorted(frames):
@@ -111,7 +114,7 @@ def prepare(source, output):
             image=Image.new('RGBA',(entry['width'],entry['height']))
             image.putdata([tuple((c&252)|(c>>6) for c in palette[table[v]*3:table[v]*3+3])+(255,) if v>=0 else (0,0,0,0) for v in pixels])
             # The frames of ARMY__01 (the horde) and ARMY__03 (the map's objects) fill a second page: one page of 128 cells cannot hold them under the 16384 px texture limit.
-            page=1 if filename in ('ARMY__01.DAT','ARMY__03.DAT','ARMY__05.DAT') else 0;target=horde_images if page else images
+            page=1 if filename in ('ARMY__01.DAT','ARMY__03.DAT','ARMY__03.EFF','ARMY__05.DAT') else 0;target=horde_images if page else images
             slot=len(target);target.append(image);team_pixels.append(pixels if any(v>=240 for v in pixels) else None)
             entries.append({'template_file':filename,'template_index':index,'frame':frame,'page':page,
                             'x':slot%32*128,'y':slot//32*128,'width':image.width,'height':image.height})

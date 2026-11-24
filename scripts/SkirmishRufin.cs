@@ -14,27 +14,66 @@ public sealed partial class Skirmish
     /// <summary>A mage at war with the player (the player attacked him or his friends): he fights back like any unit (DAT of ARMY__03 13: reach 10, strike 7).</summary>
     public bool MageFights(SkirmishActor mage) => IsHermit(mage) && Diplomacy.AtWar(mage.Record[3], Rules.PlayerSlot);
 
-    /// <summary>The discharge of a fighting mage: a red lightning (ARMY__00 effect type 1Eh, 72×72, frames 1C6h + 4·variant, four frames of two updates, WRK 13A3, sound 14h)
-    /// at the target; everything hostile within <see cref="BoltRadius"/> is struck. ADAPTER: the strength and the area are described by the player of the original (the unit is
-    /// killed by one hit, several neighbours fall together); the WRK of the mage has no attack of its own — DAT[70] = 0 — so the values are the port's.</summary>
-    public sealed class MageBolt { public Vector2 Point; public int Variant, Left = 8; }
-    public List<MageBolt> Bolts { get; } = [];
-    public const int BoltRadius = 56, BoltDamage = 100, MageReachCells = 9, MageReloadTicks = 50;
-    private readonly Dictionary<uint, uint> _mageTarget = [];
-    public uint MageTargetOf(SkirmishActor mage) => _mageTarget.TryGetValue(mage.Id, out var t) ? t : 0;
+    /// <summary>The flashes of the mages' strikes (ARMY__03 effect type 0, 22h-byte records): 72×72, F0h + 4·heading + stage.</summary>
+    public List<byte[]> MageFlashes { get; } = [];
+    private SkirmishSpellWorld? _spellWorld;
 
-    private void MageStrike(SkirmishActor mage, SkirmishActor target)
+    /// <summary>9727 with BL = DAT[70] = 0 for an attacker of army 3: the mage's strike creates the effect type 0 of ARMY__03 (<see cref="OriginalMageSpell"/>); its ending decides between
+    /// the blast (type 8, BD0F around the point), fire (ARMY__00 type 13h) and, one time in eight, a summoned phantom.</summary>
+    private void MageDischarge(SkirmishActor mage, WorkerImpact impact)
     {
-        var point = target.Position; Bolts.Add(new MageBolt { Point = point, Variant = _terrainCatalog.NextRandomByte() & 7 });
-        if (Sounds.Count < 64) Sounds.Add(new("WORK.FX", 0x14, SoundRandom(), point));
-        foreach (var victim in Actors.ToArray())
+        if (impact.X >= Map.Width * 32 || impact.Y >= Map.Height * 32) return;
+        var flash = new byte[0x22]; flash[1] = impact.Army; flash[5] = impact.Layer;
+        BinaryPrimitives.WriteUInt32LittleEndian(flash.AsSpan(7), impact.X); BinaryPrimitives.WriteUInt32LittleEndian(flash.AsSpan(0xc), impact.Y);
+        _spellWorld ??= new SkirmishSpellWorld(this); _spellWorld.Attacker = mage;
+        OriginalMageSpell.Create(_spellWorld, flash, mage.Record, impact.TargetX, impact.TargetY);
+        MageFlashes.Add(flash);
+    }
+    private void TickMageFlashes()
+    {
+        foreach (var flash in MageFlashes) OriginalMageSpell.Step(flash);
+        MageFlashes.RemoveAll(f => f[0] == 0xff);
+    }
+
+    private sealed class SkirmishSpellWorld(Skirmish battle) : IMageSpellWorld
+    {
+        public SkirmishActor Attacker = null!;
+        public void Effect(byte army, byte type, byte layer, uint x, uint y)   // 9727
         {
-            if (!victim.Alive || victim.Structure || victim.Scenery || IsAnimal(victim) || victim == mage || !Diplomacy.AtWar(mage.Record[3], victim.Record[3])) continue;
-            if (victim.Position.DistanceTo(point) > BoltRadius) continue;
-            victim.Health -= victim.Hero ? Math.Max(1, victim.MaxHealth * 2 / 5) : BoltDamage;   // the leader withstands two discharges
-            if (!victim.Alive) Kill(victim);
+            if ((type & 0x80) != 0) { army = 0; type &= 0x7f; }
+            if (x >= battle.Map.Width * 32 || y >= battle.Map.Height * 32) return;
+            if (army == 0 && type == OriginalBurnRules.Small) { battle.FireWorld.Spawn(0, type, layer, x, y, null); return; }
+            if (army == 3 && type == OriginalMageSpell.Blast)
+            {
+                var blast = new byte[0x22]; blast[1] = army; blast[5] = layer;
+                BinaryPrimitives.WriteUInt32LittleEndian(blast.AsSpan(7), x); BinaryPrimitives.WriteUInt32LittleEndian(blast.AsSpan(0xc), y);
+                OriginalMageSpell.BlastStep(this, blast, Attacker.Record);
+            }
         }
-        Log("Руфин поражает врагов молнией!");
+        public void Sound(uint id) { var flash = new byte[0x22]; flash[1] = 3; BinaryPrimitives.WriteUInt32LittleEndian(flash.AsSpan(7), (uint)Attacker.Position.X); BinaryPrimitives.WriteUInt32LittleEndian(flash.AsSpan(0xc), (uint)Attacker.Position.Y); battle.EffectSound(flash, (int)id); }
+        public void Blast(byte attack, byte kind, byte planes, byte cellX, byte cellY, byte width, byte height)   // BD0F
+        {
+            int plane = battle.Occupancy.Width * battle.Occupancy.Height; var struck = new List<SkirmishActor>();
+            OriginalCatapultRules.Hit(attack, kind, planes, cellX, cellY, width, height, (byte)battle.Map.Width, (byte)battle.Map.Height,
+                (p, cell) => p * plane + cell < battle.Occupancy.Cells.Length ? battle.Occupancy.Cells[p * plane + cell] : 0,
+                r => { if (battle.Find(r) is not { } a) return (new byte[0x40], new byte[171]); struck.Add(a); return (a.Record, a.Parameters); });
+            foreach (var victim in struck) if (!victim.Alive) battle.Kill(victim);
+        }
+        public (bool Found, byte Layer, uint X, uint Y) FindSpot(byte template, byte army)   // 9064 beside the mage
+        {
+            var phantom = Convert.FromHexString(battle._templates.Armies["ARMY__03.DAT"].Templates[template].RawRecordHex);
+            var spot = OriginalSpotFinder.Find(Attacker.Record, phantom, Attacker.Parameters, battle._terrainCatalog.NextRandomByte, (layer, x, y) =>
+            {
+                int cx = (int)(x >> 5), cy = (int)(y >> 5);   // ADAPTER: AC63 is a free cell of the layer in the occupancy
+                return cx >= 0 && cy >= 0 && cx < battle.Map.Width && cy < battle.Map.Height && battle.Occupancy.Cells[(layer & 3) * battle.Occupancy.Width * battle.Occupancy.Height + cy * battle.Occupancy.Width + cx] == 0;
+            });
+            return (spot.Found, spot.Layer, spot.X, spot.Y);
+        }
+        public byte[]? CreateObject(byte army, byte owner, byte template, byte layer, uint x, uint y)
+        { battle.Log("Руфин призывает фантома."); return null; }   // ADAPTER: the phantom (ARMY__03 3, WRK 212) is not ported
+        public void Setup(byte[] created) { }
+        public byte Random() => battle._terrainCatalog.NextRandomByte();
+        public byte[] Inventory(int owner) => battle.ItemWorld.Inventory(owner);
     }
 
     // ---- the vanishing of the hurt mage (docs/rufin.md): the continuation of the unit step and the action FS:105
@@ -88,35 +127,26 @@ public sealed partial class Skirmish
 
     private void TickMages()
     {
-        foreach (var bolt in Bolts) bolt.Left--;
-        Bolts.RemoveAll(b => b.Left <= 0);
+        TickMageFlashes();
         if (!Rules.Fauna || _scenery.Count == 0) return;
         foreach (var mage in _scenery.Where(IsHermit).ToArray())
         {
             _rufinWorld ??= new SkirmishRufinWorld(this);
             _rufinWorld.Prepare(mage);
             if (mage.Alive) OriginalRufin.Step(_rufinWorld, mage.Record);
-            if (!MageFights(mage)) { mage.Target = 0; _mageTarget.Remove(mage.Id); continue; }   // at peace he stands
-            mage.Target = 0;   // the discharge replaces the melee strike: the unit logic only walks him
+            if (!MageFights(mage)) { mage.Target = 0; continue; }   // at peace he stands
             if (!mage.Alive || (mage.Record[0x14] & 7) == 3 || mage.Record[0x32] != 0) { mage.Route.Clear(); mage.Goal = null; continue; }   // vanishing or hidden: he does nothing
-            SkirmishActor? target = null;
-            if ((_globalTick & 7) == 0 || !_mageTarget.TryGetValue(mage.Id, out uint targetId) || Find(targetId) is not { Alive: true } current || !Diplomacy.AtWar(mage.Record[3], current.Record[3]))
+            // At war the nearest enemy in his sight (14 cells) becomes his target; UpdateUnit approaches to the reach of DAT[72] and strikes (8B5E, the swing), the impact is MageDischarge.
+            if ((_globalTick & 7) == 0 || Find(mage.Target) is not { Alive: true })
             {
-                // the nearest enemy in his sight (14 cells)
-                double best = 14 * 32;
+                SkirmishActor? best = null; double nearest = 14 * 32;
                 foreach (var o in Actors)
                 {
                     if (!o.Alive || o.Structure || o.Scenery || IsAnimal(o) || !Diplomacy.AtWar(mage.Record[3], o.Record[3])) continue;
-                    double d = mage.Position.DistanceTo(o.Position); if (d < best) { best = d; target = o; }
+                    double d = mage.Position.DistanceTo(o.Position); if (d < nearest) { nearest = d; best = o; }
                 }
-                if (target != null) _mageTarget[mage.Id] = target.Id; else _mageTarget.Remove(mage.Id);
+                if (best != null) { if (mage.Target != best.Id) { mage.Target = best.Id; mage.Goal = null; mage.Route.Clear(); mage.ReplanTimer = 0; } } else mage.Target = 0;
             }
-            else target = Find(_mageTarget[mage.Id]);
-            if (target == null) continue;
-            double distance = mage.Position.DistanceTo(target.Position);
-            if (distance > MageReachCells * 32) { if ((_globalTick & 7) == 0) OrderMove(mage, target.Cell, 2); continue; }
-            mage.Route.Clear(); mage.Goal = null;
-            if (mage.AttackTimer <= 0) { MageStrike(mage, target); mage.AttackTimer = MageReloadTicks / 18.2; }
         }
     }
 

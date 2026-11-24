@@ -22,7 +22,7 @@ public sealed partial class Skirmish
         if (file == "ARMY__02.DAT") return Rules.Units[template.Name];
         uint flags = BinaryPrimitives.ReadUInt32LittleEndian(parameters.AsSpan(0x40));
         bool building = (flags & 8) != 0, worker = (flags & 0x300) == 0x300;
-        return new SkirmishUnitRules { Health = template.InitialCondition, Damage = building || worker ? 0 : 1, Worker = worker, Range = (flags & 0xf00) == 0x900 ? 176 : 48 };
+        return new SkirmishUnitRules { Health = template.InitialCondition, Damage = building || worker ? 0 : 1, Worker = worker, Range = Math.Max(48, parameters[0x72] * 32) };   // DAT[72]: the reach in cells (8B5E: cells > DAT[72] → too far)
     }
 
     private void InitializeHorde(ScenarioData scenario)
