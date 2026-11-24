@@ -300,13 +300,19 @@ public sealed partial class Skirmish
             var found = OriginalTargetRules.FindEnemy(_mage.Id, _mage.Record, _mage.Parameters, true, new SearchWorld(battle, _mage.Record[3]));
             var target = battle.Find(found.Target); return (target != null, target?.Record);
         }
+        private readonly HashSet<byte[]> _switches = new(ReferenceEqualityComparer.Instance);
         public (bool Created, byte[]? Object) Create(byte army, byte owner, byte template, byte layer, uint x, uint y)
         {
+            if (army == 0 && template == 1) { var sw = new byte[0x2a]; sw[0] = 0; sw[3] = owner; _switches.Add(sw); return (true, sw); }   // the switch object of ARMY__00 (WRK 52), run when the script removes it
+
             if (army == 3 && template == 3 && layer == 1) { var phantom = battle.SpawnPhantom(owner, template, layer, x, y); return (phantom != null, phantom?.Record); }   // Miron's phantom
             return (false, null);   // ADAPTER: the switch object of ARMY__00
         }
         public void Initialize(byte[] record, uint eax, uint ecx) { }
-        public void Remove(byte[] record) { }
+        public void Remove(byte[] record)
+        {
+            if (_switches.Remove(record)) OriginalObjectScripts.RunSwitch((owner, army, template, skip) => FindObject(owner, army, template, skip), record);   // WRK 52 in one update: the way is opened
+        }
         public void Redraw() { }
         public IReadOnlyList<byte[]> Territory()
         {

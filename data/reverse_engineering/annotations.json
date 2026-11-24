@@ -4856,6 +4856,42 @@
       "evidence": ["docs/rufin.md", "tests/fixtures/mage0.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
       "implementation": ["scripts/OriginalOnis.cs", "scripts/OriginalRufin.cs"],
       "limitations": "FS services are recorded stubs in the check; the continuation 79..C5 is OriginalMageCloak"
+    },
+    {
+      "id": "army00-switch-52",
+      "module": "ARMY__00.WRK",
+      "start": 82,
+      "end": 134,
+      "name": "Switch object (template 1): opens a way for a participant (clears his bit in the masks of the traps)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-switch.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; the switch is run by the skirmish when a hermit's script removes it, the other two are not wired"
+    },
+    {
+      "id": "army00-switch2-371",
+      "module": "ARMY__00.WRK",
+      "start": 881,
+      "end": 937,
+      "name": "Second switch (template 23): blanks +31 of the objects 16h and 17h",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-switch2.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; the switch is run by the skirmish when a hermit's script removes it, the other two are not wired"
+    },
+    {
+      "id": "army00-exit-3a9",
+      "module": "ARMY__00.WRK",
+      "start": 937,
+      "end": 1008,
+      "name": "Exit (template 24): ends the level when somebody stands near",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-exit.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; the switch is run by the skirmish when a hermit's script removes it, the other two are not wired"
     }
   ]
 }

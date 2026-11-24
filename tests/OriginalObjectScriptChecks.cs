@@ -35,6 +35,7 @@ public partial class TestRunner
         private readonly Queue<(bool, uint, uint)> _spot = new(c.GetProperty("spot").EnumerateArray().Select(a => (a[0].GetInt32() != 0, (uint)a[1].GetInt32(), (uint)a[2].GetInt32())));
         private readonly Queue<(bool, byte, byte, byte)> _beside = new(c.GetProperty("beside").EnumerateArray().Select(a => (a[0].GetInt32() != 0, (byte)a[1].GetInt32(), (byte)a[2].GetInt32(), (byte)a[3].GetInt32())));
         private readonly Queue<bool> _create = new(c.GetProperty("create").EnumerateArray().Select(a => a.GetInt32() != 0));
+        public void LevelExit(byte mode) { log.Add((byte)'X'); log.Add(mode); }
         public void Appearance(byte army) { log.Add((byte)'N'); log.Add(army); }
         public (bool Found, uint Reference) ScanMasked(byte mode, uint mask)
         {
@@ -96,7 +97,7 @@ public partial class TestRunner
             var r = new byte[0x50]; BitConverter.GetBytes((uint)c.GetProperty("x").GetInt32()).CopyTo(r, 4); BitConverter.GetBytes((uint)c.GetProperty("y").GetInt32()).CopyTo(r, 8);
             r[0x15] = (byte)c.GetProperty("f15").GetInt32(); r[0x14] = (byte)c.GetProperty("f14").GetInt32(); r[0x0d] = (byte)c.GetProperty("f0d").GetInt32(); r[0x19] = (byte)c.GetProperty("f19").GetInt32(); r[0x2d] = (byte)c.GetProperty("f2d").GetInt32(); BitConverter.GetBytes((uint)c.GetProperty("f26").GetInt64()).CopyTo(r, 0x26); r[0x2a] = (byte)c.GetProperty("f2a").GetInt32();
             BitConverter.GetBytes((ushort)c.GetProperty("w1").GetInt32()).CopyTo(r, 1); BitConverter.GetBytes((uint)c.GetProperty("f22").GetInt64()).CopyTo(r, 0x22);
-            r[0x27] = (byte)c.GetProperty("f27").GetInt32(); r[0x28] = (byte)c.GetProperty("f28").GetInt32(); r[0x31] = (byte)c.GetProperty("f31").GetInt32();
+            r[0x27] = (byte)c.GetProperty("f27").GetInt32(); r[0x28] = (byte)c.GetProperty("mask28").GetInt32(); r[0x31] = (byte)c.GetProperty("f31").GetInt32();
             var log = new List<byte>(); var world = new ObjectReplay(c, random, log); Array.Copy(world.ObjectBytes, 0, world.Obj1, 0, 0x40); Array.Copy(world.ObjectBytes, 0x40, world.Obj2, 0, 0x40);
             ushort ax = 0;
             if (manuscript) { r[0x28] = (byte)c.GetProperty("mask28").GetInt32(); ax = OriginalObjectScripts.Manuscript(world, r, c.GetProperty("ah").GetInt32(), new byte[] { 0x18, 0x19, 0x1b }[c.GetProperty("k").GetInt32()], (byte)c.GetProperty("vowner").GetInt32()); }
@@ -130,6 +131,9 @@ public partial class TestRunner
         ObjectScriptReplay("obj-faceb", "faceb", "The second face ARMY__03.WRK 2D52", OriginalObjectScripts.FaceB, 0, false, true);
         ObjectScriptReplay("obj-rockfallq", "rockfallq", "The quest rockfall ARMY__03.WRK 2E19", OriginalObjectScripts.RockfallQuest, 0, false, true);
         ObjectScriptReplay("obj-manuscript", "manuscript", "The manuscripts ARMY__03.WRK 2710", (w, r, ah) => { }, 0, false, false, false, true);
+        ObjectScriptReplay("obj-switch", "switch", "The switch ARMY__00.WRK 52", OriginalObjectScripts.Switch, 0, true);
+        ObjectScriptReplay("obj-switch2", "switch2", "The second switch ARMY__00.WRK 371", OriginalObjectScripts.Switch2, 0, true);
+        ObjectScriptReplay("obj-exit", "exit", "The exit ARMY__00.WRK 3A9", OriginalObjectScripts.Exit, 0, false, true);
         ObjectScriptReplay("obj-face", "face", "The stone face script ARMY__03.WRK 2B9", OriginalObjectScripts.Face);
     }
 }
