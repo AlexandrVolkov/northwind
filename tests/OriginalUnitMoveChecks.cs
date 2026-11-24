@@ -16,7 +16,6 @@ public partial class TestRunner
         { log.Add((byte)'P'); log.Add(template); log.Add(army); log.Add(layer); log.AddRange(BitConverter.GetBytes(x)); log.AddRange(BitConverter.GetBytes(y)); return c.GetProperty("free_zf").GetInt32() != 0; }
         public void RevealFog() => log.Add((byte)'V');
         public void Finish() => log.Add((byte)'R');
-        public sbyte Trig(int index) => (sbyte)c.GetProperty("trig")[index].GetInt32();
     }
 
     /// <summary>Replays tests/fixtures/unit-move.json (tools/verify_unit_move.py): the move step LE:1 12930..12AE1.</summary>
