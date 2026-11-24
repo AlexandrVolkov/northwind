@@ -15,9 +15,9 @@ from analyze_executable import analyze
 from verify_combat import CombatOracle
 from forestry_source import source_constants
 
-ENTRIES = [('ARMY__01.WRK', 0xfe, 0x24d), ('ARMY__01.WRK', 0x24d, 0x354), ('ARMY__01.WRK', 0x354, 0x3ed), ('ARMY__01.WRK', 0x3ed, 0x4f0), ('ARMY__01.WRK', 0x6d4, 0x7a0), ('ARMY__01.WRK', 0x7a0, 0x896), ('ARMY__01.WRK', 0x896, 0x986), ('ARMY__01.WRK', 0x986, 0xa77), ('ARMY__01.WRK', 0xce3, 0xdef), ('ARMY__02.WRK', 0xfe, 0x263), ('ARMY__02.WRK', 0x263, 0x354), ('ARMY__02.WRK', 0x354, 0x454)]
-TABLES = [0x179, 0x2a1, 0x381, 0x441, 0x71e, 0, 0x8e6, 0x9d4, 0xd37, 0, 0, 0]      # the inline table after the call of FS:41 in the step of each building
-SLOTS = [0x85, 0x121, 0x197, 0x3d, 0x51, 0x49, 0x129, 0x99, 0x12d, 0xcd, 0x19, 0x1d, 0xbd, 0x9d, 0x8d, 0x91, 0x95, 0xc1, 0x15, 0x19f]
+ENTRIES = [('ARMY__01.WRK', 0xfe, 0x24d), ('ARMY__01.WRK', 0x24d, 0x354), ('ARMY__01.WRK', 0x354, 0x3ed), ('ARMY__01.WRK', 0x3ed, 0x4f0), ('ARMY__01.WRK', 0x6d4, 0x7a0), ('ARMY__01.WRK', 0x7a0, 0x896), ('ARMY__01.WRK', 0x896, 0x986), ('ARMY__01.WRK', 0x986, 0xa77), ('ARMY__01.WRK', 0xce3, 0xdef), ('ARMY__02.WRK', 0xfe, 0x263), ('ARMY__02.WRK', 0x263, 0x354), ('ARMY__02.WRK', 0x354, 0x454), ('ARMY__02.WRK', 0x756, 0x7f5), ('ARMY__02.WRK', 0x524, 0x6a1)]
+TABLES = [0x179, 0x2a1, 0x381, 0x441, 0x71e, 0, 0x8e6, 0x9d4, 0xd37, 0, 0, 0, 0, 0]      # the inline table after the call of FS:41 in the step of each building
+SLOTS = [0x85, 0x121, 0x197, 0x3d, 0x51, 0x49, 0x129, 0x99, 0x12d, 0xcd, 0x19, 0x1d, 0xbd, 0x9d, 0x8d, 0x91, 0x95, 0xc1, 0x15, 0x19f, 0x59, 0x5d, 0xd9, 0x65]
 KEEP = {0x19, 0x1d}                        # services that leave the registers alone
 TMPL, PART, OTHER, TFLAGS, FOUND = 0xc00, 0xd00, 0x900, 0xb00, 0xe00
 
@@ -36,7 +36,7 @@ def cases():
     out = []
     for n in range(1500):
         k = rng.randrange(len(ENTRIES))
-        ahs = {0: [0, 1, 1, 1, 1, 2, 5, 6], 1: [0, 1, 1, 1, 1, 2, 6], 2: [0, 1, 1, 1, 1], 3: [0, 1, 1, 1, 1, 2, 6], 4: [0, 1, 1, 1, 1, 5, 5], 5: [0, 1, 1, 1, 1, 1], 6: [0, 1, 1, 1, 1, 5], 7: [0, 1, 1, 1, 1, 2, 6], 8: [0, 1, 1, 1, 1, 2, 6], 9: [0, 1, 1, 1, 1, 2, 5, 6], 10: [0, 1, 1, 1, 1, 2, 6], 11: [0, 1, 1, 1, 1, 5]}[k]
+        ahs = {0: [0, 1, 1, 1, 1, 2, 5, 6], 1: [0, 1, 1, 1, 1, 2, 6], 2: [0, 1, 1, 1, 1], 3: [0, 1, 1, 1, 1, 2, 6], 4: [0, 1, 1, 1, 1, 5, 5], 5: [0, 1, 1, 1, 1, 1], 6: [0, 1, 1, 1, 1, 5], 7: [0, 1, 1, 1, 1, 2, 6], 8: [0, 1, 1, 1, 1, 2, 6], 9: [0, 1, 1, 1, 1, 2, 5, 6], 10: [0, 1, 1, 1, 1, 2, 6], 11: [0, 1, 1, 1, 1, 5], 12: [0, 1, 1, 1, 1], 13: [0, 1, 1, 1, 1, 2, 4, 5]}[k]
         out.append({'entry': k, 'ah': rng.choice(ahs), 'bl': rng.randrange(256), 'f14': rng.choice([0x80, 0x81, 0x40, 0x41, 0x42, 0, 1, 2, 3, 4, 5, 0x43, 0xc4, 0xc5, 0xc2]) if rng.random() < 0.9 else (rng.randrange(256) & ~7) | rng.randrange(6),
                     'f0f': rng.choice([0, 0x10, 0x20, rng.randrange(256)]), 'f22': rng.choice([0xff, 0xff, 0, rng.randrange(256)]), 'f26': rng.randrange(256), 'f27': rng.randrange(256), 'f17': rng.choice([0, 0x100, 0x180, rng.randrange(1 << 16)]),
                     'f19': rng.choice([0, 1, 0x10, 0x80, 0xff, rng.randrange(256)]), 'f1a': rng.choice([0, 1, 0x10, 0x7f, 0x80, 0xff, rng.randrange(256)]), 'f3': rng.randrange(8), 'f0': rng.randrange(256),
@@ -110,7 +110,7 @@ def generate(game):
         if case['ah'] == 5: o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + OTHER)
         o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, case['bl'])
         o.run(o.WRK + a)
-        out = bytes(o.cpu.mem_read(o.POOL + 0x800, 0x50)) + bytes(o.cpu.mem_read(o.POOL + PART + 0x28, 8)) + bytes(o.cpu.mem_read(0x19eb, 1)) + (struct.pack('<I', (reg(UC_X86_REG_EDX) - o.WRK) & 0xffffffff) if case['ah'] == 6 else b'') + (bytes([reg(UC_X86_REG_EAX) & 255, o.zf()]) if case['ah'] == 5 else b'') + bytes(o.cpu.mem_read(o.POOL + FOUND, 0x50)) + bytes(o.cpu.mem_read(o.POOL + PART + 0x18, 8)) + bytes(o.cpu.mem_read(o.POOL + 0x400 + 0x1a10, 4)) + b''.join(log)
+        out = bytes(o.cpu.mem_read(o.POOL + 0x800, 0x50)) + bytes(o.cpu.mem_read(o.POOL + PART + 0x28, 8)) + bytes(o.cpu.mem_read(0x19eb, 1)) + (struct.pack('<I', (reg(UC_X86_REG_EDX) - o.WRK) & 0xffffffff) if case['ah'] == 6 else b'') + (bytes([reg(UC_X86_REG_EAX) & 255, o.zf()]) if case['ah'] == 5 else b'') + (bytes([o.zf()]) if case['ah'] == 4 else b'') + bytes(o.cpu.mem_read(o.POOL + FOUND, 0x50)) + bytes(o.cpu.mem_read(o.POOL + PART + 0x18, 8)) + bytes(o.cpu.mem_read(o.POOL + 0x400 + 0x1a10, 4)) + b''.join(log)
         if os.environ.get('DEBUG_CASE') == str(all_cases.index(case)): print('PYTHON', out.hex())
         digest.update(out); case['sha256_prefix'] = hashlib.sha256(out).hexdigest()[:10]
     return {'format_version': 1, 'source_sha256': {k: report['source_sha256'][k] for k in ['NORWIND.EXE']} | {m: hashlib.sha256(b).hexdigest() for m, b in wrks.items()}, 'random_values': constants['random_values'],

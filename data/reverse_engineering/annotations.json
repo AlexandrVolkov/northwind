@@ -5552,6 +5552,30 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
       "implementation": ["scripts/OriginalBuildingScripts.cs"],
       "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs (FS:79, FS:1B7, FS:6D and FS:71 with fixed buffers)"
+    },
+    {
+      "id": "army__02-building-524",
+      "module": "ARMY__02.WRK",
+      "start": 1316,
+      "end": 1697,
+      "name": "Building script 524: setup AH=2, count AH=4 (FS:59), visitor test, step, state handlers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs"
+    },
+    {
+      "id": "army__02-building-756",
+      "module": "ARMY__02.WRK",
+      "start": 1878,
+      "end": 2037,
+      "name": "Building script 756: step with the participant counter, state handlers with FS:99",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs"
     }
   ]
 }
