@@ -30,6 +30,7 @@ public interface IObjectScriptWorld
     uint FoundFlags { get; }                          // the template flags (+40h) of the object FS:11 found (EBX)
     (bool Found, byte[]? Object) Scan17B(uint eax, uint ebx, uint ecx, uint edx, uint esi);   // FS:17B (D895) with the registers set by the script
     void Say143(byte message, byte participant, byte speakerOwner);   // FS:143
+    void Jump131();                                   // the tail jump to FS:131
     void Service25(uint parent, byte bl);             // FS:25
     void Service29(byte bl);                          // FS:29
     void Sound35(uint id);                            // FS:35
@@ -667,6 +668,30 @@ public static class OriginalObjectScripts
             if (y < w.MapHeightPx) { w.Random2(); w.EffectAt(r[1], 0x14, 1, x, y); }
         }
         r[0x16]--; if (r[0x16] == 0) r[0] = 0xff;
+    }
+
+    /// <summary>The wall clearing of the mages (319C and 31D0): the effect vanishes; when nothing of the template 17h (16h) of the creator's army and owner exists, the four walls (template 5) of the owner 6 and
+    /// the army of the creator lose their mask +22.</summary>
+    public static void MageClear(IObjectScriptWorld w, byte[] r, byte[] parent, int k)
+    {
+        r[0] = 0xff;
+        if (w.FindObject(parent[3], parent[0], (byte)(k == 0 ? 0x17 : 0x16), 0) != null) return;
+        for (int skip = 3; skip >= 0; skip--)
+            if (w.FindObject(6, parent[0], 5, (byte)skip) is { } wall) Put(wall, 0x22, 0);
+    }
+
+    /// <summary>The camp (template 0, ARMY__00.WRK 0): the direction from the middle of the map (800h, 800h) to the object, in eighths (+22), and a random time +23 of 2710h and more; the update is FS:131.</summary>
+    public static void Camp(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah == 1) { w.Jump131(); return; }
+        if (ah != 0) return;
+        uint cl = 0, ch = 0; int ax = (int)(U32(r, 4) - 0x800), bx = (int)(U32(r, 8) - 0x800);
+        if (ax < 0) { ax = -ax; cl = 4; }
+        if (bx < 0) { bx = -bx; ch = 4; }
+        byte dl = 2;
+        if ((uint)ax > (uint)bx) dl = (byte)(dl + cl); else dl = (byte)(4 + ch);
+        r[0x22] = (byte)(dl & 7);
+        Put(r, 0x23, (uint)(w.Random() + 0x2710));
     }
 
     public static void Fx54aKind16(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)   // B62

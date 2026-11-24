@@ -7,10 +7,10 @@
 | LE:1 | 146882 | 101186 | 6265 | 97 | 39334 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
-| ARMY__00.WRK | 5403 | 591 | 100 | 0 | 4712 | 0 |
+| ARMY__00.WRK | 5403 | 509 | 100 | 0 | 4794 | 0 |
 | ARMY__01.WRK | 4951 | 4576 | 0 | 0 | 375 | 7 |
 | ARMY__02.WRK | 6930 | 5296 | 855 | 0 | 779 | 7 |
-| ARMY__03.WRK | 13412 | 1038 | 0 | 0 | 12374 | 1 |
+| ARMY__03.WRK | 13412 | 963 | 0 | 0 | 12449 | 1 |
 | ARMY__04.WRK | 411 | 411 | 0 | 0 | 0 | 0 |
 | ARMY__05.WRK | 882 | 882 | 0 | 0 | 0 | 2 |
 
@@ -20,6 +20,7 @@
 
 | Модуль / полуоткрытый диапазон | Имя | Статус | Доказательства | Ограничения |
 | --- | --- | --- | --- | --- |
+| ARMY__00.WRK `0x0..0x52` | Camp (template 0): the direction from the middle of the map and a random time | ported | [object-scripts.md](../docs/object-scripts.md); [obj-camp.json](../tests/fixtures/obj-camp.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; not wired into the skirmish |
 | ARMY__00.WRK `0x52..0x86` | Switch object (template 1): opens a way for a participant (clears his bit in the masks of the traps) | ported | [object-scripts.md](../docs/object-scripts.md); [obj-switch.json](../tests/fixtures/obj-switch.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; the switch is run by the skirmish when a hermit's script removes it, the other two are not wired |
 | ARMY__00.WRK `0x86..0x371` | Item objects: staffs of the hermits, stones, crystal ball, disease, manuscripts (init, visit, claim, animation, fade) | ported | [object-scripts.md](../docs/object-scripts.md); [obj-itemobj.json](../tests/fixtures/obj-itemobj.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; the skirmish keeps the item objects in OriginalItems/SkirmishContainers (adapter for the claim and the animation) |
 | ARMY__00.WRK `0x371..0x3A9` | Second switch (template 23): blanks +31 of the objects 16h and 17h | ported | [object-scripts.md](../docs/object-scripts.md); [obj-switch2.json](../tests/fixtures/obj-switch2.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; the switch is run by the skirmish when a hermit's script removes it, the other two are not wired |
@@ -123,6 +124,7 @@
 | ARMY__03.WRK `0x30A0..0x30D1` | Mage effect script 30A0 | ported | [object-scripts.md](../docs/object-scripts.md); [obj-m30a0.json](../tests/fixtures/obj-m30a0.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; not wired into the skirmish |
 | ARMY__03.WRK `0x30D1..0x3118` | Mage blast, effect type 8: BD0F around the point, side = distance in cells (1..3) | ported | [rufin.md](../docs/rufin.md); [mage-spell.json](../tests/fixtures/mage-spell.json); [verify_mage_spell.py](../tools/verify_mage_spell.py); [OriginalMageSpellChecks.cs](../tests/OriginalMageSpellChecks.cs) | FS:69 (BD0F) is a recorded stub in the check; it is verified separately (catapult.json) |
 | ARMY__03.WRK `0x3118..0x319C` | Mage spray preludes 3118, 3139, 315A, 317B | ported | [object-scripts.md](../docs/object-scripts.md); [obj-mspray.json](../tests/fixtures/obj-mspray.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; not wired into the skirmish |
+| ARMY__03.WRK `0x319C..0x31E7` | Mage wall clearing (319C, 31D0) | ported | [object-scripts.md](../docs/object-scripts.md); [obj-mclear.json](../tests/fixtures/obj-mclear.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; not wired into the skirmish |
 | ARMY__03.WRK `0x31E7..0x324C` | Mage effect script 31E7 | ported | [object-scripts.md](../docs/object-scripts.md); [obj-m31e7.json](../tests/fixtures/obj-m31e7.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; not wired into the skirmish |
 | ARMY__03.WRK `0x333A..0x336E` | Mage effect script 333A | ported | [object-scripts.md](../docs/object-scripts.md); [obj-m333a.json](../tests/fixtures/obj-m333a.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; not wired into the skirmish |
 | ARMY__03.WRK `0x336E..0x33E0` | Mage effect script 336E | ported | [object-scripts.md](../docs/object-scripts.md); [obj-m336e.json](../tests/fixtures/obj-m336e.json); [verify_object_scripts.py](../tools/verify_object_scripts.py); [OriginalObjectScriptChecks.cs](../tests/OriginalObjectScriptChecks.cs) | FS services are recorded stubs in the check; not wired into the skirmish |

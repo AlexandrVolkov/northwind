@@ -60,9 +60,10 @@ public partial class TestRunner
         public void Say143(byte message, byte participant, byte speakerOwner) { log.Add((byte)'M'); log.AddRange([message, participant, speakerOwner]); }
         public byte[] ParentRecord()
         {
-            var p = new byte[0x40]; p[0x25] = Parent25; p[3] = (byte)c.GetProperty("vowner").GetInt32();
+            var p = new byte[0x40]; p[0] = 0; p[0x25] = Parent25; p[3] = (byte)c.GetProperty("vowner").GetInt32();
             BitConverter.GetBytes((uint)c.GetProperty("ef7").GetInt64()).CopyTo(p, 4); BitConverter.GetBytes((uint)c.GetProperty("efc").GetInt64()).CopyTo(p, 8); return p;
         }
+        public void Jump131() => log.Add((byte)'J');
         public void Service25(uint parent, byte bl) { log.Add((byte)'a'); log.AddRange(BitConverter.GetBytes(parent)); log.Add(bl); }
         public void Service29(byte bl) { log.Add((byte)'b'); log.Add(bl); }
         public void Sound35(uint id) { log.Add((byte)'S'); log.AddRange(BitConverter.GetBytes(id)); }
@@ -197,6 +198,8 @@ public partial class TestRunner
         ObjectScriptReplay("obj-m340f", "m340f", "Mage effect ARMY__03.WRK 340F", (w, r, ah) => OriginalObjectScripts.MageFx340f(w, r, ah, ((ObjectReplay)w).Bl), 0);
         ObjectScriptReplay("obj-mblast", "mblast", "Mage blasts ARMY__03.WRK 2F75..2FD9", (w, r, ah) => OriginalObjectScripts.MageBlast(w, r, ((ObjectReplay)w).ParentRecord(), 0x400a00, ((ObjectReplay)w).K % 3), 0, true);
         ObjectScriptReplay("obj-mspray", "mspray", "Mage spray ARMY__03.WRK 300B..31D0", (w, r, ah) => OriginalObjectScripts.MageSpray(w, r, ah, ((ObjectReplay)w).ParentRecord(), ((ObjectReplay)w).K), 0);
+        ObjectScriptReplay("obj-mclear", "mclear", "Mage wall clearing ARMY__03.WRK 319C", (w, r, ah) => OriginalObjectScripts.MageClear(w, r, ((ObjectReplay)w).ParentRecord(), ((ObjectReplay)w).K % 2), 0, true);
+        ObjectScriptReplay("obj-camp", "camp", "The camp ARMY__00.WRK 0", OriginalObjectScripts.Camp, 0);
         ObjectScriptReplay("obj-face", "face", "The stone face script ARMY__03.WRK 2B9", OriginalObjectScripts.Face);
     }
 }
