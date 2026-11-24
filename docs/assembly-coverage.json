@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "db9a21e1e014ca487aff704428e65085f2e16bd0c356f9b498ff3a76f454d120",
+  "annotation_sha256": "736b9f0dc3dcf474d69a8afeefb97eb2332e59fc3fc7d9e2e1a224e32270c82d",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -4158,6 +4158,16 @@
         },
         {
           "start": 3974,
+          "end": 4152,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army02-catapult-f86",
+            "army__02-unit-f86"
+          ]
+        },
+        {
+          "start": 4152,
           "end": 4216,
           "status": "ported",
           "classification": "code",
