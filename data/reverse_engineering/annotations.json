@@ -4364,6 +4364,18 @@
       "evidence": ["docs/rufin.md", "tests/fixtures/irvil.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
       "implementation": ["scripts/OriginalIrvil.cs"],
       "limitations": "FS services are recorded stubs (as for Rufin); the cloak continuation 1646.. is shared with Rufin"
+    },
+    {
+      "id": "army03-miron-16c8",
+      "module": "ARMY__03.WRK",
+      "start": 5832,
+      "end": 6664,
+      "name": "Quest script of the hermit Miron (template 16): answers every update, grudge timer, threats, a phantom at a free spot once in 256 updates",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/miron.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
+      "implementation": ["scripts/OriginalMiron.cs"],
+      "limitations": "FS services (including FS:187 and FS:19B) are recorded stubs; FS:0/FS:4 are taken as the map size in pixels; the continuation after the FS:E1 table (1A20.., a different vanish trigger by +17 bit 0) is not ported; in the skirmish FS:19B is done by the phantom spawn"
     }
   ]
 }

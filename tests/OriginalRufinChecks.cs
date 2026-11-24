@@ -5,8 +5,14 @@ using Northwind;
 
 public partial class TestRunner
 {
-    private sealed class RufinTestWorld : IRufinWorld
+    private sealed class RufinTestWorld : IMironWorld
     {
+        public uint Time { get; set; } public uint Dim0 { get; set; } public uint Dim4 { get; set; }
+        public bool SpotOk; public uint SpotX, SpotY;
+        public byte RandomIndex2; public byte Random2() => RandomTable[RandomIndex2++];
+        public (bool Found, uint X, uint Y) FreeSpot(byte radius, byte army, byte flag, uint x, uint y)
+        { Log.AddRange([(byte)'P', radius, army, flag]); Log.AddRange(BitConverter.GetBytes(x)); Log.AddRange(BitConverter.GetBytes(y)); return (SpotOk, SpotX, SpotY); }
+        public void Occupy(byte[] record) { Log.Add((byte)'O'); Log.AddRange(BitConverter.GetBytes(0x600u)); }
         public DiplomacyState Diplomacy { get; set; } = new(4);
         public int ParticipantCount { get; set; } public byte Tick { get; set; }
         public byte[][] Inventories = []; public List<byte[]> Pool = []; public Dictionary<(byte, byte), uint> Flags = new(); public List<byte> Log = [];
@@ -35,9 +41,10 @@ public partial class TestRunner
     private void OriginalRufinChecks() => HermitReplay("rufin", "rufin", "Rufin's quest script ARMY__03.WRK 8EC", 300, (w, r, ah) => { if (ah == 0) OriginalRufin.Initialize(w, r, 7); else if (ah == 1) OriginalRufin.Step(w, r); else OriginalRufin.Speak(w); });
     private void OriginalOnisChecks() => HermitReplay("onis", "onis", "Onis' quest script ARMY__03.WRK DBF", 100, (w, r, ah) => { if (ah == 0) OriginalOnis.Initialize(w, r, 7); else if (ah == 1) OriginalOnis.Step(w, r); else OriginalOnis.Voice(w); });
 
+    private void OriginalMironChecks() => HermitReplay("miron", "miron", "Miron's quest script ARMY__03.WRK 16C8", 50, (w, r, ah) => { if (ah == 0) OriginalMiron.Initialize(w, r, 7); else if (ah == 1) OriginalMiron.Step(w, r); else OriginalMiron.Voice(w); }, 0, 0);
     private void OriginalIrvilChecks() => HermitReplay("irvil", "irvil", "Irvil's quest script ARMY__03.WRK 1297", 100, (w, r, ah) => { if (ah == 0) OriginalIrvil.Initialize(w, r, 7); else if (ah == 1) OriginalIrvil.Step(w, r); else OriginalIrvil.Voice(w); }, 0);
 
-    private void HermitReplay(string file, string key, string label, int minSpeeches, Action<IRufinWorld, byte[], int> run, int minCreations = 2)
+    private void HermitReplay(string file, string key, string label, int minSpeeches, Action<RufinTestWorld, byte[], int> run, int minCreations = 2, int minSweeps = 2)
     {
         using var reference = GameData.Read<JsonDocument>($"res://tests/fixtures/{file}.json");
         var root = reference.RootElement;
@@ -47,7 +54,7 @@ public partial class TestRunner
         foreach (var c in root.GetProperty("cases").EnumerateArray())
         {
             int participants = c.GetProperty("count").GetInt32(); int owner = c.GetProperty("owner").GetInt32();
-            var world = new RufinTestWorld { Diplomacy = new DiplomacyState(participants), ParticipantCount = participants, Tick = (byte)c.GetProperty("tick").GetInt32(), RandomTable = random, RandomIndex = (byte)c.GetProperty("seed").GetInt32(),
+            var world = new RufinTestWorld { Diplomacy = new DiplomacyState(participants), ParticipantCount = participants, Tick = (byte)c.GetProperty("tick").GetInt32(), RandomTable = random, RandomIndex = (byte)c.GetProperty("seed").GetInt32(), RandomIndex2 = (byte)(c.GetProperty("seed").GetInt32() ^ 0x5a),
                 ScanFound = c.GetProperty("scan").GetProperty("zf").GetInt32() == 0, ScanIndex = c.GetProperty("scan").GetProperty("object").GetInt32(), CreateOk = c.GetProperty("create_zf").GetInt32() != 0 };
             world.Inventories = Enumerable.Range(0, participants).Select(p => c.GetProperty("inventory")[p].EnumerateArray().Select(e => (byte)e.GetInt32()).ToArray()).ToArray();
             for (int p = 0; p < participants; p++)
@@ -63,10 +70,16 @@ public partial class TestRunner
                 world.Pool.Add(raw); world.Flags[(raw[0], raw[0x0e])] = g.GetProperty("flags").GetUInt32();
             }
             world.TerritoryIndices = c.GetProperty("territory").EnumerateArray().Select(e => e.GetInt32()).Where(i => i < objects.Length).ToList();
-            var r = new byte[0x50]; r[0] = 3; r[3] = (byte)owner; r[0x14] = (byte)c.GetProperty("flags14").GetInt32(); BitConverter.GetBytes((ushort)c.GetProperty("flags17").GetInt32()).CopyTo(r, 0x17); r[0x19] = (byte)c.GetProperty("condition").GetInt32();
+            var r = new byte[root.TryGetProperty("record_size", out var recordSize) ? recordSize.GetInt32() : 0x50]; r[0] = 3; r[3] = (byte)owner; r[0x14] = (byte)c.GetProperty("flags14").GetInt32(); BitConverter.GetBytes((ushort)c.GetProperty("flags17").GetInt32()).CopyTo(r, 0x17); r[0x19] = (byte)c.GetProperty("condition").GetInt32();
             foreach (var m in c.GetProperty("masks").EnumerateObject()) BitConverter.GetBytes((uint)m.Value.GetInt32()).CopyTo(r, Convert.ToInt32(m.Name, 16));
             BitConverter.GetBytes((ushort)c.GetProperty("word47").GetInt32()).CopyTo(r, 0x47);
             int ah = c.GetProperty("ah").GetInt32();
+            if (c.TryGetProperty("time", out var time))
+            {
+                world.Time = (uint)time.GetInt64(); world.Dim4 = (uint)c.GetProperty("dim4").GetInt32(); world.Dim0 = (uint)c.GetProperty("dim0").GetInt32();
+                world.SpotOk = c.GetProperty("spot").GetProperty("ok").GetInt32() != 0; world.SpotX = (uint)c.GetProperty("spot").GetProperty("x").GetInt32(); world.SpotY = (uint)c.GetProperty("spot").GetProperty("y").GetInt32();
+                if (r.Length > 0x50) BitConverter.GetBytes((uint)c.GetProperty("deadline").GetInt64()).CopyTo(r, 0x4d);
+            }
             run(world, r, ah);
             speeches += world.Log.Count(b => b == (byte)'M'); if (world.Log.Contains((byte)'C')) created++; if (world.Log.Contains((byte)'A')) reveals++; if (world.Log.Contains((byte)'S')) sweeps++;
             var output = new List<byte>(r); foreach (var o in world.Pool) output.AddRange(o); output.AddRange(world.Created);
@@ -78,7 +91,7 @@ public partial class TestRunner
         }
         GD.Print($"{key}: first mismatch {firstMismatch}; speeches {speeches}, creations {created}, reveals {reveals}, sweeps {sweeps}");
         var summary = root.GetProperty("results").GetProperty(key);
-        Check(count == summary.GetProperty("case_count").GetInt32() && speeches > minSpeeches && created >= minCreations && reveals > 5 && sweeps > 1, $"{key} reference coverage ({count}: {speeches} speeches, {created} creations, {reveals} reveals, {sweeps} sweeps)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && speeches > minSpeeches && created >= minCreations && reveals > 5 && sweeps >= minSweeps, $"{key} reference coverage ({count}: {speeches} speeches, {created} creations, {reveals} reveals, {sweeps} sweeps)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), $"{label} matches original x86");
     }
 }
