@@ -1,0 +1,75 @@
+using System.Security.Cryptography;
+using System.Text.Json;
+using Godot;
+using Northwind;
+
+public partial class TestRunner
+{
+    private sealed class ObjectReplay(JsonElement c, byte[] random, List<byte> log) : IObjectScriptWorld
+    {
+        private byte _i = (byte)c.GetProperty("seed").GetInt32(), _j = (byte)(c.GetProperty("seed").GetInt32() ^ 0x5a);
+        public byte I => _i; public byte J => _j;
+        public byte Random() => random[_i++];
+        public byte Random2() => random[_j++];
+        private readonly Queue<(uint, uint, int)> _area2 = new(c.GetProperty("area").EnumerateArray().Select(a => ((uint)a[0].GetInt32(), (uint)a[1].GetInt32(), a[2].GetInt32())));
+        private readonly Queue<uint> _claim = new(c.GetProperty("claim").EnumerateArray().Select(a => (uint)a.GetInt32()));
+        private readonly Queue<byte> _dist = new(c.GetProperty("dist").EnumerateArray().Select(a => (byte)a.GetInt32()));
+        public byte Tick => (byte)c.GetProperty("tick").GetInt32();
+        public uint Reference(byte[] record) => 0x800;
+        public (uint Count, uint Hostile, byte[]? Object) Area(uint center, uint size)
+        {
+            log.Add((byte)'A'); log.AddRange(BitConverter.GetBytes(center)); log.AddRange(BitConverter.GetBytes(size));
+            if (_area2.Count == 0) return (0, 0, null);
+            var (count, hostile, k) = _area2.Dequeue(); byte[]? obj = null;
+            if (k != 0) { obj = new byte[0x40]; BitConverter.GetBytes((uint)(c.GetProperty("area")[0][3].GetInt64() >> k)).CopyTo(obj, 4); BitConverter.GetBytes((uint)(c.GetProperty("area")[0][4].GetInt64() >> k)).CopyTo(obj, 8); }
+            return (count, hostile, obj);
+        }
+        public uint Claim(uint eax, uint ebx, ushort cx) { log.Add((byte)'C'); log.AddRange(BitConverter.GetBytes(eax)); log.AddRange(BitConverter.GetBytes(ebx)); log.AddRange(BitConverter.GetBytes(cx)); return _claim.Count > 0 ? _claim.Dequeue() : 0; }
+        public byte Distance(uint x, uint y) { log.Add((byte)'L'); log.AddRange(BitConverter.GetBytes(x)); log.AddRange(BitConverter.GetBytes(y)); return _dist.Count > 0 ? _dist.Dequeue() : (byte)0; }
+        public void Spawn(ushort eax, byte bl, ushort cx, uint edx) { log.Add((byte)'N'); log.AddRange(BitConverter.GetBytes(eax)); log.Add(bl); log.AddRange(BitConverter.GetBytes(cx)); log.AddRange(BitConverter.GetBytes(edx)); }
+        public void Redraw() => log.Add((byte)'D');
+        public void Remove(byte[] record) => log.Add((byte)'R');
+        public void Vitals() => log.Add((byte)'V');
+        public void Actions() => log.Add((byte)'U');
+        public void Effect(byte[] record, byte type, byte layer, uint x, uint y) { log.Add((byte)'E'); log.Add(type); log.Add(layer); log.AddRange(BitConverter.GetBytes(0x800u)); log.AddRange(BitConverter.GetBytes(x)); log.AddRange(BitConverter.GetBytes(y)); }
+        public void Sound(uint id) { log.Add((byte)'S'); log.AddRange(BitConverter.GetBytes(id)); }
+    }
+
+    private void ObjectScriptReplay(string file, string key, string label, Action<IObjectScriptWorld, byte[], int> script, int minEffects = 5)
+    {
+        using var reference = GameData.Read<JsonDocument>($"res://tests/fixtures/{file}.json");
+        var root = reference.RootElement;
+        var random = root.GetProperty("random_values").EnumerateArray().Select(e => (byte)e.GetInt32()).ToArray();
+        using var digest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        int count = 0, firstMismatch = -1, effects = 0;
+        int only = int.TryParse(System.Environment.GetEnvironmentVariable("DEBUG_CASE"), out var d) ? d : -1;
+        foreach (var c in root.GetProperty("cases").EnumerateArray())
+        {
+            var r = new byte[0x50]; BitConverter.GetBytes((uint)c.GetProperty("x").GetInt32()).CopyTo(r, 4); BitConverter.GetBytes((uint)c.GetProperty("y").GetInt32()).CopyTo(r, 8);
+            r[0x15] = (byte)c.GetProperty("f15").GetInt32(); r[0x14] = (byte)c.GetProperty("f14").GetInt32(); r[0x0d] = (byte)c.GetProperty("f0d").GetInt32(); r[0x19] = (byte)c.GetProperty("f19").GetInt32(); r[0x2d] = (byte)c.GetProperty("f2d").GetInt32(); BitConverter.GetBytes((uint)c.GetProperty("f26").GetInt64()).CopyTo(r, 0x26); r[0x2a] = (byte)c.GetProperty("f2a").GetInt32();
+            BitConverter.GetBytes((ushort)c.GetProperty("w1").GetInt32()).CopyTo(r, 1); BitConverter.GetBytes((uint)c.GetProperty("f22").GetInt64()).CopyTo(r, 0x22);
+            r[0x27] = (byte)c.GetProperty("f27").GetInt32(); r[0x28] = (byte)c.GetProperty("f28").GetInt32();
+            var log = new List<byte>(); var world = new ObjectReplay(c, random, log);
+            script(world, r, c.GetProperty("ah").GetInt32());
+            byte[] output = [.. r, world.I, world.J, .. log];
+            digest.AppendData(output); if (log.Contains((byte)'E')) effects++;
+            string hex = Convert.ToHexStringLower(SHA256.HashData(output))[..10];
+            if (hex != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; if (only == count) GD.Print("CSHARP " + Convert.ToHexStringLower(output)); }
+            count++;
+        }
+        GD.Print($"{key}: first mismatch {firstMismatch}; {effects} effects");
+        var summary = root.GetProperty("results").GetProperty(key);
+        Check(count == summary.GetProperty("case_count").GetInt32() && effects >= minEffects, $"{key} reference coverage ({count} cases, {effects} effects)");
+        Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), $"{label} matches original x86");
+    }
+
+    private void OriginalObjectScriptChecks()
+    {
+        ObjectScriptReplay("obj-rockfall", "rockfall", "The rockfall script ARMY__03.WRK 189", OriginalObjectScripts.Rockfall);
+        ObjectScriptReplay("obj-wall", "wall", "The stone wall script ARMY__03.WRK 3F8", OriginalObjectScripts.Wall, 0);
+        ObjectScriptReplay("obj-head", "head", "The knight's head script ARMY__03.WRK 522", OriginalObjectScripts.Head, 0);
+        ObjectScriptReplay("obj-tree", "tree", "The living fir script ARMY__03.WRK 624", OriginalObjectScripts.Tree, 0);
+        ObjectScriptReplay("obj-raven", "raven", "The raven script ARMY__03.WRK 6BA", OriginalObjectScripts.Raven, 0);
+        ObjectScriptReplay("obj-face", "face", "The stone face script ARMY__03.WRK 2B9", OriginalObjectScripts.Face);
+    }
+}
