@@ -48,6 +48,8 @@ public partial class TestRunner
         public byte[]? ObjectAt(uint reference) => reference == 0x140 ? Obj1 : (reference == 0x180 ? Obj2 : new byte[0x40]);
         public byte Parent25 => (byte)c.GetProperty("parent25").GetInt32();
         public byte Bl => (byte)c.GetProperty("bl").GetInt32();
+        public void Service25(uint parent, byte bl) { log.Add((byte)'a'); log.AddRange(BitConverter.GetBytes(parent)); log.Add(bl); }
+        public void Service29(byte bl) { log.Add((byte)'b'); log.Add(bl); }
         public void Sound35(uint id) { log.Add((byte)'S'); log.AddRange(BitConverter.GetBytes(id)); }
         public (bool Zf, byte Al) Service11(uint eax) { log.Add((byte)'Q'); log.AddRange(BitConverter.GetBytes(eax)); return _s11.Count > 0 ? _s11.Dequeue() : (true, (byte)0); }
         public bool ServiceA5() { log.Add((byte)'W'); return _a5.Count > 0 ? _a5.Dequeue() : true; }
@@ -166,6 +168,8 @@ public partial class TestRunner
         ObjectScriptReplay("obj-fxab4", "fxab4", "The large explosion ARMY__00.WRK AB4", (w, r, ah) => OriginalObjectScripts.Explosion(w, r, ah, ((ObjectReplay)w).Bl, true), 0);
         ObjectScriptReplay("obj-fxaeb", "fxaeb", "The following mark ARMY__00.WRK AEB", (w, r, ah) => OriginalObjectScripts.Fxaeb(w, r, ah, ((ObjectReplay)w).Bl), 0, true);
         ObjectScriptReplay("obj-fxb62", "fxb62", "The effect ARMY__00.WRK B62", (w, r, ah) => OriginalObjectScripts.Fx54aKind16(w, r, ah, Enumerable.Range(0, 0x40).Select(i => i == 0x25 ? ((ObjectReplay)w).Parent25 : (byte)0).ToArray()), 0);
+        ObjectScriptReplay("obj-fxfd1", "fxfd1", "The effect ARMY__00.WRK FD1", (w, r, ah) => OriginalObjectScripts.FxKind17(w, r, ah, Enumerable.Range(0, 0x40).Select(i => i == 0x25 ? ((ObjectReplay)w).Parent25 : (byte)0).ToArray()), 0);
+        ObjectScriptReplay("obj-fx1012", "fx1012", "The burst ARMY__00.WRK 1012", (w, r, ah) => OriginalObjectScripts.Fx1012(w, r, ah, 0xa00), 0);
         ObjectScriptReplay("obj-face", "face", "The stone face script ARMY__03.WRK 2B9", OriginalObjectScripts.Face);
     }
 }

@@ -41,6 +41,8 @@ PRESETS = {
     'fxab4': {'entry': 0xab4, 'end': 0xaeb, 'more': [(0xa6c, 0xab4)], 'module': 'ARMY__00.WRK', 'effect': True, 'regs_effect': True},
     'fxaeb': {'entry': 0xaeb, 'end': 0xb62, 'module': 'ARMY__00.WRK', 'effect': True, 'extra': True},
     'fxb62': {'entry': 0xb62, 'end': 0xbab, 'module': 'ARMY__00.WRK', 'effect': True},
+    'fxfd1': {'entry': 0xfd1, 'end': 0x1012, 'module': 'ARMY__00.WRK', 'effect': True},
+    'fx1012': {'entry': 0x1012, 'end': 0x10b3, 'module': 'ARMY__00.WRK', 'effect': True},
     'manuscript': {'entry': 0x2710, 'end': 0x279a, 'entries': [0x2710, 0x2780, 0x278d], 'visitor': True},
     'dragon': {'entry': 0x279a, 'end': 0x29f1, 'regs_effect': True, 'extra': True},
 }
@@ -168,6 +170,8 @@ def generate(game):
         al = state['a9'].pop(0) if state['a9'] else 0
         o.cpu.reg_write(UC_X86_REG_EAX, (reg(UC_X86_REG_EAX) & ~0xff) | al)
         o.cpu.reg_write(UC_X86_REG_EFLAGS, (reg(UC_X86_REG_EFLAGS) & ~0x40) | (0x40 if al == 0 else 0)); o.ret()
+    def svc25(): log.append(b'a' + struct.pack('<IB', reg(UC_X86_REG_ESI) - o.POOL, reg(UC_X86_REG_EBX) & 255)); o.ret()
+    def svc29(): log.append(b'b' + struct.pack('<B', reg(UC_X86_REG_EBX) & 255)); o.ret()
     def level_exit(): log.append(b'X' + struct.pack('<B', reg(UC_X86_REG_EAX) & 255)); o.ret()
     def sound():    # FS:31
         log.append(b'S' + struct.pack('<I', reg(UC_X86_REG_EAX))); o.ret()
@@ -175,7 +179,7 @@ def generate(game):
     slots = {x['fs_slot']: x['target_offset'] for x in report['fs_assignments']}
     o.stubs[slots[0x14b]] = area; o.stubs[slots[0x19]] = effect_regs if PRESET.get('regs_effect') else effect; o.stubs[slots[0x14f]] = find; o.stubs[slots[0x31]] = sound; o.stubs[slots[0x157]] = claim; o.stubs[slots[0x15b]] = distance; o.stubs[slots[0x69]] = spawn
     o.stubs[slots[0x1bf]] = zf_service(b'Z', 'zf'); o.stubs[slots[0x187]] = spot; o.stubs[slots[0x16b]] = beside; o.stubs[slots[0x45]] = create; o.stubs[slots[0x19b]] = occupy; o.stubs[slots[0x6d]] = participant
-    o.stubs[slots[0x1a3]] = level_exit; o.stubs[slots[0x11]] = svc11; o.stubs[slots[0xa1]] = svca1; o.stubs[slots[0xa9]] = svca9; o.stubs[slots[0xa5]] = svca5; o.stubs[slots[0xad]] = svcad; o.stubs[slots[0x35]] = sound35; o.stubs[slots[0x1d]] = redraw; o.stubs[slots[0x4d]] = appearance; o.stubs[slots[0x17b]] = scan_masked; o.stubs[slots[0x1b7]] = strength
+    o.stubs[slots[0x1a3]] = level_exit; o.stubs[slots[0x25]] = svc25; o.stubs[slots[0x29]] = svc29; o.stubs[slots[0x11]] = svc11; o.stubs[slots[0xa1]] = svca1; o.stubs[slots[0xa9]] = svca9; o.stubs[slots[0xa5]] = svca5; o.stubs[slots[0xad]] = svcad; o.stubs[slots[0x35]] = sound35; o.stubs[slots[0x1d]] = redraw; o.stubs[slots[0x4d]] = appearance; o.stubs[slots[0x17b]] = scan_masked; o.stubs[slots[0x1b7]] = strength
     if PRESET.get('stop_jumps'): o.stubs[slots[0xed]] = stopper(b'H')
     o.stubs[slots[0x1d]] = redraw; o.stubs[slots[0x15]] = remove; o.stubs[slots[0xdd]] = vitals; o.stubs[slots[0xe1]] = actions
     digest = hashlib.sha256(); all_cases = cases()
@@ -202,7 +206,7 @@ def generate(game):
         if PRESET.get('extra') or PRESET.get('extra2'): o.cpu.mem_write(0x97a + 0x12, struct.pack('<I', case['part12']))
         o.cpu.reg_write(UC_X86_REG_ESI, o.POOL + 0x800); o.cpu.mem_write(o.POOL + 0x900, bytes([0, 0, 0, case['vowner']])); o.cpu.mem_write(o.POOL + 0x800 + 0x28, bytes([case['mask28']]))
         o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 0x900 if (PRESET.get('visitor') and case['ah'] == 8) else (o.DAT if (PRESET.get('dat') and case['ah'] != 0) else o.POOL + 0x800))
-        o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, (o.POOL + 0xa00) if (PRESET.get('effect') and case['ah'] == 0 and PRESET['entry'] in (0x54a, 0xb62)) else case['bl']); o.cpu.reg_write(UC_X86_REG_ECX, 0); o.cpu.reg_write(UC_X86_REG_EDX, 0)
+        o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, (o.POOL + 0xa00) if (PRESET.get('effect') and case['ah'] == 0 and PRESET['entry'] in (0x54a, 0xb62, 0xfd1, 0x1012)) else case['bl']); o.cpu.reg_write(UC_X86_REG_ECX, 0); o.cpu.reg_write(UC_X86_REG_EDX, 0)
         o.run(o.WRK + (PRESET['entries'][case['k']] if PRESET.get('entries') else PRESET['entry']))
         out = (struct.pack('<H', (reg(UC_X86_REG_EAX) & 0xffff) if case['ah'] == 8 else 0) if PRESET.get('visitor') else b'') + bytes(o.cpu.mem_read(o.POOL + 0x800, 0x50)) + bytes(o.cpu.mem_read(0x19eb, 2)) + (bytes(o.cpu.mem_read(o.POOL + 0x140, 0x80)) + bytes(o.cpu.mem_read(0x97a + 0x12, 4)) if PRESET.get('extra') else (bytes(o.cpu.mem_read(0x97a + 0x12, 4)) if PRESET.get('extra2') else b'')) + b''.join(log)
         if os.environ.get('DEBUG_CASE') == str(all_cases.index(case)): print('PYTHON', out.hex())

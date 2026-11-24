@@ -5024,6 +5024,30 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fxb62.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services (11, A1, A5, A9, AD, 35, 19) are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army00-fxfd1-fd1",
+      "module": "ARMY__00.WRK",
+      "start": 4049,
+      "end": 4114,
+      "name": "Effect kind 17h: a flame at its creator",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fxfd1.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army00-fx1012-1012",
+      "module": "ARMY__00.WRK",
+      "start": 4114,
+      "end": 4275,
+      "name": "Effect kind 18h: a burst of 5 frames",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fx1012.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
     }
   ]
 }
