@@ -4244,6 +4244,18 @@
       "evidence": ["docs/rufin.md", "tests/DialogChecks.cs"],
       "implementation": ["scripts/OriginalVanishAction.cs", "scripts/SkirmishRufin.cs"],
       "limitations": "the action is ported from the disassembly and exercised by DialogChecks, not Unicorn-verified; 9210 around state 5 is an adapter"
+    },
+    {
+      "id": "le1-unit-motion-9210",
+      "module": "LE:1",
+      "start": 37392,
+      "end": 38355,
+      "name": "Unit motion machine: rest/turn/walk/swing/move/frame range/resting states of +2D and the state switch 9275",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-motion.md", "tests/fixtures/unit-motion.json", "tools/verify_unit_motion.py", "tests/OriginalUnitMotionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitMotion.cs"],
+      "limitations": "the services 70B0, 12930, 9653, D12C, 10799, 9727 and 95D3 are recorded stubs in the check; the module is verified but not yet the driver of the skirmish units"
     }
   ]
 }
