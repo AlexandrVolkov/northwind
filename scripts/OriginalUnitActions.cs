@@ -1651,4 +1651,32 @@ public static class OriginalUnitActions
         next:;
         }
     }
+
+    /// <summary>6EB2: clears the slot table of 6 * 12 bytes at DS:1978.</summary>
+    public static void F6EB2(IUnitActionWorld w, ActionRegs g)
+    {
+        Array.Clear(w.Ds, 0x1978, 0x48); g.Edi = 0x19c0; g.Ecx = 0; g.Eax = 0; g.Logic(0, 32);
+    }
+
+    /// <summary>6EC1: fills the slot table at DS:1978 from the template of the object [1969]: for every bit of +0F (from bit 0) the 8-byte template entry (from +0B) gives the slot its word, the bytes +6 and +7, the pointer +2 (entry + 4 + dword)
+    /// with the word behind it, and the template number (+0 of the object).</summary>
+    public static void F6EC1(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); F6885(w, g, o); uint tb = g.Edi; var t = w.ObjectAt(tb);
+        g.Eax = 0; g.Ebx = 0x1978; g.Edi += 0xb; g.Ch = o[0xf]; g.Cl = 6;
+        do
+        {
+            Put(d, (int)g.Ebx + 2, 0); g.Ch = (byte)g.Shr(g.Ch, 1, 8);
+            if (g.Cf)
+            {
+                int e = (int)(g.Edi - tb);
+                g.Eax = (g.Eax & 0xffff0000) | U16(t, e); Put16(d, (int)g.Ebx, (ushort)g.Eax);
+                g.Al = t[e + 6]; d[g.Ebx + 6] = g.Al; g.Al = t[e + 7]; d[g.Ebx + 7] = g.Al;
+                g.Eax = g.Edi + 4 + U32(t, e + 2); Put(d, (int)g.Ebx + 2, g.Eax);
+                g.Eax = U32(t, (int)(g.Eax - tb) - 2); Put16(d, (int)g.Ebx + 9, (ushort)g.Eax);
+                g.Al = o[0]; d[g.Ebx + 0xb] = g.Al;
+            }
+            g.Edi += 8; g.Add(g.Ebx, 0xc); g.Ebx += 0xc; g.Cl--; g.Zf = g.Cl == 0;
+        } while (g.Cl != 0);
+    }
 }

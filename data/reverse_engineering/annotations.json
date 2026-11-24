@@ -6596,6 +6596,30 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "BA2E and 6EC1 are recorded stubs; the caller supplies ESI and EBP"
+    },
+    {
+      "id": "le1-unit-actions-6eb2",
+      "module": "LE:1",
+      "start": 28338,
+      "end": 28353,
+      "name": "Clear the slot table (6EB2)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The template of the check is one 100h-byte buffer; the pointers of the entries are small offsets inside it"
+    },
+    {
+      "id": "le1-unit-actions-6ec1",
+      "module": "LE:1",
+      "start": 28353,
+      "end": 28440,
+      "name": "Fill the slot table from the template of the object (6EC1)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The template of the check is one 100h-byte buffer; the pointers of the entries are small offsets inside it"
     }
   ]
 }
