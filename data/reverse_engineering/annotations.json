@@ -6224,6 +6224,30 @@
       "evidence": ["docs/effect-pool.md", "tests/fixtures/effect-pool.json", "tools/verify_effect_pool.py", "tests/OriginalEffectPoolChecks.cs"],
       "implementation": ["scripts/OriginalEffectPool.cs"],
       "limitations": "The effect scripts are a recorded stub in the check; the skirmish keeps its own effect lists"
+    },
+    {
+      "id": "le1-unit-actions-a10b",
+      "module": "LE:1",
+      "start": 41227,
+      "end": 41425,
+      "name": "Game speed gate and slow-tick flags (A10B)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check; the skirmish keeps its own pace gate and walk end"
+    },
+    {
+      "id": "le1-unit-actions-9a8e",
+      "module": "LE:1",
+      "start": 39566,
+      "end": 39693,
+      "name": "End of the walk step: the rest of the step along the heading, occupancy carry-over (9A8E)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check; the skirmish keeps its own pace gate and walk end"
     }
   ]
 }
