@@ -105,8 +105,14 @@ public sealed partial class Skirmish
         OriginalVanishAction.Motion.Step(mage.Record, mage.Parameters);
         if (IsPhantom(mage)) { OriginalPhantom.Continuation(r); return; }
         _mageDrop ??= new MageDrop(this);
-        bool rufin = mage.Source.TemplateIndex == 13;
-        OriginalMageCloak.Step(_mageDrop, r, rufin ? OriginalMageCloak.RufinLow : OriginalMageCloak.FirstMageLow, rufin ? OriginalMageCloak.RufinHigh : OriginalMageCloak.FirstMageHigh, rufin);
+        // the continuation after the FS:E1 table is the hermit's own (verified for all nine, tests/fixtures/mage-cloak.json)
+        switch (mage.Source.TemplateIndex)
+        {
+            case 13 or 14 or 15 or 19 or 21: OriginalMageCloak.Step(_mageDrop, r, OriginalMageCloak.RufinLow, OriginalMageCloak.RufinHigh, true); break;
+            case 17: OriginalMageCloak.Step(_mageDrop, r, OriginalMageCloak.RufinLow, OriginalMageCloak.RufinHigh, true, 0x55, 0x1f); break;
+            case 16 or 18 or 20: OriginalMageCloak.FlagStep(_mageDrop, r); break;
+            default: OriginalMageCloak.Step(_mageDrop, r, OriginalMageCloak.FirstMageLow, OriginalMageCloak.FirstMageHigh, false); break;
+        }
     }
 
     /// <summary>FS:105 (<see cref="OriginalVanishAction"/>) and the playback of its frames (the state-5 slice of 9210).</summary>

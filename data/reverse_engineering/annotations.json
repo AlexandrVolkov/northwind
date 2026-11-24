@@ -4436,6 +4436,102 @@
       "evidence": ["docs/rufin.md", "tests/fixtures/kochet.json", "tools/verify_hermit.py", "tests/OriginalRufinChecks.cs"],
       "implementation": ["scripts/OriginalKochet.cs"],
       "limitations": "FS services are recorded stubs (as for Rufin); the continuation after the FS:E1 table is shared with Rufin's cloak (OriginalMageCloak) or not ported; the transfer of ownership D1BA is not ported in the skirmish (log only)"
+    },
+    {
+      "id": "army03-cloak-hermits-1215",
+      "module": "ARMY__03.WRK",
+      "start": 4629,
+      "end": 4735,
+      "name": "Continuation of a hermit's update after the FS:E1 table: dropped items, vanishing request",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/mage-cloak.json", "tools/verify_mage_cloak.py", "tests/OriginalMageCloakChecks.cs"],
+      "implementation": ["scripts/OriginalMageCloak.cs"],
+      "limitations": "FS:197 is a recorded stub in the check"
+    },
+    {
+      "id": "army03-cloak-hermits-1646",
+      "module": "ARMY__03.WRK",
+      "start": 5702,
+      "end": 5808,
+      "name": "Continuation of a hermit's update after the FS:E1 table: dropped items, vanishing request",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/mage-cloak.json", "tools/verify_mage_cloak.py", "tests/OriginalMageCloakChecks.cs"],
+      "implementation": ["scripts/OriginalMageCloak.cs"],
+      "limitations": "FS:197 is a recorded stub in the check"
+    },
+    {
+      "id": "army03-cloak-hermits-1a20",
+      "module": "ARMY__03.WRK",
+      "start": 6688,
+      "end": 6742,
+      "name": "Continuation of a hermit's update after the FS:E1 table: dropped items, vanishing request",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/mage-cloak.json", "tools/verify_mage_cloak.py", "tests/OriginalMageCloakChecks.cs"],
+      "implementation": ["scripts/OriginalMageCloak.cs"],
+      "limitations": "FS:197 is a recorded stub in the check"
+    },
+    {
+      "id": "army03-cloak-hermits-1cf0",
+      "module": "ARMY__03.WRK",
+      "start": 7408,
+      "end": 7514,
+      "name": "Continuation of a hermit's update after the FS:E1 table: dropped items, vanishing request",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/mage-cloak.json", "tools/verify_mage_cloak.py", "tests/OriginalMageCloakChecks.cs"],
+      "implementation": ["scripts/OriginalMageCloak.cs"],
+      "limitations": "FS:197 is a recorded stub in the check"
+    },
+    {
+      "id": "army03-cloak-hermits-1eeb",
+      "module": "ARMY__03.WRK",
+      "start": 7915,
+      "end": 7969,
+      "name": "Continuation of a hermit's update after the FS:E1 table: dropped items, vanishing request",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/mage-cloak.json", "tools/verify_mage_cloak.py", "tests/OriginalMageCloakChecks.cs"],
+      "implementation": ["scripts/OriginalMageCloak.cs"],
+      "limitations": "FS:197 is a recorded stub in the check"
+    },
+    {
+      "id": "army03-cloak-hermits-208f",
+      "module": "ARMY__03.WRK",
+      "start": 8335,
+      "end": 8441,
+      "name": "Continuation of a hermit's update after the FS:E1 table: dropped items, vanishing request",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/mage-cloak.json", "tools/verify_mage_cloak.py", "tests/OriginalMageCloakChecks.cs"],
+      "implementation": ["scripts/OriginalMageCloak.cs"],
+      "limitations": "FS:197 is a recorded stub in the check"
+    },
+    {
+      "id": "army03-cloak-hermits-244b",
+      "module": "ARMY__03.WRK",
+      "start": 9291,
+      "end": 9345,
+      "name": "Continuation of a hermit's update after the FS:E1 table: dropped items, vanishing request",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/mage-cloak.json", "tools/verify_mage_cloak.py", "tests/OriginalMageCloakChecks.cs"],
+      "implementation": ["scripts/OriginalMageCloak.cs"],
+      "limitations": "FS:197 is a recorded stub in the check"
+    },
+    {
+      "id": "army03-cloak-hermits-268e",
+      "module": "ARMY__03.WRK",
+      "start": 9870,
+      "end": 9976,
+      "name": "Continuation of a hermit's update after the FS:E1 table: dropped items, vanishing request",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/rufin.md", "tests/fixtures/mage-cloak.json", "tools/verify_mage_cloak.py", "tests/OriginalMageCloakChecks.cs"],
+      "implementation": ["scripts/OriginalMageCloak.cs"],
+      "limitations": "FS:197 is a recorded stub in the check"
     }
   ]
 }

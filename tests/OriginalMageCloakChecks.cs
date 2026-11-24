@@ -20,8 +20,15 @@ public partial class TestRunner
             var r = new byte[0x40]; r[3] = (byte)c.GetProperty("owner").GetInt32(); r[0x19] = (byte)c.GetProperty("condition").GetInt32(); r[0x31] = (byte)c.GetProperty("charge").GetInt32();
             r[0x32] = (byte)c.GetProperty("hidden").GetInt32(); r[0x2e] = (byte)c.GetProperty("tick").GetInt32(); r[0x14] = (byte)c.GetProperty("state").GetInt32(); r[0x20] = (byte)c.GetProperty("mask").GetInt32();
             BitConverter.GetBytes(c.GetProperty("x").GetUInt32()).CopyTo(r, 4); BitConverter.GetBytes(c.GetProperty("y").GetUInt32()).CopyTo(r, 8);
-            bool rufin = c.GetProperty("kind").GetString() == "rufin"; var log = new List<byte>(); byte before14 = r[0x14];
-            byte al = OriginalMageCloak.Step(new MageTestWorld(log), r, rufin ? OriginalMageCloak.RufinLow : OriginalMageCloak.FirstMageLow, rufin ? OriginalMageCloak.RufinHigh : OriginalMageCloak.FirstMageHigh, rufin, 0x55);
+            BitConverter.GetBytes((ushort)c.GetProperty("f17").GetInt32()).CopyTo(r, 0x17);
+            string kind = c.GetProperty("kind").GetString()!; var log = new List<byte>(); byte before14 = r[0x14]; var world = new MageTestWorld(log);
+            byte al = kind switch
+            {
+                "mage" => OriginalMageCloak.Step(world, r, OriginalMageCloak.FirstMageLow, OriginalMageCloak.FirstMageHigh, false, 0x55),
+                "rufin" or "onis" or "irvil" or "garik" or "kochet" => OriginalMageCloak.Step(world, r, OriginalMageCloak.RufinLow, OriginalMageCloak.RufinHigh, true, 0x55),
+                "magus" => OriginalMageCloak.Step(world, r, OriginalMageCloak.RufinLow, OriginalMageCloak.RufinHigh, true, 0x55, 0x1f),
+                _ => OriginalMageCloak.FlagStep(world, r, 0x55),
+            };
             if (r[0x14] != before14) requests++; if (r[0x20] == 0 && r[0x32] != 0) hidden++; if (log.Count > 0) drops++;
             byte[] output = [.. r, al, .. log];
             digest.AppendData(output);
