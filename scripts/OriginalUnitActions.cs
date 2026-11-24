@@ -1834,4 +1834,29 @@ public static class OriginalUnitActions
         }
         g.Ebx = s1; g.Eax = a0;
     }
+
+    /// <summary>11CC9 = FS:18B: counts the campaign areas (records of 841h bytes from [3E87], [6C9] of them, those with +0 bit 0) whose [6C6] owner entries (84h bytes from +1) are all settled for the player AL: the area has a high enough
+    /// value (+17 above 7CFh), no flag +59, the entry is not the player, and the relation +1 + AL is neither 3 nor 4 -- an entry that fails the relation test excludes the area. AL = the count, ESI/EDI/EDX/ECX are kept.</summary>
+    public static void FS18B(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint esi0 = g.Esi, edi0 = g.Edi, edx0 = g.Edx, ecx0 = g.Ecx;
+        g.Eax = g.Eax & 0xff; g.Bl = 0; g.Logic(0, 8); uint esi = U32(d, 0x3e87); byte outer = d[0x6c9]; int al = (int)g.Eax;
+        do
+        {
+            uint areaStart = esi;
+            if ((d[esi] & 1) != 0)
+            {
+                esi += 1; byte inner = d[0x6c6]; bool all = true;
+                do
+                {
+                    bool ok = U32(d, (int)esi + 0x17) <= 0x7cf || d[esi + 0x59] != 0 || d[esi] == al || d[esi + (uint)al + 1] == 3;
+                    if (!ok && d[esi + (uint)al + 1] != 4) { all = false; break; }
+                    esi += 0x84; inner--;
+                } while (inner != 0);
+                if (all) g.Bl++;
+            }
+            esi = areaStart + 0x841; outer--;
+        } while (outer != 0);
+        g.Al = g.Bl; g.Eax &= 0xff; g.Esi = esi0; g.Edi = edi0; g.Edx = edx0; g.Ecx = ecx0; g.Cf = false; g.Zf = true;
+    }
 }

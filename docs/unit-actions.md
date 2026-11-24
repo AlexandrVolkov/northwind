@@ -77,3 +77,7 @@
 ## 9064 (FS:16B)
 
 `FS16B` looks for a free spot for the template AL of the army AH next to the object ESI: the distance is the sum of the half sizes (+3, +4) of both templates times 16, the 8 directions come from the table of signed bytes at DS:19C7 and are tried from a random one (9E41, called once) round the ring until AC63 accepts a spot. ZF = 0, BH = the direction and ECX/EDX = the spot when found (the `OR AL,FFh` sets the flags); ZF = 1 when none fits. EAX is restored. Verified against x86.
+
+## 11CC9 (FS:18B)
+
+`FS18B` counts the campaign areas (records of 841h bytes from [3E87], [6C9] of them, +0 bit 0 set) in which every one of the [6C6] entries (84h bytes from +1) is settled for the player AL: value +17 not above 7CFh, or flag +59, or the entry is the player, or its relation byte (+1 + AL) is 3; a relation other than 3/4 on an entry that does not pass the first tests excludes the area. AL = the count. The check also found that the participant index of DA45 must be below 8 (the oracle read past the table). Verified against x86.

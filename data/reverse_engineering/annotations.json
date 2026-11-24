@@ -6668,6 +6668,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "9E41 and AC63 are recorded stubs; template 0 of armies 0..2"
+    },
+    {
+      "id": "le1-unit-actions-11cc9",
+      "module": "LE:1",
+      "start": 72905,
+      "end": 72942,
+      "name": "FS:18B: count the campaign areas settled for the player (11CC9)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The area records live in a DS block at 5000h filled with sparse random bytes; relation value 4 is rarely hit"
     }
   ]
 }
