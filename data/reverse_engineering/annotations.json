@@ -6248,6 +6248,54 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "The callees outside the function are recorded stubs in the check; the skirmish keeps its own pace gate and walk end"
+    },
+    {
+      "id": "le1-unit-actions-da45",
+      "module": "LE:1",
+      "start": 55877,
+      "end": 55935,
+      "name": "Count the objects of the list by the owner mask (DA45)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check"
+    },
+    {
+      "id": "le1-unit-actions-d740",
+      "module": "LE:1",
+      "start": 55104,
+      "end": 55162,
+      "name": "A blow on the object found by 982B (D740)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check"
+    },
+    {
+      "id": "le1-unit-actions-d77a",
+      "module": "LE:1",
+      "start": 55162,
+      "end": 55217,
+      "name": "Random point around an object for an effect (D77A)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check"
+    },
+    {
+      "id": "le1-unit-actions-8659",
+      "module": "LE:1",
+      "start": 34393,
+      "end": 34486,
+      "name": "Unit action 8659: target search and approach",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function are recorded stubs in the check"
     }
   ]
 }

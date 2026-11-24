@@ -920,6 +920,76 @@ public static class OriginalUnitActions
             g.Cl = (byte)(r[0xd] & 3); w.Call(0x4442, g); g.Edx = 0; w.Call(0x43b7, g);
             g.Eax = g.Esi - w.PoolBase; w.Call(0x43b0, g);
         }
-        r[0x24] &= 0xf8; w.Call(0x8120, g);
+        r[0x24] &= 0xf8; g.Logic(r[0x24], 8); w.Call(0x8120, g);
+    }
+
+    /// <summary>DA45: counts the objects of the list at 1F45 whose owner is in the mask +12h of the participant AL (EBX) and those whose owner is not (EAX).</summary>
+    public static void FDA45(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Bl = g.Al; g.Eax = 0xf5; g.Eax = (g.Eax & 0xffff0000) | (ushort)(0xf5 * g.Bl);
+        var part = w.PartOf(g.Bl); BitConverter.GetBytes(BitConverter.ToUInt32(part, 0x12)).CopyTo(d, 0x1ca2);
+        g.Eax = 0; g.Ebx = 0; uint ebp = 0x1f45;
+        for (; ; )
+        {
+            g.Edi = BitConverter.ToUInt32(d, (int)ebp); g.Test(g.Edi, g.Edi, 32);
+            if (g.Zf) return;
+            uint owner = w.ObjectAt(g.Edi)[3]; g.Ecx = owner;
+            bool inMask = ((BitConverter.ToUInt32(d, (int)(0x1ca2 + (owner >> 5) * 4)) >> (int)(owner & 31)) & 1) != 0;
+            if (inMask) g.Ebx++; else g.Eax++;
+            ebp += 4;
+        }
+    }
+
+    /// <summary>D740: a blow of the strength BL and the kind BH on the object found by 982B: its health +19 falls by the strength minus DAT[44] and +17 gets the flags of the blow (bit 2 = it hurt).</summary>
+    public static void FD740(IUnitActionWorld w, ActionRegs g)
+    {
+        uint saved = g.Eax; w.Call(0x982b, g); g.Ebx = saved;
+        if (g.Zf) return;
+        var o = w.ObjectAt(g.Edi); g.Ah = o[0x19]; g.Cmp(g.Ah, 0, 8);
+        if (g.Jle) { { g.Ah = 0xff; g.Logic(0xff, 8); }; return; }
+        g.Bh = (byte)(g.Bh << 3); g.Ecx = 1; g.Cl = (byte)(g.Cl | g.Bh);
+        byte before = g.Bl; g.Bl = (byte)(g.Bl - w.Template[0x44]); g.Cmp(before, w.Template[0x44], 8);
+        if (!(g.Cf || g.Zf))
+        {
+            g.Cl = (byte)(g.Cl | 2); g.Ah = (byte)(g.Ah - g.Bl); g.Logic(g.Ah, 8);
+            if (g.Sf) g.Ah = 0;
+            o[0x19] = g.Ah;
+        }
+        PutW(o, 0x17, (ushort)((U16(o, 0x17) & 0xffe0) | (ushort)g.Ecx));
+        { g.Ah = 0xff; g.Logic(0xff, 8); };
+    }
+
+    /// <summary>D77A: a random point around the object EDI (up to AL · 16 cells away in each axis, 9E41 / 9E55 pick the offsets and signs) for the effect 996F.</summary>
+    public static void FD77A(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Al = (byte)(g.Al << 4); g.Dl = g.Al;
+        w.Call(0x9e41, g); g.Eax = (g.Eax & 0xffff0000) | (ushort)(g.Al * g.Dl); g.Ecx = g.Ah; g.Ecx += g.Ecx;
+        w.Call(0x9e55, g); g.Eax = (g.Eax & 0xffff0000) | (ushort)(g.Al * g.Dl); g.Edx = g.Ah; g.Edx += g.Edx;
+        g.Test(g.Ah, 1, 8); if (g.Zf) g.Ecx = (uint)-(int)g.Ecx;
+        g.Test(g.Ah, 2, 8); if (g.Zf) g.Edx = (uint)-(int)g.Edx;
+        var o = w.ObjectAt(g.Edi); g.Ecx += U32(o, 7); g.Add(g.Edx, U32(o, 0xc)); g.Edx += U32(o, 0xc);
+        w.Call(0x996f, g);
+    }
+
+    /// <summary>8659: the action of the unit that looks for a target near it (C439) and approaches it (8F70).</summary>
+    public static void F8659(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Bl = (byte)(g.Bl & 0x40); w.G1C9F = g.Bl; w.Call(0x8d89, g);
+        g.Test(g.Al, g.Al, 8);
+        if (g.Zf)
+        {
+            g.Ebx = 0xf00; g.Eax = 0x200; w.Call(0xc439, g);
+            if (g.Zf) { Xor0(g); return; }
+            g.Edi -= w.PoolBase; Put(r, 0x1c, g.Edi); r[0x15]++; r[0x30] = 0; g.Cmp(w.G1C9F, 0x40, 8); return;
+        }
+        g.Cmp(g.Al, 1, 8);
+        if (!g.Zf) { Xor0(g); return; }
+        w.Call(0x8f70, g);
+        if (!g.Zf) { g.Cmp(w.G1C9F, 0x40, 8); return; }
+        g.Test(g.Bl, g.Bl, 8);
+        if (!g.Zf) { Xor0(g); return; }
+        g.Cmp(r[0x31], 0, 8);
+        if (!g.Zf) { Xor0(g); return; }
+        r[0x14] = (byte)((r[0x14] & 7) | 0x58); Xor0(g);
     }
 }
