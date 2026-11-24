@@ -6356,6 +6356,30 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "The callees outside the function are recorded stubs in the check; the template lookups 6885 / 68BD run as ported code over one template buffer"
+    },
+    {
+      "id": "le1-unit-actions-c331",
+      "module": "LE:1",
+      "start": 49969,
+      "end": 50015,
+      "name": "Chebyshev distances C331 and C344",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The map of the check is 32 x 32 with identity tiles and random terrain classes"
+    },
+    {
+      "id": "le1-unit-actions-c35f",
+      "module": "LE:1",
+      "start": 50015,
+      "end": 50233,
+      "name": "Find a cell of a terrain class near the unit (C35F)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The map of the check is 32 x 32 with identity tiles and random terrain classes"
     }
   ]
 }

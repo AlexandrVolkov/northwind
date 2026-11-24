@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 97940 | 6265 | 97 | 42580 | 44 |
+| LE:1 | 146882 | 97921 | 6265 | 97 | 42599 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -337,8 +337,10 @@
 | LE:1 `0xBD0F..0xBE2E` | Hit objects in an area with a fixed attack | ported | [combat.md](../docs/combat.md); [catapult.json](../tests/fixtures/catapult.json) |  |
 | LE:1 `0xBE04..0xBE2E` | Apply damage to one prepared target | ported | [building-condition-kernel.md](../docs/building-condition-kernel.md); [building-kernel.json](../tests/fixtures/building-kernel.json) | Хвост после подготовки шаблона и силы; выбор цели, генерация силы, площадное действие и смерть с эффектами вне контракта. |
 | LE:1 `0xBFC9..0xC010` | Apply a hit: attack minus defence or a small chance of one point | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
+| LE:1 `0xC331..0xC35F` | Chebyshev distances C331 and C344 | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The map of the check is 32 x 32 with identity tiles and random terrain classes |
 | LE:1 `0xC344..0xC35F` | Chebyshev distance between object centres | ported | [combat.md](../docs/combat.md); [enemy-search.json](../tests/fixtures/enemy-search.json) |  |
 | LE:1 `0xC35F..0xC439` | Find harvestable forest footprint | ported | [native-forestry.md](../docs/native-forestry.md); [forestry.json](../tests/fixtures/forestry.json) | Непустая область внутри карты и поисковый прямоугольник без переполнения правого/нижнего конца; поведение для выходящих областей не включено. |
+| LE:1 `0xC35F..0xC439` | Find a cell of a terrain class near the unit (C35F) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The map of the check is 32 x 32 with identity tiles and random terrain classes |
 | LE:1 `0xC439..0xC4CD` | Find worker cargo receiver | ported | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Порядок цепочки передан вызывающей стороной; выбирается последний при равном расстоянии. Полный пул владельца схватки ещё не используется как хранилище. |
 | LE:1 `0xC4CD..0xC5D7` | Find waiting worker at building | partial | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Только фиксированный вход через DAT[53]/[54] и C591; общий обход периметра здания не включён. |
 | LE:1 `0xC4CD..0xC5D7` | Find the waiting worker at the building (C4CD with C591) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The callees outside the function are recorded stubs in the check; the template lookups 6885 / 68BD run as ported code over one template buffer |

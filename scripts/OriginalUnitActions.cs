@@ -1167,4 +1167,61 @@ public static class OriginalUnitActions
         g.Add(0, U32(w.Template, 0x3b)); g.Eax = U32(w.Template, 0x3b); Put(w.Ds, 0x19c3, g.Eax); g.Edx = edx; g.Ecx = ecx; g.Eax = eax;
         w.Call(U32(w.Ds, 0x19c3), g);
     }
+
+    /// <summary>C331: EAX = the larger of the distances |EAX − ECX| and |EBX − EDX| (the flags of the last comparison).</summary>
+    public static void FC331(ActionRegs g)
+    {
+        g.Eax = (uint)Math.Abs((int)(g.Eax - g.Ecx)); g.Ebx = (uint)Math.Abs((int)(g.Ebx - g.Edx)); g.Cmp(g.Eax, g.Ebx, 32);
+        if (!(g.Cf || g.Zf)) return;
+        g.Eax = g.Ebx;
+    }
+
+    /// <summary>C344: as C331 between the object ESI and the object EDI.</summary>
+    public static void FC344(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var o = w.ObjectAt(g.Edi);
+        g.Eax = (uint)Math.Abs((int)(U32(r, 4) - U32(o, 4))); g.Ebx = (uint)Math.Abs((int)(U32(r, 8) - U32(o, 8))); g.Cmp(g.Eax, g.Ebx, 32);
+        if (!(g.Cf || g.Zf)) return;
+        g.Eax = g.Ebx;
+    }
+
+    /// <summary>C35F: the first cell of the terrain class AL within DL cells around the unit (the window of DL·2 plus the size [273F] × [2740], clipped to the 32 × 32 map): AL, BL = the cell, ZF = 0 when found.</summary>
+    public static void FC35F(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; byte target = g.Al, dl = g.Dl;
+        byte cl = (byte)(dl + dl), ch = cl; cl = (byte)(cl + d[0x273f]); ch = (byte)(ch + d[0x2740]);
+        byte al = (byte)(U32(r, 8) >> 5), dh = (byte)(d[0x2740] >> 1);
+        al = (byte)(al - dh); bool borrow = al < dl; al = (byte)(al - dl);
+        if (borrow) { ch = (byte)(ch + al); al = 0; }
+        byte bl = (byte)(al + ch); borrow = bl < 32; bl = (byte)(bl - 32);
+        if (!borrow) ch = (byte)(ch - bl);
+        uint ebx = U32(r, 4) >> 5; bl = (byte)ebx; dh = (byte)(d[0x273f] >> 1);
+        bl = (byte)(bl - dh); borrow = bl < dl; bl = (byte)(bl - dl);
+        if (borrow) { cl = (byte)(cl + bl); bl = 0; }
+        byte bh = (byte)(bl + cl); borrow = bh < 32; bh = (byte)(bh - 32);
+        if (!borrow) cl = (byte)(cl - bh);
+        dl = bl; dh = al; uint axy = (ushort)(al * 32);
+        ebx = (ebx & 0xffff0000) | bl; ebx += axy; ebx = ebx * 4 + 0xe00000;
+        uint eax = 32; eax = (eax & ~0xffu) | (byte)(32 - cl); uint edi = eax * 4; byte keepCl = cl, keepDl = dl;
+        g.Edi = edi; g.Ecx = (g.Ecx & 0xffff0000) | ((uint)ch << 8) | cl; g.Edx = (g.Edx & 0xffff0000) | ((uint)dh << 8) | dl;
+        for (; ; )
+        {
+            cl = keepCl; dl = keepDl;
+            for (; ; )
+            {
+                uint tile = (ebx - 0xe00000) / 4; if (tile >= 1024) tile = 0; uint desc = w.TileDescriptor(tile); eax = desc & 7;
+                if ((byte)eax == target)
+                {
+                    g.Eax = dl; g.Ebx = (ebx & ~0xffu) | dh; byte before = dh; dh++; g.Zf = dh == 0; g.Sf = (dh & 0x80) != 0; g.Cf = false;
+                    g.Ecx = (g.Ecx & 0xffff0000) | ((uint)ch << 8) | cl; g.Edx = (g.Edx & 0xffff0000) | ((uint)dh << 8) | dl; _ = before; return;
+                }
+                ebx += 4; dl++; cl--;
+                if (cl == 0) break;
+            }
+            ebx += edi; dh++; ch--;
+            if (ch == 0) break;
+        }
+        g.Eax = eax; g.Ebx = ebx; g.Ecx = (g.Ecx & 0xffff0000) | ((uint)ch << 8) | cl; g.Edx = (g.Edx & 0xffff0000) | ((uint)dh << 8) | dl;
+        g.Zf = true; g.Cf = false; g.Sf = false;
+    }
 }
