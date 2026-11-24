@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 101433 | 6265 | 97 | 39087 | 44 |
+| LE:1 | 146882 | 101186 | 6265 | 97 | 39334 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 3072 | 100 | 0 | 2231 | 0 |
@@ -126,6 +126,8 @@
 | LE:1 `0x8C1E..0x8C47` | Unit at rest and facing the point (turn request state 1) | ported | [campaign-items.md](../docs/campaign-items.md); [visit.json](../tests/fixtures/visit.json); [verify_visit.py](../tools/verify_visit.py); [OriginalVisitChecks.cs](../tests/OriginalVisitChecks.cs) | only the call with the target's point (8C47 variant not ported) |
 | LE:1 `0x8C7C..0x8C89` | Move request to the referenced object (+22 = FF, state 3) | ported | [campaign-items.md](../docs/campaign-items.md); [visit.json](../tests/fixtures/visit.json); [verify_visit.py](../tools/verify_visit.py); [OriginalVisitChecks.cs](../tests/OriginalVisitChecks.cs) | the movement itself belongs to the unit action machine (adapter in the skirmish) |
 | LE:1 `0x8C98..0x8CA1` | Clear a pending request | ported | [campaign-items.md](../docs/campaign-items.md); [visit.json](../tests/fixtures/visit.json); [verify_visit.py](../tools/verify_visit.py); [OriginalVisitChecks.cs](../tests/OriginalVisitChecks.cs) | none known |
+| LE:1 `0x8CA1..0x8CF3` | Unit order helpers: move request (8CA1) and following the referenced object (8CBB) | ported | [unit-orders.json](../tests/fixtures/unit-orders.json); [verify_unit_orders.py](../tools/verify_unit_orders.py); [OriginalUnitOrdersChecks.cs](../tests/OriginalUnitOrdersChecks.cs) | 8120, D895 and DA7F are recorded stubs in the check; the skirmish keeps its own order handling (adapter) |
+| LE:1 `0x8D0B..0x8DB0` | Unit order helpers: state-5 request (8D0B), enemy scans (8D1A, 8D3E), decoding of the motion nibbles (8D89) | ported | [unit-orders.json](../tests/fixtures/unit-orders.json); [verify_unit_orders.py](../tools/verify_unit_orders.py); [OriginalUnitOrdersChecks.cs](../tests/OriginalUnitOrdersChecks.cs) | 8120, D895 and DA7F are recorded stubs in the check; the skirmish keeps its own order handling (adapter) |
 | LE:1 `0x8DB0..0x8E0E` | Choose visitor entry point | ported | [worker-delivery.md](../docs/worker-delivery.md); [worker-delivery.json](../tests/fixtures/worker-delivery.json) | Исходные DAT-смещения по размеру посетителя, u32-координаты и проверка границ; последующее движение отдельное. |
 | LE:1 `0x8E0E..0x8E3C` | Request a move to a random map cell | ported | [combat.md](../docs/combat.md); [combat.json](../tests/fixtures/combat.json) |  |
 | LE:1 `0x8F70..0x902F` | Approach and handoff state machine | partial | [worker-approach.md](../docs/worker-approach.md); [worker-approach.json](../tests/fixtures/worker-approach.json) | Все фазы проверены с валидатором лесопилки. Произвольные WRK-валидаторы, путь и вызывающий диспетчер не заменены полным исходным автоматом. |
