@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+"""Verify the building scripts of ARMY__01.WRK (A 0FE, B 24D, C 354, D 3ED: init AH=0, step AH=1, voice AH=2, visitor test AH=5, table AH=6) with Unicorn.
+FS:41 (C88C) is emulated as far as its front half: the state +14 and 7 picks the handler from the inline table, BL = +14 and 40h, BH = +19 for the state 0, EDX = the handler; the handler runs as
+original code, its flags are logged, then the script goes on after the table with the flags of the case. The services the scripts call (FS:85, 121, 197, 3D, 51, 49, 129, 99, 12D, CD, 19, 1D)
+are recorded stubs; FS:6D (the participant record in ECX, the template in EDI) and FS:71 (the template of an object in EDX) are stubs with fixed buffers."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import random
+import struct
+from unicorn.x86_const import *
+from analyze_executable import analyze
+from verify_combat import CombatOracle
+from forestry_source import source_constants
+
+ENTRIES = [('ARMY__01.WRK', 0xfe, 0x24d), ('ARMY__01.WRK', 0x24d, 0x354), ('ARMY__01.WRK', 0x354, 0x3ed), ('ARMY__01.WRK', 0x3ed, 0x4f0)]
+TABLES = [0x179, 0x2a1, 0x381, 0x441]      # the inline table after the call of FS:41 in the step of each building
+SLOTS = [0x85, 0x121, 0x197, 0x3d, 0x51, 0x49, 0x129, 0x99, 0x12d, 0xcd, 0x19, 0x1d]
+KEEP = {0x19, 0x1d}                        # services that leave the registers alone
+TMPL, PART, OTHER, TFLAGS = 0xc00, 0xd00, 0x900, 0xb00
+
+
+class BuildingOracle(CombatOracle):
+    RANGES = {'unit': ([(0x9e41, 0x9e69)], [(0, 0x4000)])}
+
+    def run(self, address):
+        self.cpu.mem_write(self.STACK + 0xf00, struct.pack('<I', self.STOP))
+        self.cpu.reg_write(UC_X86_REG_ESP, self.STACK + 0xf00); self.cpu.reg_write(UC_X86_REG_EFLAGS, 2)
+        self.cpu.emu_start(address, self.STOP, count=4000)
+
+
+def cases():
+    rng = random.Random(0x51)
+    out = []
+    for n in range(1500):
+        k = rng.randrange(len(ENTRIES))
+        ahs = {0: [0, 1, 1, 1, 1, 2, 5, 6], 1: [0, 1, 1, 1, 1, 2, 6], 2: [0, 1, 1, 1, 1], 3: [0, 1, 1, 1, 1, 2, 6]}[k]
+        out.append({'entry': k, 'ah': rng.choice(ahs), 'bl': rng.randrange(256), 'f14': rng.choice([0x80, 0x81, 0x40, 0x41, 0x42, 0, 1, 2, 3, 4, 5, 0x43, 0xc4, 0xc5, 0xc2]) if rng.random() < 0.9 else (rng.randrange(256) & ~7) | rng.randrange(6),
+                    'f0f': rng.choice([0, 0x10, 0x20, rng.randrange(256)]), 'f22': rng.choice([0xff, 0xff, 0, rng.randrange(256)]), 'f26': rng.randrange(256), 'f27': rng.randrange(256), 'f17': rng.choice([0, 0x100, 0x180, rng.randrange(1 << 16)]),
+                    'f19': rng.choice([0, 1, 0x10, 0x80, 0xff, rng.randrange(256)]), 'f1a': rng.choice([0, 1, 0x10, 0x7f, 0x80, 0xff, rng.randrange(256)]), 'f3': rng.randrange(8), 'f0': rng.randrange(256),
+                    'x': rng.randrange(1 << 16), 'y': rng.randrange(1 << 16), 't45': rng.choice([0, 0x10, 0x20, 0xff, rng.randrange(256)]), 't46': rng.choice([0, 0x10, 0x20, 0x7f, 0x80, rng.randrange(256)]), 't78': rng.choice([0, 5, 100, rng.randrange(1 << 32)]),
+                    'p2c': rng.choice([0, 3, 100, 0xffffffff, rng.randrange(1 << 32)]), 'o3': rng.choice([0, 1, 2, 3, rng.randrange(8)]), 'tflags': rng.choice([0, 0x20000, 0x20000, rng.randrange(1 << 32)]),
+                    'svc': [[rng.choice([0, 1, 1]), rng.randrange(1 << 32) if rng.random() < 0.4 else rng.randrange(256), rng.choice([0, 1, 0x40, rng.randrange(1 << 16)])] for _ in range(8)], 'zf': rng.choice([0, 1, 1]), 'seed': rng.randrange(256)})
+    return out
+
+
+def generate(game):
+    constants = source_constants(game); report, code = analyze(game)
+    o = BuildingOracle(code, report['fs_assignments'], constants)
+    slots = {x['fs_slot']: x['target_offset'] for x in report['fs_assignments']}
+    wrks = {m: (game / m).read_bytes() for m in {e[0] for e in ENTRIES}}
+    log = []; state = {}
+    def reg(r): return o.cpu.reg_read(r)
+    def rel(v):
+        if o.WRK <= v < o.WRK + 0x8000: return v - o.WRK
+        if o.POOL <= v < o.POOL + 0x2000: return v - o.POOL
+        return v
+    def setzf(z): o.cpu.reg_write(UC_X86_REG_EFLAGS, (reg(UC_X86_REG_EFLAGS) & ~0x40) | (0x40 if z else 0))
+    def service(slot):
+        def f():
+            log.append(b'S' + struct.pack('<HIIII', slot, reg(UC_X86_REG_EAX), reg(UC_X86_REG_EBX), rel(reg(UC_X86_REG_ECX)), rel(reg(UC_X86_REG_EDX))))
+            if slot not in KEEP:
+                zf, eax, ebx = state['svc'].pop(0) if state['svc'] else (1, 0, 0)
+                o.cpu.reg_write(UC_X86_REG_EAX, eax & 0xffffffff); o.cpu.reg_write(UC_X86_REG_EBX, ebx); setzf(zf)
+            o.ret()
+        return f
+    def svc6d():
+        log.append(b'P'); o.cpu.reg_write(UC_X86_REG_ECX, o.POOL + PART); o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + TMPL); o.ret()
+    def svc71():
+        log.append(b'T'); o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + TFLAGS); o.ret()
+    def dispatch():
+        esp = reg(UC_X86_REG_ESP); ret = struct.unpack('<I', bytes(o.cpu.mem_read(esp, 4)))[0]
+        esi = reg(UC_X86_REG_ESI); f14 = bytes(o.cpu.mem_read(esi + 0x14, 1))[0]
+        st = f14 & 7; bl = f14 & 0x40; bh = 0
+        if st == 0:
+            f = bytes(o.cpu.mem_read(esi + 0x0f, 1))[0] | 2; bh = bytes(o.cpu.mem_read(esi + 0x19, 1))[0]
+            if bh == bytes(o.cpu.mem_read(o.POOL + TMPL + 0x45, 1))[0]: f &= 0xfd
+            o.cpu.mem_write(esi + 0x0f, bytes([f]))
+        eb = (reg(UC_X86_REG_EBX) & 0xffff0000) | (bh << 8) | bl
+        handler = ret + struct.unpack('<i', bytes(o.cpu.mem_read(ret + 4 * st, 4)))[0]
+        o.cpu.mem_write(esp, struct.pack('<I', ret + 0x18)); o.cpu.mem_write(esp - 4, struct.pack('<I', o.CODE + 0x20))
+        o.cpu.reg_write(UC_X86_REG_ESP, esp - 4); o.cpu.reg_write(UC_X86_REG_EAX, st); o.cpu.reg_write(UC_X86_REG_EBX, eb); o.cpu.reg_write(UC_X86_REG_EDX, handler)
+        o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + TMPL); o.cpu.reg_write(UC_X86_REG_EIP, handler)
+        log.append(b'C' + struct.pack('<BIII', st, eb, rel(handler), rel(reg(UC_X86_REG_ECX))))
+    def handler_return():
+        log.append(b'H' + struct.pack('<B', o.zf())); setzf(state['zf']); o.ret()
+    o.stubs = {slots[s]: service(s) for s in SLOTS}
+    o.stubs[slots[0x6d]] = svc6d; o.stubs[slots[0x71]] = svc71; o.stubs[slots[0x41]] = dispatch; o.stubs[0x20] = handler_return
+    digest = hashlib.sha256(); all_cases = cases()
+    for case in all_cases:
+        log.clear(); o.prepare(32, 32); o.mode = 'unit'
+        module, a, e = ENTRIES[case['entry']]
+        o.cpu.mem_write(o.WRK, wrks[module]); o.cpu.ctl_flush_tb(); o.cpu.mem_write(o.POOL, bytes(0x2000)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x19eb, bytes([case['seed']]))
+        state['svc'] = [list(x) for x in case['svc']]; state['zf'] = case['zf']
+        r = bytearray(0x50); r[0] = case['f0']; r[3] = case['f3']; r[0x14] = case['f14']; r[0x0f] = case['f0f']; r[0x22] = case['f22']; r[0x26] = case['f26']; r[0x27] = case['f27']; struct.pack_into('<H', r, 0x17, case['f17']); r[0x19] = case['f19']; r[0x1a] = case['f1a']
+        struct.pack_into('<II', r, 4, case['x'], case['y'])
+        o.cpu.mem_write(o.POOL + 0x800, bytes(r))
+        t = bytearray(0x100); t[0x45] = case['t45']; t[0x46] = case['t46']; struct.pack_into('<I', t, 0x78, case['t78']); o.cpu.mem_write(o.POOL + TMPL, bytes(t))
+        p = bytearray(0xf5); struct.pack_into('<I', p, 0x2c, case['p2c']); o.cpu.mem_write(o.POOL + PART, bytes(p))
+        ob = bytearray(0x50); ob[3] = case['o3']; o.cpu.mem_write(o.POOL + OTHER, bytes(ob)); o.cpu.mem_write(o.POOL + TFLAGS + 0x40, struct.pack('<I', case['tflags']))
+        for q in (UC_X86_REG_ESI, UC_X86_REG_EDI): o.cpu.reg_write(q, o.POOL + 0x800)
+        for q in (UC_X86_REG_ECX, UC_X86_REG_EDX): o.cpu.reg_write(q, 0)
+        if case['ah'] == 5: o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + OTHER)
+        o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, case['bl'])
+        o.run(o.WRK + a)
+        out = bytes(o.cpu.mem_read(o.POOL + 0x800, 0x50)) + bytes(o.cpu.mem_read(o.POOL + PART + 0x28, 8)) + bytes(o.cpu.mem_read(0x19eb, 1)) + (struct.pack('<I', (reg(UC_X86_REG_EDX) - o.WRK) & 0xffffffff) if case['ah'] == 6 else b'') + (bytes([reg(UC_X86_REG_EAX) & 255]) if case['ah'] == 5 else b'') + b''.join(log)
+        if os.environ.get('DEBUG_CASE') == str(all_cases.index(case)): print('PYTHON', out.hex())
+        digest.update(out); case['sha256_prefix'] = hashlib.sha256(out).hexdigest()[:10]
+    return {'format_version': 1, 'source_sha256': {k: report['source_sha256'][k] for k in ['NORWIND.EXE']} | {m: hashlib.sha256(b).hexdigest() for m, b in wrks.items()}, 'random_values': constants['random_values'],
+            'entries': [list(e) for e in ENTRIES], 'cases': all_cases, 'results': {'unit': {'case_count': len(all_cases), 'sha256': digest.hexdigest()}}}
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--game', type=Path, required=True)
+    parser.add_argument('--fixture', type=Path, required=True)
+    args = parser.parse_args()
+    args.fixture.write_text(json.dumps(generate(args.game)) + '\n', encoding='utf-8')

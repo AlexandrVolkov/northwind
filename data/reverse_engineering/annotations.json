@@ -5384,6 +5384,54 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/unit-scripts.json", "tools/verify_unit_scripts.py", "tests/OriginalUnitScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS:4D, FS:D1, FS:1D, FS:DD, FS:E1 (unit step with its inline table), FS:19 and FS:1BB are recorded stubs in the check; the 16-byte table at 841 stays in the module"
+    },
+    {
+      "id": "army__01-building-fe",
+      "module": "ARMY__01.WRK",
+      "start": 254,
+      "end": 589,
+      "name": "Building A: init, step, voice, visitor test, table AH=6, six state handlers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half (state, EBX, handler); the services 85, 121, 197, 3D, 51, 49, 129, 99, 12D, CD, 19, 1D are recorded stubs; FS:6D and FS:71 are stubs with fixed buffers; the data tables returned by AH=6 stay in the module"
+    },
+    {
+      "id": "army__01-building-24d",
+      "module": "ARMY__01.WRK",
+      "start": 589,
+      "end": 852,
+      "name": "Building B: init, step, voice, table AH=6, six state handlers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half (state, EBX, handler); the services 85, 121, 197, 3D, 51, 49, 129, 99, 12D, CD, 19, 1D are recorded stubs; FS:6D and FS:71 are stubs with fixed buffers; the data tables returned by AH=6 stay in the module"
+    },
+    {
+      "id": "army__01-building-354",
+      "module": "ARMY__01.WRK",
+      "start": 852,
+      "end": 1005,
+      "name": "Building C: step with the participant counter, six state handlers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half (state, EBX, handler); the services 85, 121, 197, 3D, 51, 49, 129, 99, 12D, CD, 19, 1D are recorded stubs; FS:6D and FS:71 are stubs with fixed buffers; the data tables returned by AH=6 stay in the module"
+    },
+    {
+      "id": "army__01-building-3ed",
+      "module": "ARMY__01.WRK",
+      "start": 1005,
+      "end": 1264,
+      "name": "Building D: init, step, voice, table AH=6, six state handlers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half (state, EBX, handler); the services 85, 121, 197, 3D, 51, 49, 129, 99, 12D, CD, 19, 1D are recorded stubs; FS:6D and FS:71 are stubs with fixed buffers; the data tables returned by AH=6 stay in the module"
     }
   ]
 }
