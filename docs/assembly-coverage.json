@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "7e3b117b572d70e2144238080bed62e2089ec55dd6c529163b5b7bb6d1a95f1a",
+  "annotation_sha256": "646944a76a8d10ceff111a3e7c1b6ddbd93c0a4772ddd3093cc987b78c0222fa",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 6265,
-        "ported": 40254,
-        "unreviewed": 100266,
+        "ported": 41023,
+        "unreviewed": 99497,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -668,9 +668,11 @@
         {
           "start": 34687,
           "end": 34701,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-877f"
+          ]
         },
         {
           "start": 34701,
@@ -678,15 +680,63 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "le1-vanish-action-878d"
+            "le1-vanish-action-878d",
+            "le1-unit-actions-878d"
           ]
         },
         {
           "start": 34843,
+          "end": 35095,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-881b"
+          ]
+        },
+        {
+          "start": 35095,
+          "end": 35313,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8917"
+          ]
+        },
+        {
+          "start": 35313,
+          "end": 35412,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-89f1"
+          ]
+        },
+        {
+          "start": 35412,
+          "end": 35455,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8a54"
+          ]
+        },
+        {
+          "start": 35455,
+          "end": 35487,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8a7f"
+          ]
+        },
+        {
+          "start": 35487,
           "end": 35519,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8a9f"
+          ]
         },
         {
           "start": 35519,
@@ -694,7 +744,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "attack-target-alive"
+            "attack-target-alive",
+            "le1-unit-actions-8abf"
           ]
         },
         {
@@ -703,15 +754,36 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "attack-swing-gate"
+            "attack-swing-gate",
+            "le1-unit-actions-8af4"
           ]
         },
         {
           "start": 35599,
+          "end": 35639,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8b0f"
+          ]
+        },
+        {
+          "start": 35639,
+          "end": 35660,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8b37"
+          ]
+        },
+        {
+          "start": 35660,
           "end": 35678,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8b4c"
+          ]
         },
         {
           "start": 35678,

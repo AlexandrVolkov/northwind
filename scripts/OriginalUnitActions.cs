@@ -5,11 +5,12 @@ namespace Northwind;
 /// <summary>The registers and the flags of the unit action handlers (LE:1 8227..9210). The flag helpers follow the x86 semantics, the jumps of the handlers test them as the original does.</summary>
 public sealed class ActionRegs
 {
-    public uint Eax, Ebx, Ecx, Edx, Edi;
+    public uint Eax, Ebx, Ecx, Edx, Edi, Esi = 0x400800;
     public bool Zf, Cf, Sf, Of;
     public byte Al { get => (byte)Eax; set => Eax = (Eax & 0xffffff00) | value; }
     public byte Ah { get => (byte)(Eax >> 8); set => Eax = (Eax & 0xffff00ff) | ((uint)value << 8); }
     public byte Bl { get => (byte)Ebx; set => Ebx = (Ebx & 0xffffff00) | value; }
+    public byte Bh { get => (byte)(Ebx >> 8); set => Ebx = (Ebx & 0xffff00ff) | ((uint)value << 8); }
     public byte Cl { get => (byte)Ecx; set => Ecx = (Ecx & 0xffffff00) | value; }
     public byte Ch { get => (byte)(Ecx >> 8); set => Ecx = (Ecx & 0xffff00ff) | ((uint)value << 8); }
     public byte Dl { get => (byte)Edx; set => Edx = (Edx & 0xffffff00) | value; }
@@ -55,6 +56,10 @@ public interface IUnitActionWorld
     byte G1C9F { get; set; }
     byte G522 { get; }
     uint G50E { get; set; }
+    /// <summary>The participant record of the owner (the bytes at +0CDh are read by 89F1).</summary>
+    byte[] PartOf(byte owner);
+    /// <summary>The byte [1CCB + 16h · owner] written by 8A54.</summary>
+    void SetG1CCB(int index, byte value);
 }
 
 /// <summary>The unit action helpers 8E3C..902F of LE:1 (the target of the unit and the approach). Each method is one function of the original; the callees outside it go through
@@ -411,5 +416,225 @@ public static class OriginalUnitActions
         w.Call(0x8f70, g);
         if (g.Zf) { Xor0(g); return; }
         NotTest40(w, g);
+    }
+
+    /// <summary>(DAT[4A] + DAT[4B]) · 8 and (DAT[4F] + DAT[50] + DAT[51] + DAT[52]) · 4 as bytes.</summary>
+    private static void Frames(byte[] t, out byte first, out byte second)
+    {
+        first = (byte)((byte)(t[0x4a] + t[0x4b]) << 3); second = (byte)((byte)(t[0x4f] + t[0x50] + t[0x51] + t[0x52]) << 2);
+    }
+
+    /// <summary>877F: the action of the unit that is turned (C0F6 with AL = 13h).</summary>
+    public static void F877F(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Al = 0x13; w.Call(0xc0f6, g); g.Al = (byte)~g.Bl; g.Logic((uint)(g.Al & 0x40), 8); }
+
+    /// <summary>878D: the standing frame request of the shooter (8D0B).</summary>
+    public static void F878D(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        w.Call(0x8d89, g); g.Test(g.Al, g.Al, 8);
+        if (g.Zf)
+        {
+            g.Cmp(g.Dl, 0, 8); bool stand = false;
+            if (g.Zf) { g.Cmp(g.Dh, g.Dl, 8); stand = g.Zf; }
+            if (!stand) { w.Call(0x8c98, g); OrFF(g); return; }
+            r[0x25] = 0x24; var t = w.Template; Frames(t, out byte f1, out byte f2);
+            g.Al = f1; g.Bl = f2; g.Al = (byte)(g.Al + g.Bl); g.Ah = (byte)(t[0x78] - 1); g.Ah = (byte)(g.Ah + g.Al);
+            g.Cmp(r[0x32], 0, 8);
+            if (!g.Zf) { r[0x15] = 2; byte x = g.Ah; g.Ah = g.Al; g.Al = x; }
+            else r[0x15] = 1;
+            w.Call(0x8d0b, g); OrFF(g); return;
+        }
+        g.Cmp(g.Al, 1, 8);
+        if (g.Zf)
+        {
+            g.Cmp(g.Dh, 5, 8);
+            if (g.Zf) { OrFF(g); return; }
+            r[0x32] = 0xff; PutW(r, 0x17, (ushort)(U16(r, 0x17) | 0x200)); Xor0(g); return;
+        }
+        g.Cmp(g.Al, 2, 8);
+        if (!g.Zf) { Xor0(g); return; }
+        g.Cmp(g.Dl, 5, 8);
+        if (!g.Zf) { OrFF(g); return; }
+        r[0x32] = 0; r[0x20] = 0xff; Xor0(g);
+    }
+
+    /// <summary>8854 of 881B: the standing frame request of the worker.</summary>
+    private static void Tail8854(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        r[0x25] = 0x24; Frames(w.Template, out byte f1, out byte f2);
+        g.Bl = f1; g.Ebx = (g.Ebx & 0xffff00ff) | ((uint)f2 << 8); g.Bl = (byte)(g.Bl + f2);
+        g.Al = (byte)(g.Al + g.Bl); g.Ah = (byte)(g.Ah + g.Bl);
+        w.Call(0x8d0b, g); OrFF(g);
+    }
+
+    /// <summary>881B: the action of the idler: the standing request, and (AL = 1) a wander to a random place near it (10AD2).</summary>
+    public static void F881B(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        w.Call(0x8d89, g); g.Test(g.Al, g.Al, 8);
+        if (g.Zf)
+        {
+            g.Cmp(g.Dl, 0, 8); bool stand = false;
+            if (g.Zf) { g.Cmp(g.Dh, g.Dl, 8); stand = g.Zf; }
+            if (!stand) { w.Call(0x8c98, g); OrFF(g); return; }
+            r[0x15] = 1; g.Al = 0; g.Ah = (byte)(w.Template[0x78] - 1);
+            Tail8854(w, g, r); return;
+        }
+        g.Cmp(g.Al, 1, 8);
+        if (g.Zf)
+        {
+            g.Cmp(g.Dh, 5, 8);
+            if (g.Zf) { OrFF(g); return; }
+            PutW(r, 0x17, (ushort)(U16(r, 0x17) | 0x200)); g.Eax = 0; w.Call(0x43b0, g);
+            g.Ecx = U32(r, 4) >> 5; g.Eax = U32(r, 8) >> 5; g.Ch = (byte)g.Eax; g.Edx = 0xa0a; w.Call(0x219c3, g);
+            g.Edx -= g.Ecx; g.Edx += 0x101;
+            w.Call(0x9e41, g); g.Eax = (g.Eax & 0xffff0000) | (ushort)(g.Al * g.Dl); g.Cl = (byte)(g.Cl + g.Ah);
+            w.Call(0x9e55, g); g.Eax = (g.Eax & 0xffff0000) | (ushort)(g.Al * g.Dh); g.Ch = (byte)(g.Ch + g.Ah);
+            g.Al = r[0xe]; g.Ah = r[0]; g.Bl = (byte)(r[0xd] & 3); g.Edx = g.Ch; g.Ecx = g.Cl; g.Edx <<= 5; g.Ecx <<= 5;
+            w.Call(0x10ad2, g);
+            if (g.Zf) { Put(r, 4, g.Ecx); Put(r, 8, g.Edx); }
+            g.Eax = g.Esi - w.PoolBase; w.Call(0x43b0, g); r[0x15] = 2; g.Al = (byte)(w.Template[0x78] - 1); g.Ah = 0;
+            Tail8854(w, g, r); return;
+        }
+        g.Cmp(g.Al, 2, 8);
+        if (!g.Zf) { Xor0(g); return; }
+        g.Cmp(g.Dl, 5, 8);
+        if (g.Zf) { OrFF(g); return; }
+        Xor0(g);
+    }
+
+    /// <summary>8917: the action of the building that produces creatures (the herd of a lair): its health, the birth of the young, the take-over of a waiting worker.</summary>
+    public static void F8917(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Cmp(r[0x19], 0, 8);
+        if (g.Jle) return;
+        var t = w.Template; g.Cmp(r[0x31], 0xff, 8);
+        if (g.Zf)
+        {
+            r[0x14] = 0; g.Al = (byte)(r[0x2d] & 0xf); g.Cmp(g.Al, 0, 8);
+            if (!g.Zf) { w.Call(0x8c98, g); return; }
+            bool bit = (U32(r, 0x17) & 0x40) != 0; Put(r, 0x17, U32(r, 0x17) & ~0x40u); g.Cf = bit;
+            if (!g.Cf) return;
+            w.Call(0xc4cd, g);
+            if (g.Zf) return;
+            g.Test(U32(w.Template, 0x40), 0x1000, 32);
+            if (g.Zf) return;
+            uint saved = g.Edi; g.Edi -= w.PoolBase; Put(r, 0x1c, g.Edi); w.Call(0xcaee, g); g.Edi = saved;
+            if (!g.Zf) return;
+            g.Eax = 0; var o = w.ObjectAt(g.Edi); o[0x19] = 0; Put(r, 0x1c, 0); r[0x14] = 0; r[0x15] = 0; g.Logic(0, 32);
+            g.Al = o[0]; r[0x32] = g.Al; g.Al = o[0xe]; r[0x31] = g.Al; g.Al = o[0x16]; r[0x16] = g.Al; g.Al = t[0x45]; r[0x19] = g.Al; g.Al = o[3];
+            uint esi = g.Esi; w.Call(0xd1ba, g); g.Esi = esi;
+            return;
+        }
+        g.Al = (byte)(t[0x45] >> 1); g.Cmp(r[0x19], g.Al, 8);
+        if (g.Sf == g.Of) return;   // JGE
+        r[0x19] = (byte)(r[0x19] + g.Al); g.Al = r[0x31]; g.Ah = r[0x32]; w.Call(0x9064, g);
+        if (!g.Zf)
+        {
+            byte x = g.Bh; g.Bh = g.Bl; g.Bl = x; g.Bl = (byte)(g.Bl + 4); g.Bl = (byte)(g.Bl & 7); uint pushed = g.Ebx;
+            g.Bl = g.Al; g.Al = g.Ah; g.Ah = r[3]; w.Call(0xa758, g); g.Eax = pushed;
+            if (g.Zf) w.ObjectAt(g.Edi)[0x19] = 0;
+        }
+        r[0x31] = 0xff; g.Al = 0; r[0x16] = 0; r[0x0f] = 0; r[0x1b] = 0; r[0x14] = 0; r[0x15] = 0; g.Logic(0, 8);
+    }
+
+    /// <summary>89F1: every 32 updates the unit asks the army (1ECA0, 22E46, BE2E) and marks +0F bit 10h; bit 20h when the participant has any of its 20 slots (+0CDh) in use.</summary>
+    public static void F89F1(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Test(r[0x2e], 0x1f, 8);
+        if (!g.Zf) return;
+        r[0x0f] &= 0xcf; g.Al = r[3]; g.Ecx = 0xf08; g.Edx = 0x508; w.Call(0x1eca0, g);
+        if (g.Zf)
+        {
+            g.Al = r[3]; g.Ecx = 0xf08; g.Edx = 0x508; w.Call(0x22e46, g);
+            if (!g.Zf) { w.Call(0xbe2e, g); if (g.Zf) r[0x0f] |= 0x10; }
+        }
+        g.Eax = 0xf5; g.Eax = (g.Eax & 0xffff0000) | (ushort)(0xf5 * r[3]); g.Ecx = g.Eax + 0x97a; g.Eax = 0;
+        var part = w.PartOf(r[3]);
+        for (; ; )
+        {
+            g.Cmp(part[0xcd + g.Eax], 0, 8);
+            if (!g.Zf) { r[0x0f] |= 0x20; g.Logic(r[0x0f], 8); return; }
+            g.Eax++; g.Cmp(g.Eax, 0x14, 32);
+            if (g.Zf) return;
+        }
+    }
+
+    /// <summary>8A54: the unit has left (12588), its slot [1CCB + 16h · owner] is cleared and 4473 runs.</summary>
+    public static void F8A54(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = U32(r, 8) >> 5; g.Ecx = U32(r, 4) >> 5; g.Ch = (byte)g.Eax; g.Ah = r[3]; w.Call(0x12588, g);
+        g.Eax = 0x16; g.Eax = (g.Eax & 0xffff0000) | (ushort)(0x16 * r[3]); g.Cf = g.Of = (g.Eax & 0xff00) != 0; w.SetG1CCB((int)g.Eax, 0xff); w.Call(0x4473, g);
+    }
+
+    /// <summary>8A7F: the target of the unit asks D182 (AH = 5) whether it is in range of the unit; EDI the target.</summary>
+    public static void F8A7F(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = U32(r, 0x1c); g.Test(g.Eax, g.Eax, 32);
+        if (g.Zf) { OrFF(g); return; }
+        uint saved = g.Esi; g.Edx = g.Esi; g.Esi = w.PoolBase + g.Eax; g.Ah = 5; w.Call(0xd182, g);
+        g.Edi = g.Esi; g.Esi = saved;
+    }
+
+    /// <summary>8A9F: the unit forgets its target (+1C = 0) when the target is no longer alive (health at most DAT[46]).</summary>
+    public static void F8A9F(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Edi = U32(r, 0x1c); g.Test(g.Edi, g.Edi, 32);
+        if (g.Zf) return;
+        g.Edi += w.PoolBase; w.Call(0x68bd, g); g.Al = w.ObjectAt(g.Edi)[0x19]; g.Cmp(g.Al, w.Template[0x46], 8);
+        if (g.Jg) return;
+        g.Eax = 0; g.Logic(0, 32); Put(r, 0x1c, 0);
+    }
+
+    /// <summary>8ABF: as 8A9F, and a unit that loses its target gains experience +16 (DAT[76] / 4, up to 7F).</summary>
+    public static void F8ABF(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Edi = U32(r, 0x1c); g.Test(g.Edi, g.Edi, 32);
+        if (g.Zf) return;
+        g.Edi += w.PoolBase; w.Call(0x68bd, g); g.Al = w.ObjectAt(g.Edi)[0x19]; g.Cmp(g.Al, w.Template[0x46], 8);
+        if (g.Jg) return;
+        g.Cmp(r[0x16], 0x40, 8);
+        if (!g.Jae)
+        {
+            g.Al = (byte)(w.Template[0x76] >> 2); r[0x16] = (byte)(r[0x16] + g.Al); g.Logic(r[0x16], 8);
+            if (g.Sf) r[0x16] = 0x7f;
+        }
+        g.Eax = 0; g.Logic(0, 32); Put(r, 0x1c, 0);
+    }
+
+    /// <summary>8AF4: the swing delay counter +2F counts up to DAT[75] minus the experience's share; ZF = ready.</summary>
+    public static void F8AF4(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = 0x400c00; g.Al = w.Template[0x75]; g.Bl = g.Al;
+        g.Eax = (g.Eax & 0xffff0000) | (ushort)(g.Al * r[0x16]); g.Bl = (byte)(g.Bl - g.Ah);
+        g.Cmp(r[0x2f], g.Bl, 8);
+        if (!g.Jae) { r[0x2f]++; g.Zf = r[0x2f] == 0; g.Sf = (r[0x2f] & 0x80) != 0; g.Of = r[0x2f] == 0x80; return; }
+        Xor0(g);
+    }
+
+    /// <summary>8B0F: asks A38A for a place when the unit rests (+2D low nibble 0) and requests the move to it.</summary>
+    public static void F8B0F(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Al = (byte)(r[0x2d] & 0xf); g.Cmp(g.Al, 0, 8);
+        if (!g.Zf) return;
+        w.Call(0xa38a, g);
+        if (!g.Zf) return;
+        PutW(r, 0x22, (ushort)g.Eax); r[0x2d] &= 0xf; g.Cmp(r[0x2d], 2, 8);
+        if (g.Zf) w.Call(0x8120, g);
+        r[0x2d] |= 0x20; g.Logic(r[0x2d], 8);
+    }
+
+    /// <summary>8B37: a unit with +17 bit 20h (told to move) takes the place (8B0F).</summary>
+    public static void F8B37(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Test(U16(r, 0x17), 0x20, 16);
+        if (g.Zf) return;
+        PutW(r, 0x17, (ushort)(U16(r, 0x17) & 0xffdf)); w.Call(0x8b0f, g); OrFF(g);
+    }
+
+    /// <summary>8B4C: every 128 updates B5AB with the template.</summary>
+    public static void F8B4C(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Test(r[0x2e], 0x7f, 8);
+        if (!g.Zf) return;
+        w.Call(0xb5ab, g);
     }
 }
