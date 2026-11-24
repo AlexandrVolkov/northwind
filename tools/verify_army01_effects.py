@@ -13,7 +13,8 @@ from analyze_executable import analyze
 from verify_combat import CombatOracle
 from forestry_source import source_constants
 
-ENTRIES = [('ARMY__01.WRK', a, e) for a, e in [(0x10ed, 0x114c), (0x114c, 0x117b), (0x117b, 0x11a2), (0x11a2, 0x11ac), (0x11ac, 0x11b6), (0x11b6, 0x11c0), (0x11c0, 0x11ca), (0x11ca, 0x120e), (0x120e, 0x1258), (0x1258, 0x12e5), (0x12e5, 0x1357)]]
+ENTRIES = [('ARMY__01.WRK', a, e) for a, e in [(0x10ed, 0x114c), (0x114c, 0x117b), (0x117b, 0x11a2), (0x11a2, 0x11ac), (0x11ac, 0x11b6), (0x11b6, 0x11c0), (0x11c0, 0x11ca), (0x11ca, 0x120e), (0x120e, 0x1258), (0x1258, 0x12e5), (0x12e5, 0x1357)]] + \
+    [('ARMY__02.WRK', a, e) for a, e in [(0x16dd, 0x170c), (0x170c, 0x1775), (0x1775, 0x1795), (0x1795, 0x1828), (0x1828, 0x18b8), (0x18b8, 0x18fc), (0x18fc, 0x1989), (0x1989, 0x1a06), (0x1a06, 0x1a65), (0x1a65, 0x1a8c), (0x1a8c, 0x1a96), (0x1a96, 0x1aa0), (0x1aa0, 0x1aaa), (0x1aaa, 0x1ab4), (0x1ab4, 0x1abe), (0x1abe, 0x1ac8), (0x1ac8, 0x1b12)]]
 PARENT, FOUND, TEMPLATE, STATE = 0xa00, 0xb00, 0xc00, 0xd00
 
 
@@ -31,7 +32,7 @@ def cases():
     out = []
     for n in range(1500):
         k = rng.randrange(len(ENTRIES))
-        out.append({'entry': k, 'ah': rng.choice([0, 1, 1, 1]), 'f0': rng.randrange(256), 'f2': rng.randrange(256), 'f3': rng.randrange(1 << 16), 'f5': rng.randrange(256), 'f6': rng.randrange(256), 'x': rng.randrange(1 << 20), 'y': rng.randrange(1 << 20),
+        out.append({'entry': k, 'ah': rng.choice([0, 1, 1, 1]), 'f0': rng.randrange(256), 'f2': rng.randrange(256), 'f3': rng.randrange(1 << 16), 'f5': rng.choice([0, 0, 1, rng.randrange(256)]), 'f6': rng.randrange(256), 'x': rng.randrange(1 << 20), 'y': rng.randrange(1 << 20),
                     'f16': rng.choice([0, 1, 2, 9, 0xa, 0xff, rng.randrange(256)]), 'f17': rng.choice([0, 1, 2, 4, 5, 7, 9, rng.randrange(256)]), 'f18': rng.choice([0, 1, 2, 0x258, rng.randrange(1 << 20)]), 'f1c': rng.randrange(1 << 20),
                     'f12': rng.choice([0, 0x200, 0xb00, 0xb00, 0xb00, 0xb00]), 'p1': rng.randrange(1 << 16), 'p3': rng.randrange(256), 'p17': rng.randrange(1 << 16), 'p25': rng.randrange(256),
                     'o17': rng.choice([0, 0x80, 0x180, 0x100, rng.randrange(1 << 16)]), 'o19': rng.choice([0, 1, 5, 0x80, 0xff, rng.randrange(256)]), 'o1': rng.choice([0, 1, 100, 0xffff, rng.randrange(1 << 16)]),
@@ -57,7 +58,8 @@ def generate(game):
         return f
     def svc71():
         log.append(b'T' + struct.pack('<I', (reg(UC_X86_REG_EDI) - o.POOL) & 0xffffffff)); o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + TEMPLATE); o.ret()
-    o.stubs = {slots[s]: service(s) for s in (0xa5, 0xa9, 0xad)}; o.stubs[slots[0x71]] = svc71
+    def sound(): log.append(b'Z' + struct.pack('<I', reg(UC_X86_REG_EAX))); o.ret()
+    o.stubs = {slots[s]: service(s) for s in (0xa5, 0xa9, 0xad)}; o.stubs[slots[0x35]] = sound; o.stubs[slots[0x71]] = svc71
     digest = hashlib.sha256(); all_cases = cases()
     for case in all_cases:
         log.clear(); o.prepare(32, 32); o.mode = 'unit'

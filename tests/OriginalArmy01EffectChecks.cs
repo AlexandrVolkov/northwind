@@ -21,6 +21,7 @@ public partial class TestRunner
         public byte[] ObjectAt(uint rel) => rel == 0xb00 ? Found : rel == 0xa00 ? Parent : new byte[0x50];
         public byte[] Template71(uint rel) { log.Add((byte)'T'); log.AddRange(BitConverter.GetBytes(rel)); return Template; }
         public byte StateByte() => Wind;
+        public void Sound35(uint eax) { log.Add((byte)'Z'); log.AddRange(BitConverter.GetBytes(eax)); }
     }
 
     /// <summary>Replays tests/fixtures/army01-effects.json (tools/verify_army01_effects.py): the effect scripts of ARMY__01.WRK 10ED..1357.</summary>
@@ -42,7 +43,7 @@ public partial class TestRunner
             BitConverter.GetBytes((ushort)c.GetProperty("t48").GetInt32()).CopyTo(world.Template, 0x48); world.Template[0x4a] = (byte)c.GetProperty("t4a").GetInt32(); world.Template[0x4b] = (byte)c.GetProperty("t4b").GetInt32(); world.Wind = (byte)c.GetProperty("wind").GetInt32();
             var parent = new byte[0x40]; BitConverter.GetBytes((ushort)c.GetProperty("p1").GetInt32()).CopyTo(parent, 1); parent[3] = (byte)c.GetProperty("p3").GetInt32(); BitConverter.GetBytes((ushort)c.GetProperty("p17").GetInt32()).CopyTo(parent, 0x17); parent[0x25] = (byte)c.GetProperty("p25").GetInt32();
             int ah = c.GetProperty("ah").GetInt32(), k = c.GetProperty("entry").GetInt32(); seen.Add(k); if (ah == 1) steps++;
-            world.Parent = parent; OriginalArmy01Effects.Run(world, r, ah, k, parent, 0xa00);
+            world.Parent = parent; if (k >= 11) OriginalArmy02Effects.Run(world, r, ah, k - 11, parent, 0xa00); else OriginalArmy01Effects.Run(world, r, ah, k, parent, 0xa00);
             byte[] output = [.. r, .. world.Found, .. log];
             digest.AppendData(output);
             if (Convert.ToHexStringLower(SHA256.HashData(output))[..10] != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; if (only == count) GD.Print("CSHARP " + Convert.ToHexStringLower(output)); }
@@ -50,7 +51,7 @@ public partial class TestRunner
         }
         GD.Print($"ARMY__01 effects: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("unit");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 11 && steps > 500, $"ARMY__01 effect reference coverage ({count} cases, {steps} steps)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 28 && steps > 500, $"ARMY__01 effect reference coverage ({count} cases, {steps} steps)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "ARMY__01.WRK effect scripts match original x86");
     }
 }

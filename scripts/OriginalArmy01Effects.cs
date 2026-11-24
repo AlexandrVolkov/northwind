@@ -13,6 +13,8 @@ public interface IArmy01EffectWorld
     byte[] Template71(uint rel);
     /// <summary>The byte at +8 of the structure fs:[0Ch].</summary>
     byte StateByte();
+    /// <summary>FS:35: a sound (EAX).</summary>
+    void Sound35(uint eax);
 }
 
 /// <summary>The effect scripts of ARMY__01.WRK from 10ED: the dust and the fragments (kinds 9, 0Ah, 16h..1Ah), two frame animations (1Bh, 1Ch), the mark that follows the target (1Dh), which turns into the
@@ -52,12 +54,12 @@ public static class OriginalArmy01Effects
         }
     }
 
-    private static ushort Word(byte[] a, int i) => BitConverter.ToUInt16(a, i);
-    private static void Word(byte[] a, int i, ushort v) => BitConverter.GetBytes(v).CopyTo(a, i);
-    private static uint U32(byte[] a, int i) => BitConverter.ToUInt32(a, i);
-    private static void Put(byte[] a, int i, uint v) => BitConverter.GetBytes(v).CopyTo(a, i);
+    internal static ushort Word(byte[] a, int i) => BitConverter.ToUInt16(a, i);
+    internal static void Word(byte[] a, int i, ushort v) => BitConverter.GetBytes(v).CopyTo(a, i);
+    internal static uint U32(byte[] a, int i) => BitConverter.ToUInt32(a, i);
+    internal static void Put(byte[] a, int i, uint v) => BitConverter.GetBytes(v).CopyTo(a, i);
 
-    private static void Animate(byte[] r)
+    internal static void Animate(byte[] r)
     {
         if (r[0x17] != 0)
         {
