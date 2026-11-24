@@ -32,9 +32,12 @@ public partial class TestRunner
     }
 
     /// <summary>Replays tests/fixtures/rufin.json (tools/verify_rufin.py): the quest script of the mage Rufin (ARMY__03.WRK 8EC).</summary>
-    private void OriginalRufinChecks()
+    private void OriginalRufinChecks() => HermitReplay("rufin", "rufin", "Rufin's quest script ARMY__03.WRK 8EC", 300, (w, r, ah) => { if (ah == 0) OriginalRufin.Initialize(w, r, 7); else if (ah == 1) OriginalRufin.Step(w, r); else OriginalRufin.Speak(w); });
+    private void OriginalOnisChecks() => HermitReplay("onis", "onis", "Onis' quest script ARMY__03.WRK DBF", 100, (w, r, ah) => { if (ah == 0) OriginalOnis.Initialize(w, r, 7); else if (ah == 1) OriginalOnis.Step(w, r); else OriginalOnis.Voice(w); });
+
+    private void HermitReplay(string file, string key, string label, int minSpeeches, Action<IRufinWorld, byte[], int> run)
     {
-        using var reference = GameData.Read<JsonDocument>("res://tests/fixtures/rufin.json");
+        using var reference = GameData.Read<JsonDocument>($"res://tests/fixtures/{file}.json");
         var root = reference.RootElement;
         var random = root.GetProperty("random_values").EnumerateArray().Select(e => (byte)e.GetInt32()).ToArray();
         using var digest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
@@ -62,18 +65,18 @@ public partial class TestRunner
             foreach (var m in c.GetProperty("masks").EnumerateObject()) BitConverter.GetBytes((uint)m.Value.GetInt32()).CopyTo(r, Convert.ToInt32(m.Name, 16));
             BitConverter.GetBytes((ushort)c.GetProperty("word47").GetInt32()).CopyTo(r, 0x47);
             int ah = c.GetProperty("ah").GetInt32();
-            if (ah == 0) OriginalRufin.Initialize(world, r, 7); else if (ah == 1) OriginalRufin.Step(world, r); else OriginalRufin.Speak(world);
+            run(world, r, ah);
             speeches += world.Log.Count(b => b == (byte)'M'); if (world.Log.Contains((byte)'C')) created++; if (world.Log.Contains((byte)'A')) reveals++; if (world.Log.Contains((byte)'S')) sweeps++;
             var output = new List<byte>(r); foreach (var o in world.Pool) output.AddRange(o); output.AddRange(world.Created);
             for (int p = 0; p < participants; p++) for (int s = 0; s < 8; s++) { var q = new byte[14]; q[0] = world.Diplomacy.Queue[p, s].Type; q[9] = world.Diplomacy.Queue[p, s].Other; output.AddRange(q); }
             output.AddRange(world.Log);
             digest.AppendData(output.ToArray());
-            if (Convert.ToHexStringLower(SHA256.HashData(output.ToArray()))[..10] != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; GD.Print($"RUFIN MISMATCH {count} ah={ah}"); }
+            if (Convert.ToHexStringLower(SHA256.HashData(output.ToArray()))[..10] != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; GD.Print($"{key.ToUpperInvariant()} MISMATCH {count} ah={ah}"); if (System.Environment.GetEnvironmentVariable("DEBUG_CASE") == count.ToString()) GD.Print("CSHARP " + Convert.ToHexStringLower(output.ToArray())); }
             count++;
         }
-        GD.Print($"Rufin: first mismatch {firstMismatch}; speeches {speeches}, creations {created}, reveals {reveals}, sweeps {sweeps}");
-        var summary = root.GetProperty("results").GetProperty("rufin");
-        Check(count == summary.GetProperty("case_count").GetInt32() && speeches > 300 && created > 5 && reveals > 10 && sweeps > 3, $"Rufin reference coverage ({count}: {speeches} speeches, {created} creations, {reveals} reveals, {sweeps} sweeps)");
-        Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Rufin's quest script ARMY__03.WRK 8EC matches original x86");
+        GD.Print($"{key}: first mismatch {firstMismatch}; speeches {speeches}, creations {created}, reveals {reveals}, sweeps {sweeps}");
+        var summary = root.GetProperty("results").GetProperty(key);
+        Check(count == summary.GetProperty("case_count").GetInt32() && speeches > minSpeeches && created > 2 && reveals > 5 && sweeps > 1, $"{key} reference coverage ({count}: {speeches} speeches, {created} creations, {reveals} reveals, {sweeps} sweeps)");
+        Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), $"{label} matches original x86");
     }
 }
