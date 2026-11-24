@@ -5804,6 +5804,138 @@
       "evidence": ["docs/object-allocator.md", "tests/fixtures/object-alloc.json", "tools/verify_object_alloc.py", "tests/OriginalObjectAllocChecks.cs"],
       "implementation": ["scripts/OriginalObjectAllocator.cs"],
       "limitations": "The call of the template script is a recorded stub; the skirmish still creates objects with its own code"
+    },
+    {
+      "id": "le1-unit-actions-8227",
+      "module": "LE:1",
+      "start": 33319,
+      "end": 33395,
+      "name": "FS:E1 unit step dispatcher: six handlers by +14, the next state",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function (8D89, 8ABF, 8AF4, 8B37, ...) are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-8273",
+      "module": "LE:1",
+      "start": 33395,
+      "end": 33475,
+      "name": "Unit action 8273: walking to a point, strike answer",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function (8D89, 8ABF, 8AF4, 8B37, ...) are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-82c3",
+      "module": "LE:1",
+      "start": 33475,
+      "end": 33599,
+      "name": "Unit action 82C3: idle search for an enemy, follow",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function (8D89, 8ABF, 8AF4, 8B37, ...) are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-833f",
+      "module": "LE:1",
+      "start": 33599,
+      "end": 33695,
+      "name": "Unit action 833F: 82C3 and the hand-off check",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function (8D89, 8ABF, 8AF4, 8B37, ...) are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-839f",
+      "module": "LE:1",
+      "start": 33695,
+      "end": 33753,
+      "name": "Unit action 839F: engagement and reach",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function (8D89, 8ABF, 8AF4, 8B37, ...) are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-83d9",
+      "module": "LE:1",
+      "start": 33753,
+      "end": 33854,
+      "name": "Unit action 83D9: 839F and the abandonment of a foreign target",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function (8D89, 8ABF, 8AF4, 8B37, ...) are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-843e",
+      "module": "LE:1",
+      "start": 33854,
+      "end": 33962,
+      "name": "Unit action 843E: combat action (reach, swing, engagement, approach)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function (8D89, 8ABF, 8AF4, 8B37, ...) are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-8e3c",
+      "module": "LE:1",
+      "start": 36412,
+      "end": 36481,
+      "name": "Target selection 8E3C and engagement 8E56",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function (8D89, 8ABF, 8AF4, 8B37, ...) are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-8e81",
+      "module": "LE:1",
+      "start": 36481,
+      "end": 36551,
+      "name": "Idle enemy search of the guard 8E81",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function (8D89, 8ABF, 8AF4, 8B37, ...) are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-8ec7",
+      "module": "LE:1",
+      "start": 36551,
+      "end": 36720,
+      "name": "Reach test 8EC7 of the attack handler",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function (8D89, 8ABF, 8AF4, 8B37, ...) are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
+    },
+    {
+      "id": "le1-unit-actions-8f70",
+      "module": "LE:1",
+      "start": 36720,
+      "end": 36911,
+      "name": "Approach and hand-off state machine 8F70",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The callees outside the function (8D89, 8ABF, 8AF4, 8B37, ...) are recorded stubs in the check; the skirmish does not drive its units with these handlers yet"
     }
   ]
 }
