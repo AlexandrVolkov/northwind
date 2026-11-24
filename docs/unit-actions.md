@@ -81,3 +81,7 @@
 ## 11CC9 (FS:18B)
 
 `FS18B` counts the campaign areas (records of 841h bytes from [3E87], [6C9] of them, +0 bit 0 set) in which every one of the [6C6] entries (84h bytes from +1) is settled for the player AL: value +17 not above 7CFh, or flag +59, or the entry is the player, or its relation byte (+1 + AL) is 3; a relation other than 3/4 on an entry that does not pass the first tests excludes the area. AL = the count. The check also found that the participant index of DA45 must be below 8 (the oracle read past the table). Verified against x86.
+
+## 7A03
+
+`F7A03` turns the two points (DS:274E/274F and DS:2791/2792) into a direction 0..7 with the angle function 6996: (angle + 10h) >> 5 in AL; EBX, ECX, EDX and the upper bytes of EAX are kept. Verified against x86. (The annotation of FS:18B was corrected to end at 11D2E.)

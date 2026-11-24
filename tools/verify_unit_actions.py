@@ -92,6 +92,7 @@ FUNCS = {
     'fs187': (0x10ad2, 0x10b75, [0x9e41, 0x9e55, 0xac63]),
     'fs16b': (0x9064, 0x90e9, [0x9e41, 0xac63]),
     'fs18b': (0x11cc9, 0x11d2e, []),
+    'f7a03': (0x7a03, 0x7a36, [0x6996]),
     'fc439': (0xc439, 0xc4cd, []),
     'f84aa': (0x84aa, 0x8659, [0x8d89, 0x8c98, 0x8ca1, 0xc331, 0x8c47, 0x8af4, 0x8c89, 0xcfac, 0x123d3, 0xd101, 0x8b0f, 0xc35f]),
 }
@@ -258,6 +259,8 @@ def generate(game, names):
             tb = bytearray(o.cpu.mem_read(o.POOL + TMPL, 0x100)); tb[0x46] = 5; tb[0x74] = 0xf; tb[0x40] &= ~0x20 & 0xff; tb[0x41] &= 0x7f; o.cpu.mem_write(o.POOL + TMPL, bytes(tb))
         if case['fn'] in ('fs187', 'fs16b'): o.cpu.reg_write(UC_X86_REG_EAX, (case['regs'][0] & 0xffff0000) | ((((case['regs'][0] >> 8) & 0xff) % 3) << 8))
         o.cpu.mem_write(0x6c6, bytes(1)); o.cpu.mem_write(0x6c9, bytes(1)); o.cpu.mem_write(0x3e87, bytes(4))
+        if case['fn'] == 'f7a03':
+            q = prng(case['ds'] + 13, 8); o.cpu.mem_write(0x274e, bytes([q[0], q[1]])); o.cpu.mem_write(0x2791, bytes([q[2], q[3]]))
         if case['fn'] == 'fs18b':
             a1, a2 = prng(case['ds'] + 11, 0x3000), prng(case['ds'] + 12, 0x3000)
             blk = bytes(((a1[k] | a2[k]) if k % 3 == 0 else (a1[k] & a2[k])) & (0 if k % 0x84 in (0x59, 0x17) else 0xff) for k in range(0x3000))
