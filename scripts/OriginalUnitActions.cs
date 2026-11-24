@@ -1625,4 +1625,30 @@ public static class OriginalUnitActions
             edi += U32(o, 0x10); g.Edi = edi; g.Cmp(edi, ebp, 32);
         }
     }
+
+    /// <summary>B6F1: BA2E and 6EC1 for the object ESI ([1969] holds it meanwhile), then the objects of the chain (to EBP) whose +1B equals [1C87] clear the 6 slots (12 bytes each, from DS:1978) whose template entry (8 bytes from +0B)
+    /// does not match: bit k of +0F set, byte +7 equal and non-zero keeps the slot.</summary>
+    public static void FB6F1(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Al = d[0x1972]; g.Bl = d[0x1c87]; w.Call(0xba2e, g);
+        uint esi = g.Esi, ebp = g.Ebp, saved = U32(d, 0x1969); Put(d, 0x1969, esi); w.Call(0x6ec1, g); Put(d, 0x1969, saved); g.Esi = esi; g.Ebp = ebp;
+        for (; ; )
+        {
+            g.Al = d[0x1c87]; g.Esi += U32(w.ObjectAt(g.Esi), 0x10); g.Cmp(g.Esi, g.Ebp, 32);
+            if (g.Zf) return;
+            var o = w.ObjectAt(g.Esi); g.Cmp(o[0x1b], g.Al, 8);
+            if (!g.Zf) { g.Al = d[0x1c87]; goto next; }
+            F6885(w, g, o); uint tb = g.Edi; var t = w.ObjectAt(tb);
+            g.Eax = 0; g.Ebx = 0x1978; g.Edi += 0xb; g.Ch = o[0xf]; g.Cl = 6;
+            do
+            {
+                g.Ch = (byte)g.Shr(g.Ch, 1, 8);
+                bool keep = false;
+                if (g.Cf) { g.Al = t[g.Edi - tb + 7]; g.Cmp(g.Al, d[g.Ebx + 7], 8); if (g.Zf) { g.Test(g.Al, g.Al, 8); keep = !g.Zf; } }
+                if (!keep) Put(d, (int)g.Ebx + 2, 0);
+                g.Edi += 8; g.Ebx += 0xc; g.Cl--;
+            } while (g.Cl != 0);
+        next:;
+        }
+    }
 }
