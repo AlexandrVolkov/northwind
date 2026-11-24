@@ -21,3 +21,7 @@
 Восьмой пакет: шаблонные поиски `6877`, `6885`, `68A0`, `68BD` теперь не заглушки, а перенесённый код (EBX — запись армии, EDI/EDX — шаблон `[запись армии + 4] + 0ABh·номер`), `C4CD` с `C591` (ожидающий рабочий у здания: клетка `DAT[53]/[54]` или спираль вокруг `DAT[03]×DAT[04]` по плоскостям занятости `[18CE]`), `CAEE`, `D12C`/`D157` (класс местности клетки), `D182`/`D19C` (вызов скрипта шаблона с сохранением регистров). Всего 51 функция; объекты проверки ограничены армией 0..2 и шаблоном 0.
 
 Девятый пакет: `C331`/`C344` (большее из расстояний по осям между двумя точками или объектами), `C35F` (первая клетка класса местности AL в окне вокруг юнита: окно `DL·2 + [273F] × [2740]`, обрезка по карте 32 × 32, возврат клетки в AL/BL, ZF = 0 — найдена). Всего 54 функции.
+
+## C439: the nearest object of the chain
+
+`FC439` (LE:1 C439..C4CD) walks the chain of the owner of the object (participant +0xE .. +9), takes the template of every object through the army table (`0x56·army`, `0xAB·index`), keeps those whose `flags & EBX == [1F35]` and whose health is above DAT[46], and returns the one with the least Chebyshev distance in EDI and [1F31]. Verified against x86 on random chains of 0..4 objects (57 cases); EAX/ECX/EDX/EBP, the flags and the globals match.

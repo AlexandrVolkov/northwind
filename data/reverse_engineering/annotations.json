@@ -6380,6 +6380,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "The map of the check is 32 x 32 with identity tiles and random terrain classes"
+    },
+    {
+      "id": "le1-unit-actions-c439",
+      "module": "LE:1",
+      "start": 50233,
+      "end": 50381,
+      "name": "Nearest object of the chain by template flags (C439)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "Chain objects use army 0..2 and template index 0; the chain holds up to 4 objects"
     }
   ]
 }

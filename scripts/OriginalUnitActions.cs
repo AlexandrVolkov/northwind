@@ -1224,4 +1224,33 @@ public static class OriginalUnitActions
         g.Eax = eax; g.Ebx = ebx; g.Ecx = (g.Ecx & 0xffff0000) | ((uint)ch << 8) | cl; g.Edx = (g.Edx & 0xffff0000) | ((uint)dh << 8) | dl;
         g.Zf = true; g.Cf = false; g.Sf = false;
     }
+
+    /// <summary>C439: the nearest object of the chain of the owner of ESI (from the hint to the end) whose template flags &amp; EBX equal [1F35] and whose health is above DAT[46]; EDI = it (0 = none), [1F31] its distance.</summary>
+    public static void FC439(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; Put(d, 0x1f35, g.Eax); g.Eax = 0xf5; Mul8(g, 0xf5, r[3]); var part = w.PartOf(r[3]);
+        uint end = U32(part, 9) + w.PoolBase, edx = U32(part, 0xe) + w.PoolBase; g.Ebp = end; g.Edx = edx;
+        g.Edi = 0xffffffff; Put(d, 0x1f31, g.Edi); g.Edi = 0;
+        g.Cmp(edx, end, 32);
+        while (!g.Zf)
+        {
+            var o = w.ObjectAt(edx); g.Eax = 0x56; Mul8(g, 0x56, o[0]);
+            g.Eax = 0xab; Mul8(g, 0xab, o[0xe]); uint ecx = w.ArmyTable(o[0]) + (g.Eax & 0xffff); g.Ecx = ecx;
+            var t = w.ObjectAt(ecx); g.Eax = U32(t, 0x40) & g.Ebx; g.Ecx = ecx; g.Cmp(g.Eax, U32(d, 0x1f35), 32);
+            if (g.Zf)
+            {
+                g.Al = t[0x46]; g.Cmp(o[0x19], g.Al, 8);
+                if (!g.Jle)
+                {
+                    g.Eax = U32(o, 4); uint dx = g.Eax - U32(r, 4); g.Cmp(g.Eax, U32(r, 4), 32); if ((int)dx < 0) dx = (uint)-(int)dx; g.Eax = dx;
+                    uint dy = U32(o, 8) - U32(r, 8); g.Ecx = U32(o, 8); g.Cmp(g.Ecx, U32(r, 8), 32); if ((int)dy < 0) dy = (uint)-(int)dy; g.Ecx = dy;
+                    g.Cmp(g.Eax, g.Ecx, 32); if (g.Cf || g.Zf) g.Eax = g.Ecx;
+                    g.Cmp(g.Eax, U32(d, 0x1f31), 32);
+                    if (g.Cf || g.Zf) { Put(d, 0x1f31, g.Eax); g.Edi = edx; }
+                }
+            }
+            edx += U32(o, 0x10); g.Edx = edx; g.Cmp(edx, end, 32);
+        }
+        g.Test(g.Edi, g.Edi, 32);
+    }
 }
