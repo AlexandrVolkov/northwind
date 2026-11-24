@@ -42,5 +42,17 @@ public partial class TestRunner
         foreach (var unit in group) { System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(unit.Record.AsSpan(4), (uint)(spot.X + 12 * k)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(unit.Record.AsSpan(8), (uint)(spot.Y + 8 * k)); k++; unit.Goal = null; unit.Route.Clear(); }
         for (int t = 0; t < 200 && group.Any(u => u.Alive) && battle.Hero.Alive; t++) battle.Advance(1 / 18.2);
         Check(group.Count == 3 && group.Count(u => !u.Alive) >= 2, $"One discharge kills the units standing together ({group.Count(u => !u.Alive)} of {group.Count})");
+    
+        // the hurt mage vanishes (ARMY__03.WRK D3D, FS:105) and returns when he has recovered
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), 64); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(8), 64);
+        foreach (var w in group) { }
+        rufin.Record[0x19] = 40;
+        for (int t = 0; t < 120 && !Skirmish.IsHidden(rufin); t++) battle.Advance(1 / 18.2);
+        Check(Skirmish.IsHidden(rufin) && rufin.Record[0x32] == 0xff, $"A mage hurt below 3Ch vanishes (+32 = {rufin.Record[0x32]:X}, mask {rufin.Record[0x20]:X})");
+        Check(battle.At(rufin.Position) != rufin && !battle.Attack([battle.Hero.Id], rufin.Id), "Nobody sees or attacks the vanished mage");
+        rufin.Record[0x19] = 95;
+        for (int t = 0; t < 400 && Skirmish.IsHidden(rufin); t++) battle.Advance(1 / 18.2);
+
+        Check(!Skirmish.IsHidden(rufin) && rufin.Record[0x32] == 0, $"He returns when his health is above 5Ah (+32 = {rufin.Record[0x32]:X}, mask {rufin.Record[0x20]:X})");
     }
 }

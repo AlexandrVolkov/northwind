@@ -88,6 +88,7 @@ def prepare(source, output):
     # Rufin (ARMY__03 13, a mage who fights when attacked): 8 directions of DAT[4A] frames, the swings and the death.
     mage=bytes.fromhex(tables['ARMY__03.DAT']['templates'][13]['raw_record_hex']);mbase=struct.unpack_from('<H',mage,0x48)[0]
     wanted.setdefault(('ARMY__03.DAT',13),set()).update(range(mbase,mbase+8*mage[0x4a]));wanted[('ARMY__03.DAT',13)].update(action_frames(mage,mbase))
+    mvanish=mbase+8*(mage[0x4a]+mage[0x4b])+4*sum(mage[0x4f:0x53]);wanted[('ARMY__03.DAT',13)].update(range(mvanish,mvanish+mage[0x78]))   # FS:105 (878D): the vanishing action plays DAT[78] frames after the death block
     # The birds of the first map (ARMY__05 0): 8 directions of DAT[4A] frames, 32x32.
     bird=bytes.fromhex(tables['ARMY__05.DAT']['templates'][0]['raw_record_hex']);wanted[('ARMY__05.DAT',0)]=set(range(struct.unpack_from('<H',bird,0x48)[0],struct.unpack_from('<H',bird,0x48)[0]+8*bird[0x4a]))
     # The pit trap (ARMY__03 12): 19 opening frames from 289h; its first frame is the closed pit.

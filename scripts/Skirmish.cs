@@ -232,7 +232,7 @@ public sealed partial class Skirmish : IDisposable
         var size = new Vector2I(a.Parameters[3], a.Parameters[4]);
         return new Rect2((Vector2)((a.Cell - size / 2) * 32), (Vector2)(size * 32));
     }
-    public SkirmishActor? At(Vector2 point) => Actors.Where(a => a.Alive && !IsAnimal(a) && HitBounds(a).HasPoint(point))
+    public SkirmishActor? At(Vector2 point) => Actors.Where(a => a.Alive && !IsAnimal(a) && !IsHidden(a) && HitBounds(a).HasPoint(point))
         .OrderBy(a => a.Structure).ThenBy(a => (a.Position - new Vector2(0, 16)).DistanceSquaredTo(point)).FirstOrDefault();
     private Rect2 HitBounds(SkirmishActor actor)
     {
@@ -375,7 +375,7 @@ public sealed partial class Skirmish : IDisposable
     }
     public bool Attack(IEnumerable<uint> ids, uint targetId)
     {
-        if (Paused || Outcome != "" || Find(targetId) is not { } foe || !(foe.Team == 1 || IsMage(foe) || IsContainer(foe))) return false;
+        if (Paused || Outcome != "" || Find(targetId) is not { } foe || IsHidden(foe) || !(foe.Team == 1 || IsMage(foe) || IsContainer(foe))) return false;
         if (ids.Distinct().Select(Find).OfType<SkirmishActor>().Any(a => a.Team == 0 && !a.Structure && !a.Worker) && !IsContainer(foe) && !DeclareWarByOrder(foe)) return false;
         bool accepted = false;
         foreach (var actor in ids.Distinct().Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && !a.Structure && !a.Worker))
