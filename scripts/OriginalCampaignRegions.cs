@@ -9,8 +9,8 @@ public interface ICampaignRegionWorld
 }
 
 /// <summary>The regions of the campaign layer, LE:1 10BD4..10E19 and 110C8..11150. The table at DS:3E87 holds <see cref="Region"/> bytes per region (byte 0 bit 0: the region exists, then one
-/// <see cref="Record"/>-byte record per army: +0 the army, +1..10 its relations to the armies (2 = enemy, 3/4 = ally), +11 strength, +17 the population, +57/+58 growth and war flags, +59 settled).
-/// Every 1024 updates the populations grow and the war flag costs strength (10BD4); the snapshot (10CA0) writes the running mission into its region; 110C8 decides whether the campaign has
+/// <see cref="Record"/>-byte record per army: +0 the army, +1..10 its relations to the armies (2 = enemy, 3/4 = ally), +11 value (state +19E9), +17 the population (state +19F1), +57/+58 growth and war flags, +59 settled).
+/// Every 1024 updates the populations grow and the war flag costs value (10BD4); the snapshot (10CA0) writes the running mission into its region; 110C8 decides whether the campaign has
 /// ended. Field names are descriptive guesses from the use of the values; the code is verified against the original x86 by tests/fixtures/campaign-regions.json.</summary>
 public static class OriginalCampaignRegions
 {
@@ -97,16 +97,16 @@ public static class OriginalCampaignRegions
 }
 
 /// <summary>10FDE: casualties of an army taken while it was away from its mission. The units of the army are weakened to the minimum condition of their template (DAT[46]) until the
-/// strength budget is spent: the population of the army shrinks by <c>loss</c>; units that carry weight (DAT[76]) count against the new population, soldiers (flags &amp; 28h = 8) against the
+/// strength budget is spent: the value of the army (state +19E9, the sum of DAT[76] of its units, docs/ai.md) shrinks by <c>loss</c>; units that carry weight (DAT[76]) count against the new value, soldiers (flags &amp; 28h = 8) against the
 /// share of strength lost. Verified by tests/fixtures/campaign-losses.json (tools/verify_campaign_losses.py; 68BD is a stub).</summary>
 public static class OriginalCampaignLosses
 {
     public static void Apply(byte[] state, uint loss, IEnumerable<(byte[] Unit, byte[] Template)> units)
     {
         if (loss == 0) return;
-        uint population = BinaryPrimitives.ReadUInt32LittleEndian(state.AsSpan(0x19e9)); byte strength = state[0x5c];
-        uint remaining = population >= loss ? population - loss : 0;
-        uint half = (population >> 1) + 1, lost = 0;
+        uint value = BinaryPrimitives.ReadUInt32LittleEndian(state.AsSpan(0x19e9)); byte strength = state[0x5c];
+        uint remaining = value >= loss ? value - loss : 0;
+        uint half = (value >> 1) + 1, lost = 0;
         if (loss > half) lost = (uint)(((ulong)(loss - half) * strength) / half);
         uint budget = strength >= lost ? strength - lost : 0, accumulated = 0, counter = 0;
         foreach (var (unit, template) in units)
@@ -132,7 +132,7 @@ public interface ICampaignCatchupWorld
 }
 
 /// <summary>10E19 and 10ECE: the time the campaign has spent elsewhere is applied when a region is entered. <see cref="Away"/> takes 800h from the budget [3E83], adds the rest to the global time,
-/// restores the relations of the participants from the region record and gives the army the casualties it took (state population above the recorded one); <see cref="Budget"/> runs the
+/// restores the relations of the participants from the region record and gives the army the casualties it took (state value +19E9 above the recorded +11); <see cref="Budget"/> runs the
 /// budget as world updates in chunks of 400h. Verified by tests/fixtures/campaign-catchup.json.</summary>
 public static class OriginalCampaignCatchup
 {
@@ -149,8 +149,8 @@ public static class OriginalCampaignCatchup
                 for (int a = 0; a < armies; a++, rec += OriginalCampaignRegions.Record)
                 {
                     for (int j = 0; j < 0x10; j++) participants[a * OriginalCampaignRegions.Participant + 0xb9 + j] = regions[rec + 1 + j];
-                    uint population = BitConverter.ToUInt32(states, a * OriginalCampaignRegions.State + 0x19e9), recorded = BitConverter.ToUInt32(regions, rec + 0x11);
-                    if (population > recorded) world.Casualties(population - recorded, a);
+                    uint value = BitConverter.ToUInt32(states, a * OriginalCampaignRegions.State + 0x19e9), recorded = BitConverter.ToUInt32(regions, rec + 0x11);
+                    if (value > recorded) world.Casualties(value - recorded, a);
                 }
             }
         }

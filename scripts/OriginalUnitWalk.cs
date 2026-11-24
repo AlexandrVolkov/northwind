@@ -94,31 +94,33 @@ public sealed class OriginalUnitWalk(IWalkWorld world)
         sbyte dx = world.Delta(h), dy = world.Delta(h + 1);
         if (dx != 0) Put(r, 4, dx < 0 ? U32(r, 4) - cl : U32(r, 4) + cl);
         if (dy != 0) Put(r, 8, dy < 0 ? U32(r, 8) - cl : U32(r, 8) + cl);
-        r[0x27] = (byte)(r[0x27] + (byte)((r[0x26] << 3) & 0xf0));
-        if ((r[0x27] >> 4) >= t[0x57]) goto stride;
-        goto tail;
-    stride:
-        {
-            byte next = (byte)((r[0x27] & 0xf) + 1);
-            if (next >= t[0x4a])
-            {
-                if (t[0xa2] != 0xff) world.Effect(r[0], t[0xa2], U32(r, 4), U32(r, 8));
-                next = 1;
-            }
-            r[0x27] = next;
-        }
-    tail:
+        Stride(r, t, (army, type, x, y) => world.Effect(army, type, x, y));
         if (r[0x2c] != 0) return;
         r[0x24] = (byte)((r[0x24] & 0xf8) | 1);
         world.RevealFog(); world.SearchEnemy(0);
     }
 
-    private byte End(byte[] r, byte[] t)   // 72D8
+    /// <summary>725C..72A2: the stride counter +27 (high nibble: the strides taken, low: the frame of the stride) advances by the speed; at the end of a stride the dust effect DAT[A2] is made.</summary>
+    public static void Stride(byte[] r, byte[] t, Action<byte, byte, uint, uint>? effect)
+    {
+        r[0x27] = (byte)(r[0x27] + (byte)((r[0x26] << 3) & 0xf0));
+        if ((r[0x27] >> 4) < t[0x57]) return;
+        byte next = (byte)((r[0x27] & 0xf) + 1);
+        if (next >= t[0x4a])
+        {
+            if (t[0xa2] != 0xff) effect?.Invoke(r[0], t[0xa2], U32(r, 4), U32(r, 8));
+            next = 1;
+        }
+        r[0x27] = next;
+    }
+
+    /// <summary>72D8: the frame of a walking unit: heading · DAT[4A] + the stride frame + DAT[48].</summary>
+    public static void WriteFrame(byte[] r, byte[] t)
     {
         int product = (r[0x25] & 7) * t[0x4a];
         byte low = (byte)((byte)product + (byte)(r[0x27] & 0xf));
-        ushort frame = (ushort)(((product & 0xff00) | low) + BinaryPrimitives.ReadUInt16LittleEndian(t.AsSpan(0x48)));
-        BinaryPrimitives.WriteUInt16LittleEndian(r.AsSpan(1), frame);
-        return Flags;
+        BinaryPrimitives.WriteUInt16LittleEndian(r.AsSpan(1), (ushort)(((product & 0xff00) | low) + BinaryPrimitives.ReadUInt16LittleEndian(t.AsSpan(0x48))));
     }
+
+    private byte End(byte[] r, byte[] t) { WriteFrame(r, t); return Flags; }   // 72D8
 }

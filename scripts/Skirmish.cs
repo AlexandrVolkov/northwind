@@ -612,7 +612,12 @@ public sealed partial class Skirmish : IDisposable
             var prepared = OriginalMotionPreparation.TurnAndAdvance(Occupancy, Map.Cells, _properties, actor.Record, actor.Parameters, actor.Id, 0);
             actor.Turning = !prepared.EnteredMotion; result = prepared.Step;
         }
-        else result = OriginalSpatialRules.AdvanceMotion(Occupancy, actor.Record, actor.Id, actor.Parameters[3], actor.Parameters[4], 0);
+        else
+        {
+            result = OriginalSpatialRules.AdvanceMotion(Occupancy, actor.Record, actor.Id, actor.Parameters[3], actor.Parameters[4], 0);
+            OriginalUnitWalk.Stride(actor.Record, actor.Parameters, null);   // 725C: the stride counter of the walking frames (the dust effect DAT[A2] is not drawn yet)
+        }
+        OriginalUnitWalk.WriteFrame(actor.Record, actor.Parameters);        // 72D8: the frame of the walk
         if (!actor.Turning && result.Distance == 0) actor.StalledTicks++; else actor.StalledTicks = 0;
         if (actor.StalledTicks > 120)
         {
@@ -622,7 +627,7 @@ public sealed partial class Skirmish : IDisposable
         if (actor.Record[0x2c] == 0 || actor.StalledTicks > 120)
         {
             ReleaseStep(actor.Id); actor.Stepping = false;
-            if (actor.Route.Count == 0) actor.Record[0x2d] = 0;
+            if (actor.Route.Count == 0) { actor.Record[0x2d] = 0; actor.Record[0x27] = 0; OriginalUnitWalk.WriteFrame(actor.Record, actor.Parameters); }   // 72CF + 92CA: the standing frame of the heading
         }
     }
     /// <summary>Phase-1 attack loop of 843E/8EC7: reach 8B5E, swing delay 8AF4, turn, swing request 8C7C and the
@@ -630,7 +635,7 @@ public sealed partial class Skirmish : IDisposable
     private bool AttackStep(SkirmishActor actor, SkirmishActor target)
     {
         // A move request (8E0E flight, high nibble 2) during a swing: the original ends the swing and starts moving
-        // (9275 → 939A, not ported). Here the unit disengages and the flight route moves it (adapter).
+        // (9275 → 939A: ported as OriginalUnitMotion, not yet driving the units). Here the unit disengages and the flight route moves it (adapter).
         if ((actor.Record[0x2d] >> 4) == 2 && (actor.Record[0x2d] & 15) != 2) { actor.Target = 0; actor.Record[0x2d] &= 0xf0; return false; }
         if (OriginalWorkerAnimation.Pending(actor.Record))
         {

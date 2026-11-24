@@ -769,7 +769,6 @@ public partial class SkirmishMain : Node2D
             return;
         }
         int frameIndex = Skirmish.IsMageUnit(actor) && Battle.VanishFrame(actor) is { } vanishing ? vanishing : actor.Frame;
-        if (actor.Stepping && !actor.Turning) frameIndex += (int)(Battle.Elapsed * 8) % Math.Max(1, (int)actor.Parameters[0x4a]);
         if (!_frames.TryGetValue((actor.Source.TemplateFile, actor.Source.TemplateIndex, frameIndex), out var frame))
             _frames.TryGetValue((actor.Source.TemplateFile, actor.Source.TemplateIndex, actor.Frame), out frame);
         if (frame != null)
