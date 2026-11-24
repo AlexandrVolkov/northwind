@@ -83,7 +83,7 @@ public partial class TestRunner
         public void Sound(uint id) { log.Add((byte)'S'); log.AddRange(BitConverter.GetBytes(id)); }
     }
 
-    private void ObjectScriptReplay(string file, string key, string label, Action<IObjectScriptWorld, byte[], int> script, int minEffects = 5, bool extra = false, bool part = false, bool idle = false)
+    private void ObjectScriptReplay(string file, string key, string label, Action<IObjectScriptWorld, byte[], int> script, int minEffects = 5, bool extra = false, bool part = false, bool idle = false, bool manuscript = false)
     {
         using var reference = GameData.Read<JsonDocument>($"res://tests/fixtures/{file}.json");
         var root = reference.RootElement;
@@ -98,8 +98,10 @@ public partial class TestRunner
             BitConverter.GetBytes((ushort)c.GetProperty("w1").GetInt32()).CopyTo(r, 1); BitConverter.GetBytes((uint)c.GetProperty("f22").GetInt64()).CopyTo(r, 0x22);
             r[0x27] = (byte)c.GetProperty("f27").GetInt32(); r[0x28] = (byte)c.GetProperty("f28").GetInt32(); r[0x31] = (byte)c.GetProperty("f31").GetInt32();
             var log = new List<byte>(); var world = new ObjectReplay(c, random, log); Array.Copy(world.ObjectBytes, 0, world.Obj1, 0, 0x40); Array.Copy(world.ObjectBytes, 0x40, world.Obj2, 0, 0x40);
-            script(world, r, c.GetProperty("ah").GetInt32());
-            byte[] output = part ? [.. r, world.I, world.J, .. BitConverter.GetBytes(world.Part12), .. log] : extra ? [.. r, world.I, world.J, .. world.Obj1, .. world.Obj2, .. BitConverter.GetBytes(world.Part12), .. log] : [.. r, world.I, world.J, .. log];
+            ushort ax = 0;
+            if (manuscript) { r[0x28] = (byte)c.GetProperty("mask28").GetInt32(); ax = OriginalObjectScripts.Manuscript(world, r, c.GetProperty("ah").GetInt32(), new byte[] { 0x18, 0x19, 0x1b }[c.GetProperty("k").GetInt32()], (byte)c.GetProperty("vowner").GetInt32()); }
+            else script(world, r, c.GetProperty("ah").GetInt32());
+            byte[] output = manuscript ? [.. BitConverter.GetBytes(ax), .. r, world.I, world.J, .. log] : part ? [.. r, world.I, world.J, .. BitConverter.GetBytes(world.Part12), .. log] : extra ? [.. r, world.I, world.J, .. world.Obj1, .. world.Obj2, .. BitConverter.GetBytes(world.Part12), .. log] : [.. r, world.I, world.J, .. log];
             digest.AppendData(output); if (log.Contains((byte)'E')) effects++;
             string hex = Convert.ToHexStringLower(SHA256.HashData(output))[..10];
             if (hex != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; if (only == count) GD.Print("CSHARP " + Convert.ToHexStringLower(output)); }
@@ -127,6 +129,7 @@ public partial class TestRunner
         ObjectScriptReplay("obj-talking", "talking", "The talking object ARMY__03.WRK 2D08", OriginalObjectScripts.Talking, 0, false, true);
         ObjectScriptReplay("obj-faceb", "faceb", "The second face ARMY__03.WRK 2D52", OriginalObjectScripts.FaceB, 0, false, true);
         ObjectScriptReplay("obj-rockfallq", "rockfallq", "The quest rockfall ARMY__03.WRK 2E19", OriginalObjectScripts.RockfallQuest, 0, false, true);
+        ObjectScriptReplay("obj-manuscript", "manuscript", "The manuscripts ARMY__03.WRK 2710", (w, r, ah) => { }, 0, false, false, false, true);
         ObjectScriptReplay("obj-face", "face", "The stone face script ARMY__03.WRK 2B9", OriginalObjectScripts.Face);
     }
 }

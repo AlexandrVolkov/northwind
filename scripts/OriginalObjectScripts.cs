@@ -333,6 +333,25 @@ public static class OriginalObjectScripts
         Rockfall(w, r, ah);
     }
 
+    /// <summary>The manuscripts (templates 24..26, 2710 / 2780 / 278D differ in the item +31 they hold: 18h, 19h, 1Bh): AH = 0 sets the item and the health 64h; AH = 8 (a visitor takes the page): the
+    /// strength +19F1 of the owner's AI above 7CFh lets only the participants whose bit is not set in +28 take it; AH = 1 the redraw and the fade after the health is gone. Returns AX as left by the
+    /// original.</summary>
+    public static ushort Manuscript(IObjectScriptWorld w, byte[] r, int ah, byte item, byte visitorOwner)
+    {
+        if (ah == 0) { r[0x31] = item; r[0x19] = 0x64; return 0; }
+        if (ah == 8)
+        {
+            bool takes = w.AiStrength(r[3]) <= 0x7cf || ((U32(r, 0x28) >> (visitorOwner & 31)) & 1) != 0;
+            if (!takes) return 0xff00;
+            byte al = r[0x31]; r[0x31] = 0; r[0x19] = 0; return al;
+        }
+        if (ah != 1) return (ushort)(ah << 8);
+        if ((sbyte)r[0x19] > 0) { if ((r[0x14] & 0x80) != 0) { r[0x14] = 0; w.Redraw(); } return 0x100; }
+        r[0x19]--;
+        if (r[0x19] > 0xfa) return 0x100;
+        w.Remove(r); return 0x100;
+    }
+
     private static void Redraw(IObjectScriptWorld w, byte[] r) { if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); } }
     private static uint CornerMinus(byte[] r, int dx, int dy)
     {

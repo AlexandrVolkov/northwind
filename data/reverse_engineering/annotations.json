@@ -4832,6 +4832,18 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-rockfallq.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services are recorded stubs in the check; not yet wired into the skirmish"
+    },
+    {
+      "id": "army03-manuscripts-2710",
+      "module": "ARMY__03.WRK",
+      "start": 10000,
+      "end": 10138,
+      "name": "Manuscripts 1..3 (templates 24..26): the item, the visit and the fade",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-manuscript.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS:1B7 and the other services are recorded stubs in the check; the page items (18h, 19h, 1Bh) are given by the visit handler of OriginalItems in the skirmish"
     }
   ]
 }

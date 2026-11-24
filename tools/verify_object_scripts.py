@@ -28,6 +28,7 @@ PRESETS = {
     'talking': {'entry': 0x2d08, 'end': 0x2d52, 'dat': True, 'extra2': True},
     'faceb': {'entry': 0x2d52, 'end': 0x2e19, 'dat': True, 'extra2': True},
     'rockfallq': {'entry': 0x2e19, 'end': 0x2e4c, 'extra2': True, 'dat': True, 'more': [(0x189, 0x212)]},
+    'manuscript': {'entry': 0x2710, 'end': 0x279a, 'entries': [0x2710, 0x2780, 0x278d], 'visitor': True},
     'dragon': {'entry': 0x279a, 'end': 0x29f1, 'regs_effect': True, 'extra': True},
 }
 PRESET = PRESETS['rockfall']; NAME = 'rockfall'
@@ -46,9 +47,9 @@ def cases():
     rng = random.Random(PRESET['entry'])
     out = []
     for n in range(800):
-        out.append({'ah': rng.choice([0, 1, 1, 1, 1]), 'x': rng.randrange(0, 4000), 'y': rng.randrange(0, 4000), 'f15': rng.choice([0, 0, 1, 2, 3, rng.randrange(256)]), 'f26': rng.choice([0, 1, 3, 0x1f, 0x20, rng.randrange(1 << 32)]),
+        out.append({'ah': rng.choice([0, 1, 1, 1, 1, 8, 8, 8]) if NAME == 'manuscript' else rng.choice([0, 1, 1, 1, 1]), 'x': rng.randrange(0, 4000), 'y': rng.randrange(0, 4000), 'f15': rng.choice([0, 0, 1, 2, 3, rng.randrange(256)]), 'f26': rng.choice([0, 1, 3, 0x1f, 0x20, rng.randrange(1 << 32)]),
                     'f2a': rng.choice([0, 9, 10, 0x14, 0x15, 0xb, 1, rng.randrange(256)]), 'w1': rng.choice([0x1b2, 0x1b3, 0x1b6, 0x1ab, rng.randrange(65536)]), 'f14': rng.choice([0, 0x80, 0x81, rng.randrange(256)]), 'f0d': rng.randrange(4), 'f19': rng.choice([100, 0, 0x80, 0xff, 0xfb, 0xfa, 1, rng.randrange(256)]), 'f27': rng.choice([0x18, 0x20, 0x28, rng.randrange(256)]), 'f28': rng.choice([0, 3, 0xb, 0x18, rng.randrange(256)]), 'f2d': rng.randrange(256), 'tick': rng.choice([0, 1, 7, 8, 0x1f, 0x20, rng.randrange(256)]), 'f22': rng.randrange(1 << 32), 'seed': rng.randrange(256),
-                    'area': [[rng.choice([0, 0, 1, 5]), rng.choice([0, 0, 3]), rng.choice([0, 0, 1, 2]), rng.randrange(1 << 30), rng.randrange(1 << 30)] for _ in range(3)], 'claim': [rng.choice([0, 1]) for _ in range(3)], 'zf': [rng.choice([0, 1, 1]) for _ in range(2)], 'spot': [[rng.choice([0, 1]), rng.randrange(4000), rng.randrange(4000)] for _ in range(10)], 'beside': [[rng.choice([0, 1]), rng.randrange(256), rng.randrange(256), rng.randrange(256)] for _ in range(2)], 'create': [rng.choice([0, 1]) for _ in range(10)], 'units': [rng.choice([8, 0x1c, 3, 8, 5]) for _ in range(rng.randrange(0, 14))], 'finds': [rng.choice([0, 1, 2]) for _ in range(8)], 'objbytes': bytes(rng.randrange(256) for _ in range(0x80)).hex(), 'part12': rng.randrange(1 << 32), 'dat3': rng.randrange(256), 'dat48': rng.randrange(65536), 'f31': rng.randrange(256), 'strength': rng.choice([0, 0x7cf, 0x7d0, rng.randrange(1 << 20)]), 'count': rng.randrange(2, 8), 'datsound': rng.randrange(1 << 20), 'dist': [rng.randrange(256) for _ in range(3)]})
+                    'area': [[rng.choice([0, 0, 1, 5]), rng.choice([0, 0, 3]), rng.choice([0, 0, 1, 2]), rng.randrange(1 << 30), rng.randrange(1 << 30)] for _ in range(3)], 'claim': [rng.choice([0, 1]) for _ in range(3)], 'zf': [rng.choice([0, 1, 1]) for _ in range(2)], 'spot': [[rng.choice([0, 1]), rng.randrange(4000), rng.randrange(4000)] for _ in range(10)], 'beside': [[rng.choice([0, 1]), rng.randrange(256), rng.randrange(256), rng.randrange(256)] for _ in range(2)], 'create': [rng.choice([0, 1]) for _ in range(10)], 'units': [rng.choice([8, 0x1c, 3, 8, 5]) for _ in range(rng.randrange(0, 14))], 'finds': [rng.choice([0, 1, 2]) for _ in range(8)], 'objbytes': bytes(rng.randrange(256) for _ in range(0x80)).hex(), 'part12': rng.randrange(1 << 32), 'dat3': rng.randrange(256), 'dat48': rng.randrange(65536), 'k': rng.randrange(3), 'vowner': rng.randrange(8), 'mask28': rng.randrange(256), 'f31': rng.randrange(256), 'strength': rng.choice([0, 0x7cf, 0x7d0, rng.randrange(1 << 20)]), 'count': rng.randrange(2, 8), 'datsound': rng.randrange(1 << 20), 'dist': [rng.randrange(256) for _ in range(3)]})
     if NAME == 'generator':
         for c in out:
             if rng.random() < 0.6: c.update(ah=1, tick=0, units=[0x1c] * rng.randrange(1, 4) + [8] * rng.randrange(0, 5), beside=[[0, rng.randrange(256), rng.randrange(256), rng.randrange(256)], [0, 1, 2, 3]])
@@ -158,10 +159,11 @@ def generate(game):
         for pi in range(3):
             part = bytearray(0xf5); struct.pack_into('<I', part, 0x0e, 0x1000); struct.pack_into('<I', part, 0x09, 0x1000 + 0x40 * len(units)); o.cpu.mem_write(0x97a + 0xf5 * pi, bytes(part))
         if PRESET.get('extra') or PRESET.get('extra2'): o.cpu.mem_write(0x97a + 0x12, struct.pack('<I', case['part12']))
-        o.cpu.reg_write(UC_X86_REG_ESI, o.POOL + 0x800); o.cpu.reg_write(UC_X86_REG_EDI, o.DAT if (PRESET.get('dat') and case['ah'] != 0) else o.POOL + 0x800)
+        o.cpu.reg_write(UC_X86_REG_ESI, o.POOL + 0x800); o.cpu.mem_write(o.POOL + 0x900, bytes([0, 0, 0, case['vowner']])); o.cpu.mem_write(o.POOL + 0x800 + 0x28, bytes([case['mask28']]))
+        o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 0x900 if (PRESET.get('visitor') and case['ah'] == 8) else (o.DAT if (PRESET.get('dat') and case['ah'] != 0) else o.POOL + 0x800))
         o.cpu.reg_write(UC_X86_REG_EAX, case['ah'] << 8); o.cpu.reg_write(UC_X86_REG_EBX, 7)
-        o.run(o.WRK + PRESET['entry'])
-        out = bytes(o.cpu.mem_read(o.POOL + 0x800, 0x50)) + bytes(o.cpu.mem_read(0x19eb, 2)) + (bytes(o.cpu.mem_read(o.POOL + 0x140, 0x80)) + bytes(o.cpu.mem_read(0x97a + 0x12, 4)) if PRESET.get('extra') else (bytes(o.cpu.mem_read(0x97a + 0x12, 4)) if PRESET.get('extra2') else b'')) + b''.join(log)
+        o.run(o.WRK + (PRESET['entries'][case['k']] if PRESET.get('entries') else PRESET['entry']))
+        out = (struct.pack('<H', reg(UC_X86_REG_EAX) & 0xffff) if PRESET.get('visitor') else b'') + bytes(o.cpu.mem_read(o.POOL + 0x800, 0x50)) + bytes(o.cpu.mem_read(0x19eb, 2)) + (bytes(o.cpu.mem_read(o.POOL + 0x140, 0x80)) + bytes(o.cpu.mem_read(0x97a + 0x12, 4)) if PRESET.get('extra') else (bytes(o.cpu.mem_read(0x97a + 0x12, 4)) if PRESET.get('extra2') else b'')) + b''.join(log)
         if os.environ.get('DEBUG_CASE') == str(all_cases.index(case)): print('PYTHON', out.hex())
         digest.update(out); case['sha256_prefix'] = hashlib.sha256(out).hexdigest()[:10]
     return {'format_version': 1, 'source_sha256': {k: report['source_sha256'][k] for k in ['NORWIND.EXE']} | {'ARMY__03.WRK': hashlib.sha256(wrk).hexdigest()}, 'random_values': constants['random_values'],
