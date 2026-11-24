@@ -6296,6 +6296,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "The callees outside the function are recorded stubs in the check"
+    },
+    {
+      "id": "le1-unit-actions-bb8b",
+      "module": "LE:1",
+      "start": 48011,
+      "end": 48149,
+      "name": "FS:55 reshape of a building line segment and its neighbours (BB8B with BBE4)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "The neighbour search BADF and the template lookup 6885 are recorded stubs in the check (BADF is already ported as the line neighbours)"
     }
   ]
 }
