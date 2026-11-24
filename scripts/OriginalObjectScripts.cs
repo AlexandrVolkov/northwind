@@ -36,6 +36,8 @@ public interface IObjectScriptWorld
     uint TemplateFlagsOf71();                         // FS:71: DAT[40] of the template of EDI
     void Service13E();                                // FS:13E
     void Service1AF();                                // FS:1AF
+    void Reshape(ushort ax, uint edx);                // FS:55 = BB8B (OriginalLineNeighbors.Reshape)
+    bool BuildingDispatch();                          // FS:41 = C88C: the table of the building follows the call; returns ZF to the continuation
     void Service25(uint parent, byte bl);             // FS:25
     void Service29(byte bl);                          // FS:29
     void Sound35(uint id);                            // FS:35
@@ -748,6 +750,19 @@ public static class OriginalObjectScripts
     {
         if ((sbyte)r[0x19] > 0 || (Word(r, 0x17) & 0x80) != 0) return;
         w.Service1AF();
+    }
+
+    public static readonly int[] FenceTables = [0x481, 0x6ca, 0x13ff];
+    /// <summary>The fences and bridges (ARMY__01.WRK 569 and 61E, ARMY__02.WRK 454, 6A1 and 13D6): AH = 0 redraws and shapes the section (FS:55, EDX = 3, AX = ah·100h with ah = FFh for the first
+    /// fence of ARMY__01, 55h for the others); AH = 1 redraws and goes through the action table of the building (FS:41: only the state 1 does something, FS:3D, the construction) — a continuation
+    /// with ZF clears AL; AH = 9 (ARMY__02) returns the table of the shapes (EDX). <paramref name="reshapeAh"/> and <paramref name="table"/> belong to the entry. Returns EDX of AH = 9.</summary>
+    public static uint Fence(IObjectScriptWorld w, byte[] r, int ah, byte reshapeAh, uint table)
+    {
+        if (ah == 0) { w.Redraw(); w.Reshape((ushort)(reshapeAh << 8), 3); return 0; }
+        if (ah == 9 && table != 0) return table;
+        if (ah != 1) return 0;
+        if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); }
+        w.BuildingDispatch(); return 0;
     }
 
     public static void Fx54aKind16(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)   // B62
