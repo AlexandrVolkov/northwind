@@ -38,8 +38,8 @@ public interface IBuildingScriptWorld
 public static class OriginalBuildingScripts
 {
     /// <summary>The offsets of the data tables returned by AH = 6 (A, B, none, D).</summary>
-    public static readonly uint[] Tables = [0x21b, 0x336, 0, 0x4c6, 0, 0, 0, 0xa65, 0xdcd, 0x221, 0x336, 0, 0, 0];
-    private static readonly int[][] Handlers = [[0x1ef, 0x1b5, 0x1b2, 0x203, 0x23b, 0x247], [0x316, 0x2c6, 0x2c3, 0x2c3, 0x32a, 0x34e], [0x3c1, 0x3bb, 0x3b8, 0x3b8, 0x3b8, 0x3e7], [0x474, 0x466, 0x463, 0x4ae, 0x4de, 0x4ea], [0x771, 0x73b, 0x738, 0x738, 0x738, 0x79a], [], [0x909, 0x903, 0x900, 0x900, 0x900, 0x980], [0xa33, 0x9f9, 0x9f6, 0x9f6, 0xa59, 0xa71], [0xdad, 0xd73, 0xd70, 0xd70, 0xdc1, 0xde9], [0x1f5, 0x1bb, 0x1b8, 0x209, 0x251, 0x25d], [0x316, 0x2dc, 0x2d9, 0x2d9, 0x32a, 0x34e], [0x3c7, 0x3c1, 0x3be, 0x3be, 0x3be, 0x44e], [0x7c3, 0x7bd, 0x7ba, 0x7ba, 0x7ba, 0x7ef], [0x67d, 0x647, 0x644, 0x644, 0x644, 0x69b]];
+    public static readonly uint[] Tables = [0x21b, 0x336, 0, 0x4c6, 0, 0, 0, 0xa65, 0xdcd, 0x221, 0x336, 0, 0, 0, 0, 0, 0xf54, 0x130c, 0, 0];
+    private static readonly int[][] Handlers = [[0x1ef, 0x1b5, 0x1b2, 0x203, 0x23b, 0x247], [0x316, 0x2c6, 0x2c3, 0x2c3, 0x32a, 0x34e], [0x3c1, 0x3bb, 0x3b8, 0x3b8, 0x3b8, 0x3e7], [0x474, 0x466, 0x463, 0x4ae, 0x4de, 0x4ea], [0x771, 0x73b, 0x738, 0x738, 0x738, 0x79a], [], [0x909, 0x903, 0x900, 0x900, 0x900, 0x980], [0xa33, 0x9f9, 0x9f6, 0x9f6, 0xa59, 0xa71], [0xdad, 0xd73, 0xd70, 0xd70, 0xdc1, 0xde9], [0x1f5, 0x1bb, 0x1b8, 0x209, 0x251, 0x25d], [0x316, 0x2dc, 0x2d9, 0x2d9, 0x32a, 0x34e], [0x3c7, 0x3c1, 0x3be, 0x3be, 0x3be, 0x44e], [0x7c3, 0x7bd, 0x7ba, 0x7ba, 0x7ba, 0x7ef], [0x67d, 0x647, 0x644, 0x644, 0x644, 0x69b], [0xd56, 0xd20, 0xd1d, 0xd1d, 0xd1d, 0xd7f], [], [0xf02, 0xef4, 0xef1, 0xf3c, 0xf74, 0xf80], [0x12da, 0x12a0, 0x129d, 0x129d, 0x1300, 0x1318], [0x135c, 0x136e, 0x1359, 0x1359, 0x1359, 0x1374], [0x13b8, 0x13ca, 0x13b5, 0x13b5, 0x13b5, 0x13d0]];
 
     private static uint Dword(byte[] r, int i) => BitConverter.ToUInt32(r, i);
     private static void SetBl(BuildingRegs g, uint v) => g.Ebx = (g.Ebx & 0xffffff00) | (v & 0xff);
@@ -49,16 +49,17 @@ public static class OriginalBuildingScripts
     {
         zf = false;
         var g = new BuildingRegs { Eax = (uint)ah << 8, Ebx = bl };
-        if (k == 5) return Script7A0(w, r, g, ah);
+        int kd = k; k = Base(k);
+        if (k == 5) return Script7A0(w, r, g, ah, kd == 15);
         if (k == 13 && ah != 5) return Script524(w, r, g, ah, out zf);
         if (ah == 0)
         {
             if (k is 6 or 11) { r[0x23] = 0x64; return 0; }
-            if (k is not (2 or 4 or 12 or 13)) { r[0x27] = 0xff; for (int i = 0; i < 4; i++) r[0x22 + i] = 0xff; r[0x26] = 0xff; }
+            if (k is not (2 or 4 or 12 or 13 or 18 or 19)) { r[0x27] = 0xff; for (int i = 0; i < 4; i++) r[0x22 + i] = 0xff; r[0x26] = 0xff; }
             return 0;
         }
         if (ah == 2) { if (k is 0 or 1 or 3 or 7 or 8 or 9 or 10) w.Service(0xcd, g); return 0; }
-        if (ah == 6) return Tables[k];
+        if (ah == 6) return Tables[kd];
         if (ah == 5)
         {
             if (k is 9) k = 0;
@@ -74,13 +75,13 @@ public static class OriginalBuildingScripts
         if ((r[0x14] & 0x80) != 0)
         {
             r[0x14] &= 0x7f; w.Service(0x1d, g);
-            if (k is 4 or 6 or 7 or 11) { }
+            if (k is 4 or 6 or 7 or 11 or 18 or 19) { }
             else if (k is 2 or 12) { var (p, t, ptr) = w.Participant6D(); g.Ecx = ptr; BitConverter.GetBytes(Dword(p, 0x2c) + Dword(t, 0x78)).CopyTo(p, 0x2c); }
             else { w.Service(0x85, g); if (k == 9) w.Service(0x19f, g); }
         }
         if (k is 0 or 9) w.Service(0x121, g);
         if (k is 4 or 6 or 11) w.Service(0xbd, g);
-        Dispatch(w, r, g, k);
+        Dispatch(w, r, g, kd);
         if (!g.Zf) return 0;
         Continue(w, r, g, k);
         return 0;
@@ -97,7 +98,7 @@ public static class OriginalBuildingScripts
         g.Eax = (uint)state; g.Ebx = (g.Ebx & 0xffff0000) | (bh << 8) | (uint)(r[0x14] & 0x40);
         int handler = Handlers[k][state]; g.Edx = (uint)handler;
         w.BeforeHandler(state, g.Ebx, g.Edx, g.Ecx);
-        Handler(w, r, g, k, state);
+        Handler(w, r, g, Base(k), state, k >= 14);
         g.Zf = w.AfterHandler(g.Zf);
     }
 
@@ -116,14 +117,16 @@ public static class OriginalBuildingScripts
         w.Service(0x19, g);
     }
 
-    private static void Handler(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int k, int state)
+    private static int Base(int k) => k == 14 ? 4 : k == 15 ? 5 : k == 16 ? 3 : k == 17 ? 7 : k;
+
+    private static void Handler(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int k, int state, bool second)
     {
-        if (k >= 4) { Handler2(w, r, g, k, state); return; }
+        if (k >= 4) { Handler2(w, r, g, k, state, second); return; }
         switch (k, state)
         {
             case (0, 0) or (1, 0): Idle(r, g); return;
             case (3, 0):
-                { uint saved = g.Ebx; g.Eax = 6; g.Ebx = 0x11f; w.Service(0x129, g); g.Ebx = (g.Ebx & 0xffff0000) | 0x0f8b; g.Ecx = 0x20; g.Edx = 0xffffffce; w.Service(0x99, g); g.Ebx = saved; Idle(r, g); return; }
+                { uint saved = g.Ebx; g.Eax = second ? 0xcu : 6; g.Ebx = 0x11f; w.Service(0x129, g); g.Ebx = (g.Ebx & 0xffff0000) | 0x0f8b; g.Ecx = 0x20; g.Edx = second ? 0xffffffeeu : 0xffffffce; w.Service(0x99, g); g.Ebx = saved; Idle(r, g); return; }
             case (2, 0):
                 { uint saved = g.Ebx; g.Eax = 5; g.Ebx = 0x31f; w.Service(0x129, g); g.Ebx = saved; SetBl(g, ~g.Ebx); g.Zf = (g.Ebx & 0x40) == 0; return; }
             case (0, 1):
@@ -150,7 +153,7 @@ public static class OriginalBuildingScripts
                 g.Edx = 0xd; w.Service(0x51, g); for (int i = 0; i < 4; i++) r[0x22 + i] = 0xff; r[0x26] = 0xff; Done(g); return;
             case (0, 4): g.Edx = 0xffffffd5; w.Service(0x49, g); return;
             case (1, 4): g.Edx = 1; w.Service(0x49, g); return;
-            case (3, 4): g.Edx = 0xffffffdd; w.Service(0x49, g); return;
+            case (3, 4): g.Edx = second ? 0xffffffd5u : 0xffffffddu; w.Service(0x49, g); return;
             default: w.Service(0x12d, g); return;
         }
     }
@@ -173,7 +176,7 @@ public static class OriginalBuildingScripts
             }
             return;
         }
-        if (k is 4 or 6 or 11 or 13) return;
+        if (k is 4 or 6 or 11 or 13 or 18 or 19) return;
         r[0x22] = 0xff; r[0x27] = 0xff;
         if (k is 8 or 9)
         {
@@ -186,7 +189,7 @@ public static class OriginalBuildingScripts
     private static ushort Word(byte[] a, int i) => BitConverter.ToUInt16(a, i);
     private static void SetWord(byte[] a, int i, int v) => BitConverter.GetBytes((ushort)v).CopyTo(a, i);
 
-    private static void Handler2(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int k, int state)
+    private static void Handler2(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int k, int state, bool second)
     {
         switch (k, state)
         {
@@ -195,17 +198,17 @@ public static class OriginalBuildingScripts
                 w.Service(0x9d, g); g.Eax |= 0xff; g.Zf = false; return;
             case (4, 1):
                 w.Service(0x3d, g); if (!g.Zf) return;
-                if ((g.Ebx & 0xff) == 0 && (Word(r, 0x17) & 0x100) == 0) { Effect(w, r, g, 6, 0x2f, 0x1d); SetWord(r, 0x17, Word(r, 0x17) | 0x100); }
+                if ((g.Ebx & 0xff) == 0 && (Word(r, 0x17) & 0x100) == 0) { Effect(w, r, g, 6, 0x2f, second ? 0x1cu : 0x1d); SetWord(r, 0x17, Word(r, 0x17) | 0x100); }
                 Done(g); return;
             case (6, 0): Barracks(w, r, g, false); return;
             case (11, 0): Barracks(w, r, g, true); return;
             case (6, 1) or (11, 1): w.Service(0x3d, g); return;
             case (7, 0):
-                { uint saved = g.Ebx; g.Eax = 7; g.Ebx = 0x11f; w.Service(0x129, g); g.Ebx = saved; Idle(r, g); return; }
+                { uint saved = g.Ebx; g.Eax = second ? 0xdu : 7; g.Ebx = second ? 0x71fu : 0x11f; w.Service(0x129, g); g.Ebx = saved; Idle(r, g); return; }
             case (7, 1):
                 w.Service(0x3d, g); if (!g.Zf) return;
                 r[0x0f] = 0x24;
-                if ((g.Ebx & 0xff) == 0 && (Word(r, 0x17) & 0x100) == 0) { Effect(w, r, g, 0xfffffffe, 10, 0x1d); SetWord(r, 0x17, Word(r, 0x17) | 0x100); }
+                if ((g.Ebx & 0xff) == 0 && (Word(r, 0x17) & 0x100) == 0) { Effect(w, r, g, 0xfffffffe, 10, second ? 0x1cu : 0x1d); SetWord(r, 0x17, Word(r, 0x17) | 0x100); }
                 Done(g); return;
             case (7, 4): g.Edx = 1; w.Service(0x49, g); return;
             case (8, 0) or (9, 0) or (10, 0): Idle(r, g); return;
@@ -224,6 +227,8 @@ public static class OriginalBuildingScripts
             case (9, 4): g.Edx = 0xffffffc5; w.Service(0x49, g); return;
             case (10, 4): g.Edx = 1; w.Service(0x49, g); return;
             case (8, 4): g.Edx = 1; w.Service(0x49, g); return;
+            case (18, 0) or (19, 0): g.Eax = k == 18 ? 4u : 0xe; g.Ebx = k == 18 ? 0xfu : 0xff; w.Service(0x129, g); Done(g); return;
+            case (18, 1) or (19, 1): w.Service(0x3d, g); return;
             case (12, 0):
                 { uint saved = g.Ebx; g.Eax = 0xb; g.Ebx = 0x31f; w.Service(0x129, g); g.Ebx = (g.Ebx & 0xffff0000) | 0x0f8b; g.Ecx = 3; g.Edx = 0xffffffe4; w.Service(0x99, g); g.Ebx = saved; SetBl(g, ~g.Ebx); g.Zf = (g.Ebx & 0x40) == 0; return; }
             case (12, 1): w.Service(0x3d, g); return;
@@ -234,7 +239,7 @@ public static class OriginalBuildingScripts
                 w.Service(0x3d, g); if (!g.Zf) return;
                 if ((g.Ebx & 0xff) == 0 && (Word(r, 0x17) & 0x100) == 0) { Effect(w, r, g, 0x28, 0x2c, 0x1c); SetWord(r, 0x17, Word(r, 0x17) | 0x100); }
                 Done(g); return;
-            case (4, 5) or (6, 5) or (7, 5) or (8, 5) or (9, 5) or (10, 5) or (11, 5) or (12, 5) or (13, 5): w.Service(0x12d, g); return;
+            case (4, 5) or (6, 5) or (7, 5) or (8, 5) or (9, 5) or (10, 5) or (11, 5) or (12, 5) or (13, 5) or (18, 5) or (19, 5): w.Service(0x12d, g); return;
             default: Done(g); return;
         }
     }
@@ -266,9 +271,9 @@ public static class OriginalBuildingScripts
     }
 
     /// <summary>The script 7A0: a countdown (+19), the redraw and two effects when +14 has bit 80h, otherwise the state machine on +14 (services 8D, 91, 95, C1).</summary>
-    private static uint Script7A0(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int ah)
+    private static uint Script7A0(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int ah, bool second)
     {
-        if (ah == 0) { r[0x0f] = 4; r[0x0c] = 0xa; r[0x14] = 4; return 0; }
+        if (ah == 0) { r[0x0f] = 4; r[0x0c] = 0xa; r[0x14] = second ? (byte)0x84 : (byte)4; return 0; }
         if (ah != 1) return 0;
         if ((sbyte)r[0x19] <= 0)
         {
@@ -278,7 +283,7 @@ public static class OriginalBuildingScripts
         if ((r[0x14] & 0x80) != 0)
         {
             r[0x14] = 4; r[0x19] = 0x32; w.Service(0x1d, g);
-            g.Ebx = (g.Ebx & 0xffff0000) | 0x10a; g.Eax = (g.Eax & 0xffffff00) | r[0]; g.Ecx = Dword(r, 4) - 0x23; g.Edx = Dword(r, 8) + 8;
+            g.Ebx = (g.Ebx & 0xffff0000) | (second ? 0x107u : 0x10au); g.Eax = (g.Eax & 0xffffff00) | r[0]; g.Ecx = Dword(r, 4) - 0x23; g.Edx = Dword(r, 8) + 8;
             w.Service(0x19, g); g.Ecx += 0x42; w.Service(0x19, g);
             return 0;
         }

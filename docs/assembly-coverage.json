@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "b2276fbf0f19801e2c994c880cd624556e373fa764cf42d752cffa57fb4c9070",
+  "annotation_sha256": "db9a21e1e014ca487aff704428e65085f2e16bd0c356f9b498ff3a76f454d120",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3726,8 +3726,8 @@
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
         "partial": 855,
-        "ported": 3283,
-        "unreviewed": 2792
+        "ported": 4152,
+        "unreviewed": 1923
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -4107,10 +4107,35 @@
         },
         {
           "start": 2766,
-          "end": 3461,
+          "end": 3257,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 3257,
+          "end": 3428,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-cb9"
+          ]
+        },
+        {
+          "start": 3428,
+          "end": 3455,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 3455,
+          "end": 3461,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-d7f"
+          ]
         },
         {
           "start": 3461,
@@ -4118,15 +4143,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "wrk2-gate-d85"
+            "wrk2-gate-d85",
+            "army__02-building-d85"
           ]
         },
         {
           "start": 3707,
           "end": 3974,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-e7b"
+          ]
         },
         {
           "start": 3974,
@@ -4164,10 +4192,21 @@
         },
         {
           "start": 4653,
+          "end": 4894,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-122d"
+          ]
+        },
+        {
+          "start": 4894,
           "end": 5078,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-131e"
+          ]
         },
         {
           "start": 5078,

@@ -5576,6 +5576,78 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
       "implementation": ["scripts/OriginalBuildingScripts.cs"],
       "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs"
+    },
+    {
+      "id": "army__02-building-cb9",
+      "module": "ARMY__02.WRK",
+      "start": 3257,
+      "end": 3428,
+      "name": "Tower script CB9: step with FS:9D, visitor test, state handlers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs; the block 0D64..0D7F is not referenced by the table and is not ported"
+    },
+    {
+      "id": "army__02-building-d7f",
+      "module": "ARMY__02.WRK",
+      "start": 3455,
+      "end": 3461,
+      "name": "Tower script CB9: tail call of the state 5 handler",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs; the block 0D64..0D7F is not referenced by the table and is not ported"
+    },
+    {
+      "id": "army__02-building-d85",
+      "module": "ARMY__02.WRK",
+      "start": 3461,
+      "end": 3707,
+      "name": "Countdown script D85 (variant of ARMY__01 7A0)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs; the block 0D64..0D7F is not referenced by the table and is not ported"
+    },
+    {
+      "id": "army__02-building-e7b",
+      "module": "ARMY__02.WRK",
+      "start": 3707,
+      "end": 3974,
+      "name": "Building script E7B: init, step, voice, table AH=6, six state handlers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs; the block 0D64..0D7F is not referenced by the table and is not ported"
+    },
+    {
+      "id": "army__02-building-122d",
+      "module": "ARMY__02.WRK",
+      "start": 4653,
+      "end": 4894,
+      "name": "Building script 122D: init, step, voice, table AH=6, six state handlers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs; the block 0D64..0D7F is not referenced by the table and is not ported"
+    },
+    {
+      "id": "army__02-building-131e",
+      "module": "ARMY__02.WRK",
+      "start": 4894,
+      "end": 5078,
+      "name": "Building scripts 131E and 137A: step, state handlers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs; the block 0D64..0D7F is not referenced by the table and is not ported"
     }
   ]
 }
