@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "5e83e01096d82c2d79c3729e7ff84e733559391baac4d14c78b272d5f7999d3e",
+  "annotation_sha256": "79c5d3269ba633c91cd874ff9f0a15af60558c6f62311d4cab1d740b180ec8cb",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3698,8 +3698,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 7715,
-        "unreviewed": 5697
+        "ported": 8407,
+        "unreviewed": 5005
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -3809,6 +3809,22 @@
         },
         {
           "start": 4605,
+          "end": 4629,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 4629,
+          "end": 4735,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-1215"
+          ]
+        },
+        {
+          "start": 4735,
           "end": 4759,
           "status": "unreviewed",
           "classification": "unknown",
@@ -3825,6 +3841,22 @@
         },
         {
           "start": 5686,
+          "end": 5702,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 5702,
+          "end": 5808,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-1646"
+          ]
+        },
+        {
+          "start": 5808,
           "end": 5832,
           "status": "unreviewed",
           "classification": "unknown",
@@ -3841,6 +3873,22 @@
         },
         {
           "start": 6664,
+          "end": 6688,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 6688,
+          "end": 6742,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-1a20"
+          ]
+        },
+        {
+          "start": 6742,
           "end": 6766,
           "status": "unreviewed",
           "classification": "unknown",
@@ -3857,6 +3905,22 @@
         },
         {
           "start": 7384,
+          "end": 7408,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 7408,
+          "end": 7514,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-1cf0"
+          ]
+        },
+        {
+          "start": 7514,
           "end": 7538,
           "status": "unreviewed",
           "classification": "unknown",
@@ -3873,6 +3937,22 @@
         },
         {
           "start": 7891,
+          "end": 7915,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 7915,
+          "end": 7969,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-1eeb"
+          ]
+        },
+        {
+          "start": 7969,
           "end": 7993,
           "status": "unreviewed",
           "classification": "unknown",
@@ -3889,6 +3969,22 @@
         },
         {
           "start": 8311,
+          "end": 8335,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 8335,
+          "end": 8441,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-208f"
+          ]
+        },
+        {
+          "start": 8441,
           "end": 8465,
           "status": "unreviewed",
           "classification": "unknown",
@@ -3905,6 +4001,22 @@
         },
         {
           "start": 9267,
+          "end": 9291,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 9291,
+          "end": 9345,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-244b"
+          ]
+        },
+        {
+          "start": 9345,
           "end": 9369,
           "status": "unreviewed",
           "classification": "unknown",
@@ -3921,6 +4033,22 @@
         },
         {
           "start": 9846,
+          "end": 9870,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 9870,
+          "end": 9976,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-268e"
+          ]
+        },
+        {
+          "start": 9976,
           "end": 11852,
           "status": "unreviewed",
           "classification": "unknown",

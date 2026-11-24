@@ -14,7 +14,7 @@ public static class OriginalMageCloak
     public const byte RufinLow = 0x3c, RufinHigh = 0x5a, FirstMageLow = 0x1e, FirstMageHigh = 0x2d;
 
     /// <returns>AL as the original leaves it.</returns>
-    public static byte Step(IMageWorld world, byte[] r, byte low, byte high, bool dropsItems, byte al = 0x55)
+    public static byte Step(IMageWorld world, byte[] r, byte low, byte high, bool dropsItems, byte al = 0x55, byte gate = 0x7f)
     {
         if (dropsItems && (sbyte)r[0x19] <= 0)
         {
@@ -26,16 +26,29 @@ public static class OriginalMageCloak
         {
             if (!(r[0x31] >= 0x0a && r[0x19] < low))
             {
-                if ((r[0x2e] & 0x7f) != 0) return al;
+                if ((r[0x2e] & gate) != 0) return al;
                 r[0x31]++; if ((sbyte)r[0x31] < 0) r[0x31] = 0x7f;   // inc … jns
                 return al;
             }
             return Request(r);
         }
         r[0x20] = 0;        // hidden: seen by nobody
-        if ((r[0x2e] & 0x7f) != 0) return al;
+        if ((r[0x2e] & gate) != 0) return al;
         if (r[0x19] <= high) { r[0x31]--; if ((sbyte)r[0x31] >= 0) return al; r[0x31] = 0; }   // dec … jns; the exhausted charge asks for the return, too
         return Request(r);
+    }
+
+    /// <summary>The continuation of Kevin, Miron, Garik, Efil and Kochet (e.g. 1A20): the dead hermit drops his items; a hermit with the bit 0 of +17 set (hit — set by the unit machine) asks for the vanishing
+    /// action, with no thresholds and no charge. Verified by tests/fixtures/mage-cloak.json.</summary>
+    public static byte FlagStep(IMageWorld world, byte[] r, byte al = 0x55)
+    {
+        if ((sbyte)r[0x19] <= 0)
+        {
+            byte cellY = (byte)(BinaryPrimitives.ReadUInt32LittleEndian(r.AsSpan(8)) >> 5);
+            world.DropItems((byte)(BinaryPrimitives.ReadUInt32LittleEndian(r.AsSpan(4)) >> 5), cellY, r[3]);
+            al = cellY;
+        }
+        return (r[0x17] & 1) == 0 ? al : Request(r);
     }
 
     /// <summary>D96: ask for state 3 unless the mage is in it.</summary>
