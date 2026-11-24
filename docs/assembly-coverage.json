@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "03fbe61bc5bf3855b37af112dc9b508078d69fe85e3148bfe3bd79f46a89ef3c",
+  "annotation_sha256": "e05fc9605564895918769b314a67cdb32b5b38688bb701bf66235fdf4f480de0",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3634,8 +3634,8 @@
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
         "partial": 855,
-        "ported": 1981,
-        "unreviewed": 4094
+        "ported": 2328,
+        "unreviewed": 3747
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -3859,10 +3859,19 @@
         },
         {
           "start": 1981,
-          "end": 2129,
+          "end": 2037,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 2037,
+          "end": 2129,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-worker-7f5"
+          ]
         },
         {
           "start": 2129,
@@ -3871,7 +3880,8 @@
           "classification": "code",
           "claims": [
             "worker-wrk-grant",
-            "worker-ore-grant"
+            "worker-ore-grant",
+            "army__02-worker-7f5"
           ]
         },
         {
@@ -3880,15 +3890,27 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "worker-wrk-grant"
+            "worker-wrk-grant",
+            "army__02-worker-7f5"
           ]
         },
         {
           "start": 2281,
+          "end": 2302,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-worker-7f5"
+          ]
+        },
+        {
+          "start": 2302,
           "end": 2482,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-worker-8fe"
+          ]
         },
         {
           "start": 2482,
@@ -3896,15 +3918,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "worker-wrk-return"
+            "worker-wrk-return",
+            "army__02-worker-8fe"
           ]
         },
         {
           "start": 2514,
           "end": 2541,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-worker-8fe"
+          ]
         },
         {
           "start": 2541,
@@ -3912,7 +3937,8 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "ore-worker-dispatch"
+            "ore-worker-dispatch",
+            "army__02-worker-9ed"
           ]
         },
         {
@@ -3921,11 +3947,21 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "ore-worker-return-empty"
+            "ore-worker-return-empty",
+            "army__02-worker-9ed"
           ]
         },
         {
           "start": 2739,
+          "end": 2766,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-worker-9ed"
+          ]
+        },
+        {
+          "start": 2766,
           "end": 3461,
           "status": "unreviewed",
           "classification": "unknown",

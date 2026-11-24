@@ -14,6 +14,7 @@ public partial class TestRunner
         public void Redraw() => log.Add((byte)'D');
         public void Vitals() => log.Add((byte)'V');
         public void Actions() => log.Add((byte)'U');
+        public void Service1BB() => log.Add((byte)'B');
         public void Effect(byte al, byte bl, byte bh, uint ecx, uint edx) { log.Add((byte)'E'); log.AddRange([al, bl, bh]); log.AddRange(BitConverter.GetBytes(ecx)); log.AddRange(BitConverter.GetBytes(edx)); }
     }
 
@@ -32,16 +33,17 @@ public partial class TestRunner
             BitConverter.GetBytes(c.GetProperty("x").GetUInt32()).CopyTo(r, 4); BitConverter.GetBytes(c.GetProperty("y").GetUInt32()).CopyTo(r, 8);
             int entry = c.GetProperty("entry").GetInt32(); seen.Add(entry); var log = new List<byte>(); var world = new UnitScriptReplay((byte)c.GetProperty("seed").GetInt32(), random, log);
             int ah = c.GetProperty("ah").GetInt32(); if (ah == 0) inits++;
-            if (entry >= 6) OriginalUnitScript.Worker(world, r, ah, (byte)c.GetProperty("bl").GetInt32(), entry - 6, (byte)c.GetProperty("al").GetInt32());
+            if (entry >= 9) OriginalUnitScript.Worker2(world, r, ah, (byte)c.GetProperty("bl").GetInt32(), entry - 9, (byte)c.GetProperty("al").GetInt32());
+            else if (entry >= 6) OriginalUnitScript.Worker(world, r, ah, (byte)c.GetProperty("bl").GetInt32(), entry - 6, (byte)c.GetProperty("al").GetInt32());
             else OriginalUnitScript.Run(world, r, ah, (byte)c.GetProperty("bl").GetInt32(), entry is 2 or 5);
-            byte[] output = [.. r, world.Index, .. log];
+            byte[] output = [.. r, .. (entry == 9 && ah == 6 ? BitConverter.GetBytes(OriginalUnitScript.Worker2Table) : []), world.Index, .. log];
             digest.AppendData(output);
             if (Convert.ToHexStringLower(SHA256.HashData(output))[..10] != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; }
             count++;
         }
         GD.Print($"Unit scripts: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("unit");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 9 && inits > 100, $"Unit script reference coverage ({count} cases, {seen.Count} entries)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 12 && inits > 100, $"Unit script reference coverage ({count} cases, {seen.Count} entries)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Standard unit scripts ARMY__01/02.WRK match original x86");
     }
 }
