@@ -127,7 +127,16 @@ public sealed partial class Skirmish
         {
             _rufinWorld ??= new SkirmishRufinWorld(this);
             _rufinWorld.Prepare(mage);
-            if (mage.Alive) OriginalRufin.Step(_rufinWorld, mage.Record);
+            if (mage.Alive)
+            {
+                // each hermit has his own script (ARMY__03.WRK); those not ported yet (16..21) still run Rufin's (adapter)
+                switch (mage.Source.TemplateIndex)
+                {
+                    case 14: OriginalOnis.Step(_rufinWorld, mage.Record); break;
+                    case 15: OriginalIrvil.Step(_rufinWorld, mage.Record); break;
+                    default: OriginalRufin.Step(_rufinWorld, mage.Record); break;
+                }
+            }
             if (!MageFights(mage)) { mage.Target = 0; continue; }   // at peace he stands
             if (!mage.Alive || (mage.Record[0x14] & 7) == 3 || mage.Record[0x32] != 0) { mage.Route.Clear(); mage.Goal = null; continue; }   // vanishing or hidden: he does nothing
             MageSeek(mage);
