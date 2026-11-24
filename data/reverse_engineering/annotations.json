@@ -5072,6 +5072,90 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-fx1105.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
       "implementation": ["scripts/OriginalObjectScripts.cs"],
       "limitations": "FS services are recorded stubs in the check; EDI of the update is assumed to be the effect itself; not wired into the skirmish"
+    },
+    {
+      "id": "army03-m2f4e-2f4e",
+      "module": "ARMY__03.WRK",
+      "start": 12110,
+      "end": 12149,
+      "name": "Mage effect script 2F4E",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-m2f4e.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army03-m30a0-30a0",
+      "module": "ARMY__03.WRK",
+      "start": 12448,
+      "end": 12497,
+      "name": "Mage effect script 30A0",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-m30a0.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army03-m31e7-31e7",
+      "module": "ARMY__03.WRK",
+      "start": 12775,
+      "end": 12876,
+      "name": "Mage effect script 31E7",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-m31e7.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army03-m333a-333a",
+      "module": "ARMY__03.WRK",
+      "start": 13114,
+      "end": 13166,
+      "name": "Mage effect script 333A",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-m333a.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army03-m336e-336e",
+      "module": "ARMY__03.WRK",
+      "start": 13166,
+      "end": 13280,
+      "name": "Mage effect script 336E",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-m336e.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army03-m33e0-33e0",
+      "module": "ARMY__03.WRK",
+      "start": 13280,
+      "end": 13327,
+      "name": "Mage effect script 33E0",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-m33e0.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
+    },
+    {
+      "id": "army03-m340f-340f",
+      "module": "ARMY__03.WRK",
+      "start": 13327,
+      "end": 13412,
+      "name": "Mage effect script 340F",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/obj-m340f.json", "tools/verify_object_scripts.py", "tests/OriginalObjectScriptChecks.cs"],
+      "implementation": ["scripts/OriginalObjectScripts.cs"],
+      "limitations": "FS services are recorded stubs in the check; not wired into the skirmish"
     }
   ]
 }

@@ -47,6 +47,7 @@ public partial class TestRunner
         public byte ServiceA9(ushort ax) { log.Add((byte)'Y'); log.AddRange(BitConverter.GetBytes(ax)); return _a9.Count > 0 ? _a9.Dequeue() : (byte)0; }
         public byte[]? ObjectAt(uint reference) => reference == 0x140 ? Obj1 : (reference == 0x180 ? Obj2 : new byte[0x40]);
         public byte Parent25 => (byte)c.GetProperty("parent25").GetInt32();
+        public byte Bh => (byte)c.GetProperty("ef1").GetInt32();
         public byte Bl => (byte)c.GetProperty("bl").GetInt32();
         public (bool Zf, uint Flags) Service119(ushort ax) { log.Add((byte)'H'); log.AddRange(BitConverter.GetBytes(ax)); return (c.GetProperty("a1").GetArrayLength() == 0 || c.GetProperty("a1")[0][0].GetInt32() != 0, (uint)(c.GetProperty("strength").GetInt64() & 0x1f)); }
         public int K => c.GetProperty("k").GetInt32();
@@ -175,6 +176,14 @@ public partial class TestRunner
         ObjectScriptReplay("obj-fx1012", "fx1012", "The burst ARMY__00.WRK 1012", (w, r, ah) => OriginalObjectScripts.Fx1012(w, r, ah, 0xa00), 0);
         ObjectScriptReplay("obj-fx10b3", "fx10b3", "The hit spark ARMY__00.WRK 10B3", (w, r, ah) => { var p = new byte[0x40]; BitConverter.GetBytes((uint)new[] { 0, 0x100, 0x140 }[((ObjectReplay)w).K % 3]).CopyTo(p, 0x1c); OriginalObjectScripts.FxHit(w, r, p); }, 0);
         ObjectScriptReplay("obj-fx1105", "fx1105", "The wandering charm ARMY__00.WRK 1105", (w, r, ah) => OriginalObjectScripts.Fx1105(w, r, ah, (uint)((ObjectReplay)w).Bl, 0x400000), 0, true);
+        byte[] Par(IObjectScriptWorld w) => Enumerable.Range(0, 0x40).Select(i => i == 0x25 ? ((ObjectReplay)w).Parent25 : (byte)0).ToArray();
+        ObjectScriptReplay("obj-m2f4e", "m2f4e", "Mage effect ARMY__03.WRK 2F4E", (w, r, ah) => OriginalObjectScripts.MageFx2f4e(w, r, ah, Par(w)), 0);
+        ObjectScriptReplay("obj-m30a0", "m30a0", "Mage effect ARMY__03.WRK 30A0", OriginalObjectScripts.MageFx30a0, 0);
+        ObjectScriptReplay("obj-m31e7", "m31e7", "Mage effect ARMY__03.WRK 31E7", (w, r, ah) => OriginalObjectScripts.MageFx31e7(w, r, ah, Par(w)), 0);
+        ObjectScriptReplay("obj-m333a", "m333a", "Mage effect ARMY__03.WRK 333A", OriginalObjectScripts.MageFx333a, 0);
+        ObjectScriptReplay("obj-m336e", "m336e", "Mage effect ARMY__03.WRK 336E", OriginalObjectScripts.MageFx336e, 0);
+        ObjectScriptReplay("obj-m33e0", "m33e0", "Mage effect ARMY__03.WRK 33E0", (w, r, ah) => OriginalObjectScripts.MageFx33e0(w, r, ah, ((ObjectReplay)w).Bl, ((ObjectReplay)w).Bh), 0);
+        ObjectScriptReplay("obj-m340f", "m340f", "Mage effect ARMY__03.WRK 340F", (w, r, ah) => OriginalObjectScripts.MageFx340f(w, r, ah, ((ObjectReplay)w).Bl), 0);
         ObjectScriptReplay("obj-face", "face", "The stone face script ARMY__03.WRK 2B9", OriginalObjectScripts.Face);
     }
 }

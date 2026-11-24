@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "51693d6723e16acce55e94e994b8b7d8649ffc790408f7127bc05fcbb08a62f9",
+  "annotation_sha256": "dc94e8cdd0f5f2d7e54304e8ba0c0b736c5b05c26799504f56b4261172035210",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3911,8 +3911,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "ported": 11456,
-        "unreviewed": 1956
+        "ported": 11943,
+        "unreviewed": 1469
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -4445,10 +4445,28 @@
         },
         {
           "start": 12110,
-          "end": 12497,
+          "end": 12149,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m2f4e-2f4e"
+          ]
+        },
+        {
+          "start": 12149,
+          "end": 12448,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 12448,
+          "end": 12497,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m30a0-30a0"
+          ]
         },
         {
           "start": 12497,
@@ -4461,10 +4479,62 @@
         },
         {
           "start": 12568,
-          "end": 13412,
+          "end": 12775,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 12775,
+          "end": 12876,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m31e7-31e7"
+          ]
+        },
+        {
+          "start": 12876,
+          "end": 13114,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 13114,
+          "end": 13166,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m333a-333a"
+          ]
+        },
+        {
+          "start": 13166,
+          "end": 13280,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m336e-336e"
+          ]
+        },
+        {
+          "start": 13280,
+          "end": 13327,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m33e0-33e0"
+          ]
+        },
+        {
+          "start": 13327,
+          "end": 13412,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m340f-340f"
+          ]
         }
       ]
     },
