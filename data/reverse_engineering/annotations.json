@@ -5492,6 +5492,18 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
       "implementation": ["scripts/OriginalBuildingScripts.cs"],
       "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs (FS:79 and FS:6D/71 with fixed buffers); the block 077F..079A is not referenced by the table of the script and is not ported"
+    },
+    {
+      "id": "army__01-building-ce3",
+      "module": "ARMY__01.WRK",
+      "start": 3299,
+      "end": 3567,
+      "name": "Building script CE3: init, step, voice, table AH=6, six state handlers",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:41 (C88C) is emulated only as far as its front half; the services are recorded stubs"
     }
   ]
 }

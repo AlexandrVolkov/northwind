@@ -34,8 +34,8 @@ public interface IBuildingScriptWorld
 public static class OriginalBuildingScripts
 {
     /// <summary>The offsets of the data tables returned by AH = 6 (A, B, none, D).</summary>
-    public static readonly uint[] Tables = [0x21b, 0x336, 0, 0x4c6, 0, 0, 0, 0xa65];
-    private static readonly int[][] Handlers = [[0x1ef, 0x1b5, 0x1b2, 0x203, 0x23b, 0x247], [0x316, 0x2c6, 0x2c3, 0x2c3, 0x32a, 0x34e], [0x3c1, 0x3bb, 0x3b8, 0x3b8, 0x3b8, 0x3e7], [0x474, 0x466, 0x463, 0x4ae, 0x4de, 0x4ea], [0x771, 0x73b, 0x738, 0x738, 0x738, 0x79a], [], [0x909, 0x903, 0x900, 0x900, 0x900, 0x980], [0xa33, 0x9f9, 0x9f6, 0x9f6, 0xa59, 0xa71]];
+    public static readonly uint[] Tables = [0x21b, 0x336, 0, 0x4c6, 0, 0, 0, 0xa65, 0xdcd];
+    private static readonly int[][] Handlers = [[0x1ef, 0x1b5, 0x1b2, 0x203, 0x23b, 0x247], [0x316, 0x2c6, 0x2c3, 0x2c3, 0x32a, 0x34e], [0x3c1, 0x3bb, 0x3b8, 0x3b8, 0x3b8, 0x3e7], [0x474, 0x466, 0x463, 0x4ae, 0x4de, 0x4ea], [0x771, 0x73b, 0x738, 0x738, 0x738, 0x79a], [], [0x909, 0x903, 0x900, 0x900, 0x900, 0x980], [0xa33, 0x9f9, 0x9f6, 0x9f6, 0xa59, 0xa71], [0xdad, 0xd73, 0xd70, 0xd70, 0xdc1, 0xde9]];
 
     private static uint Dword(byte[] r, int i) => BitConverter.ToUInt32(r, i);
     private static void SetBl(BuildingRegs g, uint v) => g.Ebx = (g.Ebx & 0xffffff00) | (v & 0xff);
@@ -52,7 +52,7 @@ public static class OriginalBuildingScripts
             if (k is not (2 or 4)) { r[0x27] = 0xff; for (int i = 0; i < 4; i++) r[0x22 + i] = 0xff; r[0x26] = 0xff; }
             return 0;
         }
-        if (ah == 2) { if (k is 0 or 1 or 3 or 7) w.Service(0xcd, g); return 0; }
+        if (ah == 2) { if (k is 0 or 1 or 3 or 7 or 8) w.Service(0xcd, g); return 0; }
         if (ah == 6) return Tables[k];
         if (ah == 5)
         {
@@ -168,6 +168,12 @@ public static class OriginalBuildingScripts
         }
         if (k is 4 or 6) return;
         r[0x22] = 0xff; r[0x27] = 0xff;
+        if (k == 8)
+        {
+            g.Eax = Dword(r, 8) >> 5; g.Ecx = Dword(r, 4) >> 5;
+            g.Ecx = (g.Ecx & 0xffff00ff) | ((g.Eax & 0xff) << 8); g.Eax = (g.Eax & 0xffff00ff) | ((uint)r[3] << 8);
+            w.Service(0x197, g);
+        }
     }
 
     private static ushort Word(byte[] a, int i) => BitConverter.ToUInt16(a, i);
@@ -194,7 +200,14 @@ public static class OriginalBuildingScripts
                 if ((g.Ebx & 0xff) == 0 && (Word(r, 0x17) & 0x100) == 0) { Effect(w, r, g, 0xfffffffe, 10, 0x1d); SetWord(r, 0x17, Word(r, 0x17) | 0x100); }
                 Done(g); return;
             case (7, 4): g.Edx = 1; w.Service(0x49, g); return;
-            case (4, 5) or (6, 5) or (7, 5): w.Service(0x12d, g); return;
+            case (8, 0): Idle(r, g); return;
+            case (8, 1):
+                w.Service(0x3d, g); if (!g.Zf) return;
+                r[0x0f] = 0x24;
+                if ((g.Ebx & 0xff) == 0 && (Word(r, 0x17) & 0x100) == 0) { Effect(w, r, g, 2, 0x43, 0x1d); SetWord(r, 0x17, Word(r, 0x17) | 0x100); }
+                Done(g); return;
+            case (8, 4): g.Edx = 1; w.Service(0x49, g); return;
+            case (4, 5) or (6, 5) or (7, 5) or (8, 5): w.Service(0x12d, g); return;
             default: Done(g); return;
         }
     }
