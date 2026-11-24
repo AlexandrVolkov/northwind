@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "b66b291bf31c6e30febe5c5ad97af60a987913df53eca7e619b965d0d2bbaec1",
+  "annotation_sha256": "691add67b9e410f1c418e1a0a942b9e97ee7333b9baae3206d2eb85af4c8400e",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -1989,7 +1989,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "lab-research-cccb"
+            "lab-research-cccb",
+            "le1-unit-actions-cccb"
           ]
         },
         {

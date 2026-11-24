@@ -45,3 +45,7 @@
 ## CB21, CB77, CC7B, CCC4
 
 `FCB77` is the conversion of a target (the priest-like action): +22 counts the ticks, at 32h the target is handed over (D1BA) and the statistics byte [6BA] + 1A35h * owner + 17Bh + 3 * converter is counted, at 3Ch CB21 turns the target; BL ends 0 as the original (the `MOV BL,2` before `JMP CBB8` is dead). `FCB21` turns the target, `FCC7B` takes its item (1243A), `FCCC4` sets health 1. The fixture gains the statistics records ([6BA]) in the compared output; sabotaging the counter offset is caught.
+
+## CCCB
+
+`FCCCB` is the upkeep of a unit: A716 gives the count, the participant pays 10 * +23 * +22 from +20 (floored at 0, then +23 = 1), the unit pays it from +24; when that runs out A6AE is called and the statistics value +73 of the owner falls by 271h. The original also tests and clears `+73` of the unit record itself (kept; the record of the check is 80h long). Verified against x86; sabotaging 271h is caught.

@@ -6560,6 +6560,18 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "none"
+    },
+    {
+      "id": "le1-unit-actions-cccb",
+      "module": "LE:1",
+      "start": 52427,
+      "end": 52594,
+      "name": "Upkeep of the unit: participant and statistics (CCCB)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
+      "implementation": ["scripts/OriginalUnitActions.cs"],
+      "limitations": "A716, 9E41 and A6AE are recorded stubs; the original also writes +73 of the unit record (kept)"
     }
   ]
 }
