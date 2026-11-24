@@ -66,6 +66,9 @@ public partial class TestRunner
         public void Voice() => log.Add((byte)'Y');
         public void Service115() => log.Add((byte)'I');
         public uint TemplateFlagsOf71() { log.Add((byte)'T'); log.AddRange(BitConverter.GetBytes(0xffc00000u)); return (uint)c.GetProperty("tflags").GetInt64(); }
+        public void Service13E() => log.Add((byte)'K');
+        public void Service1AF() => log.Add((byte)'Z');
+        public byte[]? LastCreated;
         public void Jump131() => log.Add((byte)'J');
         public void Service25(uint parent, byte bl) { log.Add((byte)'a'); log.AddRange(BitConverter.GetBytes(parent)); log.Add(bl); }
         public void Service29(byte bl) { log.Add((byte)'b'); log.Add(bl); }
@@ -114,7 +117,7 @@ public partial class TestRunner
         public (bool Created, byte[]? Object) Create(byte army, byte owner, byte template, byte layer, uint x, uint y)
         {
             log.Add((byte)'K'); log.AddRange([army, owner, template, layer]); log.AddRange(BitConverter.GetBytes(x)); log.AddRange(BitConverter.GetBytes(y));
-            bool zf = _create.Count > 0 ? _create.Dequeue() : true; return (zf, new byte[0x40]);   // ZF = created
+            bool zf = _create.Count > 0 ? _create.Dequeue() : true; LastCreated = new byte[0x40]; return (zf, LastCreated);   // ZF = created
         }
         public void Occupy(byte[] record) { log.Add((byte)'O'); log.AddRange(BitConverter.GetBytes(0x600u)); }
         public IEnumerable<byte> OwnTemplates(byte[] record) => c.GetProperty("units").EnumerateArray().Select(a => (byte)a.GetInt32());
@@ -122,7 +125,7 @@ public partial class TestRunner
         public void Sound(uint id) { log.Add((byte)'S'); log.AddRange(BitConverter.GetBytes(id)); }
     }
 
-    private void ObjectScriptReplay(string file, string key, string label, Action<IObjectScriptWorld, byte[], int> script, int minEffects = 5, bool extra = false, bool part = false, bool idle = false, bool manuscript = false, bool itemobj = false, bool siege = false)
+    private void ObjectScriptReplay(string file, string key, string label, Action<IObjectScriptWorld, byte[], int> script, int minEffects = 5, bool extra = false, bool part = false, bool idle = false, bool manuscript = false, bool itemobj = false, bool siege = false, bool shackled = false, bool leader = false)
     {
         using var reference = GameData.Read<JsonDocument>($"res://tests/fixtures/{file}.json");
         var root = reference.RootElement;
@@ -140,13 +143,14 @@ public partial class TestRunner
             r[1] = (byte)c.GetProperty("ef1").GetInt32(); r[5] = (byte)c.GetProperty("ef5").GetInt32(); BitConverter.GetBytes((uint)c.GetProperty("ef7").GetInt64()).CopyTo(r, 7); BitConverter.GetBytes((uint)c.GetProperty("efc").GetInt64()).CopyTo(r, 0xc);
             r[0x16] = (byte)c.GetProperty("ef16").GetInt32(); r[0x17] = (byte)c.GetProperty("ef17").GetInt32(); BitConverter.GetBytes((uint)c.GetProperty("ef18").GetInt64()).CopyTo(r, 0x18); BitConverter.GetBytes((uint)c.GetProperty("ef1c").GetInt64()).CopyTo(r, 0x1c);
             var log = new List<byte>(); var world = new ObjectReplay(c, random, log); Array.Copy(world.ObjectBytes, 0, world.Obj1, 0, 0x40); Array.Copy(world.ObjectBytes, 0x40, world.Obj2, 0, 0x40);
-            ushort ax = 0; bool siegeZf = false;
+            ushort ax = 0; bool siegeZf = false; uint leaderEdx = 0;
             if (itemobj) { ax = OriginalObjectScripts.Pickup(world, r, c.GetProperty("ah").GetInt32(), c.GetProperty("k").GetInt32(), (byte)c.GetProperty("bl").GetInt32()); }
             else if (manuscript) { r[0x28] = (byte)c.GetProperty("mask28").GetInt32(); ax = OriginalObjectScripts.Manuscript(world, r, c.GetProperty("ah").GetInt32(), new byte[] { 0x18, 0x19, 0x1b }[c.GetProperty("k").GetInt32()], (byte)c.GetProperty("vowner").GetInt32()); }
+            else if (leader) { leaderEdx = OriginalObjectScripts.Leader(world, r, c.GetProperty("ah").GetInt32(), (byte)c.GetProperty("bl").GetInt32()); }
             else if (siege) { siegeZf = OriginalObjectScripts.Siege(world, r, c.GetProperty("ah").GetInt32(), (byte)c.GetProperty("bl").GetInt32(), c.GetProperty("k").GetInt32() == 1); }
             else script(world, r, c.GetProperty("ah").GetInt32());
             if (c.GetProperty("ah").GetInt32() != 8) ax = 0;   // AX is meaningful for the visitor's call only
-            byte[] output = siege ? [.. (c.GetProperty("ah").GetInt32() == 5 ? new byte[] { (byte)(siegeZf ? 1 : 0) } : []), .. r, world.I, world.J, .. log] : itemobj || manuscript ? [.. BitConverter.GetBytes(ax), .. r, world.I, world.J, .. log] : part ? [.. r, world.I, world.J, .. BitConverter.GetBytes(world.Part12), .. log] : extra ? [.. r, world.I, world.J, .. world.Obj1, .. world.Obj2, .. BitConverter.GetBytes(world.Part12), .. log] : [.. r, world.I, world.J, .. log];
+            byte[] output = shackled ? [.. r, world.I, world.J, .. (world.LastCreated ?? new byte[0x40]), .. log] : leader ? [.. r, world.I, world.J, .. (c.GetProperty("ah").GetInt32() == 6 ? BitConverter.GetBytes(leaderEdx) : []), .. log] : siege ? [.. (c.GetProperty("ah").GetInt32() == 5 ? new byte[] { (byte)(siegeZf ? 1 : 0) } : []), .. r, world.I, world.J, .. log] : itemobj || manuscript ? [.. BitConverter.GetBytes(ax), .. r, world.I, world.J, .. log] : part ? [.. r, world.I, world.J, .. BitConverter.GetBytes(world.Part12), .. log] : extra ? [.. r, world.I, world.J, .. world.Obj1, .. world.Obj2, .. BitConverter.GetBytes(world.Part12), .. log] : [.. r, world.I, world.J, .. log];
             digest.AppendData(output); if (log.Contains((byte)'E')) effects++;
             string hex = Convert.ToHexStringLower(SHA256.HashData(output))[..10];
             if (hex != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; if (only == count) GD.Print("CSHARP " + Convert.ToHexStringLower(output)); }
@@ -205,6 +209,9 @@ public partial class TestRunner
         ObjectScriptReplay("obj-mclear", "mclear", "Mage wall clearing ARMY__03.WRK 319C", (w, r, ah) => OriginalObjectScripts.MageClear(w, r, ((ObjectReplay)w).ParentRecord(), ((ObjectReplay)w).K % 2), 0, true);
         ObjectScriptReplay("obj-camp", "camp", "The camp ARMY__00.WRK 0", OriginalObjectScripts.Camp, 0);
         ObjectScriptReplay("obj-siege", "siege", "The siege weapons ARMY__02.WRK F86", (w, r, ah) => { }, 0, false, false, false, false, false, true);
+        ObjectScriptReplay("obj-shackled", "shackled", "The shackled warrior ARMY__01.WRK F64", OriginalObjectScripts.Shackled, 0, false, false, false, false, false, false, true);
+        ObjectScriptReplay("obj-leader", "leader", "The leader ARMY__02.WRK 10F1", (w, r, ah) => { }, 0, false, false, false, false, false, false, false, true);
+        ObjectScriptReplay("obj-leadercont", "leadercont", "The leader's continuation ARMY__02.WRK 116E", (w, r, ah) => OriginalObjectScripts.LeaderContinuation(w, r), 0);
         ObjectScriptReplay("obj-face", "face", "The stone face script ARMY__03.WRK 2B9", OriginalObjectScripts.Face);
     }
 }

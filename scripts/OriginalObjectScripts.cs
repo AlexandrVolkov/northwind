@@ -34,6 +34,8 @@ public interface IObjectScriptWorld
     void Voice();                                     // FS:D1
     void Service115();                                // FS:115
     uint TemplateFlagsOf71();                         // FS:71: DAT[40] of the template of EDI
+    void Service13E();                                // FS:13E
+    void Service1AF();                                // FS:1AF
     void Service25(uint parent, byte bl);             // FS:25
     void Service29(byte bl);                          // FS:29
     void Sound35(uint id);                            // FS:35
@@ -712,6 +714,40 @@ public static class OriginalObjectScripts
         w.Vitals(); w.Service115();
         if (r[0x31] == 0xff) return false;
         r[0x0f] = 7; w.Actions(); return false;
+    }
+
+    /// <summary>The shackled warrior (ARMY__01.WRK F64, template 20): a prisoner that shifts through the frames 907h..911h and, when his health is gone, falls apart and frees a warrior (template 13h of the owner 4,
+    /// +31 = 8).</summary>
+    public static void Shackled(IObjectScriptWorld w, byte[] r, int ah)
+    {
+        if (ah == 0) { Word(r, 1, 0x907); return; }
+        if (ah != 1) return;
+        if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); }
+        if ((w.Tick & 3) == 0) { Word(r, 1, (ushort)(Word(r, 1) + 1)); if (Word(r, 1) >= 0x912) Word(r, 1, 0x907); }
+        if ((sbyte)r[0x19] > 0) return;
+        r[0x19]--; if (r[0x19] > 0xfa) return;
+        w.Remove(r);
+        var (created, freed) = w.Create(r[0], 4, 0x13, 1, U32(r, 4), U32(r, 8));
+        if (created) freed![0x31] = 8;
+    }
+
+    public const int LeaderTable = 0x11a8;
+    /// <summary>The leader (ARMY__02.WRK 10F1, template 20): the unit script of the horseman with FS:13E before the step; AH = 6 returns the table at 11A8. Returns EDX of AH = 6.</summary>
+    public static uint Leader(IObjectScriptWorld w, byte[] r, int ah, byte bl)
+    {
+        if (ah == 0) { r[0x0f] = 7; w.Appearance(bl); r[0x2e] = w.Random(); return 0; }
+        if (ah == 2) { w.Voice(); return 0; }
+        if (ah == 6) return LeaderTable;
+        if (ah != 1) return 0;
+        if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Redraw(); }
+        w.Vitals(); w.Service13E(); w.Actions(); return 0;
+    }
+
+    /// <summary>The continuation of the leader's step (116E): a dead leader not yet marked asks FS:1AF.</summary>
+    public static void LeaderContinuation(IObjectScriptWorld w, byte[] r)
+    {
+        if ((sbyte)r[0x19] > 0 || (Word(r, 0x17) & 0x80) != 0) return;
+        w.Service1AF();
     }
 
     public static void Fx54aKind16(IObjectScriptWorld w, byte[] r, int ah, byte[] parent)   // B62
