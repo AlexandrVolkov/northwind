@@ -5744,6 +5744,18 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
       "implementation": ["scripts/OriginalBuildingScripts.cs"],
       "limitations": "FS:147, FS:187, FS:45, FS:19B, FS:75, FS:15, FS:8D, FS:1D, FS:DD, FS:E1, FS:4D are recorded stubs (FS:187 gives ECX/EDX derived from its results); FS:109 runs as original code"
+    },
+    {
+      "id": "army__00-effects-1267",
+      "module": "ARMY__00.WRK",
+      "start": 4711,
+      "end": 5403,
+      "name": "Effect scripts 1267..end: guardian 1Bh, impacts 129D/1481/14CE, fragment fountain 12EC, animations 1Eh..20h",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/army01-effects.json", "tools/verify_army01_effects.py", "tests/OriginalArmy01EffectChecks.cs"],
+      "implementation": ["scripts/OriginalArmy00Effects.cs"],
+      "limitations": "The services (FS:A1, 119, 25, 29, 39, 69, 19, 35, 10D, A5) and the jumps into 6FE, 735, A44 are recorded stubs; FS:109 runs as original code"
     }
   ]
 }

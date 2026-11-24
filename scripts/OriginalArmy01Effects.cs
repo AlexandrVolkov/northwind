@@ -15,6 +15,19 @@ public interface IArmy01EffectWorld
     byte StateByte();
     /// <summary>FS:35: a sound (EAX).</summary>
     void Sound35(uint eax);
+    /// <summary>FS:109 (the random byte), FS:10D (the second random byte).</summary>
+    byte Random();
+    byte Random10D();
+    /// <summary>The object FS:A1 and FS:19 leave in EDI, and the template FS:A1 and FS:119 leave in EDX (no log).</summary>
+    byte[] Found { get; }
+    byte[] TemplateRaw { get; }
+    /// <summary>fs:[0] and fs:[4], the map limits.</summary>
+    uint Limit0 { get; }
+    uint Limit4 { get; }
+    /// <summary>FS:19 with three stack arguments; ZF in the result.</summary>
+    bool Effect19(uint ebx, uint ecx, uint edx, uint a, uint b, uint c);
+    /// <summary>The jump into another script (6FE, 735, A44) with EAX and EBX.</summary>
+    void Jump(uint target, uint eax, uint ebx);
 }
 
 /// <summary>The effect scripts of ARMY__01.WRK from 10ED: the dust and the fragments (kinds 9, 0Ah, 16h..1Ah), two frame animations (1Bh, 1Ch), the mark that follows the target (1Dh), which turns into the

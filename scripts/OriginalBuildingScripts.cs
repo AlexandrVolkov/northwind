@@ -6,6 +6,8 @@ namespace Northwind;
 public sealed class BuildingRegs
 {
     public uint Eax, Ebx, Ecx, Edx;
+    /// <summary>ESI as the logged services see it (the record of the script by default).</summary>
+    public uint Esi = 0x800;
     public bool Zf;
 }
 
