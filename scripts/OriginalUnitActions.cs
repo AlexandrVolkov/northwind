@@ -60,6 +60,11 @@ public interface IUnitActionWorld
     byte[] PartOf(byte owner);
     /// <summary>The data segment (the windows 19C0, 1C30, 4160, 9080 hold the globals of A10B and 9A8E) and fs:[13Dh].</summary>
     byte[] Ds { get; }
+    /// <summary>The occupancy planes: the pointer of plane k ([18CE + 4k]) and a dword of one (a reference relative to the pool, 0 = empty).</summary>
+    uint PlanePointer(uint k);
+    uint PlaneRead(uint address);
+    /// <summary>The template table pointer [army entry + 4] of an army (0 for armies without a table).</summary>
+    uint ArmyTable(byte army);
     /// <summary>A byte of the table that follows the call of BB8B (pairs value, key; FFh ends it).</summary>
     byte TableByte(uint address);
     byte Fs13D { get; set; }
@@ -1042,5 +1047,124 @@ public static class OriginalUnitActions
             if (c == 0) break;
         }
         g.Esi = esi;
+    }
+
+    private static void Mul8(ActionRegs g, byte a, byte b) { g.Eax = (g.Eax & 0xffff0000) | (ushort)(a * b); g.Cf = g.Of = (g.Eax & 0xff00) != 0; }
+
+    /// <summary>6877: ECX = the participant record of the owner +3 of the object ESI; then 6885.</summary>
+    public static void F6877(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = 0xf5; Mul8(g, g.Al, r[3]); g.Ecx = (g.Eax & 0xffff) + 0x97a; F6885(w, g, r);
+    }
+
+    /// <summary>6885: EBX = the army entry of the object ESI, EDI = its template ([army entry + 4] + 0ABh · +0E).</summary>
+    public static void F6885(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = 0; g.Al = r[0]; Mul8(g, g.Al, 0x56); g.Ebx = (g.Eax & 0xffff) + 0x6ca;
+        g.Al = r[0xe]; Mul8(g, g.Al, 0xab); g.Edi = w.ArmyTable(r[0]) + (g.Eax & 0xffff); g.Add(w.ArmyTable(r[0]), g.Eax & 0xffff);
+    }
+
+    /// <summary>68A0: EDI = the template AL of the army AH.</summary>
+    public static void F68A0(IUnitActionWorld w, ActionRegs g)
+    {
+        uint ecx = g.Ecx; byte army = g.Ah; g.Cl = g.Al; g.Eax &= 0xffff; g.Al = 0x56; Mul8(g, g.Al, army); g.Ebx = (g.Eax & 0xffff) + 0x6ca;
+        g.Al = 0xab; Mul8(g, g.Al, g.Cl); uint table = w.ArmyTable(army); g.Add(table, g.Eax & 0xffff); g.Edi = table + (g.Eax & 0xffff); g.Ecx = ecx;
+    }
+
+    /// <summary>68BD: EDX = the template of the object EDI.</summary>
+    public static void F68BD(IUnitActionWorld w, ActionRegs g)
+    {
+        var o = w.ObjectAt(g.Edi);
+        g.Eax = 0; g.Al = o[0]; Mul8(g, g.Al, 0x56); g.Ebx = (g.Eax & 0xffff) + 0x6ca;
+        g.Al = o[0xe]; Mul8(g, g.Al, 0xab); uint table = w.ArmyTable(o[0]); g.Add(table, g.Eax & 0xffff); g.Edx = table + (g.Eax & 0xffff);
+    }
+
+    /// <summary>C591: the object whose reference lies on the cell (DL, DH) of the plane (+0D &amp; 3) of the object ESI: EDI = the object (0 = none), ZF = 0 when its +17 has bit 40h.</summary>
+    private static void C591(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Edi = 0; g.Cmp(g.Dl, 32, 8);
+        if (g.Jae) { Xor0(g); return; }
+        g.Cmp(g.Dh, 32, 8);
+        if (g.Jae) { Xor0(g); return; }
+        g.Eax = 32; Mul8(g, g.Al, g.Dh); g.Ebx = g.Dl; g.Eax += g.Ebx; g.Eax <<= 2;
+        g.Bl = r[0xd]; g.Ebx &= 3; g.Eax += w.PlanePointer(g.Ebx);
+        g.Edi = w.PlaneRead(g.Eax); g.Test(g.Edi, g.Edi, 32);
+        if (g.Zf) { Xor0(g); return; }
+        g.Edi += w.PoolBase; g.Test(U16(w.ObjectAt(g.Edi), 0x17), 0x40, 16);
+    }
+
+    /// <summary>C4CD: finds the waiting worker at the building: a building that blocks its entry (DAT[40] bit 8 with the offset DAT[53], DAT[54]) is asked at that cell, else the square ring around it (DAT[03] ×
+    /// DAT[04]) is walked outwards (C591) for an object with +17 bit 40h; EDX = the template of the one found (68BD), AL = FFh.</summary>
+    public static void FC4CD(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var t = w.Template; F6885(w, g, r); g.Test(U32(t, 0x40), 8, 32);
+        if (!g.Zf)
+        {
+            g.Edx = (uint)(sbyte)t[0x53]; g.Eax = (uint)(sbyte)t[0x54]; g.Ebx = g.Edx; g.Ebx |= g.Eax; g.Logic(g.Ebx, 32);
+            if (!g.Zf)
+            {
+                g.Edx += U32(r, 4); g.Eax += U32(r, 8); g.Edx >>= 5; g.Eax >>= 5; g.Dh = g.Al; C591(w, g, r);
+                g.Test(g.Edi, g.Edi, 32);
+                if (g.Zf) { Xor0(g); return; }
+                Found(w, g); return;
+            }
+        }
+        var d = w.Ds;
+        g.Edx = U32(r, 4) >> 5; g.Eax = U32(r, 8) >> 5; g.Dh = g.Al; g.Cl = t[3]; g.Ch = t[4]; g.Ecx += 0x202;
+        g.Al = (byte)(g.Cl >> 1); g.Dl = (byte)(g.Dl - g.Al); g.Al = (byte)(g.Ch >> 1); g.Dh = (byte)(g.Dh - g.Al); g.Ecx -= 0x101;
+        d[0x1f41] = g.Cl; d[0x1f42] = g.Ch;
+        for (int side = 0; side < 4; side++)
+        {
+            if (side > 0) g.Cl = d[side % 2 == 1 ? 0x1f42 : 0x1f41];
+            for (; ; )
+            {
+                switch (side) { case 0: g.Dl++; break; case 1: g.Dh++; break; case 2: g.Dl--; break; default: g.Dh--; break; }
+                C591(w, g, r);
+                if (!g.Zf) { Found(w, g); return; }
+                g.Cl--; g.Zf = g.Cl == 0;
+                if (g.Cl == 0) break;
+            }
+        }
+        Xor0(g);
+    }
+
+    private static void Found(IUnitActionWorld w, ActionRegs g) { F68BD(w, g); OrFF(g); }
+
+    /// <summary>CAEE: the object of the target +1C, when it rests, is marked (+17 bit 80h, +1C = its reference) and its occupancy refreshed (43E5).</summary>
+    public static void FCAEE(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Edi = U32(r, 0x1c) + w.PoolBase; var o = w.ObjectAt(g.Edi);
+        g.Al = (byte)(o[0x2d] & 0xf); g.Cmp(g.Al, 0, 8);
+        if (!g.Zf) return;
+        PutW(o, 0x17, (ushort)(U16(o, 0x17) | 0x80)); g.Eax = g.Edi - w.PoolBase; Put(r, 0x1c, g.Eax);
+        uint esi = g.Esi; g.Esi = g.Edi; g.Eax = 0; w.Call(0x43e5, g); g.Edi = g.Esi; g.Esi = esi; Xor0(g);
+    }
+
+    /// <summary>D12C: the terrain class (low 3 bits of the descriptor) of the cell of the unit.</summary>
+    public static void FD12C(IUnitActionWorld w, ActionRegs g, byte[] r) => CellClass(w, g, r);
+
+    /// <summary>D157: the terrain class of the cell of the object EDI.</summary>
+    public static void FD157(IUnitActionWorld w, ActionRegs g) => CellClass(w, g, w.ObjectAt(g.Edi));
+
+    private static void CellClass(IUnitActionWorld w, ActionRegs g, byte[] o)
+    {
+        g.Eax = U32(o, 8) >> 5; Mul8(g, g.Al, 32); g.Ebx = U32(o, 4) >> 5; g.Ebx += g.Eax; g.Ecx = 0xf00000;
+        g.Eax = g.Ebx & 0xffff; g.Al = (byte)w.TileDescriptor(g.Eax); g.Eax &= 7; g.Logic(g.Eax, 32);
+    }
+
+    /// <summary>D182: the script of the template of the object ESI (script = [army entry + 9] + DAT[3B]) is called with the registers EAX and EBX kept (a tail jump).</summary>
+    public static void FD182(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        uint eax = g.Eax, ebx = g.Ebx; F6885(w, g, r);
+        g.Add(0, U32(w.Template, 0x3b)); g.Eax = U32(w.Template, 0x3b); Put(w.Ds, 0x19c3, g.Eax); g.Ebx = ebx; g.Eax = eax;
+        w.Call(U32(w.Ds, 0x19c3), g);
+    }
+
+    /// <summary>D19C: as D182 for the template AL of the army AH given in EBX; ECX and EDX are kept.</summary>
+    public static void FD19C(IUnitActionWorld w, ActionRegs g)
+    {
+        uint eax = g.Eax, ecx = g.Ecx, edx = g.Edx; g.Eax = g.Ebx; F68A0(w, g);
+        g.Add(0, U32(w.Template, 0x3b)); g.Eax = U32(w.Template, 0x3b); Put(w.Ds, 0x19c3, g.Eax); g.Edx = edx; g.Ecx = ecx; g.Eax = eax;
+        w.Call(U32(w.Ds, 0x19c3), g);
     }
 }

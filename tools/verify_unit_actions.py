@@ -56,6 +56,16 @@ FUNCS = {
     'fd77a': (0xd77a, 0xd7b1, [0x9e41, 0x9e55, 0x996f]),
     'f8659': (0x8659, 0x86b6, [0x8d89, 0xc439, 0x8f70]),
     'fbb8b': (0xbb8b, 0xbc15, [0x6885, 0xbadf]),
+    'f6877': (0x6877, 0x68a0, []),
+    'f6885': (0x6885, 0x68a0, []),
+    'f68a0': (0x68a0, 0x68bd, []),
+    'f68bd': (0x68bd, 0x68d8, []),
+    'fc4cd': (0xc4cd, 0xc5d7, [0x68bd]),
+    'fcaee': (0xcaee, 0xcb21, [0x43e5]),
+    'fd12c': (0xd12c, 0xd157, []),
+    'fd157': (0xd157, 0xd182, []),
+    'fd182': (0xd182, 0xd19c, [0x30]),
+    'fd19c': (0xd19c, 0xd1ba, [0x30]),
     'f84aa': (0x84aa, 0x8659, [0x8d89, 0x8c98, 0x8ca1, 0xc331, 0x8c47, 0x8af4, 0x8c89, 0xcfac, 0x123d3, 0xd101, 0x8b0f, 0xc35f]),
 }
 POOLREC, OBJ1, OBJ2, TMPL = 0x800, 0x900, 0xa00, 0xc00
@@ -79,6 +89,13 @@ def prng(seed, n):
     for _ in range(n):
         x = (x * 1664525 + 1013904223) & 0xffffffff; out.append(x >> 24)
     return bytes(out)
+
+
+def constrain(b):
+    """The army (+0) of an object is 0..2 and its template (+0E) 0: the lookups 6885 / 68BD then stay inside the one template buffer."""
+    b = bytearray(b); b[0] %= 3; b[0xe] = 0
+    for k in (4, 8): b[k + 1] &= 3; b[k + 2] = 0; b[k + 3] = 0
+    return b
 
 
 def cases(names):
@@ -118,10 +135,16 @@ def generate(game, names):
         entry, end, callees = FUNCS[case['fn']]
         o.prepare(32, 32); o.mode = 'actions'
         o.RANGES['actions'] = ([(entry, end)], [])
-        o.stubs = {a: stub(a, None) for a in callees}
+        o.stubs = {a: stub(a, None) for a in callees if a not in (0x6885, 0x68bd)}
+        o.RANGES['actions'] = ([(entry, end), (0x6877, 0x68d8)], [])
         o.cpu.mem_write(o.POOL, bytes(0x2000)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x1c49, struct.pack('<I', o.POOL + TMPL))
-        r = bytearray(prng(case['r'], 0x50)); r[3] = case['f3']; struct.pack_into('<II', r, 4, case['px'], case['py']); struct.pack_into('<I', r, 0x28, case['cur']); r[0x14] = case['f14']; r[0x19] = case['f19']; r[0x15] = case['f15']; r[0x31] = case['f31']; r[0x30] = case['f30']; struct.pack_into('<H', r, 0x17, case['f17']); struct.pack_into('<I', r, 0x1c, case['f1c'])
-        o.cpu.mem_write(o.POOL + POOLREC, bytes(r)); o.cpu.mem_write(o.POOL + OBJ1, prng(case['o1'], 0x50)); o.cpu.mem_write(o.POOL + OBJ2, prng(case['o2'], 0x50)); o.cpu.mem_write(o.POOL + TMPL, prng(case['tm'], 0x100))
+        r = bytearray(prng(case['r'], 0x50)); r[0] %= 3; r[0xe] = 0; r[3] = case['f3']; struct.pack_into('<II', r, 4, case['px'], case['py']); struct.pack_into('<I', r, 0x28, case['cur']); r[0x14] = case['f14']; r[0x19] = case['f19']; r[0x15] = case['f15']; r[0x31] = case['f31']; r[0x30] = case['f30']; struct.pack_into('<H', r, 0x17, case['f17']); struct.pack_into('<I', r, 0x1c, case['f1c'])
+        o.cpu.mem_write(o.POOL + POOLREC, bytes(r)); o.cpu.mem_write(o.POOL + OBJ1, bytes(constrain(prng(case['o1'], 0x50)))); o.cpu.mem_write(o.POOL + OBJ2, bytes(constrain(prng(case['o2'], 0x50)))); o.cpu.mem_write(o.POOL + TMPL, prng(case['tm'], 0x100))
+        for k in range(4):
+            pl = prng(case['map'] + k, 1024); o.cpu.mem_write(o.POOL + 0x4000 + 0x1000 * k, b''.join(struct.pack('<I', (0, OBJ1, OBJ2)[b % 3]) for b in pl)); o.cpu.mem_write(0x18ce + 4 * k, struct.pack('<I', o.POOL + 0x4000 + 0x1000 * k))
+        if case['fn'] in ('fd182', 'fd19c'): o.cpu.mem_write(o.POOL + TMPL + 0x3b, struct.pack('<I', o.CODE + 0x30))
+        for ar in range(3):
+            tb = bytearray(0x56); struct.pack_into('<I', tb, 4, o.POOL + TMPL); o.cpu.mem_write(0x6ca + 0x56 * ar, bytes(tb))
         for ow in range(8): o.cpu.mem_write(0x97a + 0xf5 * ow, prng(case['pt'] + ow, 0xf5))
         lst = [o.POOL + OBJ1 if (case['pt'] >> k) & 1 else o.POOL + OBJ2 for k in range(case['pt'] % 7)] + [0]
         o.cpu.mem_write(0x1f45, struct.pack('<%dI' % len(lst), *lst)); o.cpu.mem_write(0x1ca2, bytes(0x20))
@@ -144,6 +167,11 @@ def generate(game, names):
         for q, v in zip((UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX, UC_X86_REG_EDX, UC_X86_REG_EDI), case['regs']): o.cpu.reg_write(q, v)
         if case['fn'] == 'fd77a': o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + OBJ1)
         if case['fn'] == 'fbb8b': o.cpu.reg_write(UC_X86_REG_EDX, 0x100)
+        if case['fn'] == 'f68a0': o.cpu.reg_write(UC_X86_REG_EAX, (case['regs'][0] & 0xffff00ff) | ((((case['regs'][0] >> 8) & 0xff) % 3) << 8))
+        if case['fn'] == 'fd19c': o.cpu.reg_write(UC_X86_REG_EBX, ((((case['regs'][1] >> 8) & 0xff) % 3) << 8))
+        if case['fn'] == 'fd157': o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + OBJ2)
+        if case['fn'] == 'fc4cd': o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + OBJ1)
+        if case['fn'] == 'f68bd': o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + OBJ2)
         o.cpu.mem_write(0x1f0a, bytes(0x3b))
         o.run(o.CODE + entry)
         fl = reg(UC_X86_REG_EFLAGS)
