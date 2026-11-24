@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "ad8cca85e35c0bbb24c181ad62b3f4c2ff6ff239054bb9f005deeed3b561640f",
+  "annotation_sha256": "6ff1dfce2ccdb83e79e9a21cb0354b83e40afef1d7ea979a04ba2ddd12eed722",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -3511,8 +3511,8 @@
       "zero_fill_bytes": 0,
       "sha256": "d2554037e3a135ce7c06530cf2ee85e89ae240aa31a00c7c72a9b3cb251c46de",
       "byte_status": {
-        "ported": 4459,
-        "unreviewed": 492
+        "ported": 4924,
+        "unreviewed": 27
       },
       "linear_rows": 1625,
       "flow_candidate_instructions": 1129,
@@ -3685,9 +3685,11 @@
         {
           "start": 3567,
           "end": 3940,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-spawner-def"
+          ]
         },
         {
           "start": 3940,
@@ -3695,15 +3697,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "army__01-shackled-f64"
+            "army__01-shackled-f64",
+            "army__01-spawner-def"
           ]
         },
         {
           "start": 4049,
           "end": 4141,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-spawner-def"
+          ]
         },
         {
           "start": 4141,

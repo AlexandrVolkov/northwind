@@ -5732,6 +5732,18 @@
       "evidence": ["docs/object-scripts.md", "tests/fixtures/army01-effects.json", "tools/verify_army01_effects.py", "tests/OriginalArmy01EffectChecks.cs"],
       "implementation": ["scripts/OriginalArmy02Effects.cs"],
       "limitations": "FS:A5, FS:A9, FS:AD, FS:35 are recorded stubs; the object behind +12h and the template of FS:71 are fixed buffers"
+    },
+    {
+      "id": "army__01-spawner-def",
+      "module": "ARMY__01.WRK",
+      "start": 3567,
+      "end": 4141,
+      "name": "Creature spawner DEF and the breeders F64, FD1 (up to FD1+5C): init, step, creation FS:187/FS:45/FS:19B, hand-over FS:75",
+      "classification": "code",
+      "status": "ported",
+      "evidence": ["docs/object-scripts.md", "tests/fixtures/building-scripts.json", "tools/verify_building_scripts.py", "tests/OriginalBuildingScriptChecks.cs"],
+      "implementation": ["scripts/OriginalBuildingScripts.cs"],
+      "limitations": "FS:147, FS:187, FS:45, FS:19B, FS:75, FS:15, FS:8D, FS:1D, FS:DD, FS:E1, FS:4D are recorded stubs (FS:187 gives ECX/EDX derived from its results); FS:109 runs as original code"
     }
   ]
 }

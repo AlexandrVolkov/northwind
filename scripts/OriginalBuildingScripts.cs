@@ -32,6 +32,12 @@ public interface IBuildingScriptWorld
     void Service115();
     /// <summary>FS:A1: after it EDX points to a template, whose dword at +40h the script tests.</summary>
     uint TemplateFlagsA1();
+    /// <summary>The record FS:45 has just created (EDI), its pointer relative to the pool, the pool-relative result EDI of FS:75, the update counter fs:[10h] and the participant count fs:[142h].</summary>
+    byte[] Created { get; }
+    uint CreatedRel { get; }
+    uint Edi75Rel { get; }
+    byte Tick { get; }
+    byte ParticipantCount { get; }
     /// <summary>The pointer of the creator record as the effect scripts hold it in EBX.</summary>
     uint ParentAddress { get; }
     /// <summary>FS:C5 (reads the dword at +48h of the record).</summary>
@@ -66,6 +72,8 @@ public static class OriginalBuildingScripts
         if (k == 20) return Unit20(w, r, g, ah, bl, kd == 21, out zf);
         if (k == 22) return Script1078(w, r, g, ah, out zf);
         if (k == 23) return Unit154E(w, r, g, ah, bl);
+        if (k == 26) return Spawner(w, r, g, ah, bl);
+        if (k is 27 or 28) return Breeder(w, r, g, ah, k == 28);
         if (k is 24 or 25) return Debris(w, r, g, ah, other!, kd == 24 ? 0x235u : 0x221u);
         if (k == 5) return Script7A0(w, r, g, ah, kd == 15);
         if (k == 13 && ah != 5) return Script524(w, r, g, ah, out zf);
@@ -473,5 +481,93 @@ public static class OriginalBuildingScripts
         g.Eax = (g.Eax & 0xffffff00) | parent[0]; g.Ebx = (g.Ebx & 0xffff0000) | 0x83;
         g.Ecx = ecx + Dword(r, 7); g.Edx = edx + Dword(r, 0xc);
         w.Service(0x19, g); return 0;
+    }
+
+    private static void SetAl(BuildingRegs g, uint v) => g.Eax = (g.Eax & 0xffffff00) | (v & 0xff);
+
+    /// <summary>The creature spawner DEF of ARMY__01.WRK: AH = 0 +32 = 1, +0F = 7, appearance, +2E random; AH = 1 looks, every update that fs:[10h] is 0, whether the owner's army has room for the kind +31 (FS:147);
+    /// with +19 &lt; 1 it asks for a free spot (FS:187) and creates the creature there (FS:45, FS:19B) and goes on with the new record; later it looks through the owners for one who can take the kind (FS:75) and
+    /// hands the creature over (+1C = the owner record, +14 = state 50h).</summary>
+    private static uint Spawner(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int ah, byte bl)
+    {
+        if (ah == 0) { r[0x32] = 1; r[0x0f] = 7; w.Appearance(bl); r[0x2e] = w.Random(); return 0; }
+        if (ah != 1) return 0;
+        if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Service(0x1d, g); }
+        bool Ask(byte[] q) { SetAl(g, q[0x31]); g.Edx = (g.Edx & 0xffffff00) | q[3]; w.Service(0x147, g); return g.Zf; }
+        if (r[0x32] == 0)
+        {
+            if (w.Tick != 0) { w.Vitals(); w.Actions(); return 0; }
+            if (r[0x31] == 0) { w.Vitals(); w.Actions(); return 0; }
+            if (!Ask(r)) { w.Vitals(); w.Actions(); return 0; }
+            r[0x32] = 1;
+        }
+        byte[] q;
+        if ((sbyte)r[0x19] > 0) { r[0x19] = 0x64; BitConverter.GetBytes((ushort)(BitConverter.ToUInt16(r, 0x17) & 0xfff8)).CopyTo(r, 0x17); q = r; }
+        else
+        {
+            r[0x32] = 0; g.Ecx = Dword(r, 4); g.Edx = Dword(r, 8);
+            g.Eax = (g.Eax & 0xffff0000) | ((uint)r[0] << 8) | r[0x0e]; g.Ebx = (g.Ebx & 0xffffff00) | 1;
+            w.Service(0x187, g); if (!g.Zf) return 0;
+            g.Ebx = (g.Ebx & 0xffff00ff) | ((g.Ebx & 0xff) << 8); g.Ebx = (g.Ebx & 0xffffff00) | (g.Eax & 0xff);
+            g.Eax = (g.Eax & 0xffffff00) | ((g.Eax >> 8) & 0xff); g.Eax = (g.Eax & 0xffff00ff) | ((uint)r[3] << 8);
+            w.Service(0x45, g); if (!g.Zf) return 0;
+            q = w.Created; q[0x31] = r[0x31];
+            g.Eax = w.CreatedRel; w.Service(0x19b, g);
+        }
+        bool done = false;
+        if (q[0x1b] == 0 && w.Tick != 0) done = true;
+        if (!done && q[0x31] != 0)
+        {
+            if (!Ask(q)) { q[0x32] = 0; }
+            else
+            {
+                g.Edx &= 0xffffff00; bool found = false;
+                for (; ; )
+                {
+                    SetAl(g, q[0x31]); w.Service(0x147, g);
+                    if (!g.Zf) { found = true; break; }
+                    g.Edx = (g.Edx & 0xffffff00) | (((g.Edx & 0xff) + 1) & 0xff);
+                    if ((byte)g.Edx == w.ParticipantCount) break;
+                }
+                if (found)
+                {
+                    uint saved = g.Edx; g.Edx = (g.Edx & 0xffff00ff) | ((uint)q[3] << 8); saved = g.Edx;
+                    byte dh = q[3]; q[3] = (byte)g.Edx; g.Ebx = 0x148024; g.Eax = 0; w.Service(0x75, g);
+                    g.Edx = saved; q[3] = dh;
+                    if (!g.Zf)
+                    {
+                        q[0x1b] = 0; Put(q, 0x1c, w.Edi75Rel); q[0x14] = (byte)((q[0x14] & 7) | 0x50);
+                    }
+                }
+            }
+        }
+        w.Vitals(); w.Actions(); return 0;
+    }
+
+    /// <summary>The scripts F64 (frames 907h..911h) and FD1 (912h) of ARMY__01.WRK that breed a creature of kind 4 when their life +19 is over (+31 = 8, FD1: 14h).</summary>
+    private static uint Breeder(IBuildingScriptWorld w, byte[] r, BuildingRegs g, int ah, bool second)
+    {
+        if (ah == 0) { BitConverter.GetBytes((ushort)(second ? 0x912 : 0x907)).CopyTo(r, 1); return 0; }
+        if (ah != 1) return 0;
+        if (!second)
+        {
+            if ((r[0x14] & 0x80) != 0) { r[0x14] &= 0x7f; w.Service(0x1d, g); }
+            if ((w.Tick & 3) == 0)
+            {
+                BitConverter.GetBytes((ushort)(BitConverter.ToUInt16(r, 1) + 1)).CopyTo(r, 1);
+                if (BitConverter.ToUInt16(r, 1) >= 0x912) BitConverter.GetBytes((ushort)0x907).CopyTo(r, 1);
+            }
+        }
+        else
+        {
+            if ((r[0x14] & 0x80) != 0) { r[0x14] = 0; r[0x19] = 0x14; w.Service(0x1d, g); }
+            w.Service(0x8d, g);
+        }
+        if ((sbyte)r[0x19] > 0) return 0;
+        r[0x19]--; if (r[0x19] > 0xfa) return 0;
+        w.Service(0x15, g);
+        g.Ecx = Dword(r, 4); g.Edx = Dword(r, 8); g.Eax = (g.Eax & 0xffff0000) | (4u << 8) | r[0]; g.Ebx = 0x113;
+        w.Service(0x45, g); if (!g.Zf) return 0;
+        w.Created[0x31] = second ? (byte)0x14 : (byte)8; return 0;
     }
 }
