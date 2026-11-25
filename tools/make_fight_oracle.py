@@ -20,7 +20,7 @@ for gap in (3, 5, 8):
     e.dsw(part(3) + 0x12, struct.pack('<I', 1)); e.dsw(part(0) + 0x12, struct.pack('<I', 8))
     pl = struct.unpack('<I', e.dsr(0x18ce + 4, 4))[0]
     for r, ref, (x, y) in ((rA, A[6], (50, 50)), (rB, B[6], (50 + gap, 50))):
-        for off, val in ((4, struct.pack('<II', x * 32 + 16, y * 32 + 16)), (0x2d, b'\0'), (0x14, b'\0'), (0x15, b'\0'), (0x1c, bytes(4)), (0x2e, b'\0')): e.cpu.mem_write(r + off, val)
+        for off, val in ((4, struct.pack('<II', x * 32 + 16, y * 32 + 16)), (0x2d, b'\0'), (0x14, b'\0'), (0x15, b'\0'), (0x1c, bytes(4)), (0x2e, b'\0'), (0x25, b'\x02' if r == rA else b'\x06'), (0x1b, b'\0'), (0x22, b'\0\0'), (0x26, b'\0'), (0x2f, b'\0'), (0x30, b'\0\0\0\0\0')): e.cpu.mem_write(r + off, val)
         e.cpu.mem_write(pl + 4 * (y * 128 + x), struct.pack('<I', ref))
     tbl = struct.unpack('<I', e.dsr(0x6ce + 0x56 * 2, 4))[0]
     log = []
