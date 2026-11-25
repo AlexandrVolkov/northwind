@@ -109,11 +109,11 @@ def main():
                 if struct.unpack('<I', peek(0x6aa, 4))[0] != 0: break
             except SystemExit: pass
         time.sleep(5)
-    elif a.command == 'snapshot':   # the first 32 MB of the emulated linear memory (code, data, pool, map, planes) into a file for the Unicorn oracles; not for Git
+    elif a.command == 'snapshot':   # the first 72 MB of the emulated linear memory (code, data, pool, map, planes) into a file for the Unicorn oracles; not for Git
         p = pid(); region, ds = find_ds(p)
         with open(f'/proc/{p}/mem', 'rb', 0) as mem, open(a.out, 'wb') as f:
             mem.seek(region)
-            for _ in range(32): f.write(mem.read(1 << 20))
+            for _ in range(72): f.write(mem.read(1 << 20))
         print('snapshot written', a.out, 'DS linear', hex(DS_LINEAR))
     elif a.command == 'objects':
         for o in objects(): print(*o)
