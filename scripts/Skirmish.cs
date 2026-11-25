@@ -127,6 +127,8 @@ public sealed partial class Skirmish : IDisposable
     private readonly AStarGrid2D _guidance = new();
     private readonly Dictionary<(int, int, int), (AStarGrid2D Grid, double At)> _guidanceGrids = [];
     /// <summary>The shared blocked-cell grid is rebuilt this often (seconds). The original AI's mode keeps the exact per-search rebuild (its checks depend on the timing of paths).</summary>
+    /// <summary>The port-only AStar guidance for orders whose partial native path makes no progress (the original stops there, see docs/reference-run.md). On by default; off reproduces the original.</summary>
+    public bool ProvisionalGuidance { get; set; } = true;
     private double GuidanceRefresh => ImprovedAi ? 0.5 : 0;
     private AStarGrid2D NewGuidanceGrid()
     {
@@ -315,6 +317,9 @@ public sealed partial class Skirmish : IDisposable
             actor.GuidanceGoal = null;
             var native = NativePath(goal);
             if (native.Count > 1 && native[^1] != actor.Cell) return native;
+            // The original (7FF0 -> 73F5) walks the partial path and searches again from the new cell; when the search gives no step the unit stops (80A2).
+            // The provisional AStar guidance below is a port-only adaptation of the improved mode (docs/reference-run.md: oracle on the live original).
+            if (!ProvisionalGuidance) return native;
             actor.GuidanceGoal = goal;
         }
         // Provisional distant-order guidance. Do not present these waypoints as recovered AI.
