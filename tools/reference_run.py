@@ -86,7 +86,7 @@ def objects():
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('command', choices=['start', 'shot', 'click', 'key', 'peek', 'objects', 'mission', 'stop'])
+    ap.add_argument('command', choices=['start', 'shot', 'click', 'key', 'peek', 'objects', 'mission', 'snapshot', 'stop'])
     ap.add_argument('args', nargs='*')
     ap.add_argument('--conf', default='/opt/game/run1/dosbox.conf'); ap.add_argument('--display', default=':77'); ap.add_argument('--out', default='shot.png')
     a = ap.parse_args()
@@ -109,6 +109,12 @@ def main():
                 if struct.unpack('<I', peek(0x6aa, 4))[0] != 0: break
             except SystemExit: pass
         time.sleep(5)
+    elif a.command == 'snapshot':   # the first 32 MB of the emulated linear memory (code, data, pool, map, planes) into a file for the Unicorn oracles; not for Git
+        p = pid(); region, ds = find_ds(p)
+        with open(f'/proc/{p}/mem', 'rb', 0) as mem, open(a.out, 'wb') as f:
+            mem.seek(region)
+            for _ in range(32): f.write(mem.read(1 << 20))
+        print('snapshot written', a.out, 'DS linear', hex(DS_LINEAR))
     elif a.command == 'objects':
         for o in objects(): print(*o)
     else: run(['pkill', 'dosbox-x']); run(['pkill', 'Xvfb'])
