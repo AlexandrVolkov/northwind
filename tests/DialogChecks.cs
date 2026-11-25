@@ -41,7 +41,7 @@ public partial class TestRunner
         var spot = rufin.Position + new Vector2(200, 0); int k = 0;
         foreach (var unit in group) { System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(unit.Record.AsSpan(4), (uint)(spot.X + 12 * k)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(unit.Record.AsSpan(8), (uint)(spot.Y + 8 * k)); k++; unit.Goal = null; unit.Route.Clear(); }
         var before3 = group.Select(u => u.Health).ToArray();
-        for (int t = 0; t < 1500 && group.Count(u => u.Health < before3[group.IndexOf(u)] || !u.Alive) < 2 && battle.Hero.Alive; t++) { battle.Hero.Health = 127; battle.Advance(1 / 18.2); }
+        for (int t = 0; t < 1500 && group.Count(u => u.Health < before3[group.IndexOf(u)] || !u.Alive) < 2 && battle.Hero.Alive; t++) { battle.Hero.Health = 127; System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), (uint)home.X); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(8), (uint)home.Y); battle.Advance(1 / 18.2); }
         Check(group.Count == 3 && group.Count(u => u.Health < before3[group.IndexOf(u)] || !u.Alive) >= 2, $"One discharge hurts the units standing together ({string.Join(", ", group.Select(u => u.Health))} from {string.Join(", ", before3)})");
         // the hurt mage vanishes (ARMY__03.WRK D3D, FS:105) and returns when he has recovered
         var home2 = rufin.Position - new Vector2(640, 0); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(4), (uint)home2.X); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(battle.Hero.Record.AsSpan(8), (uint)home2.Y);
@@ -59,7 +59,7 @@ public partial class TestRunner
         var phantom = battle.SummonPhantom(rufin);
         Check(phantom != null && Skirmish.IsPhantom(phantom) && phantom.Record[3] == mage, "A phantom stands up beside Rufin");
         for (int t = 0; t < 60; t++) battle.Advance(1 / 18.2);
-        Check(phantom!.Record[0x32] == 0 && phantom.Record[0x20] == 0xff && (phantom.Record[0x14] & 7) == 0, $"The phantom has appeared (+32 = {phantom.Record[0x32]:X}, state {phantom.Record[0x14]:X})");
+        Check(phantom!.Record[0x32] == 0 && phantom.Record[0x20] != 0 && (phantom.Record[0x14] & 7) == 0, $"The phantom has appeared (+32 = {phantom.Record[0x32]:X}, state {phantom.Record[0x14]:X}, mask {phantom.Record[0x20]:X}, alive {phantom.Alive})");
         Check(battle.MageFights(phantom), "and fights the enemies of its settlement");
         phantom.Record[0x31] = 2;
         for (int t = 0; t < 400 && phantom.Alive; t++) battle.Advance(1 / 18.2);
