@@ -21,7 +21,7 @@ import time
 
 SIGNATURE = b'D:\\7bitlabs'
 SIGNATURE_OFFSET = 0x1EE4
-DS_LINEAR = 0x17F010   # the linear address of the data segment (the same in every run; the emulated RAM does not start at the beginning of the host region)
+DS_LINEAR = 0x17F000   # the linear address of the data segment (the same in every run; the emulated RAM does not start at the beginning of the host region)
 
 
 def run(cmd, **kw): return subprocess.run(cmd, check=False, **kw)
@@ -74,7 +74,7 @@ def objects():
             part = ds + 0x97a + 0xf5 * owner
             first, end = struct.unpack('<I', rd(part + 5, 4))[0], pool + struct.unpack('<I', rd(part + 9, 4))[0]   # +5 absolute, +9 relative to the pool
             if first == 0 or end <= first or end - first > 0x40000: continue
-            cur = first + 0x10   # the chain starts with a block of 10h bytes (the first object of the first map begins at pool + 11h)
+            cur = first
             while cur < end:
                 r = rd(region + cur, 0x36)
                 size = struct.unpack_from('<I', r, 0x10)[0]
