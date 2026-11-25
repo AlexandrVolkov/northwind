@@ -134,7 +134,8 @@ public sealed partial class Skirmish : IDisposable
     /// <summary>The port-only AStar guidance for orders whose partial native path makes no progress (the original stops there, see docs/reference-run.md). On by default; off reproduces the original.</summary>
     public bool ProvisionalGuidance { get; set; } = true;
     /// <summary>The engagement timing of the original unit script (the search update, the request and start of the walk, the swing delay counted on every update, the walk withdrawn within reach): equal to the original tick for tick in tests/fixtures/fight-oracle.json. Off by default: with it on the army march of skirmish-ai changes (to be understood).</summary>
-    public bool OriginalEngagement { get; set; }
+    public bool OriginalEngagement { get; set; } = true;
+    private bool Engages(SkirmishActor actor) => OriginalEngagement && !IsMageUnit(actor);   // the hermits and phantoms fight by their own scripts (TickMages)
     private double GuidanceRefresh => ImprovedAi ? 0.5 : 0;
     private AStarGrid2D NewGuidanceGrid()
     {
@@ -550,7 +551,7 @@ public sealed partial class Skirmish : IDisposable
                     if (target != null && IsAnimal(actor) && (target.Scenery || IsBird(target))) target = null;   // the beasts leave the decorations and the birds alone
                     // While there is peace with the owner of the beasts (Rufin's forest) nobody strikes them, though their DAT flag makes them a target for all (user, 23.11).
                     if (target != null && IsAnimal(target) && !IsBird(target) && !actor.Scenery && !Diplomacy.AtWar(actor.Record[3], target.Record[3])) target = null;
-                    if (target != null) { if (actor.Goal != null) actor.ResumeGoal = actor.Goal; actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); if (OriginalEngagement && !actor.Scenery) actor.EngageDelay = 3; }
+                    if (target != null) { if (actor.Goal != null) actor.ResumeGoal = actor.Goal; actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); if (Engages(actor) && !actor.Scenery) actor.EngageDelay = 3; }
                 }
             }
             if (actor.EngageDelay > 0)
@@ -559,11 +560,11 @@ public sealed partial class Skirmish : IDisposable
                 if (actor.EngageDelay == 2) actor.Record[0x2d] = 0x20; else if (actor.EngageDelay == 1) actor.Record[0x2d] = 0x22;
                 actor.EngageDelay--; if (actor.EngageDelay > 0) return;
             }
-            if (OriginalEngagement && target != null && actor.Stepping) OriginalCombatRules.SwingReady(actor.Record, actor.Parameters);   // 82C3 calls 8AF4 on every update of an engaged unit, also while it walks up to the target
+            if (Engages(actor) && target != null && actor.Stepping) OriginalCombatRules.SwingReady(actor.Record, actor.Parameters);   // 82C3 calls 8AF4 on every update of an engaged unit, also while it walks up to the target
             // 8EC7 runs on every update too: once the target is within reach the request to walk is withdrawn (+2D high nibble 0) while the step in progress ends.
             void WithdrawWalk()
             {
-                if (!OriginalEngagement || target == null || !actor.Stepping || !actor.Alive) return;
+                if (!Engages(actor) || target == null || !actor.Stepping || !actor.Alive) return;
                 int ti = target.Cell.Y * Map.Width + target.Cell.X; byte tt = (byte)(_properties[(int)(Map.Cells[ti] & 0xffff) * 8] & 7);
                 if (OriginalCombatRules.Reach(actor.Record, actor.Parameters, target.Record, target.Parameters, tt) == 0) { actor.Route.Clear(); actor.Record[0x2d] &= 0x0f; }
             }
@@ -583,7 +584,7 @@ public sealed partial class Skirmish : IDisposable
             bool wasStepping = actor.Stepping;
             t0 = P0(); MoveTick(actor); P1("u.move", t0);
             WithdrawWalk();
-            if (OriginalEngagement && wasStepping && !actor.Stepping && target != null && actor.Alive && actor.Target == target.Id)
+            if (Engages(actor) && wasStepping && !actor.Stepping && target != null && actor.Alive && actor.Target == target.Id)
             {
                 int fi = target.Cell.Y * Map.Width + target.Cell.X; byte ft = (byte)(_properties[(int)(Map.Cells[fi] & 0xffff) * 8] & 7);
                 if (OriginalCombatRules.Reach(actor.Record, actor.Parameters, target.Record, target.Parameters, ft) == 0) { actor.Record[0x2d] = 0x02; actor.FinishPending = true; }
@@ -674,7 +675,7 @@ public sealed partial class Skirmish : IDisposable
         else if ((actor.Record[0x2d] >> 4) == 2 && (actor.Record[0x2d] & 15) != 2) { actor.Target = 0; actor.Record[0x2d] &= 0xf0; return false; }
         if (OriginalWorkerAnimation.Pending(actor.Record))
         {
-            if (OriginalEngagement) OriginalCombatRules.SwingReady(actor.Record, actor.Parameters);   // 8AF4 counts on every update, also during the swing
+            if (Engages(actor)) OriginalCombatRules.SwingReady(actor.Record, actor.Parameters);   // 8AF4 counts on every update, also during the swing
             if (OriginalWorkerAnimation.Step(actor.Record, actor.Parameters, target.Record) is { } impact) ResolveImpact(actor, target, impact);
             return true;
         }
