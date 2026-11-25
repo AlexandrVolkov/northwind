@@ -50,7 +50,7 @@ public partial class TestRunner : Node
                 case "work-sprites": OriginalWorkSpriteChecks(); break;
                 case "original-sound": OriginalSoundChecks(); break;
                 case "skirmish": await SkirmishChecks(); SkirmishFireChecks(); break;
-                case "original-route-search": OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); RouteOracleChecks(); WalkOracleChecks(); WalkOracleRealChecks(); break;
+                case "original-route-search": OriginalRouteSearchChecks(); RouteSearchIntegrationChecks(); RouteOracleChecks(); WalkOracleChecks(); WalkOracleRealChecks(); FightOracleChecks(); break;
                 case "original-route-pool": OriginalRoutePoolChecks(); PackedRouteIntegrationChecks(); break;
                 case "original-movement-admission": OriginalMovementAdmissionChecks(); MovementBridgeChecks(); break;
                 case "original-worker-approach": OriginalWorkerApproachChecks(); break;

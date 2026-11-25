@@ -91,6 +91,10 @@ public sealed class SkirmishActor
     public Vector2I StepGoal { get; set; }
     public double AttackTimer { get; set; }
     public double ReplanTimer { get; set; }
+    /// <summary>Updates to wait after the idle search found an enemy: the original sets the target (+1C, +15 = 1) on the search update and starts the approach (+2D request) one update later.</summary>
+    public int EngageDelay { get; set; }
+    /// <summary>The step that brought the unit into reach of its target has ended: the walk state stays 02h for one update (the request is withdrawn) and the swing is asked for on the next one.</summary>
+    public bool FinishPending { get; set; }
     public int StalledTicks { get; set; }
     public double ConstructionRemaining { get; set; }
     public double ConstructionDuration { get; set; }
@@ -129,6 +133,8 @@ public sealed partial class Skirmish : IDisposable
     /// <summary>The shared blocked-cell grid is rebuilt this often (seconds). The original AI's mode keeps the exact per-search rebuild (its checks depend on the timing of paths).</summary>
     /// <summary>The port-only AStar guidance for orders whose partial native path makes no progress (the original stops there, see docs/reference-run.md). On by default; off reproduces the original.</summary>
     public bool ProvisionalGuidance { get; set; } = true;
+    /// <summary>The engagement timing of the original unit script (the search update, the request and start of the walk, the swing delay counted on every update, the walk withdrawn within reach): equal to the original tick for tick in tests/fixtures/fight-oracle.json. Off by default: with it on the army march of skirmish-ai changes (to be understood).</summary>
+    public bool OriginalEngagement { get; set; }
     private double GuidanceRefresh => ImprovedAi ? 0.5 : 0;
     private AStarGrid2D NewGuidanceGrid()
     {
@@ -528,6 +534,7 @@ public sealed partial class Skirmish : IDisposable
             if (actor.Team == 0 && target is { Structure: true })
                 target = Actors.Where(a => a.Alive && a.Team == 1 && !a.Structure && Distance(actor.Position, a) <= Rules.AggroRange)
                     .OrderBy(a => Distance(actor.Position, a)).FirstOrDefault() ?? target;
+            if (actor.FinishPending && (target == null || actor.Target != target.Id)) { actor.FinishPending = false; actor.Record[0x2d] = 0; }
             actor.Record[0x2e]++; // 8227 counts every update of a living unit
             if (target == null && !actor.Stepping)
             {
@@ -543,9 +550,24 @@ public sealed partial class Skirmish : IDisposable
                     if (target != null && IsAnimal(actor) && (target.Scenery || IsBird(target))) target = null;   // the beasts leave the decorations and the birds alone
                     // While there is peace with the owner of the beasts (Rufin's forest) nobody strikes them, though their DAT flag makes them a target for all (user, 23.11).
                     if (target != null && IsAnimal(target) && !IsBird(target) && !actor.Scenery && !Diplomacy.AtWar(actor.Record[3], target.Record[3])) target = null;
-                    if (target != null) { if (actor.Goal != null) actor.ResumeGoal = actor.Goal; actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); }
+                    if (target != null) { if (actor.Goal != null) actor.ResumeGoal = actor.Goal; actor.Target = target.Id; actor.Goal = null; actor.Route.Clear(); if (OriginalEngagement && !actor.Scenery) actor.EngageDelay = 3; }
                 }
             }
+            if (actor.EngageDelay > 0)
+            {
+                // update 1: the search; 2: the request of the walk state (+2D = 20h); 3: the walk state starts (22h); then the approach moves (8D3E / 9210)
+                if (actor.EngageDelay == 2) actor.Record[0x2d] = 0x20; else if (actor.EngageDelay == 1) actor.Record[0x2d] = 0x22;
+                actor.EngageDelay--; if (actor.EngageDelay > 0) return;
+            }
+            if (OriginalEngagement && target != null && actor.Stepping) OriginalCombatRules.SwingReady(actor.Record, actor.Parameters);   // 82C3 calls 8AF4 on every update of an engaged unit, also while it walks up to the target
+            // 8EC7 runs on every update too: once the target is within reach the request to walk is withdrawn (+2D high nibble 0) while the step in progress ends.
+            void WithdrawWalk()
+            {
+                if (!OriginalEngagement || target == null || !actor.Stepping || !actor.Alive) return;
+                int ti = target.Cell.Y * Map.Width + target.Cell.X; byte tt = (byte)(_properties[(int)(Map.Cells[ti] & 0xffff) * 8] & 7);
+                if (OriginalCombatRules.Reach(actor.Record, actor.Parameters, target.Record, target.Parameters, tt) == 0) { actor.Route.Clear(); actor.Record[0x2d] &= 0x0f; }
+            }
+            WithdrawWalk();
             t0 = P0(); bool attacked = target != null && !actor.Stepping && AttackStep(actor, target); P1("u.attack", t0); if (attacked) return;
             if (target != null && actor.Target == 0) target = null;
             if (!actor.Stepping && target != null && actor.ReplanTimer <= 0)
@@ -558,7 +580,14 @@ public sealed partial class Skirmish : IDisposable
                 else if (SearchTimeUp) actor.ReplanTimer = 0.25;
                 else { t0 = P0(); Plan(actor, goal); P1("u.plan", t0); actor.ReplanTimer = ReplanDelay; }
             }
+            bool wasStepping = actor.Stepping;
             t0 = P0(); MoveTick(actor); P1("u.move", t0);
+            WithdrawWalk();
+            if (OriginalEngagement && wasStepping && !actor.Stepping && target != null && actor.Alive && actor.Target == target.Id)
+            {
+                int fi = target.Cell.Y * Map.Width + target.Cell.X; byte ft = (byte)(_properties[(int)(Map.Cells[fi] & 0xffff) * 8] & 7);
+                if (OriginalCombatRules.Reach(actor.Record, actor.Parameters, target.Record, target.Parameters, ft) == 0) { actor.Record[0x2d] = 0x02; actor.FinishPending = true; }
+            }
             }
     /// <summary>Route searches left in this world step: a unit that cannot reach its target used to try every standing cell around it, each with a
     /// full search, which cost most of the step with a large army. Now at most <see cref="SearchBudgetPerStep"/> searches run per step, a unit tries
@@ -641,9 +670,11 @@ public sealed partial class Skirmish : IDisposable
     {
         // A move request (8E0E flight, high nibble 2) during a swing: the original ends the swing and starts moving
         // (9275 → 939A: ported as OriginalUnitMotion, not yet driving the units). Here the unit disengages and the flight route moves it (adapter).
-        if ((actor.Record[0x2d] >> 4) == 2 && (actor.Record[0x2d] & 15) != 2) { actor.Target = 0; actor.Record[0x2d] &= 0xf0; return false; }
+        if (actor.FinishPending) { actor.FinishPending = false; actor.Record[0x2d] = 0; }
+        else if ((actor.Record[0x2d] >> 4) == 2 && (actor.Record[0x2d] & 15) != 2) { actor.Target = 0; actor.Record[0x2d] &= 0xf0; return false; }
         if (OriginalWorkerAnimation.Pending(actor.Record))
         {
+            if (OriginalEngagement) OriginalCombatRules.SwingReady(actor.Record, actor.Parameters);   // 8AF4 counts on every update, also during the swing
             if (OriginalWorkerAnimation.Step(actor.Record, actor.Parameters, target.Record) is { } impact) ResolveImpact(actor, target, impact);
             return true;
         }
