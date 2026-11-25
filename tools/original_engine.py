@@ -5,7 +5,7 @@ Layout of the live game: the code object is at linear 1EF000h, the data segment 
 offset + 1EF000h) is at 28A180h. Flat segments, FS with that base. Stack and GDT sit in the free top of the memory.
 """
 import struct
-from unicorn import Uc, UC_ARCH_X86, UC_MODE_32
+from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UC_HOOK_INTR
 from unicorn.x86_const import *
 
 CODE, DS, FS, SIZE = 0x1EF000, 0x17F000, 0x28A180, 72 << 20
@@ -24,6 +24,11 @@ class Engine:
         for r in (UC_X86_REG_DS, UC_X86_REG_ES, UC_X86_REG_SS): cpu.reg_write(r, 0x10)
         cpu.reg_write(UC_X86_REG_CS, 0x18); cpu.reg_write(UC_X86_REG_FS, 8)
         self.pool = struct.unpack_from('<I', data, DS + 0x6aa)[0]
+        cpu.hook_add(UC_HOOK_INTR, self.interrupt)
+
+    def interrupt(self, cpu, number, user_data):
+        """DOS and DPMI services (files, memory) are not available: the call fails (CF = 1, the program takes its error path)."""
+        cpu.reg_write(UC_X86_REG_EFLAGS, cpu.reg_read(UC_X86_REG_EFLAGS) | 1)
 
     def u32(self, a): return struct.unpack('<I', bytes(self.cpu.mem_read(a, 4)))[0]
     def put(self, a, b): self.cpu.mem_write(a, b)
