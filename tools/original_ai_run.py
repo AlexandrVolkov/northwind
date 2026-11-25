@@ -11,6 +11,12 @@ e = E.Engine(sys.argv[1]); ticks = int(sys.argv[2]); every = int(sys.argv[3]) if
 part = lambda o: 0x97a + 0xf5 * o
 e.dsw(part(3) + 0x12, struct.pack('<I', 1)); e.dsw(part(0) + 0x12, struct.pack('<I', 8))
 e.dsw(part(3) + 0xb9, bytes([2])); e.dsw(part(0) + 0xb9 + 3, bytes([2])); e.dsw(0x1c4e, bytes([1]))
+# the AI of owner 3: active (+1A27 bit 0) and one campaign plan (mode 1, stage 0, target = the player) in the plan list +697 (entries of 15h bytes, mode FFh = free)
+block = struct.unpack('<I', e.dsr(0x6ba, 4))[0] + 0x1a35 * 3
+e.put(block + 0x1a27, bytes([int(e.cpu.mem_read(block + 0x1a27, 1)[0]) | 1]))   # the blocks are at linear addresses
+e.put(block + 0x697, bytes([1, 0, 0, 0, 0, 0, 0, 0]))
+e.dsw(part(3) + 0x18, struct.pack('<IIII', 20000, 20000, 20000, 20000))   # resources of the AI participant
+e.put(block + 0x41, bytes(4))   # the threshold of the own force (+41): the AI does not fall back to a truce
 castle = next(u[3] for u in W.units(e) if u[0] == 3 and u[1] == 2 and u[2] == 2)
 for t in range(1, ticks + 1):
     e.dsw(0x1c4f, bytes([1]))
