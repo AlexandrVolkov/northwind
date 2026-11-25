@@ -21,6 +21,7 @@ import time
 
 SIGNATURE = b'D:\\7bitlabs'
 SIGNATURE_OFFSET = 0x1EE4
+DS_LINEAR = 0x17F010   # the linear address of the data segment (the same in every run; the emulated RAM does not start at the beginning of the host region)
 
 
 def run(cmd, **kw): return subprocess.run(cmd, check=False, **kw)
@@ -40,13 +41,20 @@ def regions(p):
 
 
 def find_ds(p):
-    """(region_start, ds_host_address) of the running game, or exit."""
+    """(host address of the emulated linear address 0, host address of the data segment) of the running game. The signature may occur more than once (file buffers): the right copy has a plausible pool pointer [6AA] (or, before a mission, [1C49])."""
+    best = None
     with open(f'/proc/{p}/mem', 'rb', 0) as mem:
         for a, b in regions(p):
             try: mem.seek(a); data = mem.read(b - a)
             except OSError: continue
             i = data.find(SIGNATURE)
-            if i >= 0: return a, a + i - SIGNATURE_OFFSET
+            while i >= 0:
+                ds = i - SIGNATURE_OFFSET
+                pool = struct.unpack_from('<I', data, ds + 0x6aa)[0]; vtab = struct.unpack_from('<I', data, ds + 0x1c49)[0]
+                if pool and pool < b - a or vtab and vtab < b - a: return a + ds - DS_LINEAR, a + ds
+                if best is None: best = (a + ds - DS_LINEAR, a + ds)
+                i = data.find(SIGNATURE, i + 1)
+    if best: return best
     sys.exit('the data segment signature was not found (is the game past its start-up?)')
 
 
