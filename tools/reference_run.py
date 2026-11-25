@@ -55,9 +55,30 @@ def peek(offset, length=16):
     with open(f'/proc/{p}/mem', 'rb', 0) as mem: mem.seek(ds + offset); return mem.read(length)
 
 
+def objects():
+    """The objects of every participant (chain from [97A + F5 * owner + 5] to +9): owner army template x y state(+2D) health(+19) route(+28)."""
+    p = pid(); region, ds = find_ds(p)
+    with open(f'/proc/{p}/mem', 'rb', 0) as mem:
+        def rd(a, n): mem.seek(a); return mem.read(n)
+        pool = struct.unpack('<I', rd(ds + 0x6aa, 4))[0]
+        out = []
+        for owner in range(8):
+            part = ds + 0x97a + 0xf5 * owner
+            first, end = struct.unpack('<I', rd(part + 5, 4))[0], pool + struct.unpack('<I', rd(part + 9, 4))[0]   # +5 absolute, +9 relative to the pool
+            if first == 0 or end <= first or end - first > 0x40000: continue
+            cur = first + 0x10   # the chain starts with a block of 10h bytes (the first object of the first map begins at pool + 11h)
+            while cur < end:
+                r = rd(region + cur, 0x36)
+                size = struct.unpack_from('<I', r, 0x10)[0]
+                out.append((owner, r[0], r[0xe], struct.unpack_from('<I', r, 4)[0], struct.unpack_from('<I', r, 8)[0], r[0x2d], r[0x19], struct.unpack_from('<I', r, 0x28)[0], cur - pool))
+                if size == 0: break
+                cur += size
+        return out
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('command', choices=['start', 'shot', 'click', 'key', 'peek', 'stop'])
+    ap.add_argument('command', choices=['start', 'shot', 'click', 'key', 'peek', 'objects', 'mission', 'stop'])
     ap.add_argument('args', nargs='*')
     ap.add_argument('--conf', default='/opt/game/run1/dosbox.conf'); ap.add_argument('--display', default=':77'); ap.add_argument('--out', default='shot.png')
     a = ap.parse_args()
@@ -69,6 +90,19 @@ def main():
     elif a.command == 'click': run(['xdotool', 'mousemove', a.args[0], a.args[1]], env=env); time.sleep(0.7); run(['xdotool', 'mousedown', '1'], env=env); time.sleep(0.3); run(['xdotool', 'mouseup', '1'], env=env)   # a plain click is too short for the game
     elif a.command == 'key': run(['xdotool', 'key', *a.args], env=env)
     elif a.command == 'peek': print(peek(int(a.args[0], 0), int(a.args[1], 0) if len(a.args) > 1 else 16).hex())
+    elif a.command == 'mission':   # from the start of the game to the first mission with the hero Oleg (names: Igor, Oleg, Eirik)
+        def clk(x, y): run(['xdotool', 'mousemove', str(x), str(y)], env=env); time.sleep(0.7); run(['xdotool', 'mousedown', '1'], env=env); time.sleep(0.3); run(['xdotool', 'mouseup', '1'], env=env)
+        def key(*k):
+            for x in k: run(['xdotool', 'key', x], env=env); time.sleep(0.4)
+        key('Return'); time.sleep(3); clk(418, 283); time.sleep(5); clk(300, 303); time.sleep(3); key('shift+j', 'k', 't', 'u'); time.sleep(0.5); key('Return'); time.sleep(12); clk(122, 129)
+        for _ in range(60):
+            time.sleep(5)
+            try:
+                if struct.unpack('<I', peek(0x6aa, 4))[0] != 0: break
+            except SystemExit: pass
+        time.sleep(5)
+    elif a.command == 'objects':
+        for o in objects(): print(*o)
     else: run(['pkill', 'dosbox-x']); run(['pkill', 'Xvfb'])
 
 
