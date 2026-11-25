@@ -15,7 +15,7 @@ public partial class TestRunner
         Check(rivalCastle != null && rivalCastle.Cell.X > 95 && rivalCastle.Record[3] == 1, "The rival settlement stands in the east (slot 1)");
         Check(battle.Diplomacy.AtWar(3, 1) && !battle.Diplomacy.AtWar(0, 1), "The rival is at war with the red settlement only");
         bool marched = false; int squadSounds = 0;
-        for (int second = 0; second < 35 * 60; second += 10)
+        for (int second = 0; second < 50 * 60; second += 10)   // the engagement timing of the original (OriginalEngagement) makes the march start later than the old adapter did
         {
             Run(10);
             squadSounds += battle.Sounds.Count(e => e.Bank == "WORK.FX"); battle.Sounds.Clear();   // A4C2: the squads' messages
