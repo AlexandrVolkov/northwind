@@ -66,7 +66,7 @@ def main():
         subprocess.Popen(['Xvfb', a.display, '-screen', '0', '800x600x24'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); time.sleep(2)
         subprocess.Popen(['dosbox-x', '-conf', a.conf, '-fastlaunch'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); time.sleep(20)
     elif a.command == 'shot': run(['import', '-window', 'root', a.out], env=env)
-    elif a.command == 'click': run(['xdotool', 'mousemove', a.args[0], a.args[1]], env=env); time.sleep(0.5); run(['xdotool', 'click', '1'], env=env)
+    elif a.command == 'click': run(['xdotool', 'mousemove', a.args[0], a.args[1]], env=env); time.sleep(0.7); run(['xdotool', 'mousedown', '1'], env=env); time.sleep(0.3); run(['xdotool', 'mouseup', '1'], env=env)   # a plain click is too short for the game
     elif a.command == 'key': run(['xdotool', 'key', *a.args], env=env)
     elif a.command == 'peek': print(peek(int(a.args[0], 0), int(a.args[1], 0) if len(a.args) > 1 else 16).hex())
     else: run(['pkill', 'dosbox-x']); run(['pkill', 'Xvfb'])
