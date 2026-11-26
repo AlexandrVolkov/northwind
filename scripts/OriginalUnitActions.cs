@@ -79,6 +79,8 @@ public interface IUnitActionWorld
     /// <summary>The route bytes ([6B6] points to them) and the first dword of the descriptor of a map tile.</summary>
     byte[] Route { get; }
     uint TileDescriptor(uint tile);
+    /// <summary>The first bytes of the object LE:3 (the cursor state: [0] mode, [5] object under it, [9] its template, [D] kind, [12] click state, [13] button flags).</summary>
+    byte[] L3 { get; }
     /// <summary>A byte of flat memory outside the objects (the text buffers and the font of the interface routines).</summary>
     byte Peek(uint address);
     void Poke(uint address, byte value);
@@ -2529,6 +2531,99 @@ public static class OriginalUnitActions
             g.Edi += 4; g.Cmp(g.Ebx, 0xa, 32);
         } while (!g.Zf);
         g.Al = Add8(g, g.Al, 0x30); d[(int)g.Esi] = g.Al; d[(int)g.Esi + 1] = 0xff; g.Ecx = ecx0; g.Esi = esi0; w.Call(0x6c6d, g);
+    }
+
+    // ---- the cursor and the player's orders (4580..486C) ----
+    private static void SetCursor(byte[] d, uint frames) { Put(d, 0x1946, frames); Put(d, 0x1965, 0x0f000f); }
+
+    /// <summary>4580: what the mouse points at: the button state [193A]/[194B] into L3[13], the cell under the pointer (inside the map from the view corner [1C58]/[1C5C]) classified by 67BD: the object L3[5] and its template L3[9],
+    /// the cursor kind L3[0D] (from the template flags 18004h, one more for another settlement unless the template is 20020h or the owner is [1971], one more when the player's war mask +12 has the owner); then the click state L3[12] chooses 4672, 46F7 or 478D.</summary>
+    public static void F4580(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Cmp(d[0x1c60], 0, 8); if (g.Zf) return;
+        g.Eax = 0; g.Logic(0, 32); l[0x13] = g.Al; g.Cmp(l[0], g.Al, 8);
+        if (!g.Zf) { g.Cmp(l[0], 0x2a, 8); if (!g.Zf) goto state; }
+        g.Al = d[0x194b]; g.Al = (byte)(g.Al << 2); g.Al = (byte)(g.Al | d[0x193a]); g.Logic(g.Al, 8); g.Al = (byte)(g.Al << 1); l[0x13] = g.Al;
+        g.Eax = U32(d, 0x194d); g.Ebx = U32(d, 0x1951);
+        g.Cmp(g.Eax, U32(d, 0x1c58), 32); g.Eax -= U32(d, 0x1c58); if (g.Cf) goto state;
+        g.Cmp(g.Ebx, U32(d, 0x1c5c), 32); g.Ebx -= U32(d, 0x1c5c); if (g.Cf) goto state;
+        g.Cmp(g.Eax, U32(d, 0x18de), 32); if (!g.Cf) goto state;
+        g.Cmp(g.Ebx, U32(d, 0x18e2), 32); if (!g.Cf) goto state;
+        l[0x13] |= 1; g.Logic(l[0x13], 8);
+        F67BD(w, g); if (g.Zf) goto state;
+        Put(l, 5, g.Esi); Put(l, 9, g.Edi);
+        var t = w.ObjectAt(g.Edi); var o = w.ObjectAt(g.Esi);
+        g.Eax = U32(t, 0x40); g.Eax &= 0x18004; g.Logic(g.Eax, 32); g.Ecx = g.Eax; g.Eax >>= 0xc; g.Cl = (byte)(g.Cl | g.Al); g.Cl = Inc8(g, g.Cl);
+        g.Ebx = o[3]; g.Cmp(g.Bl, d[0x1972], 8);
+        if (!g.Zf)
+        {
+            g.Eax = U32(t, 0x40); g.Eax &= 0x20020; g.Logic(g.Eax, 32); g.Cmp(g.Eax, 0x20020, 32);
+            if (!g.Zf)
+            {
+                g.Cmp(g.Bl, d[0x1971], 8);
+                if (!g.Zf)
+                {
+                    g.Cl = Inc8(g, g.Cl); g.Eax = 0xf5; Mul8(g, g.Al, d[0x1972]);
+                    var part = w.PartOf(d[0x1972]); g.Cf = BitMem(part, 0x12, g.Ebx); g.Cl = Add8(g, g.Cl, (byte)(g.Cf ? 1 : 0));
+                }
+            }
+        }
+        l[0xd] = g.Cl;
+    state:
+        g.Al = l[0x12]; g.Test(g.Al, g.Al, 8); if (g.Zf) { F4672(w, g); return; }
+        g.Cmp(g.Al, 1, 8); if (g.Zf) { F46F7(w, g); return; }
+        g.Cmp(g.Al, 2, 8); if (g.Zf) { F478D(w, g); return; }
+    }
+
+    /// <summary>4672: the pointer over the map with no click: the cursor frames 400037h; a press with the left button (L3[13] = 11h or 5) turns into a click (46F7); the right button scrolls the view by the pointer (A320).</summary>
+    public static void F4672(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; g.Test(l[0x13], 1, 8); if (g.Zf) return;
+        SetCursor(d, 0x400037); g.Cmp(l[0x13], 0x11, 8);
+        if (!g.Zf) { g.Cmp(l[0x13], 5, 8); if (!g.Zf) { g.Test(l[0x13], 2, 8); if (g.Zf) return; g.Eax = U32(d, 0x194d) - U32(d, 0x1c58); g.Ebx = U32(d, 0x1951) - U32(d, 0x1c5c); FA320(w, g); return; } }
+        g.Al = l[0x13]; g.Al = (byte)g.Shr(g.Al, 1, 8); g.Al = (byte)(g.Al & 0xa); g.Logic(g.Al, 8); g.Al = (byte)(g.Al | 1); l[0x13] = g.Al;
+        g.Cmp(d[0x1986], 0, 8); if (g.Zf) return;
+        g.Cmp(d[0x198a], 1, 8); if (!g.Zf) return;
+        d[0x19c0] = 0x48; F46F7(w, g);
+    }
+
+    /// <summary>46F7: the left button over the map: the cursor 93008Ah; with the button flag 8 the cell under the pointer becomes the goal +22/+23 of the selected object [1969] with the order [19C0] in +14 (or, in a group [1C89], 20232 and 1F464 with 80h); then 4938.</summary>
+    public static void F46F7(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; g.Test(l[0x13], 1, 8); if (g.Zf) return;
+        SetCursor(d, 0x93008a); g.Test(l[0x13], 8, 8); if (g.Zf) return;
+        g.Ecx = U32(d, 0x194d); g.Eax = U32(d, 0x1951); g.Ecx -= U32(d, 0x1c58); g.Eax -= U32(d, 0x1c5c); g.Ch = g.Al; g.Ah = d[0x19c0];
+        g.Cmp(d[0x1c89], 0, 8);
+        if (g.Zf)
+        {
+            g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); o[0x22] = g.Cl; o[0x23] = g.Ch; o[0x14] &= 7; o[0x14] |= g.Ah; g.Logic(o[0x14], 8); w.Call(0x4938, g); return;
+        }
+        uint pushed = g.Ecx; g.Edi = U32(d, 0xed20); g.Add(g.Edi, 0x9df); g.Edi += 0x9df; g.Bl = d[0x1c87]; w.Call(0x20232, g); g.Ecx = pushed;
+        if (!g.Zf) { g.Bl = 0x80; w.Call(0x1f464, g); }
+        w.Call(0x4938, g);
+    }
+
+    /// <summary>478D: the right button over an object L3[5] (not the selected one, not an own group member): the cursor 6D0064h (810078h on an enemy that may be attacked, 77006Eh when the kind has both low bits); with the button flag 8 the object becomes the target +1C of the selected object with the order [19C0] (a group: B851); then 4938.</summary>
+    public static void F478D(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; g.Test(l[0x13], 1, 8); if (g.Zf) return;
+        SetCursor(d, 0x6d0064); g.Esi = U32(l, 5); g.Test(g.Esi, g.Esi, 32); if (g.Zf) return;
+        g.Al = l[0xd]; g.Test(g.Al, 8, 8); if (!g.Zf) return;
+        g.Cmp(g.Esi, U32(d, 0x1969), 32); if (g.Zf) return;
+        var o = w.ObjectAt(g.Esi);
+        g.Cmp(d[0x1c89], 0, 8);
+        if (g.Zf) goto L47f4;
+        g.Ah = o[3]; g.Cmp(g.Ah, d[0x1972], 8);
+        if (g.Zf) { g.Ah = o[0x1b]; g.Cmp(g.Ah, d[0x1c87], 8); if (g.Zf) return; }
+    L47f4:
+        SetCursor(d, 0x810078); g.Al &= 3; g.Logic(g.Al, 8); g.Cmp(g.Al, 3, 8);
+        if (g.Zf) SetCursor(d, 0x77006e);
+        g.Test(l[0x13], 8, 8); if (g.Zf) return;
+        g.Ecx = g.Esi; g.Cmp(g.Ecx, w.PoolBase, 32); g.Ecx -= w.PoolBase; g.Ah = d[0x19c0];
+        g.Cmp(d[0x1c89], 0, 8);
+        if (!g.Zf) { g.Al = d[0x1972]; g.Bl = d[0x1c87]; w.Call(0xb851, g); w.Call(0x4938, g); return; }
+        g.Esi = U32(d, 0x1969); var sel = w.ObjectAt(g.Esi); Put(sel, 0x1c, g.Ecx); sel[0x14] &= 7; sel[0x14] |= g.Ah; g.Logic(sel[0x14], 8); w.Call(0x4938, g);
     }
 
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are

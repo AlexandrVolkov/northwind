@@ -7635,6 +7635,82 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "6C6D (draw text) is a recorded stub"
+    },
+    {
+      "id": "le1-cursor-4580",
+      "module": "LE:1",
+      "start": 17792,
+      "end": 18034,
+      "name": "Mouse over the map: object and template under the pointer, cursor kind (4580)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The cursor state lives in LE:3 (offsets 0..13h, fixups to object 3); 20232, 1F464, 4938 and B851 are recorded stubs"
+    },
+    {
+      "id": "le1-cursor-4672",
+      "module": "LE:1",
+      "start": 18034,
+      "end": 18167,
+      "name": "Pointer without a click: cursor and view scroll (4672)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The cursor state lives in LE:3 (offsets 0..13h, fixups to object 3); 20232, 1F464, 4938 and B851 are recorded stubs"
+    },
+    {
+      "id": "le1-order-move-46f7",
+      "module": "LE:1",
+      "start": 18167,
+      "end": 18317,
+      "name": "Left click: the move order (46F7)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The cursor state lives in LE:3 (offsets 0..13h, fixups to object 3); 20232, 1F464, 4938 and B851 are recorded stubs"
+    },
+    {
+      "id": "le1-order-attack-478d",
+      "module": "LE:1",
+      "start": 18317,
+      "end": 18541,
+      "name": "Right click: the attack order (478D)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The cursor state lives in LE:3 (offsets 0..13h, fixups to object 3); 20232, 1F464, 4938 and B851 are recorded stubs"
     }
   ]
 }
