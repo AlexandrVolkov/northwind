@@ -8908,6 +8908,44 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "The per-object callback (WRK base + template +3B) is a recorded stub; the check keeps the kind +E = 0 so the template is the single table entry (the multiplier 0ABh and the WRK base +9 read zero)"
+    },
+    {
+      "id": "le1-pending-event-4473",
+      "module": "LE:1",
+      "start": 17523,
+      "end": 17600,
+      "name": "Drop the pending event when no other player waits (4473)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-input-step-44c0",
+      "module": "LE:1",
+      "start": 17600,
+      "end": 17792,
+      "name": "Input step of the frame: dead selection, event timer, settlement, cursor (44C0)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "EDD5, E559, 486D and 4580 are recorded stubs (486D and 4580 are ported separately); A320 runs as the ported code"
     }
   ]
 }

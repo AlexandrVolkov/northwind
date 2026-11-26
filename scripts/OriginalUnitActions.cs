@@ -3742,6 +3742,62 @@ public static class OriginalUnitActions
         } while (!g.Zf);
     }
 
+    /// <summary>4473: the pending event [1CAD] (-1 = none) is dropped when no player but the own one is waiting: [1CB6] = FFh drops it at once; else for every owner AL below [6C6] other than [1972]: when AL is not in the list DS:1CB5 (ended by FFh) the byte DS:1CCB + 16h * AL must be FFh, or the event stays.</summary>
+    public static void F4473(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(U32(d, 0x1cad), 0xffffffff, 32); if (g.Zf) return;
+        g.Cmp(d[0x1cb6], 0xff, 8);
+        if (!g.Zf)
+        {
+            g.Eax = 0; g.Ebx = 0x1ccb;
+            do
+            {
+                g.Cmp(g.Al, d[0x1972], 8);
+                if (!g.Zf)
+                {
+                    g.Ecx = 0x1cb4; bool skip = false;
+                    for (; ; )
+                    {
+                        g.Ecx++; g.Cmp(d[g.Ecx], 0xff, 8); if (g.Zf) { skip = true; break; }
+                        g.Cmp(d[g.Ecx], g.Al, 8); if (g.Zf) break;
+                    }
+                    if (!skip) { g.Cmp(d[g.Ebx], 0xff, 8); if (!g.Zf) return; }
+                }
+                g.Al = Inc8(g, g.Al); g.Ebx += 0x16; g.Cmp(g.Al, d[0x6c6], 8);
+            } while (!g.Zf);
+        }
+        Put(d, 0x1cad, 0xffffffff);
+    }
+
+    /// <summary>44C0: the input step of the frame: with [1EC6] = 0 and the selected object [1974] dead (+19 not above 0) the view goes to it (A320, cells +4/+8 &gt;&gt; 5), EDD5 (AL = 0Eh, AH = BL = [1972]), the selection is cleared, the entry DS:1CCB + 16h * [1972] = FFh and a pending event [1CAD] becomes 12Ch; without a selection and a pending event, on a zero [19EA] [1EC6] = 2; then ED20 = the settlement 1A35h * [1972] + [6BA], the cursor [1946] = [1942], [1965] = 0 and E559, 486D, 4580.</summary>
+    public static void F44C0(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(d[0x1ec6], 0, 8);
+        if (g.Zf)
+        {
+            g.Esi = U32(d, 0x1974); g.Test(g.Esi, g.Esi, 32);
+            if (!g.Zf)
+            {
+                var o = w.ObjectAt(g.Esi); g.Cmp(o[0x19], 0, 8);
+                if (g.Jle)
+                {
+                    g.Eax = g.Shr(U32(o, 4), 5, 32); g.Ebx = g.Shr(U32(o, 8), 5, 32); FA320(w, g);
+                    g.Al = 0xe; g.Bl = d[0x1972]; g.Ah = g.Bl; w.Call(0xedd5, g);
+                    Put(d, 0x1974, 0); g.Eax = 0x16; Mul8(g, g.Al, d[0x1972]); d[(g.Eax & 0xffff) + 0x1ccb] = 0xff;
+                    g.Cmp(U32(d, 0x1cad), 0xffffffff, 32); if (!g.Zf) Put(d, 0x1cad, 0x12c);
+                }
+            }
+            else
+            {
+                g.Cmp(U32(d, 0x1cad), 0xffffffff, 32);
+                if (g.Zf) { g.Test(d[0x19ea], 0xff, 8); if (g.Zf) d[0x1ec6] = 2; }
+            }
+        }
+        g.Eax = 0x1a35; g.Ebx = d[0x1972]; ulong p = (ulong)g.Eax * g.Ebx; g.Eax = (uint)p; g.Edx = (uint)(p >> 32); g.Cf = g.Of = g.Edx != 0;
+        g.Add(g.Eax, U32(d, 0x6ba)); g.Eax += U32(d, 0x6ba); Put(d, 0xed20, g.Eax); g.Eax = U32(d, 0x1942); Put(d, 0x1946, g.Eax); Put(d, 0x1965, 0);
+        w.Call(0xe559, g); w.Call(0x486d, g); w.Call(0x4580, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
