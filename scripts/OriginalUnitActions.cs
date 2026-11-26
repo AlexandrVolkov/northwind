@@ -4199,6 +4199,38 @@ public static class OriginalUnitActions
     }
     private static void Put16(byte[] b, int o, ushort v) { b[o] = (byte)v; b[o + 1] = (byte)(v >> 8); }
 
+    /// <summary>6BA3: the sprite AL (AL - 30h from B0h on) of the bank DS:19EE (the word table of offsets, then per sprite: the line offset +0, the dword +1 with the width CL and the height CH, the bytes from +3) is drawn at the cell (ECX, EDX + line offset) of the picture [68E] (640 bytes a line); AH is added to every non-zero byte; EAX = the width.</summary>
+    public static void F6BA3(IUnitActionWorld w, ActionRegs g) => Blit(w, g, false);
+
+    /// <summary>6C04: as 6BA3, but every non-zero byte goes through the table at EBP (the palette change).</summary>
+    public static void F6C04(IUnitActionWorld w, ActionRegs g) => Blit(w, g, true);
+
+    private static void Blit(IUnitActionWorld w, ActionRegs g, bool table)
+    {
+        var d = w.Ds; if (!table) g.Bh = g.Ah;
+        if (g.Al >= 0xb0) g.Al -= 0x30;
+        g.Esi = g.Al; g.Eax = U32(d, 0x19ee); uint bank = g.Eax; g.Esi = (uint)(w.Peek(bank + g.Esi * 2) | w.Peek(bank + g.Esi * 2 + 1) << 8); g.Esi += g.Eax;
+        g.Eax = 0; g.Al = w.Peek(g.Esi); g.Edx += g.Eax; g.Eax = g.Edx; g.Edx <<= 9; g.Eax <<= 7; g.Edx += g.Eax; g.Edx += g.Ecx; g.Edi = g.Edx + U32(d, 0x68e);
+        g.Ecx = Peek32(w, g.Esi + 1); g.Esi += 3;
+        if (g.Ch != 0)
+        {
+            if (!table) { g.Edx = 0x280; g.Dl = (byte)(g.Dl - g.Cl); bool borrow = (0x280 & 0xff) < g.Cl; g.Dh = (byte)(g.Dh - (borrow ? 1 : 0)); }
+            else { g.Eax = 0; g.Edx = 0x280; bool borrow = (0x280 & 0xff) < g.Cl; g.Dl = (byte)(g.Dl - g.Cl); g.Dh = (byte)(g.Dh - 0 - (borrow ? 1 : 0)); }
+            do
+            {
+                g.Bl = g.Cl;
+                do
+                {
+                    g.Al = w.Peek(g.Esi);
+                    if (g.Al != 0) { if (table) g.Al = w.Peek(g.Ebp + g.Al); else g.Al = (byte)(g.Al + g.Bh); w.Poke(g.Edi, g.Al); }
+                    g.Esi++; g.Edi++; g.Bl--;
+                } while (g.Bl != 0);
+                g.Edi += g.Edx; g.Ch--;
+            } while (g.Ch != 0);
+        }
+        g.Eax = 0; g.Logic(0, 32); g.Al = g.Cl;
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
