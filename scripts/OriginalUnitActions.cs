@@ -71,6 +71,8 @@ public interface IUnitActionWorld
     /// <summary>A byte of the table that follows the call of BB8B (pairs value, key; FFh ends it).</summary>
     byte TableByte(uint address);
     byte Fs13D { get; set; }
+    /// <summary>fs:[17F] (the global tick copy).</summary>
+    uint Fs17F { get; set; }
     byte G525 { get; } byte G526 { get; }
     byte G1C61 { get; set; }
     uint G2730 { get; }
@@ -1985,6 +1987,68 @@ public static class OriginalUnitActions
             esi++; edi++;
         }
         g.Esi = start; g.Edi = edi; g.Eax = saved[0]; g.Ebx = saved[1]; g.Ecx = saved[2];
+    }
+
+    // ---- the game tick (9BF9, 9C57) ----
+    /// <summary>9BF9: the tick counters: [19E8]++, and while the game runs ([1C4E]) [19E9]++, the global tick [1CA9]++ (copied to fs:[17F]) with 9E7D; then the state of the commands is reset ([1C61] = 5, [1C37] = 0) and C06E, C0A4 (three texts) run.</summary>
+    public static void F9BF9(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; d[0x19e8]++;
+        g.Cmp(d[0x1c4e], 0, 8);
+        if (!g.Zf)
+        {
+            d[0x19e9]++; Put(d, 0x1ca9, U32(d, 0x1ca9) + 1); g.Eax = U32(d, 0x1ca9); w.Fs17F = g.Eax; w.Call(0x9e7d, g);
+        }
+        d[0x1c61] = 5; PutW(d, 0x1c37, 0); w.Call(0xc06e, g);
+        g.Esi = 0x54c; w.Call(0xc0a4, g); g.Esi = 0x5b0; w.Call(0xc0a4, g); g.Esi = 0x745; w.Call(0xc0a4, g);
+    }
+
+    /// <summary>9C57: the per-tick events of the game loop: the countdown [1CAD] of the message rotation (list [1CB4], table [1CCB + 16h · id]), the key 1D001Fh of the pause toggle, and the actions of the command code [1C35] (44h, 58h, 0Fh, 3Bh..3Dh); every 1000h ticks FEC6.</summary>
+    public static void F9C57(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Ecx = (g.Ecx & 0xffff0000) | U16(d, 0x1c35);
+        g.Cmp(g.Cl, 2, 8); g.Cl = (byte)(g.Cl - 2);
+        if (!g.Cf)
+        {
+            g.Cmp(g.Cl, 7, 8);
+            if (!(g.Cl > 7)) { g.Al = 1; int count = g.Cl & 31; g.Al = (byte)(g.Al << count); if (count != 0) { g.Cf = false; g.Zf = g.Al == 0; g.Sf = (g.Al & 0x80) != 0; } }
+        }
+        g.Cmp(d[0x1c4e], 0, 8);
+        if (!g.Zf)
+        {
+            g.Cmp(U32(d, 0x1cad), 0xffffffff, 32);
+            if (!g.Zf)
+            {
+                g.Cmp(U32(d, 0x1cad), 0x400, 32);
+                if (g.Zf) { g.Esi = 0x490; w.Call(0xdee4, g); }
+                uint count = U32(d, 0x1cad) - 1; Put(d, 0x1cad, count); g.Zf = count == 0; g.Sf = (count & 0x80000000) != 0;
+                if (g.Zf)
+                {
+                    g.Ebx = 0x1cb4; g.Al = d[0x1972];
+                    do { g.Ebx++; g.Cmp(g.Al, d[(int)g.Ebx], 8); } while (!g.Zf);
+                    for (; ; )
+                    {
+                        g.Cl = d[(int)g.Ebx + 1]; g.Cmp(g.Cl, 0xff, 8);
+                        if (g.Zf) { g.Ebx = 0x1cb4; g.Cl = d[0x1cb5]; }
+                        g.Ebx++; g.Eax = 0x16; Mul8(g, g.Al, g.Cl); g.Cmp(d[(int)g.Eax + 0x1ccb], 0xff, 8);
+                        if (!g.Zf) break;
+                    }
+                    d[0x1972] = g.Cl; g.Eax = U32(d, 0x1cb1); Put(d, 0x1cad, g.Eax); d[0x1ec6] = 4;
+                }
+            }
+        }
+        w.Call(0xaab3, g); g.Cmp(d[0x9090], 0, 8);
+        if (!g.Zf) { g.Cmp(g.Eax, 0x1d001f, 32); if (g.Zf) { d[0x9091] ^= 1; g.Logic(d[0x9091], 8); } }
+        g.Cmp(U16(d, 0x1c35), 0x44, 8 * 2);
+        if (g.Zf) { w.Call(0xc7ab, g); w.Call(0xfec6, g); }
+        g.Cmp(U16(d, 0x1c35), 0x58, 16);
+        if (g.Zf) { w.Call(0x151e3, g); PutW(d, 0x1c35, 0); }
+        g.Test(d[0x19e9], 0xff, 8); g.Test(U32(d, 0x1ca9), 0xfff, 32);
+        if (g.Zf) w.Call(0xfec6, g);
+        g.Cmp(U16(d, 0x1c35), 0x0f, 16); if (g.Zf) w.Call(0x9d87, g);
+        g.Cmp(U16(d, 0x1c35), 0x3b, 16); if (g.Zf) w.Call(0x68d8, g);
+        g.Cmp(U16(d, 0x1c35), 0x3c, 16); if (g.Zf) w.Call(0x10005, g);
+        g.Cmp(U16(d, 0x1c35), 0x3d, 16); if (g.Zf) w.Call(0x10032, g);
     }
 
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
