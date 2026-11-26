@@ -3955,6 +3955,69 @@ public static class OriginalUnitActions
         g.Eax = U32(d, 0x1ca9); Put(l, 0x3cda, g.Eax);
     }
 
+    /// <summary>DFE5: removes the first queue record whose word +1 (number, and its next byte) equals AX; the mode L3[0] equal to AL is cleared first (word 0). The later records move up (DWORDs then bytes), the end L3[0DCE] follows; AL = FFh. Without a match ZF = 1 and nothing changes. AH = the remainder of the moved bytes (modulo 4).</summary>
+    public static void FDFE5(IUnitActionWorld w, ActionRegs g)
+    {
+        var l = w.L3; g.Cmp(g.Al, l[0], 8); if (g.Zf) { l[0] = 0; l[1] = 0; }
+        g.Edi = 0x7d4; g.Ecx = U32(l, 0xdce);
+        for (; ; )
+        {
+            g.Edi += 0x1e; g.Cmp(g.Edi, g.Ecx, 32); if (g.Zf) return;
+            g.Cmp(g.Eax & 0xffff, U16(l, (int)g.Edi + 1), 16); if (g.Zf) break;
+        }
+        g.Esi = g.Edi + 0x1e; g.Ecx -= g.Esi; g.Ah = (byte)g.Ecx; uint dwords = g.Ecx >> 2; g.Ecx = dwords;
+        uint rem = (uint)(g.Ah & 3); int total = (int)(dwords * 4 + rem);
+        for (int k = 0; k < total; k++) l[(int)g.Edi + k] = l[(int)g.Esi + k];
+        g.Edi += (uint)total; g.Esi += (uint)total; g.Ah = (byte)rem; g.Ecx = 0;
+        Put(l, 0xdce, g.Edi); g.Al |= 0xff; g.Logic(g.Al, 8);
+    }
+
+    /// <summary>E02A: DFE5 for AH = BL .. BH (AL = the number).</summary>
+    public static void FE02A(IUnitActionWorld w, ActionRegs g)
+    {
+        do
+        {
+            uint eax = g.Eax, ebx = g.Ebx; g.Ah = g.Bl; FDFE5(w, g); g.Ebx = ebx; g.Eax = eax;
+            g.Bl = Inc8(g, g.Bl); g.Cmp(g.Bl, g.Bh, 8);
+        } while (g.Cf || g.Zf);
+    }
+
+    /// <summary>E03C: looks for the queue record whose word +1 equals AX: EDI = it, AL = FFh and ZF = 0, otherwise ZF = 1 (EDI = the end).</summary>
+    public static void FE03C(IUnitActionWorld w, ActionRegs g)
+    {
+        var l = w.L3; g.Edi = 0x7d4;
+        for (; ; )
+        {
+            g.Edi += 0x1e; g.Cmp(g.Edi, U32(l, 0xdce), 32); if (g.Zf) return;
+            g.Cmp(g.Eax & 0xffff, U16(l, (int)g.Edi + 1), 16); if (g.Zf) break;
+        }
+        g.Al |= 0xff; g.Logic(g.Al, 8);
+    }
+
+    /// <summary>E055: the flag 40h of every queue record with the number AL is set.</summary>
+    public static void FE055(IUnitActionWorld w, ActionRegs g)
+    {
+        var l = w.L3; g.Edi = 0x7f2;
+        for (; ; )
+        {
+            g.Cmp(g.Edi, U32(l, 0xdce), 32); if (g.Zf) return;
+            g.Cmp(l[g.Edi + 1], g.Al, 8); if (g.Zf) { l[g.Edi] |= 0x40; g.Logic(l[g.Edi], 8); }
+            g.Add(g.Edi, 0x1e); g.Edi += 0x1e;
+        }
+    }
+
+    /// <summary>E070: the flag 40h of every queue record with the number AL is cleared.</summary>
+    public static void FE070(IUnitActionWorld w, ActionRegs g)
+    {
+        var l = w.L3; g.Edi = 0x7f2;
+        for (; ; )
+        {
+            g.Cmp(g.Edi, U32(l, 0xdce), 32); if (g.Zf) return;
+            g.Cmp(l[g.Edi + 1], g.Al, 8); if (g.Zf) { l[g.Edi] &= 0xbf; g.Logic(l[g.Edi], 8); }
+            g.Add(g.Edi, 0x1e); g.Edi += 0x1e;
+        }
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

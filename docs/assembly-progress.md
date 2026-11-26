@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 83351 | 6265 | 97 | 57169 | 44 |
+| LE:1 | 146882 | 83185 | 6265 | 97 | 57335 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -503,6 +503,11 @@
 | LE:1 `0xDEC8..0xDEDA` | Message queue: reset (DEC8) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The queue memory is the object LE:3 (offsets 7D4..DD8); DEE4 (message with a handler call) and the rest of the queue code are not ported |
 | LE:1 `0xDF2A..0xDF7E` | Message queue: remove the records of an id (DF2A) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The queue memory is the object LE:3 (offsets 7D4..DD8); DEE4 (message with a handler call) and the rest of the queue code are not ported |
 | LE:1 `0xDF7E..0xDFE5` | Message queue: insert a record at the end or the front (DF7E) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The queue memory is the object LE:3 (offsets 7D4..DD8); DEE4 (message with a handler call) and the rest of the queue code are not ported |
+| LE:1 `0xDFE5..0xE02A` | Remove the message queue record with the word AX (DFE5) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed |
+| LE:1 `0xE02A..0xE03C` | Remove records AL with AH = BL..BH (E02A) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed |
+| LE:1 `0xE03C..0xE055` | Find the queue record with the word AX (E03C) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed |
+| LE:1 `0xE055..0xE070` | Set the flag 40h of the records AL (E055) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed |
+| LE:1 `0xE070..0xE08B` | Clear the flag 40h of the records AL (E070) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed |
 | LE:1 `0xEDD5..0xEE38` | Queue and dispatch a message | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xEE69..0xEE92` | Find a queued message by type and party | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xEEFA..0xEF3F` | Drop messages between two settlements | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |

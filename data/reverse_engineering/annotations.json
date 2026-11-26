@@ -9117,6 +9117,101 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "EAD8, 1416B and 9E69 are recorded stubs; F5F2, DF7E, 7012 and A4A9 run as the ported code; the record L3:3CDE is read through Peek (zero in the check); the check keeps one owner (6C6 = 1)"
+    },
+    {
+      "id": "le1-queue-remove-dfe5",
+      "module": "LE:1",
+      "start": 57317,
+      "end": 57386,
+      "name": "Remove the message queue record with the word AX (DFE5)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-queue-remove-range-e02a",
+      "module": "LE:1",
+      "start": 57386,
+      "end": 57404,
+      "name": "Remove records AL with AH = BL..BH (E02A)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-queue-find-e03c",
+      "module": "LE:1",
+      "start": 57404,
+      "end": 57429,
+      "name": "Find the queue record with the word AX (E03C)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-queue-flag-set-e055",
+      "module": "LE:1",
+      "start": 57429,
+      "end": 57456,
+      "name": "Set the flag 40h of the records AL (E055)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-queue-flag-clear-e070",
+      "module": "LE:1",
+      "start": 57456,
+      "end": 57483,
+      "name": "Clear the flag 40h of the records AL (E070)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
     }
   ]
 }
