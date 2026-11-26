@@ -9383,6 +9383,139 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "9E41, 9E55 and CFAC are recorded stubs (the random stubs change only EAX and ZF); the check uses a 32 x 32 map, so the width/height swap and the identity of tile and cell index are not distinguished"
+    },
+    {
+      "id": "le1-msg-216-be9d",
+      "module": "LE:1",
+      "start": 48797,
+      "end": 48807,
+      "name": "Message 216h (BE9D)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "DEE4 is a recorded stub"
+    },
+    {
+      "id": "le1-widget-follow-bea7",
+      "module": "LE:1",
+      "start": 48807,
+      "end": 48827,
+      "name": "Queue record CFh following the selected object byte (BEA7)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "DF7E and 640B run as the ported code; the record source L3:00CF is read through Peek (zero)"
+    },
+    {
+      "id": "le1-widget-health-bebb",
+      "module": "LE:1",
+      "start": 48827,
+      "end": 48855,
+      "name": "Queue record EDh with +1A, +16 (BEBB)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "DF7E and 63F7 run as the ported code; the record source is read through Peek (zero)"
+    },
+    {
+      "id": "le1-widget-plain-bed7",
+      "module": "LE:1",
+      "start": 48855,
+      "end": 48870,
+      "name": "Queue record 10Bh (BED7)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "DF7E runs as the ported code; the record source is read through Peek (zero)"
+    },
+    {
+      "id": "le1-widget-bar-bee6",
+      "module": "LE:1",
+      "start": 48870,
+      "end": 48903,
+      "name": "Queue record 129h with +1A, +16, +15 (BEE6)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "DF7E and 645B run as the ported code; the record source is read through Peek (zero)"
+    },
+    {
+      "id": "le1-widget-picture-bf07",
+      "module": "LE:1",
+      "start": 48903,
+      "end": 48981,
+      "name": "Picture of the widget kind +31 (BF07)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1E133 and 1E098 are recorded stubs (drawing)"
+    },
+    {
+      "id": "le1-widget-scroll-bf55",
+      "module": "LE:1",
+      "start": 48981,
+      "end": 49097,
+      "name": "Scroll widget: pointer above or below the middle (BF55)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
     }
   ]
 }
