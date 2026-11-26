@@ -2787,6 +2787,81 @@ public static class OriginalUnitActions
     /// <summary>4D41: the click state: L3[2] = 1, L3[12] = 1.</summary>
     public static void F4D41(IUnitActionWorld w, ActionRegs g) { w.L3[2] = 1; w.L3[0x12] = 1; }
 
+    /// <summary>4D50: the tool «go to the point» (the key [1C35] = 1Dh shows the cursor 1D0000h): the left button over the map (flag 8): effect 4, the point [1955]/[1959] becomes the goal +22/+23 of the selected object [1969] with the order [19C0] (a group [1C89]: 20232 and 1F464), then 4938; otherwise the key 1 or the right button ends the tool.</summary>
+    public static void F4D50(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Test(l[4], 1, 8);
+        if (!g.Zf)
+        {
+            SetCursor(d, 0x93008a); g.Cmp(d[0x1c35], 0x1d, 8); if (g.Zf) SetCursor(d, 0x1d0000);
+            g.Test(l[4], 8, 8);
+            if (!g.Zf)
+            {
+                g.Eax = 7; g.Eax = 4; FA4A9(w, g);
+                g.Ecx = g.Shr(U32(d, 0x1955), 5, 32); g.Eax = g.Shr(U32(d, 0x1959), 5, 32); g.Ch = g.Al; g.Ah = d[0x19c0];
+                g.Cmp(d[0x1c89], 0, 8);
+                if (g.Zf) { g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); o[0x22] = g.Cl; o[0x23] = g.Ch; o[0x14] &= 7; o[0x14] |= g.Ah; g.Logic(o[0x14], 8); w.Call(0x4938, g); return; }
+                uint pushed = g.Ecx; g.Edi = U32(d, 0xed20); g.Add(g.Edi, 0x9df); g.Edi += 0x9df; g.Bl = d[0x1c87]; w.Call(0x20232, g); g.Ecx = pushed;
+                if (!g.Zf) { g.Bl = 0x80; w.Call(0x1f464, g); }
+                w.Call(0x4938, g); return;
+            }
+        }
+        EndTool(w, g);
+    }
+
+    private static void EndTool(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(U16(d, 0x1c35), 1, 16); if (g.Zf) { w.Call(0x4938, g); return; }
+        g.Test(w.L3[4], 0x10, 8); if (!g.Zf) { w.Call(0x4938, g); return; }
+    }
+
+    /// <summary>4E27: the tool state 2: L3[2] = 2, L3[12] = 0, L3[0E] = 0.</summary>
+    public static void F4E27(IUnitActionWorld w, ActionRegs g) { w.L3[2] = 2; w.L3[0x12] = 0; Put(w.L3, 0xe, 0); }
+
+    /// <summary>4E40: the tool «attack or talk»: the right-button cursors (6D0064h, 810078h, 77006Eh), the object L3[5] under the pointer as the target +1C with the order [19C0] (a group: 20232, then the area around it by 219C3 and 1F306); a friendly one (kind bits = 2) is
+    /// spoken to (EE69 with 93h, EDD5; the second press 5), remembered in L3[0E].</summary>
+    public static void F4E40(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Test(l[4], 1, 8); if (g.Zf) { EndTool(w, g); return; }
+        SetCursor(d, 0x6d0064); g.Esi = U32(l, 5); g.Test(g.Esi, g.Esi, 32); if (g.Zf) { EndTool(w, g); return; }
+        g.Al = l[0xd]; g.Test(g.Al, 8, 8); if (!g.Zf) { EndTool(w, g); return; }
+        g.Cmp(g.Esi, U32(d, 0x1969), 32); if (g.Zf) { EndTool(w, g); return; }
+        var o = w.ObjectAt(g.Esi);
+        g.Cmp(d[0x1c89], 0, 8);
+        if (!g.Zf)
+        {
+            g.Ah = o[3]; g.Cmp(g.Ah, d[0x1972], 8);
+            if (g.Zf) { g.Ah = o[0x1b]; g.Cmp(g.Ah, d[0x1c87], 8); if (g.Zf) { EndTool(w, g); return; } }
+        }
+        SetCursor(d, 0x810078); g.Al &= 3; g.Logic(g.Al, 8); g.Cmp(g.Al, 2, 8);
+        if (!g.Zf) { g.Cmp(g.Al, 3, 8); if (g.Zf) SetCursor(d, 0x77006e); }
+        g.Test(l[4], 8, 8); if (g.Zf) { EndTool(w, g); return; }
+        g.Eax = 8; g.Eax = 4; FA4A9(w, g);
+        g.Al = l[0xd]; g.Al &= 3; g.Logic(g.Al, 8); g.Cmp(g.Al, 2, 8);
+        if (g.Zf)
+        {
+            g.Cmp(U32(l, 0xe), g.Esi, 32);
+            if (!g.Zf)
+            {
+                Put(l, 0xe, g.Esi); g.Al = 0x93; g.Bl = d[0x1972]; g.Ah = g.Bl; w.Call(0xee69, g);
+                if (!g.Zf) w.ObjectAt(g.Edi)[0] = 0xff;
+                w.Call(0xedd5, g); EndTool(w, g); return;
+            }
+            g.Al = 5; g.Bl = d[0x1972]; g.Ah = o[3]; w.Call(0xedd5, g); g.Esi = U32(l, 5); o = w.ObjectAt(g.Esi);
+        }
+        g.Ecx = g.Esi; g.Cmp(g.Ecx, w.PoolBase, 32); g.Ecx -= w.PoolBase; g.Ah = d[0x19c0];
+        g.Cmp(d[0x1c89], 0, 8);
+        if (!g.Zf)
+        {
+            g.Edi = U32(d, 0xed20); g.Add(g.Edi, 0x9df); g.Edi += 0x9df; g.Bl = d[0x1c87]; w.Call(0x20232, g);
+            if (g.Zf) { w.Call(0x4938, g); return; }
+            g.Ecx = g.Shr(U32(o, 4), 5, 32); g.Eax = g.Shr(U32(o, 8), 5, 32); g.Ch = g.Al; g.Dl = 0xa; g.Dh = 0xa; w.Call(0x219c3, g); g.Bl = 0x80; w.Call(0x1f306, g); w.Call(0x4938, g); return;
+        }
+        g.Esi = U32(d, 0x1969); var sel = w.ObjectAt(g.Esi); Put(sel, 0x1c, g.Ecx); sel[0x14] &= 7; sel[0x14] |= g.Ah; g.Logic(sel[0x14], 8); w.Call(0x4938, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

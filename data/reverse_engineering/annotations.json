@@ -7825,6 +7825,63 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "200B5, B616, BA2E, 6A73, 20143, 200AB, 6ACD, 205FB, 1F3E9, DF7E, 65DF, 1416B (A4A9), D101, 50F4, 4D50, 53D3, 52A6 and 4E40 are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-tool-goto-4d50",
+      "module": "LE:1",
+      "start": 19792,
+      "end": 20007,
+      "name": "Tool: go to the point (4D50)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "20232, 1F464, 4938, EE69, EDD5, 219C3 and 1F306 are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-tool-state-4e27",
+      "module": "LE:1",
+      "start": 20007,
+      "end": 20032,
+      "name": "Tool state 2 (4E27)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "20232, 1F464, 4938, EE69, EDD5, 219C3 and 1F306 are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-tool-attack-4e40",
+      "module": "LE:1",
+      "start": 20032,
+      "end": 20430,
+      "name": "Tool: attack or talk (4E40)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "20232, 1F464, 4938, EE69, EDD5, 219C3 and 1F306 are recorded stubs; A4A9 runs as the ported code"
     }
   ]
 }
