@@ -8091,6 +8091,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "20232, 1FB9C, 1F71A, DEE4 and 4938 are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-tool-gift-5679",
+      "module": "LE:1",
+      "start": 22137,
+      "end": 22294,
+      "name": "Tool: gift to an object (5679)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "124FD, 124D8 and 4938 are recorded stubs; A4A9 runs as the ported code"
     }
   ]
 }
