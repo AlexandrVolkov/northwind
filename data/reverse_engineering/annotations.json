@@ -7882,6 +7882,120 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "20232, 1F464, 4938, EE69, EDD5, 219C3 and 1F306 are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-tool-area-start-4fce",
+      "module": "LE:1",
+      "start": 20430,
+      "end": 20493,
+      "name": "Start of the area tool (4FCE)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "AE57, 20232, 1F62B and 4938 are recorded stubs; 68A0 and A4A9 run as the ported code; 51AC (D182) is not ported"
+    },
+    {
+      "id": "le1-tool-area-500d",
+      "module": "LE:1",
+      "start": 20493,
+      "end": 20709,
+      "name": "The area tool: the rectangle and the order (500D)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "AE57, 20232, 1F62B and 4938 are recorded stubs; 68A0 and A4A9 run as the ported code; 51AC (D182) is not ported"
+    },
+    {
+      "id": "le1-tool-state4-50e5",
+      "module": "LE:1",
+      "start": 20709,
+      "end": 20724,
+      "name": "Tool state 4 (50E5)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "AE57, 20232, 1F62B and 4938 are recorded stubs; 68A0 and A4A9 run as the ported code; 51AC (D182) is not ported"
+    },
+    {
+      "id": "le1-tool-goto2-50f4",
+      "module": "LE:1",
+      "start": 20724,
+      "end": 20908,
+      "name": "Tool go and do (50F4)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "AE57, 20232, 1F62B and 4938 are recorded stubs; 68A0 and A4A9 run as the ported code; 51AC (D182) is not ported"
+    },
+    {
+      "id": "le1-tool-area2-520b",
+      "module": "LE:1",
+      "start": 21003,
+      "end": 21143,
+      "name": "Second point of the area tool (520B)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "AE57, 20232, 1F62B and 4938 are recorded stubs; 68A0 and A4A9 run as the ported code; 51AC (D182) is not ported"
+    },
+    {
+      "id": "le1-tool-state6-5297",
+      "module": "LE:1",
+      "start": 21143,
+      "end": 21158,
+      "name": "Tool state 6 (5297)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "AE57, 20232, 1F62B and 4938 are recorded stubs; 68A0 and A4A9 run as the ported code; 51AC (D182) is not ported"
     }
   ]
 }
