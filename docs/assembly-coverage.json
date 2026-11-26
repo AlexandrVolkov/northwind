@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "604fde10673de9c251df9ce0ab353665f4d383f161391e244752ec40b593c470",
+  "annotation_sha256": "03417b967236e7ffb0748f18f93b773453973ace46bcea5bf4bdd7b42242aab7",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -5661,7 +5661,8 @@
       "zero_fill_bytes": 0,
       "sha256": "c419f791822084e83013a8988d792948cadb4f5f3b5606149b000300c9ee2316",
       "byte_status": {
-        "unreviewed": 411
+        "ported": 160,
+        "unreviewed": 251
       },
       "linear_rows": 131,
       "flow_candidate_instructions": 53,
@@ -5673,6 +5674,15 @@
       "regions": [
         {
           "start": 0,
+          "end": 160,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army04-volcano-0"
+          ]
+        },
+        {
+          "start": 160,
           "end": 411,
           "status": "unreviewed",
           "classification": "unknown",
