@@ -7255,6 +7255,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": ""
+    },
+    {
+      "id": "army04-volcano-0",
+      "module": "ARMY__04.WRK",
+      "start": 0,
+      "end": 160,
+      "name": "Volcano script: pause, countdown and eruption effects",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/volcano.md",
+        "tests/fixtures/volcano.json",
+        "tools/verify_volcano.py",
+        "tests/OriginalVolcanoChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalVolcano.cs"
+      ],
+      "limitations": "FS:109 (9E41), FS:10D (9E55) and FS:19 (9727) are recorded stubs; the bytes 0A0..19A are data tables; the skirmish does not place volcanoes yet (the first map has none)"
     }
   ]
 }
