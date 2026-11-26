@@ -8946,6 +8946,158 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "EDD5, E559, 486D and 4580 are recorded stubs (486D and 4580 are ported separately); A320 runs as the ported code"
+    },
+    {
+      "id": "le1-msg-gate-f5ce",
+      "module": "LE:1",
+      "start": 62926,
+      "end": 62962,
+      "name": "Gate of the message step (F5CE)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "F629 is a recorded stub"
+    },
+    {
+      "id": "le1-msg-number-f5f2",
+      "module": "LE:1",
+      "start": 62962,
+      "end": 63017,
+      "name": "Free message number 14h..17h in the queue (F5F2)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-msg-e055-f781",
+      "module": "LE:1",
+      "start": 63361,
+      "end": 63377,
+      "name": "E055 for the numbers 14h..17h (F781)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E055 is a recorded stub"
+    },
+    {
+      "id": "le1-msg-e070-f791",
+      "module": "LE:1",
+      "start": 63377,
+      "end": 63393,
+      "name": "E070 for the numbers 14h..17h (F791)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E070 is a recorded stub"
+    },
+    {
+      "id": "le1-msg-widget-f7a1",
+      "module": "LE:1",
+      "start": 63393,
+      "end": 63440,
+      "name": "Message widget timer and drop (F7A1)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5F6 and E5AB are recorded stubs; DF2A runs as the ported code; the type 11h branch is not reached by the check"
+    },
+    {
+      "id": "le1-msg-demand-f7d0",
+      "module": "LE:1",
+      "start": 63440,
+      "end": 63586,
+      "name": "Widget of the demand message (F7D0)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "EE69, E5F6, E5AB, 1EAD8 and DEE4 are recorded stubs; DF2A runs as the ported code"
+    },
+    {
+      "id": "le1-msg-offer-f862",
+      "module": "LE:1",
+      "start": 63586,
+      "end": 63689,
+      "name": "Widget of the offer message (F862)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5F6, E5AB, EE69 and EDD5 are recorded stubs; A320 and DF2A run as the ported code"
+    },
+    {
+      "id": "le1-msg-move-f8c9",
+      "module": "LE:1",
+      "start": 63689,
+      "end": 63713,
+      "name": "Moving message widget: speed and position (F8C9)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
     }
   ]
 }

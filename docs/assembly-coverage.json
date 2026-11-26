@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "f02eb895c288e19493e2932734434dedb8d5acc326409098e272e6fadd840d1f",
+  "annotation_sha256": "6a0a27460aaf3d977edfe1c1c5a05be9fe6e568e1a6b35841036e0c38deef17a",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 6265,
-        "ported": 56382,
-        "unreviewed": 84138,
+        "ported": 56825,
+        "unreviewed": 83695,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -3267,6 +3267,85 @@
         },
         {
           "start": 62926,
+          "end": 62962,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-msg-gate-f5ce"
+          ]
+        },
+        {
+          "start": 62962,
+          "end": 63017,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-msg-number-f5f2"
+          ]
+        },
+        {
+          "start": 63017,
+          "end": 63361,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 63361,
+          "end": 63377,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-msg-e055-f781"
+          ]
+        },
+        {
+          "start": 63377,
+          "end": 63393,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-msg-e070-f791"
+          ]
+        },
+        {
+          "start": 63393,
+          "end": 63440,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-msg-widget-f7a1"
+          ]
+        },
+        {
+          "start": 63440,
+          "end": 63586,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-msg-demand-f7d0"
+          ]
+        },
+        {
+          "start": 63586,
+          "end": 63689,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-msg-offer-f862"
+          ]
+        },
+        {
+          "start": 63689,
+          "end": 63713,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-msg-move-f8c9"
+          ]
+        },
+        {
+          "start": 63713,
           "end": 65653,
           "status": "unreviewed",
           "classification": "unknown",
