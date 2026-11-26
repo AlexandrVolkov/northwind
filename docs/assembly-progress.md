@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 85910 | 6265 | 97 | 54610 | 44 |
+| LE:1 | 146882 | 85384 | 6265 | 97 | 55136 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -257,6 +257,10 @@
 | LE:1 `0x6423..0x643C` | Widget follows byte +27 of the selected object (6423) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |
 | LE:1 `0x643C..0x645B` | Widget follows a value at a pointer (643C) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |
 | LE:1 `0x645B..0x64AD` | Widget follows a byte, kind 3 computes it (645B) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |
+| LE:1 `0x64AD..0x6562` | Build the five order-slot widgets in the queue (64AD) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | DF7E, 68A0 and 6423 run as the ported code; the constant records at DS:23D/25B/279 are read through Peek (zero in the check) |
+| LE:1 `0x6562..0x658A` | Order slot handler: clear the order table (6562) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E5AB is a recorded stub |
+| LE:1 `0x658A..0x65DF` | Redraw the order slots when the sum changed (658A) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E02A, 1DF08 and DEE4 are recorded stubs |
+| LE:1 `0x65DF..0x66BB` | Widget follows an object: position, frame, group select or lookup (65DF) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E5F6, E5AB, 6ACD, BA60 and DFE5 are recorded stubs |
 | LE:1 `0x66BB..0x66DF` | Countdown dots row (66BB) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |
 | LE:1 `0x66DF..0x66E9` | Widget byte sum (66DF) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |
 | LE:1 `0x67BD..0x6877` | What is under the map cell for the player: selectable, blocking or nothing (67BD, 67C0, 67D3) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |

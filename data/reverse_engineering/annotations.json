@@ -8604,6 +8604,82 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-order-widgets-64ad",
+      "module": "LE:1",
+      "start": 25773,
+      "end": 25954,
+      "name": "Build the five order-slot widgets in the queue (64AD)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "DF7E, 68A0 and 6423 run as the ported code; the constant records at DS:23D/25B/279 are read through Peek (zero in the check)"
+    },
+    {
+      "id": "le1-order-handler-6562",
+      "module": "LE:1",
+      "start": 25954,
+      "end": 25994,
+      "name": "Order slot handler: clear the order table (6562)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5AB is a recorded stub"
+    },
+    {
+      "id": "le1-order-redraw-658a",
+      "module": "LE:1",
+      "start": 25994,
+      "end": 26079,
+      "name": "Redraw the order slots when the sum changed (658A)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E02A, 1DF08 and DEE4 are recorded stubs"
+    },
+    {
+      "id": "le1-widget-follow-65df",
+      "module": "LE:1",
+      "start": 26079,
+      "end": 26299,
+      "name": "Widget follows an object: position, frame, group select or lookup (65DF)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5F6, E5AB, 6ACD, BA60 and DFE5 are recorded stubs"
     }
   ]
 }
