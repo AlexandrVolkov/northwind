@@ -16,6 +16,9 @@ public sealed class OriginalOccupancyMap
         Width = width; Height = height; _cells = new uint[3 * width * height];
     }
 
+    /// <summary>One dword of the planes by its flat index (plane * W * H + cell): the write of the ported area step D2D1.</summary>
+    public void SetCell(int index, uint value) => _cells[index] = value;
+
     public void LoadCells(ReadOnlySpan<uint> cells)
     {
         if (cells.Length != _cells.Length) throw new ArgumentException("Wrong plane buffer size", nameof(cells));

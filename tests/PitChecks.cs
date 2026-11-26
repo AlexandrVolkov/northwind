@@ -14,6 +14,7 @@ public partial class TestRunner
         var pit = battle.Pits[0]; var spot = new Vector2I((int)(System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(pit.AsSpan(4)) >> 5), (int)(System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(pit.AsSpan(8)) >> 5));
         var victim = battle.Actors.First(a => a.Team == 1 && a.Alive && !a.Structure && !a.Worker);
         System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(victim.Record.AsSpan(4), (uint)(spot.X * 32 + 16)); System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(victim.Record.AsSpan(8), (uint)(spot.Y * 32 + 16));
+        battle.Occupancy.ClearReference(victim.Id); battle.Occupancy.WriteFootprint(victim.Parameters[3], victim.Parameters[4], victim.Record[0x0d], (uint)(spot.X * 32 + 16), (uint)(spot.Y * 32 + 16), victim.Id);   // the walk keeps the planes in step; the test moved him by hand
         Run(30);
         Check(!victim.Alive, "A unit in the square is swallowed by the pit");
         bool opened = pit[0x2a] > 0 || pit[0x15] != 0; Run(40);
