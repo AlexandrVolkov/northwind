@@ -14,8 +14,9 @@ public partial class TestRunner
         gridA.WriteFootprint(1, 1, 0, 5 * 32 + 16, 5 * 32 + 16, 77); gridB.WriteFootprint(1, 1, 0, 5 * 32 + 16, 5 * 32 + 16, 77);
         var a = NewRecord(); var b = NewRecord();
         var world = new SkirmishWalkWorld(gridB, cells, props) { Record = b, Template = template, Reference = 77 };
-        for (int i = 1; i < route.Length; i++) world.Route.Enqueue(route[i]);
-        var walk = new OriginalUnitWalk(world); var queue = new Queue<Vector2I>(route.Skip(1));
+        var queue = new Queue<Vector2I>(route.Skip(1)); var bQueue = new Queue<Vector2I>(route.Skip(1));
+        world.RouteCount = () => bQueue.Count; world.RoutePeek = () => bQueue.Peek(); world.RouteDequeue = () => bQueue.Dequeue();
+        var walk = new OriginalUnitWalk(world);
         bool stepping = false, turning = false; int firstDiff = -1; string detail = "";
         for (int tick = 0; tick < 200 && firstDiff < 0; tick++)
         {
@@ -34,7 +35,7 @@ public partial class TestRunner
                 if (a[0x2c] == 0) { a[0x24] = (byte)((a[0x24] & 0xf8) | 1); stepping = false; if (queue.Count == 0) { a[0x27] = 0; OriginalUnitWalk.WriteFrame(a, template); } }
             }
             // B: the ported step
-            if (b[0x24] != 0 || world.Route.Count > 0 || tick == 0) walk.Step(b, template, 2, 2, 0);
+            if (b[0x24] != 0 || bQueue.Count > 0 || tick == 0) walk.Step(b, template, 2, 2, 0);
             bool lagTick = queue.Count == 0 && !stepping && a[0x27] == 0 && b[0x27] != 0 && b[0x24] != 0;   // the original ends the walk one update after the last step (7FA7 answers «none»)
             if (lagTick) { walk.Step(b, template, 2, 2, 0); }
             if (!a.SequenceEqual(b) || !gridA.Cells.ToArray().SequenceEqual(gridB.Cells.ToArray()))
