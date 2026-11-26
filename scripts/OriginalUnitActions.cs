@@ -4349,6 +4349,16 @@ public static class OriginalUnitActions
         for (uint k = 0; k < 14; k++) w.Poke(g.Edi + k, 1);
     }
 
+    /// <summary>3DB5: the frame of the cursor animation [193E]: a step of the clock [19E4] of at least 4 since [194A] advances it by one (and stores the clock); a frame outside the range of the words [1946] .. [1948] goes back to the first.</summary>
+    public static void F3DB5(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Eax = U32(d, 0x193e); g.Bl = d[0x19e4]; g.Bh = g.Bl; g.Bl = Sub8(g, g.Bl, d[0x194a]); g.Cmp(g.Bl, 4, 8);
+        if (!g.Cf) { g.Eax++; d[0x194a] = g.Bh; }
+        g.Cmp(g.Eax & 0xffff, U16(d, 0x1946), 16);
+        if (!g.Cf) { g.Cmp(g.Eax & 0xffff, U16(d, 0x1948), 16); if (g.Cf || g.Zf) { Put(d, 0x193e, g.Eax); return; } }
+        g.Eax = (g.Eax & 0xffff0000) | U16(d, 0x1946); Put(d, 0x193e, g.Eax);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
