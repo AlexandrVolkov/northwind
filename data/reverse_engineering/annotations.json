@@ -8110,6 +8110,63 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "124FD, 124D8 and 4938 are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-queue-reset-dec8",
+      "module": "LE:1",
+      "start": 57032,
+      "end": 57050,
+      "name": "Message queue: reset (DEC8)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The queue memory is the object LE:3 (offsets 7D4..DD8); DEE4 (message with a handler call) and the rest of the queue code are not ported"
+    },
+    {
+      "id": "le1-queue-remove-df2a",
+      "module": "LE:1",
+      "start": 57130,
+      "end": 57214,
+      "name": "Message queue: remove the records of an id (DF2A)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The queue memory is the object LE:3 (offsets 7D4..DD8); DEE4 (message with a handler call) and the rest of the queue code are not ported"
+    },
+    {
+      "id": "le1-queue-insert-df7e",
+      "module": "LE:1",
+      "start": 57214,
+      "end": 57317,
+      "name": "Message queue: insert a record at the end or the front (DF7E)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The queue memory is the object LE:3 (offsets 7D4..DD8); DEE4 (message with a handler call) and the rest of the queue code are not ported"
     }
   ]
 }

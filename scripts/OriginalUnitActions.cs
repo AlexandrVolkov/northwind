@@ -3027,6 +3027,53 @@ public static class OriginalUnitActions
         EndTool(w, g);
     }
 
+    // ---- the queue of the pending messages in LE:3 (header 7D4, records of 1Eh bytes from 7F2, +1 the id; the end pointer at 0DCE) ----
+    /// <summary>DEC8: empties the queue (the end is the first record place) and clears the flag at LE:3[0DD3].</summary>
+    public static void FDEC8(IUnitActionWorld w, ActionRegs g)
+    {
+        var l = w.L3; Put(l, 0xdce, 0x7f2); l[0xdd3] = 0;
+    }
+
+    /// <summary>DF2A: removes the records of the id AL from the queue (consecutive ones together, the tail moves down) and clears the mode L3[0] when it is that id; ESI = the header (7D4) at the end.</summary>
+    public static void FDF2A(IUnitActionWorld w, ActionRegs g)
+    {
+        var l = w.L3; g.Cmp(g.Al, l[0], 8); if (g.Zf) PutW(l, 0, 0);
+        for (; ; )
+        {
+            g.Esi = 0x7d4; g.Ecx = U32(l, 0xdce);
+            for (; ; )
+            {
+                g.Esi += 0x1e; g.Cmp(g.Esi, g.Ecx, 32);
+                if (!g.Cf) { g.Esi = 0x7d4; return; }
+                g.Cmp(g.Al, l[(int)g.Esi + 1], 8);
+                if (g.Zf) break;
+            }
+            g.Edi = g.Esi;
+            do { g.Esi += 0x1e; g.Cmp(g.Esi, g.Ecx, 32); if (!g.Cf) break; g.Cmp(g.Al, l[(int)g.Esi + 1], 8); } while (g.Zf);
+            g.Ecx -= g.Esi; g.Ah = g.Cl; uint count = g.Ecx; g.Ah = (byte)(g.Ah & 3); g.Logic(g.Ah, 8);
+            for (uint k = 0; k < count; k++) l[(int)g.Edi + (int)k] = l[(int)g.Esi + (int)k];
+            g.Edi += count; g.Esi += count; g.Ecx = 0;
+            Put(l, 0xdce, g.Edi);
+        }
+    }
+
+    /// <summary>DF7E: puts the 1Eh-byte record at ESI into the queue when 1Eh bytes are left before 0DCE: AL ≠ 0 behind the last record, AL = 0 in front of the first one (the others move up); EAX = 2, ECX = 0.</summary>
+    public static void FDF7E(IUnitActionWorld w, ActionRegs g)
+    {
+        var l = w.L3; g.Ebx = 0xdce; g.Edi = U32(l, 0xdce); g.Ecx = 0x1e; g.Ebx -= g.Edi; g.Cmp(g.Ebx, g.Ecx, 32); if (g.Cf) return;
+        g.Ebx = g.Edi + g.Ecx; Put(l, 0xdce, g.Ebx); g.Test(g.Al, g.Al, 8);
+        uint edi = g.Edi;
+        if (g.Zf)
+        {
+            uint total = g.Edi - 0x7f2;
+            for (int k = (int)total - 1; k >= 0; k--) l[0x7f2 + k + 0x1e] = l[0x7f2 + k];
+            edi = 0x7f2;
+        }
+        for (int k = 0; k < 0x1e; k++) l[(int)edi + k] = w.Peek(g.Esi + (uint)k);
+        g.Edi = edi;
+        g.Eax = 2; g.Logic(2, 32); g.Ecx = 0;
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
