@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 84451 | 6265 | 97 | 56069 | 44 |
+| LE:1 | 146882 | 84407 | 6265 | 97 | 56113 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -192,6 +192,7 @@
 | LE:1 `0x418A..0x41C6` | Program PIT channel 0 to 72.8 Hz and hook INT 8 | verified | [game-timing.md](../docs/game-timing.md) | Установлено чтением инструкций; частота в схватке задана данными. |
 | LE:1 `0x41C6..0x41EB` | Timer interrupt: tick counter and chained BIOS handler | verified | [game-timing.md](../docs/game-timing.md) | Установлено чтением инструкций; частота в схватке задана данными. |
 | LE:1 `0x42BB..0x430E` | Object update gate every second world step and global tick | partial | [game-timing.md](../docs/game-timing.md) | Обход цепочек объектов по участникам не перенесён. |
+| LE:1 `0x42BB..0x43B0` | Object cycle: gate, participants, chains, callback per object (42BB) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The per-object callback (WRK base + template +3B) is a recorded stub; the check keeps the kind +E = 0 so the template is the single table entry (the multiplier 0ABh and the WRK base +9 read zero) |
 | LE:1 `0x42E7..0x434D` | Traverse settlements and object chains, dispatch AH=1 | partial | [game-timing.md](../docs/game-timing.md) | Юниты обходятся по владельцу; здания и юниты не в одной цепочке пула. |
 | LE:1 `0x433A..0x434C` | DAT to WRK callback dispatch | partial | [executable-analysis.md](../docs/executable-analysis.md) | Подтверждены выбор DAT[3B], AH=1 и косвенный вызов; общий цикл обновления не перенесён. |
 | LE:1 `0x434D..0x4384` | Object update tail: previous condition, stale target, periodic mark reset | ported | [combat.md](../docs/combat.md); [update-tail.json](../tests/fixtures/update-tail.json) |  |

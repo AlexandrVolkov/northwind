@@ -71,6 +71,8 @@ public interface IUnitActionWorld
     /// <summary>A byte of the table that follows the call of BB8B (pairs value, key; FFh ends it).</summary>
     byte TableByte(uint address);
     byte Fs13D { get; set; }
+    /// <summary>FS:10: the counter of the object cycles (42BB).</summary>
+    byte Fs10 { get; set; }
     /// <summary>fs:[17F] (the global tick copy).</summary>
     uint Fs17F { get; set; }
     byte G525 { get; } byte G526 { get; }
@@ -3697,6 +3699,47 @@ public static class OriginalUnitActions
             if (g.Zf) break;
         }
         g.Esi = 0x297; w.Call(0xdee4, g); g.Eax = 0; FA4A9(w, g);
+    }
+
+    /// <summary>42BB: the object cycle, every second world step ([1C4E] set, [1C4F] counts 2 down): [19EA] and FS:10 count; for every participant (from 97Ah, [6C6] of them, 0F5h apart) every object of its chain: the template (the table 6CAh: army * 56h, +4 = DAT, +9 = WRK base; + kind * 0ABh) gives [1C49], the footprint [273F] and the callback [19C3] = WRK base + template +3B, called with AH = 1 (ESI = the object); then +1A = +19 (the health of the last cycle), a lost or dead target (+1C: its +17 bit 200h or health below 0) is forgotten, and every eighth cycle +17 &amp;= FDD8h.</summary>
+    public static void F42BB(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(d[0x1c4e], 0, 8); if (g.Zf) return;
+        d[0x1c4f] = Dec8(g, d[0x1c4f]); if (!g.Zf) return;
+        d[0x1c4f] = 2; d[0x19ea] = Inc8(g, d[0x19ea]); w.Fs10 = Inc8(g, w.Fs10);
+        g.Cl = d[0x6c6]; g.Esi = 0x97a;
+        do
+        {
+            uint ecx = g.Ecx, esi = g.Esi; var part = w.PartOf((byte)((esi - 0x97a) / 0xf5));
+            g.Eax = U32(part, 9) + w.PoolBase; g.Esi = U32(part, 0xe) + w.PoolBase; g.Cmp(g.Esi, g.Eax, 32);
+            if (!g.Zf)
+            {
+                for (; ; )
+                {
+                    var o = w.ObjectAt(g.Esi); g.Eax = o[0]; g.Ah = 0x56; Mul8(g, g.Al, g.Ah); g.Eax += 0x6ca;
+                    int table = (int)g.Eax; g.Ecx = U32(d, table + 9); g.Edi = w.ArmyTable(o[0]);
+                    g.Eax = o[0xe]; g.Ah = 0xab; Mul8(g, g.Al, g.Ah); g.Edi += g.Eax; Put(d, 0x1c49, g.Edi);
+                    var t = w.ObjectAt(g.Edi); g.Ebx = U32(t, 3); d[0x273f] = (byte)g.Ebx; d[0x2740] = (byte)(g.Ebx >> 8);
+                    g.Add(g.Ecx, U32(t, 0x3b)); g.Ecx += U32(t, 0x3b); Put(d, 0x19c3, g.Ecx); g.Ah = 1;
+                    uint cur = g.Esi; w.Call(g.Ecx, g); g.Esi = cur; o = w.ObjectAt(g.Esi);
+                    g.Al = o[0x19]; o[0x1a] = g.Al; g.Eax = U32(o, 0x1c); g.Test(g.Eax, g.Eax, 32);
+                    if (!g.Zf)
+                    {
+                        g.Eax += w.PoolBase; var tgt = w.ObjectAt(g.Eax); g.Test(U16(tgt, 0x17), 0x200, 16);
+                        bool clear = !g.Zf;
+                        if (!clear) { g.Cmp(tgt[0x19], 0, 8); clear = g.Sf != g.Of; }
+                        if (clear) Put(o, 0x1c, 0);
+                    }
+                    g.Test(d[0x19ea], 7, 8);
+                    if (g.Zf) { ushort f = (ushort)(U16(o, 0x17) & 0xfdd8); o[0x17] = (byte)f; o[0x18] = (byte)(f >> 8); g.Logic(f, 16); }
+                    g.Eax = U32(part, 9) + w.PoolBase; g.Cmp(g.Esi, g.Eax, 32);
+                    if (!g.Cf) break;
+                    g.Esi += U32(o, 0x10); g.Cmp(g.Esi, g.Eax, 32);
+                    if (!g.Cf) break;
+                }
+            }
+            g.Ecx = ecx; g.Esi = esi; g.Add(g.Esi, 0xf5); g.Esi += 0xf5; g.Cl = Dec8(g, g.Cl);
+        } while (!g.Zf);
     }
 
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are

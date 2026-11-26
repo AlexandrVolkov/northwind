@@ -8889,6 +8889,25 @@
         "scripts/OriginalRouteSearch.cs"
       ],
       "limitations": "The inner state machine 7497..79C0 is the partial Find(); the candidate admission (7D4C) is a delegate over the footprint scan; squares up to 2 x 2 are checked"
+    },
+    {
+      "id": "le1-object-cycle-42bb",
+      "module": "LE:1",
+      "start": 17083,
+      "end": 17328,
+      "name": "Object cycle: gate, participants, chains, callback per object (42BB)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The per-object callback (WRK base + template +3B) is a recorded stub; the check keeps the kind +E = 0 so the template is the single table entry (the multiplier 0ABh and the WRK base +9 read zero)"
     }
   ]
 }
