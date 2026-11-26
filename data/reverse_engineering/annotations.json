@@ -6643,7 +6643,7 @@
       "status": "ported",
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
-      "limitations": "21A00, D7B1, C344 and D157 are recorded stubs; the skirmish pit still uses its own adapter"
+      "limitations": "21A00, D7B1, C344 and D157 are recorded stubs in the x86 check; the skirmish pits call this port with the callees implemented over actors (SkirmishPits.PitActionWorld)"
     },
     {
       "id": "le1-unit-actions-10ad2",
@@ -6704,6 +6704,82 @@
       "evidence": ["docs/unit-actions.md", "tests/fixtures/unit-actions.json", "tools/verify_unit_actions.py", "tests/OriginalUnitActionChecks.cs"],
       "implementation": ["scripts/OriginalUnitActions.cs"],
       "limitations": "Template 0 of armies 0..2"
+    },
+    {
+      "id": "le1-growth-db47",
+      "module": "LE:1",
+      "start": 56135,
+      "end": 56238,
+      "name": "List of the distinct objects in the rectangle above the unit's plane (DB47)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "4409 runs as the original code; the list lies at DS:1F45"
+    },
+    {
+      "id": "le1-growth-dbae",
+      "module": "LE:1",
+      "start": 56238,
+      "end": 56465,
+      "name": "Strength and hostile count of the objects near a unit (DBAE)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "6885 and 68BD run as the original code"
+    },
+    {
+      "id": "le1-growth-dc91",
+      "module": "LE:1",
+      "start": 56465,
+      "end": 56844,
+      "name": "Growth script of a building: phases +15, counter +22, frames +1, health +19 (DC91)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "A416, D2D1 and 43B0 are recorded stubs; not yet called by the skirmish's construction"
+    },
+    {
+      "id": "le1-place-check-de0c",
+      "module": "LE:1",
+      "start": 56844,
+      "end": 57032,
+      "name": "Free-place check: empty planes and equal tile property bytes (DE0C)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The row step advances the planes by twice the gap (EBP*2) as in the original; tile property read through TileProperty"
     }
   ]
 }
