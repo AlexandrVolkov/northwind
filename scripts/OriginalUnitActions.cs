@@ -3579,6 +3579,62 @@ public static class OriginalUnitActions
         g.Ecx = 0; g.Edx = 0; g.Logic(0, 32); g.Ebp = 0x280; g.Esi = U32(w.Ds, 0x192a); g.Edi = 0x1001d0; w.Call(0x6fcc, g);
     }
 
+    /// <summary>6996: the direction (0..FFh, 0 = east, the clockwise quarter 40h) from the point (EAX, EBX) to the point (ECX, EDX): the quarter and the swap of the axes give [50C]; the ratio of the smaller to the larger distance (a 16-bit division of the shifted value) indexes the table DS:287E; equal distances give 20h. AL = the direction.</summary>
+    public static void F6996(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint ebx = g.Ebx, ecx = g.Ecx, edx = g.Edx, eax = g.Eax; byte q = 0x40;
+        bool borrow = ecx < eax; ecx -= eax;
+        if (borrow) { ecx = 0 - ecx; (edx, ebx) = (ebx, edx); q += 0x80; }
+        borrow = edx < ebx; edx -= ebx;
+        if (borrow) { edx = 0 - edx; (edx, ecx) = (ecx, edx); q -= 0x40; }
+        d[0x50c] = q; eax = (eax & 0xffffff00) | 0x20;
+        if (ecx != edx)
+        {
+            bool bigger = ecx > edx;
+            if (!bigger) (edx, ecx) = (ecx, edx);
+            eax = edx << 8; edx >>= 8; uint divisor = ecx & 0xffff; uint dividend = (edx << 16) | (eax & 0xffff);
+            if (divisor == 0 || dividend / divisor > 0xffff) throw new OverflowException("DIV r/m16 faults");
+            uint quo = dividend / divisor, rem = dividend % divisor; eax = (eax & 0xffff0000) | quo; edx = (edx & 0xffff0000) | rem; eax &= 0xff;
+            if (bigger) eax = d[0x287e + (int)eax];
+            else { byte ah = d[0x287e + (int)eax]; eax = ((uint)ah << 8) | (byte)(0x40 - ah); }
+        }
+        g.Eax = eax; g.Ebx = ebx; g.Ecx = ecx; g.Edx = edx; g.Al = Add8(g, g.Al, d[0x50c]);
+    }
+
+    /// <summary>69FE: the approach step: the distances |EAX - ECX| and |EBX - EDX| against the half sizes (+3, +4) &lt;&lt; 5 of the object EDI; when both are within, AL = 0 (EAX, EBX are kept below); else the direction (6996) selects, with the toggle [50D], the offset (+4, +3 times DS:19C8/19C7) added to BX / AX; ECX = the old EAX, CL = FFh.</summary>
+    public static void F69FE(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint e0 = g.Eax, b0 = g.Ebx; uint a = g.Eax - g.Ecx; if ((a & 0x80000000) != 0) a = 0 - a; uint b = g.Ebx - g.Edx; if ((b & 0x80000000) != 0) b = 0 - b;
+        var o = w.ObjectAt(g.Edi); g.Ebp = (uint)o[3] << 5; g.Cmp(a, g.Ebp, 32);
+        bool far = a > g.Ebp;
+        if (!far) { g.Ebp = (uint)o[4] << 5; far = b > g.Ebp; }
+        if (!far) { g.Eax = a & 0xffffff00; g.Ebx = b; g.Logic(0, 8); return; }
+        g.Eax = e0; g.Ebx = b0; F6996(w, g);
+        g.Al = Add8(g, g.Al, 0x10); g.Al = (byte)g.Shr(g.Al, 5, 8); g.Al = Add8(g, g.Al, d[0x50d]); g.Al &= 6; d[0x50d] ^= 1;
+        g.Ebx = b0; g.Ecx = e0; g.Edx = g.Al;
+        g.Eax = (uint)o[4] << 5; short p = (short)((sbyte)d[(int)g.Edx * 2 + 0x19c8] * (sbyte)(byte)g.Eax); g.Eax = (g.Eax & 0xffff0000) | (ushort)p;
+        g.Ebx = (g.Ebx & 0xffff0000) | (ushort)(g.Ebx + g.Eax);
+        g.Eax = (uint)o[3] << 5; p = (short)((sbyte)d[(int)g.Edx * 2 + 0x19c7] * (sbyte)(byte)g.Eax); g.Eax = (g.Eax & 0xffff0000) | (ushort)p;
+        g.Eax = (g.Eax & 0xffff0000) | (ushort)(g.Eax + g.Ecx);
+        g.Cl = 0xff; g.Logic(g.Cl, 8);
+    }
+
+    /// <summary>6A73: the selection is cleared: DF2A with 29h, 32h, 2Bh, 670F, 6EB2, [1C89] = 0, [1A1B] = 1, the message 4Eh (DEE4); an own object [1969] (+3 = [1972]) also D182 (AH = 2) and the message 147h.</summary>
+    public static void F6A73(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Al = 0x29; FDF2A(w, g); g.Al = 0x32; FDF2A(w, g); g.Al = 0x2b; FDF2A(w, g); w.Call(0x670f, g); w.Call(0x6eb2, g);
+        d[0x1c89] = 0; d[0x1a1b] = 1; g.Esi = 0x4e; w.Call(0xdee4, g);
+        g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); g.Al = o[3]; g.Cmp(g.Al, d[0x1972], 8); if (!g.Zf) return;
+        g.Ah = 2; w.Call(0xd182, g); g.Esi = 0x147; w.Call(0xdee4, g);
+    }
+
+    /// <summary>6ACD: the group is selected: DF2A with 29h, 32h, 2Bh, 670F, [1969] = 0, [1C89] = 1, [1A1B] = 1, the messages 147h and 37Bh (DEE4).</summary>
+    public static void F6ACD(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Al = 0x29; FDF2A(w, g); g.Al = 0x32; FDF2A(w, g); g.Al = 0x2b; FDF2A(w, g); w.Call(0x670f, g);
+        Put(d, 0x1969, 0); d[0x1c89] = 1; d[0x1a1b] = 1; g.Esi = 0x147; w.Call(0xdee4, g); g.Esi = 0x37b; w.Call(0xdee4, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
