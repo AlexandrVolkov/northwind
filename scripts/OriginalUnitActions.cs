@@ -4231,6 +4231,35 @@ public static class OriginalUnitActions
         g.Eax = 0; g.Logic(0, 32); g.Al = g.Cl;
     }
 
+    /// <summary>6C66: draws the string ESI (bytes, 0Dh = a new line 12h lower from the first column, 7Eh + a colour byte = the colour added to the glyph bytes [1F10], FFh = the end) at (ECX, EDX) glyph by glyph (6BA3, each glyph one more cell than its width), then clears the rectangle of the text (3EEA with EAX = the first column, EBX = the first line, ECX = the width reached, EDX = the lines + 10h) when the text is wider than 0.</summary>
+    public static void F6C66(IUnitActionWorld w, ActionRegs g) => TextLine(w, g, false);
+
+    /// <summary>6CD6: as 6C66 through the palette table at EBP (6C04); the colour byte moves EBP; the cleared width is one more.</summary>
+    public static void F6CD6(IUnitActionWorld w, ActionRegs g) => TextLine(w, g, true);
+
+    private static void TextLine(IUnitActionWorld w, ActionRegs g, bool table)
+    {
+        var d = w.Ds; d[0x1f10] = 0; Put(d, 0x1c6e, g.Ecx); uint x0 = g.Ecx, y0 = g.Edx;
+        for (; ; )
+        {
+            g.Al = w.Peek(g.Esi); g.Cmp(g.Al, 0xff, 8); if (g.Zf) break;
+            g.Esi++; g.Cmp(g.Al, 0xd, 8);
+            if (g.Zf) { g.Ecx = x0; g.Edx += 0x12; continue; }
+            g.Cmp(g.Al, 0x7e, 8);
+            if (g.Zf) { g.Al = w.Peek(g.Esi); g.Esi++; d[0x1f10] = g.Al; continue; }
+            uint ecx = g.Ecx, edx = g.Edx, esi = g.Esi, ebp = g.Ebp; g.Ah = d[0x1f10];
+            if (table) { g.Esi = (uint)(int)(sbyte)d[0x1f10]; g.Ebp += g.Esi; Blit(w, g, true); } else Blit(w, g, false);
+            g.Ebp = ebp; g.Esi = esi; g.Edx = edx; g.Ecx = ecx;
+            g.Add(g.Ecx, g.Eax); g.Ecx += g.Eax; g.Add(g.Ecx, 1); g.Ecx += 1; g.Cmp(g.Ecx, U32(d, 0x1c6e), 32);
+            if (!(g.Cf || g.Zf)) Put(d, 0x1c6e, g.Ecx);
+        }
+        g.Ebx = y0; g.Eax = x0; g.Ecx = U32(d, 0x1c6e);
+        if (table) g.Ecx++;
+        g.Cmp(g.Ecx, g.Eax, 32); g.Ecx -= g.Eax;
+        if (g.Cf || g.Zf) return;
+        g.Edx -= g.Ebx; g.Edx += 0x10; w.Call(0x3eea, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

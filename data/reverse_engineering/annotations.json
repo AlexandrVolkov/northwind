@@ -9554,6 +9554,44 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "The picture buffer [68E] is a flat test region; the sprites of the check are at most 8 cells wide, so the borrow of the line step (width above 80h) is not reached"
+    },
+    {
+      "id": "le1-text-6c66",
+      "module": "LE:1",
+      "start": 27750,
+      "end": 27862,
+      "name": "Draw a string glyph by glyph (6C66)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "3EEA is a recorded stub (the clearing of the text rectangle); 6BA3 / 6C04 run as the ported code; the check draws strings of at most six glyphs"
+    },
+    {
+      "id": "le1-text-table-6cd6",
+      "module": "LE:1",
+      "start": 27862,
+      "end": 27978,
+      "name": "Draw a string through a palette table (6CD6)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "3EEA is a recorded stub (the clearing of the text rectangle); 6BA3 / 6C04 run as the ported code; the check draws strings of at most six glyphs"
     }
   ]
 }
