@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "799243f7801f84b4ce36e83c8fa9ab9ad3794e4880b72fb57ab4fe2a97180940",
+  "annotation_sha256": "3b60c388bbe487f89d91409e8ca132881d644c85ed48598bc05d4b32665a9de2",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 6265,
-        "ported": 57405,
-        "unreviewed": 83115,
+        "ported": 57638,
+        "unreviewed": 82882,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -3189,6 +3189,67 @@
         },
         {
           "start": 57483,
+          "end": 58737,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 58737,
+          "end": 58795,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-widget-anim-e571"
+          ]
+        },
+        {
+          "start": 58795,
+          "end": 58854,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-widget-picture-e5ab"
+          ]
+        },
+        {
+          "start": 58854,
+          "end": 58870,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-widget-leave-e5e6"
+          ]
+        },
+        {
+          "start": 58870,
+          "end": 58913,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-widget-mode-e5f6"
+          ]
+        },
+        {
+          "start": 58913,
+          "end": 58934,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-widget-close-e621"
+          ]
+        },
+        {
+          "start": 58934,
+          "end": 58970,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-widget-cancel-e636"
+          ]
+        },
+        {
+          "start": 58970,
           "end": 60885,
           "status": "unreviewed",
           "classification": "unknown",
