@@ -2307,6 +2307,190 @@ public static class OriginalUnitActions
         g.Al = 0; g.Logic(0, 8); g.Cf = true;
     }
 
+    // ---- the actions of the animals of ARMY__05 (12AE1..12E12): the handlers of the unit step tables of the birds, wolves and bears ----
+    private static bool BitMem(byte[] t, int offset, uint bit) => ((U32(t, offset + 4 * (int)(bit >> 5)) >> (int)(bit & 31)) & 1) != 0;
+    private static byte Inc8(ActionRegs g, byte a) { byte r = (byte)(a + 1); g.Zf = r == 0; g.Sf = (r & 0x80) != 0; g.Of = a == 0x7f; return r; }   // CF is kept
+    private static void AnimalResult(IUnitActionWorld w, ActionRegs g)   // mov al, [1C9F]; not al; test al, 40h
+    {
+        g.Al = w.Ds[0x1c9f]; g.Al = (byte)~g.Al; g.Test(g.Al, 0x40, 8);
+    }
+
+    /// <summary>12AE1: state 1, the walk to the point (+22/+23): BL (the request bit of the step) goes to [1C9F]; 8D89 tells the situation (AL 1: the order stands, else a new one): a new point gives 12BD8 and +15 + 1.</summary>
+    public static void F12AE1(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        w.Ds[0x1c9f] = g.Bl; w.Call(0x8d89, g); g.Cmp(g.Al, 1, 8);
+        if (!g.Zf) { g.Al = r[0x22]; g.Ah = r[0x23]; F12BD8(w, g, r); r[0x15] = Inc8(g, r[0x15]); AnimalResult(w, g); return; }
+        g.Cmp(g.Dl, 4, 8); if (g.Zf) { AnimalResult(w, g); return; }
+        g.Eax = g.Shr(U32(r, 4), 5, 32); g.Ebx = g.Shr(U32(r, 8), 5, 32);
+        g.Cmp(g.Al, r[0x22], 8);
+        if (g.Zf) { g.Bl = r[0x23]; return; }
+        r[0x15] = 0; AnimalResult(w, g);
+    }
+
+    /// <summary>12B29: state 0, the animal at rest or hunting: a situation 0 turns away from a wall (DL or DH = 6) or hunts (8AF4, 8D3E; a target at [51A] when [512] is set), 1 goes on with 12C65.</summary>
+    public static void F12B29(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; d[0x1c9f] = g.Bl; w.Call(0x8d89, g); g.Test(g.Al, g.Al, 8);
+        if (g.Zf)
+        {
+            g.Cmp(g.Dl, 6, 8); bool turn = g.Zf; if (!turn) { g.Cmp(g.Dh, 6, 8); turn = g.Zf; }
+            if (!turn)
+            {
+                w.Call(0x8af4, g); if (!g.Zf) return;
+                w.Call(0x8d3e, g); g.Cmp(w.G512, 0, 32);
+                if (!g.Zf) { g.Eax = w.G51A - w.PoolBase; Put(r, 0x1c, g.Eax); r[0x15] = Inc8(g, r[0x15]); }
+            }
+            else
+            {
+                g.Eax = g.Shr(U32(r, 4), 5, 32); g.Ebx = g.Shr(U32(r, 8), 5, 32); g.Ah = g.Bl; g.Ah = Dec8(g, g.Ah); g.Test(g.Bl, 1, 8);
+                if (g.Zf) g.Ah = Add8(g, g.Ah, 2);
+                F12BD8(w, g, r);
+            }
+            AnimalResult(w, g); return;
+        }
+        g.Cmp(g.Al, 1, 8); if (!g.Zf) return;
+        F12C65(w, g, r); if (g.Zf) { r[0x15] &= 0xf0; g.Logic(r[0x15], 8); }
+        AnimalResult(w, g);
+    }
+
+    /// <summary>12BA3: state 2: a situation 0 steps on (+15 + 1), 1 goes on with 12C65; the end of the approach gives AL = 0.</summary>
+    public static void F12BA3(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        w.Ds[0x1c9f] = g.Bl; w.Call(0x8d89, g); g.Test(g.Al, g.Al, 8);
+        if (g.Zf) { r[0x15] = Inc8(g, r[0x15]); AnimalResult(w, g); return; }
+        g.Cmp(g.Al, 1, 8); if (!g.Zf) return;
+        F12C65(w, g, r);
+        if (g.Zf) { g.Al = 0; g.Logic(0, 8); return; }
+        g.Test(U16(r, 0x17), 2, 16); if (!g.Zf) { g.Al = 0; g.Logic(0, 8); return; }
+        AnimalResult(w, g);
+    }
+
+    /// <summary>12BD8: the point (AL, AH) becomes the target +22/+23 and the request of the walk (+2D = request 4, 8120 when it is already walking).</summary>
+    public static void F12BD8(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        r[0x22] = g.Al; r[0x23] = g.Ah; r[0x2d] &= 0xf; g.Logic(r[0x2d], 8); g.Cmp(r[0x2d], 4, 8);
+        if (g.Zf) w.Call(0x8120, g);
+        r[0x2d] |= 0x40; g.Logic(r[0x2d], 8);
+    }
+
+    /// <summary>12BF2: the request 6 (rest).</summary>
+    public static void F12BF2(IUnitActionWorld w, ActionRegs g, byte[] r) { r[0x2d] &= 0xf; r[0x2d] |= 0x60; g.Logic(r[0x2d], 8); }
+
+    /// <summary>12BFB: turn to the heading AL (+25 high bits) with the request 7.</summary>
+    public static void F12BFB(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Al &= 7; g.Al = (byte)(g.Al << 3); r[0x25] &= 7; r[0x25] |= g.Al; r[0x2d] &= 0xf; r[0x2d] |= 0x70; g.Logic(r[0x2d], 8);
+    }
+
+    /// <summary>12C10: follow the target +1C: its cell becomes the point +22/+23 (BL = 3 when the target is there already, else 1) with the walk request.</summary>
+    public static void F12C10(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Bl = 1; g.Edi = U32(r, 0x1c); g.Test(g.Edi, g.Edi, 32); if (g.Zf) return;
+        g.Edi += w.PoolBase; var o = w.ObjectAt(g.Edi);
+        g.Eax = g.Shr(U32(o, 4), 5, 32); g.Ebx = g.Shr(U32(o, 8), 5, 32); g.Ah = g.Bl; g.Bl = 3;
+        g.Cmp(r[0x22], g.Al, 8);
+        if (g.Zf) { g.Cmp(r[0x23], g.Ah, 8); if (g.Zf) return; }
+        r[0x22] = g.Al; r[0x23] = g.Ah; r[0x2d] &= 0xf; r[0x2d] |= 0x40; g.Logic(r[0x2d], 8);
+    }
+
+    /// <summary>12C48: turn toward the object EDI (9688); ZF = 1 when the heading is right already, else 12BFB and AL = FFh.</summary>
+    public static void F12C48(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var o = w.ObjectAt(g.Edi); g.Eax = U32(o, 4); g.Ebx = U32(o, 8); w.Call(0x9688, g);
+        g.Ah = (byte)(r[0x25] & 7); g.Logic(g.Ah, 8); g.Cmp(g.Al, g.Ah, 8); if (g.Zf) return;
+        F12BFB(w, g, r); g.Al = 0xff; g.Logic(0xff, 8);
+    }
+
+    /// <summary>12C65: the attack on the target: 8D89 and 8ABF; the target out of reach is followed (12C10), in reach it is faced (12C48) and struck (8C7C).</summary>
+    public static void F12C65(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; w.Call(0x8d89, g); w.Call(0x8abf, g);
+        if (g.Zf) { g.Al = 0; g.Logic(0, 8); return; }
+        F12CB1(w, g, r);
+        if (g.Zf)
+        {
+            g.Cmp(w.G522, 3, 8); if (!g.Zf)
+            {
+                w.Call(0x8af4, g);
+                if (g.Zf) { F12C48(w, g, r); if (g.Zf) w.Call(0x8c7c, g); }
+            }
+            g.Al = 0xff; g.Logic(0xff, 8); return;
+        }
+        g.Cmp(g.Bl, 1, 8); if (!g.Zf) { g.Al = 0; g.Logic(0, 8); return; }
+        g.Cmp(w.G522, 6, 8);
+        if (g.Zf) { F12C10(w, g, r); if (g.Zf) { g.Al = 0; g.Logic(0, 8); return; } }
+        g.Al = 0xff; g.Logic(0xff, 8);
+    }
+
+    /// <summary>12CB1: where is the target +1C: BL 0 in reach (the template's +73..+72 cells), 1 too far, 2 too near, 3 none or of another layer (than allowed by +74); AL = FFh when not in reach.</summary>
+    public static void F12CB1(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Bl = 3; g.Edi = U32(r, 0x1c); g.Test(g.Edi, g.Edi, 32);
+        if (!g.Zf)
+        {
+            g.Edi += w.PoolBase; var o = w.ObjectAt(g.Edi); g.Ebp = U32(d, 0x1c49); var t = w.ObjectAt(g.Ebp);
+            g.Al = o[0xd]; g.Eax &= 3; g.Cf = BitMem(t, 0x74, g.Eax);
+            if (g.Cf)
+            {
+                FC344(w, g, r); uint pushed = g.Eax; FD157(w, g); g.Bl = 1; g.Cmp(g.Al, 1, 8); g.Eax = pushed;
+                bool far = false;
+                if (g.Zf) { g.Cmp(g.Eax, 0x30, 32); if (!g.Cf) far = true; }
+                if (!far)
+                {
+                    g.Ebp = U32(d, 0x1c49); t = w.ObjectAt(g.Ebp); g.Eax >>= 5; g.Al = Inc8(g, g.Al); g.Cmp(g.Al, t[0x72], 8);
+                    if (!(!g.Cf && !g.Zf))
+                    {
+                        g.Bl = 2; g.Al = Dec8(g, g.Al); g.Cmp(g.Al, t[0x73], 8);
+                        if (!g.Cf) { g.Bl = 0; g.Logic(0, 8); return; }
+                    }
+                }
+            }
+        }
+        g.Al = 0xff; g.Logic(0xff, 8);
+    }
+
+    /// <summary>12D08: the action of a dying or flying animal (the frame from +25 heading and +27 step, the move by +26 on the heading table, the effect of the template +53 and 98DB at the end).</summary>
+    public static void F12D08(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Edi = U32(d, 0x1c49); var t = w.ObjectAt(g.Edi);
+        g.Test(U16(r, 0x17), 0x80, 16);
+        if (!g.Zf)
+        {
+            r[0x19] = Dec8(g, r[0x19]); g.Cmp(r[0x19], 0xfa, 8); if (!g.Cf && !g.Zf) return;
+            Settle(w, g, r); return;
+        }
+        g.Cmp(r[0x19], 0, 8);
+        if (g.Zf)
+        {
+            g.Eax = 0; w.Call(0x43b0, g); r[0x27] = 0; r[0x2c] = 0x1e; r[0x26] = 0x14; r[0x19] = Dec8(g, r[0x19]);
+            g.Eax = U32(w.ObjectAt(g.Edi), 0xa7); FA416(w, g, r);
+        }
+        g.Edi = U32(d, 0x1c49); t = w.ObjectAt(g.Edi); g.Test(d[0x19ea], 1, 8);
+        if (g.Zf)
+        {
+            r[0x27] = Inc8(g, r[0x27]); g.Al = t[0x4f]; g.Cmp(r[0x27], g.Al, 8); if (!g.Cf) r[0x27] = 0;
+        }
+        g.Al = r[0x25]; g.Al = (byte)g.Shr(g.Al, 1, 8); g.Eax &= 3; Mul8(g, g.Al, t[0x4f]); g.Al = Add8(g, g.Al, r[0x27]);
+        g.Ebx = t[0x4a]; g.Bl = Add8(g, g.Bl, t[0x4b]); g.Eax = g.Eax + g.Ebx * 8; ushort frame = Add16(g, (ushort)g.Eax, U16(t, 0x48)); g.Eax = (g.Eax & 0xffff0000) | frame; PutW(r, 1, frame);
+        g.Dl = r[0x25]; g.Edx &= 6; g.Edx |= 1; g.Edx <<= 2;
+        g.Al = r[0x26]; short y = (short)((sbyte)r[0x26] * (sbyte)OriginalUnitMove.Heading[g.Edx * 2 + 1]); g.Eax = (g.Eax & 0xffff0000) | (ushort)y; g.Ebx = (uint)(int)y;
+        g.Al = r[0x26]; short x = (short)((sbyte)r[0x26] * (sbyte)OriginalUnitMove.Heading[g.Edx * 2]); g.Eax = (uint)(int)x;
+        g.Eax = (uint)((int)g.Eax >> 4); g.Ebx = (uint)((int)g.Ebx >> 4); g.Eax += U32(r, 4); g.Ebx += U32(r, 8);
+        g.Cmp(g.Eax, U32(d, 0x18e6), 32);
+        if (g.Cf) { g.Cmp(g.Ebx, U32(d, 0x18ea), 32); if (g.Cf) { Put(r, 4, g.Eax); Put(r, 8, g.Ebx); } }
+        r[0x2c] = Dec8(g, r[0x2c]); if (!g.Zf) return;
+        FD12C(w, g, r);
+        g.Cmp(g.Al, 1, 8); if (g.Zf) { Settle(w, g, r); return; }
+        g.Cmp(g.Al, 2, 8); if (g.Zf) { Settle(w, g, r); return; }
+        g.Edi = U32(d, 0x1c49); t = w.ObjectAt(g.Edi); g.Al = r[0x19]; g.Eax &= 3; g.Bl = t[0x53 + (int)g.Eax]; g.Cmp(g.Bl, 0xff, 8);
+        if (!g.Zf)
+        {
+            g.Al = r[0]; g.Bh = 0; g.Ecx = U32(r, 4); g.Edx = U32(r, 8); uint esi = g.Esi; w.Call(0x9727, g); g.Esi = esi;
+        }
+        Settle(w, g, r);
+    }
+    private static void Settle(IUnitActionWorld w, ActionRegs g, byte[] r) { w.Call(0x98db, g); g.Al = 0; g.Logic(0, 8); }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
