@@ -4391,6 +4391,38 @@ public static class OriginalUnitActions
         g.Eax = 0xffffffff; for (int k = 0; k < 0xc4; k++) Put(d, 0x33c + 4 * k, 0xffffffff); g.Edi = 0x33c + 0xc4 * 4; g.Ecx = 0;
     }
 
+    /// <summary>3F79: the dirty-cell cache DS:33C (C4h dwords: 1Ch rows of 7) is OR-ed into the table [64C] + 29h (the rows 28h bytes apart).</summary>
+    public static void F3F79(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Esi = 0x33c; g.Edi = U32(d, 0x64c); g.Add(g.Edi, 0x29); g.Edi += 0x29; g.Ch = 0x1c;
+        do
+        {
+            g.Cl = 7;
+            do
+            {
+                g.Eax = U32(d, (int)g.Esi); uint cur = Peek32(w, g.Edi); uint r = cur | g.Eax; for (int k = 0; k < 4; k++) w.Poke(g.Edi + (uint)k, (byte)(r >> (8 * k))); g.Logic(r, 32);
+                g.Add(g.Edi, 4); g.Edi += 4; g.Add(g.Esi, 4); g.Esi += 4; g.Cl = Dec8(g, g.Cl);
+            } while (!g.Zf);
+            g.Add(g.Edi, 0xc); g.Edi += 0xc; g.Ch = Dec8(g, g.Ch);
+        } while (!g.Zf);
+    }
+
+    /// <summary>3D40: with the cursor on ([194C] set) the redraw 1DF08 of the rectangle 20h x 20h at ([195D], [1961]) from the picture [192E].</summary>
+    public static void F3D40(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(d[0x194c], 0, 8); if (g.Zf) return;
+        g.Esi = U32(d, 0x192e); g.Eax = U32(d, 0x195d); g.Ebx = U32(d, 0x1961); g.Edx = 0x20; g.Ecx = g.Edx; w.Call(0x1df08, g);
+    }
+
+    /// <summary>3D67: with the cursor on: 1DECF (the picture [192E] saved at ([195D], [1961]), 20h x 20h), 1E133 (EAX = the frame [193E], ESI = [191A]) and 1E098 (the rectangle redrawn).</summary>
+    public static void F3D67(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(d[0x194c], 0, 8); if (g.Zf) return;
+        g.Eax = U32(d, 0x195d); g.Ebx = U32(d, 0x1961); g.Edi = U32(d, 0x192e); g.Ecx = 0x20; g.Edx = g.Ecx; w.Call(0x1decf, g);
+        g.Esi = U32(d, 0x191a); g.Eax = U32(d, 0x193e); w.Call(0x1e133, g);
+        g.Eax = U32(d, 0x195d); g.Ebx = U32(d, 0x1961); g.Edx = 0x20; g.Ecx = g.Edx; w.Call(0x1e098, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

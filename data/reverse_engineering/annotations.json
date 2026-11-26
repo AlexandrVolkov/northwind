@@ -9687,6 +9687,63 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "none stubbed; the map size of the check is 32 x 32"
+    },
+    {
+      "id": "le1-cursor-restore-3d40",
+      "module": "LE:1",
+      "start": 15680,
+      "end": 15719,
+      "name": "Redraw of the cursor rectangle (3D40)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1DF08 is a recorded stub"
+    },
+    {
+      "id": "le1-cursor-draw-3d67",
+      "module": "LE:1",
+      "start": 15719,
+      "end": 15797,
+      "name": "Save, draw and redraw the cursor (3D67)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1DECF, 1E133 and 1E098 are recorded stubs"
+    },
+    {
+      "id": "le1-dirty-cache-3f79",
+      "module": "LE:1",
+      "start": 16249,
+      "end": 16289,
+      "name": "OR the dirty-cell cache into the table [64C] (3F79)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed; the table is a flat test region"
     }
   ]
 }
