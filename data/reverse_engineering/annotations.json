@@ -6837,6 +6837,44 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "The names are read from the participant records (DS:0A1E + 0F5h · owner)"
+    },
+    {
+      "id": "le1-tick-counters-9bf9",
+      "module": "LE:1",
+      "start": 39929,
+      "end": 40023,
+      "name": "Game tick counters and the command reset (9BF9)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "9E7D, C06E, C0A4 are recorded stubs"
+    },
+    {
+      "id": "le1-tick-events-9c57",
+      "module": "LE:1",
+      "start": 40023,
+      "end": 40327,
+      "name": "Per-tick events of the game loop: message rotation, pause key, command codes (9C57)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "DEE4, AAB3, C7AB, FEC6, 151E3, 9D87, 68D8, 10005, 10032 are recorded stubs"
     }
   ]
 }
