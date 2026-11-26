@@ -8471,6 +8471,139 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "E03C, E571, E5AB and 5573 are recorded stubs; 6377 and 6361 run as the ported code"
+    },
+    {
+      "id": "le1-tool-area-5573",
+      "module": "LE:1",
+      "start": 21875,
+      "end": 21888,
+      "name": "Tool area then state 0Ah (5573)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "4FCE is a recorded stub"
+    },
+    {
+      "id": "le1-tool-step-5580",
+      "module": "LE:1",
+      "start": 21888,
+      "end": 21907,
+      "name": "Area tool step, state check (5580)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "500D and 538D are recorded stubs"
+    },
+    {
+      "id": "le1-tool-state-5593",
+      "module": "LE:1",
+      "start": 21907,
+      "end": 21941,
+      "name": "Tool state 0Bh, DF2A 30h, message 466Eh (5593)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "DEE4 is a recorded stub; DF2A runs as the ported code"
+    },
+    {
+      "id": "le1-tool-end-55b5",
+      "module": "LE:1",
+      "start": 21941,
+      "end": 21969,
+      "name": "End of a tool (55B5)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "4938 is a recorded stub"
+    },
+    {
+      "id": "le1-tool-state-55d1",
+      "module": "LE:1",
+      "start": 21969,
+      "end": 21984,
+      "name": "Tool state 0Ch (55D1)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-tool-use-55e0",
+      "module": "LE:1",
+      "start": 21984,
+      "end": 22122,
+      "name": "Tool use the item on the ground (55E0)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "124FD, 124D8, 4938 and 1416B are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-tool-state-566a",
+      "module": "LE:1",
+      "start": 22122,
+      "end": 22137,
+      "name": "Tool state 0Dh (566A)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
     }
   ]
 }

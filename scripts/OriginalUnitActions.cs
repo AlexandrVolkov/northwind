@@ -3433,6 +3433,48 @@ public static class OriginalUnitActions
         g.Al = r[2]; s[0x22] = g.Al; Put(s, 0x23, 0xffffffff); d[0x19c0] = 0x43; w.Call(0x5573, g);
     }
 
+    /// <summary>5573: the tool area (4FCE), then the tool state 0Ah.</summary>
+    public static void F5573(IUnitActionWorld w, ActionRegs g) { w.Call(0x4fce, g); w.L3[2] = 0xa; }
+
+    /// <summary>5580: 500D (the area tool step); when the tool state is not 0Ah, 538D.</summary>
+    public static void F5580(IUnitActionWorld w, ActionRegs g)
+    {
+        w.Call(0x500d, g); g.Cmp(w.L3[2], 0xa, 8); if (!g.Zf) w.Call(0x538d, g);
+    }
+
+    /// <summary>5593: the tool state 0Bh (L3[12] = 0Bh), DF2A with 30h, the message 466Eh (DEE4); ESI is kept.</summary>
+    public static void F5593(IUnitActionWorld w, ActionRegs g)
+    {
+        w.L3[2] = 0xb; w.L3[0x12] = 0xb; uint esi = g.Esi; g.Al = 0x30; FDF2A(w, g); g.Esi = 0x466e; w.Call(0xdee4, g); g.Esi = esi;
+    }
+
+    /// <summary>55B5: the end of a tool (the same as 53A8).</summary>
+    public static void F55B5(IUnitActionWorld w, ActionRegs g) => EndTool(w, g);
+
+    /// <summary>55D1: the tool state 0Ch (L3[12] = 0).</summary>
+    public static void F55D1(IUnitActionWorld w, ActionRegs g) { w.L3[2] = 0xc; w.L3[0x12] = 0; }
+
+    /// <summary>566A: the tool state 0Dh (L3[12] = 0).</summary>
+    public static void F566A(IUnitActionWorld w, ActionRegs g) { w.L3[2] = 0xd; w.L3[0x12] = 0; }
+
+    /// <summary>55E0: the tool «use the item on the ground» (cursor 93008Ah): the left button (flag 8) - effect 4, 124FD with the item [4190], the player [1972] and the cell of the pointer [1955]/[1959] (&gt;&gt; 5), then 4938; every other press first calls 124D8 (4938 when it answers zero), then the end of the tool.</summary>
+    public static void F55E0(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; g.Test(l[4], 1, 8);
+        if (!g.Zf)
+        {
+            SetCursor(d, 0x93008a); g.Test(l[4], 8, 8);
+            if (!g.Zf)
+            {
+                g.Eax = 4; FA4A9(w, g); g.Ecx = g.Shr(U32(d, 0x1955), 5, 32); g.Eax = g.Shr(U32(d, 0x1959), 5, 32); g.Ch = g.Al;
+                g.Al = d[0x4190]; g.Ah = d[0x1972]; w.Call(0x124fd, g); w.Call(0x4938, g); return;
+            }
+        }
+        g.Al = d[0x4190]; g.Dl = d[0x1972]; w.Call(0x124d8, g);
+        if (g.Zf) { w.Call(0x4938, g); return; }
+        EndTool(w, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
