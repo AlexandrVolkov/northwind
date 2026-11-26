@@ -9516,6 +9516,44 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-blit-6ba3",
+      "module": "LE:1",
+      "start": 27555,
+      "end": 27652,
+      "name": "Sprite blit with a colour offset (6BA3)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The picture buffer [68E] is a flat test region; the sprites of the check are at most 8 cells wide, so the borrow of the line step (width above 80h) is not reached"
+    },
+    {
+      "id": "le1-blit-table-6c04",
+      "module": "LE:1",
+      "start": 27652,
+      "end": 27750,
+      "name": "Sprite blit through a palette table (6C04)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The picture buffer [68E] is a flat test region; the sprites of the check are at most 8 cells wide, so the borrow of the line step (width above 80h) is not reached"
     }
   ]
 }
