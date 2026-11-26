@@ -4271,6 +4271,7 @@ public static class OriginalUnitActions
         } while (!g.Zf);
         g.Eax = 0x10; g.Ebx = 0x10; g.Ecx = 0x280; g.Edx = 0x1e0; w.Call(0x3eea, g);
     }
+    private static uint Shl32(ActionRegs g, uint a, int n) { uint r = a << n; g.Cf = ((a >> (32 - n)) & 1) != 0; g.Zf = r == 0; g.Sf = (r & 0x80000000) != 0; return r; }
     private static uint Dec32(ActionRegs g, uint a) { uint r = a - 1; g.Zf = r == 0; g.Sf = (r & 0x80000000) != 0; g.Of = a == 0x80000000; return r; }   // CF is kept
 
     /// <summary>6D4A: a frame (DL wide, DH high, at the cell of 3EEA): the first line of 44h, the interior lines with 44h on both sides and the fill AL (0, then - the second pass - the low byte of the pushed EDI), the last line of 44h; ECX holds the share of the interior lines (the quotient (DH - 2) * CL / CH).</summary>
@@ -4357,6 +4358,37 @@ public static class OriginalUnitActions
         g.Cmp(g.Eax & 0xffff, U16(d, 0x1946), 16);
         if (!g.Cf) { g.Cmp(g.Eax & 0xffff, U16(d, 0x1948), 16); if (g.Cf || g.Zf) { Put(d, 0x193e, g.Eax); return; } }
         g.Eax = (g.Eax & 0xffff0000) | U16(d, 0x1946); Put(d, 0x193e, g.Eax);
+    }
+
+    /// <summary>3FA1: the scroll of the view [1906], [190A] (cells) by the mouse at the edges of the screen ([1932], [1936]) or the arrow keys ([1C35] = E04Bh, E04Dh, E048h, E050h) when [19C2] is set: a step of the clock [19E4] of at least 10h - [908F] since [19C1] makes the step 1, else 0; the cursor [1946] shows the direction; the view stays within 0 .. map size - 0Eh; a changed view stores the pixels [190E], [1912] (cells * 32) and wipes the cache DS:33C (C4h dwords).</summary>
+    public static void F3FA1(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(d[0x19c2], 0, 8); if (g.Zf) return;
+        g.Bl = 0x10; g.Bl = Sub8(g, g.Bl, d[0x908f]); g.Al = d[0x19e4]; g.Ah = g.Al; g.Al = Sub8(g, g.Al, d[0x19c1]); g.Cmp(g.Al, g.Bl, 8); g.Ebx = 0;
+        if (!g.Cf) { g.Ebx = 1; d[0x19c1] = g.Ah; }
+        g.Ecx = U32(d, 0x1932); g.Edx = U32(d, 0x1936); g.Esi = U32(d, 0x1906); g.Edi = U32(d, 0x190a); g.Ebp = U16(d, 0x1c35);
+        g.Cmp(g.Ebp, 0xe04b, 32);
+        if (!g.Zf) { g.Cmp(g.Ecx, 1, 32); if (!g.Cf) goto right; }
+        Put(d, 0x1946, 0x36002d); g.Cmp(g.Esi, g.Ebx, 32); g.Esi -= g.Ebx; if (!g.Cf) goto vertical; g.Esi = 0; goto right;
+    right:
+        g.Cmp(g.Ebp, 0xe04d, 32);
+        if (!g.Zf) { g.Cmp(g.Ecx, 0x27f, 32); if (g.Cf) goto vertical; }
+        Put(d, 0x1946, 0x220019); g.Add(g.Esi, g.Ebx); g.Esi += g.Ebx; g.Eax = U32(d, 0x18de); g.Eax -= 0xe; g.Cmp(g.Esi, g.Eax, 32);
+        if (!(g.Cf || g.Zf)) g.Esi = g.Eax;
+    vertical:
+        g.Cmp(g.Ebp, 0xe048, 32);
+        if (!g.Zf) { g.Cmp(g.Edx, 1, 32); if (!g.Cf) goto down; }
+        Put(d, 0x1946, 0x18000f); g.Cmp(g.Edi, g.Ebx, 32); g.Edi -= g.Ebx; if (!g.Cf) goto settle; g.Edi = 0; goto down;
+    down:
+        g.Cmp(g.Ebp, 0xe050, 32);
+        if (!g.Zf) { g.Cmp(g.Edx, 0x1dd, 32); if (g.Cf) goto settle; }
+        Put(d, 0x1946, 0x2c0023); g.Add(g.Edi, g.Ebx); g.Edi += g.Ebx; g.Eax = U32(d, 0x18e2); g.Eax -= 0xe; g.Cmp(g.Edi, g.Eax, 32);
+        if (!(g.Cf || g.Zf)) g.Edi = g.Eax;
+    settle:
+        g.Cmp(U32(d, 0x1906), g.Esi, 32);
+        if (g.Zf) { g.Cmp(U32(d, 0x190a), g.Edi, 32); if (g.Zf) return; }
+        Put(d, 0x1906, g.Esi); g.Esi = Shl32(g, g.Esi, 5); Put(d, 0x190e, g.Esi); Put(d, 0x190a, g.Edi); g.Edi = Shl32(g, g.Edi, 5); Put(d, 0x1912, g.Edi);
+        g.Eax = 0xffffffff; for (int k = 0; k < 0xc4; k++) Put(d, 0x33c + 4 * k, 0xffffffff); g.Edi = 0x33c + 0xc4 * 4; g.Ecx = 0;
     }
 
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are

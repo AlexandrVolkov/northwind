@@ -9668,6 +9668,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the upper bound jbe boundary is not distinguished by the check"
+    },
+    {
+      "id": "le1-view-scroll-3fa1",
+      "module": "LE:1",
+      "start": 16289,
+      "end": 16580,
+      "name": "Scroll of the view by the mouse edges and the arrow keys (3FA1)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed; the map size of the check is 32 x 32"
     }
   ]
 }
