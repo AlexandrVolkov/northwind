@@ -6875,6 +6875,120 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "DEE4, AAB3, C7AB, FEC6, 151E3, 9D87, 68D8, 10005, 10032 are recorded stubs"
+    },
+    {
+      "id": "le1-view-clamp-a320",
+      "module": "LE:1",
+      "start": 41760,
+      "end": 41866,
+      "name": "View corner clamp and cache invalidation (A320)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-free-neighbour-a38a",
+      "module": "LE:1",
+      "start": 41866,
+      "end": 42006,
+      "name": "Object looks for a free neighbour cell (A38A)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "43B0, 9E41 and 7A36 are recorded stubs"
+    },
+    {
+      "id": "le1-effect-a416",
+      "module": "LE:1",
+      "start": 42006,
+      "end": 42052,
+      "name": "Effect of an object at its cell (A416)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1416B is a recorded stub"
+    },
+    {
+      "id": "le1-wound-effect-a444",
+      "module": "LE:1",
+      "start": 42052,
+      "end": 42110,
+      "name": "Wounded object may raise an effect (A444)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "9E41 and 1416B are recorded stubs"
+    },
+    {
+      "id": "le1-effect-a47e",
+      "module": "LE:1",
+      "start": 42110,
+      "end": 42153,
+      "name": "Effect of an object with shifted fields (A47E)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1416B is a recorded stub"
+    },
+    {
+      "id": "le1-effect-a4a9",
+      "module": "LE:1",
+      "start": 42153,
+      "end": 42178,
+      "name": "Effect with the table entry 191E (A4A9)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1416B is a recorded stub"
     }
   ]
 }

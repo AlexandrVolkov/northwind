@@ -2051,6 +2051,83 @@ public static class OriginalUnitActions
         g.Cmp(U16(d, 0x1c35), 0x3d, 16); if (g.Zf) w.Call(0x10032, g);
     }
 
+    // ---- view and effects around the units (A320..A4C1) ----
+    /// <summary>A320: puts the view corner [1906]/[190A] (cells) at the cell (EAX, EBX) minus 7, clamped to the map minus 14; when it moves the pixel corner [190E]/[1912] follows and the cache DS:33C.. (C4h dwords) is invalidated with FFFFFFFFh.</summary>
+    public static void FA320(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds;
+        g.Cmp(g.Eax, 7, 32); g.Eax -= 7; if (g.Cf) { g.Eax = 0; g.Logic(0, 32); }
+        g.Ecx = U32(d, 0x18de); g.Cmp(g.Ecx, 0xe, 32); g.Ecx -= 0xe; g.Cmp(g.Eax, g.Ecx, 32); if (!g.Cf && !g.Zf) g.Eax = g.Ecx;
+        g.Cmp(g.Ebx, 7, 32); g.Ebx -= 7; if (g.Cf) { g.Ebx = 0; g.Logic(0, 32); }
+        g.Edx = U32(d, 0x18e2); g.Cmp(g.Edx, 0xe, 32); g.Edx -= 0xe; g.Cmp(g.Ebx, g.Edx, 32); if (!g.Cf && !g.Zf) g.Ebx = g.Edx;
+        g.Cmp(U32(d, 0x1906), g.Eax, 32);
+        if (g.Zf) { g.Cmp(U32(d, 0x190a), g.Ebx, 32); if (g.Zf) return; }
+        Put(d, 0x1906, g.Eax); g.Eax <<= 5; Put(d, 0x190e, g.Eax); Put(d, 0x190a, g.Ebx);
+        { uint before = g.Ebx; g.Ebx <<= 5; g.Cf = ((before >> 27) & 1) != 0; g.Zf = g.Ebx == 0; g.Sf = (g.Ebx & 0x80000000) != 0; g.Of = false; }   // SHL EBX, 5 sets the flags that stay
+        Put(d, 0x1912, g.Ebx);
+        g.Eax = 0xffffffff; g.Edi = 0x33c; g.Ecx = 0xc4;
+        for (int k = 0; k < 0xc4; k++) Put(d, 0x33c + 4 * k, 0xffffffff);
+        g.Edi += 0x310; g.Ecx = 0;
+    }
+
+    /// <summary>A416: the effect EAX (0 = none) at the cell of the object ESI: 1416B with ESI = the army's effect table entry ([6DB + 56h · army]), ECX, EDX = the cell, EBX = 100h.</summary>
+    public static void FA416(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Test(g.Eax, g.Eax, 32); if (g.Zf) return;
+        var d = w.Ds; uint edi = g.Edi, esi = g.Esi, eax = g.Eax;
+        g.Eax = 0x56; Mul8(g, g.Al, r[0]); g.Ecx = g.Shr(U32(r, 4), 5, 32); g.Edx = g.Shr(U32(r, 8), 5, 32); g.Esi = U32(d, (int)(g.Eax & 0xffff) + 0x6db);
+        g.Eax = eax; g.Ebx = 0x100; w.Call(0x1416b, g); g.Esi = esi; g.Edi = edi;
+    }
+
+    /// <summary>A444: a wounded object (health below 3/4 of the template's +45, signed) may raise the effect ECX: when (ESI − [1C49] + [19EA]) has no bit of BL and a random byte has none of BH.</summary>
+    public static void FA444(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Ecx = g.Eax; g.Edi = U32(d, 0x1c49); var t = w.ObjectAt(g.Edi);
+        g.Al = t[0x45]; g.Ah = g.Al; g.Ah = (byte)(g.Ah >> 2); g.Al = (byte)(g.Al - g.Ah);
+        g.Cmp(r[0x19], g.Al, 8); if (g.Sf != g.Of) return;
+        g.Eax = g.Esi - U32(d, 0x1c49); g.Al = (byte)(g.Al + d[0x19ea]); g.Test(g.Bl, g.Al, 8); if (!g.Zf) return;
+        w.Call(0x9e41, g); g.Test(g.Bh, g.Al, 8); if (!g.Zf) return;
+        g.Eax = g.Ecx; FA416(w, g, r);
+    }
+
+    /// <summary>A47E: as A416 for an object whose fields are shifted by one (+1 army, +7 / +0C position).</summary>
+    public static void FA47E(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; uint edi = g.Edi, esi = g.Esi, eax = g.Eax;
+        g.Eax = 0x56; Mul8(g, g.Al, r[1]); g.Ecx = g.Shr(U32(r, 7), 5, 32); g.Edx = g.Shr(U32(r, 0xc), 5, 32); g.Esi = U32(d, (int)(g.Eax & 0xffff) + 0x6db);
+        g.Eax = eax; g.Ebx = 0x100; w.Call(0x1416b, g); g.Esi = esi; g.Edi = edi;
+    }
+
+    /// <summary>A4A9: the effect EAX (0 = none) with the table entry [191E] and EBX = 101h.</summary>
+    public static void FA4A9(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Test(g.Eax, g.Eax, 32); if (g.Zf) return;
+        var d = w.Ds; uint esi = g.Esi, edi = g.Edi; g.Esi = U32(d, 0x191e); g.Ebx = 0x101; w.Call(0x1416b, g); g.Edi = edi; g.Esi = esi;
+    }
+
+    /// <summary>A38A: the object ESI looks for a free neighbour cell (7A36) from a random direction among the eight; none: the object is marked (+17 |= 20h of the one at [ECX]) and AL = 1; found: its next cell (AL, AH) is the goal and BL = 0.</summary>
+    public static void FA38A(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Eax = 0; w.Call(0x43b0, g); w.Call(0x9e41, g); g.Al = (byte)(g.Al & 7); g.Ah = g.Al;
+        for (; ; )
+        {
+            w.Call(0x7a36, g); if (g.Zf) goto found;
+            g.Al = (byte)(g.Al + 1); g.Al = (byte)(g.Al & 7); g.Cmp(g.Al, g.Ah, 8); if (g.Zf) break;
+        }
+        g.Test(g.Ecx, g.Ecx, 32);
+        if (!g.Zf)
+        {
+            g.Eax = U32(w.ObjectAt(g.Ecx), 0); g.Test(g.Eax, g.Eax, 32);
+            if (!g.Zf) { g.Eax += w.PoolBase; var o = w.ObjectAt(g.Eax); PutW(o, 0x17, (ushort)(U16(o, 0x17) | 0x20)); }
+        }
+        g.Eax = g.Esi - w.PoolBase; w.Call(0x43b0, g); g.Al = 0; g.Logic(0, 8); g.Al++; g.Zf = false; g.Sf = false; return;
+    found:
+        g.Cl = d[0x273f]; g.Ch = d[0x2740]; g.Ebx = 0; g.Bl = g.Al; g.Eax = U32(r, 4); g.Cl = (byte)(g.Cl >> 1); g.Eax >>= 5; g.Al = (byte)(g.Al - g.Cl);
+        g.Edx = U32(r, 8); g.Ch = (byte)(g.Ch >> 1); g.Edx >>= 5; g.Dl = (byte)(g.Dl - g.Ch); g.Ah = g.Dl;
+        g.Al = (byte)(g.Al + d[(int)(g.Ebx * 2) + 0x19c7]); g.Ah = (byte)(g.Ah + d[(int)(g.Ebx * 2) + 0x19c8]);
+        uint pushed = g.Eax; g.Eax = g.Esi - w.PoolBase; w.Call(0x43b0, g); g.Eax = pushed; g.Bl = 0; g.Logic(0, 8);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
