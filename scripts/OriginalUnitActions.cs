@@ -2714,6 +2714,79 @@ public static class OriginalUnitActions
         Put(d, 0x1969, g.Eax); w.Call(0x6a73, g); g.Eax = 4; FA4A9(w, g);
     }
 
+    /// <summary>4B03: the drag ends here: L3[0] = 28h, [1C86] + 1, then 4B12.</summary>
+    public static void F4B03(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; PutW(w.L3, 0, 0x28); d[0x1c86] = Inc8(g, d[0x1c86]); F4B12(w, g);
+    }
+
+    /// <summary>4B12: the selection box is closed (the button flag 2 not set): the records of the group (200B5) in the box [1955]/[1959] .. [1C7E]/[1C82] (cells) go to B616; none: the group of the settlement is
+    /// emptied (20143, 200AB); one: it is the selected object (BA2E, 6A73, the effect 4); more: a new group is made (6ACD, 205FB, 1F3E9, DF7E, the record +2 / +1D / +18, 65DF, the effect 5; at most 0F groups [4C]).</summary>
+    public static void F4B12(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        SetCursor(d, 0xe0000); Put(d, 0x1965, 0);
+        g.Test(l[4], 2, 8); if (!g.Zf) return;
+        d[0x1c86] = 0; w.Call(0x200b5, g); if (!g.Zf) return;
+        d[0x1c88] = g.Ah; Put(d, 0xf0b7, g.Edi);
+        g.Ecx = g.Shr(U32(d, 0x1955), 5, 32); g.Eax = g.Shr(U32(d, 0x1959), 5, 32); g.Ch = g.Al;
+        g.Edx = g.Shr(U32(d, 0x1c7e), 5, 32); g.Eax = g.Shr(U32(d, 0x1c82), 5, 32); g.Dh = g.Al;
+        var rec = w.ObjectAt(g.Edi); g.Bl = rec[1]; g.Al = rec[0]; w.Call(0xb616, g);
+        F4B79(w, g);
+    }
+
+    private static void F4B79(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds;
+        g.Test(g.Eax, g.Eax, 32);
+        if (!g.Zf)
+        {
+            g.Cmp(g.Eax, 1, 32);
+            if (!g.Zf)
+            {
+                g.Al = d[0x1c88]; d[0x1c87] = g.Al; w.Call(0x6acd, g); g.Edi = U32(d, 0xf0b7); w.Call(0x205fb, g); g.Bl = 0; g.Logic(0, 8); w.Call(0x1f3e9, g);
+                g.Cmp(d[0x4c], 0xf, 8); if (!g.Cf) return;
+                d[0x4c] = Inc8(g, d[0x4c]); g.Esi = 0x2be; g.Al = 0; g.Logic(0, 8); w.Call(0xdf7e, g);
+                g.Al = d[0x1972]; g.Bl = d[0x1c87]; var e = w.ObjectAt(g.Edi); e[2] = g.Bl; e[0x1d] = g.Al;
+                uint pushed = g.Edi; w.Call(0xba2e, g); g.Edi = pushed;
+                g.Cmp(g.Esi, w.PoolBase, 32); g.Esi -= w.PoolBase; Put(e, 0x18, g.Esi);
+                g.Esi = g.Edi; w.Call(0x65df, g); g.Eax = 5; FA4A9(w, g); return;
+            }
+            g.Bl = d[0x1c88]; g.Al = d[0x1972]; w.Call(0xba2e, g); w.ObjectAt(g.Esi)[0x1b] = 0; Put(d, 0x1969, g.Esi); w.Call(0x6a73, g); g.Eax = 4; FA4A9(w, g);
+        }
+        g.Esi = U32(d, 0xed20); g.Edi = g.Esi + 0x9df; g.Bl = d[0x1c88]; w.Call(0x20143, g);
+        g.Al = d[0x1c88]; g.Esi = U32(d, 0xed20); w.Call(0x200ab, g);
+    }
+
+    /// <summary>4C46: the button is released: L3[4] shifted into the click flags (&gt;&gt; 1 &amp; Ah | 1); on the map (no object) the tool by the pressed key flags [199E]/[19A2] = 4 (D101 = 1: 50F4 with the order 58h), else [1986]/[198A] (4D50, 48h); over an object by its template class (flags +41 &amp; 0Fh = 4: 53D3, 60h;
+    /// kind bit 10h and [199E]/[19A2] = 6: 52A6, 58h; [1992]/[1996] = 2: 4E40, 50h).</summary>
+    public static void F4C46(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Al = l[4]; g.Al = (byte)g.Shr(g.Al, 1, 8); g.Al = (byte)(g.Al & 0xa); g.Logic(g.Al, 8); g.Al = (byte)(g.Al | 1); l[4] = g.Al;
+        g.Cmp(U32(l, 5), 0, 32);
+        if (g.Zf)
+        {
+            g.Cmp(d[0x199e], 0, 8);
+            if (!g.Zf) { g.Cmp(d[0x19a2], 4, 8); if (g.Zf)
+                {
+                    g.Ecx = g.Shr(U32(d, 0x1955), 5, 32); g.Eax = g.Shr(U32(d, 0x1959), 5, 32); g.Ch = g.Al; w.Call(0xd101, g); g.Cmp(g.Eax, 1, 32);
+                    if (g.Zf) { d[0x19c0] = 0x58; w.Call(0x50f4, g); return; }
+                } }
+            g.Cmp(d[0x1986], 0, 8); if (g.Zf) return; g.Cmp(d[0x198a], 1, 8); if (!g.Zf) return;
+            d[0x19c0] = 0x48; w.Call(0x4d50, g); return;
+        }
+        g.Edi = U32(l, 9); var t = w.ObjectAt(g.Edi); g.Eax = U32(t, 0x40); g.Ah = (byte)(g.Ah & 0xf); g.Logic(g.Ah, 8); g.Cmp(g.Ah, 4, 8);
+        if (g.Zf) { g.Cmp(d[0x19aa], 0, 8); if (!g.Zf) { g.Cmp(d[0x19ae], 8, 8); if (g.Zf) { d[0x19c0] = 0x60; w.Call(0x53d3, g); return; } } }
+        g.Test(l[0xd], 0x10, 8);
+        if (!g.Zf) { g.Cmp(d[0x199e], 0, 8); if (!g.Zf) { g.Cmp(d[0x19a2], 6, 8); if (g.Zf) { d[0x19c0] = 0x58; w.Call(0x52a6, g); return; } } }
+        g.Cmp(d[0x1992], 0, 8); if (g.Zf) return; g.Cmp(d[0x1996], 2, 8); if (!g.Zf) return;
+        d[0x19c0] = 0x50; w.Call(0x4e40, g);
+    }
+
+    /// <summary>4D41: the click state: L3[2] = 1, L3[12] = 1.</summary>
+    public static void F4D41(IUnitActionWorld w, ActionRegs g) { w.L3[2] = 1; w.L3[0x12] = 1; }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
