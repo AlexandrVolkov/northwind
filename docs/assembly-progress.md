@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 81599 | 6265 | 97 | 58921 | 44 |
+| LE:1 | 146882 | 81264 | 6265 | 97 | 59256 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -397,6 +397,7 @@
 | LE:1 `0x9E7D..0x9F38` | Wind vector, direction and random acceleration | ported | [combat.md](../docs/combat.md); [wind.json](../tests/fixtures/wind.json) |  |
 | LE:1 `0xA10B..0xA1D1` | Game speed gate and slow-tick flags | partial | [game-timing.md](../docs/game-timing.md) | Перенесены частота и шаг по умолчанию; клавиши смены скорости и флаги [19E7] не подключены. |
 | LE:1 `0xA10B..0xA1D1` | Game speed gate and slow-tick flags (A10B) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The callees outside the function are recorded stubs in the check; the skirmish keeps its own pace gate and walk end |
+| LE:1 `0xA1D1..0xA320` | Minimap: one byte per map cell with fog, objects and the view frame (A1D1) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 3EEA is a recorded stub; the map word of a cell is taken as the cell index (the check maps tile = cell); the planes and the picture are the flat test regions |
 | LE:1 `0xA320..0xA38A` | View corner clamp and cache invalidation (A320) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |
 | LE:1 `0xA38A..0xA416` | Object looks for a free neighbour cell (A38A) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 43B0, 9E41 and 7A36 are recorded stubs |
 | LE:1 `0xA416..0xA444` | Effect of an object at its cell (A416) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 1416B is a recorded stub |

@@ -9630,6 +9630,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "3EEA is a recorded stub; the check keeps the low byte of the pushed EDI non-zero (a zero byte makes the original pop the return address)"
+    },
+    {
+      "id": "le1-minimap-a1d1",
+      "module": "LE:1",
+      "start": 41425,
+      "end": 41760,
+      "name": "Minimap: one byte per map cell with fog, objects and the view frame (A1D1)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "3EEA is a recorded stub; the map word of a cell is taken as the cell index (the check maps tile = cell); the planes and the picture are the flat test regions"
     }
   ]
 }
