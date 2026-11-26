@@ -4119,6 +4119,34 @@ public static class OriginalUnitActions
         }
     }
 
+    /// <summary>11B4E: the wild spark of the map: with [1C4E] set ten times a random cell (9E41 / 9E55 scaled by the map size [18DE] x [18E2]) outside the rectangle [1906],[190A] (+0Dh) whose tile has the terrain class 3 in the high nibble of the byte +1 of its descriptor gets the effect CFAC (EAX = 0, EDX = the cell, ECX = 101h).</summary>
+    public static void F11B4E(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(d[0x1c4e], 0, 8); if (g.Zf) return;
+        g.Ecx = 10;
+        for (; ; )
+        {
+            uint saved = g.Ecx; w.Call(0x9e41, g); Mul8(g, g.Al, d[0x18de]); g.Cl = g.Ah; w.Call(0x9e55, g); Mul8(g, g.Al, d[0x18e2]); g.Ch = g.Ah; g.Dl = d[0x1906];
+            bool inside = false; g.Cmp(g.Cl, g.Dl, 8);
+            if (!g.Cf)
+            {
+                g.Dh = d[0x190a]; g.Cmp(g.Ch, g.Dh, 8);
+                if (!g.Cf)
+                {
+                    g.Add(g.Edx, 0xd0d); g.Edx += 0xd0d; g.Cmp(g.Cl, g.Dl, 8);
+                    if (g.Cf || g.Zf) { g.Cmp(g.Ch, g.Dh, 8); inside = g.Cf || g.Zf; }
+                }
+            }
+            if (!inside)
+            {
+                g.Eax = U32(d, 0x18de); Mul8(g, g.Al, g.Ch); g.Ebx = g.Cl; g.Add(g.Eax, g.Ebx); g.Eax += g.Ebx; g.Eax *= 4; uint cell = g.Eax / 4; g.Eax += U32(d, 0x18ee);
+                g.Ebx = (g.Ebx & 0xffff0000) | (cell & 0xffff); g.Edx = w.TileProperty(cell, 0); g.Dh = (byte)(g.Dh & 0xf); g.Cmp(g.Dh, 3, 8);
+                if (g.Zf) { g.Eax = 0; g.Edx = g.Ecx; g.Ecx = 0x101; w.Call(0xcfac, g); }
+            }
+            g.Ecx = saved; g.Ecx--; g.Zf = g.Ecx == 0; g.Sf = (g.Ecx & 0x80000000) != 0; g.Of = false; if (g.Zf) return;
+        }
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

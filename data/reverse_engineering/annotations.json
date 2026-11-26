@@ -9364,6 +9364,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "EAD8 is a recorded stub (EBP is not part of its log); F781, E055 run as the ported code; the settlement field +19F1 is read from the stats block"
+    },
+    {
+      "id": "le1-wild-spark-11b4e",
+      "module": "LE:1",
+      "start": 72526,
+      "end": 72671,
+      "name": "Wild spark of the map: ten random cells of terrain class 3 (11B4E)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "9E41, 9E55 and CFAC are recorded stubs (the random stubs change only EAX and ZF); the check uses a 32 x 32 map, so the width/height swap and the identity of tile and cell index are not distinguished"
     }
   ]
 }

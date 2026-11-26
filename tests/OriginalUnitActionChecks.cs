@@ -86,7 +86,7 @@ public partial class TestRunner
             bool tmplEdx = address == 0xc4cd || address == 0x982b;
             uint ownerIn = g.Eax & 255;
             var (zf, ax, bx, cx, dx, di) = calls.Count > 0 ? calls[0] : (true, 0u, 0u, 0u, 0u, 0u); if (calls.Count > 0) calls.RemoveAt(0);
-            if (address == 0x9e41 || address == 0x9e69) { g.Eax = ax; g.Zf = zf; return; }
+            if (address == 0x9e41 || address == 0x9e55 || address == 0x9e69) { g.Eax = ax; g.Zf = zf; return; }
             g.Eax = ax; g.Ebx = bx; g.Ecx = cx; g.Edx = tmplEdx ? 0x400c00 : dx; if (address == 0x1ead8) g.Edx = 0x40a000u + 0x1a35u * ownerIn; if (address != 0x43b0) g.Edi = di; g.Zf = zf; if (address == 0xbadf) g.Edx = 0x401900 + 4 * ((ax >> 8) & 0xff); if (address == 0xd1ba && c.GetProperty("fn").GetString() == "fcb77") g.Esi = 0x400a00; if (objEdi) g.Edi = (di & 1) != 0 ? 0x400900u : 0x400a00u; if (objEcx) g.Ecx = (cx & 1) != 0 ? 0x400900u : 0x400a00u;
         }
     }
@@ -389,6 +389,7 @@ public partial class TestRunner
                         if (fn == "f66e9") OriginalUnitActions.F66E9(w, g); else if (fn == "f670f") OriginalUnitActions.F670F(w, g); else if (fn == "f672f") OriginalUnitActions.F672F(w, g); else OriginalUnitActions.F674F(w, g);
                         break;
                     }
+                case "f11b4e": w.Ds[0x1c4e] = (byte)c.GetProperty("k4e").GetInt32(); w.Ds[0x1906] = (byte)c.GetProperty("r1").GetInt32(); w.Ds[0x190a] = (byte)c.GetProperty("r2").GetInt32(); OriginalUnitActions.F11B4E(w, g); break;
                 case "fdee4":
                     {
                         Array.Clear(w.L3, 0x7d4, 0x604); int room = c.GetProperty("room").GetInt32(); int qn = c.GetProperty("qn").GetInt32(); int end = 0xdce - room; end = room > 0x80 ? 0x7f2 + 0x1e * qn : end;
@@ -601,7 +602,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 216, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 217, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }
