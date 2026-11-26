@@ -7711,6 +7711,44 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "The cursor state lives in LE:3 (offsets 0..13h, fixups to object 3); 20232, 1F464, 4938 and B851 are recorded stubs"
+    },
+    {
+      "id": "le1-minimap-486d",
+      "module": "LE:1",
+      "start": 18541,
+      "end": 18744,
+      "name": "Pointer over the minimap: object, cursor kind and the mode handler (486D)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The handler table of LE:3 (+14h) is a recorded stub; 67C0 runs as original code"
+    },
+    {
+      "id": "le1-click-end-4938",
+      "module": "LE:1",
+      "start": 18744,
+      "end": 18789,
+      "name": "End of a click: reset the click state (4938)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
     }
   ]
 }

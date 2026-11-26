@@ -129,6 +129,7 @@ public sealed partial class Skirmish
         public uint TileProperty(uint cell, int offset) => 0;
         public uint Fs17F { get; set; }
         public byte[] L3 { get; } = new byte[0x1000];
+        public void CallHandler(uint mode, ActionRegs g) { }
         public byte Peek(uint address) => 0;
         public void Poke(uint address, byte value) { }
         public void SetG1CCB(int index, byte value) { }

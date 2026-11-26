@@ -81,6 +81,8 @@ public interface IUnitActionWorld
     uint TileDescriptor(uint tile);
     /// <summary>The first bytes of the object LE:3 (the cursor state: [0] mode, [5] object under it, [9] its template, [D] kind, [12] click state, [13] button flags).</summary>
     byte[] L3 { get; }
+    /// <summary>The call through the handler table of LE:3 (+14h, one dword per mode): the world runs the handler of the mode.</summary>
+    void CallHandler(uint mode, ActionRegs g);
     /// <summary>A byte of flat memory outside the objects (the text buffers and the font of the interface routines).</summary>
     byte Peek(uint address);
     void Poke(uint address, byte value);
@@ -2624,6 +2626,46 @@ public static class OriginalUnitActions
         g.Cmp(d[0x1c89], 0, 8);
         if (!g.Zf) { g.Al = d[0x1972]; g.Bl = d[0x1c87]; w.Call(0xb851, g); w.Call(0x4938, g); return; }
         g.Esi = U32(d, 0x1969); var sel = w.ObjectAt(g.Esi); Put(sel, 0x1c, g.Ecx); sel[0x14] &= 7; sel[0x14] |= g.Ah; g.Logic(sel[0x14], 8); w.Call(0x4938, g);
+    }
+
+    /// <summary>486D: the pointer over the minimap (pixels 10h.., 1C0h square): L3[4] the button flags, the cell by 67C0, a living object (+19 &gt; 0) as L3[5] / L3[9], the cursor kind L3[0D] as in 4580 (no 20020h exception), then the handler of the mode L3[2] (table +14h).</summary>
+    public static void F486D(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Eax = 0; g.Logic(0, 32); Put(l, 5, 0); l[4] = g.Al; g.Cmp(l[0], g.Al, 8);
+        if (!g.Zf) { g.Cmp(l[0], 0x28, 8); if (!g.Zf) goto dispatch; }
+        g.Al = d[0x194b]; g.Al = (byte)(g.Al << 2); g.Al = (byte)(g.Al | d[0x193a]); g.Logic(g.Al, 8); g.Al = (byte)(g.Al << 1); l[4] = g.Al;
+        g.Eax = U32(d, 0x194d); g.Ebx = U32(d, 0x1951);
+        g.Cmp(g.Eax, 0x10, 32); g.Eax -= 0x10; if (g.Cf) goto dispatch;
+        g.Cmp(g.Ebx, 0x10, 32); g.Ebx -= 0x10; if (g.Cf) goto dispatch;
+        g.Cmp(g.Eax, 0x1c0, 32); if (!g.Cf) goto dispatch;
+        g.Cmp(g.Ebx, 0x1c0, 32); if (!g.Cf) goto dispatch;
+        l[4] |= 1; g.Logic(l[4], 8);
+        F67C0(w, g); if (g.Zf) goto dispatch;
+        var o = w.ObjectAt(g.Esi); g.Cmp(o[0x19], 0, 8); if (g.Zf || (g.Sf != g.Of)) goto dispatch;
+        Put(l, 5, g.Esi); Put(l, 9, g.Edi);
+        var t = w.ObjectAt(g.Edi);
+        g.Eax = U32(t, 0x40); g.Eax &= 0x18004; g.Logic(g.Eax, 32); g.Ecx = g.Eax; g.Eax >>= 0xc; g.Cl = (byte)(g.Cl | g.Al); g.Cl = Inc8(g, g.Cl);
+        g.Ebx = o[3]; g.Cmp(g.Bl, d[0x1972], 8);
+        if (!g.Zf)
+        {
+            g.Cmp(g.Bl, d[0x1971], 8);
+            if (!g.Zf)
+            {
+                g.Cl = Inc8(g, g.Cl); g.Eax = 0xf5; Mul8(g, g.Al, d[0x1972]);
+                var part = w.PartOf(d[0x1972]); g.Cf = BitMem(part, 0x12, g.Ebx); g.Cl = Add8(g, g.Cl, (byte)(g.Cf ? 1 : 0));
+            }
+        }
+        l[0xd] = g.Cl;
+    dispatch:
+        g.Eax = l[2]; w.CallHandler(g.Eax, g);
+    }
+
+    /// <summary>4938: ends a click: [19C2] = 1, the click state L3[2], L3[3], L3[12] = 0 and, in a group [1C89], [1A1B] = 0.</summary>
+    public static void F4938(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; d[0x19c2] = 1; l[2] = 0; l[3] = 0; l[0x12] = 0; g.Cmp(d[0x1c89], 0, 8); if (g.Zf) return;
+        d[0x1a1b] = 0;
     }
 
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
