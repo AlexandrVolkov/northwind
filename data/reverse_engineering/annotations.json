@@ -9345,6 +9345,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "F791, E070, E5E6 and DF2A run as the ported code"
+    },
+    {
+      "id": "le1-talk-list-e65b",
+      "module": "LE:1",
+      "start": 58971,
+      "end": 59159,
+      "name": "List of the players to talk to, drawn in rows (E65B)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "EAD8 is a recorded stub (EBP is not part of its log); F781, E055 run as the ported code; the settlement field +19F1 is read from the stats block"
     }
   ]
 }

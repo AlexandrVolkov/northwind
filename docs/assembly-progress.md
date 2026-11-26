@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 82882 | 6265 | 97 | 57638 | 44 |
+| LE:1 | 146882 | 82694 | 6265 | 97 | 57826 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -515,6 +515,7 @@
 | LE:1 `0xE5F6..0xE621` | Mode word of the widget (E5F6) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed |
 | LE:1 `0xE621..0xE636` | Widget closes when E5AB answers zero (E621) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E5AB and DF2A run as the ported code |
 | LE:1 `0xE636..0xE65A` | Closing widget: flags, queue, mode (E636) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | F791, E070, E5E6 and DF2A run as the ported code |
+| LE:1 `0xE65B..0xE717` | List of the players to talk to, drawn in rows (E65B) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | EAD8 is a recorded stub (EBP is not part of its log); F781, E055 run as the ported code; the settlement field +19F1 is read from the stats block |
 | LE:1 `0xEDD5..0xEE38` | Queue and dispatch a message | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xEE69..0xEE92` | Find a queued message by type and party | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xEEFA..0xEF3F` | Drop messages between two settlements | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |

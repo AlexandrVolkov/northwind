@@ -3831,10 +3831,10 @@ public static class OriginalUnitActions
     }
 
     /// <summary>F781: E055 for AL = 14h..17h.</summary>
-    public static void FF781(IUnitActionWorld w, ActionRegs g)
+    public static void FF781(IUnitActionWorld w, ActionRegs g, bool real = false)
     {
         g.Al = 0x14;
-        do { uint e = g.Eax; w.Call(0xe055, g); g.Eax = e; g.Al = Inc8(g, g.Al); g.Cmp(g.Al, 0x18, 8); } while (!g.Zf);
+        do { uint e = g.Eax; if (real) FE055(w, g); else w.Call(0xe055, g); g.Eax = e; g.Al = Inc8(g, g.Al); g.Cmp(g.Al, 0x18, 8); } while (!g.Zf);
     }
 
     /// <summary>F791: E070 for AL = 14h..17h.</summary>
@@ -4083,6 +4083,40 @@ public static class OriginalUnitActions
         g.Cmp(U16(w.Ds, 0x1c35), 1, 16);
         if (!g.Zf) { g.Test(r[3], 0x10, 8); if (g.Zf) return; }
         FF791(w, g, true); FE5E6(w, g, r); w.L3[0] = 0; w.L3[1] = 0;
+    }
+
+    /// <summary>E65B: the list of the players to talk to: the widgets 14h..17h are marked (F781), [DD4] = 0, mode 1; for every owner AL below [6C6] other than [1972] with the relation byte +B9+AL of the own record non-zero and more than 7CFh in the settlement field +19F1 its number goes to the list DS:1F45 (ended by FFh); the numbers are drawn in rows of at most four (a longer list splits half and half): EAD8 with the number, BL = 1, EBP = 0EC38h, ECX = 0F0h - 38h * count + 70h * column, EDX = 82h + 96h * row.</summary>
+    public static void FE65B(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; FF781(w, g, true); l[0xdd4] = 0; l[0] = 1; l[1] = 0; g.Edi = 0x1f45;
+        g.Eax = 0xf5; Mul8(g, g.Al, d[0x1972]); uint rec = g.Eax & 0xffff; var part = w.PartOf(d[0x1972]); g.Ecx = rec + 0x97a; g.Ebx = 0; g.Eax = 0; g.Esi = U32(d, 0x6ba);
+        do
+        {
+            g.Cmp(part[0xb9 + g.Al], 0, 8);
+            if (!g.Zf)
+            {
+                g.Cmp(g.Al, d[0x1972], 8);
+                if (!g.Zf)
+                {
+                    g.Cmp(BitConverter.ToUInt32(w.Stats, g.Al * 0x1a35 + 0x19f1), 0x7cf, 32);
+                    if (!(g.Cf || g.Zf)) { d[g.Edi] = g.Al; g.Edi++; g.Ebx++; }
+                }
+            }
+            g.Al = Inc8(g, g.Al); g.Add(g.Esi, 0x1a35); g.Esi += 0x1a35; g.Cmp(g.Al, d[0x6c6], 8);
+        } while (!g.Zf);
+        d[g.Edi] = 0xff; g.Test(g.Ebx, g.Ebx, 32); if (g.Zf) return;
+        g.Edi = 0x1f45; g.Edx = 0x82; g.Cmp(g.Ebx, 4, 32);
+        if (!(g.Cf || g.Zf)) { g.Bh = g.Bl; g.Bh = (byte)g.Shr(g.Bh, 1, 8); g.Bl = Sub8(g, g.Bl, g.Bh); }
+        for (; ; )
+        {
+            g.Eax = 0x38; Mul8(g, g.Al, g.Bl); g.Ecx = 0xf0; g.Ecx -= g.Eax & 0xffff;
+            do
+            {
+                uint ebx = g.Ebx, ecx = g.Ecx, edx = g.Edx, edi = g.Edi; g.Eax = d[g.Edi]; g.Bl = 1; g.Ebp = 0xec38; w.Call(0xead8, g);
+                g.Edi = edi; g.Edx = edx; g.Ecx = ecx; g.Ebx = ebx; g.Edi++; g.Add(g.Ecx, 0x70); g.Ecx += 0x70; g.Bl = Dec8(g, g.Bl);
+            } while (!g.Zf);
+            g.Add(g.Edx, 0x96); g.Edx += 0x96; g.Ebx = g.Shr(g.Ebx, 8, 32); if (g.Zf) return;
+        }
     }
 
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
