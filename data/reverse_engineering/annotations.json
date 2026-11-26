@@ -7597,6 +7597,44 @@
         "scripts/OriginalFauna.cs"
       ],
       "limitations": "FS services (9E41, 81D9, A444, 90E9, 8227, D895, A6AE, 9064, A758, 43E5, 982B, 8273, 82C3, 839F) are recorded stubs; the skirmish still uses its own fauna adapter (SkirmishFauna, SkirmishBirds)"
+    },
+    {
+      "id": "le1-panel-counters-aab3",
+      "module": "LE:1",
+      "start": 43699,
+      "end": 44067,
+      "name": "Resource counters of the panel follow the participant's values (AAB3)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "ABE9 (draw) and 1EAD8 are recorded stubs"
+    },
+    {
+      "id": "le1-panel-number-ac23",
+      "module": "LE:1",
+      "start": 44067,
+      "end": 44131,
+      "name": "Decimal string of a number without leading zeros (AC23)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "6C6D (draw text) is a recorded stub"
     }
   ]
 }
