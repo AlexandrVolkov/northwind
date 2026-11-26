@@ -2128,6 +2128,56 @@ public static class OriginalUnitActions
         uint pushed = g.Eax; g.Eax = g.Esi - w.PoolBase; w.Call(0x43b0, g); g.Eax = pushed; g.Bl = 0; g.Logic(0, 8);
     }
 
+    // ---- the tile descriptors of the map (CE9D, CF07, CF41): [18FE] the table of 8-byte descriptors, [1902] their number ----
+    private static uint Desc(IUnitActionWorld w, uint tile, int offset) => w.TileProperty(tile, offset);
+
+    /// <summary>CE9D: a random tile whose descriptor equals EAX in the bits FFFF0F00h: EAX = its index, ZF = 0; no such tile: ZF = 1. The registers but EAX are kept; 9E41 draws the random byte.</summary>
+    public static void FCE9D(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint sEsi = g.Esi, sEbx = g.Ebx, sEcx = g.Ecx, sEdx = g.Edx;
+        g.Eax &= 0xffff0f00; g.Logic(g.Eax, 32); g.Edx = g.Eax; uint count = U32(d, 0x1902); g.Ecx = 0;
+        for (uint t = 0; t < count; t++) { g.Eax = Desc(w, t, 0) & 0xffff0f00; if (g.Eax == g.Edx) g.Ecx++; }
+        g.Esi = U32(d, 0x18fe) + 8 * count; g.Ebx = 0;   // the scan has walked the table to its end
+        g.Test(g.Ecx, g.Ecx, 32);
+        if (!g.Zf)
+        {
+            w.Call(0x9e41, g); uint pushed = g.Edx; ulong product = (ulong)g.Eax * g.Ecx; g.Eax = (uint)product; g.Edx = (uint)(product >> 32); g.Cf = g.Of = g.Edx != 0;
+            g.Eax >>= 8; g.Edx = pushed; g.Ecx = g.Eax + 1;
+            g.Ebx = 0xffffffff; uint at = 0xffffffff;
+            do
+            {
+                do { at++; g.Ebx++; g.Eax = Desc(w, at, 0) & 0xffff0f00; } while (g.Eax != g.Edx);
+                g.Ecx--;
+            } while (g.Ecx != 0);
+            g.Eax = g.Ebx; g.Cl = 0xff; g.Logic(0xff, 8);
+        }
+        g.Esi = sEsi; g.Ebx = sEbx; g.Ecx = sEcx; g.Edx = sEdx;
+    }
+
+    /// <summary>CF07: the tiles whose descriptor has in the bits EBX the value EAX &amp; EBX: their indices as words at DS:1F45, ended by FFFFh; ECX = their number (ZF = 0 when there are some).</summary>
+    public static void FCF07(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint sEdi = g.Edi; g.Eax &= g.Ebx; g.Logic(g.Eax, 32); g.Edi = 0x1f45; g.Ecx = 0; uint count = U32(d, 0x1902);
+        for (uint t = 0; t < count; t++)
+        {
+            g.Edx = Desc(w, t, 0) & g.Ebx;
+            if (g.Edx == g.Eax) { g.Ecx++; PutW(d, (int)g.Edi, (ushort)t); g.Edi += 2; }
+        }
+        PutW(d, (int)g.Edi, 0xffff); g.Test(g.Ecx, g.Ecx, 32); g.Edi = sEdi;
+    }
+
+    /// <summary>CF41: the first tile whose descriptor has the class AL (byte 0 &amp; 7), the byte AH as byte 1 and equal bytes 2 and 3 (the latter turned by 4 bits): EAX = its index, ZF = 0; none: ZF = 1 and ECX = the number of tiles.</summary>
+    public static void FCF41(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Ecx = 0; uint count = U32(d, 0x1902);
+        for (; ; )
+        {
+            g.Ebx = Desc(w, g.Ecx, 0); g.Bl = (byte)(g.Bl & 7); g.Cmp(g.Bl, g.Al, 8);
+            if (g.Zf) { g.Cmp(g.Bh, g.Ah, 8); if (g.Zf) { g.Ebx = Desc(w, g.Ecx, 2); g.Cmp(g.Bl, g.Bh, 8); if (g.Zf) { g.Bl = (byte)((g.Bl << 4) | (g.Bl >> 4)); g.Cmp(g.Bl, g.Bh, 8); if (g.Zf) { g.Eax = g.Ecx; g.Cl = 0xff; g.Logic(0xff, 8); return; } } } }
+            g.Ecx++; g.Cmp(g.Ecx, count, 32); if (g.Zf) return;
+        }
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

@@ -6989,6 +6989,63 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "1416B is a recorded stub"
+    },
+    {
+      "id": "le1-tile-random-ce9d",
+      "module": "LE:1",
+      "start": 52893,
+      "end": 52999,
+      "name": "Random tile with the same descriptor class bits (CE9D)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "9E41 is a recorded stub that changes only EAX"
+    },
+    {
+      "id": "le1-tile-list-cf07",
+      "module": "LE:1",
+      "start": 52999,
+      "end": 53057,
+      "name": "List of the tiles with a masked descriptor value (CF07)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-tile-find-cf41",
+      "module": "LE:1",
+      "start": 53057,
+      "end": 53111,
+      "name": "First tile of a class with equal property bytes (CF41)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
     }
   ]
 }
