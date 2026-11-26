@@ -3838,10 +3838,10 @@ public static class OriginalUnitActions
     }
 
     /// <summary>F791: E070 for AL = 14h..17h.</summary>
-    public static void FF791(IUnitActionWorld w, ActionRegs g)
+    public static void FF791(IUnitActionWorld w, ActionRegs g, bool real = false)
     {
         g.Al = 0x14;
-        do { uint e = g.Eax; w.Call(0xe070, g); g.Eax = e; g.Al = Inc8(g, g.Al); g.Cmp(g.Al, 0x18, 8); } while (!g.Zf);
+        do { uint e = g.Eax; if (real) FE070(w, g); else w.Call(0xe070, g); g.Eax = e; g.Al = Inc8(g, g.Al); g.Cmp(g.Al, 0x18, 8); } while (!g.Zf);
     }
 
     private static void Dec16(ActionRegs g, byte[] b, int at)
@@ -4027,6 +4027,62 @@ public static class OriginalUnitActions
         for (uint k = 0; k < cnt; k++) l[edi + k] = w.Peek(esi + 9 + k);
         Put(l, 0xdce, edi + cnt); g.Ecx = 0; g.Eax = cnt & 3; g.Edi = edi; g.Ebx = ebx0; g.Eax = eax0;
         g.Esi = esi; w.Call(Peek32(w, esi + 4), g); g.Esi = 0x7d4;
+    }
+
+    /// <summary>E571: the picture animation of the widget ESI (+10 current, +11 wanted): on every odd step of [19E7] a differing value marks the widget (+0 |= 80h); a picture with the low nibble 8 steps its high nibble by one towards the wanted one, any other jumps at once.</summary>
+    public static void FE571(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Test(w.Ds[0x19e7], 1, 8); if (g.Zf) return;
+        g.Al = r[0x11]; g.Cmp(g.Al, r[0x10], 8); if (g.Zf) return;
+        r[0] |= 0x80; g.Logic(r[0], 8); g.Bl = g.Al; g.Ah = g.Al; g.Ah &= 0xf; g.Cmp(g.Ah, 8, 8);
+        if (!g.Zf) { r[0x10] = g.Al; return; }
+        g.Al &= 0xf0; r[0x10] &= 0xf; r[0x10] |= g.Al; g.Cmp(g.Bl, r[0x10], 8);
+        if (!(g.Cf || g.Zf)) { r[0x10] = Inc8(g, r[0x10]); return; }
+        r[0x10] = Dec8(g, r[0x10]);
+    }
+
+    /// <summary>E5AB: sets the wanted picture +11 of the widget ESI (low nibble AH for the types 1 and 3, else 8; cursor [1946] = A5009Ch) and animates (E571); ZF = the type +3 is 9.</summary>
+    public static void FE5AB(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Test(r[3], 1, 8);
+        if (g.Zf) g.Al = 8;
+        else
+        {
+            Put(d, 0x1946, 0xa5009c); Put(d, 0x1965, 0); g.Cmp(r[3], 1, 8);
+            if (!g.Zf) { g.Al = g.Ah; g.Cmp(r[3], 3, 8); if (!g.Zf) g.Al = 8; }
+        }
+        r[0x11] &= 0xf0; r[0x11] |= g.Al; FE571(w, g, r); g.Cmp(r[3], 9, 8);
+    }
+
+    /// <summary>E5E6: the widget ESI leaves the queue (DF2A with +1) and [DD3] = 0.</summary>
+    public static void FE5E6(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Al = r[1]; FDF2A(w, g); w.L3[0xdd3] = 0; }
+
+    /// <summary>E5F6: the mode word L3[0]: with a non-zero mode equal to the widget's word +1 it is cleared; then a widget of the type bit 1 sets it to its word +1.</summary>
+    public static void FE5F6(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var l = w.L3; g.Ebx = 0; g.Eax = (g.Eax & 0xffff0000) | U16(r, 1); g.Cmp(l[0], g.Bl, 8);
+        if (!g.Zf)
+        {
+            g.Cmp(U16(l, 0), g.Eax & 0xffff, 16); if (!g.Zf) return;
+            l[0] = 0; l[1] = 0;
+        }
+        g.Test(r[3], 1, 8); if (g.Zf) return;
+        l[0] = (byte)g.Eax; l[1] = (byte)(g.Eax >> 8);
+    }
+
+    /// <summary>E621: E5AB with AH = E04h; when it answers non-zero (the type is not 9) nothing more, else the widget leaves the queue (DF2A).</summary>
+    public static void FE621(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = 0xe04; FE5AB(w, g, r); if (!g.Zf) return;
+        g.Al = r[1]; FDF2A(w, g);
+    }
+
+    /// <summary>E636: a closing widget (the key 1 or the type bit 10h): the widgets 14h..17h lose the flag 40h (F791), the widget leaves the queue (E5E6) and the mode is 0.</summary>
+    public static void FE636(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Cmp(U16(w.Ds, 0x1c35), 1, 16);
+        if (!g.Zf) { g.Test(r[3], 0x10, 8); if (g.Zf) return; }
+        FF791(w, g, true); FE5E6(w, g, r); w.L3[0] = 0; w.L3[1] = 0;
     }
 
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are

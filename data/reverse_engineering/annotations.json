@@ -9231,6 +9231,120 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "The handler +4 is a recorded stub; the record is read through Peek (LE:3 in the original); the final ESI = 7D4h is not part of the compared output"
+    },
+    {
+      "id": "le1-widget-anim-e571",
+      "module": "LE:1",
+      "start": 58737,
+      "end": 58795,
+      "name": "Picture animation of a widget (E571)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-widget-picture-e5ab",
+      "module": "LE:1",
+      "start": 58795,
+      "end": 58854,
+      "name": "Wanted picture and cursor of a widget (E5AB)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E571 runs as the ported code; the types 1 and 3 are not reached by the queue-based checks"
+    },
+    {
+      "id": "le1-widget-leave-e5e6",
+      "module": "LE:1",
+      "start": 58854,
+      "end": 58870,
+      "name": "The widget leaves the queue (E5E6)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "DF2A runs as the ported code"
+    },
+    {
+      "id": "le1-widget-mode-e5f6",
+      "module": "LE:1",
+      "start": 58870,
+      "end": 58913,
+      "name": "Mode word of the widget (E5F6)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-widget-close-e621",
+      "module": "LE:1",
+      "start": 58913,
+      "end": 58934,
+      "name": "Widget closes when E5AB answers zero (E621)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5AB and DF2A run as the ported code"
+    },
+    {
+      "id": "le1-widget-cancel-e636",
+      "module": "LE:1",
+      "start": 58934,
+      "end": 58970,
+      "name": "Closing widget: flags, queue, mode (E636)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "F791, E070, E5E6 and DF2A run as the ported code"
     }
   ]
 }
