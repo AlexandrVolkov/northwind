@@ -646,6 +646,7 @@ public sealed partial class Skirmish : IDisposable
         {
             var prepared = OriginalMotionPreparation.TurnAndAdvance(Occupancy, Map.Cells, _properties, actor.Record, actor.Parameters, actor.Id, 0);
             actor.Turning = !prepared.EnteredMotion; result = prepared.Step;
+            if (prepared.EnteredMotion) OriginalUnitWalk.Stride(actor.Record, actor.Parameters, null);   // 7165 continues into 71F5, which ends with 725C: the first moving update strides too
         }
         else
         {
@@ -661,8 +662,8 @@ public sealed partial class Skirmish : IDisposable
         }
         if (actor.Record[0x2c] == 0 || actor.StalledTicks > 120)
         {
-            ReleaseStep(actor.Id); actor.Stepping = false;
-            if (actor.Route.Count == 0) { actor.Record[0x2d] = 0; actor.Record[0x27] = 0; OriginalUnitWalk.WriteFrame(actor.Record, actor.Parameters); }   // 72CF + 92CA: the standing frame of the heading
+            ReleaseStep(actor.Id); actor.Stepping = false; actor.Record[0x24] = (byte)((actor.Record[0x24] & 0xf8) | 1);   // 71F5: the step is over, the walk waits for the next route step
+            if (actor.Route.Count == 0) { actor.Record[0x2d] = 0; actor.Record[0x27] = 0; OriginalUnitWalk.WriteFrame(actor.Record, actor.Parameters); }   // 72CF + 92CA: the standing frame of the heading (adapter: the original ends the walk one update later, see docs/unit-motion.md)
         }
     }
     /// <summary>Phase-1 attack loop of 843E/8EC7: reach 8B5E, swing delay 8AF4, turn, swing request 8C7C and the
