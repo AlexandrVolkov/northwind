@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 84698 | 6265 | 97 | 55822 | 44 |
+| LE:1 | 146882 | 84451 | 6265 | 97 | 56069 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -289,6 +289,7 @@
 | LE:1 `0x7165..0x7180` | Pending turn and motion entry | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Связка с поворотом и подготовкой движения, до анимации/эффектов; полный диспетчер состояний 70B0 не переносится этим статусом. |
 | LE:1 `0x7180..0x71F5` | DAT and SEG movement accumulator | ported | [motion-preparation.md](../docs/motion-preparation.md); [motion-preparation.json](../tests/fixtures/motion-preparation.json) | Координаты внутри карты, свойства SEG присутствуют; назначение всех DAT/SEG полей вне операции ещё не установлено. |
 | LE:1 `0x71F5..0x725C` | Fractional motion step | ported | [spatial-movement-removal.md](../docs/spatial-movement-removal.md); [spatial.json](../tests/fixtures/spatial.json) | Граница 725C до анимации, эффектов и завершения действия; специальные варианты движения не включены. |
+| LE:1 `0x72FE..0x73F5` | Planner with explicit parameters: up to four unbounded contour searches (72FE) | ported | [native-route-search.md](../docs/native-route-search.md); [route-plan.json](../tests/fixtures/route-plan.json); [verify_route_plan.py](../tools/verify_route_plan.py); [OriginalRouteSearchChecks.cs](../tests/OriginalRouteSearchChecks.cs) | The inner state machine 7497..79C0 is the partial Find(); the candidate admission (7D4C) is a delegate over the footprint scan; squares up to 2 x 2 are checked |
 | LE:1 `0x73F5..0x7497` | Prepare local contour search | partial | [native-route-search.md](../docs/native-route-search.md); [route-search.json](../tests/fixtures/route-search.json) | Параметры размера, угла области и границ представлены API C#; исходная маска владельца и динамический вызов допуска в схватке заменены консервативным callback. |
 | LE:1 `0x7497..0x79C0` | Local contour search state machine | partial | [native-route-search.md](../docs/native-route-search.md); [route-search.json](../tests/fixtures/route-search.json) | Маршруты, конечное состояние и порядок проверок совпали на 294 картах; код использует переданный callback и карты до 128x128. Весь диапазон не объявляется побайтово полностью перенесённым: блок 7976..79B5 не имеет отдельной перенесённой достижимой ветви C#. |
 | LE:1 `0x79C0..0x7A03` | Octant direction for contour search | ported | [native-route-search.md](../docs/native-route-search.md); [route-search.json](../tests/fixtures/route-search.json) | Байтовые координаты в контракте локального поиска; совпадение даёт FF, а не направление. |

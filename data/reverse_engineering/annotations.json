@@ -8870,6 +8870,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "DEE4 and 1416B are recorded stubs; DF7E, 68A0 and A4A9 run as the ported code; the record DS:472 is read through Peek (zero in the check)"
+    },
+    {
+      "id": "le1-route-plan-72fe",
+      "module": "LE:1",
+      "start": 29438,
+      "end": 29685,
+      "name": "Planner with explicit parameters: up to four unbounded contour searches (72FE)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/native-route-search.md",
+        "tests/fixtures/route-plan.json",
+        "tools/verify_route_plan.py",
+        "tests/OriginalRouteSearchChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalRouteSearch.cs"
+      ],
+      "limitations": "The inner state machine 7497..79C0 is the partial Find(); the candidate admission (7D4C) is a delegate over the footprint scan; squares up to 2 x 2 are checked"
     }
   ]
 }
