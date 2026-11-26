@@ -4260,6 +4260,55 @@ public static class OriginalUnitActions
         g.Edx -= g.Ebx; g.Edx += 0x10; w.Call(0x3eea, g);
     }
 
+    /// <summary>677F: the picture [68E] from the cell (16, 16) is cleared: 1C0h lines of 70h dwords (448 bytes; the line step is 640), then 3EEA (EAX = EBX = 10h, ECX = 280h, EDX = 1E0h).</summary>
+    public static void F677F(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Edi = U32(d, 0x68e); g.Add(g.Edi, 0x2810); g.Edi += 0x2810; g.Eax = 0; g.Logic(0, 32); g.Ebp = 0xc0; g.Ebx = 0x1c0;
+        do
+        {
+            for (uint k = 0; k < 0x70 * 4; k++) w.Poke(g.Edi + k, 0);
+            g.Edi += 0x70 * 4; g.Ecx = 0; g.Add(g.Edi, g.Ebp); g.Edi += g.Ebp; g.Ebx = Dec32(g, g.Ebx);
+        } while (!g.Zf);
+        g.Eax = 0x10; g.Ebx = 0x10; g.Ecx = 0x280; g.Edx = 0x1e0; w.Call(0x3eea, g);
+    }
+    private static uint Dec32(ActionRegs g, uint a) { uint r = a - 1; g.Zf = r == 0; g.Sf = (r & 0x80000000) != 0; g.Of = a == 0x80000000; return r; }   // CF is kept
+
+    /// <summary>6D4A: a frame (DL wide, DH high, at the cell of 3EEA): the first line of 44h, the interior lines with 44h on both sides and the fill AL (0, then - the second pass - the low byte of the pushed EDI), the last line of 44h; ECX holds the share of the interior lines (the quotient (DH - 2) * CL / CH).</summary>
+    public static void F6D4A(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; d[0x1f08] = g.Dh; d[0x1f09] = g.Dl; uint savedEdi = g.Edi, savedEcx = g.Ecx;
+        g.Ecx = d[0x1f09]; g.Edx = d[0x1f08]; w.Call(0x3eea, g);
+        g.Edi = g.Ebx << 9; g.Ebx <<= 7; g.Edi += g.Ebx; g.Edi += g.Eax; g.Edi += U32(d, 0x68e);
+        g.Ecx = d[0x1f09]; g.Edx = 0x280 - g.Ecx; g.Al = 0x44;
+        do { w.Poke(g.Edi, g.Al); g.Edi++; g.Cl = Dec8(g, g.Cl); } while (!g.Zf);
+        g.Edi += g.Edx; g.Ecx = savedEcx;
+        g.Al = (byte)(d[0x1f08] - 2); Mul8(g, g.Al, g.Cl); g.Test(g.Eax & 0xffff, g.Eax & 0xffff, 16);
+        if (!g.Zf)
+        {
+            uint ax = g.Eax & 0xffff; byte div = g.Ch; if (div == 0 || ax / div > 0xff) throw new OverflowException("DIV r/m8 faults");
+            g.Eax = (g.Eax & 0xffff0000) | ((ax % div) << 8) | (ax / div);
+        }
+        g.Edx++; g.Ch = d[0x1f08]; g.Ch = (byte)(g.Ch - 2); g.Cl = g.Al; g.Al = 0; g.Ch = Sub8(g, g.Ch, g.Cl);
+        bool rows = !g.Zf; bool first = true; uint stack = savedEdi;
+        for (; ; )
+        {
+            if (rows)
+            {
+                do
+                {
+                    g.Ah = 0x44; w.Poke(g.Edi, g.Ah); g.Edi++; g.Bl = (byte)(d[0x1f09] - 2);
+                    do { w.Poke(g.Edi, g.Al); g.Edi++; g.Bl = Dec8(g, g.Bl); } while (!g.Zf);
+                    w.Poke(g.Edi, g.Ah); g.Edi += g.Edx; g.Ch = Dec8(g, g.Ch);
+                } while (!g.Zf);
+                g.Test(g.Al, g.Al, 8); if (!g.Zf) break;
+            }
+            if (!first) throw new InvalidOperationException("6D4A pops the return address (the fill byte is zero)");
+            first = false; g.Eax = stack; g.Ch |= g.Cl; g.Logic(g.Ch, 8); rows = !g.Zf; if (!rows) break;
+        }
+        g.Ecx = (g.Ecx & 0xffffff00) | d[0x1f09]; g.Al = 0x44;
+        do { w.Poke(g.Edi, g.Al); g.Edi++; g.Cl = Dec8(g, g.Cl); } while (!g.Zf);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

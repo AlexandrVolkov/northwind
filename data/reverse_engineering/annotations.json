@@ -9592,6 +9592,44 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "3EEA is a recorded stub (the clearing of the text rectangle); 6BA3 / 6C04 run as the ported code; the check draws strings of at most six glyphs"
+    },
+    {
+      "id": "le1-clear-picture-677f",
+      "module": "LE:1",
+      "start": 26495,
+      "end": 26557,
+      "name": "Clear the picture area below the top line (677F)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "3EEA is a recorded stub; only the first 8000h bytes of the picture are compared"
+    },
+    {
+      "id": "le1-frame-6d4a",
+      "module": "LE:1",
+      "start": 27978,
+      "end": 28143,
+      "name": "Frame with the interior fill (6D4A)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "3EEA is a recorded stub; the check keeps the low byte of the pushed EDI non-zero (a zero byte makes the original pop the return address)"
     }
   ]
 }
