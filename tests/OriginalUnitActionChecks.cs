@@ -192,17 +192,24 @@ public partial class TestRunner
                     BitConverter.GetBytes(1024u).CopyTo(w.Ds, 0x1902);
                     if (fn == "fce9d") OriginalUnitActions.FCE9D(w, g); else if (fn == "fcf07") OriginalUnitActions.FCF07(w, g); else OriginalUnitActions.FCF41(w, g);
                     break;
-                case "f6377": case "f6361": case "f63cb": case "f63f7": case "f640b": case "f6423": case "f643c": case "f645b": case "f66bb": case "f66df": case "f67bd": case "f67c0": case "f67d3":
+                case "f6377": case "f6361": case "f63cb": case "f63f7": case "f640b": case "f6423": case "f643c": case "f645b": case "f66bb": case "f66df": case "f67bd": case "f67c0": case "f67d3": case "f616f": case "f6267": case "f6294":
                     {
                         int sel = c.GetProperty("sel").GetInt32(); var wi = Convert.FromHexString(c.GetProperty("wi").GetString()!); var ob = w.Obj1; if (fn != "f645b") wi[3] %= 8;
                         BitConverter.GetBytes(0x400900u).CopyTo(w.Ds, 0x1969); BitConverter.GetBytes(c.GetProperty("cad").GetUInt32()).CopyTo(w.Ds, 0x1cad);
-                        if (fn is "f6377" or "f6361")
+                        if (fn is "f6377" or "f6361" or "f6294")
                         {
-                            wi[2] = 0; wi[0x14] %= 3; ob[3] %= 8; if (fn == "f6361" && (sel & 1) != 0) wi[0x1a] = 1;
+                            wi[2] = 0; wi[0x14] %= 3; ob[3] %= 8; if (fn == "f6361" && (sel & 1) != 0) wi[0x1a] = 1; if (fn == "f6294") { wi[0x1a] = (byte)(wi[6] & 1); ob[0x40] = 0xff; if ((wi[5] & 1) != 0) ob[0x26] = 0xff; }
                             if ((sel & 2) != 0) w.Template[0x40] |= 8; else w.Template[0x40] &= 0xf7;
                             if ((sel & 1) != 0) for (int k = 0x7c; k < 0x8c; k++) w.Template[k] = k % 4 == 0 ? (byte)(w.Template[k] % 4) : (byte)0;
                             if ((sel & 1) != 0) { var pp = w.PartOf(ob[3]); for (int k = 0x18; k < 0x28; k++) pp[k] = (byte)(k % 4 == 0 ? 100 : 0); }
                         }
+                        if (fn == "f616f")
+                        {
+                            wi[2] %= 6; if (sel != 3) wi[0x1a] = 0; int sl = 0x1978 + 12 * wi[2];
+                            w.Ds[sl + 6] = new byte[] { 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xb, 0xa }[wi[5] % 14];
+                            if ((sel & 1) != 0) { w.Ds[sl + 9] = w.Ds[0x1c35]; w.Ds[sl + 10] = w.Ds[0x1c36]; } w.Ds[0x1c89] = (byte)(wi[9] & 1);
+                        }
+                        if (fn == "f6267") { byte l2 = new byte[] { 0, 2, 7, 0xa, 0x10 }[wi[7] % 5]; if ((wi[8] & 2) != 0 && (wi[8] & 1) == 0) l2 = 0xa; w.L3[2] = l2; if ((wi[8] & 1) != 0) wi[0x1b] = l2; else if ((wi[8] & 2) != 0) wi[0x1b] = 7; }
                         if (fn == "f63cb" && (sel & 1) != 0) wi[0x14] = ob[0x19];
                         if (fn == "f63f7" && (sel & 1) != 0) wi[0x14] = ob[0x16];
                         if (fn == "f640b") { wi[0x1a] %= 0x40; if ((sel & 1) != 0) wi[0x14] = ob[wi[0x1a]]; }
@@ -222,6 +229,9 @@ public partial class TestRunner
                         switch (fn)
                         {
                             case "f6377": OriginalUnitActions.F6377(w, g, r); break;
+                            case "f616f": OriginalUnitActions.F616F(w, g, r); break;
+                            case "f6267": OriginalUnitActions.F6267(w, g, r); break;
+                            case "f6294": OriginalUnitActions.F6294(w, g, r); break;
                             case "f6361": OriginalUnitActions.F6361(w, g, r); break;
                             case "f63cb": OriginalUnitActions.F63CB(w, g, r); break;
                             case "f63f7": OriginalUnitActions.F63F7(w, g, r); break;
@@ -428,7 +438,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 167, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 170, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }

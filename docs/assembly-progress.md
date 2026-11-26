@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 86646 | 6265 | 97 | 53874 | 44 |
+| LE:1 | 146882 | 86172 | 6265 | 97 | 54348 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -236,6 +236,9 @@
 | LE:1 `0x608E..0x612B` | Widget tick: E03C hand-over, scroll position, clear slot in chain (608E) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E03C, E571, E5AB are recorded stubs; writes into chain objects are not part of the compared output |
 | LE:1 `0x612B..0x6142` | Message 44Bh when E5AB answers zero (612B) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E5AB and DEE4 are recorded stubs |
 | LE:1 `0x6142..0x616F` | Centre the view on the selected object (6142) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E5AB is a recorded stub; A320 runs as the ported code |
+| LE:1 `0x616F..0x6267` | Panel slot widget: start and tool choice by kind (616F) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E03C, E5AB, 4938, B8A2 and the tool entries 4D41..5593 are recorded stubs (4D41..53C4 are ported separately; 51AC, 54B4, 5593 are not ported) |
+| LE:1 `0x6267..0x6294` | Keep or reset a started panel widget by tool L3[2] (6267) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E571 is a recorded stub |
+| LE:1 `0x6294..0x6361` | Priced widget tick: afford check, order slots (6294) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E03C, E571, E5AB and 5573 are recorded stubs; 6377 and 6361 run as the ported code |
 | LE:1 `0x62FE..0x6304` | Check fifth queue slot | ported | [recruitment-production.md](../docs/recruitment-production.md); [production.json](../tests/fixtures/production.json) | Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора. |
 | LE:1 `0x6330..0x6342` | Append a template to the first unused queue slot | ported | [recruitment-production.md](../docs/recruitment-production.md); [production.json](../tests/fixtures/production.json) | Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора. |
 | LE:1 `0x6361..0x6377` | Widget: afford and consume one unit of +1A (6361) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |
