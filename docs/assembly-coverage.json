@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "abacab08639f12047a8bfbf605cba54cee316ee0545673b58638c0880ed04e86",
+  "annotation_sha256": "8b52aee84bad5a2b4179e2ede6c0ab40b35e4f16ba8a6dadc00e5339ffc901b3",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 6265,
-        "ported": 45816,
-        "unreviewed": 94704,
+        "ported": 46632,
+        "unreviewed": 93888,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -1279,6 +1279,24 @@
         },
         {
           "start": 39929,
+          "end": 40023,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-tick-counters-9bf9"
+          ]
+        },
+        {
+          "start": 40023,
+          "end": 40327,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-tick-events-9c57"
+          ]
+        },
+        {
+          "start": 40327,
           "end": 40513,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1330,10 +1348,64 @@
         },
         {
           "start": 41425,
-          "end": 42178,
+          "end": 41760,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 41760,
+          "end": 41866,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-view-clamp-a320"
+          ]
+        },
+        {
+          "start": 41866,
+          "end": 42006,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-free-neighbour-a38a"
+          ]
+        },
+        {
+          "start": 42006,
+          "end": 42052,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-effect-a416"
+          ]
+        },
+        {
+          "start": 42052,
+          "end": 42110,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-wound-effect-a444"
+          ]
+        },
+        {
+          "start": 42110,
+          "end": 42153,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-effect-a47e"
+          ]
+        },
+        {
+          "start": 42153,
+          "end": 42178,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-effect-a4a9"
+          ]
         },
         {
           "start": 42178,
