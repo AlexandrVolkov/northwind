@@ -374,6 +374,12 @@ public partial class TestRunner
                         if (fn == "f5e1c") OriginalUnitActions.F5E1C(w, g, r); else if (fn == "f5f0a") OriginalUnitActions.F5F0A(w, g, r); else if (fn == "f5fc5") OriginalUnitActions.F5FC5(w, g, r); else if (fn == "f6057") OriginalUnitActions.F6057(w, g, r); else if (fn == "f608e") OriginalUnitActions.F608E(w, g, r); else if (fn == "f612b") OriginalUnitActions.F612B(w, g); else OriginalUnitActions.F6142(w, g);
                         break;
                     }
+                case "f66e9": case "f670f": case "f672f": case "f674f":
+                    {
+                        BitConverter.GetBytes(c.GetProperty("u22").GetUInt32()).CopyTo(w.Ds, 0x1922); BitConverter.GetBytes(c.GetProperty("u2a").GetUInt32()).CopyTo(w.Ds, 0x192a);
+                        if (fn == "f66e9") OriginalUnitActions.F66E9(w, g); else if (fn == "f670f") OriginalUnitActions.F670F(w, g); else if (fn == "f672f") OriginalUnitActions.F672F(w, g); else OriginalUnitActions.F674F(w, g);
+                        break;
+                    }
                 case "f5cc2": case "f5da5": case "f5df6":
                     {
                         BitConverter.GetBytes((ushort)c.GetProperty("k35").GetInt32()).CopyTo(w.Ds, 0x1c35); BitConverter.GetBytes((uint)c.GetProperty("d193a").GetInt32()).CopyTo(w.Ds, 0x193a);
@@ -463,7 +469,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 181, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 185, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }
