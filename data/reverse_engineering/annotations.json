@@ -8300,6 +8300,63 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "20232, 674F and DEE4 are recorded stubs; DF2A runs as the ported code"
+    },
+    {
+      "id": "le1-widget-health-5f0a",
+      "module": "LE:1",
+      "start": 24330,
+      "end": 24517,
+      "name": "Group health widget tick: mean health and colour (5F0A)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "68BD runs as the ported code; none stubbed"
+    },
+    {
+      "id": "le1-widget-mean-5fc5",
+      "module": "LE:1",
+      "start": 24517,
+      "end": 24663,
+      "name": "Group widget tick: mean of byte +16 (5FC5)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-widget-group-6057",
+      "module": "LE:1",
+      "start": 24663,
+      "end": 24718,
+      "name": "Widget follows settlement group: rebuild via B3B6 (6057)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "20232 and B3B6 are recorded stubs"
     }
   ]
 }
