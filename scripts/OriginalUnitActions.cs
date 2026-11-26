@@ -4018,6 +4018,17 @@ public static class OriginalUnitActions
         }
     }
 
+    /// <summary>DEE4: puts the message record at ESI (length dword +0, handler +4, byte +8 -> L3[0DD3], data from +9) into the queue when the room up to 0DCE allows it (else only the registers return, CF = 1), then calls the handler +4 with ESI the record; ESI = 7D4h afterwards.</summary>
+    public static void FDEE4(IUnitActionWorld w, ActionRegs g)
+    {
+        var l = w.L3; uint eax0 = g.Eax, ebx0 = g.Ebx; g.Eax = 0xdce; g.Edi = U32(l, 0xdce); g.Ecx = Peek32(w, g.Esi); g.Cmp(g.Eax - g.Edi, g.Ecx, 32); g.Eax -= g.Edi;
+        if (g.Cf) { g.Ebx = ebx0; g.Eax = eax0; return; }
+        uint esi = g.Esi, edi = g.Edi, cnt = g.Ecx; l[0xdd3] = w.Peek(esi + 8);
+        for (uint k = 0; k < cnt; k++) l[edi + k] = w.Peek(esi + 9 + k);
+        Put(l, 0xdce, edi + cnt); g.Ecx = 0; g.Eax = cnt & 3; g.Edi = edi; g.Ebx = ebx0; g.Eax = eax0;
+        g.Esi = esi; w.Call(Peek32(w, esi + 4), g); g.Esi = 0x7d4;
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
