@@ -123,7 +123,7 @@ public sealed partial class Skirmish
         public byte[] PartOf(byte owner) => throw new NotSupportedException();
         public uint ArmyTable(byte army) => 0;
         public byte TableByte(uint address) => 0xff;
-        public byte Fs13D { get; set; } public byte G525 => 0; public byte G526 => 0; public byte G1C61 { get; set; } public uint G2730 => 0;
+        public byte Fs13D { get; set; } public byte Fs10 { get; set; } public byte G525 => 0; public byte G526 => 0; public byte G1C61 { get; set; } public uint G2730 => 0;
         public byte[] Route => throw new NotSupportedException();
         public uint TileDescriptor(uint tile) => 0;
         public uint TileProperty(uint cell, int offset) => 0;
