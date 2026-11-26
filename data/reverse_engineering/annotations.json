@@ -8680,6 +8680,82 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "E5F6, E5AB, 6ACD, BA60 and DFE5 are recorded stubs"
+    },
+    {
+      "id": "le1-redraw-66e9",
+      "module": "LE:1",
+      "start": 26345,
+      "end": 26383,
+      "name": "Redraw of the panel rectangle 1E0h x 138h (66E9)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1DF08 is a recorded stub (video drawing)"
+    },
+    {
+      "id": "le1-redraw-670f",
+      "module": "LE:1",
+      "start": 26383,
+      "end": 26415,
+      "name": "Redraw from [1922], EDX = 118h (670F)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1DF08 is a recorded stub (video drawing)"
+    },
+    {
+      "id": "le1-redraw-672f",
+      "module": "LE:1",
+      "start": 26415,
+      "end": 26447,
+      "name": "Redraw from [1922], EDX = 99h (672F)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1DF08 is a recorded stub (video drawing)"
+    },
+    {
+      "id": "le1-clear-picture-674f",
+      "module": "LE:1",
+      "start": 26447,
+      "end": 26495,
+      "name": "Clear the picture: 3EEA and 6FCC (674F)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "3EEA and 6FCC are recorded stubs (video drawing)"
     }
   ]
 }

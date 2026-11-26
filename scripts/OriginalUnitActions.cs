@@ -3554,6 +3554,31 @@ public static class OriginalUnitActions
         g.Al = 0x2d; g.Ah = r[2]; w.Call(0xdfe5, g); d[0x4c] = Dec8(g, d[0x4c]);
     }
 
+    /// <summary>66E9: the redraw (1DF08) of the rectangle 1E0h x 138h at [1922] + 5580h (the picture of the panel: ESI = the source, EAX = 1E0h, EBX = 138h, ECX = 90h, EDX = 7Fh).</summary>
+    public static void F66E9(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Esi = U32(w.Ds, 0x1922); g.Add(g.Esi, 0x5580); g.Esi += 0x5580; g.Eax = 0x1e0; g.Ebx = 0x138; g.Ecx = 0x90; g.Edx = 0x7f; w.Call(0x1df08, g);
+    }
+
+    /// <summary>670F: the redraw (1DF08) from [1922] with EAX = 1E0h, EBX = A0h, ECX = 90h, EDX = 118h.</summary>
+    public static void F670F(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Esi = U32(w.Ds, 0x1922); g.Eax = 0x1e0; g.Ebx = 0xa0; g.Ecx = 0x90; g.Edx = 0x118; w.Call(0x1df08, g);
+    }
+
+    /// <summary>672F: the redraw (1DF08) from [1922] with EAX = 1E0h, EBX = A0h, ECX = 90h, EDX = 99h.</summary>
+    public static void F672F(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Esi = U32(w.Ds, 0x1922); g.Eax = 0x1e0; g.Ebx = 0xa0; g.Ecx = 0x90; g.Edx = 0x99; w.Call(0x1df08, g);
+    }
+
+    /// <summary>674F: the clearing of the picture: 3EEA (EAX = 0, EBX = ECX = 1D0h, EDX = 10h), then 6FCC with ESI = [192A], EDI = 1001D0h, EBP = 280h, ECX = EDX = 0.</summary>
+    public static void F674F(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Eax = 0; g.Logic(0, 32); g.Ebx = 0x1d0; g.Ecx = 0x1d0; g.Edx = 0x10; w.Call(0x3eea, g);
+        g.Ecx = 0; g.Edx = 0; g.Logic(0, 32); g.Ebp = 0x280; g.Esi = U32(w.Ds, 0x192a); g.Edi = 0x1001d0; w.Call(0x6fcc, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

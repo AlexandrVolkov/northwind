@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 85384 | 6265 | 97 | 55136 | 44 |
+| LE:1 | 146882 | 85234 | 6265 | 97 | 55286 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -263,6 +263,10 @@
 | LE:1 `0x65DF..0x66BB` | Widget follows an object: position, frame, group select or lookup (65DF) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E5F6, E5AB, 6ACD, BA60 and DFE5 are recorded stubs |
 | LE:1 `0x66BB..0x66DF` | Countdown dots row (66BB) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |
 | LE:1 `0x66DF..0x66E9` | Widget byte sum (66DF) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |
+| LE:1 `0x66E9..0x670F` | Redraw of the panel rectangle 1E0h x 138h (66E9) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 1DF08 is a recorded stub (video drawing) |
+| LE:1 `0x670F..0x672F` | Redraw from [1922], EDX = 118h (670F) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 1DF08 is a recorded stub (video drawing) |
+| LE:1 `0x672F..0x674F` | Redraw from [1922], EDX = 99h (672F) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 1DF08 is a recorded stub (video drawing) |
+| LE:1 `0x674F..0x677F` | Clear the picture: 3EEA and 6FCC (674F) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 3EEA and 6FCC are recorded stubs (video drawing) |
 | LE:1 `0x67BD..0x6877` | What is under the map cell for the player: selectable, blocking or nothing (67BD, 67C0, 67D3) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |
 | LE:1 `0x6877..0x68D8` | Participant record and DAT template of an object | ported | [formats.md](../docs/formats.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | implicit: the port passes template records alongside objects |
 | LE:1 `0x6996..0x69FE` | Direction byte between two points (arctangent table DS:287E) | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
