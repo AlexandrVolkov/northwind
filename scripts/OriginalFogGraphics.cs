@@ -38,7 +38,7 @@ public sealed class OriginalFogGraphics
             throw new ArgumentOutOfRangeException(nameof(left));
         if (corners == 0) return;
         if (corners > 15) throw new ArgumentOutOfRangeException(nameof(corners));
-        int sprite = OriginalVisibilityRules.FogSprite(corners, worldX, worldY);
+        int sprite = 164 + 2 * corners + ((worldX + worldY) & 1);
         int index = sprite - 166;
         int maskLeft = (index % 8) * 32, maskTop = (index / 8) * 32;
         for (int y = 0; y < 32; y++)
@@ -71,9 +71,23 @@ public sealed class OriginalFogGraphics
                 int nx = x + dx, ny = y + dy;
                 neighbours[i++] = nx < 0 || ny < 0 || nx >= width || ny >= height ? (byte)255 : map[ny * width + nx];
             }
-            byte corners = OriginalVisibilityRules.FogCorners(map[y * width + x], neighbours, participant);
+            byte corners = FogCorners(map[y * width + x], neighbours, participant);
             ShadeTile(framebuffer, stride, screenLeft + column * 32, screenTop + row * 32, corners, x, y);
         }
+    }
+
+    // A019..A05B: NW,N,NE,W,E,SW,S,SE. Keep rendering geometry here;
+    // OriginalVisibilityRules in main owns only the 813E reveal operation.
+    private static byte FogCorners(byte centre, ReadOnlySpan<byte> neighbours, byte participant)
+    {
+        byte bit = participant < 8 ? (byte)(1 << participant) : (byte)0;
+        if ((centre & bit) == 0) return 0;
+        byte mask = 0;
+        if ((neighbours[1] & neighbours[2] & neighbours[4] & bit) != 0) mask |= 1;
+        if ((neighbours[0] & neighbours[1] & neighbours[3] & bit) != 0) mask |= 2;
+        if ((neighbours[3] & neighbours[5] & neighbours[6] & bit) != 0) mask |= 4;
+        if ((neighbours[4] & neighbours[6] & neighbours[7] & bit) != 0) mask |= 8;
+        return mask;
     }
 
     public byte[] ToRgb(ReadOnlySpan<byte> indices)

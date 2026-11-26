@@ -47,6 +47,7 @@ public partial class TestRunner : Node
                 case "video": await VideoChecks(); break;
                 case "help": await HelpChecks(); break;
                 case "original-texts": OriginalTextsChecks(); break;
+                case "fog": await FogChecks(); break;
                 case "work-sprites": OriginalWorkSpriteChecks(); break;
                 case "original-sound": OriginalSoundChecks(); break;
                 case "skirmish": await SkirmishChecks(); SkirmishFireChecks(); break;
