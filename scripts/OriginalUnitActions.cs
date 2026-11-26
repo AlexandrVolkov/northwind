@@ -3002,6 +3002,31 @@ public static class OriginalUnitActions
         SpellOrder(w, g, 0x1f71a, false);
     }
 
+    /// <summary>5679: the tool «gift» (cursor 6D0064h, 77006Eh over an object not of kind bit 8): the left button (flag 8): effect 4, 124FD with the item [4190] and the player [1972], then 4938; every other press first calls 124D8 and the key 1 or the right button ends the tool.</summary>
+    public static void F5679(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Test(l[4], 1, 8);
+        if (!g.Zf)
+        {
+            SetCursor(d, 0x6d0064); g.Edi = U32(l, 5); g.Test(g.Edi, g.Edi, 32);
+            if (!g.Zf)
+            {
+                g.Al = l[0xd]; g.Test(g.Al, 8, 8);
+                if (g.Zf)
+                {
+                    SetCursor(d, 0x77006e); g.Test(l[4], 8, 8);
+                    if (!g.Zf)
+                    {
+                        g.Eax = 8; g.Eax = 4; FA4A9(w, g); g.Al = d[0x4190]; g.Ah = d[0x1972]; w.Call(0x124fd, g); w.Call(0x4938, g); return;
+                    }
+                }
+            }
+        }
+        g.Al = d[0x4190]; g.Dl = d[0x1972]; w.Call(0x124d8, g);
+        EndTool(w, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
