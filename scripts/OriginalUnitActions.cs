@@ -3351,6 +3351,88 @@ public static class OriginalUnitActions
         g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); g.Eax = g.Shr(U32(o, 4), 5, 32); g.Ebx = g.Shr(U32(o, 8), 5, 32); FA320(w, g);
     }
 
+    /// <summary>616F: widget ESI (+2 = slot, +1A = state, +1B = kind, +3 = flags, +14): with the flag 1 E03C (2Bh, FFh) gives the object EDI +1C = +2; a started widget (+1A) goes to 6267; else the slot DS:1978 + 12 * slot with its word +9 equal to [1C35] marks +3 = 3, E5AB (B05h), and with +3 = 3 the widget starts (+1A = 1, [19C0] = slot * 8 | 40h, +1B = byte +6 of the slot) and the tool of that kind is chosen: 1 - 4D41, 2 - 4E27, 3 - 4FCE, 4 - 50E5, 5 - 51AC, 6 - 5297, 7 - 538D, 8 - 53C4, 9 - 54B4, 0Bh - 5593; kind 0: 4938 and the class [19C0] goes to +14 of the selected object (B8A2 for a group).</summary>
+    public static void F616F(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Test(r[3], 1, 8);
+        if (!g.Zf)
+        {
+            g.Al = 0x2b; g.Ah = 0xff; w.Call(0xe03c, g);
+            if (!g.Zf) { var o = w.ObjectAt(g.Edi); g.Al = r[2]; o[0x1c] = g.Al; }
+        }
+        g.Cmp(r[0x1a], 0, 8);
+        if (!g.Zf) { F6267(w, g, r); return; }
+        g.Eax = 0xc; Mul8(g, g.Al, r[2]); g.Edi = g.Eax + 0x1978;
+        g.Eax = (g.Eax & 0xffff0000) | U16(d, (int)g.Edi + 9); g.Cmp(g.Eax & 0xffff, U16(d, 0x1c35), 16);
+        if (g.Zf) r[3] = 3;
+        g.Eax = 0xb05; w.Call(0xe5ab, g);
+        g.Cmp(r[3], 3, 8); if (!g.Zf) return;
+        r[0x1a] = 1; g.Al = r[2]; g.Al = (byte)(g.Al << 3); g.Al |= 0x40; d[0x19c0] = g.Al; g.Al = d[g.Edi + 6]; r[0x1b] = g.Al; g.Test(g.Al, g.Al, 8);
+        if (!g.Zf)
+        {
+            byte[] kinds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0xb]; int[] targets = [0x4d41, 0x4e27, 0x4fce, 0x50e5, 0x51ac, 0x5297, 0x538d, 0x53c4, 0x54b4, 0x5593];
+            for (int k = 0; k < kinds.Length; k++) { g.Cmp(g.Al, kinds[k], 8); if (g.Zf) { w.Call((uint)targets[k], g); return; } }
+            return;
+        }
+        w.Call(0x4938, g); g.Cmp(d[0x1c89], 0, 8);
+        if (!g.Zf) { g.Ah = d[0x19c0]; g.Al = d[0x1972]; g.Bl = d[0x1c87]; w.Call(0xb8a2, g); return; }
+        g.Edi = U32(d, 0x1969); var s = w.ObjectAt(g.Edi); g.Al = d[0x19c0]; s[0x14] &= 7; s[0x14] |= g.Al; g.Logic(s[0x14], 8);
+    }
+
+    /// <summary>6267: E571; a widget with kind +1B = 0 and +3 = 3 stays; kind equal to the tool L3[2] (or 7 with the tool 0Ah) stays; else +1A = 0.</summary>
+    public static void F6267(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        w.Call(0xe571, g); g.Al = r[0x1b]; g.Test(g.Al, g.Al, 8);
+        if (g.Zf) { g.Cmp(r[3], 3, 8); if (g.Zf) return; r[0x1a] = 0; return; }
+        g.Cmp(w.L3[2], g.Al, 8); if (g.Zf) return;
+        g.Cmp(g.Al, 7, 8); if (!g.Zf) { r[0x1a] = 0; return; }
+        g.Cmp(w.L3[2], 0xa, 8); if (g.Zf) return;
+        r[0x1a] = 0;
+    }
+
+    /// <summary>6294: the tick of a widget with a price: as 608E up to E571, then a started widget goes to 6361; else 6377: when it cannot be afforded +1A grows and the picture +11 = 1Ah; when it can, a template without the price flag (or with +26 of the selected object = FFh) asks for the picture 8 (4 with the flag 1), otherwise E5AB (C04h) puts the slot into the first free +21.. of the selected object (or, with the price flag, +22 and the cursor 43h, 5573).</summary>
+    public static void F6294(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Test(r[3], 1, 8);
+        if (!g.Zf)
+        {
+            g.Al = 0x2c; g.Ah = 0xfa; w.Call(0xe03c, g);
+            if (!g.Zf) { var o = w.ObjectAt(g.Edi); o[0x1a] = r[2]; o[0x1c] = r[0x14]; g.Al = r[0x14]; }
+        }
+        g.Test(d[0x19e7], 2, 8);
+        if (!g.Zf)
+        {
+            g.Eax = (uint)(int)(sbyte)r[0x1b]; g.Test(g.Eax, g.Eax, 32);
+            if (!g.Zf)
+            {
+                g.Add(U32(r, 4), g.Eax); Put(r, 4, U32(r, 4) + g.Eax); g.Cmp(U32(r, 4), 0x186, 32);
+                if (g.Cf || g.Zf) r[0x1b] = Inc8(g, r[0x1b]);
+            }
+        }
+        w.Call(0xe571, g); g.Cmp(r[0x1a], 0, 8);
+        if (!g.Zf) { F6361(w, g, r); return; }
+        F6377(w, g, r);
+        if (!g.Zf) { r[0x1a] = Inc8(g, r[0x1a]); r[0x11] = 0x1a; return; }
+        var t = w.ObjectAt(g.Edi); g.Test(U32(t, 0x40), 8, 32);
+        bool price = !g.Zf;
+        if (!price)
+        {
+            g.Ebx = U32(d, 0x1969); var ob = w.ObjectAt(g.Ebx); g.Cmp(ob[0x26], 0xff, 8);
+            if (!g.Zf) { r[0x11] = 8; g.Test(r[3], 1, 8); if (g.Zf) return; r[0x11] = 4; return; }
+        }
+        g.Eax = 0xc04; uint edi = g.Edi; w.Call(0xe5ab, g); g.Edi = edi;
+        if (!g.Zf) return;
+        g.Test(U32(t, 0x40), 8, 32);
+        g.Ebx = U32(d, 0x1969); var s = w.ObjectAt(g.Ebx);
+        if (g.Zf)
+        {
+            g.Ecx = 0;
+            do { g.Ecx++; g.Cmp(s[g.Ecx + 0x21], 0xff, 8); } while (!g.Zf);
+            g.Al = r[2]; s[g.Ecx + 0x21] = g.Al; return;
+        }
+        g.Al = r[2]; s[0x22] = g.Al; Put(s, 0x23, 0xffffffff); d[0x19c0] = 0x43; w.Call(0x5573, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

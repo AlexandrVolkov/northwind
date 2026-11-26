@@ -8414,6 +8414,63 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "E5AB is a recorded stub; A320 runs as the ported code"
+    },
+    {
+      "id": "le1-panel-slot-616f",
+      "module": "LE:1",
+      "start": 24943,
+      "end": 25191,
+      "name": "Panel slot widget: start and tool choice by kind (616F)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E03C, E5AB, 4938, B8A2 and the tool entries 4D41..5593 are recorded stubs (4D41..53C4 are ported separately; 51AC, 54B4, 5593 are not ported)"
+    },
+    {
+      "id": "le1-panel-keep-6267",
+      "module": "LE:1",
+      "start": 25191,
+      "end": 25236,
+      "name": "Keep or reset a started panel widget by tool L3[2] (6267)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E571 is a recorded stub"
+    },
+    {
+      "id": "le1-panel-price-6294",
+      "module": "LE:1",
+      "start": 25236,
+      "end": 25441,
+      "name": "Priced widget tick: afford check, order slots (6294)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E03C, E571, E5AB and 5573 are recorded stubs; 6377 and 6361 run as the ported code"
     }
   ]
 }
