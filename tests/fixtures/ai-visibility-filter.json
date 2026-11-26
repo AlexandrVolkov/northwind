@@ -1,0 +1,57 @@
+{
+  "format_version": 1,
+  "source_sha256": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
+  "case_count": 2000,
+  "accepted": 224,
+  "results_sha256": "df6377dc75c2f47baa375836925298f8209f2ddf299ff1b7768d920f1bbe4b39",
+  "dimensions": {
+    "visibility": [
+      0,
+      1,
+      2,
+      3,
+      255
+    ],
+    "mask": [
+      0,
+      1,
+      2,
+      3,
+      255
+    ],
+    "flags": [
+      0,
+      32,
+      32768,
+      4194304
+    ],
+    "owner": [
+      0,
+      1,
+      7,
+      8
+    ],
+    "hp_min_hp": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        9,
+        8
+      ],
+      [
+        8,
+        8
+      ],
+      [
+        200,
+        100
+      ]
+    ]
+  }
+}
