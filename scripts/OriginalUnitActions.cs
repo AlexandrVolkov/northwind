@@ -77,6 +77,9 @@ public interface IUnitActionWorld
     /// <summary>The route bytes ([6B6] points to them) and the first dword of the descriptor of a map tile.</summary>
     byte[] Route { get; }
     uint TileDescriptor(uint tile);
+    /// <summary>A byte of flat memory outside the objects (the text buffers and the font of the interface routines).</summary>
+    byte Peek(uint address);
+    void Poke(uint address, byte value);
     /// <summary>The dword at <paramref name="offset"/> of the 8-byte descriptor of the tile of the map cell (the cell index, row by row).</summary>
     uint TileProperty(uint cell, int offset);
     /// <summary>The byte [1CCB + 16h · owner] written by 8A54.</summary>
@@ -1937,6 +1940,51 @@ public static class OriginalUnitActions
         g.Al = 0xff; g.Logic(0xff, 8); return;
     none:
         g.Al = 0; g.Logic(0, 8);
+    }
+
+    // ---- the text helpers 7012, 704F, 7069 (interface) ----
+    /// <summary>7012: the width of the string ESI in pixels: EBX = the sum over the characters of the glyph width (+1 of the glyph) + 1; the string ends with FFh or 0Dh, «~» skips the next character, characters from B0h are shifted down by 30h; the font table at DS:19EE.</summary>
+    public static void F7012(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint esi = g.Esi, sEsi = g.Esi, sEdi = g.Edi, sEcx = g.Ecx, sEdx = g.Edx; g.Edx = U32(d, 0x19ee); g.Ebx = 0;
+        for (; ; )
+        {
+            g.Al = w.Peek(esi); g.Cmp(g.Al, 0xff, 8); if (g.Zf) break;
+            g.Cmp(g.Al, 0x0d, 8); if (g.Zf) break;
+            esi += 2; g.Cmp(g.Al, 0x7e, 8); if (g.Zf) continue;
+            esi--; g.Cmp(g.Al, 0xb0, 8); if (!g.Cf) g.Al = (byte)(g.Al - 0x30);
+            g.Edi = g.Al; uint a = g.Edx + g.Edi * 2; g.Edi = (uint)(w.Peek(a) | w.Peek(a + 1) << 8); g.Edi += g.Edx;
+            byte width = w.Peek(g.Edi + 1); uint sum = (uint)g.Bl + width; g.Bl = (byte)sum; g.Bh = (byte)(g.Bh + (sum > 0xff ? 1 : 0)); g.Add(g.Ebx, 1); g.Ebx += 1;
+        }
+        g.Esi = sEsi; g.Edi = sEdi; g.Ecx = sEcx; g.Edx = sEdx;   // the pops
+    }
+
+    /// <summary>704F: AX = (the number of the lines of the string ESI, 0Dh breaks them, FFh ends it) * 12h.</summary>
+    public static void F704F(IUnitActionWorld w, ActionRegs g)
+    {
+        uint esi = g.Esi; g.Eax = 0;
+        do { g.Ah = w.Peek(esi); if (g.Ah == 0x0d) g.Al++; esi++; } while (g.Ah != 0xff);
+        g.Al++; g.Ah = 0x12; Mul8(g, g.Al, g.Ah);
+    }
+
+    /// <summary>7069: copies the string ESI to EDI up to and including FFh; «%nK» (K = 1..4) is replaced by the name (DS:0A1E + 0F5h · owner, FFh-ended) of the owner in the low byte of EAX, EBX, ECX or EDI as the caller had it. ESI = the old EDI at the end, EDI = behind the copy.</summary>
+    public static void F7069(IUnitActionWorld w, ActionRegs g)
+    {
+        uint esi = g.Esi, edi = g.Edi; uint[] saved = [g.Eax, g.Ebx, g.Ecx, g.Edi]; uint start = g.Edi;
+        for (; ; )
+        {
+            g.Al = w.Peek(esi); w.Poke(edi, g.Al); g.Cmp(g.Al, 0xff, 8); if (g.Zf) break;
+            g.Cmp(g.Al, 0x25, 8);
+            if (g.Al == 0x25) { g.Cmp(w.Peek(esi + 1), 0x6e, 8); if (g.Zf)
+                {
+                    g.Eax = w.Peek(esi + 2); g.Al = (byte)(g.Al - 0x31); g.Ebx = saved[g.Eax];
+                    g.Eax = 0xf5; Mul8(g, g.Al, g.Bl); var part = w.PartOf(g.Bl); int at = 0xa4;
+                    do { g.Al = part[at]; w.Poke(edi, g.Al); at++; edi++; g.Cmp(g.Al, 0xff, 8); } while (!g.Zf);
+                    edi -= 2; esi += 2;
+                } }
+            esi++; edi++;
+        }
+        g.Esi = start; g.Edi = edi; g.Eax = saved[0]; g.Ebx = saved[1]; g.Ecx = saved[2];
     }
 
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
