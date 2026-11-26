@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 84407 | 6265 | 97 | 56113 | 44 |
+| LE:1 | 146882 | 84138 | 6265 | 97 | 56382 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -199,6 +199,8 @@
 | LE:1 `0x43B0..0x43E5` | Occupancy rectangle coordinate preparation | ported | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Корректные размеры области и ссылки; запись вне карты отклоняется C# до изменения сетки. |
 | LE:1 `0x43E5..0x4409` | Occupancy footprint writer wrapper | ported | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Область полностью внутри карты, слои 0..2; исходное поведение вне этой области не заявляется совместимым. |
 | LE:1 `0x4409..0x4473` | Occupancy rectangle writer | ported | [original-occupancy.md](../docs/original-occupancy.md); [occupancy.json](../tests/fixtures/occupancy.json) | Только корректные ненулевые прямоугольники внутри сетки; нативный писатель сам не проверяет границы. |
+| LE:1 `0x4473..0x44C0` | Drop the pending event when no other player waits (4473) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed |
+| LE:1 `0x44C0..0x4580` | Input step of the frame: dead selection, event timer, settlement, cursor (44C0) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | EDD5, E559, 486D and 4580 are recorded stubs (486D and 4580 are ported separately); A320 runs as the ported code |
 | LE:1 `0x4580..0x4672` | Mouse over the map: object and template under the pointer, cursor kind (4580) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The cursor state lives in LE:3 (offsets 0..13h, fixups to object 3); 20232, 1F464, 4938 and B851 are recorded stubs |
 | LE:1 `0x4672..0x46F7` | Pointer without a click: cursor and view scroll (4672) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The cursor state lives in LE:3 (offsets 0..13h, fixups to object 3); 20232, 1F464, 4938 and B851 are recorded stubs |
 | LE:1 `0x46F7..0x478D` | Left click: the move order (46F7) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The cursor state lives in LE:3 (offsets 0..13h, fixups to object 3); 20232, 1F464, 4938 and B851 are recorded stubs |
