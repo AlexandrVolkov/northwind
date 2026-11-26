@@ -7483,6 +7483,120 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "8D89, 8AF4, 8D3E, 8ABF, 8C7C, 9688, 8120, 43B0, 9727, 98DB and 1416B are recorded stubs"
+    },
+    {
+      "id": "army05-bird-0",
+      "module": "ARMY__05.WRK",
+      "start": 0,
+      "end": 112,
+      "name": "Bird script: init, step with the wound effect and the unit step table",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/fauna.md",
+        "tests/fixtures/fauna.json",
+        "tools/verify_fauna.py",
+        "tests/OriginalFaunaChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalFauna.cs"
+      ],
+      "limitations": "FS services (9E41, 81D9, A444, 90E9, 8227, D895, A6AE, 9064, A758, 43E5, 982B, 8273, 82C3, 839F) are recorded stubs; the skirmish still uses its own fauna adapter (SkirmishFauna, SkirmishBirds)"
+    },
+    {
+      "id": "army05-generator-70",
+      "module": "ARMY__05.WRK",
+      "start": 112,
+      "end": 234,
+      "name": "Bird generator: a bird while fewer than four per generator",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/fauna.md",
+        "tests/fixtures/fauna.json",
+        "tools/verify_fauna.py",
+        "tests/OriginalFaunaChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalFauna.cs"
+      ],
+      "limitations": "FS services (9E41, 81D9, A444, 90E9, 8227, D895, A6AE, 9064, A758, 43E5, 982B, 8273, 82C3, 839F) are recorded stubs; the skirmish still uses its own fauna adapter (SkirmishFauna, SkirmishBirds)"
+    },
+    {
+      "id": "army05-wolf-ea",
+      "module": "ARMY__05.WRK",
+      "start": 234,
+      "end": 424,
+      "name": "Wolf script with the hunting handler 13F",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/fauna.md",
+        "tests/fixtures/fauna.json",
+        "tools/verify_fauna.py",
+        "tests/OriginalFaunaChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalFauna.cs"
+      ],
+      "limitations": "FS services (9E41, 81D9, A444, 90E9, 8227, D895, A6AE, 9064, A758, 43E5, 982B, 8273, 82C3, 839F) are recorded stubs; the skirmish still uses its own fauna adapter (SkirmishFauna, SkirmishBirds)"
+    },
+    {
+      "id": "army05-bear-1a8",
+      "module": "ARMY__05.WRK",
+      "start": 424,
+      "end": 674,
+      "name": "Bear script: death sound of the killer, hunting handler 239",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/fauna.md",
+        "tests/fixtures/fauna.json",
+        "tools/verify_fauna.py",
+        "tests/OriginalFaunaChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalFauna.cs"
+      ],
+      "limitations": "FS services (9E41, 81D9, A444, 90E9, 8227, D895, A6AE, 9064, A758, 43E5, 982B, 8273, 82C3, 839F) are recorded stubs; the skirmish still uses its own fauna adapter (SkirmishFauna, SkirmishBirds)"
+    },
+    {
+      "id": "army05-wolf-2a2",
+      "module": "ARMY__05.WRK",
+      "start": 674,
+      "end": 787,
+      "name": "Second wolf: wound effect handler 2F7",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/fauna.md",
+        "tests/fixtures/fauna.json",
+        "tools/verify_fauna.py",
+        "tests/OriginalFaunaChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalFauna.cs"
+      ],
+      "limitations": "FS services (9E41, 81D9, A444, 90E9, 8227, D895, A6AE, 9064, A758, 43E5, 982B, 8273, 82C3, 839F) are recorded stubs; the skirmish still uses its own fauna adapter (SkirmishFauna, SkirmishBirds)"
+    },
+    {
+      "id": "army05-remains-313",
+      "module": "ARMY__05.WRK",
+      "start": 787,
+      "end": 882,
+      "name": "Remains of a creature: frame by the heading, countdown 258h, 4 stages",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/fauna.md",
+        "tests/fixtures/fauna.json",
+        "tools/verify_fauna.py",
+        "tests/OriginalFaunaChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalFauna.cs"
+      ],
+      "limitations": "FS services (9E41, 81D9, A444, 90E9, 8227, D895, A6AE, 9064, A758, 43E5, 982B, 8273, 82C3, 839F) are recorded stubs; the skirmish still uses its own fauna adapter (SkirmishFauna, SkirmishBirds)"
     }
   ]
 }
