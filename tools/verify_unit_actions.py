@@ -179,6 +179,9 @@ FUNCS = {
     'f5f0a': (0x5f0a, 0x5fc5, []),
     'f5fc5': (0x5fc5, 0x6057, []),
     'f6057': (0x6057, 0x608e, [0x20232, 0xb3b6]),
+    'f608e': (0x608e, 0x612b, [0xe03c, 0xe571, 0xe5ab]),
+    'f612b': (0x612b, 0x6142, [0xe5ab, 0xdee4]),
+    'f6142': (0x6142, 0x616f, [0xe5ab]),
     'f84aa': (0x84aa, 0x8659, [0x8d89, 0x8c98, 0x8ca1, 0xc331, 0x8c47, 0x8af4, 0x8c89, 0xcfac, 0x123d3, 0xd101, 0x8b0f, 0xc35f]),
 }
 HEADING = [0, -4, 1, -4, 2, -4, 3, -4, 4, -4, 4, -3, 4, -2, 4, -1, 4, 0, 4, 1, 4, 2, 4, 3, 4, 4, 3, 4, 2, 4, 1, 4, 0, 4, -1, 4, -2, 4, -3, 4, -4, 4, -4, 3, -4, 2, -4, 1, -4, 0, -4, -1, -4, -2, -4, -3, -4, -4, -3, -4, -2, -4, -1, -4]
@@ -216,7 +219,7 @@ def cases(names):
     rng = random.Random(0x8e3c)
     out = []
     for n in range(2500):
-        fn_pick = rng.choice(names + ['fd2d1'] * 4 + ['fb319'] * 4 + ['fc0f6'] * 5 + ['fcb77'] * 4 + ['fcccb'] * 4 + ['fdb47'] * 5 + ['fdbae'] * 8 + ['fdc91'] * 14 + ['fde0c'] * 8 + ['f4409'] * 2 + ['f5cc2'] * 3 + ['f5da5'] * 10 + ['f5df6'] * 6 + ['f5e1c'] * 24 + ['f5f0a'] * 16 + ['f5fc5'] * 12 + ['f6057'] * 10 + ['f5960'] * 2 + ['f5af6'] * 12 + ['f5b55'] * 16 + ['fdec8'] * 2 + ['fdf2a'] * 10 + ['fdf7e'] * 8 + ['f5679'] * 12 + ['f52a6'] * 14 + ['f538d'] * 2 + ['f53a8'] * 4 + ['f53c4'] * 2 + ['f53d3'] * 12 + ['f4fce'] * 4 + ['f500d'] * 14 + ['f50e5'] * 2 + ['f50f4'] * 10 + ['f520b'] * 8 + ['f5297'] * 2 + ['f4d50'] * 12 + ['f4e27'] * 2 + ['f4e40'] * 16 + ['f4b03'] * 6 + ['f4b12'] * 14 + ['f4c46'] * 16 + ['f4d41'] * 2 + ['f4965'] * 22 + ['f486d'] * 14 + ['f4938'] * 3 + ['f4580'] * 14 + ['f4672'] * 6 + ['f46f7'] * 8 + ['f478d'] * 8 + ['faab3'] * 10 + ['fac23'] * 6 + ['f12ae1'] * 6 + ['f12b29'] * 6 + ['f12ba3'] * 6 + ['f12bd8'] * 6 + ['f12bf2'] * 6 + ['f12bfb'] * 6 + ['f12c10'] * 6 + ['f12c48'] * 6 + ['f12c65'] * 6 + ['f12cb1'] * 6 + ['f12d08'] * 6 + ['f6377'] * 5 + ['f6361'] * 5 + ['f63cb'] * 5 + ['f63f7'] * 5 + ['f640b'] * 5 + ['f6423'] * 5 + ['f643c'] * 5 + ['f645b'] * 5 + ['f66bb'] * 5 + ['f66df'] * 5 + ['f67bd'] * 5 + ['f67c0'] * 5 + ['f67d3'] * 5 + ['fce9d'] * 6 + ['fcf07'] * 6 + ['fcf41'] * 8 + ['fa320'] * 6 + ['fa38a'] * 8 + ['fa416'] * 4 + ['fa444'] * 8 + ['fa47e'] * 3 + ['fa4a9'] * 3 + ['f9bf9'] * 3 + ['f9c57'] * 14 + ['f7012'] * 6 + ['f704f'] * 4 + ['f7069'] * 8)
+        fn_pick = rng.choice(names + ['fd2d1'] * 4 + ['fb319'] * 4 + ['fc0f6'] * 5 + ['fcb77'] * 4 + ['fcccb'] * 4 + ['fdb47'] * 5 + ['fdbae'] * 8 + ['fdc91'] * 14 + ['fde0c'] * 8 + ['f4409'] * 2 + ['f5cc2'] * 3 + ['f5da5'] * 10 + ['f5df6'] * 6 + ['f5e1c'] * 24 + ['f5f0a'] * 16 + ['f5fc5'] * 12 + ['f6057'] * 10 + ['f608e'] * 18 + ['f612b'] * 4 + ['f6142'] * 10 + ['f5960'] * 2 + ['f5af6'] * 12 + ['f5b55'] * 16 + ['fdec8'] * 2 + ['fdf2a'] * 10 + ['fdf7e'] * 8 + ['f5679'] * 12 + ['f52a6'] * 14 + ['f538d'] * 2 + ['f53a8'] * 4 + ['f53c4'] * 2 + ['f53d3'] * 12 + ['f4fce'] * 4 + ['f500d'] * 14 + ['f50e5'] * 2 + ['f50f4'] * 10 + ['f520b'] * 8 + ['f5297'] * 2 + ['f4d50'] * 12 + ['f4e27'] * 2 + ['f4e40'] * 16 + ['f4b03'] * 6 + ['f4b12'] * 14 + ['f4c46'] * 16 + ['f4d41'] * 2 + ['f4965'] * 22 + ['f486d'] * 14 + ['f4938'] * 3 + ['f4580'] * 14 + ['f4672'] * 6 + ['f46f7'] * 8 + ['f478d'] * 8 + ['faab3'] * 10 + ['fac23'] * 6 + ['f12ae1'] * 6 + ['f12b29'] * 6 + ['f12ba3'] * 6 + ['f12bd8'] * 6 + ['f12bf2'] * 6 + ['f12bfb'] * 6 + ['f12c10'] * 6 + ['f12c48'] * 6 + ['f12c65'] * 6 + ['f12cb1'] * 6 + ['f12d08'] * 6 + ['f6377'] * 5 + ['f6361'] * 5 + ['f63cb'] * 5 + ['f63f7'] * 5 + ['f640b'] * 5 + ['f6423'] * 5 + ['f643c'] * 5 + ['f645b'] * 5 + ['f66bb'] * 5 + ['f66df'] * 5 + ['f67bd'] * 5 + ['f67c0'] * 5 + ['f67d3'] * 5 + ['fce9d'] * 6 + ['fcf07'] * 6 + ['fcf41'] * 8 + ['fa320'] * 6 + ['fa38a'] * 8 + ['fa416'] * 4 + ['fa444'] * 8 + ['fa47e'] * 3 + ['fa4a9'] * 3 + ['f9bf9'] * 3 + ['f9c57'] * 14 + ['f7012'] * 6 + ['f704f'] * 4 + ['f7069'] * 8)
         out.append({'fn': names[n] if n < len(names) else fn_pick, 'r': rng.randrange(1 << 32), 'o1': rng.randrange(1 << 32), 'o2': rng.randrange(1 << 32), 'tm': rng.randrange(1 << 32), 'f1c': rng.choice([0, 0x900, 0xa00]), 'f14': rng.choice([0, 1, 2, 3, 4, 5, 0x40, 0x41, 0x4a, 0x2d, (rng.randrange(256) & ~7) | rng.randrange(6)]), 'f19': rng.choice([0, 1, 5, 0x80, 0xff, rng.randrange(256)]), 'pt': rng.randrange(1 << 32), 'f3': rng.randrange(8), 'nch': rng.randrange(0, 5), 'st': rng.randrange(0, 5), 'bm': rng.choice([8, 0x1000, 0x20000, 0xffffffff, 0x10, rng.randrange(1 << 32)]), 'sel': rng.randrange(4), 'g273': rng.randrange(1, 5), 'g274': rng.randrange(1, 5), 'ds': rng.randrange(1 << 32), 'tab': rng.randrange(1 << 32), 'fs13d': rng.randrange(256), 'px': rng.randrange(1024), 'py': rng.randrange(1024), 'cur': rng.choice([0xffffffff, rng.randrange(0x3ff), rng.randrange(0x3ff), 0]), 'g525': rng.randrange(256), 'g526': rng.randrange(256), 'g1c61': rng.choice([0, 1, 5, rng.randrange(256)]), 'g2730': rng.choice([0xffffffff, 0, rng.randrange(1 << 32)]), 'rt': rng.randrange(1 << 32), 'map': rng.randrange(1 << 32), 'f15': rng.choice([0, 1, 2, 3, 0x10, 0x11, rng.randrange(256)]), 'f31': rng.choice([0, 1, rng.randrange(256)]),
                     'f30': rng.choice([0, 0x10, 0x91, 0xf3, rng.randrange(256)]), 'f17': rng.choice([0, 2, 0x40, 0x42, rng.randrange(1 << 16)]), 'g1c9f': rng.choice([0, 0x40, 0x80, rng.randrange(256)]), 'g512': rng.choice([0, 0, 1, rng.randrange(1 << 20)]),
                     'g51a': rng.randrange(1 << 20), 'g51e': rng.choice([0, 0x400900]), 'g522': rng.choice([0, 3, rng.randrange(256)]),
@@ -284,7 +287,7 @@ def cases(names):
                         'l12': rng.choice([0, 1, 2, 3]), 'l13': rng.choice([1, 3, 9, 0x11, 5, 0x0d, 0, 0x19, 8, 0xb]), 'l5': rng.choice([0, 0, 1, 2]), 'ld': rng.choice([0, 1, 3, 8, 0xb, 7, 2]), 'ed20': rng.randrange(1 << 20), 'l2': rng.randrange(8), 'px': rng.choice([0x1bf, 0x1c0 - 1, rng.randrange(0, 0x1c0)]), 'py': rng.choice([0x1bf, 0x1c0 - 1, rng.randrange(0, 0x1c0)]), 'hp': rng.choice([0, 1, 0x80, 0x7f, 0xff]), 'l0b': rng.choice([0, 0, 0x28, 3]), 'c86': rng.choice([0, 1, 2, 0]), 'k35': rng.choice([0x39, 0x1c, 0x1d, 1, 0, 5]), 'p74': rng.choice([0, 1, 2]), 'l3': rng.choice([0, 0, 1, 0x80, 0xff, 2]), 'd55': rng.randrange(4), 'e0': rng.choice([0, 1]), 'v99e': rng.choice([0, 1]), 'v9a2': rng.choice([4, 6, 0, 3]), 'v9aa': rng.choice([0, 1]), 'v9ae': rng.choice([8, 0, 2]), 'v92': rng.choice([0, 1]), 'v96': rng.choice([2, 0, 1]), 'c4c': rng.choice([0, 0xe, 0xf, 0x10, 3]), 'bx': rng.choice([0, 1, 9, 0x11, 3, 8, 0x19, 0x10, 2, 0xb]), 'l5b': rng.choice([0, 1, 2]), 'v27f4': rng.choice([0, 1, 1]), 'a4f0': rng.choice([0, 0, 5, 0x123]), 'a4f4': rng.randrange(1 << 20), 'a4f8': rng.randrange(1 << 20), 'a4fc': rng.randrange(1 << 20)}
             c['regs'][2] = rng.randrange(1 << 32); c['regs'][3] = rng.randrange(1 << 32)
             if c['fn'] in ('f4e40', 'f4d50', 'f478d', 'f46f7', 'f52a6', 'f53d3', 'f5679') and n % 3 == 0: c['cu']['ld'] = 0x11 if c['fn'] == 'f52a6' else 0x12; c['cu']['bx'] = 9; c['cu']['l13'] = 9; c['cu']['l5b'] = 2 if c['sel'] & 1 else 1; c['cu']['l5'] = c['cu']['l5b']; c['cu']['e0'] = 0; c['cu']['g89'] = 1 if n % 6 == 0 else 0; c['cu']['b1971'] = 9
-        if c['fn'] in ('fdec8', 'fdf2a', 'fdf7e', 'f5cc2', 'f5da5', 'f5df6', 'f5e1c', 'f5f0a', 'f5fc5', 'f6057'): c['f3'] = 5 + c['f3'] % 3
+        if c['fn'] in ('fdec8', 'fdf2a', 'fdf7e', 'f5cc2', 'f5da5', 'f5df6', 'f5e1c', 'f5f0a', 'f5fc5', 'f6057', 'f608e', 'f612b', 'f6142'): c['f3'] = 5 + c['f3'] % 3
         if c['fn'] in ('f5960', 'f5af6', 'f5b55'):
             c['sel'] = n % 4; c['wi'] = bytes(rng.randrange(256) for _ in range(0x30)).hex(); c['hp'] = rng.choice([0, 1, 100, 0x80])
             c['k1d'] = rng.choice([0, 1, 2, 5, 0xff, 3]); c['k1c'] = rng.choice([0xff, 0xff, 0, 1, 2, 5, 3]); c['t12'] = rng.choice([0, 1, 2, 5]); c['b19e7'] = rng.choice([0, 1, 1]); c['own'] = 5 + rng.randrange(3); c['qid'] = rng.choice([0x29, 0x2b, 0x2c, 0x32, 0x44]); c['qn'] = rng.choice([0, 1, 1, 2]); c['l0q'] = rng.choice([0, 0x29, 0x2b, 0x2c, 0x32])
@@ -294,7 +297,7 @@ def cases(names):
             c['sel'] = n % 4; c['hp'] = rng.choice([0, 1, 50, 100, 0x80]); c['k35'] = rng.choice([1, 0, 5]); c['d193a'] = rng.choice([0, 2, 1, 3]); c['ed20'] = rng.randrange(1 << 20); c['b87'] = rng.randrange(256); c['qid'] = rng.choice([0x29, 0x2b, 0x2c, 0x32, 0x44]); c['qn'] = rng.choice([0, 1, 1, 2]); c['l0q'] = rng.choice([0, 0x29, 0x2b, 0x2c, 0x32])
             c['regs'][4] = 0x400900
             for call in c['calls']: call[5] = 0x400900
-        if c['fn'] in ('f5e1c', 'f5f0a', 'f5fc5', 'f6057'):
+        if c['fn'] in ('f5e1c', 'f5f0a', 'f5fc5', 'f6057', 'f608e', 'f612b', 'f6142'):
             c['k35'] = rng.choice([1, 0, 5, 0, 0]); c['b19e7'] = rng.choice([0, 1, 2, 3, 3, 1]); c['d1951'] = rng.choice([0, 0x46, 0x47, 0x19a, 0x19b, 0x100, rng.randrange(1 << 12)])
             c['wf'] = rng.choice([5, 6, 7, 8, 9, 0xa, 0xd, 0xe, 0x12, 0x15, 0x19, 0x1a, 5, 7]); c['w1a'] = rng.choice([0, 0x1e, 0x1f, 0x20, 5, 0x100, 0x1a2, 0x1a1, 0xff00, 0x8000, 0x7fff, rng.randrange(65536)])
             c['k1c'] = rng.choice([1, 2, 3, 3]); c['k1d'] = rng.choice([0, 1, 7, 8, 0xf9, 0xfa, 0xf8, 0xff, 2, 0x80, 6]); c['m16'] = rng.choice([0, 1, 1]); c['t22'] = rng.randrange(1 << 32); c['r16'] = rng.randrange(1 << 32)
@@ -302,6 +305,9 @@ def cases(names):
             if n % 3 == 1: c['w1a'] = rng.choice([0x1e, 0x1f, 0x1d]); c['b19e7'] |= 1; c['wf'] = rng.choice([5, 7, 9, 0xd, 0xf]); c['d1951'] = rng.choice([0x46, 0x47, 0x45, 0x19a])
             c['b87'] = rng.randrange(256); c['qid'] = rng.choice([0x29, 0x2b, 0x2c, 0x32, 0x33, 0x44]); c['qn'] = rng.choice([0, 1, 1, 2, 3]); c['l0q'] = rng.choice([0, 0x29, 0x2b, 0x2c, 0x33]); c['tail'] = rng.randrange(1 << 20); c['regs'][4] = 0x400800
             c['own'] = 5 + rng.randrange(3)
+            c['pos'] = rng.choice([0x180, 0x184, 0x185, 0x186, 0x187, 0x190, 0xfffffff0, rng.randrange(1 << 12)])
+            if c['fn'] in ('f608e', 'f612b', 'f6142'):
+                for call in c['calls']: call[5] = 0x400900
             if c['fn'] in ('f5f0a', 'f5fc5'): c['b87'] = c['regs'][1] & 0xff
             if c['fn'] in ('f5f0a', 'f5fc5'): c['w1a'] = rng.choice([0x1f, 0x3f, 0x5f, 0x1f, 0x7f, 0x1e, 0x20, 0xff])
         if c['fn'] == 'fd2d1': c['px'] = 160 + n * 7 % 340; c['py'] = 160 + n * 13 % 340
@@ -344,7 +350,7 @@ def generate(game, names):
         o.prepare(32, 32); o.mode = 'actions'
         o.RANGES['actions'] = ([(entry, end)], [])
         o.stubs = {a: stub(a, None) for a in callees if a not in (0x6885, 0x68bd)}
-        o.RANGES['actions'] = ([(entry, end), (0x6877, 0x68d8), (0x4409, 0x4442), (0xdb47, 0xdc91), (0xa416, 0xa444), (0x6361, 0x6377), (0x6377, 0x63cb), (0x6423, 0x643c), (0x12ae1, 0x12e12), (0xc331, 0xc35f), (0xd12c, 0xd182), (0x67bd, 0x6877), (0xa320, 0xa38a), (0x4580, 0x4870), (0x67c0, 0x6877), (0x4965, 0x4b03), (0xa4a9, 0xa4c2), (0x4b03, 0x5716), (0x5af6, 0x5c2e), (0x5cc2, 0x608e), (0x7012, 0x704f), (0x66df, 0x66e9), (0xdf2a, 0xdf7e)], [])
+        o.RANGES['actions'] = ([(entry, end), (0x6877, 0x68d8), (0x4409, 0x4442), (0xdb47, 0xdc91), (0xa416, 0xa444), (0x6361, 0x6377), (0x6377, 0x63cb), (0x6423, 0x643c), (0x12ae1, 0x12e12), (0xc331, 0xc35f), (0xd12c, 0xd182), (0x67bd, 0x6877), (0xa320, 0xa38a), (0x4580, 0x4870), (0x67c0, 0x6877), (0x4965, 0x4b03), (0xa4a9, 0xa4c2), (0x4b03, 0x5716), (0x5af6, 0x5c2e), (0x5cc2, 0x616f), (0x7012, 0x704f), (0x66df, 0x66e9), (0xdf2a, 0xdf7e)], [])
         o.cpu.mem_write(o.POOL, bytes(0x3000)); o.cpu.mem_write(o.FS + 0x17f, bytes(4)); o.cpu.mem_write(0x4c0, bytes(0x110)); o.cpu.mem_write(0, bytes(0x40)); o.cpu.mem_write(0xf0b0, bytes(0x10)); o.cpu.mem_write(0x40, bytes(0x20)); o.cpu.mem_write(0x27f0, bytes(0x60)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x1c49, struct.pack('<I', o.POOL + TMPL))
         r = bytearray(prng(case['r'], 0x50)); r[0] %= 3; r[0xe] = 0; r[3] = case['f3']; struct.pack_into('<II', r, 4, case['px'], case['py']); struct.pack_into('<I', r, 0x28, case['cur']); r[0x14] = case['f14']; r[0x19] = case['f19']; r[0x15] = case['f15']; r[0x31] = case['f31']; r[0x30] = case['f30']
         if 'f22' in case: r[0x22] = case['f22']
@@ -529,11 +535,13 @@ def generate(game, names):
             for k in range(6): wd(0x1978 + 0xc * k + 2, o.POOL + 0x2200, 4)
             o.cpu.mem_write(0x7d4, bytes(0x604)); [o.cpu.mem_write(0x7f2 + 0x1e * k + 1, bytes([case['qid'] if k == 0 else (case['qid'] + 1)])) for k in range(case['qn'])]; wd(0xdce, 0x7f2 + 0x1e * case['qn'], 4); wd(0x0, case['l0q'], 2)
             o.cpu.mem_write(o.POOL + OBJ1, bytes(ob)); o.cpu.mem_write(o.POOL + POOLREC, bytes(wi) + bytes(o.cpu.mem_read(o.POOL + POOLREC + 0x30, 0x20)))
-        if case['fn'] in ('f5e1c', 'f5f0a', 'f5fc5', 'f6057'):
+        if case['fn'] in ('f5e1c', 'f5f0a', 'f5fc5', 'f6057', 'f608e', 'f612b', 'f6142'):
             def wd(a, v, n): o.cpu.mem_write(a, int(v & ((1 << (8 * n)) - 1)).to_bytes(n, 'little'))
             wi = bytearray(prng(case['ds'] + 51, 0x80)); wi[3] = case['wf']; r[3] = wi[3]; struct.pack_into('<H', wi, 0x1a, case['w1a']); wi[0x1c] = case['k1c']; wi[0x1d] = case['k1d']
             t22 = case['t22']; struct.pack_into('<I', wi, 0x16, t22 if case['m16'] else case['r16'])
             if case['fn'] == 'f6057' and case['m16']: struct.pack_into('<I', wi, 0x1a, t22)
+            if case['fn'] == 'f608e': wi[0x1b] = case['k1d']; struct.pack_into('<I', wi, 4, case['pos'])
+            wd(0x19c2, case['b19e7'], 1); wd(0x1969, o.POOL + OBJ1, 4)
             wd(0x1972, case['own'], 1)
             if case['fn'] == 'f5f0a': tb = bytearray(o.cpu.mem_read(o.POOL + TMPL, 0x100)); tb[0x45] = 64 + case['k1d'] % 190; o.cpu.mem_write(o.POOL + TMPL, bytes(tb))
             ob = bytearray(o.cpu.mem_read(o.POOL + OBJ1, 0x50)); struct.pack_into('<I', ob, 0x22, t22); o.cpu.mem_write(o.POOL + OBJ1, bytes(ob))

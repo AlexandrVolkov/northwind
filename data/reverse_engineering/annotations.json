@@ -8357,6 +8357,63 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "20232 and B3B6 are recorded stubs"
+    },
+    {
+      "id": "le1-widget-move-608e",
+      "module": "LE:1",
+      "start": 24718,
+      "end": 24875,
+      "name": "Widget tick: E03C hand-over, scroll position, clear slot in chain (608E)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E03C, E571, E5AB are recorded stubs; writes into chain objects are not part of the compared output"
+    },
+    {
+      "id": "le1-msg-612b",
+      "module": "LE:1",
+      "start": 24875,
+      "end": 24898,
+      "name": "Message 44Bh when E5AB answers zero (612B)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5AB and DEE4 are recorded stubs"
+    },
+    {
+      "id": "le1-view-center-6142",
+      "module": "LE:1",
+      "start": 24898,
+      "end": 24943,
+      "name": "Centre the view on the selected object (6142)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5AB is a recorded stub; A320 runs as the ported code"
     }
   ]
 }

@@ -3303,6 +3303,54 @@ public static class OriginalUnitActions
         Put(r, 0x1a, g.Eax); g.Ebx = 0x20; g.Ecx = 0x252; g.Edx = U32(r, 8); w.Call(0xb3b6, g);
     }
 
+    /// <summary>608E: widget ESI (+2 = slot, +14 = class, +1B = speed, +4 = position): with flag 1 in +3 E03C (AL = 2Ch, AH = FAh) may give the object EDI +1A = slot, +1C = class, +1D = 0; with the flag 2 of [19E7] the position moves by the signed speed (a position above 186h keeps the speed, otherwise it grows by one); E571, then (E5AB with C04h) the objects of the owner's chain with +1B = [1C87], +E = slot and +0 = class lose their +1B.</summary>
+    public static void F608E(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Test(r[3], 1, 8);
+        if (!g.Zf)
+        {
+            g.Al = 0x2c; g.Ah = 0xfa; w.Call(0xe03c, g);
+            if (!g.Zf) { var o = w.ObjectAt(g.Edi); o[0x1a] = r[2]; o[0x1c] = r[0x14]; o[0x1d] = 0; g.Al = r[0x14]; }
+        }
+        g.Test(d[0x19e7], 2, 8);
+        if (!g.Zf)
+        {
+            g.Eax = (uint)(int)(sbyte)r[0x1b]; g.Test(g.Eax, g.Eax, 32);
+            if (!g.Zf)
+            {
+                g.Add(U32(r, 4), g.Eax); Put(r, 4, U32(r, 4) + g.Eax); g.Cmp(U32(r, 4), 0x186, 32);
+                if (g.Cf || g.Zf) r[0x1b] = Inc8(g, r[0x1b]);
+            }
+        }
+        w.Call(0xe571, g); g.Eax = 0xc04; w.Call(0xe5ab, g);
+        if (!g.Zf) return;
+        g.Eax = 0xf5; Mul8(g, 0xf5, d[0x1972]); var part = w.PartOf(d[0x1972]);
+        g.Ebp = U32(part, 9); g.Add(g.Ebp, w.PoolBase); g.Ebp += w.PoolBase;
+        g.Edi = U32(part, 0xe); g.Add(g.Edi, w.PoolBase); g.Edi += w.PoolBase;
+        g.Cmp(g.Edi, g.Ebp, 32);
+        while (!g.Zf)
+        {
+            var o = w.ObjectAt(g.Edi); g.Al = o[0x1b]; g.Cmp(g.Al, d[0x1c87], 8);
+            if (g.Zf) { g.Al = o[0xe]; g.Cmp(g.Al, r[2], 8); if (g.Zf) { g.Al = o[0]; g.Cmp(g.Al, r[0x14], 8); if (g.Zf) o[0x1b] = 0; } }
+            g.Edi += U32(o, 0x10); g.Cmp(g.Edi, g.Ebp, 32);
+        }
+    }
+
+    /// <summary>612B: E5AB with C04h; when it answers zero, the message 44Bh (DEE4).</summary>
+    public static void F612B(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Eax = 0xc04; w.Call(0xe5ab, g); if (!g.Zf) return;
+        g.Esi = 0x44b; w.Call(0xdee4, g);
+    }
+
+    /// <summary>6142: with [19C2] set and E5AB (C04h) answering zero the view centres (A320) on the selected object [1969].</summary>
+    public static void F6142(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(d[0x19c2], 0, 8); if (g.Zf) return;
+        g.Eax = 0xc04; w.Call(0xe5ab, g); if (!g.Zf) return;
+        g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); g.Eax = g.Shr(U32(o, 4), 5, 32); g.Ebx = g.Shr(U32(o, 8), 5, 32); FA320(w, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
