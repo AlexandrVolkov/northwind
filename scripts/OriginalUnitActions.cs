@@ -3074,6 +3074,69 @@ public static class OriginalUnitActions
         g.Eax = 2; g.Logic(2, 32); g.Ecx = 0;
     }
 
+    // ---- the widgets of the panel that follow the selected object (5960, 5AF6, 5B55) ----
+    /// <summary>5960: the widget EDI shows nothing (+1A = +1B = FFh).</summary>
+    public static void F5960(IUnitActionWorld w, ActionRegs g, byte[] widget) { widget[0x1a] = 0xff; widget[0x1b] = 0xff; }
+
+    /// <summary>5AF6: the widget ESI keeps its object template +1A = +E of the selected object [1969]; the object that died, is hidden from the player (the fog [18DA]) or is not visible (+17 bit 80h) clears the panel (672F, DF2A with 29h); another template clears it and sends 4E (DEDA).</summary>
+    public static void F5AF6(IUnitActionWorld w, ActionRegs g, byte[] widget)
+    {
+        var d = w.Ds; g.Edi = U32(d, 0x1969); var o = w.ObjectAt(g.Edi); g.Al = o[0xe]; g.Cmp(widget[0x1a], g.Al, 8);
+        if (!g.Zf) { w.Call(0x672f, g); g.Esi = 0x4e; w.Call(0xdeda, g); return; }
+        g.Cmp(o[0x19], 0, 8);
+        bool clear = g.Zf || (g.Sf != g.Of);
+        if (!clear)
+        {
+            g.Ebx = g.Shr(U32(o, 4), 5, 32); g.Eax = g.Shr(U32(o, 8), 5, 32); Mul8(g, g.Al, d[0x18de]); g.Add(g.Ebx, g.Eax); g.Ebx += g.Eax; g.Add(g.Ebx, U32(d, 0x18da)); g.Ebx += U32(d, 0x18da);
+            g.Eax = d[0x1972]; uint word = (uint)(w.Peek(g.Ebx) | w.Peek(g.Ebx + 1) << 8 | w.Peek(g.Ebx + 2) << 16 | w.Peek(g.Ebx + 3) << 24); g.Cf = ((word >> (int)(g.Eax & 31)) & 1) != 0;
+            clear = g.Cf;
+            if (!clear) { g.Test(U16(o, 0x17), 0x80, 16); if (g.Zf) return; }
+        }
+        w.Call(0x672f, g); g.Al = 0x29; FDF2A(w, g);
+    }
+
+    /// <summary>5B55: the tick of a panel widget (+1C the new frame, +1D the shown one, +12 the hint timer, +1B the age): a new frame restarts the timer (674F); every second update the timer runs out and the hint text of the frame (the table [1978 + 0C · frame] + 2) is measured (7012) and drawn (6C66); then the widget is compared with the selected object [1969]
+    /// (alone: +1A with 66DF; in a group [1C89]: B9EB) and a mismatch rebuilds the panel (5787, 66E9) or clears it (66E9, 674F, 6EB2, 4938, DF2A with 2Bh).</summary>
+    public static void F5B55(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds;
+        g.Al = r[0x1c]; r[0x1c] = 0xff; g.Cmp(g.Al, r[0x1d], 8);
+        if (!g.Zf) { r[0x1d] = g.Al; r[0x12] = 0xc; uint esi = g.Esi; w.Call(0x674f, g); g.Esi = esi; }
+        g.Cmp(r[0x1d], 0xff, 8);
+        if (!g.Zf)
+        {
+            g.Cmp(r[0x12], 0, 8);
+            if (!g.Zf)
+            {
+                g.Test(d[0x19e7], 1, 8);
+                if (!g.Zf)
+                {
+                    r[0x12] = Dec8(g, r[0x12]);
+                    if (g.Zf)
+                    {
+                        uint esi = g.Esi; g.Eax = 0xc; Mul8(g, g.Al, r[0x1d]); g.Esi = (g.Eax & 0xffff) + 0x1978; g.Esi = U32(d, (int)g.Esi + 2); F7012(w, g);
+                        g.Ecx = 0x1c0; g.Ecx -= g.Ebx; g.Edx = 0x1d0; w.Call(0x6c66, g); g.Esi = esi;
+                    }
+                }
+            }
+        }
+        r[0x1b] = Inc8(g, r[0x1b]); g.Cmp(d[0x1c89], 0, 8);
+        if (g.Zf)
+        {
+            g.Edi = g.Esi; g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); g.Cmp(o[0x19], 0, 8);
+            if (!(g.Zf || (g.Sf != g.Of))) { g.Test(U16(o, 0x17), 0x80, 16); if (g.Zf) { F66DF(w, g, o); g.Esi = g.Edi; g.Cmp(r[0x1a], g.Al, 8); if (g.Zf) return; Rebuild(w, g); return; } }
+            Clear5B55(w, g); return;
+        }
+        g.Test(r[0x1b], 0x3f, 8); if (!g.Zf) return;
+        g.Al = d[0x1972]; g.Bl = d[0x1c87]; uint saved = g.Esi; w.Call(0xb9eb, g); g.Esi = saved; g.Test(g.Eax, g.Eax, 32);
+        if (g.Zf) { Clear5B55(w, g); return; }
+        g.Eax--; g.Zf = g.Eax == 0; if (g.Zf) { Rebuild(w, g); return; }
+        g.Cmp(r[0x1a], g.Cl, 8); if (g.Zf) return;
+        Rebuild(w, g);
+    }
+    private static void Rebuild(IUnitActionWorld w, ActionRegs g) { g.Edi = g.Esi; w.Call(0x5787, g); w.Call(0x66e9, g); }
+    private static void Clear5B55(IUnitActionWorld w, ActionRegs g) { w.Call(0x66e9, g); w.Call(0x674f, g); w.Call(0x6eb2, g); w.Call(0x4938, g); g.Al = 0x2b; FDF2A(w, g); }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
