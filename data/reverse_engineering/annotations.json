@@ -7274,6 +7274,215 @@
         "scripts/OriginalVolcano.cs"
       ],
       "limitations": "FS:109 (9E41), FS:10D (9E55) and FS:19 (9727) are recorded stubs; the bytes 0A0..19A are data tables; the skirmish does not place volcanoes yet (the first map has none)"
+    },
+    {
+      "id": "le1-animal-12ae1",
+      "module": "LE:1",
+      "start": 76513,
+      "end": 76585,
+      "name": "Animal state 1: walk to the point (12AE1)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "8D89, 8AF4, 8D3E, 8ABF, 8C7C, 9688, 8120, 43B0, 9727, 98DB and 1416B are recorded stubs"
+    },
+    {
+      "id": "le1-animal-12b29",
+      "module": "LE:1",
+      "start": 76585,
+      "end": 76707,
+      "name": "Animal state 0: rest, turn from a wall, hunt (12B29)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "8D89, 8AF4, 8D3E, 8ABF, 8C7C, 9688, 8120, 43B0, 9727, 98DB and 1416B are recorded stubs"
+    },
+    {
+      "id": "le1-animal-12ba3",
+      "module": "LE:1",
+      "start": 76707,
+      "end": 76760,
+      "name": "Animal state 2: approach and strike (12BA3)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "8D89, 8AF4, 8D3E, 8ABF, 8C7C, 9688, 8120, 43B0, 9727, 98DB and 1416B are recorded stubs"
+    },
+    {
+      "id": "le1-animal-12bd8",
+      "module": "LE:1",
+      "start": 76760,
+      "end": 76786,
+      "name": "Set the walk target and request (12BD8)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "8D89, 8AF4, 8D3E, 8ABF, 8C7C, 9688, 8120, 43B0, 9727, 98DB and 1416B are recorded stubs"
+    },
+    {
+      "id": "le1-animal-12bf2",
+      "module": "LE:1",
+      "start": 76786,
+      "end": 76795,
+      "name": "Rest request (12BF2)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-animal-12bfb",
+      "module": "LE:1",
+      "start": 76795,
+      "end": 76816,
+      "name": "Turn request toward a heading (12BFB)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-animal-12c10",
+      "module": "LE:1",
+      "start": 76816,
+      "end": 76872,
+      "name": "Follow the target's cell (12C10)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "8D89, 8AF4, 8D3E, 8ABF, 8C7C, 9688, 8120, 43B0, 9727, 98DB and 1416B are recorded stubs"
+    },
+    {
+      "id": "le1-animal-12c48",
+      "module": "LE:1",
+      "start": 76872,
+      "end": 76901,
+      "name": "Face the object (12C48)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "8D89, 8AF4, 8D3E, 8ABF, 8C7C, 9688, 8120, 43B0, 9727, 98DB and 1416B are recorded stubs"
+    },
+    {
+      "id": "le1-animal-12c65",
+      "module": "LE:1",
+      "start": 76901,
+      "end": 76977,
+      "name": "Attack the target: follow, face, strike (12C65)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "8D89, 8AF4, 8D3E, 8ABF, 8C7C, 9688, 8120, 43B0, 9727, 98DB and 1416B are recorded stubs"
+    },
+    {
+      "id": "le1-animal-12cb1",
+      "module": "LE:1",
+      "start": 76977,
+      "end": 77064,
+      "name": "Where is the target relative to the reach (12CB1)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "8D89, 8AF4, 8D3E, 8ABF, 8C7C, 9688, 8120, 43B0, 9727, 98DB and 1416B are recorded stubs"
+    },
+    {
+      "id": "le1-animal-12d08",
+      "module": "LE:1",
+      "start": 77064,
+      "end": 77330,
+      "name": "Dying or flying animal: frame, move, effect (12D08)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "8D89, 8AF4, 8D3E, 8ABF, 8C7C, 9688, 8120, 43B0, 9727, 98DB and 1416B are recorded stubs"
     }
   ]
 }

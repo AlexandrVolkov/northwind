@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "03417b967236e7ffb0748f18f93b773453973ace46bcea5bf4bdd7b42242aab7",
+  "annotation_sha256": "66847ad8ab170bd4bea684a556b364e9cf2ec28f3df9cb24f95c1d039358b6da",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -33,8 +33,8 @@
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
         "partial": 6265,
-        "ported": 47152,
-        "unreviewed": 93368,
+        "ported": 47969,
+        "unreviewed": 92551,
         "verified": 97
       },
       "linear_rows": 45008,
@@ -3038,6 +3038,105 @@
         },
         {
           "start": 76513,
+          "end": 76585,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-animal-12ae1"
+          ]
+        },
+        {
+          "start": 76585,
+          "end": 76707,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-animal-12b29"
+          ]
+        },
+        {
+          "start": 76707,
+          "end": 76760,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-animal-12ba3"
+          ]
+        },
+        {
+          "start": 76760,
+          "end": 76786,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-animal-12bd8"
+          ]
+        },
+        {
+          "start": 76786,
+          "end": 76795,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-animal-12bf2"
+          ]
+        },
+        {
+          "start": 76795,
+          "end": 76816,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-animal-12bfb"
+          ]
+        },
+        {
+          "start": 76816,
+          "end": 76872,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-animal-12c10"
+          ]
+        },
+        {
+          "start": 76872,
+          "end": 76901,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-animal-12c48"
+          ]
+        },
+        {
+          "start": 76901,
+          "end": 76977,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-animal-12c65"
+          ]
+        },
+        {
+          "start": 76977,
+          "end": 77064,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-animal-12cb1"
+          ]
+        },
+        {
+          "start": 77064,
+          "end": 77330,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-animal-12d08"
+          ]
+        },
+        {
+          "start": 77330,
           "end": 124218,
           "status": "unreviewed",
           "classification": "unknown",
