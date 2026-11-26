@@ -6729,7 +6729,7 @@
       "module": "LE:1",
       "start": 56238,
       "end": 56465,
-      "name": "Strength and hostile count of the objects near a unit (DBAE)",
+      "name": "Strength and hostile count of the objects near a trap (DBAE)",
       "classification": "code",
       "status": "ported",
       "evidence": [
@@ -6748,7 +6748,7 @@
       "module": "LE:1",
       "start": 56465,
       "end": 56844,
-      "name": "Growth script of a building: phases +15, counter +22, frames +1, health +19 (DC91)",
+      "name": "Hidden trap script: phases +15, counter +22, frames +1, health +19, crush through D2D1 (DC91)",
       "classification": "code",
       "status": "ported",
       "evidence": [
@@ -6760,7 +6760,7 @@
       "implementation": [
         "scripts/OriginalUnitActions.cs"
       ],
-      "limitations": "A416, D2D1 and 43B0 are recorded stubs; not yet called by the skirmish's construction"
+      "limitations": "A416, D2D1 and 43B0 are recorded stubs; the skirmish does not run this script yet (docs/combat.md: hidden traps hide with OBE[20])"
     },
     {
       "id": "le1-place-check-de0c",
