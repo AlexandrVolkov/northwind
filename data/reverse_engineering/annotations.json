@@ -7768,6 +7768,63 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "4B12, 200B5, B616, 4B79, 4C46, 4B03 and 6A73 are recorded stubs (tail jumps and calls out of the range); A320 and A4A9 run as the ported code"
+    },
+    {
+      "id": "le1-box-select-4b03",
+      "module": "LE:1",
+      "start": 19203,
+      "end": 19526,
+      "name": "Selection box ends: single object or a new group (4B03, 4B12)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "200B5, B616, BA2E, 6A73, 20143, 200AB, 6ACD, 205FB, 1F3E9, DF7E, 65DF, 1416B (A4A9), D101, 50F4, 4D50, 53D3, 52A6 and 4E40 are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-click-release-4c46",
+      "module": "LE:1",
+      "start": 19526,
+      "end": 19777,
+      "name": "Button released: the tool by the key flags or the object class (4C46)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "200B5, B616, BA2E, 6A73, 20143, 200AB, 6ACD, 205FB, 1F3E9, DF7E, 65DF, 1416B (A4A9), D101, 50F4, 4D50, 53D3, 52A6 and 4E40 are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-click-state-4d41",
+      "module": "LE:1",
+      "start": 19777,
+      "end": 19792,
+      "name": "Click state 1 (4D41)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "200B5, B616, BA2E, 6A73, 20143, 200AB, 6ACD, 205FB, 1F3E9, DF7E, 65DF, 1416B (A4A9), D101, 50F4, 4D50, 53D3, 52A6 and 4E40 are recorded stubs; A4A9 runs as the ported code"
     }
   ]
 }
