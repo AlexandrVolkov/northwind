@@ -1501,7 +1501,6 @@ public static class OriginalUnitActions
         Put16(o, 0x17, (ushort)((U16(o, 0x17) | 0x20) & 0xfd3f));
         g.Al = 0; o[0x14] = 0; o[0x15] = 0; g.Eax = g.Esi - w.PoolBase; w.Call(0x43e5, g); g.Al = 0; g.Logic(0, 8); g.Esi = saved;
     }
-    private static void Put16(byte[] b, int o, ushort v) { b[o] = (byte)v; b[o + 1] = (byte)(v >> 8); }
 
     /// <summary>CC7B: the unit asks for a target (C4CD): with the template flag 20000h its owner gets the item +31 of the target (1243A) and the target loses +31; every 16th tick the target is marked (+17 bit 20h).</summary>
     public static void FCC7B(IUnitActionWorld w, ActionRegs g, byte[] r)
@@ -4146,6 +4145,59 @@ public static class OriginalUnitActions
             g.Ecx = saved; g.Ecx--; g.Zf = g.Ecx == 0; g.Sf = (g.Ecx & 0x80000000) != 0; g.Of = false; if (g.Zf) return;
         }
     }
+
+    /// <summary>BE9D: the message 216h (DEE4).</summary>
+    public static void FBE9D(IUnitActionWorld w, ActionRegs g) { g.Esi = 0x216; w.Call(0xdee4, g); }
+
+    private static byte[] LiveRecord(IUnitActionWorld w, ActionRegs g, uint source)
+    {
+        g.Esi = source; g.Al = 1; FDF7E(w, g); var rec = new byte[0x30]; Array.Copy(w.L3, (int)g.Edi, rec, 0, 0x30); return rec;
+    }
+    private static void StoreRecord(IUnitActionWorld w, ActionRegs g, byte[] rec) { Array.Copy(rec, 0, w.L3, (int)g.Edi, 0x30); }
+
+    /// <summary>BEA7: the record CFh into the queue, its +14 follows the byte +1A of the selected object (640B).</summary>
+    public static void FBEA7(IUnitActionWorld w, ActionRegs g) { var rec = LiveRecord(w, g, 0xcf); g.Esi = g.Edi; F640B(w, g, rec); StoreRecord(w, g, rec); }
+
+    /// <summary>BEBB: the record EDh into the queue with +1A = AL, +16 = AH; its +14 follows the byte +16 of the selected object (63F7).</summary>
+    public static void FBEBB(IUnitActionWorld w, ActionRegs g)
+    {
+        uint eax = g.Eax; var rec = LiveRecord(w, g, 0xed); g.Eax = eax; rec[0x1a] = g.Al; rec[0x16] = g.Ah; g.Esi = g.Edi; F63F7(w, g, rec); StoreRecord(w, g, rec);
+    }
+
+    /// <summary>BED7: the record 10Bh into the queue (ESI is kept).</summary>
+    public static void FBED7(IUnitActionWorld w, ActionRegs g) { uint esi = g.Esi; g.Esi = 0x10b; g.Al = 1; FDF7E(w, g); g.Esi = esi; }
+
+    /// <summary>BEE6: the record 129h into the queue with +1A = AL, +16 = AH, +15 = BL; its +14 follows the selected object (645B).</summary>
+    public static void FBEE6(IUnitActionWorld w, ActionRegs g)
+    {
+        uint eax = g.Eax, ebx = g.Ebx; var rec = LiveRecord(w, g, 0x129); g.Eax = eax; g.Ebx = ebx; rec[0x1a] = g.Al; rec[0x16] = g.Ah; rec[0x15] = g.Bl; g.Esi = g.Edi; F645B(w, g, rec); StoreRecord(w, g, rec);
+    }
+
+    /// <summary>BF07: the picture of the widget kind +31 (1, 2, 3 = 137h, 138h, 139h): 1E133 with [191A], then 1E098 for the rectangle 1E2h, ECh, 20h x 10h; ESI is kept.</summary>
+    public static void FBF07(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        uint esi = g.Esi; g.Cmp(r[0x31], 1, 8);
+        if (g.Zf) g.Eax = 0x137;
+        else { g.Cmp(r[0x31], 2, 8); if (g.Zf) g.Eax = 0x138; else { g.Cmp(r[0x31], 3, 8); if (g.Zf) g.Eax = 0x139; else { g.Esi = esi; return; } } }
+        g.Esi = U32(w.Ds, 0x191a); w.Call(0x1e133, g); g.Eax = 0x1e2; g.Ebx = 0xec; g.Ecx = 0x20; g.Edx = 0x10; w.Call(0x1e098, g); g.Esi = esi;
+    }
+
+    /// <summary>BF55: the scroll widget (type bit 1): above the middle of the widget (+14 / 2 + +8 against the pointer [1951]) the position +17 grows (cursor 18000Fh) while below +1C - 1 + +1A, below the pointer it falls to +1A (cursor 2C0023h); the type 9 steps it and marks the widget.</summary>
+    public static void FBF55(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Test(r[3], 1, 8); if (g.Zf) return;
+        g.Eax = (uint)U16(r, 0x14); g.Eax = g.Shr(g.Eax, 1, 32); g.Add(g.Eax, U32(r, 8)); g.Eax += U32(r, 8); g.Cmp(U32(d, 0x1951), g.Eax, 32);
+        if (!(g.Cf || g.Zf))
+        {
+            g.Eax = (g.Eax & 0xffff0000) | U16(r, 0x1a); g.Cmp(U16(r, 0x17), g.Eax & 0xffff, 16); if (g.Cf || g.Zf) return;
+            Put(d, 0x1946, 0x2c0023); Put(d, 0x1965, 0xf000f); g.Cmp(r[3], 9, 8); if (!g.Zf) return;
+            Put16(r, 0x17, (ushort)(U16(r, 0x17) - 1)); r[0] |= 0x80; g.Logic(r[0], 8); return;
+        }
+        g.Eax = r[0x1c]; g.Eax--; g.Eax = (g.Eax & 0xffff0000) | (ushort)((ushort)g.Eax + U16(r, 0x1a)); g.Cmp(U16(r, 0x17), g.Eax & 0xffff, 16); if (!g.Cf) return;
+        Put(d, 0x1946, 0x18000f); Put(d, 0x1965, 0xf000f); g.Cmp(r[3], 9, 8); if (!g.Zf) return;
+        Put16(r, 0x17, (ushort)(U16(r, 0x17) + 1)); r[0] |= 0x80; g.Logic(r[0], 8);
+    }
+    private static void Put16(byte[] b, int o, ushort v) { b[o] = (byte)v; b[o + 1] = (byte)(v >> 8); }
 
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
