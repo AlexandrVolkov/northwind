@@ -8167,6 +8167,63 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "The queue memory is the object LE:3 (offsets 7D4..DD8); DEE4 (message with a handler call) and the rest of the queue code are not ported"
+    },
+    {
+      "id": "le1-panel-clear-5960",
+      "module": "LE:1",
+      "start": 22880,
+      "end": 22889,
+      "name": "Panel widget shows nothing (5960)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-panel-follow-5af6",
+      "module": "LE:1",
+      "start": 23286,
+      "end": 23381,
+      "name": "Panel widget follows the selected object's template (5AF6)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "672F and DEDA are recorded stubs; DF2A runs as the ported code"
+    },
+    {
+      "id": "le1-panel-tick-5b55",
+      "module": "LE:1",
+      "start": 23381,
+      "end": 23598,
+      "name": "Tick of a panel widget: hint text, group check, rebuild or clear (5B55)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "674F, 6C66, B9EB, 5787, 66E9, 6EB2 and 4938 are recorded stubs; 7012, 66DF and DF2A run as the ported code"
     }
   ]
 }
