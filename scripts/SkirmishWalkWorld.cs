@@ -6,7 +6,11 @@ namespace Northwind;
 public sealed class SkirmishWalkWorld(OriginalOccupancyMap grid, uint[] mapCells, byte[] properties) : IWalkWorld
 {
     private static readonly (int X, int Y)[] Directions = [(0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1)];
-    public byte[] Record = []; public byte[] Template = []; public uint Reference; public Queue<Vector2I> Route = new();
+    public byte[] Record = []; public byte[] Template = []; public uint Reference;
+    /// <summary>The route of the unit: its length, the next cell and the removal of that cell (the skirmish route lives in the original route pool, the test one in a queue).</summary>
+    public Func<int> RouteCount = () => 0; public Func<Vector2I> RoutePeek = () => default; public Action RouteDequeue = () => { };
+    /// <summary>Called when a step is granted (the skirmish reserves the cell).</summary>
+    public Action<Vector2I>? Granted;
     /// <summary>True when the route step was refused (a blocked cell): the step ends with BL = 80h.</summary>
     public Func<Vector2I, bool>? CanEnter;
     public byte MapWidth => grid.Width;
@@ -16,11 +20,11 @@ public sealed class SkirmishWalkWorld(OriginalOccupancyMap grid, uint[] mapCells
 
     public (byte Heading, byte Code) NextStep()
     {
-        if (Route.Count == 0) return (0, 0);
-        var next = Route.Peek(); int cx = (int)(U32(Record, 4) >> 5), cy = (int)(U32(Record, 8) >> 5);
+        if (RouteCount() == 0) return (0, 0);
+        var next = RoutePeek(); int cx = (int)(U32(Record, 4) >> 5), cy = (int)(U32(Record, 8) >> 5);
         if (CanEnter != null && !CanEnter(next)) return (0, 1);
         if (Math.Max(Math.Abs(next.X - cx), Math.Abs(next.Y - cy)) != 1) return (0, 1);
-        Route.Dequeue();
+        RouteDequeue(); Granted?.Invoke(next);
         return (OriginalMotionPreparation.DirectionToward((uint)cx, (uint)cy, (uint)next.X, (uint)next.Y), 3);
     }
     public bool Turn(byte target) => OriginalMotionPreparation.TurnToward(Record, target, Template);
