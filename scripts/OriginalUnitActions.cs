@@ -3635,6 +3635,70 @@ public static class OriginalUnitActions
         Put(d, 0x1969, 0); d[0x1c89] = 1; d[0x1a1b] = 1; g.Esi = 0x147; w.Call(0xdee4, g); g.Esi = 0x37b; w.Call(0xdee4, g);
     }
 
+    /// <summary>5969: the list of the order records of the selected object [1969] (the pointer DS:6DF + 56h * army + 4 * owner): every record whose byte +0 is 80h and whose dword +3 is not zero is queued (DF7E with 33Fh; EDI = the new record in L3: +12 = the end of the record data, +8 = the height 28h, +14h per record); the next record starts 10h + 2 * (+F) bytes on, the list ends with the byte +1 = FFh.</summary>
+    public static void F5969(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; l[0] = 0x2e; l[1] = 0; g.Esi = U32(d, 0x1969); var sel = w.ObjectAt(g.Esi);
+        g.Eax = 0x56; Mul8(g, g.Al, sel[0]); g.Ebx = sel[3]; g.Esi = U32(d, (int)(g.Eax & 0xffff) + (int)g.Ebx * 4 + 0x6df); g.Ebx = 0x28;
+        for (; ; )
+        {
+            g.Cmp(w.Peek(g.Esi), 0x80, 8);
+            if (g.Zf)
+            {
+                uint dw = Peek32(w, g.Esi + 3); g.Cmp(dw, 0, 32);
+                if (!g.Zf)
+                {
+                    uint esi = g.Esi, ebx = g.Ebx; g.Esi = 0x33f; g.Al = 1; FDF7E(w, g); g.Ebx = ebx; g.Esi = esi;
+                    int e = (int)g.Edi; g.Eax = g.Esi + 3 + dw; Put(l, e + 0x12, g.Eax); Put(l, e + 8, g.Ebx); g.Ebx += 0x14;
+                }
+            }
+            g.Ecx = w.Peek(g.Esi + 0xf); g.Esi = g.Esi + g.Ecx * 2 + 0x10; g.Cmp(w.Peek(g.Esi + 1), 0xff, 8);
+            if (g.Zf) return;
+        }
+    }
+    private static uint Peek32(IUnitActionWorld w, uint a) => (uint)(w.Peek(a) | w.Peek(a + 1) << 8 | w.Peek(a + 2) << 16 | w.Peek(a + 3) << 24);
+
+    /// <summary>59DE: the group widget list: L3[0] = 33h; the distinct kinds (+E, +0 of the objects of the owner's chain with +1B = [1C87] and +19 &gt; 0) are collected at DS:1F45 (dwords ended with FFh, their number in [1F41], the objects in [1F31]); with any: the widget EDI gets the number +16, the top +1A = E0h - 1Bh * count and +1C = count; for every kind a record (DF7E with 472h; EDI = the new record: +2 = kind, +14 = army, +15 = the picture of the template 68A0, +8 = the running position [1F31] that grows by 32h); then the message 297h (DEE4) and A4A9 with 0.</summary>
+    public static void F59DE(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; l[0] = 0x33; l[1] = 0; uint widget = g.Edi; var wd = w.ObjectAt(widget);
+        g.Eax = 0xf5; Mul8(g, 0xf5, d[0x1972]); var part = w.PartOf(d[0x1972]);
+        g.Ebp = U32(part, 9) + w.PoolBase; g.Edi = U32(part, 0xe) + w.PoolBase;
+        d[0x1f45] = 0xff; d[0x1f41] = 0; Put(d, 0x1f31, 0);
+        g.Cmp(g.Edi, g.Ebp, 32);
+        while (!g.Zf)
+        {
+            var o = w.ObjectAt(g.Edi); g.Al = o[0x1b]; g.Cmp(g.Al, d[0x1c87], 8);
+            if (g.Zf)
+            {
+                g.Cmp(o[0x19], 0, 8);
+                if (!g.Jle)
+                {
+                    Put(d, 0x1f31, U32(d, 0x1f31) + 1); g.Eax = 0; g.Al = o[0xe]; g.Ah = o[0]; g.Esi = 0x1f41;
+                    for (; ; )
+                    {
+                        g.Esi += 4; g.Cmp(U32(d, (int)g.Esi), g.Eax, 32); if (g.Zf) break;
+                        g.Cmp(d[g.Esi], 0xff, 8); if (g.Zf) { Put(d, (int)g.Esi, g.Eax); d[g.Esi + 4] = 0xff; d[0x1f41] = Inc8(g, d[0x1f41]); break; }
+                    }
+                }
+            }
+            g.Edi += U32(o, 0x10); g.Cmp(g.Edi, g.Ebp, 32);
+        }
+        g.Edi = widget; g.Cmp(d[0x1f41], 0, 8); if (g.Zf) return;
+        g.Eax = U32(d, 0x1f31); Put(wd, 0x16, g.Eax); g.Eax = 0x1b; Mul8(g, g.Al, d[0x1f41]); g.Eax = 0 - (g.Eax & 0xffff); g.Eax += 0xe0; Put(d, 0x1f31, g.Eax);
+        wd[0x1a] = (byte)g.Eax; wd[0x1b] = (byte)(g.Eax >> 8); g.Al = d[0x1f41]; wd[0x1c] = g.Al; g.Esi = 0x1f45;
+        for (; ; )
+        {
+            uint esi = g.Esi; g.Esi = 0x472; g.Al = 1; FDF7E(w, g); g.Esi = esi; int e = (int)g.Edi;
+            g.Eax = U32(d, (int)g.Esi); l[e + 2] = g.Al; l[e + 0x14] = g.Ah;
+            uint edi = g.Edi; F68A0(w, g); var t = w.ObjectAt(g.Edi); g.Eax = (g.Eax & 0xffff0000) | U16(t, 5); g.Edi = edi;
+            l[e + 0x15] = (byte)g.Eax; l[e + 0x16] = (byte)(g.Eax >> 8); g.Eax = U32(d, 0x1f31); Put(l, e + 8, g.Eax);
+            Put(d, 0x1f31, U32(d, 0x1f31) + 0x32); g.Esi += 4; g.Cmp(d[g.Esi], 0xff, 8);
+            if (g.Zf) break;
+        }
+        g.Esi = 0x297; w.Call(0xdee4, g); g.Eax = 0; FA4A9(w, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
