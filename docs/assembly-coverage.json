@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "8b52aee84bad5a2b4179e2ede6c0ab40b35e4f16ba8a6dadc00e5339ffc901b3",
+  "annotation_sha256": "65e8549ff77eb200b26f57a9f1a71b5ab06c559fe5fa9a573f0af3b3f9d2c5b6",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -2130,6 +2130,45 @@
         },
         {
           "start": 52594,
+          "end": 52893,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "forestry-patch"
+          ]
+        },
+        {
+          "start": 52893,
+          "end": 52999,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "forestry-patch",
+            "le1-tile-random-ce9d"
+          ]
+        },
+        {
+          "start": 52999,
+          "end": 53057,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "forestry-patch",
+            "le1-tile-list-cf07"
+          ]
+        },
+        {
+          "start": 53057,
+          "end": 53111,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "forestry-patch",
+            "le1-tile-find-cf41"
+          ]
+        },
+        {
+          "start": 53111,
           "end": 53505,
           "status": "partial",
           "classification": "code",
