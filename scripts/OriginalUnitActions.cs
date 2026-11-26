@@ -3899,6 +3899,62 @@ public static class OriginalUnitActions
         r[0x1d] = Sub8(g, r[0x1d], 6); g.Add(U32(r, 4), 6); Put(r, 4, U32(r, 4) + 6);
     }
 
+    /// <summary>F629: a message to the players: on every 16th step ([19E9] &amp; 0Fh = 0) for the owners [6C6] - 1 .. 0 and their 8 entries of 0Eh bytes (DS:97A + 0F5h * owner + 34h): an entry whose kind +0 is not FFh, whose owner +9 is [1972] and whose dword +1 is above L3[3CDA] gets a free message number (F5F2) and a record in the queue (DF7E to the front; for another owner first EAD8 with 0FFFFFFCEh and the handler F8C9 of the two records before), the handler F7D0 (F862 for the kind 3), the text chosen at random by 9E69 among the +0 variants (ended by FFh) of the table L3:0EFB + 13h * kind, its position +4 = 11Ah - the half width (7012), +8 = the slot + 40h and the effects (A4A9) of the table +4 and 1. The step ends with L3[3CDA] = [1CA9].</summary>
+    public static void FF629(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; g.Test(d[0x19e9], 0xf, 8); if (!g.Zf) return;
+        g.Cl = d[0x6c6]; g.Cl = Dec8(g, g.Cl);
+        for (; ; )
+        {
+            g.Eax = 0xf5; Mul8(g, g.Al, g.Cl); g.Esi = (g.Eax & 0xffff) + 0x9ae; g.Ch = 8; byte owner = g.Cl; var part = w.PartOf(owner);
+            do
+            {
+                int off = (int)(g.Esi - 0x97a - 0xf5u * owner);
+                g.Cmp(part[off], 0xff, 8);
+                if (!g.Zf)
+                {
+                    g.Al = part[off + 9]; g.Cmp(g.Al, d[0x1972], 8);
+                    if (g.Zf)
+                    {
+                        g.Eax = U32(part, off + 1); g.Cmp(g.Eax, U32(l, 0x3cda), 32);
+                        if (!(g.Cf || g.Zf))
+                        {
+                            FF5F2(w, g);
+                            if (!g.Zf)
+                            {
+                                uint ecx = g.Ecx, esi = g.Esi;
+                                g.Cmp(g.Cl, d[0x1972], 8);
+                                if (!g.Zf)
+                                {
+                                    g.Eax = g.Cl; g.Bl = l[0x3cd9]; g.Ecx = 0xffffffce; g.Edx = U32(l, 0x3cd1); g.Ebp = 0xe65a; w.Call(0xead8, g);
+                                    int e0 = (int)g.Edi; Put(l, e0 + 4, U32(l, e0 + 4) + 0x46); Put(l, e0 - 0x12, 0xf8c9); l[e0 - 1] = 0x46; Put(l, e0 - 0x30, 0xf8c9); l[e0 - 0x1f] = 0x46;
+                                }
+                                g.Esi = 0x3cde; g.Al = 0; g.Logic(0, 8); FDF7E(w, g); g.Esi = esi;
+                                g.Eax = 0x13; Mul8(g, g.Al, part[off]); g.Edx = (g.Eax & 0xffff) + 0xefb; int t = (int)g.Edx; int e = (int)g.Edi;
+                                g.Eax = ecx; g.Cmp(g.Al, d[0x1972], 8); if (!g.Zf) Put(l, e + 0xc, 0xf7d0);
+                                g.Ebx = U32(l, t); w.Call(0x9e69, g); Mul8(g, g.Al, w.Peek(g.Ebx));
+                                bool skip = true;
+                                for (; ; )
+                                {
+                                    if (!skip) { g.Ebx++; if (w.Peek(g.Ebx) != 0xff) continue; }
+                                    skip = false; g.Ebx++; g.Ah = Dec8(g, g.Ah); if (g.Sf) break;
+                                }
+                                Put(l, e + 0x12, g.Ebx); g.Al = d[0x1972]; l[e + 0x17] = g.Al; g.Eax = ecx; l[e + 0x18] = g.Al; l[e + 0x1d] = g.Al; g.Al = part[off]; l[e + 0x1c] = g.Al;
+                                g.Al = l[0x3cd9]; l[e + 1] = g.Al; g.Eax = U32(l, 0x3cd1); g.Eax += 0x40; Put(l, e + 8, g.Eax);
+                                uint esi2 = g.Esi; g.Esi = g.Ebx; F7012(w, g); g.Eax = 0x11a; g.Ebx = g.Shr(g.Ebx, 1, 32); g.Eax -= g.Ebx; Put(l, e + 4, g.Eax); g.Esi = esi2;
+                                g.Cmp(part[off], 3, 8); if (g.Zf) Put(l, e + 0xc, 0xf862);
+                                g.Eax = U32(l, t + 4); FA4A9(w, g); g.Eax = 1; FA4A9(w, g); g.Ecx = ecx;
+                            }
+                        }
+                    }
+                }
+                g.Add(g.Esi, 0xe); g.Esi += 0xe; g.Ch = Dec8(g, g.Ch);
+            } while (!g.Zf);
+            g.Cl = Dec8(g, g.Cl); if (g.Sf) break;
+        }
+        g.Eax = U32(d, 0x1ca9); Put(l, 0x3cda, g.Eax);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
