@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 85234 | 6265 | 97 | 55286 | 44 |
+| LE:1 | 146882 | 85073 | 6265 | 97 | 55447 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -271,7 +271,11 @@
 | LE:1 `0x6877..0x68D8` | Participant record and DAT template of an object | ported | [formats.md](../docs/formats.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) | implicit: the port passes template records alongside objects |
 | LE:1 `0x6996..0x69FE` | Direction byte between two points (arctangent table DS:287E) | ported | [ai.md](../docs/ai.md); [ai-squad-states.json](../tests/fixtures/ai-squad-states.json) |  |
 | LE:1 `0x6996..0x69FE` | Direction byte between two points (arctangent table) | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [builder.json](../tests/fixtures/builder.json); [verify_builder.py](../tools/verify_builder.py) | none |
+| LE:1 `0x6996..0x69FE` | Direction byte between two points (6996) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed; the table DS:287E is read from the data |
 | LE:1 `0x69FE..0x6A73` | Step along a line of segments (bridge, fence) | ported | [building-command-lifecycle.md](../docs/building-command-lifecycle.md); [builder.json](../tests/fixtures/builder.json); [verify_builder.py](../tools/verify_builder.py) | The toggle [50D] is a field of the builder |
+| LE:1 `0x69FE..0x6A73` | Approach step to an object: direction, toggle, offset (69FE) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 6996 runs as the ported code |
+| LE:1 `0x6A73..0x6ACD` | Clear the selection (6A73) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 670F, 6EB2, DEE4 and D182 are recorded stubs; DF2A runs as the ported code |
+| LE:1 `0x6ACD..0x6B14` | Select the group (6ACD) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 670F and DEE4 are recorded stubs; DF2A runs as the ported code |
 | LE:1 `0x6DEF..0x6EB2` | Rasterize a column-filled status gauge | ported | [interface.md](../docs/interface.md); [status-bars.json](../tests/fixtures/status-bars.json) | Сверены индексы всех пикселей 1314 изображений в трёх размерах, current<=maximum и особый нулевой предел. DOS framebuffer и dirty-cache заменены отрисовкой Godot; опасные размеры и DIV за пределами контракта не перенесены. |
 | LE:1 `0x6EB2..0x6EC1` | Clear the slot table (6EB2) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | The template of the check is one 100h-byte buffer; the pointers of the entries are small offsets inside it |
 | LE:1 `0x6EC1..0x6F18` | Single selection command panel filtered by WorkFlags | partial | [interface.md](../docs/interface.md); [command-panel.json](../tests/fixtures/command-panel.json) | Маски одиночной панели проверены для пяти DAT-шаблонов и всех 256 WorkFlags. Исходный runtime-буфер указателей, группа выделения и полный диспетчер кликов не перенесены. |

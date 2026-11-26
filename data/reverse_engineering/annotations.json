@@ -8756,6 +8756,82 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "3EEA and 6FCC are recorded stubs (video drawing)"
+    },
+    {
+      "id": "le1-direction-6996",
+      "module": "LE:1",
+      "start": 27030,
+      "end": 27134,
+      "name": "Direction byte between two points (6996)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none stubbed; the table DS:287E is read from the data"
+    },
+    {
+      "id": "le1-approach-69fe",
+      "module": "LE:1",
+      "start": 27134,
+      "end": 27251,
+      "name": "Approach step to an object: direction, toggle, offset (69FE)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "6996 runs as the ported code"
+    },
+    {
+      "id": "le1-select-clear-6a73",
+      "module": "LE:1",
+      "start": 27251,
+      "end": 27341,
+      "name": "Clear the selection (6A73)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "670F, 6EB2, DEE4 and D182 are recorded stubs; DF2A runs as the ported code"
+    },
+    {
+      "id": "le1-select-group-6acd",
+      "module": "LE:1",
+      "start": 27341,
+      "end": 27412,
+      "name": "Select the group (6ACD)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "670F and DEE4 are recorded stubs; DF2A runs as the ported code"
     }
   ]
 }
