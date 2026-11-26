@@ -41,6 +41,40 @@ public partial class TestRunner
         Check(count == expected.GetProperty("case_count").GetInt32() && probes == expected.GetProperty("probe_count").GetInt32(), "Contour route and probe coverage");
         Check(missing == expected.GetProperty("no_route_count").GetInt32() && partial == expected.GetProperty("partial_count").GetInt32(), "Contour no-path and partial-route outcomes match x86");
         Check(Convert.ToHexStringLower(aggregate.GetHashAndReset()) == expected.GetProperty("sha256").GetString(), "All contour results match original x86");
+        OriginalRoutePlanChecks();
+    }
+
+    /// <summary>Replays tests/fixtures/route-plan.json (tools/verify_route_plan.py): the planner 72FE with explicit parameters.</summary>
+    private void OriginalRoutePlanChecks()
+    {
+        using var doc = GameData.Read<JsonDocument>("res://tests/fixtures/route-plan.json"); var root = doc.RootElement;
+        using var aggregate = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        int count = 0, foundCount = 0; var search = new OriginalRouteSearch();
+        foreach (var c in root.GetProperty("cases").EnumerateArray())
+        {
+            int[] Get(string name) => c.GetProperty(name).EnumerateArray().Select(v => v.GetInt32()).ToArray();
+            var size = Get("size"); var footprint = Get("footprint"); var start = Get("start"); var target = Get("target");
+            var blocked = Convert.FromHexString(c.GetProperty("blocked").GetString()!); var trace = new List<byte>();
+            bool Probe(byte x, byte y, byte direction)
+            {
+                trace.AddRange(new byte[] { x, y, direction });
+                if (x > size[0] - footprint[0] || y > size[1] - footprint[1]) return false;
+                for (int yy = y; yy < y + footprint[1]; yy++) for (int xx = x; xx < x + footprint[0]; xx++)
+                    if (blocked[yy * size[0] + xx] != 0) return false;
+                return true;
+            }
+            byte half = (byte)(footprint[0] >> 1);
+            var result = search.Plan72FE((byte)size[0], (byte)size[1], (byte)footprint[0], new((byte)(start[0] + half), (byte)(start[1] + half)), new((byte)(target[0] + half), (byte)(target[1] + half)), Probe);
+            using var stream = new MemoryStream(); using var writer = new BinaryWriter(stream);
+            writer.Write(result.Found); writer.Write((ushort)result.Route.Length); writer.Write(result.Route);
+            writer.Write(result.End.X); writer.Write(result.End.Y); writer.Write(result.Left); writer.Write(trace.Count / 3); writer.Write(trace.ToArray()); writer.Flush();
+            var bytes = stream.ToArray(); aggregate.AppendData(bytes);
+            Check(Convert.ToHexStringLower(SHA256.HashData(bytes)) == c.GetProperty("sha256").GetString(), $"Native planner 72FE: {c.GetProperty("name").GetString()}, route={Convert.ToHexString(result.Route)}, end={result.End}, left={result.Left}, probes={trace.Count / 3}");
+            count++; if (result.Found) foundCount++;
+        }
+        var expected = root.GetProperty("result");
+        Check(count == expected.GetProperty("case_count").GetInt32() && foundCount == expected.GetProperty("found_count").GetInt32(), "Planner 72FE coverage and outcomes");
+        Check(Convert.ToHexStringLower(aggregate.GetHashAndReset()) == expected.GetProperty("sha256").GetString(), "All planner 72FE results match original x86");
     }
 }
 
