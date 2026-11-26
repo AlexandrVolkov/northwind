@@ -38,7 +38,7 @@ public partial class TestRunner
         public byte[] L3 { get; } = new byte[0x1000];
         public void CallHandler(uint mode, ActionRegs g) => Call(0x20232, g);
         public byte[] Text { get; } = new byte[0x1000];   // flat 402200..4031FF: the string (+0), the font (+200), the destination (+600)
-        public byte Peek(uint a) => a >= 0x402200 && a < 0x403200 ? Text[a - 0x402200] : (byte)0;
+        public byte Peek(uint a) => a >= 0x402200 && a < 0x403200 ? Text[a - 0x402200] : a < (uint)Ds.Length ? Ds[a] : (byte)0;
         public void Poke(uint a, byte v) { if (a >= 0x402200 && a < 0x403200) Text[a - 0x402200] = v; }
         public byte G525 => Ds[0x525]; public byte G526 => Ds[0x526];
         public byte G1C61 { get => Ds[0x1c61]; set => Ds[0x1c61] = value; }
@@ -67,7 +67,7 @@ public partial class TestRunner
             if (c.TryGetProperty("nch", out _)) { BitConverter.GetBytes((uint)(0x8000 + 0x60 * Nch)).CopyTo(b, 9); BitConverter.GetBytes((uint)(0x8000 + 0x60 * St)).CopyTo(b, 0xe); }
             parts[owner] = b; return b;
         }
-        private byte[] Chain(int k) { var b = Constrain(ActionPrng(unchecked(c.GetProperty("o1").GetUInt32() + 7 + (uint)k), 0x50)); BitConverter.GetBytes(0x60u).CopyTo(b, 0x10); if ((b[0x1c] & 1) != 0) b[0x1b] = (byte)c.GetProperty("regs")[1].GetUInt32(); if (c.GetProperty("fn").GetString() == "fb319") { b[0x19] = 0x7f; BitConverter.GetBytes((uint)(900 + b[0x1d] % 120)).CopyTo(b, 4); BitConverter.GetBytes((uint)(850 + b[0x1e] % 100)).CopyTo(b, 8); } if (c.GetProperty("fn").GetString() == "fb5d8" && (b[0x1c] & 2) != 0) b[0x1b] = (byte)(1 + b[0x1d] % (Nch + 1)); return b; }
+        private byte[] Chain(int k) { var b = Constrain(ActionPrng(unchecked(c.GetProperty("o1").GetUInt32() + 7 + (uint)k), 0x50)); BitConverter.GetBytes(0x60u).CopyTo(b, 0x10); if ((b[0x1c] & 1) != 0) b[0x1b] = (byte)c.GetProperty("regs")[1].GetUInt32(); if (c.GetProperty("fn").GetString() == "fb319") { b[0x19] = 0x7f; BitConverter.GetBytes((uint)(900 + b[0x1d] % 120)).CopyTo(b, 4); BitConverter.GetBytes((uint)(850 + b[0x1e] % 100)).CopyTo(b, 8); } if (c.GetProperty("fn").GetString() == "fb5d8" && (b[0x1c] & 2) != 0) b[0x1b] = (byte)(1 + b[0x1d] % (Nch + 1)); if (c.GetProperty("fn").GetString() == "f59de") b[0xe] = 0; return b; }
         public void SetG1CCB(int index, byte value) => Ds[0x1ccb + index] = value;
         public byte G522 => Ds[0x522];
         private static uint Rel(uint v) => v >= 0x400000 && v < 0x402000 ? v - 0x400000 : v;
@@ -380,6 +380,24 @@ public partial class TestRunner
                         if (fn == "f66e9") OriginalUnitActions.F66E9(w, g); else if (fn == "f670f") OriginalUnitActions.F670F(w, g); else if (fn == "f672f") OriginalUnitActions.F672F(w, g); else OriginalUnitActions.F674F(w, g);
                         break;
                     }
+                case "f5969": case "f59de":
+                    {
+                        Array.Clear(w.L3, 0x7d4, 0x604); for (int k = 0; k < c.GetProperty("qn").GetInt32(); k++) w.L3[0x7f2 + 0x1e * k + 1] = (byte)(k == 0 ? c.GetProperty("qid").GetInt32() : c.GetProperty("qid").GetInt32() + 1); BitConverter.GetBytes((uint)(0x7f2 + 0x1e * c.GetProperty("qn").GetInt32())).CopyTo(w.L3, 0xdce); w.L3[0] = (byte)c.GetProperty("l0q").GetInt32(); w.L3[1] = 0;
+                        if (fn == "f5969")
+                        {
+                            var buf = ActionPrng(c.GetProperty("rs").GetUInt32(), 0x200); int pos = 0; uint rs = c.GetProperty("rs").GetUInt32();
+                            for (int k = 0; k < c.GetProperty("nrec").GetInt32(); k++)
+                            {
+                                buf[pos] = (byte)(((rs >> k) & 1) != 0 ? 0x80 : 0x20); buf[pos + 1] = 1; BitConverter.GetBytes((((rs >> (k + 8)) & 1) != 0 ? 0u : (uint)(k + 2))).CopyTo(buf, pos + 3); int cnt = buf[pos + 0xf] % 3; buf[pos + 0xf] = (byte)cnt; pos += 0x10 + 2 * cnt;
+                            }
+                            buf[pos + 1] = 0xff; Array.Copy(buf, 0, w.Text, 0, 0x200);
+                            w.Obj1[0] = (byte)c.GetProperty("sel").GetInt32(); w.Obj1[3] = (byte)c.GetProperty("own").GetInt32();
+                            BitConverter.GetBytes(0x400900u).CopyTo(w.Ds, 0x1969); BitConverter.GetBytes(0x402200u).CopyTo(w.Ds, 0x6df + 0x56 * c.GetProperty("sel").GetInt32() + 4 * c.GetProperty("own").GetInt32());
+                            OriginalUnitActions.F5969(w, g);
+                        }
+                        else { w.Ds[0x1972] = (byte)c.GetProperty("own").GetInt32(); w.Ds[0x1c87] = (byte)c.GetProperty("b87").GetInt32(); g.Edi = 0x400800; OriginalUnitActions.F59DE(w, g); }
+                        break;
+                    }
                 case "f6996": case "f69fe": case "f6a73": case "f6acd":
                     {
                         if (fn is "f6996" or "f69fe")
@@ -474,7 +492,7 @@ public partial class TestRunner
                 case "f81d9": OriginalUnitActions.F81D9(w, g, r); break;
             }
             uint Rel(uint v) => v >= 0x400000 && v < 0x402000 ? v - 0x400000 : v;
-            byte[] output = [.. r, .. w.Obj1, .. w.Obj2, w.G1C9F, .. BitConverter.GetBytes(w.G512), .. BitConverter.GetBytes(w.G50E), w.G1CCB, w.G525, w.G526, w.G1C61, .. w.Ds[0x19c0..0x1a00], .. w.Ds[0x1c30..0x1c80], .. w.Ds[0x4160..0x4170], .. w.Ds[0x9080..0x9090], .. w.Ds[0x1978..0x19c0], .. w.Ds[0x1c80..0x1cd0], .. w.Ds[0x1ec0..0x1ed0], .. w.Ds[0x1960..0x1978], .. w.Ds[0x9090..0x90a0], .. w.Ds[0x1904..0x1914], .. w.Ds[0x33c..0x43c], .. w.Ds[0x640..0x64c], .. w.Ds[0x1940..0x1960], .. w.Ds[0x1a10..0x1a20], w.Fs13D, .. w.Stats[0x170..0x1b0], .. w.Stats[(0x1a35 + 0x170)..(0x1a35 + 0x1b0)], .. w.Stats[(2 * 0x1a35 + 0x170)..(2 * 0x1a35 + 0x1b0)], .. Enumerable.Range(0, 8).SelectMany(k => w.Stats[(k * 0x1a35 + 0x70)..(k * 0x1a35 + 0x80)]), .. w.Ds[0x1ca2..0x1cc2], .. w.Ds[0x1f0a..0x2104], .. w.Ds[0x4c0..0x5d0], .. w.L3[0..0x14], .. w.Ds[0xf0b0..0xf0c0], .. w.Ds[0x40..0x60], .. w.Ds[0x27f0..0x2850], .. (fn is "fdec8" or "fdf2a" or "fdf7e" or "f5af6" or "f5b55" or "f5cc2" or "f5df6" or "f5da5" or "f5e1c" or "f5593" or "f64ad" or "f6a73" or "f6acd" ? w.L3[0x7d4..0xdd8] : new byte[0x604]), .. BitConverter.GetBytes(w.Fs17F), .. w.Text[0x600..0x700], .. BitConverter.GetBytes(Rel(g.Eax)), .. BitConverter.GetBytes(Rel(g.Ebx)), .. BitConverter.GetBytes(Rel(g.Ecx)), .. BitConverter.GetBytes(Rel(g.Edx)), .. BitConverter.GetBytes(Rel(g.Edi)),
+            byte[] output = [.. r, .. w.Obj1, .. w.Obj2, w.G1C9F, .. BitConverter.GetBytes(w.G512), .. BitConverter.GetBytes(w.G50E), w.G1CCB, w.G525, w.G526, w.G1C61, .. w.Ds[0x19c0..0x1a00], .. w.Ds[0x1c30..0x1c80], .. w.Ds[0x4160..0x4170], .. w.Ds[0x9080..0x9090], .. w.Ds[0x1978..0x19c0], .. w.Ds[0x1c80..0x1cd0], .. w.Ds[0x1ec0..0x1ed0], .. w.Ds[0x1960..0x1978], .. w.Ds[0x9090..0x90a0], .. w.Ds[0x1904..0x1914], .. w.Ds[0x33c..0x43c], .. w.Ds[0x640..0x64c], .. w.Ds[0x1940..0x1960], .. w.Ds[0x1a10..0x1a20], w.Fs13D, .. w.Stats[0x170..0x1b0], .. w.Stats[(0x1a35 + 0x170)..(0x1a35 + 0x1b0)], .. w.Stats[(2 * 0x1a35 + 0x170)..(2 * 0x1a35 + 0x1b0)], .. Enumerable.Range(0, 8).SelectMany(k => w.Stats[(k * 0x1a35 + 0x70)..(k * 0x1a35 + 0x80)]), .. w.Ds[0x1ca2..0x1cc2], .. w.Ds[0x1f0a..0x2104], .. w.Ds[0x4c0..0x5d0], .. w.L3[0..0x14], .. w.Ds[0xf0b0..0xf0c0], .. w.Ds[0x40..0x60], .. w.Ds[0x27f0..0x2850], .. (fn is "fdec8" or "fdf2a" or "fdf7e" or "f5af6" or "f5b55" or "f5cc2" or "f5df6" or "f5da5" or "f5e1c" or "f5593" or "f64ad" or "f6a73" or "f6acd" or "f5969" or "f59de" ? w.L3[0x7d4..0xdd8] : new byte[0x604]), .. BitConverter.GetBytes(w.Fs17F), .. w.Text[0x600..0x700], .. BitConverter.GetBytes(Rel(g.Eax)), .. BitConverter.GetBytes(Rel(g.Ebx)), .. BitConverter.GetBytes(Rel(g.Ecx)), .. BitConverter.GetBytes(Rel(g.Edx)), .. BitConverter.GetBytes(Rel(g.Edi)),
                 g.Zf ? (byte)1 : (byte)0, g.Cf ? (byte)1 : (byte)0, .. w.PartOf(r[3]), .. (fn == "fd2d1" ? Enumerable.Range(0, 4096).SelectMany(k => BitConverter.GetBytes(w.PlaneRead(0x404000u + (uint)(4 * k)))) : []), .. log];
             digest.AppendData(output);
             if (Convert.ToHexStringLower(SHA256.HashData(output))[..10] != c.GetProperty("sha256_prefix").GetString()) { if (firstMismatch < 0) firstMismatch = count; if (only == count) GD.Print("CSHARP " + Convert.ToHexStringLower(output)); }
@@ -482,7 +500,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 189, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 191, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }

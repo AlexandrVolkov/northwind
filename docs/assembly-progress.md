@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 85073 | 6265 | 97 | 55447 | 44 |
+| LE:1 | 146882 | 84698 | 6265 | 97 | 55822 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -231,6 +231,8 @@
 | LE:1 `0x566A..0x5679` | Tool state 0Dh (566A) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed |
 | LE:1 `0x5679..0x5716` | Tool: gift to an object (5679) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 124FD, 124D8 and 4938 are recorded stubs; A4A9 runs as the ported code |
 | LE:1 `0x5960..0x5969` | Panel widget shows nothing (5960) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |
+| LE:1 `0x5969..0x59C8` | List of order records of the selected object into the queue (5969) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | DF7E runs as the ported code; the records DS:33F are read through Peek |
+| LE:1 `0x59DE..0x5AF6` | Group widget list: kinds of the chain, records per kind (59DE) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | DEE4 and 1416B are recorded stubs; DF7E, 68A0 and A4A9 run as the ported code; the record DS:472 is read through Peek (zero in the check) |
 | LE:1 `0x5AF6..0x5B55` | Panel widget follows the selected object's template (5AF6) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 672F and DEDA are recorded stubs; DF2A runs as the ported code |
 | LE:1 `0x5B55..0x5C2E` | Tick of a panel widget: hint text, group check, rebuild or clear (5B55) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 674F, 6C66, B9EB, 5787, 66E9, 6EB2 and 4938 are recorded stubs; 7012, 66DF and DF2A run as the ported code |
 | LE:1 `0x5CC2..0x5CD9` | Close panel: 674F, drop queue entries 2Ch, effect 2 (5CC2) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 674F and 1416B are recorded stubs; DF2A and A4A9 run as the ported code |

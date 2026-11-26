@@ -8832,6 +8832,44 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "670F and DEE4 are recorded stubs; DF2A runs as the ported code"
+    },
+    {
+      "id": "le1-order-list-5969",
+      "module": "LE:1",
+      "start": 22889,
+      "end": 22984,
+      "name": "List of order records of the selected object into the queue (5969)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "DF7E runs as the ported code; the records DS:33F are read through Peek"
+    },
+    {
+      "id": "le1-group-widgets-59de",
+      "module": "LE:1",
+      "start": 23006,
+      "end": 23286,
+      "name": "Group widget list: kinds of the chain, records per kind (59DE)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "DEE4 and 1416B are recorded stubs; DF7E, 68A0 and A4A9 run as the ported code; the record DS:472 is read through Peek (zero in the check)"
     }
   ]
 }
