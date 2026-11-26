@@ -3169,6 +3169,73 @@ public static class OriginalUnitActions
         w.Call(0x672f, g); g.Al = 0x32; FDF2A(w, g);
     }
 
+    /// <summary>5E1C: scroll of the widget list (record ESI, +1C records after it, +1D speed, +1A offset): the offset follows the key and the flag 19E7; then the settlement group 20232 and its +22 are compared with the widget's +16: a mismatch (or no group, or key 1 / flag 10h of +3) clears the panel (674F, DF2A with 33h and 2Ch; DEE4 with 44Bh when the group exists).</summary>
+    public static void F5E1C(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Cmp(U16(d, 0x1c35), 1, 16);
+        if (g.Zf) { Fail5E1C(w, g); return; }
+        g.Test(r[3], 0x10, 8); if (!g.Zf) { Fail5E1C(w, g); return; }
+        g.Ebx = (uint)(int)(short)U16(r, 0x1a); g.Eax = 0x36; g.Cl = r[0x1c]; Mul8(g, g.Al, g.Cl); g.Add(g.Eax, g.Ebx); g.Eax += g.Ebx;
+        g.Test(r[3], 1, 8);
+        bool toDec = false;
+        if (!g.Zf)
+        {
+            g.Test(d[0x19e7], 1, 8);
+            if (g.Zf) goto L5E99;
+            g.Cmp(g.Eax, 0x1a2, 32);
+            if (g.Sf == g.Of)
+            {
+                g.Cmp(U32(d, 0x1951), 0x19a, 32);
+                if (!g.Cf)
+                {
+                    g.Cmp(r[0x1d], 0xf9, 8);
+                    if (g.Jle) goto L5E99;
+                    r[0x1d] = Dec8(g, r[0x1d]); goto L5E99;
+                }
+            }
+            g.Cmp(g.Ebx, 0x1e, 32);
+            if (g.Jg) toDec = true;
+            else
+            {
+                g.Cmp(U32(d, 0x1951), 0x46, 32);
+                if (!g.Cf && !g.Zf) toDec = true;
+                else
+                {
+                    g.Cmp(r[0x1d], 7, 8);
+                    if (g.Sf == g.Of) goto L5E99;
+                    r[0x1d] = Inc8(g, r[0x1d]); goto L5E99;
+                }
+            }
+        }
+        else toDec = true;
+        if (toDec)
+        {
+            g.Cmp(r[0x1d], 0, 8);
+            if (!g.Zf)
+            {
+                if (!g.Sf) r[0x1d] = Sub8(g, r[0x1d], 2);
+                r[0x1d] = Inc8(g, r[0x1d]);
+            }
+        }
+    L5E99:
+        g.Test(d[0x19e7], 2, 8);
+        if (!g.Zf)
+        {
+            g.Edx = (uint)(int)(sbyte)r[0x1d]; g.Test(g.Edx, g.Edx, 32);
+            if (!g.Zf)
+            {
+                g.Ebx += g.Edx; r[0x1a] = (byte)g.Ebx; r[0x1b] = (byte)(g.Ebx >> 8);
+                int o = 0; do { o += 0x1e; Put(r, o + 8, U32(r, o + 8) + g.Edx); g.Cl = Dec8(g, g.Cl); } while (!g.Zf);
+            }
+        }
+        g.Edi = U32(d, 0xed20); g.Edi += 0x9df; g.Bl = d[0x1c87]; w.Call(0x20232, g);
+        if (g.Zf) { Fail5E1C(w, g); return; }
+        g.Eax = U32(w.ObjectAt(g.Edi), 0x22); g.Cmp(U32(r, 0x16), g.Eax, 32);
+        if (g.Zf) return;
+        g.Al = 0x33; FDF2A(w, g); g.Al = 0x2c; FDF2A(w, g); g.Esi = 0x44b; w.Call(0xdee4, g);
+    }
+    private static void Fail5E1C(IUnitActionWorld w, ActionRegs g) { w.Call(0x674f, g); g.Al = 0x33; FDF2A(w, g); g.Al = 0x2c; FDF2A(w, g); }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

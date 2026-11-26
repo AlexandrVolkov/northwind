@@ -8281,6 +8281,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "20232 and 672F are recorded stubs; DF2A runs as the ported code"
+    },
+    {
+      "id": "le1-widget-scroll-5e1c",
+      "module": "LE:1",
+      "start": 24092,
+      "end": 24330,
+      "name": "Scroll of the widget list and group check (5E1C)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "20232, 674F and DEE4 are recorded stubs; DF2A runs as the ported code"
     }
   ]
 }
