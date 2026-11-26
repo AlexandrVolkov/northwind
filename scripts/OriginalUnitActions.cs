@@ -3798,6 +3798,107 @@ public static class OriginalUnitActions
         w.Call(0xe559, g); w.Call(0x486d, g); w.Call(0x4580, g);
     }
 
+    /// <summary>F5CE: the gate of the message step: with [1C4E] set and the mode L3[0] = 0 or at least 0Ah (but not 31h, 32h) F629.</summary>
+    public static void FF5CE(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(d[0x1c4e], 0, 8); if (g.Zf) return;
+        g.Al = w.L3[0]; g.Test(g.Al, g.Al, 8);
+        if (!g.Zf)
+        {
+            g.Cmp(g.Al, 0x32, 8); if (g.Zf) return; g.Cmp(g.Al, 0x31, 8); if (g.Zf) return; g.Cmp(g.Al, 0xa, 8); if (g.Cf) return;
+        }
+        w.Call(0xf629, g);
+    }
+
+    /// <summary>F5F2: looks for a free message number 14h..17h: AL runs from 14h up to 17h while the number is in the queue (L3 from 7D4h: the records of 1Eh bytes, the number in +1, the end in 0DCE); a free number is stored in L3[3CD9], its slot (AL - 14h) * 60h + 14h in the dword L3[3CD1]; ZF = 0 (AL = FFh); all four taken - ZF = 1.</summary>
+    public static void FF5F2(IUnitActionWorld w, ActionRegs g)
+    {
+        var l = w.L3; g.Eax = 0x14;
+        for (; ; )
+        {
+            g.Edi = 0x7d4; bool taken = false;
+            for (; ; )
+            {
+                g.Edi += 0x1e; g.Cmp(g.Edi, U32(l, 0xdce), 32);
+                if (g.Zf)
+                {
+                    l[0x3cd9] = g.Al; g.Al = Sub8(g, g.Al, 0x14); g.Ah = 0x60; Mul8(g, g.Al, g.Ah); g.Add(g.Eax, 0x14); g.Eax += 0x14; Put(l, 0x3cd1, g.Eax); g.Al |= 0xff; g.Logic(g.Al, 8); return;
+                }
+                g.Cmp(g.Al, l[g.Edi + 1], 8); if (g.Zf) { taken = true; break; }
+            }
+            if (taken) { g.Al = Inc8(g, g.Al); g.Cmp(g.Al, 0x18, 8); if (g.Zf) return; }
+        }
+    }
+
+    /// <summary>F781: E055 for AL = 14h..17h.</summary>
+    public static void FF781(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Al = 0x14;
+        do { uint e = g.Eax; w.Call(0xe055, g); g.Eax = e; g.Al = Inc8(g, g.Al); g.Cmp(g.Al, 0x18, 8); } while (!g.Zf);
+    }
+
+    /// <summary>F791: E070 for AL = 14h..17h.</summary>
+    public static void FF791(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Al = 0x14;
+        do { uint e = g.Eax; w.Call(0xe070, g); g.Eax = e; g.Al = Inc8(g, g.Al); g.Cmp(g.Al, 0x18, 8); } while (!g.Zf);
+    }
+
+    private static void Dec16(ActionRegs g, byte[] b, int at)
+    {
+        ushort v = U16(b, at), r = (ushort)(v - 1); b[at] = (byte)r; b[at + 1] = (byte)(r >> 8); g.Zf = r == 0; g.Sf = (r & 0x8000) != 0; g.Of = v == 0x8000;   // CF is kept
+    }
+
+    /// <summary>F7A1: the message widget ESI: the timer +1A counts down on the even steps; at 0, with the type +3 = 11h or E5AB (E02h) answering zero, the widget is dropped from the queue (DF2A with +1).</summary>
+    public static void FF7A1(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Test(d[0x19ea], 1, 8);
+        if (g.Zf) { Dec16(g, r, 0x1a); if (g.Zf) { g.Al = r[1]; FDF2A(w, g); return; } }
+        w.Call(0xe5f6, g); g.Cmp(r[3], 0x11, 8); if (g.Zf) { g.Al = r[1]; FDF2A(w, g); return; }
+        g.Eax = 0xe02; w.Call(0xe5ab, g); if (!g.Zf) return;
+        g.Al = r[1]; FDF2A(w, g);
+    }
+
+    /// <summary>F7D0: the widget of the demand message: a refused EE69 (+1C, +1D, [1972]) or the timer or the type 11h or E5AB (E02h) answering non-zero ends it as in F7A1; otherwise, when the owner +1D has more than 7CFh in the settlement field +19F1, the message 3B94h (the names are equal: [DD4] = +1D) or 3BCCh (AL = +1C, AH = +1D) goes out (DEE4); then DF2A with +1.</summary>
+    public static void FF7D0(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; var l = w.L3; g.Al = r[0x1c]; g.Bl = r[0x1d]; g.Ah = d[0x1972]; w.Call(0xee69, g);
+        if (g.Zf) { Drop(w, g, r); return; }
+        g.Test(d[0x19ea], 1, 8);
+        if (g.Zf) { Dec16(g, r, 0x1a); if (g.Zf) { Drop(w, g, r); return; } }
+        w.Call(0xe5f6, g); g.Cmp(r[3], 0x11, 8); if (g.Zf) { Drop(w, g, r); return; }
+        g.Eax = 0xe02; w.Call(0xe5ab, g); if (!g.Zf) return;
+        g.Al = r[0x1d]; w.Call(0x1ead8, g);
+        g.Cmp(BitConverter.ToUInt32(w.Stats, (int)(g.Edx - 0x40a000u) + 0x19f1), 0x7cf, 32);
+        if (g.Cf || g.Zf) { Drop(w, g, r); return; }
+        uint esi = g.Esi; g.Eax = 0x13; Mul8(g, g.Al, r[0x1c]); g.Edx = (g.Eax & 0xffff) + 0xefb; int t = (int)g.Edx;
+        g.Al = l[t + 0x12]; g.Cmp(g.Al, l[t + 0x11], 8);
+        if (g.Zf) { g.Al = r[0x1d]; l[0xdd4] = g.Al; g.Esi = 0x3b94; w.Call(0xdee4, g); }
+        else { g.Al = r[0x1c]; g.Ah = r[0x1d]; g.Esi = 0x3bcc; w.Call(0xdee4, g); }
+        g.Esi = esi; Drop(w, g, r);
+    }
+    private static void Drop(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Al = r[1]; FDF2A(w, g); }
+
+    /// <summary>F862: the widget of the offer message: as F7D0 up to E5AB; with EE69 answering non-zero the item of the object EDI (+0A) is shown (EDD5 with 95h, A320 on the cell of its position), then DF2A with +1.</summary>
+    public static void FF862(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Test(d[0x19ea], 1, 8);
+        if (g.Zf) { Dec16(g, r, 0x1a); if (g.Zf) { Drop(w, g, r); return; } }
+        w.Call(0xe5f6, g); g.Cmp(r[3], 0x11, 8); if (g.Zf) { Drop(w, g, r); return; }
+        g.Eax = 0xe02; w.Call(0xe5ab, g); if (!g.Zf) return;
+        g.Al = r[0x1c]; g.Bl = r[0x1d]; g.Ah = d[0x1972]; w.Call(0xee69, g); if (g.Zf) { Drop(w, g, r); return; }
+        uint esi = g.Esi; var o = w.ObjectAt(g.Edi); g.Ebx = U32(o, 0xa); uint saved = g.Ebx; g.Ebx >>= 16; g.Bl &= 0xf; g.Al = 0x95; g.Ah = d[0x1972]; w.Call(0xedd5, g);
+        g.Eax = saved; g.Ebx = (uint)(byte)(g.Eax >> 8); g.Eax = (byte)g.Eax; FA320(w, g); g.Esi = esi; Drop(w, g, r);
+    }
+
+    /// <summary>F8C9: the moving message widget: with +1D from 6 on and the flag 2 of [19E7] the speed +1D falls by 6 and the position +4 grows by 6.</summary>
+    public static void FF8C9(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Cmp(r[0x1d], 6, 8); if (g.Cf) return;
+        g.Test(w.Ds[0x19e7], 2, 8); if (g.Zf) return;
+        r[0x1d] = Sub8(g, r[0x1d], 6); g.Add(U32(r, 4), 6); Put(r, 4, U32(r, 4) + 6);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

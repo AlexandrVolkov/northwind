@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 84138 | 6265 | 97 | 56382 | 44 |
+| LE:1 | 146882 | 83695 | 6265 | 97 | 56825 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -513,6 +513,14 @@
 | LE:1 `0xF250..0xF28B` | First contact, mutual | ported | [diplomacy.md](../docs/diplomacy.md); [diplomacy.json](../tests/fixtures/diplomacy.json) |  |
 | LE:1 `0xF28B..0xF33E` | Dialog handlers: replace the message type by the hermits' stone state (F28B, F29C, F2AD), crystal trades (F2BE, F2DE, F2FE, F31E) | ported | [diplomacy.md](../docs/diplomacy.md); [quest.json](../tests/fixtures/quest.json); [verify_quest.py](../tools/verify_quest.py); [OriginalQuestChecks.cs](../tests/OriginalQuestChecks.cs) | as above |
 | LE:1 `0xF33E..0xF5CE` | Dialog handlers: staff and crystal trades, gifts of the dying hermits, payments | ported | [diplomacy.md](../docs/diplomacy.md); [quest.json](../tests/fixtures/quest.json); [verify_quest.py](../tools/verify_quest.py); [OriginalQuestChecks.cs](../tests/OriginalQuestChecks.cs) | as above; F459..F49B are not message handlers |
+| LE:1 `0xF5CE..0xF5F2` | Gate of the message step (F5CE) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | F629 is a recorded stub |
+| LE:1 `0xF5F2..0xF629` | Free message number 14h..17h in the queue (F5F2) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed |
+| LE:1 `0xF781..0xF791` | E055 for the numbers 14h..17h (F781) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E055 is a recorded stub |
+| LE:1 `0xF791..0xF7A1` | E070 for the numbers 14h..17h (F791) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E070 is a recorded stub |
+| LE:1 `0xF7A1..0xF7D0` | Message widget timer and drop (F7A1) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E5F6 and E5AB are recorded stubs; DF2A runs as the ported code; the type 11h branch is not reached by the check |
+| LE:1 `0xF7D0..0xF862` | Widget of the demand message (F7D0) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | EE69, E5F6, E5AB, 1EAD8 and DEE4 are recorded stubs; DF2A runs as the ported code |
+| LE:1 `0xF862..0xF8C9` | Widget of the offer message (F862) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E5F6, E5AB, EE69 and EDD5 are recorded stubs; A320 and DF2A run as the ported code |
+| LE:1 `0xF8C9..0xF8E1` | Moving message widget: speed and position (F8C9) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed |
 | LE:1 `0x10075..0x100FA` | Lay a formation out around a goal | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x100FA..0x101B4` | Spread members along a formation segment | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
 | LE:1 `0x101B4..0x10262` | Nearest free member of a class to a formation point | ported | [formations.md](../docs/formations.md); [ai-formations.json](../tests/fixtures/ai-formations.json) |  |
