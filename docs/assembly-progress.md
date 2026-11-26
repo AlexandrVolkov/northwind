@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 87259 | 6265 | 97 | 53261 | 44 |
+| LE:1 | 146882 | 86871 | 6265 | 97 | 53649 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -230,6 +230,9 @@
 | LE:1 `0x5DA5..0x5DF6` | Command validity check, otherwise reset order table (5DA5) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | E5E6, E070, F791 and 4938 are recorded stubs |
 | LE:1 `0x5DF6..0x5E1C` | Group order failure: 20232, 672F, drop queue entries 32h (5DF6) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 20232 and 672F are recorded stubs; DF2A runs as the ported code |
 | LE:1 `0x5E1C..0x5F0A` | Scroll of the widget list and group check (5E1C) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 20232, 674F and DEE4 are recorded stubs; DF2A runs as the ported code |
+| LE:1 `0x5F0A..0x5FC5` | Group health widget tick: mean health and colour (5F0A) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 68BD runs as the ported code; none stubbed |
+| LE:1 `0x5FC5..0x6057` | Group widget tick: mean of byte +16 (5FC5) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed |
+| LE:1 `0x6057..0x608E` | Widget follows settlement group: rebuild via B3B6 (6057) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 20232 and B3B6 are recorded stubs |
 | LE:1 `0x62FE..0x6304` | Check fifth queue slot | ported | [recruitment-production.md](../docs/recruitment-production.md); [production.json](../tests/fixtures/production.json) | Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора. |
 | LE:1 `0x6330..0x6342` | Append a template to the first unused queue slot | ported | [recruitment-production.md](../docs/recruitment-production.md); [production.json](../tests/fixtures/production.json) | Только указанный контракт, без полного WRK/C88C, интерфейса и исходного аллокатора. |
 | LE:1 `0x6361..0x6377` | Widget: afford and consume one unit of +1A (6361) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) |  |

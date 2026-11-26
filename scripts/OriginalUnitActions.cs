@@ -3236,6 +3236,73 @@ public static class OriginalUnitActions
     }
     private static void Fail5E1C(IUnitActionWorld w, ActionRegs g) { w.Call(0x674f, g); g.Al = 0x33; FDF2A(w, g); g.Al = 0x2c; FDF2A(w, g); }
 
+    /// <summary>5F0A: tick of the group-health widget (ESI): +1A counts; every 20h-th tick the objects of the chain of the owner [1972] with +1B = [1C87] and positive +19 contribute (+19 * 128) / (+45 of their template) to the sum [1F31], their number to [1F35]; the mean AH is compared with +14: a change stores it, picks the colour +16 (B2h, 51h or 22h by the thresholds +15 / 2 and / 4) and marks the widget (+0 |= 80h).</summary>
+    public static void F5F0A(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; r[0x1a] = Inc8(g, r[0x1a]); g.Test(r[0x1a], 0x1f, 8); if (!g.Zf) return;
+        Chain5F0A(w, g, d, r, true);
+        g.Ah = g.Al; g.Cmp(r[0x14], g.Ah, 8); if (g.Zf) return;
+        g.Al = r[0x15]; g.Bl = 0xb2; g.Al = (byte)g.Shr(g.Al, 1, 8); g.Cmp(g.Ah, g.Al, 8);
+        if (!(g.Cf || g.Zf)) { }
+        else
+        {
+            g.Bl = 0x51; g.Al = (byte)g.Shr(g.Al, 1, 8); g.Cmp(g.Ah, g.Al, 8);
+            if (g.Cf || g.Zf) g.Bl = 0x22;
+        }
+        r[0x16] = g.Bl; r[0x14] = g.Ah; r[0] |= 0x80; g.Logic((uint)r[0], 8);
+    }
+
+    /// <summary>5FC5: as 5F0A, but sums the byte +16 of the objects; the mean AL is stored in +14 (+0 |= 80h) when it changed.</summary>
+    public static void F5FC5(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; r[0x1a] = Inc8(g, r[0x1a]); g.Test(r[0x1a], 0x1f, 8); if (!g.Zf) return;
+        Chain5F0A(w, g, d, r, false);
+        g.Cmp(r[0x14], g.Al, 8); if (g.Zf) return;
+        r[0x14] = g.Al; r[0] |= 0x80; g.Logic((uint)r[0], 8);
+    }
+
+    private static void Chain5F0A(IUnitActionWorld w, ActionRegs g, byte[] d, byte[] r, bool health)
+    {
+        g.Eax = 0xf5; Mul8(g, 0xf5, d[0x1972]); var part = w.PartOf(d[0x1972]);
+        g.Ebp = U32(part, 9); g.Add(g.Ebp, w.PoolBase); g.Ebp += w.PoolBase;
+        g.Edi = U32(part, 0xe); g.Add(g.Edi, w.PoolBase); g.Edi += w.PoolBase;
+        Put(d, 0x1f31, 0); Put(d, 0x1f35, 0);
+        g.Cmp(g.Edi, g.Ebp, 32);
+        while (!g.Zf)
+        {
+            uint edi = g.Edi; var o = w.ObjectAt(edi); g.Al = o[0x1b]; g.Cmp(g.Al, d[0x1c87], 8);
+            if (g.Zf)
+            {
+                g.Cmp(o[0x19], 0, 8);
+                if (!g.Jle)
+                {
+                    if (health)
+                    {
+                        w.Call(0x68bd, g); var t = w.ObjectAt(g.Edx);
+                        g.Eax = (uint)o[0x19] << 7; Div8(g, t[0x45]); g.Eax &= 0xff;
+                    }
+                    else g.Eax = o[0x16];
+                    Put(d, 0x1f31, U32(d, 0x1f31) + g.Eax); Put(d, 0x1f35, U32(d, 0x1f35) + 1);
+                }
+            }
+            edi += U32(o, 0x10); g.Edi = edi; g.Cmp(g.Edi, g.Ebp, 32);
+        }
+        g.Eax = 0; g.Edx = 0; g.Logic(0, 32); g.Cmp(U32(d, 0x1f35), 0, 32);
+        if (!g.Zf)
+        {
+            uint cnt = U32(d, 0x1f35), sum = U32(d, 0x1f31); g.Eax = sum / cnt; g.Edx = sum % cnt;
+        }
+    }
+
+    /// <summary>6057: the settlement group (20232) whose +22 differs from the widget's +1A is stored there and the widget is rebuilt (B3B6 with EBX = 20h, ECX = 252h, EDX = +8).</summary>
+    public static void F6057(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Edi = U32(d, 0xed20); g.Add(g.Edi, 0x9df); g.Edi += 0x9df; g.Bl = d[0x1c87]; w.Call(0x20232, g);
+        if (g.Zf) return;
+        g.Eax = U32(w.ObjectAt(g.Edi), 0x22); g.Cmp(g.Eax, U32(r, 0x1a), 32); if (g.Zf) return;
+        Put(r, 0x1a, g.Eax); g.Ebx = 0x20; g.Ecx = 0x252; g.Edx = U32(r, 8); w.Call(0xb3b6, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
