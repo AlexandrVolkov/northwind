@@ -111,10 +111,26 @@ FUNCS = {
     'fa444': (0xa444, 0xa47e, [0x9e41, 0x1416b]),
     'fa47e': (0xa47e, 0xa4a9, [0x1416b]),
     'fa4a9': (0xa4a9, 0xa4c2, [0x1416b]),
+    'fce9d': (0xce9d, 0xcf07, [0x9e41]),
+    'fcf07': (0xcf07, 0xcf41, []),
+    'fcf41': (0xcf41, 0xcf77, []),
+    'f6377': (0x6377, 0x63cb, []),
+    'f6361': (0x6361, 0x6377, []),
+    'f63cb': (0x63cb, 0x63f7, []),
+    'f63f7': (0x63f7, 0x640b, []),
+    'f640b': (0x640b, 0x6423, []),
+    'f6423': (0x6423, 0x643c, []),
+    'f643c': (0x643c, 0x645b, []),
+    'f645b': (0x645b, 0x64ad, []),
+    'f66bb': (0x66bb, 0x66df, []),
+    'f66df': (0x66df, 0x66e9, []),
+    'f67bd': (0x67bd, 0x6877, []),
+    'f67c0': (0x67c0, 0x6877, []),
+    'f67d3': (0x67d3, 0x6877, []),
     'f84aa': (0x84aa, 0x8659, [0x8d89, 0x8c98, 0x8ca1, 0xc331, 0x8c47, 0x8af4, 0x8c89, 0xcfac, 0x123d3, 0xd101, 0x8b0f, 0xc35f]),
 }
 POOLREC, OBJ1, OBJ2, TMPL = 0x800, 0x900, 0xa00, 0xc00
-DS_WINDOWS = [(0x19c0, 0x40), (0x1c30, 0x50), (0x4160, 0x10), (0x9080, 0x10), (0x1978, 0x48), (0x1c80, 0x50), (0x1ec0, 0x10), (0x1960, 0x18), (0x9090, 0x10), (0x1904, 0x10), (0x33c, 0x100), (0x640, 0xc)]   # filled with pseudo-random bytes (the globals of the functions that read them)
+DS_WINDOWS = [(0x19c0, 0x40), (0x1c30, 0x50), (0x4160, 0x10), (0x9080, 0x10), (0x1978, 0x48), (0x1c80, 0x50), (0x1ec0, 0x10), (0x1960, 0x18), (0x9090, 0x10), (0x1904, 0x10), (0x33c, 0x100), (0x640, 0xc), (0x1940, 0x20)]   # filled with pseudo-random bytes (the globals of the functions that read them)
 
 
 class ActionOracle(CombatOracle):
@@ -147,7 +163,7 @@ def cases(names):
     rng = random.Random(0x8e3c)
     out = []
     for n in range(2500):
-        out.append({'fn': rng.choice(names + ['fd2d1'] * 4 + ['fb319'] * 4 + ['fc0f6'] * 5 + ['fcb77'] * 4 + ['fcccb'] * 4 + ['fdb47'] * 5 + ['fdbae'] * 8 + ['fdc91'] * 14 + ['fde0c'] * 8 + ['f4409'] * 2 + ['fa320'] * 6 + ['fa38a'] * 8 + ['fa416'] * 4 + ['fa444'] * 8 + ['fa47e'] * 3 + ['fa4a9'] * 3 + ['f9bf9'] * 3 + ['f9c57'] * 14 + ['f7012'] * 6 + ['f704f'] * 4 + ['f7069'] * 8), 'r': rng.randrange(1 << 32), 'o1': rng.randrange(1 << 32), 'o2': rng.randrange(1 << 32), 'tm': rng.randrange(1 << 32), 'f1c': rng.choice([0, 0x900, 0xa00]), 'f14': rng.choice([0, 1, 2, 3, 4, 5, 0x40, 0x41, 0x4a, 0x2d, (rng.randrange(256) & ~7) | rng.randrange(6)]), 'f19': rng.choice([0, 1, 5, 0x80, 0xff, rng.randrange(256)]), 'pt': rng.randrange(1 << 32), 'f3': rng.randrange(8), 'nch': rng.randrange(0, 5), 'st': rng.randrange(0, 5), 'bm': rng.choice([8, 0x1000, 0x20000, 0xffffffff, 0x10, rng.randrange(1 << 32)]), 'sel': rng.randrange(4), 'g273': rng.randrange(1, 5), 'g274': rng.randrange(1, 5), 'ds': rng.randrange(1 << 32), 'tab': rng.randrange(1 << 32), 'fs13d': rng.randrange(256), 'px': rng.randrange(1024), 'py': rng.randrange(1024), 'cur': rng.choice([0xffffffff, rng.randrange(0x3ff), rng.randrange(0x3ff), 0]), 'g525': rng.randrange(256), 'g526': rng.randrange(256), 'g1c61': rng.choice([0, 1, 5, rng.randrange(256)]), 'g2730': rng.choice([0xffffffff, 0, rng.randrange(1 << 32)]), 'rt': rng.randrange(1 << 32), 'map': rng.randrange(1 << 32), 'f15': rng.choice([0, 1, 2, 3, 0x10, 0x11, rng.randrange(256)]), 'f31': rng.choice([0, 1, rng.randrange(256)]),
+        out.append({'fn': rng.choice(names + ['fd2d1'] * 4 + ['fb319'] * 4 + ['fc0f6'] * 5 + ['fcb77'] * 4 + ['fcccb'] * 4 + ['fdb47'] * 5 + ['fdbae'] * 8 + ['fdc91'] * 14 + ['fde0c'] * 8 + ['f4409'] * 2 + ['f6377'] * 5 + ['f6361'] * 5 + ['f63cb'] * 5 + ['f63f7'] * 5 + ['f640b'] * 5 + ['f6423'] * 5 + ['f643c'] * 5 + ['f645b'] * 5 + ['f66bb'] * 5 + ['f66df'] * 5 + ['f67bd'] * 5 + ['f67c0'] * 5 + ['f67d3'] * 5 + ['fce9d'] * 6 + ['fcf07'] * 6 + ['fcf41'] * 8 + ['fa320'] * 6 + ['fa38a'] * 8 + ['fa416'] * 4 + ['fa444'] * 8 + ['fa47e'] * 3 + ['fa4a9'] * 3 + ['f9bf9'] * 3 + ['f9c57'] * 14 + ['f7012'] * 6 + ['f704f'] * 4 + ['f7069'] * 8), 'r': rng.randrange(1 << 32), 'o1': rng.randrange(1 << 32), 'o2': rng.randrange(1 << 32), 'tm': rng.randrange(1 << 32), 'f1c': rng.choice([0, 0x900, 0xa00]), 'f14': rng.choice([0, 1, 2, 3, 4, 5, 0x40, 0x41, 0x4a, 0x2d, (rng.randrange(256) & ~7) | rng.randrange(6)]), 'f19': rng.choice([0, 1, 5, 0x80, 0xff, rng.randrange(256)]), 'pt': rng.randrange(1 << 32), 'f3': rng.randrange(8), 'nch': rng.randrange(0, 5), 'st': rng.randrange(0, 5), 'bm': rng.choice([8, 0x1000, 0x20000, 0xffffffff, 0x10, rng.randrange(1 << 32)]), 'sel': rng.randrange(4), 'g273': rng.randrange(1, 5), 'g274': rng.randrange(1, 5), 'ds': rng.randrange(1 << 32), 'tab': rng.randrange(1 << 32), 'fs13d': rng.randrange(256), 'px': rng.randrange(1024), 'py': rng.randrange(1024), 'cur': rng.choice([0xffffffff, rng.randrange(0x3ff), rng.randrange(0x3ff), 0]), 'g525': rng.randrange(256), 'g526': rng.randrange(256), 'g1c61': rng.choice([0, 1, 5, rng.randrange(256)]), 'g2730': rng.choice([0xffffffff, 0, rng.randrange(1 << 32)]), 'rt': rng.randrange(1 << 32), 'map': rng.randrange(1 << 32), 'f15': rng.choice([0, 1, 2, 3, 0x10, 0x11, rng.randrange(256)]), 'f31': rng.choice([0, 1, rng.randrange(256)]),
                     'f30': rng.choice([0, 0x10, 0x91, 0xf3, rng.randrange(256)]), 'f17': rng.choice([0, 2, 0x40, 0x42, rng.randrange(1 << 16)]), 'g1c9f': rng.choice([0, 0x40, 0x80, rng.randrange(256)]), 'g512': rng.choice([0, 0, 1, rng.randrange(1 << 20)]),
                     'g51a': rng.randrange(1 << 20), 'g51e': rng.choice([0, 0x400900]), 'g522': rng.choice([0, 3, rng.randrange(256)]),
                     'regs': [rng.choice([0, 1, 2, 3, rng.randrange(1 << 32)]) for _ in range(5)],
@@ -180,6 +196,24 @@ def cases(names):
             for call in c['calls']: call[1] = (call[1] & ~0xff) | (call[1] % 8); call[3] = rng.choice([0, 0x402000, 0x402000])
             c['sel'] = n % 3
         if c['fn'] in ('fa416', 'fa444', 'fa4a9'): c['regs'][0] = rng.choice([0, 1, 5, rng.randrange(1 << 32)]); c['regs'][1] = rng.choice([0, 0xff, 0x1, 0x80, rng.randrange(1 << 32)])
+        if c['fn'] in ('fce9d', 'fcf07', 'fcf41'):
+            c['sel'] = n % 4; seg = bytearray(prng(c['map'] + 3, 8192))
+            if c['sel'] & 2:
+                for t in range(1024): seg[t * 8 + 2] = seg[t * 8 + 3] = ((seg[t * 8 + 2] & 15) * 17 if c['sel'] & 1 == 0 else seg[t * 8 + 2])
+            t = rng.randrange(1024); desc = struct.unpack_from('<I', seg, t * 8)[0]
+            if c['fn'] == 'fce9d':
+                c['regs'][0] = desc if n % 5 else rng.randrange(1 << 32)
+                for call in c['calls']: call[1] = call[1] % 256
+            elif c['fn'] == 'fcf07':
+                c['regs'][1] = rng.choice([0x7, 0xf00, 0xffff0f00, 0xff, rng.randrange(1 << 32), 0xffffffff]); c['regs'][0] = desc if n % 4 else rng.randrange(1 << 32)
+            else:
+                c['regs'][0] = ((desc >> 8 & 0xff) << 8) | (desc & 7) if n % 3 else rng.randrange(1 << 32)
+                if c['sel'] & 2 and n % 3: c['regs'][0] = ((seg[t * 8 + 1]) << 8) | (seg[t * 8] & 7)
+        if c['fn'] in ('f6377', 'f6361', 'f63cb', 'f63f7', 'f640b', 'f6423', 'f643c', 'f645b', 'f66bb', 'f66df', 'f67bd', 'f67c0', 'f67d3'):
+            c['sel'] = n % 4; c['wi'] = bytes(rng.randrange(256) for _ in range(0x30)).hex()
+            if c['fn'] in ('f67bd', 'f67d3'): c['regs'][0] = rng.randrange(32); c['regs'][1] = rng.randrange(32)
+            if c['fn'] == 'f67c0': c['regs'][0] = rng.randrange(14 * 32); c['regs'][1] = rng.randrange(14 * 32)
+            c['cad'] = [0, 31, 32, 33, 100, 0x400, 0x1fff, rng.randrange(0x2000)][n % 8]
         if c['fn'] == 'fd2d1': c['px'] = 160 + n * 7 % 340; c['py'] = 160 + n * 13 % 340
         if c['fn'] == 'fb319': c['px'] = n % 40; c['py'] = (n // 3) % 40
         if c['fn'] == 'fcb77': c['f22'] = [0x31, 0x31, 0x3b, 0, 0x40, 0x31][n % 6]; c['f19'] = rng.choice([1, 5, 0x80])
@@ -199,6 +233,8 @@ def generate(game, names):
             if addr == 0x6885: o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + TMPL); o.ret(); return   # the template lookup keeps everything but EDI
             if addr == 0x68bd: o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + TMPL); o.ret(); return   # the template lookup keeps everything but EDX
             zf, ax, bx, cx, dx, di = state['calls'].pop(0) if state['calls'] else (1, 0, 0, 0, 0, 0)
+            if addr == 0x9e41:   # the random byte: only EAX (and ZF) change
+                o.cpu.reg_write(UC_X86_REG_EAX, ax); o.cpu.reg_write(UC_X86_REG_EFLAGS, (reg(UC_X86_REG_EFLAGS) & ~0x40) | (0x40 if zf else 0)); o.ret(); return
             o.cpu.reg_write(UC_X86_REG_EAX, ax); o.cpu.reg_write(UC_X86_REG_EBX, bx); o.cpu.reg_write(UC_X86_REG_ECX, cx)
             o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + TMPL if addr in (0xc4cd, 0x982b) else dx); o.cpu.reg_write(UC_X86_REG_EDI, di)
             if addr == 0xa758 or addr == 0xac63 or (addr == 0xc4cd and state['fn'] in ('fcb77', 'fcc7b')): o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + (OBJ1 if di & 1 else OBJ2))
@@ -215,8 +251,8 @@ def generate(game, names):
         o.prepare(32, 32); o.mode = 'actions'
         o.RANGES['actions'] = ([(entry, end)], [])
         o.stubs = {a: stub(a, None) for a in callees if a not in (0x6885, 0x68bd)}
-        o.RANGES['actions'] = ([(entry, end), (0x6877, 0x68d8), (0x4409, 0x4442), (0xdb47, 0xdc91), (0xa416, 0xa444)], [])
-        o.cpu.mem_write(o.POOL, bytes(0x3000)); o.cpu.mem_write(o.FS + 0x17f, bytes(4)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x1c49, struct.pack('<I', o.POOL + TMPL))
+        o.RANGES['actions'] = ([(entry, end), (0x6877, 0x68d8), (0x4409, 0x4442), (0xdb47, 0xdc91), (0xa416, 0xa444), (0x6361, 0x6377), (0x6377, 0x63cb), (0x6423, 0x643c)], [])
+        o.cpu.mem_write(o.POOL, bytes(0x3000)); o.cpu.mem_write(o.FS + 0x17f, bytes(4)); o.cpu.mem_write(0x4c0, bytes(0x110)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x1c49, struct.pack('<I', o.POOL + TMPL))
         r = bytearray(prng(case['r'], 0x50)); r[0] %= 3; r[0xe] = 0; r[3] = case['f3']; struct.pack_into('<II', r, 4, case['px'], case['py']); struct.pack_into('<I', r, 0x28, case['cur']); r[0x14] = case['f14']; r[0x19] = case['f19']; r[0x15] = case['f15']; r[0x31] = case['f31']; r[0x30] = case['f30']
         if 'f22' in case: r[0x22] = case['f22']
         if 'f23' in case: r[0x23] = case['f23']; struct.pack_into('<I', r, 0x24, case['f24'])
@@ -247,7 +283,7 @@ def generate(game, names):
         for i in range(256): tab += bytes([tv[i] & 0x7f, (i * 167 + (case['tab'] & 0xff)) & 0xff])
         o.cpu.mem_write(o.STACK + 0x900, bytes(tab) + b'\xff\xff'); o.cpu.mem_write(o.POOL + 0x1900, struct.pack('<4I', o.POOL + OBJ1, o.POOL + OBJ2, o.POOL + OBJ1, o.POOL + OBJ2))
         o.cpu.mem_write(0x1ccb, bytes(0x16 * 256 + 4)); o.cpu.mem_write(0x1f45, struct.pack('<%dI' % len(lst), *lst))
-        dsb = prng(case['ds'], 0x29c)
+        dsb = prng(case['ds'], 0x2bc)
         for k, (wa, wn) in enumerate(DS_WINDOWS): o.cpu.mem_write(wa, dsb[sum(n for _, n in DS_WINDOWS[:k]):sum(n for _, n in DS_WINDOWS[:k + 1])])
         o.cpu.mem_write(o.FS + 0x13d, bytes([case['fs13d']])); o.cpu.mem_write(0x1c49, struct.pack('<I', o.POOL + TMPL))
         o.cpu.mem_write(0x273f, bytes([case['g273'], case['g274']]))
@@ -313,16 +349,46 @@ def generate(game, names):
             o.cpu.mem_write(o.POOL + 0x2000, struct.pack('<I', (0, 0x900, 0xa00)[case['sel']]))
         if case['fn'] == 'fa47e':
             rr = bytearray(o.cpu.mem_read(o.POOL + POOLREC, 0x50)); rr[1] %= 3; o.cpu.mem_write(o.POOL + POOLREC, bytes(rr))
+        if case['fn'] in ('f6377', 'f6361', 'f63cb', 'f63f7', 'f640b', 'f6423', 'f643c', 'f645b', 'f66bb', 'f66df', 'f67bd', 'f67c0', 'f67d3'):
+            fn, sel = case['fn'], case['sel']; wi = bytearray(bytes.fromhex(case['wi'])); ob = bytearray(o.cpu.mem_read(o.POOL + OBJ1, 0x50))
+            if fn != 'f645b': wi[3] %= 8
+            o.cpu.mem_write(0x1969, struct.pack('<I', o.POOL + OBJ1)); o.cpu.mem_write(0x1cad, struct.pack('<I', case['cad']))
+            if fn in ('f6377', 'f6361'):
+                wi[2] = 0; wi[0x14] %= 3; ob[3] %= 8
+                if fn == 'f6361': wi[0x1a] = 1 if sel & 1 else wi[0x1a]
+                tb = bytearray(o.cpu.mem_read(o.POOL + TMPL, 0x100))
+                if sel & 2: tb[0x40] |= 8
+                else: tb[0x40] &= 0xf7
+                if sel & 1:
+                    for k in range(0x7c, 0x8c): tb[k] = tb[k] % 4 if k % 4 == 0 else 0
+                o.cpu.mem_write(o.POOL + TMPL, bytes(tb)); pa = 0x97a + 0xf5 * ob[3]; pbb = bytearray(o.cpu.mem_read(pa, 0xf5))
+                if sel & 1:
+                    for k in range(0x18, 0x28): pbb[k] = 100 if k % 4 == 0 else 0
+                o.cpu.mem_write(pa, bytes(pbb))
+            if fn == 'f63cb' and sel & 1: wi[0x14] = ob[0x19]
+            if fn == 'f63f7' and sel & 1: wi[0x14] = ob[0x16]
+            if fn == 'f640b': wi[0x1a] %= 0x40; ob_idx = wi[0x1a]; wi[0x14] = ob[ob_idx] if sel & 1 else wi[0x14]
+            if fn == 'f6423' and sel & 1: wi[0x14] = ob[0x27]
+            if fn == 'f643c':
+                struct.pack_into('<I', wi, 0x15, o.POOL + OBJ1); wi[0x14] = 1 if sel & 1 else wi[0x14]
+                if sel & 2: struct.pack_into('<I', wi, 0x1a, (struct.unpack_from('<I', ob, 0)[0] & (0xff if wi[0x14] == 1 else 0xffffff)))
+            if fn == 'f645b':
+                wi[0x1a] %= 0x40; wi[3] = [0, 1, 3, 3][sel]; wi[0x12] = 0x7f + wi[0x12] % 0x7e; wi[0x15] %= 130
+            if fn in ('f67bd', 'f67c0', 'f67d3'):
+                o.cpu.mem_write(0x1906, struct.pack('<II', case['regs'][2] % 12, case['regs'][3] % 12)); o.cpu.mem_write(0x190a, struct.pack('<I', case['regs'][3] % 12)); o.cpu.mem_write(0x1906, struct.pack('<I', case['regs'][2] % 12))
+                o.cpu.mem_write(0x18da, struct.pack('<I', o.POOL + 0x2e00)); o.cpu.mem_write(o.POOL + 0x2e00, prng(case['ds'] + 50, 1024))
+                seg = bytearray(prng(case['map'] + 3, 8192)); o.cpu.mem_write(o.SEG, bytes(seg))
+            r[3] = wi[3]; o.cpu.mem_write(o.POOL + OBJ1, bytes(ob)); o.cpu.mem_write(o.POOL + POOLREC, bytes(wi) + bytes(o.cpu.mem_read(o.POOL + POOLREC + 0x30, 0x50 - 0x30)))
         if case['fn'] == 'fdc91':
             tb = bytearray(o.cpu.mem_read(o.POOL + TMPL, 0x100)); tb[0x45] = 1 + tb[0x45] % 200; tb[0x4a] %= tb[0x45] + 1; tb[0x51] %= 3; tb[0x52] %= 3; tb[0x4c] %= 0x30; o.cpu.mem_write(o.POOL + TMPL, bytes(tb))
             rr = bytearray(o.cpu.mem_read(o.POOL + POOLREC, 0x50))
             if case['sel'] & 1: rr[0x1a] = rr[0x19]
             if case['sel'] & 2: rr[0x19] = 1 + rr[0x19] % 100; rr[0x1a] = 0
             o.cpu.mem_write(o.POOL + POOLREC, bytes(rr))
-        if case['fn'] == 'fde0c':
-            seg = bytearray(prng(case['map'] + 3, 8192))
+        if case['fn'] in ('fde0c', 'fce9d', 'fcf07', 'fcf41'):
+            seg = bytearray(prng(case['map'] + 3, 8192)); o.cpu.mem_write(0x1902, struct.pack('<I', 1024))
             if case['sel'] & 2:
-                for t in range(1024): seg[t * 8 + 2] = seg[t * 8 + 3] = (seg[t * 8 + 2] & 15) * 17
+                for t in range(1024): seg[t * 8 + 2] = seg[t * 8 + 3] = ((seg[t * 8 + 2] & 15) * 17 if case['sel'] & 1 == 0 else seg[t * 8 + 2])
             o.cpu.mem_write(o.SEG, bytes(seg))
             if case['sel'] & 1:   # sparse planes: a cell in sixteen holds an object
                 for k in range(4): o.cpu.mem_write(o.POOL + 0x4000 + 0x1000 * k, b''.join(struct.pack('<I', OBJ1 if b % 16 == 0 else 0) for b in prng(case['map'] + k, 1024)))
@@ -347,8 +413,8 @@ def generate(game, names):
         try: o.run(o.CODE + entry)
         except Exception: print('FAIL', all_cases.index(case), case['fn'], hex(o.cpu.reg_read(UC_X86_REG_EIP) - o.CODE), [hex(o.cpu.reg_read(q)) for q in (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_EDI, UC_X86_REG_ESI)]); raise
         fl = reg(UC_X86_REG_EFLAGS)
-        out = (bytes(o.cpu.mem_read(o.POOL + POOLREC, 0x80)) + bytes(o.cpu.mem_read(o.POOL + OBJ1, 0x50)) + bytes(o.cpu.mem_read(o.POOL + OBJ2, 0x50)) + bytes(o.cpu.mem_read(0x1c9f, 1)) + bytes(o.cpu.mem_read(0x512, 4)) + bytes(o.cpu.mem_read(0x50e, 4)) + bytes(o.cpu.mem_read(0x1ccb + 0x16 * r[3], 1)) + bytes(o.cpu.mem_read(0x525, 2)) + bytes(o.cpu.mem_read(0x1c61, 1)) + b''.join(bytes(o.cpu.mem_read(a, n)) for a, n in DS_WINDOWS) + bytes(o.cpu.mem_read(o.FS + 0x13d, 1)) + b''.join(bytes(o.cpu.mem_read(o.POOL + 0xa000 + k * 0x1a35 + 0x170, 0x40)) for k in range(3)) + b''.join(bytes(o.cpu.mem_read(o.POOL + 0xa000 + k * 0x1a35 + 0x70, 0x10)) for k in range(8)) + bytes(o.cpu.mem_read(0x1ca2, 0x20)) + bytes(o.cpu.mem_read(0x1f0a, 0x7b)) + bytes(o.cpu.mem_read(o.FS + 0x17f, 4)) + bytes(o.cpu.mem_read(o.POOL + 0x2800, 0x100))
-               + struct.pack('<IIIII', *[rel(reg(q)) for q in (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX, UC_X86_REG_EDX, UC_X86_REG_EDI)]) + bytes([(fl >> 6) & 1, fl & 1]) + bytes(o.cpu.mem_read(0x97a + 0xf5 * case['f3'], 0xf5)) + (b''.join(bytes(o.cpu.mem_read(o.POOL + 0x4000 + 0x1000 * k, 0x1000)) for k in range(4)) if case['fn'] == 'fd2d1' else b'') + b''.join(log))
+        out = (bytes(o.cpu.mem_read(o.POOL + POOLREC, 0x80)) + bytes(o.cpu.mem_read(o.POOL + OBJ1, 0x50)) + bytes(o.cpu.mem_read(o.POOL + OBJ2, 0x50)) + bytes(o.cpu.mem_read(0x1c9f, 1)) + bytes(o.cpu.mem_read(0x512, 4)) + bytes(o.cpu.mem_read(0x50e, 4)) + bytes(o.cpu.mem_read(0x1ccb + 0x16 * r[3], 1)) + bytes(o.cpu.mem_read(0x525, 2)) + bytes(o.cpu.mem_read(0x1c61, 1)) + b''.join(bytes(o.cpu.mem_read(a, n)) for a, n in DS_WINDOWS) + bytes(o.cpu.mem_read(o.FS + 0x13d, 1)) + b''.join(bytes(o.cpu.mem_read(o.POOL + 0xa000 + k * 0x1a35 + 0x170, 0x40)) for k in range(3)) + b''.join(bytes(o.cpu.mem_read(o.POOL + 0xa000 + k * 0x1a35 + 0x70, 0x10)) for k in range(8)) + bytes(o.cpu.mem_read(0x1ca2, 0x20)) + bytes(o.cpu.mem_read(0x1f0a, 0x1fa)) + bytes(o.cpu.mem_read(0x4c0, 0x110)) + bytes(o.cpu.mem_read(o.FS + 0x17f, 4)) + bytes(o.cpu.mem_read(o.POOL + 0x2800, 0x100))
+               + struct.pack('<IIIII', *[rel(reg(q)) for q in (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX, UC_X86_REG_EDX, UC_X86_REG_EDI)]) + bytes([(fl >> 6) & 1, fl & 1]) + bytes(o.cpu.mem_read(0x97a + 0xf5 * r[3], 0xf5)) + (b''.join(bytes(o.cpu.mem_read(o.POOL + 0x4000 + 0x1000 * k, 0x1000)) for k in range(4)) if case['fn'] == 'fd2d1' else b'') + b''.join(log))
         if os.environ.get('DEBUG_CASE') == str(all_cases.index(case)): print('PYTHON', out.hex())
         digest.update(out); case['sha256_prefix'] = hashlib.sha256(out).hexdigest()[:10]
     return {'format_version': 1, 'source_sha256': {k: report['source_sha256'][k] for k in ['NORWIND.EXE']}, 'cases': all_cases, 'results': {'actions': {'case_count': len(all_cases), 'sha256': digest.hexdigest()}}}

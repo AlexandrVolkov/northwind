@@ -6989,6 +6989,291 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "1416B is a recorded stub"
+    },
+    {
+      "id": "le1-tile-random-ce9d",
+      "module": "LE:1",
+      "start": 52893,
+      "end": 52999,
+      "name": "Random tile with the same descriptor class bits (CE9D)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "9E41 is a recorded stub that changes only EAX"
+    },
+    {
+      "id": "le1-tile-list-cf07",
+      "module": "LE:1",
+      "start": 52999,
+      "end": 53057,
+      "name": "List of the tiles with a masked descriptor value (CF07)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-tile-find-cf41",
+      "module": "LE:1",
+      "start": 53057,
+      "end": 53111,
+      "name": "First tile of a class with equal property bytes (CF41)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-ui-6361",
+      "module": "LE:1",
+      "start": 25441,
+      "end": 25463,
+      "name": "Widget: afford and consume one unit of +1A (6361)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-ui-afford-6377",
+      "module": "LE:1",
+      "start": 25463,
+      "end": 25547,
+      "name": "Can the settlement afford the template of a widget (6377)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-ui-health-63cb",
+      "module": "LE:1",
+      "start": 25547,
+      "end": 25591,
+      "name": "Health gauge widget: value and colour (63CB)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-ui-follow-63f7",
+      "module": "LE:1",
+      "start": 25591,
+      "end": 25611,
+      "name": "Widget follows byte +16 of the selected object (63F7)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-ui-follow-640b",
+      "module": "LE:1",
+      "start": 25611,
+      "end": 25635,
+      "name": "Widget follows a byte of the selected object (640B)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-ui-follow-6423",
+      "module": "LE:1",
+      "start": 25635,
+      "end": 25660,
+      "name": "Widget follows byte +27 of the selected object (6423)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-ui-value-643c",
+      "module": "LE:1",
+      "start": 25660,
+      "end": 25691,
+      "name": "Widget follows a value at a pointer (643C)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-ui-follow-645b",
+      "module": "LE:1",
+      "start": 25691,
+      "end": 25773,
+      "name": "Widget follows a byte, kind 3 computes it (645B)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-ui-countdown-66bb",
+      "module": "LE:1",
+      "start": 26299,
+      "end": 26335,
+      "name": "Countdown dots row (66BB)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-ui-sum-66df",
+      "module": "LE:1",
+      "start": 26335,
+      "end": 26345,
+      "name": "Widget byte sum (66DF)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-cursor-target-67bd",
+      "module": "LE:1",
+      "start": 26557,
+      "end": 26743,
+      "name": "What is under the map cell for the player: selectable, blocking or nothing (67BD, 67C0, 67D3)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "army04-volcano-0",
+      "module": "ARMY__04.WRK",
+      "start": 0,
+      "end": 160,
+      "name": "Volcano script: pause, countdown and eruption effects",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/volcano.md",
+        "tests/fixtures/volcano.json",
+        "tools/verify_volcano.py",
+        "tests/OriginalVolcanoChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalVolcano.cs"
+      ],
+      "limitations": "FS:109 (9E41), FS:10D (9E55) and FS:19 (9727) are recorded stubs; the bytes 0A0..19A are data tables; the skirmish does not place volcanoes yet (the first map has none)"
     }
   ]
 }

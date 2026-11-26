@@ -2128,6 +2128,185 @@ public static class OriginalUnitActions
         uint pushed = g.Eax; g.Eax = g.Esi - w.PoolBase; w.Call(0x43b0, g); g.Eax = pushed; g.Bl = 0; g.Logic(0, 8);
     }
 
+    // ---- the tile descriptors of the map (CE9D, CF07, CF41): [18FE] the table of 8-byte descriptors, [1902] their number ----
+    private static uint Desc(IUnitActionWorld w, uint tile, int offset) => w.TileProperty(tile, offset);
+
+    /// <summary>CE9D: a random tile whose descriptor equals EAX in the bits FFFF0F00h: EAX = its index, ZF = 0; no such tile: ZF = 1. The registers but EAX are kept; 9E41 draws the random byte.</summary>
+    public static void FCE9D(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint sEsi = g.Esi, sEbx = g.Ebx, sEcx = g.Ecx, sEdx = g.Edx;
+        g.Eax &= 0xffff0f00; g.Logic(g.Eax, 32); g.Edx = g.Eax; uint count = U32(d, 0x1902); g.Ecx = 0;
+        for (uint t = 0; t < count; t++) { g.Eax = Desc(w, t, 0) & 0xffff0f00; if (g.Eax == g.Edx) g.Ecx++; }
+        g.Esi = U32(d, 0x18fe) + 8 * count; g.Ebx = 0;   // the scan has walked the table to its end
+        g.Test(g.Ecx, g.Ecx, 32);
+        if (!g.Zf)
+        {
+            w.Call(0x9e41, g); uint pushed = g.Edx; ulong product = (ulong)g.Eax * g.Ecx; g.Eax = (uint)product; g.Edx = (uint)(product >> 32); g.Cf = g.Of = g.Edx != 0;
+            g.Eax >>= 8; g.Edx = pushed; g.Ecx = g.Eax + 1;
+            g.Ebx = 0xffffffff; uint at = 0xffffffff;
+            do
+            {
+                do { at++; g.Ebx++; g.Eax = Desc(w, at, 0) & 0xffff0f00; } while (g.Eax != g.Edx);
+                g.Ecx--;
+            } while (g.Ecx != 0);
+            g.Eax = g.Ebx; g.Cl = 0xff; g.Logic(0xff, 8);
+        }
+        g.Esi = sEsi; g.Ebx = sEbx; g.Ecx = sEcx; g.Edx = sEdx;
+    }
+
+    /// <summary>CF07: the tiles whose descriptor has in the bits EBX the value EAX &amp; EBX: their indices as words at DS:1F45, ended by FFFFh; ECX = their number (ZF = 0 when there are some).</summary>
+    public static void FCF07(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint sEdi = g.Edi; g.Eax &= g.Ebx; g.Logic(g.Eax, 32); g.Edi = 0x1f45; g.Ecx = 0; uint count = U32(d, 0x1902);
+        for (uint t = 0; t < count; t++)
+        {
+            g.Edx = Desc(w, t, 0) & g.Ebx;
+            if (g.Edx == g.Eax) { g.Ecx++; PutW(d, (int)g.Edi, (ushort)t); g.Edi += 2; }
+        }
+        PutW(d, (int)g.Edi, 0xffff); g.Test(g.Ecx, g.Ecx, 32); g.Edi = sEdi;
+    }
+
+    /// <summary>CF41: the first tile whose descriptor has the class AL (byte 0 &amp; 7), the byte AH as byte 1 and equal bytes 2 and 3 (the latter turned by 4 bits): EAX = its index, ZF = 0; none: ZF = 1 and ECX = the number of tiles.</summary>
+    public static void FCF41(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Ecx = 0; uint count = U32(d, 0x1902);
+        for (; ; )
+        {
+            g.Ebx = Desc(w, g.Ecx, 0); g.Bl = (byte)(g.Bl & 7); g.Cmp(g.Bl, g.Al, 8);
+            if (g.Zf) { g.Cmp(g.Bh, g.Ah, 8); if (g.Zf) { g.Ebx = Desc(w, g.Ecx, 2); g.Cmp(g.Bl, g.Bh, 8); if (g.Zf) { g.Bl = (byte)((g.Bl << 4) | (g.Bl >> 4)); g.Cmp(g.Bl, g.Bh, 8); if (g.Zf) { g.Eax = g.Ecx; g.Cl = 0xff; g.Logic(0xff, 8); return; } } } }
+            g.Ecx++; g.Cmp(g.Ecx, count, 32); if (g.Zf) return;
+        }
+    }
+
+    // ---- the interface widgets that follow the selected object [1969] (6361..6877) ----
+    private static void Redraw(ActionRegs g, byte[] widget) { widget[0] |= 0x80; g.Logic(widget[0], 8); }   // or byte [esi], 80h
+
+    /// <summary>6377: can the settlement of the selected object [1969] afford the template AL of the army +14 of the widget ESI? ZF = 1 when it can (or the template has no price: bit 8 of +40), AL = 0.</summary>
+    public static void F6377(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Al = r[2]; g.Ah = r[0x14]; F68A0(w, g); var t = w.ObjectAt(g.Edi);
+        g.Test(U32(t, 0x40), 8, 32); if (g.Zf) return;
+        g.Ebx = U32(d, 0x1969); var ob = w.ObjectAt(g.Ebx); g.Eax = 0xf5; Mul8(g, g.Al, ob[3]); g.Ecx = (g.Eax & 0xffff) + 0x97a; var part = w.PartOf((byte)ob[3]);
+        for (int k = 0; k < 4; k++)
+        {
+            g.Eax = U32(t, 0x7c + 4 * k); g.Cmp(g.Eax, U32(part, 0x18 + 4 * k), 32); if (!g.Cf && !g.Zf) return;
+        }
+        g.Al = 0; g.Logic(0, 8);
+    }
+
+    /// <summary>6361: the widget with +1A = 1 that can be afforded (6377) drops +1A to 0 and asks for the picture +11 = 8.</summary>
+    public static void F6361(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Cmp(r[0x1a], 1, 8); if (!g.Zf) return;
+        F6377(w, g, r); if (!g.Zf) return;
+        r[0x1a] = Dec8(g, r[0x1a]); r[0x11] = 8;
+    }
+
+    /// <summary>63CB: the health of the selected object (+19) in +14 of the widget with the colour +16 (B2h above half of +15, 51h above a quarter, else 22h); a change asks for the redraw (+0 bit 80h).</summary>
+    public static void F63CB(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Eax = U32(d, 0x1969); g.Ah = w.ObjectAt(g.Eax)[0x19]; g.Cmp(r[0x14], g.Ah, 8); if (g.Zf) return;
+        g.Al = r[0x15]; g.Bl = 0xb2; g.Al = (byte)g.Shr(g.Al, 1, 8); g.Cmp(g.Ah, g.Al, 8);
+        if (g.Cf || g.Zf)
+        {
+            g.Bl = 0x51; g.Al = (byte)g.Shr(g.Al, 1, 8); g.Cmp(g.Ah, g.Al, 8);
+            if (g.Cf || g.Zf) g.Bl = 0x22;
+        }
+        r[0x16] = g.Bl; r[0x14] = g.Ah; Redraw(g, r);
+    }
+
+    /// <summary>63F7: +14 follows the byte +16 of the selected object.</summary>
+    public static void F63F7(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Eax = U32(d, 0x1969); g.Al = w.ObjectAt(g.Eax)[0x16]; g.Cmp(r[0x14], g.Al, 8); if (g.Zf) return;
+        r[0x14] = g.Al; Redraw(g, r);
+    }
+
+    /// <summary>640B: +14 follows the byte of the selected object at the offset +1A of the widget.</summary>
+    public static void F640B(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Eax = r[0x1a]; uint ptr = U32(d, 0x1969); g.Add(g.Eax, ptr); g.Eax += ptr; g.Al = w.ObjectAt(ptr)[r[0x1a]];
+        g.Cmp(r[0x14], g.Al, 8); if (g.Zf) return; r[0x14] = g.Al; Redraw(g, r);
+    }
+
+    /// <summary>6423: +14 follows the byte +27 of the selected object while it does not exceed +15.</summary>
+    public static void F6423(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Eax = U32(d, 0x1969); g.Al = w.ObjectAt(g.Eax)[0x27]; g.Cmp(g.Al, r[0x15], 8); if (!g.Cf && !g.Zf) return;
+        g.Cmp(r[0x14], g.Al, 8); if (g.Zf) return; r[0x14] = g.Al; Redraw(g, r);
+    }
+
+    /// <summary>643C: +1A (a dword) follows the value at the pointer +15: a byte when +14 = 1, else three bytes.</summary>
+    public static void F643C(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Ebx = U32(r, 0x15); var o = w.ObjectAt(g.Ebx); g.Eax = o[0];
+        g.Cmp(r[0x14], 1, 8); if (!g.Zf) { g.Eax = U32(o, 0); g.Eax &= 0xffffff; g.Logic(g.Eax, 32); }
+        g.Cmp(g.Eax, U32(r, 0x1a), 32); if (g.Zf) return; Put(r, 0x1a, g.Eax); Redraw(g, r);
+    }
+
+    /// <summary>645B: +14 follows the byte of the selected object at the offset +1A; a widget of the kind +3 = 3 first computes it from the drawn state [194D] - +4 scaled to +15 / (+12 + 2).</summary>
+    public static void F645B(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; uint ptr = U32(d, 0x1969); g.Edx = r[0x1a]; g.Add(g.Edx, ptr); g.Edx += ptr; var ob = w.ObjectAt(ptr); int at = r[0x1a];
+        g.Test(r[3], 1, 8);
+        if (!g.Zf)
+        {
+            Put(d, 0x1946, 0xa5009c); Put(d, 0x1965, 0); g.Cmp(r[3], 3, 8);
+            if (g.Zf)
+            {
+                g.Eax = U32(d, 0x194d); g.Cmp(g.Eax, U32(r, 4), 32); g.Eax -= U32(r, 4); Mul8(g, g.Al, r[0x15]); g.Bl = r[0x12]; g.Bl = Add8(g, g.Bl, 2); Div8(g, g.Bl); ob[at] = g.Al;
+            }
+        }
+        g.Al = ob[at]; g.Cmp(g.Al, r[0x15], 8); if (!g.Cf && !g.Zf) return;
+        g.Cmp(r[0x14], g.Al, 8); if (g.Zf) return; r[0x14] = g.Al; Redraw(g, r);
+    }
+
+    /// <summary>66BB: the countdown [1CAD] / 20h as a row of dots (2Eh, at most 20h) at DS:4C4 ended by FFh.</summary>
+    public static void F66BB(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; Redraw(g, r); g.Eax = U32(d, 0x1cad); g.Edi = 0x4c4; g.Eax = g.Shr(g.Eax, 5, 32);
+        if (!g.Zf)
+        {
+            g.Cmp(g.Al, 0x20, 8); if (!(g.Cf || g.Zf)) g.Al = 0x20;
+            do { d[(int)g.Edi] = 0x2e; g.Edi++; g.Al = Dec8(g, g.Al); } while (g.Al != 0);
+        }
+        d[(int)g.Edi] = 0xff;
+    }
+
+    /// <summary>66DF: AL = +E + +3 + +F of the widget.</summary>
+    public static void F66DF(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Al = r[0xe]; g.Al = Add8(g, g.Al, r[3]); g.Al = Add8(g, g.Al, r[0xf]); }
+
+    /// <summary>67BD / 67C0 / 67D3: what is on the map cell: 67BD takes the cell (EBX = x, EAX = y), 67C0 the pixel offset on the screen (EAX = x, EBX = y; the view corner is added). Returns AL = 1, CF = 0 for an object the player [1972] may select (not a fogged cell, not template flag 8000h, an enemy only when it is visible [1CA8] and the tile class is not 1), CF = 1 for a blocking one (template flag 4) and AL = 0, CF = 1 for nothing.</summary>
+    public static void F67BD(IUnitActionWorld w, ActionRegs g) { uint t = g.Eax; g.Eax = g.Ebx; g.Ebx = t; F67D3(w, g); }
+    public static void F67C0(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Eax >>= 5; g.Ebx >>= 5; uint t = g.Eax; g.Eax = g.Ebx; g.Ebx = t; g.Add(g.Eax, U32(d, 0x190a)); g.Eax += U32(d, 0x190a); g.Add(g.Ebx, U32(d, 0x1906)); g.Ebx += U32(d, 0x1906); F67D3(w, g);
+    }
+    public static void F67D3(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Ah = d[0x18de]; Mul8(g, g.Al, g.Ah); g.Add(g.Ebx, g.Eax); g.Ebx += g.Eax; g.Cl = d[0x1972]; g.Eax = 1; g.Eax <<= (int)(g.Cl & 31);
+        g.Ecx = U32(d, 0x18da); g.Test(w.Peek(g.Ecx + g.Ebx), g.Al, 8); if (!g.Zf) goto none;
+        g.Ebx *= 4;
+        g.Eax = w.PlanePointer(2); g.Esi = w.PlaneRead(g.Eax + g.Ebx); g.Test(g.Esi, g.Esi, 32);
+        if (g.Zf) { g.Eax = w.PlanePointer(1); g.Esi = w.PlaneRead(g.Eax + g.Ebx); g.Test(g.Esi, g.Esi, 32); }
+        if (g.Zf) { g.Eax = w.PlanePointer(0); g.Esi = w.PlaneRead(g.Eax + g.Ebx); g.Test(g.Esi, g.Esi, 32); }
+        if (g.Zf) goto none;
+        g.Esi += w.PoolBase; g.Edi = U32(d, 0x18ee); g.Eax = g.Ebx / 4;   // the tile of the cell (the map word; the check map is the identity)
+        g.Edi = U32(d, 0x18fe); g.Cl = (byte)w.TileProperty(g.Eax, 0); g.Cl = (byte)(g.Cl & 7); g.Logic(g.Cl, 8);
+        F6885(w, g, w.ObjectAt(g.Esi)); var t = w.ObjectAt(g.Edi);
+        g.Test(U32(t, 0x40), 0x8000, 32); if (!g.Zf) goto none;
+        var o = w.ObjectAt(g.Esi); g.Al = o[3]; g.Cmp(g.Al, d[0x1972], 8);
+        if (!g.Zf)
+        {
+            g.Cmp(g.Cl, 1, 8); if (g.Zf) goto none;
+            g.Al = o[0x20]; g.Test(d[0x1ca8], g.Al, 8); if (g.Zf) goto none;
+        }
+        g.Test(U32(t, 0x40), 4, 32); if (!g.Zf) { g.Cf = true; return; }
+        g.Al = 0; g.Logic(0, 8); g.Al++; g.Zf = false; g.Sf = false; return;
+    none:
+        g.Al = 0; g.Logic(0, 8); g.Cf = true;
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
