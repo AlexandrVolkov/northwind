@@ -1763,7 +1763,7 @@ public static class OriginalUnitActions
         }
     }
 
-    // ---- the growth script of an object (DB47..DEC7): the footprint list, the strength nearby, the construction automaton, the check of the place ----
+    // ---- the hidden trap script (DB47..DEC7): the footprint list, the strength nearby, the construction automaton, the check of the place ----
     private static void Flags8(ActionRegs g, uint result, bool carry) { g.Zf = (result & 0xff) == 0; g.Sf = (result & 0x80) != 0; g.Cf = carry; g.Of = false; }
     private static byte Add8(ActionRegs g, byte a, byte b) { uint r = (uint)a + b; g.Zf = (r & 0xff) == 0; g.Sf = (r & 0x80) != 0; g.Cf = r > 0xff; g.Of = ((a ^ r) & (b ^ r) & 0x80) != 0; return (byte)r; }
     private static byte Sub8(ActionRegs g, byte a, byte b) { g.Cmp(a, b, 8); return (byte)(a - b); }
@@ -1850,7 +1850,7 @@ public static class OriginalUnitActions
         ushort sum = Add16(g, (ushort)g.Eax, U16(t, 0x48)); g.Eax = (g.Eax & 0xffff0000) | sum; PutW(r, 1, sum);
     }
 
-    /// <summary>DC91: the growth script of a building: +15 the phase (0 waiting for the health to reach the template's, 1 the builders are near, 2.. growing with the stages in the high nibble, 3 the last frames, 4 done), +22 the counter, +1 the frame, +19 the health.</summary>
+    /// <summary>DC91: the script of a hidden trap (OBE[20] hides it until it springs): +15 the phase (0 the health rises to the template's, 1 armed and hidden: it springs when the hostile units near it outweigh the others, 2.. growing with the stages in the high nibble, 3 the last frames, 4 done), +22 the counter, +1 the frame, +19 the health.</summary>
     public static void FDC91(IUnitActionWorld w, ActionRegs g, byte[] r)
     {
         var d = w.Ds; g.Eax = 0; r[0xf] = 0; r[0x22]++; g.Ebp = U32(d, 0x1c49); var t = w.ObjectAt(g.Ebp);
