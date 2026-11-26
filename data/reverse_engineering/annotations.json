@@ -7996,6 +7996,101 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "AE57, 20232, 1F62B and 4938 are recorded stubs; 68A0 and A4A9 run as the ported code; 51AC (D182) is not ported"
+    },
+    {
+      "id": "le1-tool-spell-friend-52a6",
+      "module": "LE:1",
+      "start": 21158,
+      "end": 21389,
+      "name": "Tool: spell on a friend (52A6)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "20232, 1FB9C, 1F71A, DEE4 and 4938 are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-tool-state7-538d",
+      "module": "LE:1",
+      "start": 21389,
+      "end": 21416,
+      "name": "Tool state 7 and its message (538D)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "20232, 1FB9C, 1F71A, DEE4 and 4938 are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-tool-end-53a8",
+      "module": "LE:1",
+      "start": 21416,
+      "end": 21444,
+      "name": "End of a tool (53A8)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "20232, 1FB9C, 1F71A, DEE4 and 4938 are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-tool-state8-53c4",
+      "module": "LE:1",
+      "start": 21444,
+      "end": 21459,
+      "name": "Tool state 8 (53C4)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "20232, 1FB9C, 1F71A, DEE4 and 4938 are recorded stubs; A4A9 runs as the ported code"
+    },
+    {
+      "id": "le1-tool-spell-thing-53d3",
+      "module": "LE:1",
+      "start": 21459,
+      "end": 21684,
+      "name": "Tool: spell on a thing (53D3)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "20232, 1FB9C, 1F71A, DEE4 and 4938 are recorded stubs; A4A9 runs as the ported code"
     }
   ]
 }

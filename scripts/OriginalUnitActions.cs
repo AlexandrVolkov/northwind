@@ -2950,6 +2950,58 @@ public static class OriginalUnitActions
     /// <summary>5297: the tool state 6.</summary>
     public static void F5297(IUnitActionWorld w, ActionRegs g) { w.L3[2] = 6; w.L3[0x12] = 0; }
 
+    /// <summary>52A6: the tool «spell on a friend» (cursor 36002Dh, 2C0023h on a unit of kind bit 10h that is not of kind 2): the left button (flag 8): effect 4, the object L3[5] as the target +1C of the selected object with the order [19C0] (a group: 20232, then 1FB9C with 96h); then 4938.</summary>
+    public static void F52A6(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Test(l[4], 1, 8); if (g.Zf) { EndTool(w, g); return; }
+        SetCursor(d, 0x36002d); g.Esi = U32(l, 5); g.Test(g.Esi, g.Esi, 32); if (g.Zf) { EndTool(w, g); return; }
+        g.Al = l[0xd]; g.Test(g.Al, 0x10, 8); if (g.Zf) { EndTool(w, g); return; }
+        g.Al &= 3; g.Logic(g.Al, 8); g.Cmp(g.Al, 2, 8); if (g.Zf) { EndTool(w, g); return; }
+        g.Cmp(g.Al, 3, 8); SetCursor(d, 0x2c0023);
+        g.Test(l[4], 8, 8); if (g.Zf) { EndTool(w, g); return; }
+        g.Eax = 9; g.Eax = 4; FA4A9(w, g);
+        SpellOrder(w, g, 0x1fb9c, true);
+    }
+
+    private static void SpellOrder(IUnitActionWorld w, ActionRegs g, uint service, bool withBl)
+    {
+        var d = w.Ds; g.Ecx = g.Esi; g.Cmp(g.Ecx, w.PoolBase, 32); g.Ecx -= w.PoolBase; g.Ah = d[0x19c0];
+        g.Cmp(d[0x1c89], 0, 8);
+        if (!g.Zf)
+        {
+            uint pushed = g.Esi; g.Edi = U32(d, 0xed20); g.Add(g.Edi, 0x9df); g.Edi += 0x9df; g.Bl = d[0x1c87]; w.Call(0x20232, g); g.Edx = pushed;
+            if (g.Zf) { w.Call(0x4938, g); return; }
+            if (withBl) g.Bl = 0x96;
+            w.Call(service, g); w.Call(0x4938, g); return;
+        }
+        g.Esi = U32(d, 0x1969); var sel = w.ObjectAt(g.Esi); Put(sel, 0x1c, g.Ecx); sel[0x14] &= 7; sel[0x14] |= g.Ah; g.Logic(sel[0x14], 8); w.Call(0x4938, g);
+    }
+
+    /// <summary>538D: the tool state 7 and the message 1D1h (DEE4).</summary>
+    public static void F538D(IUnitActionWorld w, ActionRegs g)
+    {
+        w.L3[2] = 7; w.L3[0x12] = 0; uint esi = g.Esi; g.Esi = 0x1d1; w.Call(0xdee4, g); g.Esi = esi;
+    }
+
+    /// <summary>53A8: the end of a tool: the key 1 or the right button (flag 10h) goes to 4938.</summary>
+    public static void F53A8(IUnitActionWorld w, ActionRegs g) => EndTool(w, g);
+
+    /// <summary>53C4: the tool state 8.</summary>
+    public static void F53C4(IUnitActionWorld w, ActionRegs g) { w.L3[2] = 8; w.L3[0x12] = 0; }
+
+    /// <summary>53D3: the tool «spell on a thing» (cursor 36002Dh, 2C0023h on an object whose template class +41 &amp; 0F is 4): as 52A6 with 1F71A.</summary>
+    public static void F53D3(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Test(l[4], 1, 8); if (g.Zf) { EndTool(w, g); return; }
+        SetCursor(d, 0x36002d); g.Esi = U32(l, 5); g.Test(g.Esi, g.Esi, 32); if (g.Zf) { EndTool(w, g); return; }
+        g.Edi = U32(l, 9); var t = w.ObjectAt(g.Edi); g.Eax = U32(t, 0x40); g.Ah = (byte)(g.Ah & 0xf); g.Logic(g.Ah, 8); g.Cmp(g.Ah, 4, 8); if (!g.Zf) { EndTool(w, g); return; }
+        SetCursor(d, 0x2c0023); g.Test(l[4], 8, 8); if (g.Zf) { EndTool(w, g); return; }
+        g.Eax = 7; g.Eax = 4; FA4A9(w, g);
+        SpellOrder(w, g, 0x1f71a, false);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
