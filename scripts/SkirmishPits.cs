@@ -127,6 +127,8 @@ public sealed partial class Skirmish
         public byte[] Route => throw new NotSupportedException();
         public uint TileDescriptor(uint tile) => 0;
         public uint TileProperty(uint cell, int offset) => 0;
+        public byte Peek(uint address) => 0;
+        public void Poke(uint address, byte value) { }
         public void SetG1CCB(int index, byte value) { }
     }
 }

@@ -6780,6 +6780,63 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "The row step advances the planes by twice the gap (EBP*2) as in the original; tile property read through TileProperty"
+    },
+    {
+      "id": "le1-text-width-7012",
+      "module": "LE:1",
+      "start": 28690,
+      "end": 28751,
+      "name": "Width of a text line in pixels from the font table (7012)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "Memory outside the objects through Peek/Poke of the check world"
+    },
+    {
+      "id": "le1-text-lines-704f",
+      "module": "LE:1",
+      "start": 28751,
+      "end": 28777,
+      "name": "Height of a text: lines · 12h (704F)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": ""
+    },
+    {
+      "id": "le1-text-names-7069",
+      "module": "LE:1",
+      "start": 28777,
+      "end": 28848,
+      "name": "Text copy with the %nK leader names (7069)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "The names are read from the participant records (DS:0A1E + 0F5h · owner)"
     }
   ]
 }
