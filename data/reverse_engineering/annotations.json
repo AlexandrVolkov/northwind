@@ -9098,6 +9098,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "none stubbed"
+    },
+    {
+      "id": "le1-msg-create-f629",
+      "module": "LE:1",
+      "start": 63017,
+      "end": 63361,
+      "name": "Message to the players: records in the queue, text, effects (F629)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "EAD8, 1416B and 9E69 are recorded stubs; F5F2, DF7E, 7012 and A4A9 run as the ported code; the record L3:3CDE is read through Peek (zero in the check); the check keeps one owner (6C6 = 1)"
     }
   ]
 }

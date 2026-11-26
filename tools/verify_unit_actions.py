@@ -208,6 +208,7 @@ FUNCS = {
     'f59de': (0x59de, 0x5af6, [0xdee4, 0x1416b]),
     'f42bb': (0x42bb, 0x43b0, [0x30]),
     'f4473': (0x4473, 0x44c0, []),
+    'ff629': (0xf629, 0xf781, [0xead8, 0x1416b, 0x9e69]),
     'f5ce': (0xf5ce, 0xf5f2, [0xf629]),
     'f5f2': (0xf5f2, 0xf629, []),
     'f781': (0xf781, 0xf791, [0xe055]),
@@ -254,7 +255,7 @@ def cases(names):
     rng = random.Random(0x8e3c)
     out = []
     for n in range(2500):
-        fn_pick = rng.choice(names + ['fd2d1'] * 4 + ['fb319'] * 4 + ['fc0f6'] * 5 + ['fcb77'] * 4 + ['fcccb'] * 4 + ['fdb47'] * 5 + ['fdbae'] * 8 + ['fdc91'] * 14 + ['fde0c'] * 8 + ['f4409'] * 2 + ['f5cc2'] * 3 + ['f5da5'] * 10 + ['f5df6'] * 6 + ['f5e1c'] * 24 + ['f5f0a'] * 16 + ['f5fc5'] * 12 + ['f6057'] * 10 + ['f608e'] * 18 + ['f612b'] * 4 + ['f6142'] * 10 + ['f616f'] * 30 + ['f6267'] * 10 + ['f6294'] * 30 + ['f64ad'] * 30 + ['f6562'] * 6 + ['f658a'] * 10 + ['f65df'] * 30 + ['f66e9'] * 3 + ['f670f'] * 3 + ['f672f'] * 3 + ['f674f'] * 4 + ['f6996'] * 40 + ['f69fe'] * 40 + ['f6a73'] * 8 + ['f6acd'] * 4 + ['f5969'] * 20 + ['f59de'] * 30 + ['f42bb'] * 40 + ['f4473'] * 40 + ['f5ce'] * 24 + ['f5f2'] * 30 + ['f781'] * 2 + ['f791'] * 2 + ['f7a1'] * 20 + ['f7d0'] * 40 + ['f862'] * 30 + ['f8c9'] * 10 + ['f44c0'] * 30 + ['f5960'] * 2 + ['f5af6'] * 12 + ['f5b55'] * 16 + ['fdec8'] * 2 + ['fdf2a'] * 10 + ['fdf7e'] * 8 + ['f5679'] * 12 + ['f5573'] * 4 + ['f5580'] * 8 + ['f5593'] * 6 + ['f55b5'] * 6 + ['f55d1'] * 2 + ['f55e0'] * 14 + ['f566a'] * 2 + ['f52a6'] * 14 + ['f538d'] * 2 + ['f53a8'] * 4 + ['f53c4'] * 2 + ['f53d3'] * 12 + ['f4fce'] * 4 + ['f500d'] * 14 + ['f50e5'] * 2 + ['f50f4'] * 10 + ['f520b'] * 8 + ['f5297'] * 2 + ['f4d50'] * 12 + ['f4e27'] * 2 + ['f4e40'] * 16 + ['f4b03'] * 6 + ['f4b12'] * 14 + ['f4c46'] * 16 + ['f4d41'] * 2 + ['f4965'] * 22 + ['f486d'] * 14 + ['f4938'] * 3 + ['f4580'] * 14 + ['f4672'] * 6 + ['f46f7'] * 8 + ['f478d'] * 8 + ['faab3'] * 10 + ['fac23'] * 6 + ['f12ae1'] * 6 + ['f12b29'] * 6 + ['f12ba3'] * 6 + ['f12bd8'] * 6 + ['f12bf2'] * 6 + ['f12bfb'] * 6 + ['f12c10'] * 6 + ['f12c48'] * 6 + ['f12c65'] * 6 + ['f12cb1'] * 6 + ['f12d08'] * 6 + ['f6377'] * 5 + ['f6361'] * 5 + ['f63cb'] * 5 + ['f63f7'] * 5 + ['f640b'] * 5 + ['f6423'] * 5 + ['f643c'] * 5 + ['f645b'] * 5 + ['f66bb'] * 5 + ['f66df'] * 5 + ['f67bd'] * 5 + ['f67c0'] * 5 + ['f67d3'] * 5 + ['fce9d'] * 6 + ['fcf07'] * 6 + ['fcf41'] * 8 + ['fa320'] * 6 + ['fa38a'] * 8 + ['fa416'] * 4 + ['fa444'] * 8 + ['fa47e'] * 3 + ['fa4a9'] * 3 + ['f9bf9'] * 3 + ['f9c57'] * 14 + ['f7012'] * 6 + ['f704f'] * 4 + ['f7069'] * 8)
+        fn_pick = rng.choice(names + ['fd2d1'] * 4 + ['fb319'] * 4 + ['fc0f6'] * 5 + ['fcb77'] * 4 + ['fcccb'] * 4 + ['fdb47'] * 5 + ['fdbae'] * 8 + ['fdc91'] * 14 + ['fde0c'] * 8 + ['f4409'] * 2 + ['f5cc2'] * 3 + ['f5da5'] * 10 + ['f5df6'] * 6 + ['f5e1c'] * 24 + ['f5f0a'] * 16 + ['f5fc5'] * 12 + ['f6057'] * 10 + ['f608e'] * 18 + ['f612b'] * 4 + ['f6142'] * 10 + ['f616f'] * 30 + ['f6267'] * 10 + ['f6294'] * 30 + ['f64ad'] * 30 + ['f6562'] * 6 + ['f658a'] * 10 + ['f65df'] * 30 + ['f66e9'] * 3 + ['f670f'] * 3 + ['f672f'] * 3 + ['f674f'] * 4 + ['f6996'] * 40 + ['f69fe'] * 40 + ['f6a73'] * 8 + ['f6acd'] * 4 + ['f5969'] * 20 + ['f59de'] * 30 + ['f42bb'] * 40 + ['f4473'] * 40 + ['ff629'] * 40 + ['f5ce'] * 24 + ['f5f2'] * 30 + ['f781'] * 2 + ['f791'] * 2 + ['f7a1'] * 20 + ['f7d0'] * 40 + ['f862'] * 30 + ['f8c9'] * 10 + ['f44c0'] * 30 + ['f5960'] * 2 + ['f5af6'] * 12 + ['f5b55'] * 16 + ['fdec8'] * 2 + ['fdf2a'] * 10 + ['fdf7e'] * 8 + ['f5679'] * 12 + ['f5573'] * 4 + ['f5580'] * 8 + ['f5593'] * 6 + ['f55b5'] * 6 + ['f55d1'] * 2 + ['f55e0'] * 14 + ['f566a'] * 2 + ['f52a6'] * 14 + ['f538d'] * 2 + ['f53a8'] * 4 + ['f53c4'] * 2 + ['f53d3'] * 12 + ['f4fce'] * 4 + ['f500d'] * 14 + ['f50e5'] * 2 + ['f50f4'] * 10 + ['f520b'] * 8 + ['f5297'] * 2 + ['f4d50'] * 12 + ['f4e27'] * 2 + ['f4e40'] * 16 + ['f4b03'] * 6 + ['f4b12'] * 14 + ['f4c46'] * 16 + ['f4d41'] * 2 + ['f4965'] * 22 + ['f486d'] * 14 + ['f4938'] * 3 + ['f4580'] * 14 + ['f4672'] * 6 + ['f46f7'] * 8 + ['f478d'] * 8 + ['faab3'] * 10 + ['fac23'] * 6 + ['f12ae1'] * 6 + ['f12b29'] * 6 + ['f12ba3'] * 6 + ['f12bd8'] * 6 + ['f12bf2'] * 6 + ['f12bfb'] * 6 + ['f12c10'] * 6 + ['f12c48'] * 6 + ['f12c65'] * 6 + ['f12cb1'] * 6 + ['f12d08'] * 6 + ['f6377'] * 5 + ['f6361'] * 5 + ['f63cb'] * 5 + ['f63f7'] * 5 + ['f640b'] * 5 + ['f6423'] * 5 + ['f643c'] * 5 + ['f645b'] * 5 + ['f66bb'] * 5 + ['f66df'] * 5 + ['f67bd'] * 5 + ['f67c0'] * 5 + ['f67d3'] * 5 + ['fce9d'] * 6 + ['fcf07'] * 6 + ['fcf41'] * 8 + ['fa320'] * 6 + ['fa38a'] * 8 + ['fa416'] * 4 + ['fa444'] * 8 + ['fa47e'] * 3 + ['fa4a9'] * 3 + ['f9bf9'] * 3 + ['f9c57'] * 14 + ['f7012'] * 6 + ['f704f'] * 4 + ['f7069'] * 8)
         out.append({'fn': names[n] if n < len(names) else fn_pick, 'r': rng.randrange(1 << 32), 'o1': rng.randrange(1 << 32), 'o2': rng.randrange(1 << 32), 'tm': rng.randrange(1 << 32), 'f1c': rng.choice([0, 0x900, 0xa00]), 'f14': rng.choice([0, 1, 2, 3, 4, 5, 0x40, 0x41, 0x4a, 0x2d, (rng.randrange(256) & ~7) | rng.randrange(6)]), 'f19': rng.choice([0, 1, 5, 0x80, 0xff, rng.randrange(256)]), 'pt': rng.randrange(1 << 32), 'f3': rng.randrange(8), 'nch': rng.randrange(0, 5), 'st': rng.randrange(0, 5), 'bm': rng.choice([8, 0x1000, 0x20000, 0xffffffff, 0x10, rng.randrange(1 << 32)]), 'sel': rng.randrange(4), 'g273': rng.randrange(1, 5), 'g274': rng.randrange(1, 5), 'ds': rng.randrange(1 << 32), 'tab': rng.randrange(1 << 32), 'fs13d': rng.randrange(256), 'px': rng.randrange(1024), 'py': rng.randrange(1024), 'cur': rng.choice([0xffffffff, rng.randrange(0x3ff), rng.randrange(0x3ff), 0]), 'g525': rng.randrange(256), 'g526': rng.randrange(256), 'g1c61': rng.choice([0, 1, 5, rng.randrange(256)]), 'g2730': rng.choice([0xffffffff, 0, rng.randrange(1 << 32)]), 'rt': rng.randrange(1 << 32), 'map': rng.randrange(1 << 32), 'f15': rng.choice([0, 1, 2, 3, 0x10, 0x11, rng.randrange(256)]), 'f31': rng.choice([0, 1, rng.randrange(256)]),
                     'f30': rng.choice([0, 0x10, 0x91, 0xf3, rng.randrange(256)]), 'f17': rng.choice([0, 2, 0x40, 0x42, rng.randrange(1 << 16)]), 'g1c9f': rng.choice([0, 0x40, 0x80, rng.randrange(256)]), 'g512': rng.choice([0, 0, 1, rng.randrange(1 << 20)]),
                     'g51a': rng.randrange(1 << 20), 'g51e': rng.choice([0, 0x400900]), 'g522': rng.choice([0, 3, rng.randrange(256)]),
@@ -366,6 +367,14 @@ def cases(names):
                 da = max(da, 0); db = max(db, 0); c['regs'][2] = 2000; c['regs'][0] = 2000 + da; c['regs'][1] = 2000 + rng.choice([0, 3]) ; c['regs'][3] = c['regs'][1] + db
                 if rng.random() < 0.5: c['regs'][0] = 2000 - da; c['regs'][3] = c['regs'][1] - db
         if c['fn'] == 'f5969': c['rs'] = rng.randrange(1 << 32); c['nrec'] = rng.choice([1, 2, 3, 4]); c['sel'] = n % 3; c['own'] = 5 + rng.randrange(3)
+        if c['fn'] == 'ff629':
+            c['own'] = rng.randrange(4); c['k19e9'] = rng.choice([0, 0, 0x10, 1]); c['d3cda'] = rng.randrange(1 << 32); c['v1ca9'] = rng.randrange(1 << 32); c['f3'] = 8
+            c['qn'] = rng.choice([0, 1, 2, 3]); c['qid'] = 0x14; c['l0q'] = 0
+            c['ent'] = [[rng.choice([0xff, 0xff, 0xff, 0, 1, 2, 3]), rng.choice([-1, 0, 1, 5, 100]), rng.choice([0, 1, 1])] for _ in range(8)]
+            c['ids'] = [rng.choice([0x14, 0x15, 0x16, 0x17, 0x13]) for _ in range(3)]
+            c['txt'] = bytes(rng.randrange(0x20, 0x7d) for _ in range(0x100)).hex(); c['nv'] = [rng.choice([1, 2, 3]) for _ in range(4)]; c['eff'] = [rng.choice([0, 1, 2, 3]) for _ in range(4)]; c['rb'] = rng.randrange(256)
+            c['calls'] = c['calls'] + [list(x) for x in c['calls']] + [list(x) for x in c['calls']]
+            for call in c['calls']: call[5] = 0x8d4
         if c['fn'] == 'f5ce': c['k4e'] = rng.choice([0, 1, 1, 1, 1, 1]); c['l0'] = [0, 1, 9, 0xa, 0x31, 0x32, 0x40, 0xff, 0x33, 0x30][n % 10]
         if c['fn'] in ('f7a1', 'f7d0', 'f862', 'f8c9'):
             for call in c['calls']: call[5] = 0x400900
@@ -407,7 +416,7 @@ def generate(game, names):
             if addr == 0x68bd: o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + TMPL); o.ret(); return   # the template lookup keeps everything but EDX
             owner_in = reg(UC_X86_REG_EAX) & 255
             zf, ax, bx, cx, dx, di = state['calls'].pop(0) if state['calls'] else (1, 0, 0, 0, 0, 0)
-            if addr == 0x9e41:   # the random byte: only EAX (and ZF) change
+            if addr in (0x9e41, 0x9e69):   # the random byte: only EAX (and ZF) change
                 o.cpu.reg_write(UC_X86_REG_EAX, ax); o.cpu.reg_write(UC_X86_REG_EFLAGS, (reg(UC_X86_REG_EFLAGS) & ~0x40) | (0x40 if zf else 0)); o.ret(); return
             o.cpu.reg_write(UC_X86_REG_EAX, ax); o.cpu.reg_write(UC_X86_REG_EBX, bx); o.cpu.reg_write(UC_X86_REG_ECX, cx)
             o.cpu.reg_write(UC_X86_REG_EDX, o.POOL + TMPL if addr in (0xc4cd, 0x982b) else dx)
@@ -427,7 +436,7 @@ def generate(game, names):
         o.prepare(32, 32); o.mode = 'actions'
         o.RANGES['actions'] = ([(entry, end)], [])
         o.stubs = {a: stub(a, None) for a in callees if a not in (0x6885, 0x68bd)}
-        o.RANGES['actions'] = ([(entry, end), (0x6877, 0x68d8), (0x4409, 0x4442), (0xdb47, 0xdc91), (0xa416, 0xa444), (0x6361, 0x6377), (0x6377, 0x63cb), (0x6423, 0x643c), (0x12ae1, 0x12e12), (0xc331, 0xc35f), (0xd12c, 0xd182), (0x67bd, 0x6877), (0xa320, 0xa38a), (0x4580, 0x4870), (0x67c0, 0x6877), (0x4965, 0x4b03), (0xa4a9, 0xa4c2), (0x4b03, 0x5716), (0x5af6, 0x5c2e), (0x5cc2, 0x6361), (0x6996, 0x69fe), (0x7012, 0x704f), (0x66df, 0x66e9), (0xdf2a, 0xdfe5)], [])
+        o.RANGES['actions'] = ([(entry, end), (0x6877, 0x68d8), (0x4409, 0x4442), (0xdb47, 0xdc91), (0xa416, 0xa444), (0x6361, 0x6377), (0x6377, 0x63cb), (0x6423, 0x643c), (0x12ae1, 0x12e12), (0xc331, 0xc35f), (0xd12c, 0xd182), (0x67bd, 0x6877), (0xa320, 0xa38a), (0x4580, 0x4870), (0x67c0, 0x6877), (0x4965, 0x4b03), (0xa4a9, 0xa4c2), (0x4b03, 0x5716), (0x5af6, 0x5c2e), (0x5cc2, 0x6361), (0xf5f2, 0xf629), (0x6996, 0x69fe), (0x7012, 0x704f), (0x66df, 0x66e9), (0xdf2a, 0xdfe5)], [])
         o.cpu.mem_write(o.POOL, bytes(0x3000)); o.cpu.mem_write(o.FS + 0x17f, bytes(4)); o.cpu.mem_write(0x4c0, bytes(0x110)); o.cpu.mem_write(0, bytes(0x40)); o.cpu.mem_write(0xf0b0, bytes(0x10)); o.cpu.mem_write(0x40, bytes(0x20)); o.cpu.mem_write(0x27f0, bytes(0x60)); o.cpu.mem_write(0x6aa, struct.pack('<I', o.POOL)); o.cpu.mem_write(0x1922, bytes(12)); o.cpu.mem_write(0x1a10, bytes(0x10)); o.cpu.mem_write(0x43c, bytes(0x204)); o.cpu.mem_write(0xed20, bytes(4)); o.cpu.mem_write(0x3cd0, bytes(0x20)); o.cpu.mem_write(0xefb, bytes(0x80)); o.cpu.mem_write(0x1ce1, bytes(0x40)); o.cpu.mem_write(0x1c49, struct.pack('<I', o.POOL + TMPL))
         r = bytearray(prng(case['r'], 0x50)); r[0] %= 3; r[0xe] = 0; r[3] = case['f3']; struct.pack_into('<II', r, 4, case['px'], case['py']); struct.pack_into('<I', r, 0x28, case['cur']); r[0x14] = case['f14']; r[0x19] = case['f19']; r[0x15] = case['f15']; r[0x31] = case['f31']; r[0x30] = case['f30']
         if 'f22' in case: r[0x22] = case['f22']
@@ -667,6 +676,21 @@ def generate(game, names):
             buf[pos + 1] = 0xff; o.cpu.mem_write(o.POOL + 0x2200, bytes(buf))
             ob = bytearray(o.cpu.mem_read(o.POOL + OBJ1, 0x50)); ob[0] = case['sel']; ob[3] = case['own']; o.cpu.mem_write(o.POOL + OBJ1, bytes(ob))
             o.cpu.mem_write(0x1969, struct.pack('<I', o.POOL + OBJ1)); o.cpu.mem_write(0x6df + 0x56 * case['sel'] + 4 * case['own'], struct.pack('<I', o.POOL + 0x2200))
+        if case['fn'] == 'ff629':
+            def wd(a, v, n): o.cpu.mem_write(a, int(v & ((1 << (8 * n)) - 1)).to_bytes(n, 'little'))
+            o.cpu.mem_write(0x7d4, bytes(0x604)); [o.cpu.mem_write(0x7f2 + 0x1e * k + 1, bytes([case['ids'][k]])) for k in range(case['qn'])]; wd(0xdce, 0x7f2 + 0x1e * case['qn'], 4); wd(0x0, 0, 2)
+            wd(0x6c6, 1, 1); wd(0x1972, case['own'], 1); wd(0x19e9, case['k19e9'], 1); wd(0x3cda, case['d3cda'], 4); wd(0x1ca9, case['v1ca9'], 4)
+            for j in range(8):
+                kind, dl, om = case['ent'][j]; base = 0x97a + 0x34 + 0xe * j
+                o.cpu.mem_write(base, bytes([kind])); wd(base + 1, (case['d3cda'] + dl) & 0xffffffff, 4); o.cpu.mem_write(base + 9, bytes([case['own'] if om else (case['own'] + 1) & 255]))
+            txt = bytes.fromhex(case['txt'])
+            for k in range(4):
+                blk = bytearray(); blk.append(case['nv'][k])
+                for v in range(case['nv'][k]): blk += txt[(k * 3 + v) * 5:(k * 3 + v) * 5 + 1 + v % 4] + b'\xff'
+                o.cpu.mem_write(o.POOL + 0x2200 + 0x40 * k, bytes(blk)); wd(0xefb + 0x13 * k, o.POOL + 0x2200 + 0x40 * k, 4); wd(0xefb + 0x13 * k + 4, case['eff'][k], 4)
+            font = bytearray(prng(case['ds'] + 70, 0x200 + 32))
+            for i in range(256): struct.pack_into('<H', font, 2 * i, 0x200 + (i % 8) * 4)
+            o.cpu.mem_write(o.POOL + 0x2400, bytes(font)); wd(0x19ee, o.POOL + 0x2400, 4)
         if case['fn'] == 'f5ce': o.cpu.mem_write(0x1c4e, bytes([case['k4e']])); o.cpu.mem_write(0, bytes([case['l0']]))
         if case['fn'] in ('f7a1', 'f7d0', 'f862', 'f8c9'):
             o.cpu.mem_write(0x19ea, bytes([case['k19ea']])); o.cpu.mem_write(0x19e7, bytes([case['b19e7']]))
@@ -712,7 +736,7 @@ def generate(game, names):
         if case['fn'] == 'fs14b' and case['sel'] != 0:
             tb = bytearray(o.cpu.mem_read(o.POOL + TMPL, 0x100)); tb[0x46] = 5; tb[0x74] = 0xf; tb[0x40] &= ~0x20 & 0xff; tb[0x41] &= 0x7f; o.cpu.mem_write(o.POOL + TMPL, bytes(tb))
         if case['fn'] in ('fs187', 'fs16b'): o.cpu.reg_write(UC_X86_REG_EAX, (case['regs'][0] & 0xffff0000) | ((((case['regs'][0] >> 8) & 0xff) % 3) << 8))
-        if case['fn'] not in ('f42bb', 'f4473'): o.cpu.mem_write(0x6c6, bytes(1))
+        if case['fn'] not in ('f42bb', 'f4473', 'ff629'): o.cpu.mem_write(0x6c6, bytes(1))
         o.cpu.mem_write(0x6c9, bytes(1)); o.cpu.mem_write(0x6c9, bytes(1)); o.cpu.mem_write(0x3e87, bytes(4))
         if case['fn'] == 'f7a03':
             q = prng(case['ds'] + 13, 8); o.cpu.mem_write(0x274e, bytes([q[0], q[1]])); o.cpu.mem_write(0x2791, bytes([q[2], q[3]]))
@@ -733,7 +757,7 @@ def generate(game, names):
         except Exception: print('FAIL', all_cases.index(case), case['fn'], hex(o.cpu.reg_read(UC_X86_REG_EIP) - o.CODE), [hex(o.cpu.reg_read(q)) for q in (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_EDI, UC_X86_REG_ESI)]); raise
         fl = reg(UC_X86_REG_EFLAGS)
         if case['fn'] == 'f616f': r[3] = o.cpu.mem_read(o.POOL + POOLREC + 3, 1)[0]
-        extra42 = (bytes(o.cpu.mem_read(0x2730, 0x30)) + bytes(o.cpu.mem_read(o.FS + 0x10, 1)) + b''.join(bytes(o.cpu.mem_read(o.POOL + 0x8000 + 0x60 * k, 0x20)) for k in range(case['nch']))) if case['fn'] == 'f42bb' else ((bytes(o.cpu.mem_read(0x3cd0, 0x10)) + bytes(o.cpu.mem_read(0xdd4, 1))) if case['fn'] in ('f5f2', 'f7d0') else None) or (bytes(o.cpu.mem_read(0xed20, 4)) + bytes(o.cpu.mem_read(0x1ccb + 0x16 * case['own'], 1)) if case['fn'] == 'f44c0' else b'')
+        extra42 = (bytes(o.cpu.mem_read(0x2730, 0x30)) + bytes(o.cpu.mem_read(o.FS + 0x10, 1)) + b''.join(bytes(o.cpu.mem_read(o.POOL + 0x8000 + 0x60 * k, 0x20)) for k in range(case['nch']))) if case['fn'] == 'f42bb' else ((bytes(o.cpu.mem_read(0x3cd0, 0x10)) + bytes(o.cpu.mem_read(0xdd4, 1))) if case['fn'] in ('f5f2', 'f7d0') else (bytes(o.cpu.mem_read(0x3cd0, 0x10)) + bytes(o.cpu.mem_read(0x7d4, 0x1cc)) if case['fn'] == 'ff629' else None)) or (bytes(o.cpu.mem_read(0xed20, 4)) + bytes(o.cpu.mem_read(0x1ccb + 0x16 * case['own'], 1)) if case['fn'] == 'f44c0' else b'')
         out = (bytes(o.cpu.mem_read(o.POOL + POOLREC, 0x80)) + bytes(o.cpu.mem_read(o.POOL + OBJ1, 0x50)) + bytes(o.cpu.mem_read(o.POOL + OBJ2, 0x50)) + bytes(o.cpu.mem_read(0x1c9f, 1)) + bytes(o.cpu.mem_read(0x512, 4)) + bytes(o.cpu.mem_read(0x50e, 4)) + bytes(o.cpu.mem_read(0x1ccb + 0x16 * r[3], 1)) + bytes(o.cpu.mem_read(0x525, 2)) + bytes(o.cpu.mem_read(0x1c61, 1)) + b''.join(bytes(o.cpu.mem_read(a, n)) for a, n in DS_WINDOWS) + bytes(o.cpu.mem_read(0x1a10, 0x10)) + bytes(o.cpu.mem_read(o.FS + 0x13d, 1)) + b''.join(bytes(o.cpu.mem_read(o.POOL + 0xa000 + k * 0x1a35 + 0x170, 0x40)) for k in range(3)) + b''.join(bytes(o.cpu.mem_read(o.POOL + 0xa000 + k * 0x1a35 + 0x70, 0x10)) for k in range(8)) + bytes(o.cpu.mem_read(0x1ca2, 0x20)) + bytes(o.cpu.mem_read(0x1f0a, 0x1fa)) + bytes(o.cpu.mem_read(0x4c0, 0x110)) + bytes(o.cpu.mem_read(0, 0x14)) + bytes(o.cpu.mem_read(0xf0b0, 0x10)) + bytes(o.cpu.mem_read(0x40, 0x20)) + bytes(o.cpu.mem_read(0x27f0, 0x60)) + (bytes(o.cpu.mem_read(0x7d4, 0x604)) if case['fn'] in ('fdec8', 'fdf2a', 'fdf7e', 'f5af6', 'f5b55', 'f5cc2', 'f5df6', 'f5da5', 'f5e1c', 'f5593', 'f64ad', 'f6a73', 'f6acd', 'f5969', 'f59de', 'f5f2', 'f7a1', 'f7d0', 'f862', 'f8c9') else bytes(0x604)) + bytes(o.cpu.mem_read(o.FS + 0x17f, 4)) + bytes(o.cpu.mem_read(o.POOL + 0x2800, 0x100))
                + struct.pack('<IIIII', *[rel(reg(q)) for q in (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX, UC_X86_REG_EDX, UC_X86_REG_EDI)]) + bytes([(fl >> 6) & 1, fl & 1]) + bytes(o.cpu.mem_read(0x97a + 0xf5 * r[3], 0xf5)) + (b''.join(bytes(o.cpu.mem_read(o.POOL + 0x4000 + 0x1000 * k, 0x1000)) for k in range(4)) if case['fn'] == 'fd2d1' else b'') + b''.join(log)) + extra42
         if os.environ.get('DEBUG_CASE') == str(all_cases.index(case)): print('PYTHON', out.hex())
