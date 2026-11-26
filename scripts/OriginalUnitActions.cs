@@ -2491,6 +2491,46 @@ public static class OriginalUnitActions
     }
     private static void Settle(IUnitActionWorld w, ActionRegs g, byte[] r) { w.Call(0x98db, g); g.Al = 0; g.Logic(0, 8); }
 
+    // ---- the resource counters of the panel (AAB3, AC23) ----
+    /// <summary>AAB3: the three displayed resources [1C62], [1C66], [1C6A] follow the values +18, +1C, +20 of the participant of the player [1972] by one a step (the colour [1F10] D0h down, 61h up, 0 at rest;
+    /// a gap of 3E8h or more jumps), each is drawn (ABE9 with ECX = 42h, 103h, 9Eh); the fourth (+24, red D0h below twice the statistic [stats + 19ED]) with ECX = 16Dh.</summary>
+    public static void FAAB3(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Eax = 0xf5; Mul8(g, g.Al, d[0x1972]); g.Esi = (g.Eax & 0xffff) + 0x97a; var part = w.PartOf(d[0x1972]);
+        int[] shown = [0x1c62, 0x1c66, 0x1c6a], at = [0x18, 0x1c, 0x20]; uint[] column = [0x42, 0x103, 0x9e];
+        for (int k = 0; k < 3; k++)
+        {
+            uint value = U32(part, at[k]);
+            g.Eax = U32(d, shown[k]); g.Ebx = g.Eax; g.Cmp(g.Ebx, value, 32); g.Ebx -= value;
+            if (g.Zf) continue;
+            d[0x1f10] = 0xd0; bool below = g.Cf; g.Eax--;
+            if (below) { d[0x1f10] = 0x61; g.Add(g.Eax, 2); g.Eax += 2; g.Cf = g.Ebx != 0; g.Ebx = (uint)-(int)g.Ebx; }
+            g.Cmp(g.Ebx, 0x3e8, 32); if (!g.Cf) g.Eax = value;
+            Put(d, shown[k], g.Eax); g.Cmp(g.Eax, value, 32); if (g.Zf) d[0x1f10] = 0;
+            g.Ecx = column[k]; g.Edx = 0; w.Call(0xabe9, g);
+        }
+        d[0x1f10] = 0; g.Al = d[0x1972]; w.Call(0x1ead8, g);
+        g.Ecx = U32(w.Stats, (int)(g.Edx - 0x40a000) + 0x19ed); g.Add(g.Ecx, g.Ecx); g.Ecx += g.Ecx; g.Eax = U32(part, 0x24); g.Cmp(g.Eax, g.Ecx, 32);
+        if (g.Cf) d[0x1f10] = 0xd0;
+        g.Ecx = 0x16d; g.Edx = 0; w.Call(0xabe9, g); d[0x1f10] = 0;
+    }
+
+    /// <summary>AC23: EAX as a decimal string without leading zeros at DS:1F11 (the powers of ten from the table DS:19FE down to 10, then the last digit), FFh ended; 6C6D draws it.</summary>
+    public static void FAC23(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Esi = 0x1f11; g.Edi = 0x19fe; uint esi0 = g.Esi, ecx0 = g.Ecx; g.Cl = 1;
+        do
+        {
+            g.Ebx = U32(d, (int)g.Edi); g.Ch = 0x2f;
+            do { g.Ch++; g.Cmp(g.Eax, g.Ebx, 32); g.Eax -= g.Ebx; } while (!g.Cf);
+            g.Eax += g.Ebx; g.Cmp(g.Ch, 0x30, 8);
+            bool skip = g.Zf && g.Cl != 0;
+            if (!skip) { g.Cl = 0; d[(int)g.Esi] = g.Ch; g.Esi++; }
+            g.Edi += 4; g.Cmp(g.Ebx, 0xa, 32);
+        } while (!g.Zf);
+        g.Al = Add8(g, g.Al, 0x30); d[(int)g.Esi] = g.Al; d[(int)g.Esi + 1] = 0xff; g.Ecx = ecx0; g.Esi = esi0; w.Call(0x6c6d, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
