@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "66847ad8ab170bd4bea684a556b364e9cf2ec28f3df9cb24f95c1d039358b6da",
+  "annotation_sha256": "c618980c106778702a12cf4e88b36a00065422081faf791e8bdb0e873bc83b21",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -5798,7 +5798,7 @@
       "zero_fill_bytes": 0,
       "sha256": "75e339a4869a7466714661f036fb3b933acab4ba73aaf2898dfd60691a13fafb",
       "byte_status": {
-        "unreviewed": 882
+        "ported": 882
       },
       "linear_rows": 270,
       "flow_candidate_instructions": 181,
@@ -5810,10 +5810,57 @@
       "regions": [
         {
           "start": 0,
+          "end": 112,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army05-bird-0"
+          ]
+        },
+        {
+          "start": 112,
+          "end": 234,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army05-generator-70"
+          ]
+        },
+        {
+          "start": 234,
+          "end": 424,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army05-wolf-ea"
+          ]
+        },
+        {
+          "start": 424,
+          "end": 674,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army05-bear-1a8"
+          ]
+        },
+        {
+          "start": 674,
+          "end": 787,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army05-wolf-2a2"
+          ]
+        },
+        {
+          "start": 787,
           "end": 882,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army05-remains-313"
+          ]
         }
       ]
     }
