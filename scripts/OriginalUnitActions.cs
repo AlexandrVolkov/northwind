@@ -77,6 +77,8 @@ public interface IUnitActionWorld
     /// <summary>The route bytes ([6B6] points to them) and the first dword of the descriptor of a map tile.</summary>
     byte[] Route { get; }
     uint TileDescriptor(uint tile);
+    /// <summary>The dword at <paramref name="offset"/> of the 8-byte descriptor of the tile of the map cell (the cell index, row by row).</summary>
+    uint TileProperty(uint cell, int offset);
     /// <summary>The byte [1CCB + 16h · owner] written by 8A54.</summary>
     void SetG1CCB(int index, byte value);
 }
@@ -1759,6 +1761,182 @@ public static class OriginalUnitActions
             if (!g.Cf && !g.Zf) return;
             Put(d, 0x1f31, g.Edi); Put(d, 0x1f35, g.Eax);
         }
+    }
+
+    // ---- the growth script of an object (DB47..DEC7): the footprint list, the strength nearby, the construction automaton, the check of the place ----
+    private static void Flags8(ActionRegs g, uint result, bool carry) { g.Zf = (result & 0xff) == 0; g.Sf = (result & 0x80) != 0; g.Cf = carry; g.Of = false; }
+    private static byte Add8(ActionRegs g, byte a, byte b) { uint r = (uint)a + b; g.Zf = (r & 0xff) == 0; g.Sf = (r & 0x80) != 0; g.Cf = r > 0xff; g.Of = ((a ^ r) & (b ^ r) & 0x80) != 0; return (byte)r; }
+    private static byte Sub8(ActionRegs g, byte a, byte b) { g.Cmp(a, b, 8); return (byte)(a - b); }
+    private static ushort Add16(ActionRegs g, ushort a, ushort b) { uint r = (uint)a + b; g.Zf = (r & 0xffff) == 0; g.Sf = (r & 0x8000) != 0; g.Cf = r > 0xffff; g.Of = ((a ^ r) & (b ^ r) & 0x8000) != 0; return (ushort)r; }
+    private static byte Dec8(ActionRegs g, byte a) { byte r = (byte)(a - 1); g.Zf = r == 0; g.Sf = (r & 0x80) != 0; g.Of = a == 0x80; return r; }   // CF is kept
+    /// <summary>DIV r/m8: AL = AX / divisor, AH = the remainder; the flags stay (the emulator leaves them); a zero divisor or a quotient above FFh faults in the original.</summary>
+    private static void Div8(ActionRegs g, byte divisor)
+    {
+        uint ax = g.Eax & 0xffff; if (divisor == 0 || ax / divisor > 0xff) throw new OverflowException("DIV r/m8 faults");
+        g.Eax = (g.Eax & 0xffff0000) | ((ax % divisor) << 8) | (ax / divisor);
+    }
+
+    /// <summary>4409: EBX = the address on the plane (+0D &amp; 3) of the corner of the rectangle (DS:273F x DS:2740 cells) centred on the object ESI.</summary>
+    public static void F4409(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Ecx = U32(d, 0x273f); g.Eax = U32(r, 8); g.Ch = (byte)(g.Ch >> 1); g.Eax >>= 5; g.Al = (byte)(g.Al - g.Ch); g.Ah = d[0x18de]; Mul8(g, g.Al, g.Ah);
+        g.Ebx = U32(r, 4); g.Cl = (byte)(g.Cl >> 1); g.Ebx >>= 5; g.Bl = (byte)(g.Bl - g.Cl); g.Ebx += g.Eax; g.Ebx *= 4; g.Al = r[0xd]; g.Eax &= 3;
+        uint plane = w.PlanePointer(g.Eax); g.Add(g.Ebx, plane); g.Ebx += plane;
+    }
+
+    /// <summary>DB47: the list DS:1F45 of the distinct objects whose references lie in the rectangle of the object ESI on the plane above its own (+0D + 1); EAX = their number, ZF = none.</summary>
+    public static void FDB47(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; r[0xd]++; F4409(w, g, r); r[0xd]--;
+        g.Eax = U32(d, 0x18de); g.Al = (byte)(g.Al - d[0x273f]); g.Ebp = g.Eax * 4; g.Eax = 0; Put(d, 0x1f45, 0); g.Ch = d[0x2740];
+        do
+        {
+            g.Cl = d[0x273f];
+            do
+            {
+                g.Edi = w.PlaneRead(g.Ebx);
+                if (g.Edi != 0)
+                {
+                    g.Edi += w.PoolBase; g.Edx = 0x1f41;
+                    for (; ; )
+                    {
+                        g.Edx += 4; uint v = U32(d, (int)g.Edx);
+                        if (v == g.Edi) break;
+                        if (v == 0) { Put(d, (int)g.Edx, g.Edi); Put(d, (int)g.Edx + 4, 0); g.Eax++; break; }
+                    }
+                }
+                g.Ebx += 4; g.Cl--;
+            } while (g.Cl != 0);
+            g.Ebx += g.Ebp; g.Ch--;
+        } while (g.Ch != 0);
+        g.Test(g.Eax, g.Eax, 32);
+    }
+
+    /// <summary>DBAE: the objects of the list (DB47) that lie within the template's half sizes (+3, +4 · 16 − 10) of the object ESI: EAX = the sum of their templates' +3F, ECX = the number of the others, EDX = the hostile ones (the mask +12 of the owner's participant).</summary>
+    public static void FDBAE(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Eax = 0; Put(d, 0x1f31, 0); Put(d, 0x1f35, 0); Put(d, 0x1f39, 0);
+        FDB47(w, g, r);
+        if (!g.Zf)
+        {
+            g.Eax = 0xf5; Mul8(g, g.Al, r[3]); Put(d, 0x1ca2, U32(w.PartOf(r[3]), 0x12));
+            F6885(w, g, r); var t = w.ObjectAt(g.Edi);
+            g.Ebx = 0; g.Bl = t[3]; g.Bl = (byte)(g.Bl << 4); g.Bl = (byte)(g.Bl - 0x0a);
+            g.Eax = U32(r, 4) - g.Ebx; Put(d, 0x1c76, g.Eax); g.Eax += g.Ebx * 2; Put(d, 0x1c6e, g.Eax);
+            g.Bl = t[4]; g.Bl = (byte)(g.Bl << 4); g.Bl = (byte)(g.Bl - 0x0a);
+            g.Eax = U32(r, 8) - g.Ebx; Put(d, 0x1c7a, g.Eax); g.Eax += g.Ebx * 2; Put(d, 0x1c72, g.Eax);
+            g.Ebp = 0x1f45;
+            do
+            {
+                g.Edi = U32(d, (int)g.Ebp); var o = w.ObjectAt(g.Edi);
+                if (U32(o, 4) >= U32(d, 0x1c76) && U32(o, 4) <= U32(d, 0x1c6e) && U32(o, 8) >= U32(d, 0x1c7a) && U32(o, 8) <= U32(d, 0x1c72))
+                {
+                    F68BD(w, g); var tt = w.ObjectAt(g.Edx);
+                    g.Eax = tt[0x3f]; Put(d, 0x1f31, U32(d, 0x1f31) + g.Eax);
+                    g.Eax = o[3]; bool hostile = ((d[0x1ca2 + 4 * (int)(g.Eax >> 5) + (int)((g.Eax & 31) >> 3)] >> (int)(g.Eax & 7)) & 1) != 0;
+                    if (hostile) { Put(d, 0x1f39, U32(d, 0x1f39) + 1); Put(d, 0x1f35, U32(d, 0x1f35) - 1); }
+                    Put(d, 0x1f35, U32(d, 0x1f35) + 1);
+                }
+                g.Ebp += 4;
+            } while (U32(d, (int)g.Ebp) != 0);
+            g.Cmp(0, 0, 32);   // the last cmp dword [ebp], 0
+        }
+        g.Eax = U32(d, 0x1f31); g.Ecx = U32(d, 0x1f35); g.Edx = U32(d, 0x1f39);
+    }
+
+    private static void Frame(ActionRegs g, byte[] r, byte[] t, bool afterAdd)
+    {
+        // add ax, word [ebp + 48]; mov word [esi + 1], ax
+        ushort sum = Add16(g, (ushort)g.Eax, U16(t, 0x48)); g.Eax = (g.Eax & 0xffff0000) | sum; PutW(r, 1, sum);
+    }
+
+    /// <summary>DC91: the growth script of a building: +15 the phase (0 waiting for the health to reach the template's, 1 the builders are near, 2.. growing with the stages in the high nibble, 3 the last frames, 4 done), +22 the counter, +1 the frame, +19 the health.</summary>
+    public static void FDC91(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Eax = 0; r[0xf] = 0; r[0x22]++; g.Ebp = U32(d, 0x1c49); var t = w.ObjectAt(g.Ebp);
+        if (r[0x15] == 0)
+        {
+            g.Cmp(r[0x22], 0, 8);
+            if (r[0x22] == 0) { r[0x15] = 4; return; }
+            g.Al = r[0x19]; g.Cmp(g.Al, r[0x1a], 8); if (g.Zf) return;
+            g.Bl = g.Al; Mul8(g, g.Al, t[0x4a]); Div8(g, t[0x45]); g.Ah = 0; g.Logic(0, 8); r[0x22] = g.Ah;
+            Frame(g, r, t, false);
+            g.Cmp(g.Bl, t[0x45], 8); if (g.Cf) return;
+            r[0x15]++; g.Cl = r[3]; g.Al = 1; g.Al = (byte)(g.Al << (g.Cl & 31)); r[0x20] = g.Al;
+        }
+        g.Cmp(r[0x15], 1, 8);
+        if (r[0x15] == 1)
+        {
+            g.Test(r[0x22], 3, 8); if (!g.Zf) return;
+            FDBAE(w, g, r);
+            g.Cmp(g.Edx, g.Ecx, 32); if (g.Edx <= g.Ecx) return;
+            g.Ebp = U32(d, 0x1c49); t = w.ObjectAt(g.Ebp); g.Ebx = t[0x3f]; g.Cmp(g.Eax, g.Ebx, 32); if (g.Cf) return;
+            r[0x20] = 0xff; r[0x15]++; g.Eax = 0; g.Logic(0, 32); r[0x22] = g.Al;
+            g.Al = t[0x4a]; g.Al = Add8(g, g.Al, g.Al); g.Al = Add8(g, g.Al, t[0x4b]); Frame(g, r, t, true);
+        }
+        else
+        {
+            g.Al = (byte)(r[0x15] & 7); g.Logic(g.Al, 8); g.Cmp(g.Al, 2, 8);
+            if (g.Al == 2)
+            {
+                g.Al = t[0x4c]; g.Cmp(r[0x22], g.Al, 8); if (g.Cf) return;
+                PutW(r, 1, (ushort)(U16(r, 1) + 1)); r[0x15] = Add8(g, r[0x15], 0x10); r[0x22] = 0;
+            }
+            else { Growth(w, g, r, t); return; }
+        }
+        // dd5d
+        g.Al = r[0x15]; g.Al = (byte)g.Shr(g.Al, 4, 8); g.Cmp(g.Al, t[0x52], 8); if (g.Cf) return;
+        uint pushed = g.Eax;
+        if (g.Zf) { g.Eax = U32(t, 0xa3); w.Call(0xa416, g); }
+        g.Eax = g.Esi - w.PoolBase; g.Ebx = 0; g.Cl = 0xff; g.Ch = 2; r[0xd]++; w.Call(0xd2d1, g); r[0xd]--;
+        g.Ebx = pushed; g.Ebp = U32(d, 0x1c49); t = w.ObjectAt(g.Ebp);
+        g.Cmp(g.Bl, t[0x51], 8); if (g.Cf) return;
+        PutW(r, 1, (ushort)(U16(r, 1) - 1)); r[0x15] -= 0x10; g.Test(g.Eax, g.Eax, 32); if (!g.Zf) return;
+        r[0x22] = 0xff; r[0x15] = 3; g.Al = t[0x4a]; g.Al = Add8(g, g.Al, t[0x4b]); Frame(g, r, t, true);
+        Growth(w, g, r, t);
+    }
+
+    private static void Growth(IUnitActionWorld w, ActionRegs g, byte[] r, byte[] t)
+    {
+        g.Cmp(r[0x22], 0x64, 8); if (g.Cf) return;
+        r[0x22] = 0; r[0x19]--; g.Al = t[0x45]; g.Al--; g.Al = Sub8(g, g.Al, r[0x19]); Mul8(g, g.Al, t[0x4a]); Div8(g, t[0x45]); g.Ah = 0; g.Logic(0, 8);
+        g.Bl = Sub8(g, t[0x4a], g.Al); g.Al = Add8(g, g.Al, t[0x4a]); g.Al = Add8(g, g.Al, t[0x4b]); Frame(g, r, t, true);
+        g.Bl = Dec8(g, g.Bl); if (!g.Zf) return;
+        g.Cmp(r[0x15], 3, 8); if (!g.Zf) return;
+        r[0x15]++; r[0xd]++; g.Eax = 0; w.Call(0x43b0, g); r[0xd] = Dec8(g, r[0xd]);
+    }
+
+    /// <summary>DE0C: is the place free (AL = FFh free, 0 not): the rectangle BL x BH cells centred on the pixel (ECX, EDX) lies inside the map, the planes 0..2 are empty on it and the property dword at +2 of the tile descriptor of every
+    /// cell has equal bytes 0 and 1 and the same after rotating AL by 4. The row step advances the planes by twice the row gap (EBP * 2), as the original does.</summary>
+    public static void FDE0C(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds;
+        g.Eax = g.Ebx; g.Al = (byte)(g.Al >> 1); g.Ecx >>= 5; g.Cl = (byte)(g.Cl - g.Al); g.Ah = (byte)(g.Ah >> 1); g.Edx >>= 5; g.Dl = (byte)(g.Dl - g.Ah); g.Dh = g.Dl; g.Dl = g.Cl;
+        g.Al = d[0x18de]; g.Al = Sub8(g, g.Al, g.Bl); g.Cmp(g.Dl, g.Al, 8); if (!g.Cf && !g.Zf) goto none;
+        g.Ah = d[0x18e2]; g.Ah = Sub8(g, g.Ah, g.Bh); g.Cmp(g.Dh, g.Ah, 8); if (!g.Cf && !g.Zf) goto none;
+        g.Edi = g.Dl; g.Eax = U32(d, 0x18de); Mul8(g, g.Al, g.Dh); g.Edi += g.Eax; g.Edi *= 4; g.Esi = g.Edi; g.Edi += U32(d, 0x18ee); g.Esi += w.PlanePointer(0);
+        g.Eax = U32(d, 0x18de); Mul8(g, g.Al, d[0x18e2]); g.Edx = g.Eax * 4;
+        g.Eax = U32(d, 0x18de); g.Al = Sub8(g, g.Al, g.Bl); g.Ebp = g.Eax * 4;
+        do
+        {
+            g.Cl = g.Bl;
+            do
+            {
+                g.Eax = 0; g.Logic(0, 32);
+                g.Cmp(w.PlaneRead(g.Esi), g.Eax, 32); if (!g.Zf) goto none;
+                g.Cmp(w.PlaneRead(g.Esi + g.Edx), g.Eax, 32); if (!g.Zf) goto none;
+                g.Cmp(w.PlaneRead(g.Esi + g.Edx * 2), g.Eax, 32); if (!g.Zf) goto none;
+                uint cell = (g.Edi - U32(d, 0x18ee)) / 4;
+                g.Eax = w.TileProperty(cell, 2);
+                g.Cmp(g.Al, g.Ah, 8); if (!g.Zf) goto none;
+                g.Al = (byte)((g.Al << 4) | (g.Al >> 4)); g.Cmp(g.Al, g.Ah, 8); if (!g.Zf) goto none;
+                g.Edi += 4; g.Esi += 4; g.Cl = Dec8(g, g.Cl);
+            } while (g.Cl != 0);
+            g.Add(g.Edi, g.Ebp); g.Edi += g.Ebp; g.Esi += g.Ebp * 2; g.Bh = Dec8(g, g.Bh);
+        } while (g.Bh != 0);
+        g.Al = 0xff; g.Logic(0xff, 8); return;
+    none:
+        g.Al = 0; g.Logic(0, 8);
     }
 
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
