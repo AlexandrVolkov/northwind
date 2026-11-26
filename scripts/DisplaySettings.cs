@@ -3,7 +3,7 @@ using Godot;
 using FileAccess = Godot.FileAccess;
 namespace Northwind;
 
-/// <summary>Screen settings of the port (not part of the original game, which ran at 640×480): window resolution from 720p to 4K
+/// <summary>Screen and game settings of the port (not part of the original game, which ran at 640×480): window resolution from 720p to 4K
 /// in 16:9 and 16:10, fullscreen, and the classic 4:3 layout. Autoload «Display»; saved in user://display.json.
 /// F11 or Alt+Enter toggles fullscreen; F9, «Экран» on the menu panel or the main menu opens <see cref="DisplaySettingsWindow"/>.</summary>
 public partial class DisplaySettings : CanvasLayer
@@ -20,6 +20,8 @@ public partial class DisplaySettings : CanvasLayer
     public static bool Fullscreen { get; private set; }
     /// <summary>Show the original 640×480 frame only (pillarboxed) instead of widening the map window.</summary>
     public static bool ClassicLayout { get; private set; }
+    /// <summary>Play against the original's ported AI logic instead of the port's improved one (default).</summary>
+    public static bool OriginalAi { get; private set; }
 
     private sealed class Saved
     {
@@ -27,6 +29,7 @@ public partial class DisplaySettings : CanvasLayer
         public int Height { get; set; } = 720;
         public bool Fullscreen { get; set; }
         public bool ClassicLayout { get; set; }
+        public bool OriginalAi { get; set; }
     }
 
     private DisplaySettingsWindow _window = null!;
@@ -54,7 +57,7 @@ public partial class DisplaySettings : CanvasLayer
             if (saved == null) return;
             var chosen = new Vector2I(saved.Width, saved.Height);
             Resolution = Resolutions.Contains(chosen) ? chosen : Resolutions[0];
-            Fullscreen = saved.Fullscreen; ClassicLayout = saved.ClassicLayout;
+            Fullscreen = saved.Fullscreen; ClassicLayout = saved.ClassicLayout; OriginalAi = saved.OriginalAi;
         }
         catch (Exception error) { GD.PushWarning($"Display settings ignored: {error.Message}"); }
     }
@@ -62,7 +65,7 @@ public partial class DisplaySettings : CanvasLayer
     private static void Save()
     {
         using var file = FileAccess.Open(File, FileAccess.ModeFlags.Write);
-        file?.StoreString(JsonSerializer.Serialize(new Saved { Width = Resolution.X, Height = Resolution.Y, Fullscreen = Fullscreen, ClassicLayout = ClassicLayout }));
+        file?.StoreString(JsonSerializer.Serialize(new Saved { Width = Resolution.X, Height = Resolution.Y, Fullscreen = Fullscreen, ClassicLayout = ClassicLayout, OriginalAi = OriginalAi }));
     }
 
     /// <summary>Applies the settings to the window. Fullscreen uses the monitor's own resolution (borderless);
@@ -83,11 +86,12 @@ public partial class DisplaySettings : CanvasLayer
         DisplayServer.WindowSetPosition(screen.Position + (screen.Size - size) / 2);
     }
 
-    public static void Set(Vector2I? resolution = null, bool? fullscreen = null, bool? classic = null)
+    public static void Set(Vector2I? resolution = null, bool? fullscreen = null, bool? classic = null, bool? originalAi = null)
     {
         if (resolution is { } r && Resolutions.Contains(r)) Resolution = r;
         if (fullscreen is { } f) Fullscreen = f;
         if (classic is { } c) ClassicLayout = c;
+        if (originalAi is { } a) OriginalAi = a;
         Save();
         if (DisplayServer.GetName() != "headless") Apply();
     }

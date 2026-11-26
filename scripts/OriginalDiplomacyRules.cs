@@ -53,6 +53,9 @@ public sealed class OriginalDiplomacyRules(OriginalDiplomacyData data, uint reac
     public const uint FirstContactHandler = 0xf250, WarHandler = 0xf000, SilentWarHandler = 0xf057, NoHandler = 0xe65a;
     /// <summary>Called for handlers outside the kernel: handler address, BL|BH, the stored record.</summary>
     public Action<uint, ushort, DiplomacyMessage>? Unhandled { get; set; }
+    /// <summary>The dialog handlers of <see cref="OriginalQuestRules"/>: they may replace the type of the message (the stack slot [ESP+4] that EDD5 stores back).</summary>
+    public Func<uint, ushort, DiplomacyMessage, byte>? QuestHandler { get; set; }
+    private int _patchedType = -1;
     private bool _reacting;
     private readonly List<(byte Me, byte Them)> _deferred = [];
 
@@ -68,8 +71,9 @@ public sealed class OriginalDiplomacyRules(OriginalDiplomacyData data, uint reac
         ulong deadline = (ulong)state.Time + info.Duration;
         state.Queue[owner, slot] = new DiplomacyMessage { Type = type, Other = other, Parameter = parameter, Time = state.Time,
             Deadline = deadline > uint.MaxValue ? uint.MaxValue : (uint)deadline };
+        _patchedType = -1;
         Handle(state, info.Handler, owner, bh, slot);
-        state.Queue[owner, slot].Type = type; state.Queue[owner, slot].Other = other;
+        state.Queue[owner, slot].Type = _patchedType >= 0 ? (byte)_patchedType : type; state.Queue[owner, slot].Other = other;
         return true;
     }
 
@@ -101,6 +105,7 @@ public sealed class OriginalDiplomacyRules(OriginalDiplomacyData data, uint reac
                 return;
             default:
                 Unhandled?.Invoke(handler, (ushort)(bl | (bh << 8)), record);
+                if (QuestHandler != null) { byte patched = QuestHandler(handler, (ushort)(bl | (bh << 8)), record); if (patched != record.Type) _patchedType = patched; }
                 return;
         }
     }
@@ -114,7 +119,10 @@ public sealed class OriginalDiplomacyRules(OriginalDiplomacyData data, uint reac
     }
 
     /// <summary>EF3F: every other living settlement reacts by its relations to both sides. Re-entry is deferred and replayed in order.</summary>
-    private void React(DiplomacyState state, byte me, byte them)
+    private void React(DiplomacyState state, byte me, byte them) => ReactAt(state, me, them, 0, reactionBase);
+    /// <summary>EF3F with EBP = the table of reactions (LE:3 0DDB: war, E23: alliance, E6B: vassalage, EB3: peace; 72 bytes each).</summary>
+    public void React(DiplomacyState state, byte me, byte them, uint table) => ReactAt(state, me, them, (int)(table - 0xddb), table);
+    private void ReactAt(DiplomacyState state, byte me, byte them, int tableOffset, uint table)
     {
         if (_reacting) { _deferred.Add((me, them)); return; }
         _reacting = true;
@@ -122,13 +130,13 @@ public sealed class OriginalDiplomacyRules(OriginalDiplomacyData data, uint reac
         {
             if (state.Dead[d] || d == me || d == them) continue;
             int index = state.Relations[d, them] * 12 + state.Relations[d, me] * 2;
-            byte first = data.Reactions[index], second = data.Reactions[index + 1];
-            uint parameter = reactionBase + (uint)index;
+            byte first = data.Reactions[tableOffset + index], second = data.Reactions[tableOffset + index + 1];
+            uint parameter = table + (uint)index;
             if (first != 0) Send(state, first, (byte)d, me, 0, parameter);
             if (second != 0) Send(state, second, (byte)d, them, 0, parameter);
         }
         _reacting = false;
         var pending = _deferred.ToArray(); _deferred.Clear();
-        foreach (var (m, t) in pending) React(state, m, t);
+        foreach (var (m, t) in pending) ReactAt(state, m, t, tableOffset, table);
     }
 }

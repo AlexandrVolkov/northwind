@@ -101,7 +101,12 @@ public partial class TestRunner
             if (c.GetProperty("loot").GetArrayLength() > 0) pickups += own.Where((r, i) => (r[0x14] & 0xf8) == 0x48 && before[i] != r[0x14]).Count();
             var masked = new List<byte>();
             foreach (int list in new[] { 0x1ab, 0x34f })
-                for (int i = 0; i < 20; i++) { var r = ai.AsSpan(list + i * 0x15, 0x15).ToArray(); r[3] = 0; Array.Clear(r, 5, 7); masked.AddRange(r); }
+                for (int i = 0; i < 20; i++)
+                {
+                    var r = ai.AsSpan(list + i * 0x15, 0x15).ToArray(); r[3] = 0;
+                    if (list == 0x34f && r[0] == 0x0a) Array.Clear(r, 8, 4); else Array.Clear(r, 5, 7);   // the area of a bridge order is real
+                    masked.AddRange(r);
+                }
             byte[] output = [.. ai.AsSpan(OriginalAiSquads.List, 1 + S * ai[OriginalAiSquads.List]), .. ai.AsSpan(0x17c, 0x2f), .. masked, ai[0x19e8],
                 .. own.SelectMany(r => r), .. world.Log, world.RandomIndex, world.RandomIndex2];
             digest.AppendData(output);

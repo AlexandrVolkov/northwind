@@ -621,16 +621,7 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
     private static readonly (int X, int Y)[] Directions = [(0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1)]; // DS:19C7
 
     /// <summary>6996: direction byte (0..255, 0 = north, clockwise) from (x1, y1) to (x2, y2) with the arctangent table DS:287E.</summary>
-    public byte Direction(uint x1, uint y1, uint x2, uint y2)
-    {
-        byte quadrant = 0x40;
-        uint ecx = x2, eax = x1, edx = y2, ebx = y1;
-        if (ecx < eax) { ecx = eax - ecx; (edx, ebx) = (ebx, edx); quadrant += 0x80; } else ecx -= eax;
-        if (edx < ebx) { edx = ebx - edx; (edx, ecx) = (ecx, edx); quadrant -= 0x40; } else edx -= ebx;
-        if (ecx == edx) return (byte)(0x20 + quadrant);
-        if (ecx > edx) return (byte)(arctangent[(byte)((edx << 8) / (ecx & 0xffff))] + quadrant);
-        return (byte)(0x40 - arctangent[(byte)((ecx << 8) / (edx & 0xffff))] + quadrant);
-    }
+    public byte Direction(uint x1, uint y1, uint x2, uint y2) => OriginalDirectionRules.Between(arctangent, x1, y1, x2, y2);
 
     /// <summary>1FCED: fight in the area, by mode +7 (0: chase the enemy centre, 1: march, then clear, 2: clear +17..+1A).
     /// True while the fight goes on.</summary>
@@ -798,7 +789,7 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
                 if (!arrived)
                 {
                     var (x0, y0, x1, y1) = Clip(s[0x20], s[0x21], 0x14, 0x14);
-                    Request(ai, Orders, 0x0a, s[1], s[4], x0, 0);
+                    OriginalAiMilitary.Request(ai, Orders, 0x0a, s[1], s[4], x0, y0, x1, y1, 0);   // CL..DH of 219C3: the area to cross
                     ToIdle(s, 0); return;
                 }
                 (s[0x17], s[0x18], s[0x19], s[0x1a]) = (s[0x13], s[0x14], s[0x15], s[0x16]);
@@ -1013,7 +1004,7 @@ public sealed class OriginalAiSquadStates(IAiSquadStateWorld world, byte[] arcta
             if (!arrived)
             {
                 var (x0, y0, x1, y1) = Clip(s[0x20], s[0x21], 0x14, 0x14);
-                Request(ai, Orders, 0x0a, s[1], 0x40, x0, 0);
+                OriginalAiMilitary.Request(ai, Orders, 0x0a, s[1], 0x40, x0, y0, x1, y1, 0);
             }
             s[5] = 0; return;
         }
@@ -1035,6 +1026,11 @@ public interface IAiMilitaryWorld : IAiSquadWorld
     byte ParticipantCount { get; }
     /// <summary>223B4 for the settlement: open templates of the class (DAT[40] &amp; mask = value, DAT[9C] ≠ FFh, tree allows).</summary>
     IReadOnlyList<byte> Buildable(byte participant, uint mask, uint value);
+    /// <summary>The templates the army request (20DD0 mode 8) may order to fill its strength: the original's list; the skirmish adapter leaves out the siege engines.</summary>
+    IReadOnlyList<byte> ArmyFill(byte participant, uint mask, uint value) => Buildable(participant, mask, value);
+    /// <summary>The port's own AI logic (switchable in the settings; false = the original's behaviour): all orders run by priority, farms
+    /// are urgent when people run out.</summary>
+    bool Improved => false;
     byte[] Template(byte participant, byte template);
     /// <summary>Pool reference (offset from [6AA]) of an object record.</summary>
     uint Reference(byte[] record);
@@ -1382,7 +1378,7 @@ public sealed class OriginalAiMilitary(IAiMilitaryWorld world, byte[] gatherClas
         if (wanted > U32(ai, s + 0x36))
         {
             uint shortfall = wanted - U32(ai, s + 0x36);
-            var open = world.Buildable(ai[0], mask, value);
+            var open = world.ArmyFill(ai[0], mask, value);
             if (open.Count == 0) return false;
             byte t = open[(world.Random() * open.Count) >> 8];
             byte strength = world.Template(ai[0], t)[0x76];
@@ -1628,10 +1624,20 @@ public sealed class OriginalAiOrders(IAiOrdersWorld world, OriginalAiMilitary mi
         if ((ai[0x1a15] & 1) == 0) return;
         byte top = 0;
         for (int k = 0; k < 20; k++) if (ai[List + k * Size] != 0xff && ai[List + k * Size + 3] > top) top = ai[List + k * Size + 3];
-        for (int k = 0; k < 20; k++)
+        // The original runs only the orders of the highest priority present: an unpayable order of the army (people run out) then starves
+        // the farm that would bring the people. The improved logic runs every order, the highest priority first.
+        var order = Enumerable.Range(0, 20).ToList();
+        if (world.Improved)
+        {
+            var priority = new int[20];
+            for (int k = 0; k < 20; k++) priority[k] = ai[List + k * Size] != 0xff ? ai[List + k * Size + 3] : -1;
+            order = [.. order.OrderByDescending(k => priority[k])];
+        }
+        foreach (int k in order)
         {
             int at = List + k * Size;
-            if (ai[at + 3] >= top && !Process(ai, at)) ai[at] = 0xff;
+            if (ai[at] == 0xff && world.Improved) continue;
+            if ((world.Improved || ai[at + 3] >= top) && !Process(ai, at)) ai[at] = 0xff;
             W32(ai, at + 0x10, U32(ai, at + 0x10) + 1);
         }
     }
@@ -1706,7 +1712,7 @@ public sealed class OriginalAiOrders(IAiOrdersWorld world, OriginalAiMilitary mi
                     {
                         if ((U32(r, 0x10) & 0x3f) != 0) return true;
                         uint mask = (uint)(8 | (r[6] >> 4) << 8), value = (uint)((r[6] & 0xf) << 8);
-                        var open = world.Buildable(ai[0], mask, value);
+                        var open = world.ArmyFill(ai[0], mask, value);
                         if (open.Count == 0) return false;
                         byte t = open[(world.Random() * open.Count) >> 8];
                         byte army = world.Participant(ai[0])[0];
@@ -1972,6 +1978,7 @@ public sealed class OriginalAiEconomy(IAiEconomyWorld world, OriginalAiMilitary 
             if ((turn & 0x1ff) == 0 && U32(ai, 0x4e) > U32(p, 0x2c))
             {
                 byte urgency = (byte)((ulong)(U32(ai, 0x4e) - U32(p, 0x2c)) * 200 / U32(ai, 0x4e));
+                if (world.Improved && U32(p, 0x24) < 4) urgency = Math.Max(urgency, (byte)0xc8);   // out of people: farms first
                 if (Random(ai, 0xf08, 0x108) is { } farm) Request(ai, Orders, 8, 0x3c, urgency, farm);
             }
             if (((turn + 0x100) & 0x1ff) == 0)
@@ -2455,14 +2462,5 @@ public sealed class OriginalAiFormations(IReadOnlyList<byte[]> formations, byte[
     private static uint Abs(int v) => v < 0 ? (uint)-v : (uint)v;
 
     /// <summary>6996 (as in <see cref="OriginalAiSquadStates.Direction"/>).</summary>
-    private byte Direction(uint x1, uint y1, uint x2, uint y2)
-    {
-        byte quadrant = 0x40;
-        uint ecx = x2, eax = x1, edx = y2, ebx = y1;
-        if (ecx < eax) { ecx = eax - ecx; (edx, ebx) = (ebx, edx); quadrant += 0x80; } else ecx -= eax;
-        if (edx < ebx) { edx = ebx - edx; (edx, ecx) = (ecx, edx); quadrant -= 0x40; } else edx -= ebx;
-        if (ecx == edx) return (byte)(0x20 + quadrant);
-        if (ecx > edx) return (byte)(arctangent[(byte)((edx << 8) / (ecx & 0xffff))] + quadrant);
-        return (byte)(0x40 - arctangent[(byte)((ecx << 8) / (edx & 0xffff))] + quadrant);
-    }
+    private byte Direction(uint x1, uint y1, uint x2, uint y2) => OriginalDirectionRules.Between(arctangent, x1, y1, x2, y2);
 }

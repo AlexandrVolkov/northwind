@@ -3,7 +3,7 @@ using System.Buffers.Binary;
 namespace Northwind;
 
 public sealed class TerrainColorsData { public int[][] Colors { get; set; } = []; }
-public sealed class BattleFramesData { public BattleFrame[] Frames { get; set; } = []; }
+public sealed class BattleFramesData { public int[] TeamTables { get; set; } = []; public BattleFrame[] Frames { get; set; } = []; }
 public sealed class BattleFrame
 {
     public string TemplateFile { get; set; } = "";
@@ -13,6 +13,10 @@ public sealed class BattleFrame
     public int Y { get; set; }
     public int Width { get; set; }
     public int Height { get; set; }
+    /// <summary>Slot in the owner-colour sheets (battle_frames_team_NN.png, 64×64 cells); −1 when the frame has no owner colour.</summary>
+    public int TeamSlot { get; set; } = -1;
+    /// <summary>0 = battle_frames.png, 1 = battle_frames_horde.png (the horde's ARMY__01 frames).</summary>
+    public int Page { get; set; }
 }
 
 public partial class SkirmishMain : Node2D
@@ -35,17 +39,24 @@ public partial class SkirmishMain : Node2D
     public HashSet<uint> Selection { get; } = [];
     public Camera2D Camera { get; } = new();
     public float Speed { get; private set; } = 1;
-    private Texture2D _terrain = null!, _sprites = null!;
+    private Texture2D _terrain = null!, _sprites = null!, _spritesHorde = null!;
     private readonly Dictionary<(string, int, int), BattleFrame> _frames = [];
+    private readonly Dictionary<int, Texture2D> _teamSheets = [];
     private Label _status = null!, _selection = null!, _events = null!;
     private Label _economy = null!, _recruitment = null!;
     private Button _cancelRecruitment = null!;
     private Button _hire = null!, _buildMill = null!, _hireMilitia = null!, _buildFarm = null!, _buildBarracks = null!, _buildMine = null!;
     public bool PlacingBarracks { get; private set; }
     public bool PlacingMine { get; private set; }
+    public bool PlacingFactory { get; private set; }
+    /// <summary>ARMY__02 index of the building placed from the castle's or the factory's list (15 factory, 13 tower).</summary>
+    private int _placingIndex = 15;
+    /// <summary>The bridge takes two clicks: the first end, then the second (docs/bridges.md).</summary>
+    public bool PlacingBridge { get; private set; }
+    private Vector2I? _bridgeStart;
     public bool PlacingMill { get; private set; }
     public bool PlacingFarm { get; private set; }
-    public bool PlacingBuilding => PlacingMill || PlacingFarm || PlacingBarracks || PlacingMine;
+    public bool PlacingBuilding => PlacingMill || PlacingFarm || PlacingBarracks || PlacingMine || PlacingFactory;
     private Button _pause = null!, _speed = null!;
     private TextureRect _minimap = null!;
     private Image _minimapImage = null!;
@@ -70,9 +81,11 @@ public partial class SkirmishMain : Node2D
         {
             _terrain = GD.Load<Texture2D>("res://assets/imported/terrain.png");
             _sprites = GD.Load<Texture2D>("res://assets/imported/battle_frames.png");
-            if (_terrain == null || _sprites == null) throw new InvalidDataException("Bundled textures are missing");
-            foreach (var frame in GameData.Read<BattleFramesData>("res://assets/imported/battle_frames.json").Frames)
-                _frames[(frame.TemplateFile, frame.TemplateIndex, frame.Frame)] = frame;
+            _spritesHorde = GD.Load<Texture2D>("res://assets/imported/battle_frames_horde.png");
+            if (_terrain == null || _sprites == null || _spritesHorde == null) throw new InvalidDataException("Bundled textures are missing");
+            var framesData = GameData.Read<BattleFramesData>("res://assets/imported/battle_frames.json");
+            foreach (var frame in framesData.Frames) _frames[(frame.TemplateFile, frame.TemplateIndex, frame.Frame)] = frame;
+            foreach (int table in framesData.TeamTables) _teamSheets[table] = GD.Load<Texture2D>($"res://assets/imported/battle_frames_team_{table:00}.png");
             _terrainColors = GameData.Read<TerrainColorsData>("res://assets/imported/terrain_colors.json").Colors;
             _minimapImage = GD.Load<Texture2D>("res://assets/imported/minimap.png").GetImage();
             _minimapTexture = ImageTexture.CreateFromImage(_minimapImage); _minimap.Texture = _minimapTexture;
@@ -85,11 +98,16 @@ public partial class SkirmishMain : Node2D
     {
         if (Battle != null) Battle.Dispose();
         var rules = GameData.Read<SkirmishRules>("res://data/skirmish.json");
+        rules.PlayerStartBoost = 20; rules.AiStartBoost = 10;   // TEMPORARY (user request): 20× and 10× starting stores; restore 1/1 like the original (docs/continuation.md)
+        rules.Pits = true;   // pit traps of the first map (docs/campaign-items.md)
+        rules.Fauna = true;   // wolves and bears of slots 6 and 7 (docs/fauna.md)
+        rules.HordeSlot = 4;   // the horde of Teymur (docs/horde.md): camps found a tent at random
         rules.RivalSlot = 1;   // observation: a second AI settlement in the east, at war with the red one
         Battle = new Skirmish(GameData.Read<MapData>("res://assets/imported/map.json"),
             GameData.Read<ScenarioData>("res://assets/imported/scenario.json"),
             GameData.Read<TemplatesData>("res://assets/imported/templates.json"), rules);
-        Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false;
+        Battle.FrameBudgetMs = 14; Battle.SearchTimeLimitMs = 5;   // keep the frame rate when a large army makes the world step slow
+        Selection.Clear(); Selection.Add(Battle.Hero.Id); _orderMark = null; _drag = _pan = PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingFactory = PlacingBridge = false; _bridgeStart = null;
         PendingOrder = 0; Hud.MenuOpen = false;
         // DOSBox screenshots: the idle castle shows «Выбор» and «Разрушить» (WorkFlags bits 2 and 5 = 24h) although its OBE record holds 0;
         // the WRK handler that sets them is not ported, so the observed idle value is applied here.
@@ -105,20 +123,53 @@ public partial class SkirmishMain : Node2D
     public void SelectCastle()
     {
         if (!Battle.PlayerCastle.Alive) return;
-        Selection.Clear(); Selection.Add(Battle.PlayerCastle.Id); PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false;
+        Selection.Clear(); Selection.Add(Battle.PlayerCastle.Id); PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingFactory = false;
         Focus(Battle.PlayerCastle.Position); RefreshUi();
     }
     /// <summary>Castle build list opened by the «eye» button (WORK sprite 874) as on DOSBox screenshots: barracks, sawmill, mine,
     /// farm, worker. The original greys the mine with full resources for a reason not found yet; the port greys unaffordable items.</summary>
     public bool BuildMenuOpen { get; set; }
-    public sealed record BuildItem(TemplateEntry Template, int TemplateIndex, Action Start);
+    /// <summary><paramref name="Enabled"/> false: the player's development tree does not allow it yet (greyed, a click does nothing).</summary>
+    public sealed record BuildItem(TemplateEntry Template, int TemplateIndex, Action Start, bool Enabled = true);
     public BuildItem[] CastleBuildItems() =>
     [
-        new(Battle.BarracksTemplate, 3, BeginBarracksPlacement), new(Battle.MillTemplate, 4, BeginMillPlacement),
-        new(Battle.MineTemplate, 6, BeginMinePlacement), new(Battle.FarmTemplate, 9, BeginFarmPlacement), new(Battle.WorkerTemplate, 10, HireWorker),
+        Item(3, BeginBarracksPlacement), Item(4, BeginMillPlacement), Item(6, BeginMinePlacement), Item(9, BeginFarmPlacement), Item(12, () => BeginCastlePlacement(12)),
+        Item(15, BeginFactoryPlacement), Item(22, () => BeginCastlePlacement(22)), Item(23, () => BeginCastlePlacement(23)), Item(24, () => BeginCastlePlacement(24)),
+        new(Battle.WorkerTemplate, 10, HireWorker),
     ];
-    public bool BuildMenuVisible => BuildMenuOpen && Selection.Count == 1 && Selection.Contains(Battle.PlayerCastle.Id) && Battle.PlayerCastle.Alive;
-    public TemplateEntry? PlacingTemplate => PlacingBarracks ? Battle.BarracksTemplate : PlacingMill ? Battle.MillTemplate : PlacingMine ? Battle.MineTemplate : PlacingFarm ? Battle.FarmTemplate : null;
+    private BuildItem Item(int index, Action start) => new(Battle.TemplateOf(index), index, start, Battle.Available(index));
+    private BuildItem UnitItem(SkirmishActor producer, int index) => new(Battle.TemplateOf(index), index, () => { Battle.QueueUnit(producer, index); RefreshUi(); }, Battle.Available(index));
+    /// <summary>The castle's list: a building of any index of the list is placed like the factory (near the castle, paid up front).</summary>
+    public bool InventoryOpen;
+    /// <summary>A click on an inventory slot: the item is described in the message line (its use is the campaign's business: the stones and staffs are keys for the hermits' dialogs).</summary>
+    public void ClickInventory(int slot)
+    {
+        byte item = Battle.Inventory[slot]; if (item == 0) return;
+        Battle.Log($"{Battle.ItemName(item)}: предмет нельзя применить в схватке.");
+    }
+    public void BeginCastlePlacement(int index)
+    {
+        if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
+        _placingIndex = index; PlacingFactory = true; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingBridge = false; RefreshUi();
+    }
+    /// <summary>A finished barracks, stable or factory of the player is selected: its list hires the units of its production row.</summary>
+    public SkirmishActor? SelectedProducer => Selection.Count == 1 && Battle.Find(Selection.Single()) is { } p && Skirmish.IsPlayerProducer(p) ? p : null;
+    public BuildItem[] ProducerItems(SkirmishActor producer) => producer.Source.TemplateName switch
+    {
+        "Казарма" => [UnitItem(producer, 0), UnitItem(producer, 1), UnitItem(producer, 17), UnitItem(producer, 18)],
+        "Конюшня" => [UnitItem(producer, 21)],
+        "Завод" => [Item(5, BeginFencePlacement), Item(7, BeginBridgePlacement), Item(13, BeginTowerPlacement), Item(14, () => BeginCastlePlacementFactory(14)), UnitItem(producer, 16), UnitItem(producer, 26)],
+        _ => [],
+    };
+    /// <summary>A finished factory of the player is selected: its list offers the line buildings (the bridge; fence, gate, tower and the siege engines are not offered yet).</summary>
+    public SkirmishActor? SelectedFactory => Selection.Count == 1 && Battle.Find(Selection.Single()) is { } f && Skirmish.IsFactory(f) ? f : null;
+    /// <summary>A finished laboratory of the player is selected: its list offers the researchable items (cost in gold, paid while the research runs).</summary>
+    public SkirmishActor? SelectedLab => Selection.Count == 1 && Battle.Find(Selection.Single()) is { } l && Skirmish.IsPlayerLab(l) ? l : null;
+    public IReadOnlyList<Skirmish.ResearchRow> LabRows() => SelectedLab == null ? [] : Battle.ResearchRows();
+    public void StartLabResearch(Skirmish.ResearchRow row) { if (SelectedLab is { } lab) { Battle.StartResearch(lab, row); RefreshUi(); } }
+    public BuildItem[] BuildItems() => SelectedProducer is { } p ? ProducerItems(p) : CastleBuildItems();
+    public bool BuildMenuVisible => (BuildMenuOpen && Selection.Count == 1 && Selection.Contains(Battle.PlayerCastle.Id) && Battle.PlayerCastle.Alive) || SelectedProducer != null;
+    public TemplateEntry? PlacingTemplate => PlacingFactory ? Battle.TemplateOf(_placingIndex) : PlacingBarracks ? Battle.BarracksTemplate : PlacingMill ? Battle.MillTemplate : PlacingMine ? Battle.MineTemplate : PlacingFarm ? Battle.FarmTemplate : null;
     public void HireWorker()
     {
         if (!Selection.Contains(Battle.PlayerCastle.Id)) return;
@@ -127,35 +178,57 @@ public partial class SkirmishMain : Node2D
     }
     public void HireMilitia()
     {
-        if (Selection.Count != 1 || Battle.Find(Selection.Single()) is not { } barracks || !Skirmish.IsBarracks(barracks)) return;
+        if (Selection.Count != 1 || Battle.Find(Selection.Single()) is not { } barracks || !Skirmish.IsBarracks(barracks) || barracks.Team != 0) return;
         Battle.QueueBarracksMilitia(barracks);
         RefreshUi();
     }
     public void CancelRecruitment()
     {
         if (Selection.Contains(Battle.PlayerCastle.Id)) Battle.CancelRecruitment();
-        else if (Selection.Count == 1 && Battle.Find(Selection.Single()) is { } barracks && Skirmish.IsBarracks(barracks)) Battle.CancelBarracksRecruitment(barracks);
+        else if (Selection.Count == 1 && Battle.Find(Selection.Single()) is { } barracks && Skirmish.IsBarracks(barracks) && barracks.Team == 0) Battle.CancelBarracksRecruitment(barracks);
         RefreshUi();
     }
     public void BeginBarracksPlacement()
     {
         if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
-        PlacingBarracks = true; PlacingMill = PlacingFarm = PlacingMine = false; RefreshUi();
+        PlacingBarracks = true; PlacingMill = PlacingFarm = PlacingMine = PlacingFactory = false; RefreshUi();
+    }
+    public void BeginBridgePlacement() => BeginLinePlacement(7);
+    public void BeginFencePlacement() => BeginLinePlacement(5);
+    private void BeginLinePlacement(int index)
+    {
+        if (Battle.Paused || Battle.Outcome != "" || SelectedFactory == null) return;
+        Battle.LineIndex = index; PlacingBridge = true; _bridgeStart = null; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingFactory = false; RefreshUi();
+    }
+    public void BeginFactoryPlacement()
+    {
+        if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
+        _placingIndex = 15; PlacingFactory = true; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; RefreshUi();
+    }
+    public void BeginTowerPlacement()
+    {
+        if (Battle.Paused || Battle.Outcome != "" || SelectedFactory == null) return;
+        _placingIndex = 13; PlacingFactory = true; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingBridge = false; RefreshUi();
+    }
+    public void BeginCastlePlacementFactory(int index)
+    {
+        if (Battle.Paused || Battle.Outcome != "" || SelectedFactory == null) return;
+        _placingIndex = index; PlacingFactory = true; PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingBridge = false; RefreshUi();
     }
     public void BeginMinePlacement()
     {
         if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
-        PlacingMine = true; PlacingMill = PlacingFarm = PlacingBarracks = false; RefreshUi();
+        PlacingMine = true; PlacingMill = PlacingFarm = PlacingBarracks = PlacingFactory = false; RefreshUi();
     }
     public void BeginFarmPlacement()
     {
         if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
-        PlacingFarm = true; PlacingMill = PlacingBarracks = PlacingMine = false; RefreshUi();
+        PlacingFarm = true; PlacingMill = PlacingBarracks = PlacingMine = PlacingFactory = false; RefreshUi();
     }
     public void BeginMillPlacement()
     {
         if (Battle.Paused || Battle.Outcome != "" || !Selection.Contains(Battle.PlayerCastle.Id) || !Battle.PlayerCastle.Alive) return;
-        PlacingMill = true; PlacingFarm = PlacingBarracks = PlacingMine = false; RefreshUi();
+        PlacingMill = true; PlacingFarm = PlacingBarracks = PlacingMine = PlacingFactory = false; RefreshUi();
     }
     private Vector2 _pausePointer;
     public void TogglePause()
@@ -239,6 +312,9 @@ public partial class SkirmishMain : Node2D
             case (4, 4) when unit.Worker: PendingOrder = 4; break;
             case (8, 7) when unit.Worker: PendingOrder = 8; break;
             case var _ when slot.Sprite == 874 && unit.Id == Battle.PlayerCastle.Id: BuildMenuOpen = !BuildMenuOpen; break;
+            case var _ when slot.Label == "Ремонт" && unit.Structure: Battle.StartRepair(unit); break;
+            case var _ when slot.Label is "Открыть" or "Закрыть" or "Автомат" && unit.Source.TemplateName == "Ворота": Battle.SetGateMode(unit, slot.Label == "Открыть" ? 1 : slot.Label == "Закрыть" ? 0 : 2); break;
+            case var _ when slot.Label == "Разрушить" && unit.Structure: Battle.Demolish(unit); break;
             default: Battle.Log($"Приказ «{slot.Label}» ещё не перенесён."); break;
         }
     }
@@ -315,7 +391,15 @@ public partial class SkirmishMain : Node2D
         }
         Battle.Sounds.Clear();
     }
+    /// <summary>Milliseconds spent in <see cref="_Process"/> (world steps included) and <see cref="_Draw"/>, summed over frames (profiling).</summary>
+    public double ProcessMs, DrawMs, StepsMs, ProcessMaxMs; public int ProfiledFrames;
     public override void _Process(double delta)
+    {
+        long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+        ProcessBody(delta);
+        double ms = (System.Diagnostics.Stopwatch.GetTimestamp() - t0) * 1000.0 / System.Diagnostics.Stopwatch.Frequency; ProcessMs += ms; ProcessMaxMs = Math.Max(ProcessMaxMs, ms); ProfiledFrames++;
+    }
+    private void ProcessBody(double delta)
     {
         if (!_ready) return;
         Layout();
@@ -334,7 +418,8 @@ public partial class SkirmishMain : Node2D
         if (Selection.Count == 0) { Battle.Log("Сначала выделите отряды: рамкой или Ctrl+A."); return; }
         var target = Battle.At(point);
         var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
-        if (target?.Team == 1) Battle.Attack(Selection, target.Id);
+        if (target != null && Skirmish.IsContainer(target)) { if (target.Record[0x14] == 2) Battle.Visit(Selection, target.Id); else Battle.Attack(Selection, target.Id); }
+        else if (target != null && (target.Team == 1 || Skirmish.IsMage(target))) Battle.Attack(Selection, target.Id);
         else if (target?.Source.TemplateName == "Лесопилка" && Battle.DeliverTimber(Selection, target.Id)) { }
         else if (target?.Source.TemplateName == "Шахта" && Battle.WorkMine(Selection, target.Id)) { }
         else if (Battle.Harvestable(cell) && Selection.Any(id => Battle.Find(id)?.Worker == true)) Battle.GatherTimber(Selection, cell);
@@ -360,8 +445,12 @@ public partial class SkirmishMain : Node2D
             if (_dragStart.DistanceTo(_dragEnd) < 6)
             {
                 var point = GetViewport().GetCanvasTransform().AffineInverse() * button.Position;
-                if (Battle.At(point) is { Team: 0 } actor)
-                { if (!Selection.Add(actor.Id)) Selection.Remove(actor.Id); }
+                if (Battle.At(point) is { } actor && (actor.Team == 0 || !_showFog || Seen(actor.Cell)))
+                {
+                    // An enemy or foreign object can be selected alone, to look at it; orders ignore it.
+                    if (actor.Team != 0) { Selection.Clear(); Selection.Add(actor.Id); }
+                    else if (!Selection.Add(actor.Id)) Selection.Remove(actor.Id);
+                }
             }
             else
             {
@@ -388,6 +477,7 @@ public partial class SkirmishMain : Node2D
             {
                 case Key.Space: TogglePause(); break;
                 case Key.F: FocusHero(); break;
+                case Key.I: InventoryOpen = !InventoryOpen; Hud.QueueRedraw(); break;
                 case Key.End: FocusHero(); break;
                 case Key.T: FocusObjective(); break;
                 case Key.C: SelectCastle(); break;
@@ -396,12 +486,14 @@ public partial class SkirmishMain : Node2D
                 case Key.X: Battle.Stop(Selection); break;
                 case Key.Escape:
                     if (PendingOrder != 0) PendingOrder = 0;
-                    else if (PlacingBuilding) { PlacingMill = false; PlacingFarm = PlacingBarracks = PlacingMine = false; }
+                    else if (PlacingBridge) { PlacingBridge = false; _bridgeStart = null; RefreshUi(); }
+                    else if (PlacingBuilding) { PlacingMill = false; PlacingFarm = PlacingBarracks = PlacingMine = PlacingFactory = false; }
                     else if (Hud.MenuOpen) Hud.MenuOpen = false;
                     else Selection.Clear();
                     break;
                 case Key.F10: GetTree().ChangeSceneToFile("res://scenes/main.tscn"); break;
                 case Key.F1: _ui.Visible = !_ui.Visible; break;
+                case Key.F4: _showFog = !_showFog; QueueRedraw(); break;
             }
         }
         if (e is InputEventMouseButton button)
@@ -411,14 +503,23 @@ public partial class SkirmishMain : Node2D
             if (button.ButtonIndex is MouseButton.Left or MouseButton.Right && Hud.Click(ToHud(button.Position), button.ButtonIndex)) return;
             if (!MapScreenRect.HasPoint(button.Position)) return;
             if (button.ButtonIndex == MouseButton.Right && PendingOrder != 0) { PendingOrder = 0; return; }
-            if (PlacingBuilding && button.ButtonIndex == MouseButton.Right) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; RefreshUi(); return; }
+            if (PlacingBridge && button.ButtonIndex == MouseButton.Right) { if (_bridgeStart != null) _bridgeStart = null; else PlacingBridge = false; RefreshUi(); return; }
+            if (PlacingBridge && button.ButtonIndex == MouseButton.Left)
+            {
+                var spot = GetViewport().GetCanvasTransform().AffineInverse() * button.Position;
+                var at = new Vector2I((int)MathF.Floor(spot.X / 32), (int)MathF.Floor(spot.Y / 32));
+                if (_bridgeStart is not { } first) _bridgeStart = at;
+                else if (Battle.BuildBridge(first, at) > 0) { PlacingBridge = false; _bridgeStart = null; }
+                RefreshUi(); return;
+            }
+            if (PlacingBuilding && button.ButtonIndex == MouseButton.Right) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingFactory = false; RefreshUi(); return; }
             if (PlacingBuilding && button.ButtonIndex == MouseButton.Left)
             {
                 var point = GetViewport().GetCanvasTransform().AffineInverse() * button.Position;
                 var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
-                var mill = PlacingFarm ? Battle.BuildFarm(cell) : PlacingBarracks ? Battle.BuildBarracks(cell) : PlacingMine ? Battle.BuildMine(cell) : Battle.BuildMill(cell);
+                var mill = PlacingFarm ? Battle.BuildFarm(cell) : PlacingFactory ? Battle.BuildIndex(_placingIndex, cell) : PlacingBarracks ? Battle.BuildBarracks(cell) : PlacingMine ? Battle.BuildMine(cell) : Battle.BuildMill(cell);
                 // The original keeps the castle selected and its build list open after placing (DOSBox screenshots).
-                if (mill != null) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = false; if (!BuildMenuVisible) { Selection.Clear(); Selection.Add(mill.Id); } }
+                if (mill != null) { PlacingMill = PlacingFarm = PlacingBarracks = PlacingMine = PlacingFactory = false; if (!BuildMenuVisible) { Selection.Clear(); Selection.Add(mill.Id); } }
                 RefreshUi(); return;
             }
             if (button.ButtonIndex is MouseButton.WheelUp or MouseButton.WheelDown)
@@ -441,8 +542,16 @@ public partial class SkirmishMain : Node2D
             if (_pan) { Camera.Position -= motion.Relative / Camera.Zoom; ClampCamera(); }
         }
     }
+    private bool Seen(Vector2I cell) { int i = cell.Y * Battle.Map.Width + cell.X; return i < 0 || i >= Battle.FogMap.Length || (Battle.FogMap[i] & (1 << Battle.Rules.PlayerSlot)) == 0; }
     private Vector2 ClampToMap(Vector2 point) { var r = MapScreenRect; return point.Clamp(r.Position, r.End); }
+    private bool _showFog;   // adapter: a plain dark overlay of the cells the player has not seen ([18DA]); the original's edge drawing 9F38 is not ported
     public override void _Draw()
+    {
+        long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+        DrawBody();
+        DrawMs += (System.Diagnostics.Stopwatch.GetTimestamp() - t0) * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+    }
+    private void DrawBody()
     {
         if (!_ready) return;
         var half = GetViewportRect().Size / Camera.Zoom / 2;
@@ -454,8 +563,23 @@ public partial class SkirmishMain : Node2D
             int tile = (int)(Battle.Map.Cells[y * Battle.Map.Width + x] & 65535);
             DrawTextureRectRegion(_terrain, new Rect2(x * 32, y * 32, 32, 32), new Rect2(tile % 32 * 32, tile / 32 * 32, 32, 32));
         }
-        foreach (var actor in Battle.Actors.Where(a => a.Alive || a.Dying).OrderBy(a => a.Position.Y)) DrawActor(actor);
-        var producer = Selection.Count == 1 && Battle.Find(Selection.Single()) is { } barracks && Skirmish.IsBarracks(barracks)
+        foreach (var (type, firstFrame, at, left) in Battle.Sparks)
+            if (_frames.TryGetValue(("ARMY__00.EFF", type, firstFrame + (8 - left)), out var spark))
+                DrawTextureRectRegion(_sprites, new Rect2(at - new Vector2(spark.Width / 2f, spark.Height / 2f), new Vector2(spark.Width, spark.Height)), new Rect2(spark.X, spark.Y, spark.Width, spark.Height));
+        foreach (var pit in Battle.Pits)
+        {
+            var spot = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(pit.AsSpan(4)), BinaryPrimitives.ReadUInt32LittleEndian(pit.AsSpan(8)));
+            if (_showFog && !Seen(new Vector2I((int)spot.X >> 5, (int)spot.Y >> 5))) continue;
+            if (_frames.TryGetValue(("ARMY__03.DAT", 12, BinaryPrimitives.ReadUInt16LittleEndian(pit.AsSpan(1))), out var pitFrame))
+                DrawTextureRectRegion(_spritesHorde, new Rect2(spot - new Vector2(pitFrame.Width, pitFrame.Height) / 2, new Vector2(pitFrame.Width, pitFrame.Height)), new Rect2(pitFrame.X, pitFrame.Y, pitFrame.Width, pitFrame.Height));
+        }
+        foreach (var actor in Battle.Actors.Where(a => a.Alive && a.Index02 == 7)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);   // bridges lie under everything that walks
+        foreach (var actor in Battle.Actors.Where(a => (a.Alive || a.Dying) && !Skirmish.IsHiddenAnimal(a) && a.Index02 != 7).OrderBy(a => a.Position.Y)) if (!_showFog || actor.Team == 0 || Seen(actor.Cell)) DrawActor(actor);
+        if (_showFog)
+            for (int y = Math.Max(0, first.Y); y < Math.Min(Battle.Map.Height, last.Y); y++)
+            for (int x = Math.Max(0, first.X); x < Math.Min(Battle.Map.Width, last.X); x++)
+                if (!Seen(new Vector2I(x, y))) DrawRect(new Rect2(x * 32, y * 32, 32, 32), new Color(0, 0, 0, 0.85f));
+        var producer = Selection.Count == 1 && Battle.Find(Selection.Single()) is { } barracks && Skirmish.IsBarracks(barracks) && barracks.Team == 0
             ? barracks : Selection.Contains(Battle.PlayerCastle.Id) ? Battle.PlayerCastle : null;
         if (_ui.Visible && !PlacingBuilding && producer is { Alive: true })
         {
@@ -474,12 +598,26 @@ public partial class SkirmishMain : Node2D
                 DrawString(ThemeDB.FallbackFont, (Vector2)(cell * 32) - new Vector2(0, 4), "Лес · ПКМ — рубить", HorizontalAlignment.Left, -1, 12, new Color("d9e8b5"));
             }
         }
+        if (PlacingBridge)
+        {
+            var mouse = GetGlobalMousePosition(); var at = new Vector2I((int)MathF.Floor(mouse.X / 32), (int)MathF.Floor(mouse.Y / 32));
+            var line = Battle.BridgeCells(_bridgeStart ?? at, at);
+            bool affordable = !Battle.Paused && Battle.CanAffordBridge(line.Count);
+            var c = affordable ? new Color(40 / 255f, 28 / 255f, 223 / 255f) : new Color(200 / 255f, 30 / 255f, 30 / 255f);
+            var segment = Battle.LineTemplate.Construction; var halfFoot = new Vector2I(segment.FootprintWidth / 2, segment.FootprintHeight / 2);
+            foreach (var cell in line)
+            {
+                var cc = Battle.Inside(cell) && Battle.BridgeCellFree(cell) ? c : new Color(200 / 255f, 30 / 255f, 30 / 255f);
+                var r = new Rect2((Vector2)((cell - halfFoot) * 32), new Vector2(segment.FootprintWidth * 32, segment.FootprintHeight * 32)); DrawRect(r, new Color(cc, .25f)); DrawRect(r.Grow(-1), cc, false, 1);
+            }
+            if (_bridgeStart != null) DrawString(ThemeDB.FallbackFont, (Vector2)((line[^1] - halfFoot) * 32) + new Vector2(0, -5), $"Секций: {line.Count}", HorizontalAlignment.Left, -1, 12, c.Lightened(.5f));
+        }
         if (PlacingBuilding)
         {
             var point = GetGlobalMousePosition(); var cell = new Vector2I((int)MathF.Floor(point.X / 32), (int)MathF.Floor(point.Y / 32));
-            var parameters = (PlacingFarm ? Battle.FarmTemplate : PlacingBarracks ? Battle.BarracksTemplate : PlacingMine ? Battle.MineTemplate : Battle.MillTemplate).Construction;
+            var parameters = (PlacingTemplate ?? Battle.MillTemplate).Construction;
             var rect = new Rect2((Vector2)((cell - new Vector2I(parameters.FootprintWidth / 2, parameters.FootprintHeight / 2)) * 32), new Vector2(parameters.FootprintWidth * 32, parameters.FootprintHeight * 32));
-            bool clear = !Battle.Paused && Battle.CanAfford(PlacingFarm ? Battle.FarmTemplate : PlacingBarracks ? Battle.BarracksTemplate : PlacingMine ? Battle.MineTemplate : Battle.MillTemplate) && (PlacingFarm ? Battle.ProbeFarm(cell) : PlacingBarracks ? Battle.ProbeBarracks(cell) : PlacingMine ? Battle.ProbeMine(cell) : Battle.ProbeMill(cell)).Status == ConstructionPlacementStatus.Clear;
+            bool clear = !Battle.Paused && Battle.CanAfford(PlacingTemplate ?? Battle.MillTemplate) && (PlacingFarm ? Battle.ProbeFarm(cell) : PlacingFactory ? Battle.ProbeIndex(_placingIndex, cell) : PlacingBarracks ? Battle.ProbeBarracks(cell) : PlacingMine ? Battle.ProbeMine(cell) : Battle.ProbeMill(cell)).Status == ConstructionPlacementStatus.Clear;
             if (_ui.Visible) { var color = clear ? new Color("8de5b8") : new Color("ef8272"); DrawRect(rect, new Color(color, .2f)); DrawRect(rect, color, false, 2); }
             else
             {
@@ -506,23 +644,57 @@ public partial class SkirmishMain : Node2D
                 DrawString(ThemeDB.FallbackFont, pointOfEntry + new Vector2(-24, -10), "Приём груза", HorizontalAlignment.Left, -1, 12, new Color("e7cd82"));
             }
         }
+        foreach (var (template, finalFrame, at, owner, left) in Battle.Ruins)
+        {
+            // A building that dies goes through the rest of its destruction frames (the block [4A+4B-1, 2·4A+4B-1] of its shape that a damaged building
+            // shows by its condition, C88C); the last frame is the ruin, it stays for RuinTicks and fades out.
+            var (a4, b4, baseFrame, line) = Battle.Templates02(template);
+            int stride = 2 * a4 + b4, shape = line && stride > 0 ? Math.Max(0, (finalFrame - baseFrame) / stride) : 0;
+            int blockStart = baseFrame + shape * stride + a4 + b4 - 1, blockEnd = baseFrame + shape * stride + 2 * a4 + b4 - 1;
+            int from = finalFrame >= blockStart && finalFrame <= blockEnd ? finalFrame : blockStart;
+            int falling = Math.Max(0, left - Skirmish.RuinTicks);   // collapse ticks still to go
+            float progress = 1f - falling / (float)Skirmish.CollapseTicks;
+            ushort frameNumber = (ushort)Math.Clamp(from + (int)MathF.Round((blockEnd - from) * progress), blockStart, blockEnd);
+            if (!_frames.TryGetValue(("ARMY__02.DAT", template, frameNumber), out var ruin) && !_frames.TryGetValue(("ARMY__02.DAT", template, finalFrame), out ruin)) continue;
+            var ruinSize = new Vector2(ruin.Width, ruin.Height);
+            var ruinAt = at - new Vector2(ruinSize.X / 2, ruinSize.Y - StructureBottom(template));
+            var tint = new Color(1, 1, 1, Math.Min(1f, left / (float)Skirmish.RuinFadeTicks));
+            if (ruin.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(owner), out var ruinSheet))
+                DrawTextureRectRegion(ruinSheet, new Rect2(ruinAt, ruinSize), new Rect2(ruin.TeamSlot % 64 * 64, ruin.TeamSlot / 64 * 64, ruin.Width, ruin.Height), tint);
+            else DrawTextureRectRegion(_sprites, new Rect2(ruinAt, ruinSize), new Rect2(ruin.X, ruin.Y, ruin.Width, ruin.Height), tint);
+        }
         foreach (var corpse in Battle.Corpses)
         {
             var at = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(corpse.AsSpan(7)), BinaryPrimitives.ReadUInt32LittleEndian(corpse.AsSpan(0xc)));
-            if (corpse[1] == 2) DrawRect(new Rect2(at - new Vector2(9, 4), new Vector2(18, 8)), new Color(.25f, .18f, .12f, .35f + corpse[0x17] * .1f));
-            else DrawCircle(at, 3, new Color(.5f, .05f, .05f, .5f));
+            ushort frameNumber = BinaryPrimitives.ReadUInt16LittleEndian(corpse.AsSpan(3));
+            BattleFrame? sprite = null;
+            if (corpse[1] == 2)
+            {
+                // The unit's own last death frame first, then the corpse frames of ARMY__02 effect type 1.
+                _frames.TryGetValue(("ARMY__02.DAT", corpse[0x0e], frameNumber), out sprite);
+                if (sprite == null) _frames.TryGetValue(("ARMY__02.EFF", 1, frameNumber), out sprite);
+                if (sprite == null) { DrawRect(new Rect2(at - new Vector2(9, 4), new Vector2(18, 8)), new Color(.25f, .18f, .12f, .35f + corpse[0x17] * .1f)); continue; }
+            }
+            else if (!_frames.TryGetValue(("ARMY__00.EFF", 3, frameNumber), out sprite)) { DrawCircle(at, 3, new Color(.5f, .05f, .05f, .5f)); continue; }
+            var spriteSize = new Vector2(sprite.Width, sprite.Height);
+            var spriteAt = corpse[1] == 2 ? at - new Vector2(spriteSize.X / 2, spriteSize.Y - 16) : at - spriteSize / 2;
+            if (corpse[1] == 2 && sprite.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(corpse[2]), out var corpseSheet))
+                DrawTextureRectRegion(corpseSheet, new Rect2(spriteAt, spriteSize), new Rect2(sprite.TeamSlot % 64 * 64, sprite.TeamSlot / 64 * 64, sprite.Width, sprite.Height));
+            else DrawTextureRectRegion(_sprites, new Rect2(spriteAt, spriteSize), new Rect2(sprite.X, sprite.Y, sprite.Width, sprite.Height));
         }
         foreach (var arrow in Battle.Arrows)
         {
             // Effect record: position +7/+0C, 24.8 velocity +18/+1C, height above ground +10 (8.8).
             var at = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(arrow.AsSpan(7)), BinaryPrimitives.ReadUInt32LittleEndian(arrow.AsSpan(0xc)) - BinaryPrimitives.ReadUInt16LittleEndian(arrow.AsSpan(0x10)) / 256f);
             var velocity = new Vector2(BinaryPrimitives.ReadInt32LittleEndian(arrow.AsSpan(0x18)), BinaryPrimitives.ReadInt32LittleEndian(arrow.AsSpan(0x1c))).Normalized();
-            DrawLine(at - velocity * 9 - new Vector2(0, 16), at - new Vector2(0, 16), new Color("e8dcc0"), 2);
+            if (!DrawEffectSprite(2, arrow, at - new Vector2(0, 16))) DrawLine(at - velocity * 9 - new Vector2(0, 16), at - new Vector2(0, 16), new Color("e8dcc0"), 2);
         }
         foreach (var stone in Battle.Stones)
         {
             var at = new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(stone.AsSpan(7)), BinaryPrimitives.ReadUInt32LittleEndian(stone.AsSpan(0xc)) - BinaryPrimitives.ReadUInt16LittleEndian(stone.AsSpan(0x10)) / 256f);
-            if (stone[0] == OriginalCatapultRules.Stone) DrawCircle(at - new Vector2(0, 16), 4, new Color("8a8178"));
+            if (stone[0] is 8 or 0x0a or 0x0b or 0x0c or 0x0d or 0x0e or 0x11 or 0x12 or 0x1d && DrawEffectSprite(stone[0], stone, at - new Vector2(0, 16))) { }
+            else if (stone[0] is 0x13 or 0x14 or 0x15 && DrawEffectSprite(stone[0], stone, at - new Vector2(0, stone[0] switch { 0x13 => 8, 0x14 => 19, _ => 34 }))) { }   // flames stand on the burning point
+            else if (stone[0] == OriginalCatapultRules.Stone) DrawCircle(at - new Vector2(0, 16), 4, new Color("8a8178"));
             else if (stone[0] == OriginalCatapultRules.Bolt) DrawCircle(at - new Vector2(0, 16), 3, new Color("c9b38a"));
             else if (stone[0] == OriginalCatapultRules.BigExplosion) DrawCircle(at - new Vector2(0, 16), 10 + (0x12 - stone[0x17]), new Color(1f, .6f, .25f, stone[0x17] / 30f));
             else if (stone[0] == OriginalFireRules.Shot) DrawCircle(at - new Vector2(0, 16), 3, new Color("ff9a2e"));
@@ -533,6 +705,15 @@ public partial class SkirmishMain : Node2D
             else if (stone[0] == OriginalBurnRules.Column) DrawCircle(at - new Vector2(0, 20), 7, new Color(.35f, .35f, .35f, stone[0x17] / 28f));
             else DrawCircle(at - new Vector2(0, 16), 6 + (0x12 - stone[0x17]), new Color(.55f, .5f, .45f, stone[0x17] / 36f));
         }
+        foreach (var (point, left, variant) in Battle.Rocks)   // a rock falls: 16×16 frames 18Ch + 5 per variant, lower as the time runs out
+            if (_frames.TryGetValue(("ARMY__00.EFF", 0x18, 0x18c + variant * 5 + left % 5), out var rockFrame))
+                DrawTextureRectRegion(_sprites, new Rect2(point - new Vector2(8, 8 + left * 10), new Vector2(16, 16)), new Rect2(rockFrame.X, rockFrame.Y, 16, 16));
+        foreach (var flash in Battle.MageFlashes)   // the mage's discharge: ARMY__03 effect 0, 72×72, frame F0h + 4·heading + stage
+            if (_frames.TryGetValue(("ARMY__03.EFF", 0, BinaryPrimitives.ReadUInt16LittleEndian(flash.AsSpan(3))), out var flashFrame))
+                DrawTextureRectRegion(flashFrame.Page == 1 ? _spritesHorde : _sprites, new Rect2(new Vector2(BinaryPrimitives.ReadUInt32LittleEndian(flash.AsSpan(7)), BinaryPrimitives.ReadUInt32LittleEndian(flash.AsSpan(0xc))) - new Vector2(36, 52), new Vector2(72, 72)), new Rect2(flashFrame.X, flashFrame.Y, 72, 72));
+        foreach (var (point, left) in Battle.Dust)   // the puff after the impact: 62×62 frames 170h..179h
+            if (_frames.TryGetValue(("ARMY__00.EFF", 0x16, 0x170 + Math.Clamp((Skirmish.DustTicks - left) / 3, 0, 9)), out var dustFrame))
+                DrawTextureRectRegion(_sprites, new Rect2(point - new Vector2(31, 40), new Vector2(62, 62)), new Rect2(dustFrame.X, dustFrame.Y, 62, 62), new Color(1, 1, 1, Math.Min(1f, left / 10f)));
         foreach (var effect in Battle.Effects)
         {
             DrawLine(effect.From - new Vector2(0, 16), effect.To - new Vector2(0, 16), new Color(effect.Team == 0 ? "f0d88a" : "f57862"), 2);
@@ -554,8 +735,20 @@ public partial class SkirmishMain : Node2D
             DrawRect(rect, new Color(.3f, .9f, .7f, .12f)); DrawRect(rect, new Color("88e7bf"), false, 1);
         }
     }
+    /// <summary>An ARMY__00 effect (arrow, stone, explosions, smoke) from its original frame, centred on the point; false when the frame is not in the atlas.</summary>
+    private bool DrawEffectSprite(byte type, ReadOnlySpan<byte> effect, Vector2 center)
+    {
+        if (!_frames.TryGetValue(("ARMY__00.EFF", type, BinaryPrimitives.ReadUInt16LittleEndian(effect[3..])), out var f)) return false;
+        var size = new Vector2(f.Width, f.Height);
+        DrawTextureRectRegion(_sprites, new Rect2(center - size / 2, size), new Rect2(f.X, f.Y, f.Width, f.Height));
+        return true;
+    }
+    /// <summary>Distance from the position of a building to the bottom of its sprite: the footprint's lower half plus 16 px (the castle's record
+    /// position and its observed top-left corner (−64, −63) fix this, docs/castle-reference.md); a unit's sprite stands 16 px below its position.</summary>
+    private float StructureBottom(int templateIndex) => Battle.StructureFootprintHeight(templateIndex) * 16 + 16;
     private void DrawActor(SkirmishActor actor)
     {
+        if (Skirmish.IsHidden(actor)) return;   // the hurt mage has vanished
         var point = actor.Position; var color = TeamColor(actor.Team);
         bool debug = _ui.Visible;
         if (debug && !actor.Structure && !actor.Dying)
@@ -564,14 +757,28 @@ public partial class SkirmishMain : Node2D
             DrawArc(Vector2.Zero, Selection.Contains(actor.Id) ? 19 : 14, 0, Mathf.Tau, 32, color, Selection.Contains(actor.Id) ? 3 : 1);
             DrawSetTransform(Vector2.Zero);
         }
-        int frameIndex = actor.Frame;
-        if (actor.Stepping && !actor.Turning) frameIndex += (int)(Battle.Elapsed * 8) % Math.Max(1, (int)actor.Parameters[0x4a]);
+        // A unit among the trees is hidden: its owner sees only a hollow green triangle, the others see nothing.
+        if (!actor.Structure && !actor.Dying && Battle.InForest(actor) && (actor.Team == 0 || (actor.VisibleTo & (1 << (Battle.Rules.PlayerSlot & 7))) == 0))
+        {
+            if (actor.Team == 0)
+            {
+                var t = point + new Vector2(0, -10);
+                DrawPolyline([t + new Vector2(0, -7), t + new Vector2(6, 5), t + new Vector2(-6, 5), t + new Vector2(0, -7)], new Color("5ee06a"), 1.5f);
+                if (Selection.Contains(actor.Id)) DrawCorners(new Rect2(point - Vector2.One * 16, Vector2.One * 32));
+            }
+            return;
+        }
+        int frameIndex = Skirmish.IsMageUnit(actor) && Battle.VanishFrame(actor) is { } vanishing ? vanishing : actor.Frame;
         if (!_frames.TryGetValue((actor.Source.TemplateFile, actor.Source.TemplateIndex, frameIndex), out var frame))
             _frames.TryGetValue((actor.Source.TemplateFile, actor.Source.TemplateIndex, actor.Frame), out frame);
         if (frame != null)
         {
             var size = new Vector2(frame.Width, frame.Height);
-            DrawTextureRectRegion(_sprites, new Rect2(point - new Vector2(size.X / 2, size.Y - 16), size), new Rect2(frame.X, frame.Y, frame.Width, frame.Height));
+            // The owner's colour (COLOR_NN.TAB of the owner's slot) only changes the sprite indices 240..255.
+            if (frame.TeamSlot >= 0 && _teamSheets.TryGetValue(Battle.ColorTable(actor.Record[3]), out var sheet))
+                DrawTextureRectRegion(sheet, new Rect2(point - new Vector2(size.X / 2, size.Y - (actor.Structure ? actor.Parameters[4] * 16 + 16 : 16) + Battle.GateLift(actor)), size), new Rect2(frame.TeamSlot % 64 * 64, frame.TeamSlot / 64 * 64, frame.Width, frame.Height));
+            else
+                DrawTextureRectRegion(frame.Page == 1 ? _spritesHorde : _sprites, new Rect2(point - new Vector2(size.X / 2, size.Y - (actor.Structure ? actor.Parameters[4] * 16 + 16 : 16) + Battle.GateLift(actor)), size), new Rect2(frame.X, frame.Y, frame.Width, frame.Height));
         }
         else if (!actor.Dying) DrawCircle(point - Vector2.Down * 12, 9, color);
         if (actor.Dying) return; // death frames only, no ring or health bar
@@ -666,7 +873,7 @@ public partial class SkirmishMain : Node2D
     {
         if (!_ready) return;
         var rect = MiniRect(); var world = new Vector2(Battle.Map.Width, Battle.Map.Height) * 32;
-        foreach (var actor in Battle.Actors.Where(a => a.Alive))
+        foreach (var actor in Battle.Actors.Where(a => a.Alive && !Skirmish.IsHiddenAnimal(a) && !a.Scenery))
             _markers.DrawCircle(rect.Position + actor.Position / world * rect.Size, actor.Structure ? 3 : 2, TeamColor(actor.Team));
         var view = GetViewportRect().Size / Camera.Zoom;
         _markers.DrawRect(new Rect2(rect.Position + (Camera.Position - view / 2) / world * rect.Size, view / world * rect.Size), new Color("f1da93"), false);
@@ -678,7 +885,7 @@ public partial class SkirmishMain : Node2D
             !Battle.Objective.Standing ? $"Замок разрушен\nОсталось защитников: {Battle.Actors.Count(a => a.Team == 1 && !a.Structure && a.Alive)} · T — найти" :
             $"Время {TimeSpan.FromSeconds(Battle.Elapsed):mm\\:ss} · ×{Speed}";
         var units = Selection.Select(Battle.Find).OfType<SkirmishActor>().ToArray();
-        _selection.Text = units.Length == 1 ? $"{units[0].Source.TemplateName}\nЗдоровье {units[0].Health}/{units[0].MaxHealth}"
+        _selection.Text = units.Length == 1 ? $"{units[0].Source.TemplateName}{(units[0].Team != 0 ? " (чужой)" : "")}\nЗдоровье {units[0].Health}/{units[0].MaxHealth}"
             : $"Выбрано отрядов: {units.Length}\nЖивых союзников: {Battle.Actors.Count(a => a.Team == 0 && a.Alive && !a.Structure)}";
         if (units is [{ Worker: true } worker]) _selection.Text += $"\n{worker.JobText}";
         if (units is [var selectedFarm] && selectedFarm.Source.TemplateName == "Ферма")
@@ -694,7 +901,7 @@ public partial class SkirmishMain : Node2D
         _economy.Text = $"Металл: {Battle.Metal} · Дерево: {Battle.Wood}\nЗолото: {Battle.Gold} · Люди: {Battle.FreePeople}\nПоддержка ферм: {Battle.Population.FarmSupport} · Нагрузка: {Battle.Population.Used}";
         if (Battle.FreePeople == 0) _economy.Text += Battle.PopulationGrowthSeconds is { } seconds ? $"\nПополнение через {Math.Ceiling(seconds)} с" : "\nДля прироста нужна ферма";
         bool castle = units is [var selected] && selected.Id == Battle.PlayerCastle.Id && selected.Alive;
-        SkirmishActor? selectedBarracks = units is [var selectedB] && Skirmish.IsBarracks(selectedB) ? selectedB : null;
+        SkirmishActor? selectedBarracks = units is [var selectedB] && Skirmish.IsBarracks(selectedB) && selectedB.Team == 0 ? selectedB : null;
         bool barracks = selectedBarracks != null;
         _hire.Visible = _buildMill.Visible = _buildFarm.Visible = _buildBarracks.Visible = _buildMine.Visible = castle;
         _hireMilitia.Visible = barracks;
@@ -721,11 +928,12 @@ public partial class SkirmishMain : Node2D
         _buildFarm.TooltipText = Battle.MissingResources(Battle.FarmTemplate);
         _buildBarracks.TooltipText = Battle.MissingResources(Battle.BarracksTemplate);
         _buildMine.TooltipText = Battle.MissingResources(Battle.MineTemplate);
+        if (PlacingBridge) _status.Text = _bridgeStart == null ? "Мост: первый конец\nЛКМ — выбрать · ПКМ/Esc — отмена" : "Мост: второй конец\nЛКМ — строить · ПКМ — отмена точки";
         if (PlacingMine) _status.Text = "Место для шахты\nЛКМ — строить · ПКМ/Esc — отмена";
         if (PlacingBarracks) _status.Text = "Место для казармы\nЛКМ — строить · ПКМ/Esc — отмена";
         if (PlacingFarm) _status.Text = "Место для фермы\nЛКМ — строить · ПКМ/Esc — отмена";
         if (PlacingMill) _status.Text = "Место для лесопилки\nОставьте проход к жёлтой точке.\nЛКМ — строить · ПКМ/Esc — отмена";
         _pause.Text = Battle.Paused ? "ПРОДОЛЖИТЬ" : "ПАУЗА [ПРОБЕЛ]"; _speed.Text = $"СКОРОСТЬ ×{Speed}";
-        _events.Text = string.Join('\n', Battle.Events.TakeLast(2));
+        _events.Text = string.Join('\n', Battle.Events.TakeLast(2)) + (Battle.Inventory.Any(i => i != 0) ? "\nПредметы: " + string.Join(", ", Battle.Inventory.Where(i => i != 0).Select(i => Battle.ItemName(i))) : "");
     }
 }

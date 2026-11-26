@@ -38,7 +38,7 @@ public partial class OriginalHud : Node2D
     public static readonly Vector2 PortraitAt = new(482, 176);
     public InterfaceArmy Army { get; private set; } = null!;
     private InterfaceAtlas _heroes = null!;
-    private Texture2D _portraits = null!, _buttons = null!, _heroAtlas = null!;
+    private Texture2D _portraits = null!, _buttons = null!, _heroAtlas = null!, _itemIcons = null!;
     private Texture2D _frame = null!, _menuPanel = null!, _blankButton = null!;
     private OriginalFont _font = null!, _red = null!;
     private InterfaceAtlas? _cursor;
@@ -62,6 +62,7 @@ public partial class OriginalHud : Node2D
         }
         _frame = InterfaceData.Screen("game_frame"); _menuPanel = InterfaceData.Screen("panel_menu"); _blankButton = InterfaceData.Screen("button_blank");
         Army = data.Armies.Single(a => a.Army == 2); _heroes = data.HeroPortraits;
+        _itemIcons = GD.Load<Texture2D>("res://assets/imported/item_icons.png");
         _portraits = GD.Load<Texture2D>(InterfaceData.Root + Army.Portraits.Atlas); _buttons = GD.Load<Texture2D>(InterfaceData.Root + Army.Buttons.Atlas);
         _heroAtlas = GD.Load<Texture2D>(InterfaceData.Root + _heroes.Atlas);
         _font = OriginalFont.Load(data, "FONT_01.FNT"); _red = OriginalFont.Load(data, "FONT_01.FNT", "font_font_01_red.png");
@@ -143,22 +144,88 @@ public partial class OriginalHud : Node2D
     }
 
     /// <summary>Castle build list: 80×50 portraits at x = 380 (at the right edge of the map window), y = 105 + 50·k (DOSBox screenshots).</summary>
-    public Rect2 BuildItemRect(int k) => new(380 + Shift, 105 + 50 * k, 80, 50);
+    public Rect2 BuildItemRect(int k) => new((k < 5 ? 380 : 296) + Shift, 105 + 50 * (k % 5), 80, 50);   // a second column to the left holds items 6..10
     public SkirmishMain.BuildItem? BuildItemAt(Vector2 logical)
     {
         if (Game?.Battle == null || !Game.BuildMenuVisible || MenuOpen) return null;
-        var items = Game.CastleBuildItems();
+        var items = Game.BuildItems();
         for (int k = 0; k < items.Length; k++) if (BuildItemRect(k).HasPoint(logical)) return items[k];
         return null;
     }
 
+    /// <summary>The laboratory's research list: a status row, then one row per researchable item (text of the TRE record and its cost).</summary>
+    public Rect2 LabRowRect(int k) => new(262 + Shift, 105 + 22 * k, 198, 20);
+    public Skirmish.ResearchRow? LabRowAt(Vector2 logical)
+    {
+        if (Game?.Battle == null || Game.SelectedLab == null || MenuOpen) return null;
+        var rows = Game.LabRows();
+        for (int k = 0; k < rows.Count; k++) if (LabRowRect(k + 1).HasPoint(logical)) return rows[k];
+        return null;
+    }
+    private void DrawLabList(SkirmishActor lab)
+    {
+        var running = Game.Battle.Researching(lab);
+        DrawRect(LabRowRect(0), new Color(.12f, .07f, .03f, .9f));
+        _font.Draw(this, LabRowRect(0).Position + new Vector2(4, 3), running is { } r ? $"{r.Text}: {r.Remaining}" : "Лаборатория: выберите исследование");
+        var rows = Game.LabRows();
+        for (int k = 0; k < rows.Count; k++)
+        {
+            var rect = LabRowRect(k + 1);
+            DrawRect(rect, running == null ? new Color(.25f, .15f, .07f, .9f) : new Color(.14f, .1f, .07f, .9f));
+            _font.Draw(this, rect.Position + new Vector2(4, 3), $"{rows[k].Text} {rows[k].Cost}");
+        }
+    }
+
+    /// <summary>The inventory window (I): 20 slots of the participant's items (LE:3 table icons = ARMY__02.SPR 364..386), the name of the hovered item on the bottom border.
+    /// The original draws it with 125CE; its positions here are the port's own.</summary>
+    public Rect2 InventorySlotRect(int k) => new(14 + Shift + 42 * (k % 5), 30 + 42 * (k / 5), 40, 40);
+    public int InventorySlotAt(Vector2 logical)
+    {
+        if (Game?.Battle == null || !Game.InventoryOpen || MenuOpen) return -1;
+        for (int k = 0; k < Skirmish.InventorySlots; k++) if (InventorySlotRect(k).HasPoint(logical)) return k;
+        return -1;
+    }
+    private void DrawInventory()
+    {
+        if (!Game.InventoryOpen || MenuOpen) return;
+        DrawRect(new Rect2(8 + Shift, 22, 222, 182), new Color(.1f, .06f, .03f, .92f));
+        _font.Draw(this, new Vector2(14 + Shift, 24), "Предметы");
+        var inventory = Game.Battle.Inventory;
+        for (int k = 0; k < Skirmish.InventorySlots; k++)
+        {
+            var rect = InventorySlotRect(k); DrawRect(rect, new Color(.22f, .14f, .07f, .95f));
+            if (inventory[k] == 0) continue;
+            DrawTextureRectRegion(_itemIcons, new Rect2(rect.Position + Vector2.One, new Vector2(38, 38)), new Rect2(62 * inventory[k], 0, 62, 62));   // the sheet is indexed by the item code
+        }
+        if (InventorySlotAt(GetLocalMousePosition()) is var h and >= 0 && inventory[h] != 0) _font.Draw(this, new Vector2(20, 464), Game.Battle.ItemName(inventory[h]));
+    }
+
+    /// <summary>The dialog window of the mages (the messages of the forest settlement to the player, docs/diplomacy.md): the speech over the map and a button per answer.</summary>
+    private Rect2 DialogRect(Skirmish.DialogLine line) => new(24 + Shift, 28, 420, 18 + 16 * (line.Text.Split('\n').Length) + (line.Answers.Count > 0 ? 8 + 20 * line.Answers.Count : 0));
+    public Rect2 DialogAnswerRect(Skirmish.DialogLine line, int k) => new(32 + Shift, 28 + 14 + 16 * line.Text.Split('\n').Length + 8 + 20 * k, 404, 18);
+    private void DrawDialog()
+    {
+        if (MenuOpen || Game?.Battle == null || Game.Battle.CurrentDialog() is not { } line) return;
+        var rect = DialogRect(line); DrawRect(rect, new Color(.1f, .06f, .03f, .94f)); DrawRect(new Rect2(rect.Position, new Vector2(rect.Size.X, 1)), new Color("c09a52"));
+        var lines = line.Text.Split('\n');
+        for (int k = 0; k < lines.Length; k++) _font.Draw(this, rect.Position + new Vector2(8, 6 + 16 * k), lines[k].Trim());
+        for (int k = 0; k < line.Answers.Count; k++)
+        {
+            var button = DialogAnswerRect(line, k); DrawRect(button, new Color(.25f, .15f, .07f, .95f));
+            _font.Draw(this, button.Position + new Vector2(6, 3), line.Answers[k].Text.Split('\n')[0].Trim());
+        }
+    }
+
     private void DrawBuildList()
     {
+        DrawDialog();
+        DrawInventory();
+        if (Game.SelectedLab is { } lab && !MenuOpen) { DrawLabList(lab); return; }
         if (!Game.BuildMenuVisible || MenuOpen) return;
-        var items = Game.CastleBuildItems();
+        var items = Game.BuildItems();
         for (int k = 0; k < items.Length; k++)
         {
-            var tint = Game.Battle.CanAfford(items[k].Template) ? Colors.White : new Color(.45f, .45f, .45f);
+            var tint = !items[k].Enabled ? new Color(.55f, .3f, .3f) : Game.Battle.CanAfford(items[k].Template) ? Colors.White : new Color(.45f, .45f, .45f);
             DrawTextureRectRegion(_portraits, BuildItemRect(k), Army.Portraits.Region(Army.Templates[items[k].TemplateIndex].Portrait), tint);
         }
         if (BuildItemAt(GetLocalMousePosition()) is { } hover) DrawPrice(hover.Template);
@@ -286,9 +353,18 @@ public partial class OriginalHud : Node2D
 
     private void DrawBar(Rect2 rect, byte current, byte maximum, byte color)
     {
-        int filled = OriginalStatusBarRules.FilledColumns((int)rect.Size.X, current, maximum);
         DrawRect(rect, _uiColors[0]);
-        if (filled > 0) DrawRect(new Rect2(rect.Position + Vector2.One, new Vector2(filled, rect.Size.Y - 2)), _uiColors[color]);
+        if (rect.Size.Y > rect.Size.X)
+        {
+            // The health and experience gauges beside the portrait stand upright and fill from the bottom (user, 22.11); the length is the height.
+            int rows = OriginalStatusBarRules.FilledColumns((int)rect.Size.Y, current, maximum);
+            if (rows > 0) DrawRect(new Rect2(rect.Position.X + 1, rect.End.Y - 1 - rows, rect.Size.X - 2, rows), _uiColors[color]);
+        }
+        else
+        {
+            int filled = OriginalStatusBarRules.FilledColumns((int)rect.Size.X, current, maximum);
+            if (filled > 0) DrawRect(new Rect2(rect.Position + Vector2.One, new Vector2(filled, rect.Size.Y - 2)), _uiColors[color]);
+        }
         var border = _uiColors[0x44];
         DrawRect(new Rect2(rect.Position, new Vector2(rect.Size.X, 1)), border);
         DrawRect(new Rect2(rect.Position.X, rect.End.Y - 1, rect.Size.X, 1), border);
@@ -300,7 +376,11 @@ public partial class OriginalHud : Node2D
     public bool Click(Vector2 point, MouseButton button)
     {
         if (Game.Battle.Paused) return true;
-        if (button == MouseButton.Left && BuildItemAt(point) is { } item) { item.Start(); QueueRedraw(); return true; }
+        if (button == MouseButton.Left && !MenuOpen && Game.Battle.CurrentDialog() is { } dialog)
+            for (int k = 0; k < dialog.Answers.Count; k++) if (DialogAnswerRect(dialog, k).HasPoint(point)) { Game.Battle.AnswerDialog(dialog, dialog.Answers[k].Type); QueueRedraw(); return true; }
+        if (button == MouseButton.Left && InventorySlotAt(point) is var slot and >= 0) { Game.ClickInventory(slot); QueueRedraw(); return true; }
+        if (button == MouseButton.Left && LabRowAt(point) is { } row) { Game.StartLabResearch(row); QueueRedraw(); return true; }
+        if (button == MouseButton.Left && BuildItemAt(point) is { } item) { if (item.Enabled) item.Start(); QueueRedraw(); return true; }
         if (MapRect.HasPoint(point)) return false;
         point = ToClassic(point);
         if (button != MouseButton.Left) return true;

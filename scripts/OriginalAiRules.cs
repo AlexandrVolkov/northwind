@@ -63,6 +63,17 @@ public static class OriginalAiRules
         ai[0x19e4] = ai[0x2b]; ai[0x19ff] = ai[0x2c]; ai[0x1a14] = ai[0x2d]; ai[0x1a15] = ai[0x2e]; ai[0x1a27] = ai[0x2f]; ai[0x1a34] = ai[0x30];
     }
 
+    /// <summary>LE:1 1E740 (with 1EB33): a participant takes the AI character: participant +16, the character record (LE:3 ED43, 53h bytes) to +5..+57,
+    /// its bytes +2B..+30 spread to +19E4, +19FF, +1A14, +1A15, +1A27, +1A34, and the five plan lists emptied (20 records of 15h with type FF).
+    /// Unlike <see cref="Initialize"/> it keeps the rest of the block. The camp of the horde calls it with character 4.</summary>
+    public static void SetCharacter(Span<byte> ai, Span<byte> participant, byte character, ReadOnlySpan<byte> characters)
+    {
+        participant[0x16] = character;
+        characters.Slice(CharacterSize * character, CharacterSize).CopyTo(ai[5..]);
+        ai[0x19e4] = ai[0x2b]; ai[0x19ff] = ai[0x2c]; ai[0x1a14] = ai[0x2d]; ai[0x1a15] = ai[0x2e]; ai[0x1a27] = ai[0x2f]; ai[0x1a34] = ai[0x30];
+        foreach (int list in PlanLists) for (int k = 0; k < 20; k++) ai[list + k * 0x15] = 0xff;
+    }
+
     private static uint U32(ReadOnlySpan<byte> raw, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(raw[offset..]);
     private static void W32(Span<byte> raw, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(raw[offset..], value);
 

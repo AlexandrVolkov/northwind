@@ -21,6 +21,12 @@ public sealed partial class Skirmish
 {
     private ProductionData _production = null!;
     public SkirmishActor? PlayerBarracks => Actors.FirstOrDefault(a => a.Alive && a.Team == 0 && a.Source.TemplateName == "Казарма");
+    /// <summary>A finished building of the player that hires units from its production row: the barracks, the stable, the factory.</summary>
+    public static bool IsPlayerProducer(SkirmishActor actor) => actor.Alive && actor.Team == 0 && actor.Structure && actor.ConstructionRemaining <= 0 && actor.Source.TemplateName is "Казарма" or "Конюшня" or "Завод";
+    /// <summary>The tree of the player allows the template (building or unit) — A673/223B4 over his TRE copy.</summary>
+    public bool Available(int template) => OriginalTechRules.Available(TreeOf(Rules.PlayerSlot), (byte)template);
+    /// <summary>Queue a unit of the building's production row (the barracks: militia, archer, arsonist, knight; the stable: rider; the factory: catapult, ballista).</summary>
+    public bool QueueUnit(SkirmishActor producer, int template) => IsPlayerProducer(producer) && Available(template) && QueueRecruit(producer, (byte)template);
     public static bool IsBarracks(SkirmishActor actor) => actor.Alive && actor.Team == 0 && actor.Source.TemplateName == "Казарма";
     public bool BarracksReady => PlayerBarracks is { ConstructionRemaining: <= 0 };
     public int RecruitmentCount => CountQueue(PlayerCastle);
@@ -38,7 +44,7 @@ public sealed partial class Skirmish
     public bool BarracksRecruitmentBlocked(SkirmishActor barracks) => _blockedBarracks.Contains(barracks.Id);
     private static int CountQueue(SkirmishActor producer)
     { int count = 0; foreach (byte slot in producer.Record.AsSpan(0x22, 5)) if (slot != 0xff) count++; return count; }
-    private TemplateEntry? QueuedTemplate(SkirmishActor producer) => CountQueue(producer) == 0 ? null : _templates.Armies["ARMY__02.DAT"].Templates[producer.Record[0x22]];
+    private TemplateEntry? QueuedTemplate(SkirmishActor producer) => CountQueue(producer) == 0 ? null : _templates.Armies[producer.Source.TemplateFile].Templates[producer.Record[0x22]];
     private string ProductionText(SkirmishActor producer)
     {
         if (QueuedTemplate(producer) is not { } template) return "Очередь найма пуста";
@@ -79,7 +85,7 @@ public sealed partial class Skirmish
     private void TickProduction()
     {
         TickProduction(PlayerCastle);
-        foreach (var barracks in Actors.Where(IsBarracks).ToArray()) TickProduction(barracks);
+        foreach (var barracks in Actors.Where(IsPlayerProducer).ToArray()) TickProduction(barracks);
         foreach (var producer in Actors.Where(a => a.Alive && a.Team != 0 && IsEnemyProducer(a)).ToArray()) TickProduction(producer);
     }
     private ResourceQuad Wallet(int team) => team == 0 ? Resources : AiResources(SlotOfTeam(team));
@@ -88,8 +94,10 @@ public sealed partial class Skirmish
     {
         if (!producer.Alive || producer.ConstructionRemaining > 0 || QueuedTemplate(producer) is not { } template) return;
         var record = producer.Record;
-        if (producer.Team != 0 && template.TemplateIndex != 10 && (!Rules.Units.TryGetValue(template.Name, out var unitRules) || unitRules.Damage == 0
-            || (!_soldierSeeds.ContainsKey(template.TemplateIndex) && unitRules.Range > 48 && template.TemplateIndex is not (16 or 26))))
+        string file = producer.Source.TemplateFile;
+        var unitRules = file == "ARMY__02.DAT" ? (Rules.Units.TryGetValue(template.Name, out var known) ? known : null) : SpecOf(file, template, Convert.FromHexString(template.RawRecordHex));
+        if (producer.Team != 0 && !(file == "ARMY__02.DAT" ? template.TemplateIndex == 10 : unitRules is { Worker: true }) && (unitRules == null || unitRules.Damage == 0
+            || (file == "ARMY__02.DAT" && !_soldierSeeds.ContainsKey(template.TemplateIndex) && unitRules.Range > 48 && template.TemplateIndex is not (16 or 26))))
         { OriginalProductionRules.Complete(record); return; }   // no rules, or a ranged unit without a seed record: dropped
         if (record[0x15] == 0)
         {
@@ -97,9 +105,9 @@ public sealed partial class Skirmish
             if (!payment.Accepted) return;
             SetWallet(producer.Team, payment.Balances); OriginalProductionRules.StartPaid(record); SetBlocked(producer, false); return;
         }
-        byte interval = producer.Team == 0 ? _production.Interval(producer.Source.TemplateName, record[0x22]) : EnemyInterval(producer, record[0x22]);
+        byte interval = producer.Team == 0 && producer.Source.TemplateName is "Замок" or "Казарма" ? _production.Interval(producer.Source.TemplateName, record[0x22]) : EnemyInterval(producer, record[0x22]);
         if (!OriginalProductionRules.Tick(record, interval, ProductionSpeedShift, template.InitialCondition)) return;
-        if (!ReleaseRecruit(producer, template)) { SetBlocked(producer, true); if (producer.Team != 0) EnemyClearExit(producer, template); return; }
+        if (!ReleaseRecruit(producer, template)) { SetBlocked(producer, true); if (producer.Team != 0) EnemyClearExit(producer, template); else ClearExit(producer, template); return; }
         OriginalProductionRules.Complete(record); SetBlocked(producer, false);
     }
     private Vector2I? EnemyExitCell(SkirmishActor recruit, Vector2I exit, byte layer)
@@ -117,15 +125,16 @@ public sealed partial class Skirmish
     {
         var exit = RecruitExit(producer, template); var cell = new Vector2I((int)(exit.X >> 5), (int)(exit.Y >> 5));
         if (!Inside(cell)) return false;
-        bool worker = template.TemplateIndex == 10;
-        var recruit = NewEconomyActor(template.TemplateIndex, cell, worker, !worker, producer.Team);
+        string file = producer.Source.TemplateFile;
+        bool worker = file == "ARMY__02.DAT" ? template.TemplateIndex == 10 : SpecOf(file, template, Convert.FromHexString(template.RawRecordHex)).Worker;
+        var recruit = NewEconomyActor(template.TemplateIndex, cell, worker, !worker, producer.Team, file);
         recruit.Record[0x0d] = exit.Layer;
         BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(4), exit.X);
         BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(8), exit.Y);
         if (!CanStand(recruit, cell) || _reservations.ContainsKey((cell, exit.Layer)))
         {
-            // The enemy has nobody to clear its exit: its recruit takes the nearest free cell within 3 of it (adapter).
-            if (producer.Team == 0 || EnemyExitCell(recruit, cell, exit.Layer) is not { } free) return false;
+            // The exit is taken: the recruit takes the nearest free cell within 3 of it, else it waits while ClearExit moves the unit in the way (adapter).
+            if (EnemyExitCell(recruit, cell, exit.Layer) is not { } free) return false;
             cell = free; exit = exit with { X = (uint)(free.X * 32 + 16), Y = (uint)(free.Y * 32 + 16) };
             BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(4), exit.X);
             BinaryPrimitives.WriteUInt32LittleEndian(recruit.Record.AsSpan(8), exit.Y);
@@ -133,9 +142,11 @@ public sealed partial class Skirmish
         recruit.Source.RawX = exit.X; recruit.Source.RawY = exit.Y; recruit.Source.RawLayer = exit.Layer;
         if (worker) OriginalWorkerDelivery.InitializeEmpty(recruit.Record, recruit.Parameters, _terrainCatalog.NextRandomByte());
         recruit.Record[0x17] |= 0x20;
+        CountProduced(recruit);
         recruit.Route.Attach(_routes, recruit.Record); Actors.Add(recruit);
         Occupancy.WriteFootprint(recruit.Parameters[3], recruit.Parameters[4], exit.Layer, exit.X, exit.Y, recruit.Id);
         if (producer.Team != 0) { EnemyRecruitLeaves(recruit); return true; }
+        RecruitStepsAway(recruit, producer);
         LastRecruitId = recruit.Id; RecountPopulation(); Log(template.Name + " готов у выхода из " + producer.Source.TemplateName + "."); return true;
     }
 }

@@ -62,11 +62,15 @@ public sealed partial class Skirmish
     {
         _templates = templates;
         var slot = scenario.Slots.Single(s => s.SlotIndex == Rules.PlayerSlot);
-        SetResources(Rules.Economy.StartingResources ?? OriginalResourceRules.ReadScenario(Convert.FromHexString(slot.RawRecordHex)));
+        var start = Rules.Economy.StartingResources ?? OriginalResourceRules.ReadScenario(Convert.FromHexString(slot.RawRecordHex));
+        SetResources(new ResourceQuad(start.First * Rules.PlayerStartBoost, start.Second * Rules.PlayerStartBoost, start.Third * Rules.PlayerStartBoost, start.Fourth));   // TEMPORARY boost, see SkirmishRules.PlayerStartBoost
         _terrainCatalog = new OriginalTerrainCatalog(_properties, GameData.Read<OriginalTerrainData>("res://data/original_terrain.json"));
         _workerSeed = scenario.Slots.SelectMany(s => s.Objects)
             .First(o => o.TemplateFile == "ARMY__02.DAT" && o.TemplateIndex == 10);
     }
+    /// <summary>The unit stands among trees (a timber cell): hidden from the others, visible to its owner only as a marker.</summary>
+    public bool InForestCell(Vector2I cell) => Inside(cell) && (_properties[(int)(Map.Cells[cell.Y * Map.Width + cell.X] & 0xffff) * 8] & 7) == 1;
+    public bool InForest(SkirmishActor actor) => !actor.Structure && InForestCell(actor.Cell);   // terrain class 1 (LE:1 6859: a foreign object there is not pickable)
     public bool Harvestable(Vector2I cell) => Inside(cell) && OriginalForestryRules.IsTimber(
         OriginalForestryRules.Property(_properties, Map.Cells[cell.Y * Map.Width + cell.X]));
     private bool FindNextGrove(SkirmishActor worker)
@@ -81,12 +85,12 @@ public sealed partial class Skirmish
         worker.GatherTree = null; worker.Route.Clear(); worker.JobText = "Поблизости нет леса";
         Log("Поблизости нет подходящего леса. Укажите рабочему другой участок."); return false;
     }
-    private SkirmishActor NewEconomyActor(int templateIndex, Vector2I cell, bool worker, bool soldier = false, int team = 0)
+    private SkirmishActor NewEconomyActor(int templateIndex, Vector2I cell, bool worker, bool soldier = false, int team = 0, string file = "ARMY__02.DAT")
     {
-        var template = _templates.Armies["ARMY__02.DAT"].Templates[templateIndex];
+        var template = _templates.Armies[file].Templates[templateIndex];
         var parameters = Convert.FromHexString(template.RawRecordHex);
         var raw = worker ? Convert.FromHexString(_workerSeed.RawRecordHex) : soldier ? Convert.FromHexString((_soldierSeeds.GetValueOrDefault(templateIndex) ?? _militiaSeed).RawRecordHex).AsSpan(0, template.RuntimeRecordBytes).ToArray() : new byte[template.RuntimeRecordBytes];
-        raw[0] = 2; raw[3] = (byte)SlotOfTeam(team); raw[0x0d] = 1; raw[0x0e] = (byte)templateIndex;
+        raw[0] = (byte)(_armyFiles.IndexOf(file) is var armyIndex and >= 0 ? armyIndex : file[7] - '0'); raw[3] = (byte)SlotOfTeam(team); raw[0x0d] = 1; raw[0x0e] = (byte)templateIndex;
         raw[0x14] = 0x80; raw[0x19] = raw[0x1a] = template.InitialCondition; raw[0x20] = 0xff; // A855: visible to every owner
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(1), template.InitialFrame);
         BinaryPrimitives.WriteUInt16LittleEndian(raw.AsSpan(0x17), 0);
@@ -95,9 +99,9 @@ public sealed partial class Skirmish
         BinaryPrimitives.WriteUInt32LittleEndian(raw.AsSpan(0x10), (uint)raw.Length);
         if (worker || soldier) { raw[0x24] = 0; raw[0x25] = 0; raw[0x26] = 0; raw[0x2c] = 0; raw[0x2d] = 0; raw[0x30] = 0; if (worker) raw[0x31] = 0; }
         return new SkirmishActor { Source = new ObjectRecord { RuntimeReference = _nextEconomyId++, TemplateName = template.Name,
-                TemplateFile = "ARMY__02.DAT", TemplateIndex = templateIndex, RecordBytes = raw.Length,
+                TemplateFile = file, TemplateIndex = templateIndex, RecordBytes = raw.Length,
                 RawX = BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(4)), RawY = BinaryPrimitives.ReadUInt32LittleEndian(raw.AsSpan(8)), RawLayer = 1 },
-            Template = template, Parameters = parameters, Record = raw, Rules = Rules.Units[template.Name], Team = team };
+            Template = template, Parameters = parameters, Record = raw, Rules = SpecOf(file, template, parameters), Team = team };
     }
     public DeliveryPoint MillEntry(Vector2I cell)
     {
@@ -110,7 +114,9 @@ public sealed partial class Skirmish
     public ConstructionPlacement ProbeMill(Vector2I cell) => ProbeEconomyBuilding(cell, MillTemplate);
     private ConstructionPlacement ProbeEconomyBuilding(Vector2I cell, TemplateEntry template)
     {
-        if (!Inside(cell) || !PlayerCastle.Alive || (new Vector2(cell.X * 32 + 16, cell.Y * 32 + 16)).DistanceTo(PlayerCastle.Position) > Rules.Economy.BuildRadius)
+        // Sawmills and mines may be raised anywhere on the map (user, 22.11); the other buildings keep the radius around the castle.
+        bool anywhere = template.Name is "Лесопилка" or "Шахта";
+        if (!Inside(cell) || !PlayerCastle.Alive || (!anywhere && (new Vector2(cell.X * 32 + 16, cell.Y * 32 + 16)).DistanceTo(PlayerCastle.Position) > Rules.Economy.BuildRadius))
             return new(ConstructionPlacementStatus.Rejected);
         var parameters = template.Construction;
         var result = OriginalConstructionRules.ProbePlacement(Occupancy.Width, Occupancy.Height, Map.Cells, _properties, Occupancy.Cells,
@@ -130,6 +136,70 @@ public sealed partial class Skirmish
         OriginalBuildingLifecycle.MarkConstruction(mill.Record); mill.Record[0x23] = 100; mill.Record[0x24] = 0;
         Actors.Add(mill); Occupancy.WriteFootprint(mill.Parameters[3], mill.Parameters[4], 1, (uint)mill.Position.X, (uint)mill.Position.Y, mill.Id);
         Log("Лесопилка строится. Рабочий сможет сдавать сюда древесину после завершения."); return mill;
+    }
+    /// <summary>The «Ремонт» button (command slot 1, state 48h → 1 with WorkFlags = 1, docs/building-command-lifecycle.md): the building's condition rises by one
+    /// every DAT[57] updates and each step pays DAT[8C, 90, 94] from the player's stores (the maintenance step C80D); it stops when the stores run dry or the condition
+    /// reaches DAT[45].</summary>
+    public bool StartRepair(SkirmishActor building, bool byAi = false)
+    {
+        if (Paused || Outcome != "" || (building.Team != 0 && !byAi) || !building.Structure || !building.Alive || building.Ruined || building.ConstructionRemaining > 0 || building.Repairing) return false;
+        if ((sbyte)building.Record[0x19] >= building.Template.InitialCondition) { if (!byAi) Log($"{building.Source.TemplateName}: ремонт не нужен."); return false; }
+        building.Repairing = true; building.RepairFlags = building.Record[0x0f]; building.Record[0x16] = 0;
+        if (!byAi) Log($"{building.Source.TemplateName}: идёт ремонт.");
+        return true;
+    }
+    /// <summary>The maintenance step C80D of every building under repair (the building keeps working: its production and attack go on), paid from the owner's stores
+    /// (WorkFlags = 1 inside the step); the AI starts a repair as soon as one of its finished buildings is damaged (improved AI only).</summary>
+    private void TickRepairs()
+    {
+        if (ImprovedAi && (_globalTick & 3) == 0)
+            foreach (var b in Actors)
+                if (b.Team != 0 && b.Alive && b.Structure && !b.Repairing && b.ConstructionRemaining <= 0 && !b.Ruined && (sbyte)b.Record[0x19] < b.Template.InitialCondition && b.Record[0x19] > 0)
+                    StartRepair(b, byAi: true);
+        foreach (var b in Actors.Where(a => a.Repairing).ToArray())
+        {
+            if (!b.Alive || b.Ruined || b.ConstructionRemaining > 0) { b.Repairing = false; b.Record[0x0f] = b.RepairFlags; continue; }
+            var wallet = Wallet(b.Team);
+            var m = OriginalBuildingRules.StepMaintenance(new(b.Record[0x19], b.Record[0x16], 1, BinaryPrimitives.ReadUInt16LittleEndian(b.Record.AsSpan(0x17))),
+                new(b.Template.InitialCondition, b.Parameters[0x57], new(BinaryPrimitives.ReadUInt32LittleEndian(b.Parameters.AsSpan(0x8c)),
+                    BinaryPrimitives.ReadUInt32LittleEndian(b.Parameters.AsSpan(0x90)), BinaryPrimitives.ReadUInt32LittleEndian(b.Parameters.AsSpan(0x94)))),
+                new(wallet.First, wallet.Second, wallet.Third), false);
+            b.Record[0x19] = m.State.Condition; b.Record[0x16] = m.State.Counter;
+            SetWallet(b.Team, new ResourceQuad(m.Balances.First, m.Balances.Second, m.Balances.Third, wallet.Fourth));
+            if (m.ContinueAction) continue;
+            b.Repairing = false; b.Record[0x0f] = b.RepairFlags;
+            if (b.Team == 0) Log(b.Record[0x19] >= b.Template.InitialCondition ? $"{b.Source.TemplateName}: ремонт закончен." : $"{b.Source.TemplateName}: ремонт остановлен — не хватает ресурсов.");
+        }
+    }
+    /// <summary>The «Разрушить» button: the player pulls his own building down.</summary>
+    public bool Demolish(SkirmishActor building)
+    {
+        if (Paused || Outcome != "" || building.Team != 0 || !building.Structure || !building.Alive || building == PlayerCastle) return false;
+        building.Repairing = false; building.ConstructionRemaining = 0; building.Record[0x19] = 0; Kill(building); return true;
+    }
+    public TemplateEntry FactoryTemplate => _templates.Armies["ARMY__02.DAT"].Templates[15];
+    public static bool IsFactory(SkirmishActor actor) => actor.Alive && actor.Team == 0 && actor.Source.TemplateName == "Завод" && actor.ConstructionRemaining <= 0;
+    public TemplateEntry TowerTemplate => _templates.Armies["ARMY__02.DAT"].Templates[13];
+    public TemplateEntry TemplateOf(int index) => _templates.Armies["ARMY__02.DAT"].Templates[index];
+    public ConstructionPlacement ProbeFactory(Vector2I cell) => ProbeEconomyBuilding(cell, FactoryTemplate);
+    public ConstructionPlacement ProbeIndex(int index, Vector2I cell) => ProbeEconomyBuilding(cell, TemplateOf(index));
+    public SkirmishActor? BuildFactory(Vector2I cell) => BuildIndex(15, cell);
+    /// <summary>A building of the castle's or the factory's list at the cell (the factory 15, the tower 13): near the castle, paid up front, built over time.</summary>
+    public SkirmishActor? BuildIndex(int index, Vector2I cell)
+    {
+        if (Paused || Outcome != "" || !PlayerCastle.Alive) return null;
+        var template = TemplateOf(index); string name = template.Name.ToLowerInvariant();
+        if (ProbeIndex(index, cell).Status != ConstructionPlacementStatus.Clear) { Log($"Для постройки ({name}) нужна свободная площадка рядом с замком."); return null; }
+        if (!Spend(template)) return null;
+        var factory = NewEconomyActor(index, cell, false);
+        factory.ConstructionDuration = factory.ConstructionRemaining = factory.Template.InitialCondition * Math.Max(1, (int)factory.Parameters[0x57]) / (double)Rules.TicksPerSecond;
+        OriginalBuildingLifecycle.MarkConstruction(factory.Record);
+        if (factory.Record.Length >= 0x28) { factory.Record.AsSpan(0x22, 5).Fill(0xff); factory.Record[0x27] = 0xff; }   // producers' queue (the tower's record is shorter)
+        factory.Record[0x20] = 0xff;
+        if (index == 12) { factory.Record[0x22] = factory.Record[0x23] = 1; factory.Record[0x15] = 0; }   // the laboratory's AH=0
+        Actors.Add(factory);
+        Occupancy.WriteFootprint(factory.Parameters[3], factory.Parameters[4], factory.Record[0x0d], (uint)factory.Position.X, (uint)factory.Position.Y, factory.Id);
+        Log(index == 15 ? "Завод строится. Мосты и башни строят через него." : index == 14 ? "Ворота строятся." : "Башня строится."); return factory;
     }
     public ConstructionPlacement ProbeBarracks(Vector2I cell) => ProbeEconomyBuilding(cell, BarracksTemplate);
     public SkirmishActor? BuildBarracks(Vector2I cell)
@@ -175,6 +245,7 @@ public sealed partial class Skirmish
         int count = 0;
         foreach (var worker in ids.Select(Find).OfType<SkirmishActor>().Where(a => a.Team == 0 && a.Worker))
         {
+            worker.LastJob = new WorkerJob(WorkerJobKind.Timber, tree, 0); worker.IdleSince = -1;
             worker.GatherTree = tree; worker.PreferredMill = 0; worker.MineJob = false; ClearDelivery(worker); worker.Goal = null; worker.Target = 0;
             worker.Route.Clear(); worker.HarvestPrepared = false; worker.Record[0x2d] &= 15; worker.ReplanTimer = 0; count++;
         }
@@ -189,9 +260,24 @@ public sealed partial class Skirmish
         { ClearDelivery(worker); worker.MineJob = false; worker.PreferredMill = millId; worker.Route.Clear(); worker.Goal = null; worker.ReplanTimer = 0; accepted = true; }
         return accepted;
     }
+    /// <summary>C8E0..CA48 for the buildings whose frames are in the atlas: the working animation, the stage frame that follows the condition
+    /// (also while a building is raised, its condition climbing, and while it is damaged),
+    /// the slow decay of a ruin. Debris (9727) is not drawn; a collapsed building (condition below zero) is removed.</summary>
+    private void TickBuildingFrames()
+    {
+        foreach (var gate in Actors.Where(a => a.Structure && a.Alive && a.Index02 == 14).ToArray()) TickGate(gate);
+        foreach (var building in Actors.Where(a => a.Structure && (sbyte)a.Record[0x19] > 0 && a.Index02 is 2 or 3 or 4 or 5 or 6 or 7 or 9 or 12 or 13 or 15 or 22 or 23 or 24).ToArray())
+        {
+            try { OriginalBuildingFrames.Update(building.Record, building.Parameters, _globalTick, (_, _, _, _) => { }, () => { building.Record[0x19] = 0; Kill(building); }); }
+            catch (Exception e) when (e is DivideByZeroException or OverflowException) { }
+            // The object update 42BB keeps OBE[1A] = the condition of the previous update, so that a drop is seen (and its frame chosen) once.
+            if (building.Alive) building.Record[0x1a] = building.Record[0x19];
+        }
+    }
+
     private void TickBuildings()
     {
-        foreach (var building in Actors.Where(a => a.Alive && a.Structure && (a.ConstructionRemaining > 0 || a.Source.TemplateName is "Лесопилка" or "Ферма" or "Казарма" or "Шахта")).ToArray())
+        foreach (var building in Actors.Where(a => a.Alive && a.Structure && (a.ConstructionRemaining > 0 || a.Source.TemplateName is "Лесопилка" or "Ферма" or "Казарма" or "Шахта" or "Мост")).ToArray())
         {
             if (building.Team != 0 && building.ConstructionRemaining <= 0 && building.Source.TemplateName != "Лесопилка") continue;
             if (building.ConstructionRemaining > 0)
@@ -207,13 +293,13 @@ public sealed partial class Skirmish
                 building.ConstructionRemaining = maintenance.ContinueAction
                     ? ((building.Template.InitialCondition - maintenance.State.Condition + 1) * Math.Max(1, (int)building.Parameters[0x57]) - maintenance.State.Counter) / (double)Rules.TicksPerSecond : 0;
                 // Provisional visual stage binding; the full C88C frame/effects handler is not connected.
-                if (building.Source.TemplateName is "Ферма" or "Казарма" or "Шахта")
-                    BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(building.Template.InitialFrame + Math.Min(building.Parameters[0x4a], building.Record[0x19] * (building.Parameters[0x4a] + 1) / (building.Template.InitialCondition + 1))));
+                if (building.Source.TemplateName is "Ферма" or "Казарма" or "Шахта" or "Мост" or "Башня" or "Забор" or "Ворота")
+                    BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(LineShapeFrames(building) + building.Template.InitialFrame + Math.Min(building.Parameters[0x4a], building.Record[0x19] * (building.Parameters[0x4a] + 1) / (building.Template.InitialCondition + 1))));
                 if (maintenance.ContinueAction) continue;
                 var completed = OriginalBuildingLifecycle.CompleteCurrentAction(new(building.Record[0x14], building.Record[0x15], building.Record[0x0f]));
                 building.Record[0x14] = completed.EncodedState; building.Record[0x15] = completed.Auxiliary; building.Record[0x0f] = completed.WorkFlags;
-                BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(building.Template.InitialFrame + building.Parameters[0x4a]));
-                if (building.Team == 0) Log(building.Source.TemplateName + " готова.");
+                BinaryPrimitives.WriteUInt16LittleEndian(building.Record.AsSpan(1), (ushort)(LineShapeFrames(building) + building.Template.InitialFrame + building.Parameters[0x4a]));
+                if (building.Team == 0) { Log(building.Source.TemplateName + " готова."); var tree0 = TreeOf(Rules.PlayerSlot); if (tree0.Length > 0) { OriginalTechRules.Complete(tree0, 1, (byte)building.Source.TemplateIndex); if (Population.FarmSupport is >= 0x28 and <= 0x32) OriginalTechRules.Complete(tree0, 2, 0); } }   // AFDB's end: farm support 28h..32h is event (0, 2), as for the AI
                 if (building.Team != 0) { EnemyBuildingFinished(building); continue; }
             }
             if (building.Source.TemplateName != "Лесопилка") continue;
@@ -287,17 +373,17 @@ public sealed partial class Skirmish
     }
     private void TickWorker(SkirmishActor worker, double dt)
     {
+        WorkerRetryTick(worker);
         // WRK 883 calls the animation core before the work dispatcher; 856C waits while state 3 is active.
         if (OriginalWorkerAnimation.Pending(worker.Record))
         {
             var impact = OriginalWorkerAnimation.Step(worker.Record, worker.Parameters);
-            if (impact is { } hit)
-                Effects.Add(new BattleEffect { From = new Vector2(hit.X, hit.Y), To = new Vector2(hit.TargetX, hit.TargetY), Team = 0, Remaining = .12 });
+            if (impact is { } hit) ChopHit(worker, hit);
             if (OriginalWorkerAnimation.Pending(worker.Record))
             { worker.JobText = (worker.Record[0x2d] & 15) == 1 ? "Поворачивается к лесопилке" : "Рубит дерево"; return; }
         }
-        if (worker.MineJob || worker.Source.TemplateIndex == OriginalOreRules.OreWorker) { TickOreWorker(worker); return; }
-        if (worker.Source.TemplateIndex == 11 && worker.Record[0x31] == 0)
+        if (worker.MineJob || worker.Index02 == OriginalOreRules.OreWorker) { TickOreWorker(worker); return; }
+        if (worker.Index02 == 11 && worker.Record[0x31] == 0)
         {
             var empty = Convert.FromHexString(_templates.Armies["ARMY__02.DAT"].Templates[10].RawRecordHex);
             OriginalWorkerDelivery.ReturnEmpty(worker.Record, empty, _terrainCatalog.NextRandomByte()); ApplyWorkerTemplate(worker);
@@ -313,9 +399,12 @@ public sealed partial class Skirmish
         }
         if (worker.Record[0x31] == 3) { TickDelivery(worker); return; }
         var tree = worker.GatherTree!.Value;
-        if (!Harvestable(tree))
+        // Before (re)starting a load the worker checks that the tree can be felled: it still stands, nobody else fells it and a side is free to stand on; if not it
+        // takes the nearest neighbouring free tree instead of waiting (user, 22.11).
+        // (Improved AI mode only: the original AI's checks depend on the old timing.)
+        if (!Harvestable(tree) || (ImprovedAi && !worker.HarvestPrepared && (TreeTakenByOther(worker, tree) || !HasFreeApproach(worker, tree))))
         {
-            if (!FindNextGrove(worker)) return;
+            if (!(ImprovedAi && SwitchTree(worker, tree)) && !Harvestable(tree) && !FindNextGrove(worker)) return;
             tree = worker.GatherTree!.Value;
         }
         var point = new Vector2(tree.X * 32 + 16, tree.Y * 32 + 16);
@@ -342,6 +431,7 @@ public sealed partial class Skirmish
             }
             else
             {
+                FellOnWorkers(worker, tree);
                 bool clear = OriginalForestryRules.FinishLoad(worker.Record);
                 if (clear && _terrainCatalog.ClearTimber(Map.Cells, Occupancy.Width, Occupancy.Height, tree.X, tree.Y) > 0)
                 { TerrainRevision++; if (!Harvestable(tree)) ClearedGroves.Add(tree); }
@@ -355,7 +445,10 @@ public sealed partial class Skirmish
         else if (worker.ReplanTimer <= 0)
         {
             var candidates = new[] { Vector2I.Up, Vector2I.Down, Vector2I.Left, Vector2I.Right }.Select(d => tree + d).OrderBy(c => ((Vector2)c).DistanceSquaredTo(worker.Cell));
-            foreach (var cell in candidates) if (Plan(worker, cell)) break;
+            bool planned = false;
+            foreach (var cell in candidates) if (Plan(worker, cell)) { planned = true; break; }
+            // No side can be reached: go to a neighbouring free tree rather than standing and waiting.
+            if (!planned && !SearchTimeUp && ImprovedAi) SwitchTree(worker, tree);
             worker.ReplanTimer = ReplanDelay;
         }
         MoveTick(worker);

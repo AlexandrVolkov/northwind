@@ -1,0 +1,329 @@
+{
+ "source": "LE:3 4191, stride 19h",
+ "items": [
+  {
+   "code": 0,
+   "icon": 0,
+   "handler": "0",
+   "name": "",
+   "class": 0,
+   "parameter": 0,
+   "static_hex": "00000000000000000000000000"
+  },
+  {
+   "code": 1,
+   "icon": 0,
+   "handler": "11EB0",
+   "name": "",
+   "class": 0,
+   "parameter": 0,
+   "static_hex": "00000000000000000000000000"
+  },
+  {
+   "code": 2,
+   "icon": 0,
+   "handler": "11ECB",
+   "name": "",
+   "class": 0,
+   "parameter": 0,
+   "static_hex": "00000000000000000000000000"
+  },
+  {
+   "code": 3,
+   "icon": 0,
+   "handler": "E65A",
+   "name": "",
+   "class": 0,
+   "parameter": 0,
+   "static_hex": "00000000000000000000000000"
+  },
+  {
+   "code": 4,
+   "icon": 382,
+   "handler": "11EFF",
+   "name": "Рукопись",
+   "class": 16,
+   "parameter": 0,
+   "static_hex": "10000000000000000000000000"
+  },
+  {
+   "code": 5,
+   "icon": 365,
+   "handler": "11F5B",
+   "name": "Волшебный камень",
+   "class": 0,
+   "parameter": 0,
+   "static_hex": "00000000000000000000000000"
+  },
+  {
+   "code": 6,
+   "icon": 364,
+   "handler": "1217E",
+   "name": "Сиреневый камень",
+   "class": 12,
+   "parameter": 0,
+   "static_hex": "0c000000000000000001ff0000"
+  },
+  {
+   "code": 7,
+   "icon": 375,
+   "handler": "11F5B",
+   "name": "Посох Мирона",
+   "class": 4,
+   "parameter": 0,
+   "static_hex": "04000000000000000000000000"
+  },
+  {
+   "code": 8,
+   "icon": 374,
+   "handler": "121FF",
+   "name": "Посох Кочета",
+   "class": 5,
+   "parameter": 0,
+   "static_hex": "05000000000000000000000100"
+  },
+  {
+   "code": 9,
+   "icon": 379,
+   "handler": "11F5B",
+   "name": "Посох Ирвила",
+   "class": 6,
+   "parameter": 0,
+   "static_hex": "06000000000000000000000000"
+  },
+  {
+   "code": 10,
+   "icon": 373,
+   "handler": "11F5B",
+   "name": "Посох Руфина",
+   "class": 2,
+   "parameter": 0,
+   "static_hex": "02000000000000000000000000"
+  },
+  {
+   "code": 11,
+   "icon": 381,
+   "handler": "11F5B",
+   "name": "Посох Ониса",
+   "class": 3,
+   "parameter": 0,
+   "static_hex": "03000000000000000000000000"
+  },
+  {
+   "code": 12,
+   "icon": 365,
+   "handler": "12198",
+   "name": "Розовый камень",
+   "class": 13,
+   "parameter": 0,
+   "static_hex": "0d000000000000000009ff0000"
+  },
+  {
+   "code": 13,
+   "icon": 380,
+   "handler": "11F5B",
+   "name": "Посох Ефила",
+   "class": 10,
+   "parameter": 0,
+   "static_hex": "0a000000000000000000000000"
+  },
+  {
+   "code": 14,
+   "icon": 367,
+   "handler": "121E5",
+   "name": "Хрустальный шар",
+   "class": 14,
+   "parameter": 0,
+   "static_hex": "0e000000000000000007ff0000"
+  },
+  {
+   "code": 15,
+   "icon": 370,
+   "handler": "11F64",
+   "name": "Проклятие Руфина",
+   "class": 0,
+   "parameter": 0,
+   "static_hex": "00000000000000000000000000"
+  },
+  {
+   "code": 16,
+   "icon": 368,
+   "handler": "1205C",
+   "name": "Шар прозрения",
+   "class": 28,
+   "parameter": 0,
+   "static_hex": "1c010a00000000000000000000"
+  },
+  {
+   "code": 17,
+   "icon": 372,
+   "handler": "11FC8",
+   "name": "Проклятие Ониса",
+   "class": 0,
+   "parameter": 0,
+   "static_hex": "00000000000000000000000000"
+  },
+  {
+   "code": 18,
+   "icon": 371,
+   "handler": "12022",
+   "name": "Проклятие Ирвила",
+   "class": 0,
+   "parameter": 0,
+   "static_hex": "00000000000000000000000000"
+  },
+  {
+   "code": 19,
+   "icon": 369,
+   "handler": "120AD",
+   "name": "Страшная Болезнь",
+   "class": 15,
+   "parameter": 0,
+   "static_hex": "0f020000000000000000000000"
+  },
+  {
+   "code": 20,
+   "icon": 366,
+   "handler": "120E2",
+   "name": "Синий камень",
+   "class": 11,
+   "parameter": 0,
+   "static_hex": "0b000000000000000006060100"
+  },
+  {
+   "code": 21,
+   "icon": 376,
+   "handler": "11F5B",
+   "name": "Посох Магуса",
+   "class": 7,
+   "parameter": 0,
+   "static_hex": "07000000000000000000000000"
+  },
+  {
+   "code": 22,
+   "icon": 377,
+   "handler": "11F5B",
+   "name": "Посох Кевина",
+   "class": 8,
+   "parameter": 0,
+   "static_hex": "08000000000000000000000000"
+  },
+  {
+   "code": 23,
+   "icon": 378,
+   "handler": "11F5B",
+   "name": "Посох Гарика",
+   "class": 9,
+   "parameter": 0,
+   "static_hex": "09000000000000000000000000"
+  },
+  {
+   "code": 24,
+   "icon": 382,
+   "handler": "11EFF",
+   "name": "Рукопись",
+   "class": 16,
+   "parameter": 0,
+   "static_hex": "10000000000000000001000000"
+  },
+  {
+   "code": 25,
+   "icon": 382,
+   "handler": "11EFF",
+   "name": "Рукопись",
+   "class": 17,
+   "parameter": 0,
+   "static_hex": "11000000000000000002000000"
+  },
+  {
+   "code": 26,
+   "icon": 382,
+   "handler": "11EFF",
+   "name": "Рукопись",
+   "class": 18,
+   "parameter": 0,
+   "static_hex": "12000000000000000003000000"
+  },
+  {
+   "code": 27,
+   "icon": 382,
+   "handler": "11EFF",
+   "name": "Рукопись",
+   "class": 19,
+   "parameter": 0,
+   "static_hex": "13000000000000000004000000"
+  },
+  {
+   "code": 28,
+   "icon": 382,
+   "handler": "11EFF",
+   "name": "Рукопись",
+   "class": 20,
+   "parameter": 0,
+   "static_hex": "14000000000000000005000000"
+  },
+  {
+   "code": 29,
+   "icon": 382,
+   "handler": "11EFF",
+   "name": "Рукопись",
+   "class": 21,
+   "parameter": 0,
+   "static_hex": "15000000000000000006000000"
+  },
+  {
+   "code": 30,
+   "icon": 382,
+   "handler": "11EFF",
+   "name": "Рукопись",
+   "class": 22,
+   "parameter": 0,
+   "static_hex": "16000000000000000007000000"
+  },
+  {
+   "code": 31,
+   "icon": 383,
+   "handler": "12256",
+   "name": "Красная молния",
+   "class": 25,
+   "parameter": 0,
+   "static_hex": "19020000000000000000000000"
+  },
+  {
+   "code": 32,
+   "icon": 384,
+   "handler": "12296",
+   "name": "Зеленая молния",
+   "class": 26,
+   "parameter": 0,
+   "static_hex": "1a020000000000000000000000"
+  },
+  {
+   "code": 33,
+   "icon": 385,
+   "handler": "122D6",
+   "name": "Желтая молния",
+   "class": 27,
+   "parameter": 0,
+   "static_hex": "1b020000000000000000000000"
+  },
+  {
+   "code": 34,
+   "icon": 0,
+   "handler": "11EE6",
+   "name": "",
+   "class": 0,
+   "parameter": 0,
+   "static_hex": "00000000000000000000000000"
+  },
+  {
+   "code": 35,
+   "icon": 386,
+   "handler": "12316",
+   "name": "Кувшин с фантомом",
+   "class": 29,
+   "parameter": 0,
+   "static_hex": "1d010a00000000000000000000"
+  }
+ ]
+}

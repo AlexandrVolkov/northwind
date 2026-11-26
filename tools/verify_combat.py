@@ -36,6 +36,7 @@ class CombatOracle(OccupancyOracle):
         'lookup': ([(0x982b, 0x98cc)], []),
         'strike': ([(0x982b, 0x98cc), (0xbfc9, 0xc010), (0x68bd, 0x68d8), (0x6885, 0x68a0), (0x9e41, 0x9e55)],
                    [(0x4f3, 0x54a), (0x6fe, 0x71f), (0x735, 0x74c)]),
+        'cellhit': ([(0x97c6, 0x982b), (0xbfc9, 0xc010), (0x68bd, 0x68d8), (0x6885, 0x68a0), (0x9e41, 0x9e55)], [(0x6fe, 0x71f), (0x735, 0x74c), (0x762, 0x7fe)]),
         'vitals': ([(0x90e9, 0x9210), (0x8e0e, 0x8e3c), (0xd12c, 0xd157), (0x9e41, 0x9e69)], []),
     }
 
@@ -144,6 +145,27 @@ def generate(game):
         digest.update(bytes(o.cpu.mem_read(o.POOL + 1, 0x22)) + bytes(o.cpu.mem_read(o.POOL + 0x100, 54))
                       + bytes(o.cpu.mem_read(0x19eb, 1)) + json.dumps(sounds).encode()); count += 1
     o.stubs = {}; set_template(0); save('strike', digest, count)
+
+    # Cell hit, type 6, WRK 762: the object in the cell of the point, damage from the attacker's experience.
+    sounds = []
+    o.stubs = {0xa47e: lambda: (sounds.append(o.cpu.reg_read(UC_X86_REG_EAX)), o.ret())}
+    o.prepare(8, 8); o.terrain(8, 8, [i % 8 for i in range(64)])
+    spec = {'experience': [0, 63, 64, 190, 191], 'kinds': [0, 1, 3, 5], 'defences': [0, 5, 6, 7, 20], 'health': [0, 1, 6, 10, 128],
+            'flags': [0, 0x10], 'present': [0, 1], 'cells': [0, 1, 3, 7], 'random_indices': [0, 77]}
+    fixture['cellhit'] = spec; digest = hashlib.sha256(); count = 0; o.mode = 'cellhit'
+    for experience, kind, defence, hp, flags, present, cx, index in product(*(spec[k] for k in ['experience', 'kinds', 'defences', 'health', 'flags', 'present', 'cells', 'random_indices'])):
+        set_template(0, o03=1, o04=1, o44=defence, o40=struct.pack('<I', flags)); sounds.clear()
+        o.cpu.mem_write(o.GRID, bytes(8 * 8 * 12)); target = unit(0, 3, hp, 0, cx * 32 + 16, 112, 1); o.cpu.mem_write(o.POOL + 0x100, bytes(target))
+        if present: o.cpu.mem_write(o.GRID + (64 + 3 * 8 + cx) * 4, struct.pack('<I', 0x100))
+        attacker = unit(0, 0, 10, 0, 64, 96, 1); attacker[0x16] = experience; attacker[0x14] = kind | 0x10; o.cpu.mem_write(o.POOL + 0x200, bytes(attacker))
+        effect = pattern(0x22, 5, 9); effect[0] = 6; effect[1] = 0; effect[5] = 1
+        o.cpu.mem_write(o.POOL + 1, bytes(effect)); o.cpu.mem_write(0x19eb, bytes([index]))
+        o.cpu.reg_write(UC_X86_REG_EDI, o.POOL + 1); o.cpu.reg_write(UC_X86_REG_EBX, o.POOL + 0x200); o.cpu.reg_write(UC_X86_REG_EAX, 0)
+        o.cpu.reg_write(UC_X86_REG_ECX, cx * 32 + 16); o.cpu.reg_write(UC_X86_REG_EDX, 112)
+        o.run(o.WRK + 0x762)
+        digest.update(bytes(o.cpu.mem_read(o.POOL + 1, 0x22)) + bytes(o.cpu.mem_read(o.POOL + 0x100, 54))
+                      + bytes(o.cpu.mem_read(0x19eb, 1)) + json.dumps(sounds).encode()); count += 1
+    o.stubs = {}; set_template(0); save('cellhit', digest, count)
 
     # 90E9 vitals up to the animation core at 9210.
     calls = []

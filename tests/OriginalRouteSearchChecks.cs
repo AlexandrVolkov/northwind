@@ -80,4 +80,20 @@ public partial class TestRunner
         Check(hero.Cell == goal && !hero.Stepping, $"Movement rebuilds an obstructed route and reaches the far side: {hero.Cell}");
         Check(battle.Occupancy.Cells.ToArray().Count(v => v == hero.Id) == 1, "Obstacle replanning preserves a single live occupancy footprint");
     }
+
+    /// <summary>tests/fixtures/route-oracle.json: the original 73F5 on a snapshot of the live game (tools/verify_snapshot_route.py) gives the same partial paths for far goals as the port with the admission of the skirmish.</summary>
+    private void RouteOracleChecks()
+    {
+        using var battle = CreateSkirmish(); battle.ProvisionalGuidance = false;
+        var u = battle.Actors.First(a => a.Team == 0 && a.Source.TemplateName == "Ополченец");
+        using var reference = GameData.Read<System.Text.Json.JsonDocument>("res://tests/fixtures/route-oracle.json");
+        var search = new OriginalRouteSearch(); int matched = 0, total = 0;
+        foreach (var c in reference.RootElement.GetProperty("cases").EnumerateArray())
+        {
+            var goal = c.GetProperty("goal"); total++;
+            var r = search.Find((byte)battle.Map.Width, (byte)battle.Map.Height, 1, 1, new(21, 29), new((byte)goal[0].GetInt32(), (byte)goal[1].GetInt32()), (l, t, d) => battle.CanStand(u, new Godot.Vector2I(l, t)));
+            if (string.Concat(r.Directions) == c.GetProperty("directions").GetString()) matched++;
+        }
+        Check(matched == total && total == 4, $"Far-goal partial paths equal the original's on the live snapshot ({matched} of {total})");
+    }
 }

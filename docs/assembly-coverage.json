@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "bf66117691afaeadd2fbd6b6fc3fb67530932fb5415933d7da60f099e81b1f31",
+  "annotation_sha256": "f29a09cb944b16fc5ffb22be0265468eb3c2b1139cfb24e574b025bcee048d86",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -32,10 +32,10 @@
       "zero_fill_bytes": 0,
       "sha256": "942416be1088d1fd44ca43fd4a14b8d6b2629e9c1f80b2cce41ac788c0d1faa4",
       "byte_status": {
-        "partial": 9814,
-        "ported": 30978,
-        "unreviewed": 105296,
-        "verified": 794
+        "partial": 6265,
+        "ported": 45658,
+        "unreviewed": 94862,
+        "verified": 97
       },
       "linear_rows": 45008,
       "flow_candidate_instructions": 30465,
@@ -63,22 +63,6 @@
         },
         {
           "start": 12059,
-          "end": 12970,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 12970,
-          "end": 12986,
-          "status": "verified",
-          "classification": "code",
-          "claims": [
-            "save-victory-marker"
-          ]
-        },
-        {
-          "start": 12986,
           "end": 13715,
           "status": "unreviewed",
           "classification": "unknown",
@@ -249,22 +233,6 @@
         },
         {
           "start": 17523,
-          "end": 25027,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 25027,
-          "end": 25135,
-          "status": "ported",
-          "classification": "code",
-          "claims": [
-            "command-button-mode-router"
-          ]
-        },
-        {
-          "start": 25135,
           "end": 25342,
           "status": "unreviewed",
           "classification": "unknown",
@@ -340,11 +308,21 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "direction-byte"
+            "direction-byte",
+            "direction-6996"
           ]
         },
         {
           "start": 27134,
+          "end": 27251,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "builder-line-step"
+          ]
+        },
+        {
+          "start": 27251,
           "end": 28143,
           "status": "unreviewed",
           "classification": "unknown",
@@ -362,9 +340,11 @@
         {
           "start": 28338,
           "end": 28353,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-6eb2"
+          ]
         },
         {
           "start": 28353,
@@ -372,15 +352,25 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "single-command-panel"
+            "single-command-panel",
+            "le1-unit-actions-6ec1"
           ]
         },
         {
           "start": 28440,
-          "end": 29029,
+          "end": 28848,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 28848,
+          "end": 29029,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-walk-70b0"
+          ]
         },
         {
           "start": 29029,
@@ -388,7 +378,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "motion-turn-prefix"
+            "motion-turn-prefix",
+            "le1-unit-walk-70b0"
           ]
         },
         {
@@ -397,7 +388,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "motion-accumulator"
+            "motion-accumulator",
+            "le1-unit-walk-70b0"
           ]
         },
         {
@@ -406,11 +398,21 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "motion-advance"
+            "motion-advance",
+            "le1-unit-walk-70b0"
           ]
         },
         {
           "start": 29276,
+          "end": 29438,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-walk-70b0"
+          ]
+        },
+        {
+          "start": 29438,
           "end": 29685,
           "status": "unreviewed",
           "classification": "unknown",
@@ -445,10 +447,28 @@
         },
         {
           "start": 31235,
-          "end": 31843,
+          "end": 31286,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-7a03"
+          ]
+        },
+        {
+          "start": 31286,
+          "end": 31609,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 31609,
+          "end": 31843,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "placement-footprint-7b79"
+          ]
         },
         {
           "start": 31843,
@@ -474,7 +494,8 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "route-consumer-contact"
+            "route-consumer-contact",
+            "le1-unit-actions-7fa7"
           ]
         },
         {
@@ -492,7 +513,8 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "route-contact-action"
+            "route-contact-action",
+            "le1-unit-actions-809d"
           ]
         },
         {
@@ -510,15 +532,17 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "exploration-reveal"
+            "fog-reveal"
           ]
         },
         {
           "start": 33241,
           "end": 33319,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-81d9"
+          ]
         },
         {
           "start": 33319,
@@ -526,15 +550,81 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "worker-action-dispatch"
+            "worker-action-dispatch",
+            "le1-unit-actions-8227"
           ]
         },
         {
           "start": 33359,
+          "end": 33395,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8227"
+          ]
+        },
+        {
+          "start": 33395,
+          "end": 33475,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8273"
+          ]
+        },
+        {
+          "start": 33475,
+          "end": 33599,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-82c3"
+          ]
+        },
+        {
+          "start": 33599,
+          "end": 33695,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-833f"
+          ]
+        },
+        {
+          "start": 33695,
+          "end": 33753,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-839f"
+          ]
+        },
+        {
+          "start": 33753,
+          "end": 33854,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-83d9"
+          ]
+        },
+        {
+          "start": 33854,
+          "end": 33962,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-843e"
+          ]
+        },
+        {
+          "start": 33962,
           "end": 34114,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-84aa"
+          ]
         },
         {
           "start": 34114,
@@ -542,15 +632,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "forestry-prepare"
+            "forestry-prepare",
+            "le1-unit-actions-84aa"
           ]
         },
         {
           "start": 34132,
           "end": 34181,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-84aa"
+          ]
         },
         {
           "start": 34181,
@@ -558,15 +651,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "forestry-work"
+            "forestry-work",
+            "le1-unit-actions-84aa"
           ]
         },
         {
           "start": 34252,
           "end": 34261,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-84aa"
+          ]
         },
         {
           "start": 34261,
@@ -574,15 +670,27 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "forestry-modifier"
+            "forestry-modifier",
+            "le1-unit-actions-84aa"
           ]
         },
         {
           "start": 34274,
+          "end": 34393,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-84aa"
+          ]
+        },
+        {
+          "start": 34393,
           "end": 34486,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8659"
+          ]
         },
         {
           "start": 34486,
@@ -595,10 +703,76 @@
         },
         {
           "start": 34687,
+          "end": 34701,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-877f"
+          ]
+        },
+        {
+          "start": 34701,
+          "end": 34843,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "le1-vanish-action-878d",
+            "le1-unit-actions-878d"
+          ]
+        },
+        {
+          "start": 34843,
+          "end": 35095,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-881b"
+          ]
+        },
+        {
+          "start": 35095,
+          "end": 35313,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8917"
+          ]
+        },
+        {
+          "start": 35313,
+          "end": 35412,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-89f1"
+          ]
+        },
+        {
+          "start": 35412,
+          "end": 35455,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8a54"
+          ]
+        },
+        {
+          "start": 35455,
+          "end": 35487,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8a7f"
+          ]
+        },
+        {
+          "start": 35487,
           "end": 35519,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8a9f"
+          ]
         },
         {
           "start": 35519,
@@ -606,7 +780,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "attack-target-alive"
+            "attack-target-alive",
+            "le1-unit-actions-8abf"
           ]
         },
         {
@@ -615,15 +790,36 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "attack-swing-gate"
+            "attack-swing-gate",
+            "le1-unit-actions-8af4"
           ]
         },
         {
           "start": 35599,
+          "end": 35639,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8b0f"
+          ]
+        },
+        {
+          "start": 35639,
+          "end": 35660,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8b37"
+          ]
+        },
+        {
+          "start": 35660,
           "end": 35678,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8b4c"
+          ]
         },
         {
           "start": 35678,
@@ -636,10 +832,93 @@
         },
         {
           "start": 35783,
+          "end": 35818,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8bc7"
+          ]
+        },
+        {
+          "start": 35818,
+          "end": 35870,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8bea"
+          ]
+        },
+        {
+          "start": 35870,
+          "end": 35911,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "visit-8c1e"
+          ]
+        },
+        {
+          "start": 35911,
+          "end": 35964,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8c47"
+          ]
+        },
+        {
+          "start": 35964,
+          "end": 35977,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "visit-8c7c"
+          ]
+        },
+        {
+          "start": 35977,
+          "end": 35992,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8c89"
+          ]
+        },
+        {
+          "start": 35992,
+          "end": 36001,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "visit-8c98"
+          ]
+        },
+        {
+          "start": 36001,
+          "end": 36083,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-orders-8ca1"
+          ]
+        },
+        {
+          "start": 36083,
+          "end": 36107,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8cf3"
+          ]
+        },
+        {
+          "start": 36107,
           "end": 36272,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-orders-8d0b"
+          ]
         },
         {
           "start": 36272,
@@ -661,10 +940,30 @@
         },
         {
           "start": 36412,
+          "end": 36481,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8e3c"
+          ]
+        },
+        {
+          "start": 36481,
+          "end": 36551,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8e81"
+          ]
+        },
+        {
+          "start": 36551,
           "end": 36720,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-8ec7"
+          ]
         },
         {
           "start": 36720,
@@ -672,15 +971,29 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "worker-approach"
+            "worker-approach",
+            "le1-unit-actions-8f70"
           ]
         },
         {
           "start": 36911,
+          "end": 36964,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "visit-902f",
+            "le1-unit-actions-902f"
+          ]
+        },
+        {
+          "start": 36964,
           "end": 37097,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-spot-9064",
+            "le1-unit-actions-9064"
+          ]
         },
         {
           "start": 37097,
@@ -707,15 +1020,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "worker-animation-dispatch"
+            "worker-animation-dispatch",
+            "le1-unit-motion-9210"
           ]
         },
         {
           "start": 37628,
           "end": 37716,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-motion-9210"
+          ]
         },
         {
           "start": 37716,
@@ -723,15 +1039,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "worker-turn-timer"
+            "worker-turn-timer",
+            "le1-unit-motion-9210"
           ]
         },
         {
           "start": 37759,
           "end": 37805,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-motion-9210"
+          ]
         },
         {
           "start": 37805,
@@ -739,7 +1058,8 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "worker-strike-init"
+            "worker-strike-init",
+            "le1-unit-motion-9210"
           ]
         },
         {
@@ -749,7 +1069,8 @@
           "classification": "code",
           "claims": [
             "worker-strike-init",
-            "swing-object-target"
+            "swing-object-target",
+            "le1-unit-motion-9210"
           ]
         },
         {
@@ -758,7 +1079,8 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "worker-strike-init"
+            "worker-strike-init",
+            "le1-unit-motion-9210"
           ]
         },
         {
@@ -767,7 +1089,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "worker-strike-progress"
+            "worker-strike-progress",
+            "le1-unit-motion-9210"
           ]
         },
         {
@@ -776,15 +1099,37 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "worker-strike-effect-args"
+            "worker-strike-effect-args",
+            "le1-unit-motion-9210"
           ]
         },
         {
           "start": 38040,
+          "end": 38097,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-motion-9210"
+          ]
+        },
+        {
+          "start": 38097,
+          "end": 38173,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-frame-range-94d1",
+            "le1-unit-motion-9210"
+          ]
+        },
+        {
+          "start": 38173,
           "end": 38355,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-motion-9210"
+          ]
         },
         {
           "start": 38355,
@@ -798,9 +1143,11 @@
         {
           "start": 38411,
           "end": 38483,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "turn-960b"
+          ]
         },
         {
           "start": 38483,
@@ -808,7 +1155,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "motion-turn"
+            "motion-turn",
+            "turn-960b"
           ]
         },
         {
@@ -817,15 +1165,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "motion-heading"
+            "motion-heading",
+            "shot-direction-9688"
           ]
         },
         {
           "start": 38605,
           "end": 38854,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-effect-pool-96cd"
+          ]
         },
         {
           "start": 38854,
@@ -875,9 +1226,11 @@
         {
           "start": 39566,
           "end": 39693,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-9a8e"
+          ]
         },
         {
           "start": 39693,
@@ -934,11 +1287,9 @@
         {
           "start": 40760,
           "end": 41227,
-          "status": "ported",
-          "classification": "code",
-          "claims": [
-            "fog-corner-selection"
-          ]
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
         },
         {
           "start": 41227,
@@ -946,24 +1297,25 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "timing-a10b"
+            "timing-a10b",
+            "le1-unit-actions-a10b"
           ]
         },
         {
           "start": 41425,
-          "end": 41760,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "exploration-minimap"
-          ]
-        },
-        {
-          "start": 41760,
-          "end": 42207,
+          "end": 42178,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 42178,
+          "end": 42207,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-squad-message"
+          ]
         },
         {
           "start": 42207,
@@ -1032,11 +1384,21 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "castle-create-outer"
+            "castle-create-outer",
+            "le1-object-allocator-a758"
           ]
         },
         {
           "start": 43120,
+          "end": 43129,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-object-allocator-a758"
+          ]
+        },
+        {
+          "start": 43129,
           "end": 43195,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1134,10 +1496,19 @@
         },
         {
           "start": 43697,
-          "end": 44383,
+          "end": 44131,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 44131,
+          "end": 44383,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "placement-ac63"
+          ]
         },
         {
           "start": 44383,
@@ -1150,10 +1521,44 @@
         },
         {
           "start": 44602,
-          "end": 45187,
+          "end": 44631,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-ae3a"
+          ]
+        },
+        {
+          "start": 44631,
+          "end": 44807,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 44807,
+          "end": 45019,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "build-check-af07"
+          ]
+        },
+        {
+          "start": 45019,
+          "end": 45104,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 45104,
+          "end": 45187,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "builder-afdb"
+          ]
         },
         {
           "start": 45187,
@@ -1161,15 +1566,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "construction-upfront"
+            "construction-upfront",
+            "builder-afdb"
           ]
         },
         {
           "start": 45289,
           "end": 45418,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "builder-afdb"
+          ]
         },
         {
           "start": 45418,
@@ -1177,11 +1585,39 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "construction-mark"
+            "construction-mark",
+            "builder-afdb"
           ]
         },
         {
           "start": 45430,
+          "end": 45548,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "builder-afdb"
+          ]
+        },
+        {
+          "start": 45548,
+          "end": 45849,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "build-range-b1ec"
+          ]
+        },
+        {
+          "start": 45849,
+          "end": 45972,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-b319"
+          ]
+        },
+        {
+          "start": 45972,
           "end": 46071,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1216,10 +1652,39 @@
         },
         {
           "start": 46507,
+          "end": 46552,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-b5ab"
+          ]
+        },
+        {
+          "start": 46552,
+          "end": 46614,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-b5d8"
+          ]
+        },
+        {
+          "start": 46614,
+          "end": 46833,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-b616"
+          ]
+        },
+        {
+          "start": 46833,
           "end": 46893,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-b6f1"
+          ]
         },
         {
           "start": 46893,
@@ -1227,15 +1692,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "group-command-panel-filter"
+            "group-command-panel-filter",
+            "le1-unit-actions-b6f1"
           ]
         },
         {
           "start": 46948,
           "end": 46949,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-b6f1"
+          ]
         },
         {
           "start": 46949,
@@ -1267,10 +1735,21 @@
         },
         {
           "start": 47595,
+          "end": 47662,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-b9eb"
+          ]
+        },
+        {
+          "start": 47662,
           "end": 47712,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-ba2e"
+          ]
         },
         {
           "start": 47712,
@@ -1283,10 +1762,39 @@
         },
         {
           "start": 47839,
+          "end": 48011,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "line-neighbors-badf"
+          ]
+        },
+        {
+          "start": 48011,
+          "end": 48149,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-bb8b"
+          ]
+        },
+        {
+          "start": 48149,
+          "end": 48174,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-bc15"
+          ]
+        },
+        {
+          "start": 48174,
           "end": 48399,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "line-neighbors-bc2e"
+          ]
         },
         {
           "start": 48399,
@@ -1309,6 +1817,24 @@
         },
         {
           "start": 48686,
+          "end": 48751,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-be2e"
+          ]
+        },
+        {
+          "start": 48751,
+          "end": 48797,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-be6f"
+          ]
+        },
+        {
+          "start": 48797,
           "end": 49097,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1325,10 +1851,28 @@
         },
         {
           "start": 49168,
-          "end": 49988,
+          "end": 49398,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 49398,
+          "end": 49969,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-c0f6"
+          ]
+        },
+        {
+          "start": 49969,
+          "end": 49988,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-c331"
+          ]
         },
         {
           "start": 49988,
@@ -1336,7 +1880,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "search-c344"
+            "search-c344",
+            "le1-unit-actions-c331"
           ]
         },
         {
@@ -1345,7 +1890,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "forestry-find"
+            "forestry-find",
+            "le1-unit-actions-c35f"
           ]
         },
         {
@@ -1354,7 +1900,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "worker-receiver-find"
+            "worker-receiver-find",
+            "le1-unit-actions-c439"
           ]
         },
         {
@@ -1363,7 +1910,8 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "worker-waiting-lookup"
+            "worker-waiting-lookup",
+            "le1-unit-actions-c4cd"
           ]
         },
         {
@@ -1402,10 +1950,55 @@
         },
         {
           "start": 51424,
-          "end": 52347,
+          "end": 51785,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "building-frames-c8e0"
+          ]
+        },
+        {
+          "start": 51785,
+          "end": 51836,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 51836,
+          "end": 51950,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "tower-fire-ca7c"
+          ]
+        },
+        {
+          "start": 51950,
+          "end": 52001,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-caee"
+          ]
+        },
+        {
+          "start": 52001,
+          "end": 52087,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-cb21"
+          ]
+        },
+        {
+          "start": 52087,
+          "end": 52347,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-cb77"
+          ]
         },
         {
           "start": 52347,
@@ -1413,15 +2006,28 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "castle-goods-receive"
+            "castle-goods-receive",
+            "le1-unit-actions-cc7b"
           ]
         },
         {
           "start": 52420,
+          "end": 52427,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-ccc4"
+          ]
+        },
+        {
+          "start": 52427,
           "end": 52594,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "lab-research-cccb",
+            "le1-unit-actions-cccb"
+          ]
         },
         {
           "start": 52594,
@@ -1443,10 +2049,30 @@
         },
         {
           "start": 53548,
+          "end": 53634,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-d12c"
+          ]
+        },
+        {
+          "start": 53634,
+          "end": 53690,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-d182"
+          ]
+        },
+        {
+          "start": 53690,
           "end": 53969,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-object-transfer-d1ba"
+          ]
         },
         {
           "start": 53969,
@@ -1454,15 +2080,28 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "occupancy-conditional"
+            "occupancy-conditional",
+            "fs-157-claim-crush-d2d1",
+            "le1-unit-actions-d2d1"
           ]
         },
         {
           "start": 54115,
+          "end": 54245,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "site-check-d363"
+          ]
+        },
+        {
+          "start": 54245,
           "end": 54284,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-participant-stats-d3e5"
+          ]
         },
         {
           "start": 54284,
@@ -1470,7 +2109,8 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "owner-population-growth"
+            "owner-population-growth",
+            "le1-participant-stats-d3e5"
           ]
         },
         {
@@ -1479,15 +2119,19 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "owner-population-recount"
+            "owner-population-recount",
+            "le1-participant-stats-d3e5"
           ]
         },
         {
           "start": 54705,
           "end": 55014,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "le1-gate-d5b1",
+            "le1-gate-motion-d5b1"
+          ]
         },
         {
           "start": 55014,
@@ -1500,10 +2144,21 @@
         },
         {
           "start": 55104,
+          "end": 55162,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-d740"
+          ]
+        },
+        {
+          "start": 55162,
           "end": 55217,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-d77a"
+          ]
         },
         {
           "start": 55217,
@@ -1535,9 +2190,11 @@
         {
           "start": 55877,
           "end": 55935,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-da45"
+          ]
         },
         {
           "start": 55935,
@@ -1550,47 +2207,42 @@
         },
         {
           "start": 56135,
-          "end": 58971,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 58971,
-          "end": 59159,
-          "status": "partial",
+          "end": 56238,
+          "status": "ported",
           "classification": "code",
           "claims": [
-            "diplomacy-contact-layout"
+            "le1-growth-db47"
           ]
         },
         {
-          "start": 59159,
-          "end": 60120,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 60120,
-          "end": 60376,
-          "status": "partial",
+          "start": 56238,
+          "end": 56465,
+          "status": "ported",
           "classification": "code",
           "claims": [
-            "diplomacy-contact-widgets"
+            "le1-growth-dbae"
           ]
         },
         {
-          "start": 60376,
-          "end": 60472,
-          "status": "partial",
+          "start": 56465,
+          "end": 56844,
+          "status": "ported",
           "classification": "code",
           "claims": [
-            "diplomacy-button-gate"
+            "le1-growth-dc91"
           ]
         },
         {
-          "start": 60472,
+          "start": 56844,
+          "end": 57032,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-place-check-de0c"
+          ]
+        },
+        {
+          "start": 57032,
           "end": 60885,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1664,6 +2316,31 @@
         },
         {
           "start": 61554,
+          "end": 61596,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "quest-handlers-f072"
+          ]
+        },
+        {
+          "start": 61596,
+          "end": 61683,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 61683,
+          "end": 61780,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "quest-handlers-f0f3"
+          ]
+        },
+        {
+          "start": 61780,
           "end": 62032,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1680,74 +2357,24 @@
         },
         {
           "start": 62091,
-          "end": 63713,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 63713,
-          "end": 64121,
-          "status": "partial",
+          "end": 62270,
+          "status": "ported",
           "classification": "code",
           "claims": [
-            "save-tagged-container-io"
+            "quest-handlers-f28b"
           ]
         },
         {
-          "start": 64121,
-          "end": 64180,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 64180,
-          "end": 64452,
-          "status": "partial",
+          "start": 62270,
+          "end": 62926,
+          "status": "ported",
           "classification": "code",
           "claims": [
-            "save-scenario11-prefix"
+            "quest-handlers-f33e"
           ]
         },
         {
-          "start": 64452,
-          "end": 64611,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "save-scenario11-arrays"
-          ]
-        },
-        {
-          "start": 64611,
-          "end": 65222,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "save-scenario11-loader"
-          ]
-        },
-        {
-          "start": 65222,
-          "end": 65338,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "save-campaign99-write"
-          ]
-        },
-        {
-          "start": 65338,
-          "end": 65494,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "save-campaign99-read"
-          ]
-        },
-        {
-          "start": 65494,
+          "start": 62926,
           "end": 65653,
           "status": "unreviewed",
           "classification": "unknown",
@@ -1818,83 +2445,128 @@
         },
         {
           "start": 66540,
-          "end": 66577,
-          "status": "verified",
-          "classification": "code",
-          "claims": [
-            "save-area-coordinate-tag"
-          ]
-        },
-        {
-          "start": 66577,
-          "end": 66931,
+          "end": 68306,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
         },
         {
-          "start": 66931,
-          "end": 67054,
-          "status": "partial",
+          "start": 68306,
+          "end": 68469,
+          "status": "ported",
           "classification": "code",
           "claims": [
-            "save-area22-create"
+            "free-spot-10ad2",
+            "le1-unit-actions-10ad2"
           ]
         },
         {
-          "start": 67054,
-          "end": 67481,
+          "start": 68469,
+          "end": 68564,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
         },
         {
-          "start": 67481,
-          "end": 67561,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "campaign-border-transfer-coordinate"
-          ]
-        },
-        {
-          "start": 67561,
-          "end": 67586,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 67586,
-          "end": 67632,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "save-area22-open"
-          ]
-        },
-        {
-          "start": 67632,
+          "start": 68564,
           "end": 68768,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-campaign-tick-10bd4"
+          ]
         },
         {
           "start": 68768,
           "end": 69145,
-          "status": "partial",
+          "status": "ported",
           "classification": "code",
           "claims": [
-            "campaign-world-record-update"
+            "le1-campaign-snapshot-10ca0"
           ]
         },
         {
           "start": 69145,
-          "end": 73392,
+          "end": 69598,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-campaign-catchup-10e19"
+          ]
+        },
+        {
+          "start": 69598,
+          "end": 69767,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-campaign-losses-10fde"
+          ]
+        },
+        {
+          "start": 69767,
+          "end": 69832,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 69832,
+          "end": 69968,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-campaign-end-110c8"
+          ]
+        },
+        {
+          "start": 69968,
+          "end": 71979,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 71979,
+          "end": 72525,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "horde-camp-11943"
+          ]
+        },
+        {
+          "start": 72525,
+          "end": 72905,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 72905,
+          "end": 73006,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "le1-unit-actions-11cc9"
+          ]
+        },
+        {
+          "start": 73006,
+          "end": 73182,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 73182,
+          "end": 73392,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "fs-14b-square-search-11dde",
+            "le1-unit-actions-11dde"
+          ]
         },
         {
           "start": 73392,
@@ -1902,7 +2574,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "goods-gold-credit"
+            "goods-gold-credit",
+            "items-handlers-gold-cargo"
           ]
         },
         {
@@ -1911,31 +2584,127 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "goods-metal-credit"
+            "goods-metal-credit",
+            "items-handlers-gold-cargo"
           ]
         },
         {
           "start": 73446,
-          "end": 74176,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 74176,
-          "end": 74210,
+          "end": 73471,
           "status": "ported",
           "classification": "code",
           "claims": [
-            "scenario-reveal-map"
+            "items-handlers-gold-cargo"
           ]
         },
         {
-          "start": 74210,
-          "end": 74707,
+          "start": 73471,
+          "end": 73563,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "items-handler-manuscript"
+          ]
+        },
+        {
+          "start": 73563,
+          "end": 73572,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handler-staff"
+          ]
+        },
+        {
+          "start": 73572,
+          "end": 73820,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handlers-curses"
+          ]
+        },
+        {
+          "start": 73820,
+          "end": 73901,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 73901,
+          "end": 73954,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handler-disease"
+          ]
+        },
+        {
+          "start": 73954,
+          "end": 74110,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 74110,
+          "end": 74136,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handler-stone-6"
+          ]
+        },
+        {
+          "start": 74136,
+          "end": 74213,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 74213,
+          "end": 74239,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handler-crystal-14"
+          ]
+        },
+        {
+          "start": 74239,
+          "end": 74326,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 74326,
+          "end": 74518,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handlers-lightnings"
+          ]
+        },
+        {
+          "start": 74518,
+          "end": 74627,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-handler-phantom-jug"
+          ]
+        },
+        {
+          "start": 74627,
+          "end": 74707,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-update-12383"
+          ]
         },
         {
           "start": 74707,
@@ -1948,10 +2717,19 @@
         },
         {
           "start": 74756,
-          "end": 74810,
+          "end": 74758,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 74758,
+          "end": 74810,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "visitor-service-12406"
+          ]
         },
         {
           "start": 74810,
@@ -1959,159 +2737,71 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "goods-credit-dispatch"
+            "goods-credit-dispatch",
+            "items-pickup-1243a"
           ]
         },
         {
           "start": 74917,
-          "end": 101605,
+          "end": 74968,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
         },
         {
-          "start": 101605,
-          "end": 102085,
-          "status": "verified",
-          "classification": "code",
-          "claims": [
-            "menu-cursor-families"
-          ]
-        },
-        {
-          "start": 102085,
-          "end": 102100,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 102100,
-          "end": 102133,
+          "start": 74968,
+          "end": 75005,
           "status": "ported",
           "classification": "code",
           "claims": [
-            "menu-frame-forward"
+            "items-find-124d8"
           ]
         },
         {
-          "start": 102133,
-          "end": 102166,
+          "start": 75005,
+          "end": 75078,
           "status": "ported",
           "classification": "code",
           "claims": [
-            "menu-frame-backward"
+            "items-use-124fd"
           ]
         },
         {
-          "start": 102166,
-          "end": 102499,
+          "start": 75078,
+          "end": 75144,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-drop-12546"
+          ]
+        },
+        {
+          "start": 75144,
+          "end": 75214,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "items-drop-all-12588"
+          ]
+        },
+        {
+          "start": 75214,
+          "end": 76080,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
         },
         {
-          "start": 102499,
-          "end": 102637,
-          "status": "partial",
+          "start": 76080,
+          "end": 76513,
+          "status": "ported",
           "classification": "code",
           "claims": [
-            "menu-loop-frames"
+            "le1-unit-move-12930"
           ]
         },
         {
-          "start": 102637,
-          "end": 102789,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "menu-owl-frames"
-          ]
-        },
-        {
-          "start": 102789,
-          "end": 102971,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "menu-hourglass-tick"
-          ]
-        },
-        {
-          "start": 102971,
-          "end": 103478,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 103478,
-          "end": 103525,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "menu-orb-action"
-          ]
-        },
-        {
-          "start": 103525,
-          "end": 103602,
-          "status": "verified",
-          "classification": "code",
-          "claims": [
-            "menu-large-width-rle"
-          ]
-        },
-        {
-          "start": 103602,
-          "end": 104040,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 104040,
-          "end": 104320,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "save-cabinet-slot-scan"
-          ]
-        },
-        {
-          "start": 104320,
-          "end": 106766,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 106766,
-          "end": 107046,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "save-campaign-area-display"
-          ]
-        },
-        {
-          "start": 107046,
-          "end": 112126,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 112126,
-          "end": 112213,
-          "status": "verified",
-          "classification": "code",
-          "claims": [
-            "save-cabinet-caption"
-          ]
-        },
-        {
-          "start": 112213,
+          "start": 76513,
           "end": 124218,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2128,10 +2818,19 @@
         },
         {
           "start": 124610,
-          "end": 125050,
+          "end": 124906,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 124906,
+          "end": 125050,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-main-loop"
+          ]
         },
         {
           "start": 125050,
@@ -2175,11 +2874,21 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "ai-1eb40"
+            "ai-1eb40",
+            "ai-set-character-1e740"
           ]
         },
         {
           "start": 125800,
+          "end": 125930,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-set-character-1e740"
+          ]
+        },
+        {
+          "start": 125930,
           "end": 125935,
           "status": "unreviewed",
           "classification": "unknown",
@@ -2224,9 +2933,11 @@
         {
           "start": 126200,
           "end": 126246,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-squad-counters"
+          ]
         },
         {
           "start": 126246,
@@ -2249,9 +2960,11 @@
         {
           "start": 126904,
           "end": 126924,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-step-request"
+          ]
         },
         {
           "start": 126924,
@@ -2265,9 +2978,11 @@
         {
           "start": 126969,
           "end": 127096,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "ai-squad-area-helpers"
+          ]
         },
         {
           "start": 127096,
@@ -2911,8 +3626,7 @@
       "sha256": "0bd52ad3622f86939facd203138676d4c7613c9005717ac46a4b66a09dc8ff33",
       "byte_status": {
         "partial": 100,
-        "ported": 2075,
-        "unreviewed": 3228
+        "ported": 5303
       },
       "linear_rows": 1709,
       "flow_candidate_instructions": 416,
@@ -2924,10 +3638,57 @@
       "regions": [
         {
           "start": 0,
+          "end": 82,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-camp-0"
+          ]
+        },
+        {
+          "start": 82,
+          "end": 134,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-switch-52"
+          ]
+        },
+        {
+          "start": 134,
+          "end": 881,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-staffs-stones-ball-disease-manuscripts-86"
+          ]
+        },
+        {
+          "start": 881,
+          "end": 937,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-switch2-371"
+          ]
+        },
+        {
+          "start": 937,
+          "end": 1008,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-exit-3a9"
+          ]
+        },
+        {
+          "start": 1008,
           "end": 1267,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-lightnings-vision-ball-jug-3f0"
+          ]
         },
         {
           "start": 1267,
@@ -2941,9 +3702,11 @@
         {
           "start": 1354,
           "end": 1427,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fx54a-54a"
+          ]
         },
         {
           "start": 1427,
@@ -2965,19 +3728,41 @@
         },
         {
           "start": 1790,
+          "end": 1845,
+          "status": "partial",
+          "classification": "code",
+          "claims": [
+            "strike-spark-effects",
+            "army00-fx6fe-6fe"
+          ]
+        },
+        {
+          "start": 1845,
           "end": 1890,
           "status": "partial",
           "classification": "code",
           "claims": [
-            "strike-spark-effects"
+            "strike-spark-effects",
+            "army00-fx735-735"
           ]
         },
         {
           "start": 1890,
+          "end": 2046,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "cell-hit-762"
+          ]
+        },
+        {
+          "start": 2046,
           "end": 2138,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fx7fe-7fe"
+          ]
         },
         {
           "start": 2138,
@@ -2991,9 +3776,11 @@
         {
           "start": 2266,
           "end": 2438,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fx8da-8da"
+          ]
         },
         {
           "start": 2438,
@@ -3024,10 +3811,21 @@
         },
         {
           "start": 2668,
+          "end": 2740,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fxa6c-a6c"
+          ]
+        },
+        {
+          "start": 2740,
           "end": 2773,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fxab4-ab4"
+          ]
         },
         {
           "start": 2773,
@@ -3035,15 +3833,27 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "frame-loop-2"
+            "frame-loop-2",
+            "army00-fxab4-ab4"
           ]
         },
         {
           "start": 2795,
+          "end": 2914,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fxaeb-aeb"
+          ]
+        },
+        {
+          "start": 2914,
           "end": 2987,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fxb62-b62"
+          ]
         },
         {
           "start": 2987,
@@ -3083,10 +3893,48 @@
         },
         {
           "start": 4049,
+          "end": 4114,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fxfd1-fd1"
+          ]
+        },
+        {
+          "start": 4114,
+          "end": 4275,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fx1012-1012"
+          ]
+        },
+        {
+          "start": 4275,
+          "end": 4357,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fx10b3-10b3"
+          ]
+        },
+        {
+          "start": 4357,
+          "end": 4711,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army00-fx1105-1105"
+          ]
+        },
+        {
+          "start": 4711,
           "end": 4844,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__00-effects-1267"
+          ]
         },
         {
           "start": 4844,
@@ -3094,15 +3942,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "ballista-bolt"
+            "ballista-bolt",
+            "army__00-effects-1267"
           ]
         },
         {
           "start": 5027,
           "end": 5403,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__00-effects-1267"
+          ]
         }
       ]
     },
@@ -3115,7 +3966,8 @@
       "zero_fill_bytes": 0,
       "sha256": "d2554037e3a135ce7c06530cf2ee85e89ae240aa31a00c7c72a9b3cb251c46de",
       "byte_status": {
-        "unreviewed": 4951
+        "ported": 4924,
+        "unreviewed": 27
       },
       "linear_rows": 1625,
       "flow_candidate_instructions": 1129,
@@ -3127,10 +3979,209 @@
       "regions": [
         {
           "start": 0,
-          "end": 4951,
+          "end": 127,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-unit-script-0"
+          ]
+        },
+        {
+          "start": 127,
+          "end": 254,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-unit-script-7f"
+          ]
+        },
+        {
+          "start": 254,
+          "end": 589,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-building-fe"
+          ]
+        },
+        {
+          "start": 589,
+          "end": 852,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-building-24d"
+          ]
+        },
+        {
+          "start": 852,
+          "end": 1005,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-building-354"
+          ]
+        },
+        {
+          "start": 1005,
+          "end": 1264,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-building-3ed"
+          ]
+        },
+        {
+          "start": 1264,
+          "end": 1385,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-unit-script-4f0"
+          ]
+        },
+        {
+          "start": 1385,
+          "end": 1748,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-fenceA-569"
+          ]
+        },
+        {
+          "start": 1748,
+          "end": 1919,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-building-6d4"
+          ]
+        },
+        {
+          "start": 1919,
+          "end": 1946,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 1946,
+          "end": 1952,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-building-79a"
+          ]
+        },
+        {
+          "start": 1952,
+          "end": 2198,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-building-7a0"
+          ]
+        },
+        {
+          "start": 2198,
+          "end": 2438,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-building-896"
+          ]
+        },
+        {
+          "start": 2438,
+          "end": 2679,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-building-986"
+          ]
+        },
+        {
+          "start": 2679,
+          "end": 2895,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-worker-a77"
+          ]
+        },
+        {
+          "start": 2895,
+          "end": 3100,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-worker-b4f"
+          ]
+        },
+        {
+          "start": 3100,
+          "end": 3299,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-worker-c1c"
+          ]
+        },
+        {
+          "start": 3299,
+          "end": 3567,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-building-ce3"
+          ]
+        },
+        {
+          "start": 3567,
+          "end": 3940,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-spawner-def"
+          ]
+        },
+        {
+          "start": 3940,
+          "end": 4049,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-shackled-f64",
+            "army__01-spawner-def"
+          ]
+        },
+        {
+          "start": 4049,
+          "end": 4141,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-spawner-def"
+          ]
+        },
+        {
+          "start": 4141,
+          "end": 4333,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-script-102d"
+          ]
+        },
+        {
+          "start": 4333,
+          "end": 4951,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__01-effects-10ed"
+          ]
         }
       ]
     },
@@ -3143,10 +4194,9 @@
       "zero_fill_bytes": 0,
       "sha256": "71744179572a6958a7691a5c62ceca709e1bce6c4d3303fb407ad03280251b0b",
       "byte_status": {
-        "partial": 609,
-        "ported": 404,
-        "unreviewed": 5389,
-        "verified": 528
+        "partial": 855,
+        "ported": 5557,
+        "unreviewed": 518
       },
       "linear_rows": 2285,
       "flow_candidate_instructions": 1445,
@@ -3158,42 +4208,30 @@
       "regions": [
         {
           "start": 0,
-          "end": 76,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 76,
-          "end": 100,
-          "status": "verified",
-          "classification": "data",
+          "end": 127,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-4c"
+            "army__02-unit-script-0"
           ]
         },
         {
-          "start": 100,
-          "end": 203,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 203,
-          "end": 227,
-          "status": "verified",
-          "classification": "data",
+          "start": 127,
+          "end": 254,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-cb"
+            "army__02-unit-script-7f"
           ]
         },
         {
-          "start": 227,
+          "start": 254,
           "end": 315,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-fe"
+          ]
         },
         {
           "start": 315,
@@ -3201,79 +4239,74 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "castle-visitor-check"
+            "castle-visitor-check",
+            "army__02-building-fe"
           ]
         },
         {
           "start": 343,
-          "end": 383,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 383,
-          "end": 407,
-          "status": "verified",
-          "classification": "data",
-          "claims": [
-            "army02-action-table-17f"
-          ]
-        },
-        {
-          "start": 407,
           "end": 545,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-fe"
+          ]
         },
         {
           "start": 545,
           "end": 593,
           "status": "partial",
-          "classification": "data",
+          "classification": "unknown",
           "claims": [
-            "castle-production-table"
+            "castle-production-table",
+            "army__02-building-fe"
           ]
         },
         {
           "start": 593,
-          "end": 695,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 695,
-          "end": 719,
-          "status": "verified",
-          "classification": "data",
+          "end": 611,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-2b7"
+            "army__02-building-fe"
           ]
         },
         {
-          "start": 719,
+          "start": 611,
           "end": 822,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-263"
+          ]
         },
         {
           "start": 822,
           "end": 846,
           "status": "partial",
-          "classification": "data",
+          "classification": "unknown",
           "claims": [
-            "barracks-production-table"
+            "barracks-production-table",
+            "army__02-building-263"
           ]
         },
         {
           "start": 846,
+          "end": 852,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-263"
+          ]
+        },
+        {
+          "start": 852,
           "end": 867,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-354"
+          ]
         },
         {
           "start": 867,
@@ -3281,31 +4314,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "lumbermill-visitor-validator"
+            "lumbermill-visitor-validator",
+            "army__02-building-354"
           ]
         },
         {
           "start": 899,
-          "end": 932,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 932,
-          "end": 956,
-          "status": "verified",
-          "classification": "data",
-          "claims": [
-            "army02-action-table-3a4"
-          ]
-        },
-        {
-          "start": 956,
           "end": 996,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-354"
+          ]
         },
         {
           "start": 996,
@@ -3313,15 +4333,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "lumbermill-process"
+            "lumbermill-process",
+            "army__02-building-354"
           ]
         },
         {
           "start": 1042,
           "end": 1052,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-354"
+          ]
         },
         {
           "start": 1052,
@@ -3329,31 +4352,27 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "lumbermill-receive"
+            "lumbermill-receive",
+            "army__02-building-354"
           ]
         },
         {
           "start": 1102,
-          "end": 1281,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 1281,
-          "end": 1305,
-          "status": "verified",
-          "classification": "data",
+          "end": 1108,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-501"
+            "army__02-building-354"
           ]
         },
         {
-          "start": 1305,
+          "start": 1108,
           "end": 1316,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-fenceB1-454"
+          ]
         },
         {
           "start": 1316,
@@ -3361,15 +4380,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "mine-event-dispatch"
+            "mine-event-dispatch",
+            "army__02-building-524"
           ]
         },
         {
           "start": 1346,
           "end": 1427,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-524"
+          ]
         },
         {
           "start": 1427,
@@ -3377,15 +4399,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "mine-visitor-check"
+            "mine-visitor-check",
+            "army__02-building-524"
           ]
         },
         {
           "start": 1459,
           "end": 1494,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-524"
+          ]
         },
         {
           "start": 1494,
@@ -3393,47 +4418,27 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "mine-deposit-initialization"
+            "mine-deposit-initialization",
+            "army__02-building-524"
           ]
         },
         {
           "start": 1566,
-          "end": 1578,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 1578,
-          "end": 1602,
-          "status": "verified",
-          "classification": "data",
+          "end": 1697,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-62a"
+            "army__02-building-524"
           ]
         },
         {
-          "start": 1602,
-          "end": 1793,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 1793,
-          "end": 1817,
-          "status": "verified",
-          "classification": "data",
-          "claims": [
-            "army02-action-table-701"
-          ]
-        },
-        {
-          "start": 1817,
+          "start": 1697,
           "end": 1878,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-fenceB2-6a1"
+          ]
         },
         {
           "start": 1878,
@@ -3441,24 +4446,18 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "farm-event-and-counter"
+            "farm-event-and-counter",
+            "army__02-building-756"
           ]
         },
         {
           "start": 1923,
-          "end": 1947,
-          "status": "verified",
-          "classification": "data",
-          "claims": [
-            "army02-action-table-783"
-          ]
-        },
-        {
-          "start": 1947,
           "end": 1949,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-756"
+          ]
         },
         {
           "start": 1949,
@@ -3466,35 +4465,37 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "farm-counter-decrement"
+            "farm-counter-decrement",
+            "army__02-building-756"
           ]
         },
         {
           "start": 1981,
+          "end": 2037,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-building-756"
+          ]
+        },
+        {
+          "start": 2037,
           "end": 2129,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-worker-7f5"
+          ]
         },
         {
           "start": 2129,
-          "end": 2191,
+          "end": 2215,
           "status": "partial",
           "classification": "code",
           "claims": [
             "worker-wrk-grant",
-            "worker-ore-grant"
-          ]
-        },
-        {
-          "start": 2191,
-          "end": 2215,
-          "status": "partial",
-          "classification": "unknown",
-          "claims": [
-            "worker-wrk-grant",
             "worker-ore-grant",
-            "army02-action-table-88f"
+            "army__02-worker-7f5"
           ]
         },
         {
@@ -3503,31 +4504,27 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "worker-wrk-grant"
+            "worker-wrk-grant",
+            "army__02-worker-7f5"
           ]
         },
         {
           "start": 2281,
-          "end": 2405,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 2405,
-          "end": 2429,
-          "status": "verified",
-          "classification": "data",
+          "end": 2302,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-965"
+            "army__02-worker-7f5"
           ]
         },
         {
-          "start": 2429,
+          "start": 2302,
           "end": 2482,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-worker-8fe"
+          ]
         },
         {
           "start": 2482,
@@ -3535,42 +4532,27 @@
           "status": "partial",
           "classification": "code",
           "claims": [
-            "worker-wrk-return"
+            "worker-wrk-return",
+            "army__02-worker-8fe"
           ]
         },
         {
           "start": 2514,
           "end": 2541,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-worker-8fe"
+          ]
         },
         {
           "start": 2541,
-          "end": 2644,
-          "status": "partial",
-          "classification": "code",
-          "claims": [
-            "ore-worker-dispatch"
-          ]
-        },
-        {
-          "start": 2644,
-          "end": 2668,
-          "status": "partial",
-          "classification": "unknown",
-          "claims": [
-            "ore-worker-dispatch",
-            "army02-action-table-a54"
-          ]
-        },
-        {
-          "start": 2668,
           "end": 2715,
           "status": "partial",
           "classification": "code",
           "claims": [
-            "ore-worker-dispatch"
+            "ore-worker-dispatch",
+            "army__02-worker-9ed"
           ]
         },
         {
@@ -3579,207 +4561,161 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "ore-worker-return-empty"
+            "ore-worker-return-empty",
+            "army__02-worker-9ed"
           ]
         },
         {
           "start": 2739,
-          "end": 3174,
+          "end": 2766,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-worker-9ed"
+          ]
+        },
+        {
+          "start": 2766,
+          "end": 3257,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
         },
         {
-          "start": 3174,
-          "end": 3198,
-          "status": "verified",
-          "classification": "data",
+          "start": 3257,
+          "end": 3428,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-c66"
+            "army__02-building-cb9"
           ]
         },
         {
-          "start": 3198,
-          "end": 3331,
+          "start": 3428,
+          "end": 3455,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
         },
         {
-          "start": 3331,
-          "end": 3355,
-          "status": "verified",
-          "classification": "data",
+          "start": 3455,
+          "end": 3461,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-d03"
+            "army__02-building-d7f"
           ]
         },
         {
-          "start": 3355,
-          "end": 3791,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 3791,
-          "end": 3815,
-          "status": "verified",
-          "classification": "data",
+          "start": 3461,
+          "end": 3707,
+          "status": "partial",
+          "classification": "code",
           "claims": [
-            "army02-action-table-ecf"
+            "wrk2-gate-d85",
+            "army__02-building-d85"
           ]
         },
         {
-          "start": 3815,
-          "end": 4171,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 4171,
-          "end": 4195,
-          "status": "verified",
-          "classification": "data",
+          "start": 3707,
+          "end": 3974,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-104b"
+            "army__02-building-e7b"
           ]
         },
         {
-          "start": 4195,
-          "end": 4438,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 4438,
-          "end": 4462,
-          "status": "verified",
-          "classification": "data",
+          "start": 3974,
+          "end": 4152,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-1156"
+            "army02-catapult-f86",
+            "army__02-unit-f86"
           ]
         },
         {
-          "start": 4462,
-          "end": 4608,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 4608,
-          "end": 4632,
-          "status": "verified",
-          "classification": "data",
+          "start": 4152,
+          "end": 4216,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-1200"
+            "army02-catapult-f86"
           ]
         },
         {
-          "start": 4632,
-          "end": 4731,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 4731,
-          "end": 4755,
-          "status": "verified",
-          "classification": "data",
+          "start": 4216,
+          "end": 4337,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-127b"
+            "army__02-unit-1078"
           ]
         },
         {
-          "start": 4755,
-          "end": 4927,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 4927,
-          "end": 4951,
-          "status": "verified",
-          "classification": "data",
+          "start": 4337,
+          "end": 4532,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-133f"
+            "army__02-leader-10f1"
           ]
         },
         {
-          "start": 4951,
-          "end": 5019,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 5019,
-          "end": 5043,
-          "status": "verified",
-          "classification": "data",
+          "start": 4532,
+          "end": 4653,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-139b"
+            "army__02-unit-script-11b4"
           ]
         },
         {
-          "start": 5043,
-          "end": 5183,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 5183,
-          "end": 5207,
-          "status": "verified",
-          "classification": "data",
+          "start": 4653,
+          "end": 4894,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-143f"
+            "army__02-building-122d"
           ]
         },
         {
-          "start": 5207,
-          "end": 5409,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 5409,
-          "end": 5433,
-          "status": "verified",
-          "classification": "data",
+          "start": 4894,
+          "end": 5078,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-1521"
+            "army__02-building-131e"
           ]
         },
         {
-          "start": 5433,
-          "end": 5616,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
-        },
-        {
-          "start": 5616,
-          "end": 5640,
-          "status": "verified",
-          "classification": "data",
+          "start": 5078,
+          "end": 5218,
+          "status": "ported",
+          "classification": "code",
           "claims": [
-            "army02-action-table-15f0"
+            "army__02-fenceB3-13d6"
           ]
         },
         {
-          "start": 5640,
+          "start": 5218,
+          "end": 5454,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army02-ballista-1462",
+            "army__02-unit-1462"
+          ]
+        },
+        {
+          "start": 5454,
           "end": 5661,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-script-154e"
+          ]
         },
         {
           "start": 5661,
@@ -3787,15 +4723,18 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "unit-corpse"
+            "unit-corpse",
+            "army__02-script-161d"
           ]
         },
         {
           "start": 5853,
           "end": 6930,
-          "status": "unreviewed",
-          "classification": "unknown",
-          "claims": []
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__02-effects-16dd"
+          ]
         }
       ]
     },
@@ -3808,7 +4747,8 @@
       "zero_fill_bytes": 0,
       "sha256": "58154228904466ade158cf7419b61fa5bbc39a32d84c7241fd8f549c23cb5f27",
       "byte_status": {
-        "unreviewed": 13412
+        "ported": 12832,
+        "unreviewed": 580
       },
       "linear_rows": 4067,
       "flow_candidate_instructions": 3445,
@@ -3820,10 +4760,659 @@
       "regions": [
         {
           "start": 0,
-          "end": 13412,
+          "end": 97,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-mage0-0"
+          ]
+        },
+        {
+          "start": 97,
+          "end": 121,
           "status": "unreviewed",
           "classification": "unknown",
           "claims": []
+        },
+        {
+          "start": 121,
+          "end": 198,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__03-rest-79"
+          ]
+        },
+        {
+          "start": 198,
+          "end": 228,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 228,
+          "end": 393,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-jug-e4"
+          ]
+        },
+        {
+          "start": 393,
+          "end": 530,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-rockfall-189"
+          ]
+        },
+        {
+          "start": 530,
+          "end": 697,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-phantom-212"
+          ]
+        },
+        {
+          "start": 697,
+          "end": 1016,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-face-2b9"
+          ]
+        },
+        {
+          "start": 1016,
+          "end": 1314,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-wall-3f8"
+          ]
+        },
+        {
+          "start": 1314,
+          "end": 1572,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-head-522"
+          ]
+        },
+        {
+          "start": 1572,
+          "end": 1722,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-tree-624"
+          ]
+        },
+        {
+          "start": 1722,
+          "end": 1773,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-raven-6ba"
+          ]
+        },
+        {
+          "start": 1773,
+          "end": 1818,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 1818,
+          "end": 2032,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-chest-71a"
+          ]
+        },
+        {
+          "start": 2032,
+          "end": 2284,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "pit-trap-wrk-7f0"
+          ]
+        },
+        {
+          "start": 2284,
+          "end": 3353,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-rufin-8ec"
+          ]
+        },
+        {
+          "start": 3353,
+          "end": 3389,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 3389,
+          "end": 3495,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-mage-cloak"
+          ]
+        },
+        {
+          "start": 3495,
+          "end": 3519,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 3519,
+          "end": 4605,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-onis-dbf"
+          ]
+        },
+        {
+          "start": 4605,
+          "end": 4629,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 4629,
+          "end": 4735,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-1215"
+          ]
+        },
+        {
+          "start": 4735,
+          "end": 4759,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 4759,
+          "end": 5686,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-irvil-1297"
+          ]
+        },
+        {
+          "start": 5686,
+          "end": 5702,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 5702,
+          "end": 5808,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-1646"
+          ]
+        },
+        {
+          "start": 5808,
+          "end": 5832,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 5832,
+          "end": 6664,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-miron-16c8"
+          ]
+        },
+        {
+          "start": 6664,
+          "end": 6688,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 6688,
+          "end": 6742,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-1a20"
+          ]
+        },
+        {
+          "start": 6742,
+          "end": 6766,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 6766,
+          "end": 7384,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-magus-1a6e"
+          ]
+        },
+        {
+          "start": 7384,
+          "end": 7408,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 7408,
+          "end": 7514,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-1cf0"
+          ]
+        },
+        {
+          "start": 7514,
+          "end": 7538,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 7538,
+          "end": 7891,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-kevin-1d72"
+          ]
+        },
+        {
+          "start": 7891,
+          "end": 7915,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 7915,
+          "end": 7969,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-1eeb"
+          ]
+        },
+        {
+          "start": 7969,
+          "end": 7993,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 7993,
+          "end": 8311,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-garik-1f39"
+          ]
+        },
+        {
+          "start": 8311,
+          "end": 8335,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 8335,
+          "end": 8441,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-208f"
+          ]
+        },
+        {
+          "start": 8441,
+          "end": 8465,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 8465,
+          "end": 9267,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-efil-2111"
+          ]
+        },
+        {
+          "start": 9267,
+          "end": 9291,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 9291,
+          "end": 9345,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-244b"
+          ]
+        },
+        {
+          "start": 9345,
+          "end": 9369,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 9369,
+          "end": 9846,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-kochet-2499"
+          ]
+        },
+        {
+          "start": 9846,
+          "end": 9870,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 9870,
+          "end": 9976,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-cloak-hermits-268e"
+          ]
+        },
+        {
+          "start": 9976,
+          "end": 10000,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 10000,
+          "end": 10138,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-manuscripts-2710"
+          ]
+        },
+        {
+          "start": 10138,
+          "end": 10737,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-dragon-279a"
+          ]
+        },
+        {
+          "start": 10737,
+          "end": 10859,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-generator-29f1"
+          ]
+        },
+        {
+          "start": 10859,
+          "end": 11107,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-chest-2a6b"
+          ]
+        },
+        {
+          "start": 11107,
+          "end": 11175,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__03-rest-2b63"
+          ]
+        },
+        {
+          "start": 11175,
+          "end": 11260,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-phantom32-2ba7"
+          ]
+        },
+        {
+          "start": 11260,
+          "end": 11293,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 11293,
+          "end": 11361,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-phantom32idle-2c1d"
+          ]
+        },
+        {
+          "start": 11361,
+          "end": 11373,
+          "status": "unreviewed",
+          "classification": "unknown",
+          "claims": []
+        },
+        {
+          "start": 11373,
+          "end": 11528,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-jugphantom-2c6d"
+          ]
+        },
+        {
+          "start": 11528,
+          "end": 11602,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-talking-2d08"
+          ]
+        },
+        {
+          "start": 11602,
+          "end": 11801,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-faceb-2d52"
+          ]
+        },
+        {
+          "start": 11801,
+          "end": 11852,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-rockfallq-2e19"
+          ]
+        },
+        {
+          "start": 11852,
+          "end": 12110,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-mage-spell-flash"
+          ]
+        },
+        {
+          "start": 12110,
+          "end": 12149,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m2f4e-2f4e"
+          ]
+        },
+        {
+          "start": 12149,
+          "end": 12299,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-mblast-2f75"
+          ]
+        },
+        {
+          "start": 12299,
+          "end": 12448,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-mspray-300b"
+          ]
+        },
+        {
+          "start": 12448,
+          "end": 12497,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m30a0-30a0"
+          ]
+        },
+        {
+          "start": 12497,
+          "end": 12568,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "wrk3-mage-spell-blast"
+          ]
+        },
+        {
+          "start": 12568,
+          "end": 12700,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-mspray2-3118"
+          ]
+        },
+        {
+          "start": 12700,
+          "end": 12775,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-mclear-319c"
+          ]
+        },
+        {
+          "start": 12775,
+          "end": 12876,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m31e7-31e7"
+          ]
+        },
+        {
+          "start": 12876,
+          "end": 13114,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army__03-rest-324c"
+          ]
+        },
+        {
+          "start": 13114,
+          "end": 13166,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m333a-333a"
+          ]
+        },
+        {
+          "start": 13166,
+          "end": 13280,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m336e-336e"
+          ]
+        },
+        {
+          "start": 13280,
+          "end": 13327,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m33e0-33e0"
+          ]
+        },
+        {
+          "start": 13327,
+          "end": 13412,
+          "status": "ported",
+          "classification": "code",
+          "claims": [
+            "army03-m340f-340f"
+          ]
         }
       ]
     },
