@@ -3475,6 +3475,85 @@ public static class OriginalUnitActions
         EndTool(w, g);
     }
 
+    /// <summary>64AD: builds the five widgets (EDI = the panel widget, +1A = the sum of the bytes +22..+26 of the selected object [1969] plus 0Dh): for every slot ECX = 5..1 whose byte +21+ECX is not FFh the record 23Dh is queued (DF7E; EDI = the new record in L3, which is filled further: army +14, picture +15 from the template, slot 10h + ECX in +2, the price position [1F31] in +4, which falls by 0Fh); the slot 1 also gets the handler 6562, two more records (25Bh, 279h; +12 from the template; +15 = template +45) and 6423 for the last one.</summary>
+    public static void F64AD(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; var panel = w.ObjectAt(g.Edi); g.Esi = U32(d, 0x1969); var sel = w.ObjectAt(g.Esi); g.Ecx = 5; g.Al = 0xd;
+        do { g.Al = Add8(g, g.Al, sel[g.Ecx + 0x21]); g.Ecx--; } while (g.Ecx != 0);
+        panel[0x1a] = g.Al; Put(d, 0x1f31, 0x220); g.Ecx = 5;
+        for (; ; )
+        {
+            g.Cmp(sel[g.Ecx + 0x21], 0xff, 8);
+            if (!g.Zf)
+            {
+                uint ecx = g.Ecx, esi = g.Esi; g.Esi = 0x23d; g.Al = 1; FDF7E(w, g); g.Esi = esi; g.Ecx = ecx;
+                int e = (int)g.Edi;
+                g.Ah = sel[0]; l[e + 0x14] = g.Ah; g.Al = sel[g.Ecx + 0x21]; uint edi = g.Edi; F68A0(w, g); g.Edx = g.Edi; g.Edi = edi;
+                var t = w.ObjectAt(g.Edx); g.Eax = (g.Eax & 0xffff0000) | U16(t, 5); l[e + 0x15] = (byte)g.Eax; l[e + 0x16] = (byte)(g.Eax >> 8);
+                g.Al = 0x10; g.Al = Add8(g, g.Al, g.Cl); l[e + 2] = g.Al; g.Eax = U32(d, 0x1f31); Put(l, e + 4, g.Eax);
+                g.Cmp(g.Ecx, 1, 32);
+                if (g.Zf)
+                {
+                    ecx = g.Ecx; Put(l, e + 0xc, 0x6562); uint edx = g.Edx; g.Esi = 0x25b; g.Al = 1; FDF7E(w, g);
+                    e = (int)g.Edi; g.Edx = edx; g.Eax = g.Edx + 7; g.Eax += U32(t, 7); Put(l, e + 0x12, g.Eax);
+                    g.Esi = 0x279; g.Al = 1; FDF7E(w, g); e = (int)g.Edi; g.Edx = edx; g.Al = t[0x45]; l[e + 0x15] = g.Al;
+                    g.Esi = g.Edi; var rec = new byte[0x30]; Array.Copy(l, e, rec, 0, 0x30); F6423(w, g, rec); Array.Copy(rec, 0, l, e, 0x30); g.Ecx = ecx;
+                }
+            }
+            uint old = U32(d, 0x1f31); Put(d, 0x1f31, old - 0xf); bool cf = old < 0xf;
+            g.Ecx--; g.Zf = g.Ecx == 0; g.Sf = (g.Ecx & 0x80000000) != 0; g.Of = false; g.Cf = cf;
+            if (g.Zf) return;
+        }
+    }
+
+    /// <summary>6562: the handler: a selected object whose +F is not 1 and for which E5AB (C04h) answers zero loses its order table (+22 = FFFFFFFFh, +26 = FFh).</summary>
+    public static void F6562(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Eax = U32(d, 0x1969); var o = w.ObjectAt(g.Eax); g.Cmp(o[0xf], 1, 8); if (g.Zf) return;
+        g.Eax = 0xc04; w.Call(0xe5ab, g); if (!g.Zf) return;
+        g.Eax = U32(d, 0x1969); o = w.ObjectAt(g.Eax); Put(o, 0x22, 0xffffffff); o[0x26] = 0xff;
+    }
+
+    /// <summary>658A: when the sum of the bytes +22..+26 of the selected object plus 0Dh differs from +1A of the widget ESI: E02A (AL = +1, EBX = 1710h), the rectangle of the picture [1922] + 2520h is redrawn (1DF08) and the message 216h (DEE4).</summary>
+    public static void F658A(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Edi = U32(d, 0x1969); var sel = w.ObjectAt(g.Edi); g.Ecx = 5; g.Al = 0xd;
+        do { g.Al = Add8(g, g.Al, sel[g.Ecx + 0x21]); g.Ecx--; } while (g.Ecx != 0);
+        g.Cmp(r[0x1a], g.Al, 8); if (g.Zf) return;
+        g.Al = r[1]; g.Ebx = 0x1710; w.Call(0xe02a, g);
+        g.Esi = U32(d, 0x1922); g.Add(g.Esi, 0x2520); g.Esi += 0x2520; g.Eax = 0x1e0; g.Ebx = 0xe2; g.Ecx = 0x90; g.Edx = 0x52; w.Call(0x1df08, g);
+        g.Esi = 0x216; w.Call(0xdee4, g);
+    }
+
+    /// <summary>65DF: the widget ESI follows the object +18 (a pool offset): a living object of the player +2 gives the position (-[190E] - 17h, -[1912] - 3Ch), the frame +1C counts to 0Ah with the flag 1 of [19E7], the picture +15 = E7h + 5 * ((([1C96] + 8) &amp; 0Eh)) + frame; with the tool L3[2] = 0 and E5AB (C02h) answering zero for the player +1D the widget selects its group (+2 to [1C87], 6ACD); with another tool the widget asks the pictures +10 = +11 = 8. A dead or foreign object is looked up again (BA60 with the position; when it is found, the pool offset is stored in +18; otherwise DFE5 with 2Dh, and [4C] decrements).</summary>
+    public static void F65DF(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Edi = U32(r, 0x18); g.Add(g.Edi, w.PoolBase); g.Edi += w.PoolBase; var o = w.ObjectAt(g.Edi);
+        g.Cmp(o[0x19], 0, 8);
+        if (!g.Jle)
+        {
+            g.Al = o[0x1b]; g.Cmp(g.Al, r[2], 8);
+            if (g.Zf)
+            {
+                g.Eax = U32(o, 4); g.Eax -= U32(d, 0x190e); g.Eax -= 0x17; Put(r, 4, g.Eax);
+                g.Eax = U32(o, 8); g.Eax -= U32(d, 0x1912); g.Eax -= 0x3c; Put(r, 8, g.Eax);
+                g.Test(d[0x19e7], 1, 8);
+                if (!g.Zf) { r[0x1c] = Inc8(g, r[0x1c]); g.Cmp(r[0x1c], 0xa, 8); if (g.Cf) { } else r[0x1c] = 0; }
+                g.Eax = d[0x1c96]; g.Al = Add8(g, g.Al, 8); g.Al &= 0xe; g.Eax = g.Eax + g.Eax * 4; g.Al = Add8(g, g.Al, r[0x1c]); g.Add(g.Eax, 0xe7); g.Eax += 0xe7;
+                r[0x15] = (byte)g.Eax; r[0x16] = (byte)(g.Eax >> 8);
+                g.Cmp(w.L3[2], 0, 8);
+                if (!g.Zf) { r[0x10] = 8; r[0x11] = 8; return; }
+                w.Call(0xe5f6, g); g.Eax = 0xc02; w.Call(0xe5ab, g); if (!g.Zf) return;
+                g.Al = r[0x1d]; g.Cmp(d[0x1972], g.Al, 8); if (!g.Zf) return;
+                g.Al = r[2]; d[0x1c87] = g.Al; w.Call(0x6acd, g); return;
+            }
+        }
+        g.Ecx = U32(o, 4); g.Edx = U32(o, 8); g.Bl = r[2]; g.Al = r[0x1d]; uint esi = g.Esi; w.Call(0xba60, g); g.Esi = esi;
+        g.Cmp(g.Eax, 1, 32);
+        if (!(g.Cf || g.Zf)) { g.Edi -= w.PoolBase; Put(r, 0x18, g.Edi); return; }
+        g.Al = 0x2d; g.Ah = r[2]; w.Call(0xdfe5, g); d[0x4c] = Dec8(g, d[0x4c]);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
