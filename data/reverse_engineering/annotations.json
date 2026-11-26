@@ -8224,6 +8224,63 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "674F, 6C66, B9EB, 5787, 66E9, 6EB2 and 4938 are recorded stubs; 7012, 66DF and DF2A run as the ported code"
+    },
+    {
+      "id": "le1-panel-close-5cc2",
+      "module": "LE:1",
+      "start": 23746,
+      "end": 23769,
+      "name": "Close panel: 674F, drop queue entries 2Ch, effect 2 (5CC2)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "674F and 1416B are recorded stubs; DF2A and A4A9 run as the ported code"
+    },
+    {
+      "id": "le1-cmd-check-5da5",
+      "module": "LE:1",
+      "start": 23973,
+      "end": 24054,
+      "name": "Command validity check, otherwise reset order table (5DA5)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5E6, E070, F791 and 4938 are recorded stubs"
+    },
+    {
+      "id": "le1-group-fail-5df6",
+      "module": "LE:1",
+      "start": 24054,
+      "end": 24092,
+      "name": "Group order failure: 20232, 672F, drop queue entries 32h (5DF6)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "20232 and 672F are recorded stubs; DF2A runs as the ported code"
     }
   ]
 }

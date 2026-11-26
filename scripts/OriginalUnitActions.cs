@@ -3137,6 +3137,38 @@ public static class OriginalUnitActions
     private static void Rebuild(IUnitActionWorld w, ActionRegs g) { g.Edi = g.Esi; w.Call(0x5787, g); w.Call(0x66e9, g); }
     private static void Clear5B55(IUnitActionWorld w, ActionRegs g) { w.Call(0x66e9, g); w.Call(0x674f, g); w.Call(0x6eb2, g); w.Call(0x4938, g); g.Al = 0x2b; FDF2A(w, g); }
 
+    /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
+    public static void F5CC2(IUnitActionWorld w, ActionRegs g)
+    {
+        w.Call(0x674f, g); g.Al = 0x2c; FDF2A(w, g); g.Eax = 2; FA4A9(w, g);
+    }
+
+    /// <summary>5DA5: the check before a command on the selected object: neither the key 1 nor the flag 2 of [193A] and a health above the template's +46 keep the panel (RET); else E5E6, E070 with 2Dh, F791, the cache DS:33C.. is invalidated and 4938.</summary>
+    public static void F5DA5(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(U16(d, 0x1c35), 1, 16);
+        if (!g.Zf)
+        {
+            g.Test(U32(d, 0x193a), 2, 32);
+            if (g.Zf)
+            {
+                g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); F6885(w, g, o); var t = w.ObjectAt(g.Edi); g.Al = t[0x46]; g.Cmp(o[0x19], g.Al, 8);
+                if (!(g.Zf || (g.Sf != g.Of))) return;
+            }
+        }
+        w.Call(0xe5e6, g); g.Al = 0x2d; w.Call(0xe070, g); w.Call(0xf791, g);
+        g.Eax = 0xffffffff; g.Edi = 0x33c; g.Ecx = 0xc4; for (int k = 0; k < 0xc4; k++) Put(d, 0x33c + 4 * k, 0xffffffff); g.Edi += 0x310; g.Ecx = 0;
+        w.Call(0x4938, g);
+    }
+
+    /// <summary>5DF6: the group of the settlement answers 20232; when it fails the panel is cleared (672F, DF2A with 32h).</summary>
+    public static void F5DF6(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Edi = U32(d, 0xed20); g.Add(g.Edi, 0x9df); g.Edi += 0x9df; g.Bl = d[0x1c87]; w.Call(0x20232, g);
+        if (!g.Zf) return;
+        w.Call(0x672f, g); g.Al = 0x32; FDF2A(w, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
