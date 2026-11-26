@@ -2862,6 +2862,94 @@ public static class OriginalUnitActions
         g.Esi = U32(d, 0x1969); var sel = w.ObjectAt(g.Esi); Put(sel, 0x1c, g.Ecx); sel[0x14] &= 7; sel[0x14] |= g.Ah; g.Logic(sel[0x14], 8); w.Call(0x4938, g);
     }
 
+    /// <summary>4FCE: starts the area tool (a spell of the selected object): the template +22 of the army of the object [1969] is remembered ([284D], [284E], its record [2849]), the rectangle [4F0] is cleared, AE57, the tool state 3.</summary>
+    public static void F4FCE(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); g.Al = o[0x22]; g.Ah = o[0]; d[0x284d] = g.Al; d[0x284e] = g.Ah;
+        F68A0(w, g); Put(d, 0x2849, g.Edi); Put(d, 0x4f0, 0); w.Call(0xae57, g); w.L3[2] = 3; w.L3[0x12] = 0;
+    }
+
+    /// <summary>500D: the area tool: the cursor 2C0023h (400037h when [27F4] allows), the left button (flag 8) drags the rectangle [4F0]/[4F4] .. [4F8]/[4FC] (a template with flag 80h only once started) and with effect 6 stores it as words at +29..+2F of the selected object with the order [19C0]; then 4938.</summary>
+    public static void F500D(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Test(l[4], 1, 8);
+        if (!g.Zf)
+        {
+            SetCursor(d, 0x2c0023); g.Cmp(d[0x27f4], 0, 8);
+            if (!g.Zf)
+            {
+                SetCursor(d, 0x400037); g.Test(l[4], 8, 8);
+                if (!g.Zf)
+                {
+                    g.Cmp(U32(d, 0x4f0), 0, 32);
+                    bool go = !g.Zf;
+                    if (!go)
+                    {
+                        g.Eax = U32(d, 0x4f8); Put(d, 0x4f0, g.Eax); g.Eax = U32(d, 0x4fc); Put(d, 0x4f4, g.Eax);
+                        g.Edi = U32(d, 0x2849); g.Test(U32(w.ObjectAt(g.Edi), 0x40), 0x80, 32); go = g.Zf;
+                    }
+                    if (go)
+                    {
+                        g.Eax = 6; FA4A9(w, g); g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi);
+                        g.Eax = U32(d, 0x4f0); PutW(o, 0x29, (ushort)g.Eax); g.Eax = U32(d, 0x4f4); PutW(o, 0x2b, (ushort)g.Eax); g.Eax = U32(d, 0x4f8); PutW(o, 0x2d, (ushort)g.Eax); g.Eax = U32(d, 0x4fc); PutW(o, 0x2f, (ushort)g.Eax);
+                        g.Al = d[0x19c0]; o[0x14] &= 7; o[0x14] |= g.Al; g.Logic(o[0x14], 8); w.Call(0x4938, g); return;
+                    }
+                }
+            }
+        }
+        EndTool(w, g);
+    }
+
+    /// <summary>50E5: the tool state 4.</summary>
+    public static void F50E5(IUnitActionWorld w, ActionRegs g) { w.L3[2] = 4; w.L3[0x12] = 0; }
+
+    /// <summary>50F4: the tool «go and do» (cursor 9B0094h): the left button over the map: effect 4, the point [1955]/[1959] as +32/+33 of the selected object with the order [19C0] (a group: 20232, 1F62B); then 4938.</summary>
+    public static void F50F4(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Test(l[4], 1, 8);
+        if (!g.Zf)
+        {
+            SetCursor(d, 0x9b0094); g.Test(l[4], 8, 8);
+            if (!g.Zf)
+            {
+                g.Eax = 7; g.Eax = 4; FA4A9(w, g);
+                g.Ecx = g.Shr(U32(d, 0x1955), 5, 32); g.Eax = g.Shr(U32(d, 0x1959), 5, 32); g.Ch = g.Al; g.Ah = d[0x19c0];
+                g.Cmp(d[0x1c89], 0, 8);
+                if (g.Zf) { g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); o[0x32] = g.Cl; o[0x33] = g.Ch; o[0x14] &= 7; o[0x14] |= g.Ah; g.Logic(o[0x14], 8); w.Call(0x4938, g); return; }
+                uint pushed = g.Ecx; g.Edi = U32(d, 0xed20); g.Add(g.Edi, 0x9df); g.Edi += 0x9df; g.Bl = d[0x1c87]; w.Call(0x20232, g); g.Ecx = pushed;
+                if (!g.Zf) w.Call(0x1f62b, g);
+                w.Call(0x4938, g); return;
+            }
+        }
+        EndTool(w, g);
+    }
+
+    /// <summary>520B: the second point of the area tool (state 5): the point [4F8]/[4FC] (cells) as +32/+33 of the selected object with the order [19C0]; the cursors 400037h / 2C0023h by [27F4]; then 4938.</summary>
+    public static void F520B(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Test(l[4], 1, 8);
+        if (!g.Zf)
+        {
+            SetCursor(d, 0x400037); g.Cmp(d[0x27f4], 0, 8);
+            if (!g.Zf)
+            {
+                SetCursor(d, 0x2c0023); g.Test(l[4], 8, 8);
+                if (!g.Zf)
+                {
+                    g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); g.Eax = g.Shr(U32(d, 0x4f8), 5, 32); o[0x32] = g.Al; g.Eax = g.Shr(U32(d, 0x4fc), 5, 32); o[0x33] = g.Al;
+                    g.Al = d[0x19c0]; o[0x14] &= 7; o[0x14] |= g.Al; g.Logic(o[0x14], 8); w.Call(0x4938, g); return;
+                }
+            }
+        }
+        EndTool(w, g);
+    }
+
+    /// <summary>5297: the tool state 6.</summary>
+    public static void F5297(IUnitActionWorld w, ActionRegs g) { w.L3[2] = 6; w.L3[0x12] = 0; }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
