@@ -2668,6 +2668,52 @@ public static class OriginalUnitActions
         d[0x1a1b] = 0;
     }
 
+    /// <summary>4965: the pointer over the map in the play mode: a pending group command [1C86] = 2 goes to 4B12; the cursor frames by the kind L3[0D] (400037h / 54004Bh / 4A0041h) while L3[3] counts out; the keys [1C35] = 39h (centre the view on the object [1974], A320) and 1Ch (200B5, B616 for the
+    /// selected record, then 4B79); the button states L3[4] = 11h or 5 go to 4C46, 3 starts a drag [1C86] = 1 with the corner [1955]/[1959] (a moved corner goes to 4B03); otherwise the object under the pointer L3[5] becomes the selected object [1969] (6A73, the effect 4 of A4A9).</summary>
+    public static void F4965(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Cmp(d[0x1c86], 2, 8); if (g.Zf) { w.Call(0x4b12, g); return; }
+        g.Cmp(U16(l, 0), 0x28, 16); if (g.Zf) PutW(l, 0, 0);
+        l[3] = Dec8(g, l[3]);
+        if (!g.Sf) goto after;
+        l[3] = Inc8(g, l[3]); g.Esi = U32(l, 5); g.Test(g.Esi, g.Esi, 32); if (g.Zf) goto after;
+        g.Al = l[0xd]; g.Test(g.Al, 4, 8); if (!g.Zf) goto after;
+        g.Al &= 3; g.Logic(g.Al, 8); SetCursor(d, 0x400037); g.Al = Dec8(g, g.Al); if (g.Zf) goto after;
+        SetCursor(d, 0x54004b); g.Al = Dec8(g, g.Al); if (g.Zf) goto after;
+        SetCursor(d, 0x4a0041);
+    after:
+        g.Cmp(l[0], 0, 8); if (!g.Zf) goto pointer;
+        g.Cmp(U16(d, 0x1c35), 0x39, 16);
+        if (g.Zf)
+        {
+            g.Esi = U32(d, 0x1974); g.Test(g.Esi, g.Esi, 32); if (g.Zf) goto pointer;
+            g.Cmp(g.Esi, U32(d, 0x1969), 32); if (g.Zf) goto pointer;
+            var o = w.ObjectAt(g.Esi); g.Eax = g.Shr(U32(o, 4), 5, 32); g.Ebx = g.Shr(U32(o, 8), 5, 32); FA320(w, g); g.Eax = U32(d, 0x1974); goto select;
+        }
+        g.Cmp(U16(d, 0x1c35), 0x1c, 16); if (!g.Zf) goto pointer;
+        w.Call(0x200b5, g); if (!g.Zf) return;
+        d[0x1c88] = g.Ah; Put(d, 0xf0b7, g.Edi); g.Cl = d[0x1906]; g.Ch = d[0x190a]; g.Edx = g.Ecx + 0xd0d; var rec = w.ObjectAt(g.Edi); g.Bl = rec[1]; g.Al = rec[0];
+        w.Call(0xb616, g); w.Call(0x4b79, g); return;
+    pointer:
+        g.Cmp(l[4], 0x11, 8); if (g.Zf) { w.Call(0x4c46, g); return; }
+        g.Cmp(l[4], 5, 8); if (g.Zf) { w.Call(0x4c46, g); return; }
+        g.Cmp(l[4], 3, 8);
+        if (g.Zf)
+        {
+            g.Eax = U32(d, 0x1955); g.Ebx = U32(d, 0x1959); g.Cmp(d[0x1c86], 0, 8);
+            if (g.Zf) { Put(d, 0x1c7e, g.Eax); Put(d, 0x1c82, g.Ebx); d[0x1c86] = 1; return; }
+            g.Cmp(U32(d, 0x1c7e), g.Eax, 32); if (!g.Zf) { w.Call(0x4b03, g); return; }
+            g.Cmp(U32(d, 0x1c82), g.Ebx, 32); if (!g.Zf) { w.Call(0x4b03, g); return; }
+        }
+        g.Eax = 0; g.Logic(0, 32); d[0x1c86] = g.Al; g.Cmp(U32(l, 5), g.Eax, 32); if (g.Zf) return;
+        g.Test(l[4], 8, 8); if (g.Zf) return;
+        g.Test(l[0xd], 4, 8); if (!g.Zf) return;
+        g.Eax = U32(l, 5);
+    select:
+        Put(d, 0x1969, g.Eax); w.Call(0x6a73, g); g.Eax = 4; FA4A9(w, g);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

@@ -7749,6 +7749,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": ""
+    },
+    {
+      "id": "le1-play-hover-4965",
+      "module": "LE:1",
+      "start": 18789,
+      "end": 19203,
+      "name": "Pointer over the map in play mode: cursor, centre key, selection drag, select the object (4965)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "4B12, 200B5, B616, 4B79, 4C46, 4B03 and 6A73 are recorded stubs (tail jumps and calls out of the range); A320 and A4A9 run as the ported code"
     }
   ]
 }
