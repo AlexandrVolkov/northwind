@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "annotation_sha256": "eb71c8a390921cf6d6df5669be83b1d375c451255ee8d257e518cb09bf175d1c",
+  "annotation_sha256": "7a21dc63225a2ad3953531843b4e4d7bcb730b3df118ea06ca7cc8d52bd194ef",
   "source_sha256": {
     "NORWIND.EXE": "eb52f043143d763f5a595ae2175249976f278d1eebf0336ae032caf7bfa0c3a8",
     "ARMY__00.DAT": "440f343f73ca406f4abc5e986a8b5e7dd2cfbc3e7e04bbad4250eaeb112aa385",
@@ -106,7 +106,8 @@
           "status": "ported",
           "classification": "code",
           "claims": [
-            "cursor-animation-step"
+            "cursor-animation-step",
+            "le1-cursor-frame-3db5"
           ]
         },
         {

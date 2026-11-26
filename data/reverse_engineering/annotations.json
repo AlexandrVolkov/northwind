@@ -9649,6 +9649,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "3EEA is a recorded stub; the map word of a cell is taken as the cell index (the check maps tile = cell); the planes and the picture are the flat test regions"
+    },
+    {
+      "id": "le1-cursor-frame-3db5",
+      "module": "LE:1",
+      "start": 15797,
+      "end": 15858,
+      "name": "Frame of the cursor animation (3DB5)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the upper bound jbe boundary is not distinguished by the check"
     }
   ]
 }
