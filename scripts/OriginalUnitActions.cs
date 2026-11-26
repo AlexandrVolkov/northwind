@@ -4309,6 +4309,46 @@ public static class OriginalUnitActions
         do { w.Poke(g.Edi, g.Al); g.Edi++; g.Cl = Dec8(g, g.Cl); } while (!g.Zf);
     }
 
+    /// <summary>A1D1: the minimap: with [1C4E] and [1C60] set, 3EEA gives the cell of the picture [68E] (EAX, EBX); every map cell (the map [18DE] x [18E2]) is drawn as one byte: hidden from the owner [1972] (bit of the byte of the table [18DA]) - 0; else an object of the planes 2 / 1 (the owner +3 equal to [1971] keeps the tile colour, else the byte DS:1C50 + owner & 0Fh); else the tile colour (the table [18FA] + tile). Then a frame of 1010101h is drawn around the view [1906], [190A]. The map word of a cell is its tile (the check maps tile = cell index).</summary>
+    public static void FA1D1(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(d[0x1c4e], 0, 8); if (g.Zf) return; g.Cmp(d[0x1c60], 0, 8); if (g.Zf) return;
+        g.Ebx = U32(d, 0x1c5c); g.Eax = U32(d, 0x1c58); g.Edx = U32(d, 0x18e2); g.Ecx = U32(d, 0x18de); w.Call(0x3eea, g);
+        uint x = g.Eax, y = g.Ebx; g.Edi = y << 9; g.Ebx = y << 7; g.Edi += g.Ebx; g.Edi += x; g.Edi += U32(d, 0x68e);
+        g.Eax = 0x280 - g.Ecx; Put(d, 0x1f31, g.Eax); g.Cl = d[0x1972]; g.Al = 1; g.Al = (byte)(g.Cl >= 8 ? 0 : g.Al << g.Cl); d[0x1f41] = g.Al;
+        g.Eax = U32(d, 0x18de); Mul8(g, g.Al, d[0x18e2]); g.Edx = (g.Eax & 0xffff) * 4 + (g.Eax & 0xffff0000) * 4;
+        g.Ebx = w.PlanePointer(0); g.Ebp = U32(d, 0x18da); g.Esi = U32(d, 0x18ee); uint mapBase = g.Esi; g.Ch = d[0x18e2]; g.Cl = d[0x18de];
+        do
+        {
+            do
+            {
+                g.Al = w.Peek(g.Ebp); g.Test(d[0x1f41], g.Al, 8);
+                if (!g.Zf) { g.Al = 0; goto store; }
+                g.Eax = w.PlaneRead(g.Ebx + g.Edx * 2); g.Test(g.Eax, g.Eax, 32);
+                if (!g.Zf) goto obj;
+                g.Eax = w.PlaneRead(g.Ebx + g.Edx); g.Test(g.Eax, g.Eax, 32);
+                if (!g.Zf) goto obj;
+                goto drawTile;
+            obj:
+                g.Eax += w.PoolBase; g.Al = w.ObjectAt(g.Eax)[3]; g.Cmp(g.Al, d[0x1971], 8);
+                if (g.Zf) goto drawTile;
+                g.Eax &= 0xf; g.Al = d[0x1c50 + (int)g.Eax]; goto store;
+            drawTile:
+                g.Eax = (g.Esi - mapBase) / 4 & 0xffff; g.Add(g.Eax, U32(d, 0x18fa)); g.Eax += U32(d, 0x18fa); g.Al = w.Peek(g.Eax);
+            store:
+                w.Poke(g.Edi, g.Al); g.Ebp++; g.Ebx += 4; g.Esi += 4; g.Edi++; g.Cl = Dec8(g, g.Cl);
+            } while (!g.Zf);
+            g.Edi += U32(d, 0x1f31); g.Ch = Dec8(g, g.Ch);
+            g.Cl = d[0x18de];
+        } while (!g.Zf);
+        g.Ebx = y; g.Eax = x; g.Eax += U32(d, 0x1906); g.Ebx += U32(d, 0x190a);
+        g.Edi = g.Ebx << 9; g.Ebx <<= 7; g.Edi += g.Ebx; g.Edi += g.Eax; g.Edi += U32(d, 0x68e); g.Eax = 0x1010101;
+        for (uint k = 0; k < 14; k++) w.Poke(g.Edi + k, k < 12 ? (byte)1 : (byte)1);
+        g.Edi += 0x280; g.Cl = 0xc;
+        do { w.Poke(g.Edi, g.Al); w.Poke(g.Edi + 0xd, g.Al); g.Edi += 0x280; g.Cl = Dec8(g, g.Cl); } while (!g.Zf);
+        for (uint k = 0; k < 14; k++) w.Poke(g.Edi + k, 1);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
