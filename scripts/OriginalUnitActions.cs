@@ -4385,6 +4385,44 @@ public static class OriginalUnitActions
         g.Al = 0; g.Logic(g.Al, 8); g.Eax = saved;
     }
 
+    /// <summary>1188F: the check of the tribute of the participants (while [19EA] is 0): for every participant (the statistics ESI from [6BA], the record ECX from 97Ah, the loop by the number +0 of the statistics up to [6C6]): with the statistics +19F1 at least 61A8h the counter +73 is checked at once, else it grows by 9Ch unless a participant with +19F1 above 7CFh and +5 = 0 stands in the relations of the record +0B9 as 1, 2 or 4; a counter above 2710h and a random number (9E41) with the low six bits zero reset it and call 117C5 for the participant.</summary>
+    public static void F1188F(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Test(d[0x19ea], 0xff, 8); if (!g.Zf) return;
+        uint sbase = U32(d, 0x6ba); g.Esi = sbase; g.Ecx = 0x97a;
+        while (true)
+        {
+            uint esiK = g.Esi, ecxK = g.Ecx; int si = (int)(esiK - sbase); var part = w.PartOf((byte)((ecxK - 0x97a) / 0xf5)); bool skip = false;
+            g.Cmp(U32(w.Stats, si + 0x19f1), 0x61a8, 32);
+            if (!g.Cf)
+            {
+                g.Eax = 0; g.Edi = sbase;
+                while (true)
+                {
+                    int ei = (int)(g.Edi - sbase); g.Cmp(U32(w.Stats, ei + 0x19f1), 0x7cf, 32);
+                    if (!(g.Cf || g.Zf))
+                    {
+                        g.Cmp(w.Stats[ei + 5], 0, 8);
+                        if (g.Zf)
+                        {
+                            byte rel = part[0xb9 + g.Al]; g.Cmp(rel, 1, 8); if (g.Zf) { skip = true; break; }
+                            g.Cmp(rel, 2, 8); if (g.Zf) { skip = true; break; }
+                            g.Cmp(rel, 4, 8); if (g.Zf) { skip = true; break; }
+                        }
+                    }
+                    g.Add(g.Edi, 0x1a35); g.Edi += 0x1a35; g.Al = Inc8(g, g.Al); g.Cmp(g.Al, d[0x6c6], 8); if (g.Zf) break;
+                }
+                if (!skip) Put(w.Stats, si + 0x73, U32(w.Stats, si + 0x73) + 0x9c);
+            }
+            if ((int)U32(w.Stats, si + 0x73) > 0x2710)
+            {
+                w.Call(0x9e41, g); g.Test(g.Al, 0x3f, 8);
+                if (g.Zf) { Put(w.Stats, si + 0x73, 0); g.Al = w.Stats[si]; F117C5(w, g); }
+            }
+            g.Esi = esiK; g.Ecx = ecxK; g.Al = w.Stats[si]; g.Esi += 0x1a35; g.Ecx += 0xf5; g.Al = Inc8(g, g.Al); g.Cmp(g.Al, d[0x6c6], 8); if (!g.Cf) return;
+        }
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
