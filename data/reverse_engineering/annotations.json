@@ -10182,6 +10182,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "B6F1, B9EB, BA2E, 66DF, 6EC1, E03C, 4938, DFE5, DF2A, 6EB2, 66E9 and 674F are recorded stubs that keep EDI; DF7E is the ported code over the flat queue window"
+    },
+    {
+      "id": "le1-object-rows-5716",
+      "module": "LE:1",
+      "start": 22294,
+      "end": 22407,
+      "name": "Picture rows of the selected object for the widget (5716)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "63CB is a recorded stub; only the widget bytes 7F2h..872h are compared (the queue window of the test world overlaps the participant table)"
     }
   ]
 }

@@ -3776,6 +3776,21 @@ public static class OriginalUnitActions
         g.Al = 0x2b; w.Call(0xdf2a, g); w.Call(0x6eb2, g); w.Call(0x66e9, g); w.Call(0x674f, g); w.Call(0x4938, g);
     }
 
+    /// <summary>5716: the picture rows of the selected object [1969] for the widget EDI: +1A of the widget = the template number +0E, the next widget (+1Eh): +12 = the template pointer + 7 + the dword +7 (the strings), +33 = the word +5, +32 = the army +0 of the object; a template with the nibble F in +41 shows the participant instead (+12 = the participant record + 0A4h, +33 = the byte +0B8 + 0C3h, +32 = FFh, +30 = 40h, +31 = 46h); 3C bytes on, +15 = the byte +45 of the template; 63CB draws; ECX + 1Eh.</summary>
+    public static void F5716(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); g.Al = o[0xe]; l[g.Edi + 0x1a] = g.Al; g.Edi += 0x1e; uint widget = g.Edi;
+        F6877(w, g, o); g.Ebx = g.Ecx; g.Ecx = widget; var t = w.ObjectAt(g.Edi);
+        g.Eax = g.Edi + 7; g.Add(g.Eax, U32(t, 7)); g.Eax += U32(t, 7); Put(l, (int)g.Ecx + 0x12, g.Eax); g.Eax = (g.Eax & 0xffff0000) | U16(t, 5); l[g.Ecx + 0x33] = t[5]; l[g.Ecx + 0x34] = t[6]; g.Al = o[0]; l[g.Ecx + 0x32] = g.Al;
+        g.Edx = U32(t, 0x40); g.Dh &= 0xf; g.Cmp(g.Dh, 0xf, 8);
+        if (g.Zf)
+        {
+            g.Eax = g.Ebx + 0xa4; Put(l, (int)g.Ecx + 0x12, g.Eax); g.Eax = w.PartOf(o[3])[0xb8]; ushort ax = (ushort)(g.Eax + 0xc3); g.Eax = (g.Eax & 0xffff0000) | ax;
+            l[g.Ecx + 0x33] = (byte)ax; l[g.Ecx + 0x34] = (byte)(ax >> 8); l[g.Ecx + 0x32] = 0xff; l[g.Ecx + 0x30] = 0x40; l[g.Ecx + 0x31] = 0x46;
+        }
+        g.Add(g.Ecx, 0x3c); g.Ecx += 0x3c; g.Al = t[0x45]; l[g.Ecx + 0x15] = g.Al; g.Esi = g.Ecx; w.Call(0x63cb, g); g.Add(g.Ecx, 0x1e); g.Ecx += 0x1e;
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
