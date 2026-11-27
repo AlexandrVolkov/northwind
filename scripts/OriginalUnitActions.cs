@@ -3470,6 +3470,19 @@ public static class OriginalUnitActions
         }
     }
 
+    /// <summary>CA49: the picture frame of the object ESI by its health +19 against the template [1C49] (+45 the full health, +46 the damaged one, +4A the number of frames, +48 the first frame): a health below +46 clears the flag +0F; with a health other than +1A the frame +1 = the first frame + the number of frames - 1 - health * frames / full health.</summary>
+    public static void FCA49(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Edi = U32(d, 0x1c49); var t = w.ObjectAt(g.Edi); var o = w.ObjectAt(g.Esi);
+        g.Eax = o[0x19]; g.Cmp(g.Al, t[0x45], 8); if (g.Zf) return;
+        g.Cmp(g.Al, t[0x46], 8); if (g.Cf) o[0xf] = 0;
+        g.Cmp(g.Al, o[0x1a], 8); if (g.Zf) return;
+        g.Ebx = t[0x4a]; Mul8(g, g.Al, g.Bl); uint ax = g.Eax & 0xffff, dv = t[0x45]; g.Al = (byte)(ax / dv); g.Ah = (byte)(ax % dv);
+        g.Bl = (byte)(g.Bl - g.Al); g.Bl = (byte)(g.Bl - 1); uint a = g.Ebx & 0xffff, b = (uint)(t[0x48] | t[0x49] << 8), r = a + b;
+        g.Zf = (r & 0xffff) == 0; g.Sf = (r & 0x8000) != 0; g.Cf = r > 0xffff; g.Of = (((a ^ r) & (b ^ r)) & 0x8000) != 0;
+        g.Ebx = (g.Ebx & 0xffff0000) | (r & 0xffff); o[1] = (byte)r; o[2] = (byte)(r >> 8);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {

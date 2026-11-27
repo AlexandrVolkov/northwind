@@ -428,6 +428,11 @@ public partial class TestRunner
                 case "f6f18":
                     Array.Fill(w.Video, (byte)0x5a, 0, 0x49000); Array.Copy(ActionPrng(c.GetProperty("seed").GetUInt32(), 0x2000), 0, w.Video, 0x50000, 0x2000); Array.Copy(ActionPrng(c.GetProperty("seed").GetUInt32() + 1, 0x3000), 0, w.Video, 0x60000, 0x3000);
                     BitConverter.GetBytes(0xc00000u).CopyTo(w.Ds, 0x68e); BitConverter.GetBytes(0xc50000u - 0x700).CopyTo(w.Ds, 0x19f6); g.Esi = 0xc60000; OriginalUnitActions.F6F18(w, g); break;
+                case "fca49":
+                    {
+                        var t = c.GetProperty("t"); var ob = c.GetProperty("o"); w.Template[0x45] = (byte)t[0].GetInt32(); w.Template[0x46] = (byte)t[1].GetInt32(); w.Template[0x4a] = (byte)t[2].GetInt32(); BitConverter.GetBytes((ushort)t[3].GetInt32()).CopyTo(w.Template, 0x48);
+                        w.Record[0x19] = (byte)ob[0].GetInt32(); w.Record[0x1a] = (byte)ob[1].GetInt32(); w.Record[0xf] = (byte)ob[2].GetInt32(); OriginalUnitActions.FCA49(w, g); break;
+                    }
                 case "f9f38":
                     {
                         Array.Fill(w.Video, (byte)0x5a, 0, 0x49000); Array.Copy(ActionPrng(c.GetProperty("seed").GetUInt32(), 0x10000), 0, w.Video, 0x50000, 0x10000); Array.Copy(Convert.FromHexString(c.GetProperty("tile").GetString()!), 0, w.Video, 0x60000, 0x1800);
@@ -688,7 +693,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 254, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 255, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }
