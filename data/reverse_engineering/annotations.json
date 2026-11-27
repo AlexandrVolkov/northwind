@@ -10524,6 +10524,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "1EAD8, 111C5 and DEE4 are recorded stubs (1EAD8 keeps EBX in the fixture); only the relation slots 0..7 are non-zero in the fixture"
+    },
+    {
+      "id": "le1-message-answers-e9f0",
+      "module": "LE:1",
+      "start": 59888,
+      "end": 60120,
+      "name": "Answer window of a message (E9F0)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1EAD8, E5E6, F781, 9E69, 7012 and 704F are recorded stubs that keep EDX, ECX and EDI; DF7E is the ported code; the message tables lie in the L3 area (records of the owners 6 and 7 only in the fixture)"
     }
   ]
 }
