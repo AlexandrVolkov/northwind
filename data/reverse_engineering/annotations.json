@@ -10638,6 +10638,44 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the handler of the table entry (+08, an indirect call) is a recorded stub in the check (the pointer is a code address: the world gets it as it is); the check has three table entries and the queues of the participants 6 and 7 (the records 0..5 overlap the L3 area in the flat memory of the Python check); the first write of +9 before the handler call is indistinguishable (DH is written again after it, the stub does not read it)"
+    },
+    {
+      "id": "le1-menu-buttons-11150",
+      "module": "LE:1",
+      "start": 69968,
+      "end": 70339,
+      "name": "Menu button handlers (11150, 11187, 111C5, 111F8, 11234, 11280, 1129B, 112AF)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5E6, DEE4, 14E51, DEC8, 6EB2, 4938 and E02A are recorded stubs (the stubs set only ZF); the button record lies in the pool in the fixture"
+    },
+    {
+      "id": "le1-menu-button-11305",
+      "module": "LE:1",
+      "start": 70405,
+      "end": 70430,
+      "name": "Menu button handler (11305)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5E6, DEE4, 14E51, DEC8, 6EB2, 4938 and E02A are recorded stubs (the stubs set only ZF); the button record lies in the pool in the fixture"
     }
   ]
 }

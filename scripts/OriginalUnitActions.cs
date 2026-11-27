@@ -4225,6 +4225,60 @@ public static class OriginalUnitActions
         g.Edx = edx; g.Edi = entry; g.Esi = esi; part[o] = g.Dl; part[o + 9] = g.Dh; g.Al = 0; g.Logic(g.Al, 8);
     }
 
+    /// <summary>111C5: the picture of a button (the record ESI) by AX: a record with bit 1 of +3 sets the cursor [1946] = A5009Ch and [1965] = 0 (for +3 = 1 the picture is AX - 1); a changed word +17 is stored and the record is marked (bit 80h of +0); the flags are those of the last CMP (+3 with 9).</summary>
+    public static void F111C5(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds;
+        if ((r[3] & 1) != 0) { Put(d, 0x1946, 0xa5009c); Put(d, 0x1965, 0); if (r[3] == 1) g.Eax--; }
+        if (U16(r, 0x17) != (g.Eax & 0xffff)) { r[0x17] = g.Al; r[0x18] = g.Ah; r[0] |= 0x80; }
+        g.Cmp(r[3], 9, 8);
+    }
+
+    /// <summary>111F8: as 111C5 with the picture AX + 1 for +3 = 1 and AX + 2 for +3 = 3 (bit 1 of +3 set).</summary>
+    public static void F111F8(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds;
+        if ((r[3] & 1) != 0) { Put(d, 0x1946, 0xa5009c); Put(d, 0x1965, 0); if (r[3] == 1) g.Eax++; if (r[3] == 3) g.Eax += 2; }
+        if (U16(r, 0x17) != (g.Eax & 0xffff)) { r[0x17] = g.Al; r[0x18] = g.Ah; r[0] |= 0x80; }
+        g.Cmp(r[3], 9, 8);
+    }
+
+    /// <summary>11234: the handler of the button 13Ch: with the key [1C35] = 1 or +3 bit 10h or the button 13Ch answering ZF: [1C60] = 1, E5E6, 14E51 (EAX = 3, EBX = 23Ch, ECX = 1D0h, EDX = 0), the menu DEE4 with ESI = 18Ch.</summary>
+    public static void F11234(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Cmp(U16(d, 0x1c35), 1, 16);
+        if (!g.Zf)
+        {
+            g.Test(r[3], 0x10, 8);
+            if (g.Zf) { g.Eax = 0x13c; F111C5(w, g, r); if (!g.Zf) return; }
+        }
+        d[0x1c60] = 1; w.Call(0xe5e6, g); g.Eax = 3; g.Ebx = 0x23c; g.Ecx = 0x1d0; g.Edx = 0; w.Call(0x14e51, g); g.Esi = 0x18c; w.Call(0xdee4, g);
+    }
+
+    /// <summary>11280 / 1129B / 112AF: the buttons 13Eh, 140h, 142h: the answer ZF sets the scroll steps [908F] = 0Dh and / or [908E] = 0FDh.</summary>
+    public static void F11280(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Eax = 0x13e; F111C5(w, g, r); if (!g.Zf) return; w.Ds[0x908f] = 0xd; w.Ds[0x908e] = 0xfd; }
+    public static void F1129B(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Eax = 0x140; F111C5(w, g, r); if (!g.Zf) return; w.Ds[0x908f] = 0xd; }
+    public static void F112AF(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Eax = 0x142; F111C5(w, g, r); if (!g.Zf) return; w.Ds[0x908e] = 0xfd; }
+
+    /// <summary>11305: the button 15Eh: the answer ZF sets EAX = 0Ah and [1EC6] = 0FFh.</summary>
+    public static void F11305(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Eax = 0x15e; F111C5(w, g, r); if (!g.Zf) return; g.Eax = 0xa; w.Ds[0x1ec6] = 0xff; }
+
+    /// <summary>11150: the button E6h answering ZF: DEC8, 6EB2, 4938, [1A1B] = 0, [1969] = 0, [1C87] = 0, the menu DEE4 with ESI = 3E8Fh.</summary>
+    public static void F11150(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Eax = 0xe6; F111C5(w, g, r); if (!g.Zf) return;
+        w.Call(0xdec8, g); w.Call(0x6eb2, g); w.Call(0x4938, g); g.Eax = 0; g.Logic(0, 32); d[0x1a1b] = 0; Put(d, 0x1969, 0); d[0x1c87] = 0; g.Esi = 0x3e8f; w.Call(0xdee4, g);
+    }
+
+    /// <summary>11187: [1C60] = 0, 14E51 (EAX = 2, EBX = 23Ch, ECX = 1D0h, EDX = 0); with [1CAD] = FFFFFFFFh the records 2Fh of the participants 14h..16h leave the queue (E02A); [0] = 2Fh.</summary>
+    public static void F11187(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; d[0x1c60] = 0; g.Eax = 2; g.Ebx = 0x23c; g.Ecx = 0x1d0; g.Edx = 0; w.Call(0x14e51, g);
+        g.Cmp(U32(d, 0x1cad), 0xffffffff, 32);
+        if (g.Zf) { g.Al = 0x2f; g.Bl = 0x14; g.Bh = 0x16; w.Call(0xe02a, g); }
+        w.L3[0] = 0x2f; w.L3[1] = 0;
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
