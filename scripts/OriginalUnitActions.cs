@@ -3981,6 +3981,19 @@ public static class OriginalUnitActions
         w.PartOf((byte)((g.Ecx - 0x97a) / 0xf5))[0xcd + g.Edx] = 0;
     }
 
+    /// <summary>11BE0: the (BH + 1)-th object of the participant BL (from [+0E] to [+09] of its record) with the template number +0E = AL and the army +0 = AH: EDI = it (the walk ends at the end of the list); SF = the counter has run out.</summary>
+    public static void F11BE0(IUnitActionWorld w, ActionRegs g)
+    {
+        uint eax0 = g.Eax; g.Eax = 0xf5; Mul8(g, g.Al, g.Bl); var part = w.PartOf(g.Bl); g.Ebp = U32(part, 9) + w.PoolBase; g.Edi = U32(part, 0xe) + w.PoolBase; g.Al = g.Bh; g.Ebx = eax0;
+        for (; ; )
+        {
+            g.Cmp(g.Edi, g.Ebp, 32); if (g.Zf) return;
+            var o = w.ObjectAt(g.Edi); g.Cmp(o[0xe], g.Bl, 8);
+            if (g.Zf) { g.Cmp(o[0], g.Bh, 8); if (g.Zf) { g.Al = Dec8(g, g.Al); if (g.Sf) return; } }
+            g.Add(g.Edi, U32(o, 0x10)); g.Edi += U32(o, 0x10);
+        }
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
