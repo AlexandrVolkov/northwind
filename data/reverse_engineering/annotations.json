@@ -9991,6 +9991,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "9E41 is a recorded stub; the map layer, the tile table and the object are flat test regions"
+    },
+    {
+      "id": "le1-command-list-a5f4",
+      "module": "LE:1",
+      "start": 42484,
+      "end": 42611,
+      "name": "List of the cursor-command entries the owner's table accepts (A5F4)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the owner's table and the list lie in the flat text test region; the owner of the object is limited to 0..7 in the fixture"
     }
   ]
 }
