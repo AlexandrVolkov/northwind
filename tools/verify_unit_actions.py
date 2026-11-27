@@ -1221,7 +1221,7 @@ def generate(game, names):
         if case['fn'] in ('fs14b', 'f11d34', 'f11c73') and case['sel'] != 0:
             tb = bytearray(o.cpu.mem_read(o.POOL + TMPL, 0x100)); tb[0x46] = 5; tb[0x74] = 0xf; tb[0x40] &= ~0x20 & 0xff; tb[0x41] &= 0x7f; o.cpu.mem_write(o.POOL + TMPL, bytes(tb))
         if case['fn'] in ('fs187', 'fs16b'): o.cpu.reg_write(UC_X86_REG_EAX, (case['regs'][0] & 0xffff0000) | ((((case['regs'][0] >> 8) & 0xff) % 3) << 8))
-        if case['fn'] not in ('f42bb', 'f4473', 'ff629', 'fe65b'): o.cpu.mem_write(0x6c6, bytes(1))
+        if case['fn'] not in ('f42bb', 'f4473', 'ff629', 'fe65b', 'fee69', 'fee92', 'feea3'): o.cpu.mem_write(0x6c6, bytes(1))
         o.cpu.mem_write(0x6c9, bytes(1)); o.cpu.mem_write(0x6c9, bytes(1)); o.cpu.mem_write(0x3e87, bytes(4))
         if case['fn'] == 'f9d87':
             o.cpu.mem_write(0, bytes([case['m0']])); o.cpu.mem_write(0x6c9, bytes([case['k6c9']])); o.cpu.mem_write(o.POOL + 0x2a00, bytes.fromhex(case['d']) * 40); o.cpu.mem_write(0x64c, struct.pack('<I', o.POOL + 0x2a00)); o.cpu.mem_write(0x33c, bytes(0x310)); o.cpu.mem_write(0x1c62, bytes(12)); o.cpu.mem_write(0x1a1b, bytes([0x55])); o.cpu.mem_write(0x1c87, bytes([0x66])); o.cpu.mem_write(0x1969, struct.pack('<I', 0x12345678)); o.cpu.mem_write(1, bytes([0x77])); o.cpu.mem_write(0x3e87, struct.pack('<I', 0x4400)); o.cpu.mem_write(0x3e8b, struct.pack('<I', 0x99))
