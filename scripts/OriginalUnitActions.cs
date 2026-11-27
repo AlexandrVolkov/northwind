@@ -3483,6 +3483,15 @@ public static class OriginalUnitActions
         g.Ebx = (g.Ebx & 0xffff0000) | (r & 0xffff); o[1] = (byte)r; o[2] = (byte)(r >> 8);
     }
 
+    /// <summary>B3B6: a picture on the minimap area: 3EEA marks the dirty cells (EAX = ECX, ECX = EBX, EBX = EDX, EDX = 10h), 6FCC blits the picture [1922] to EDI = 100000h + ECX (ECX = EAX - 1E0h, EDX = EBX - 0A0h, EBP = 90h), AC23 draws the figure with the registers ECX, EDX, EAX of the caller.</summary>
+    public static void FB3B6(IUnitActionWorld w, ActionRegs g)
+    {
+        uint esi0 = g.Esi, eax0 = g.Eax, edx0 = g.Edx, ecx0 = g.Ecx;
+        g.Eax = g.Ecx; g.Ecx = g.Ebx; g.Ebx = g.Edx; g.Edx = 0x10; w.Call(0x3eea, g);
+        g.Edi = 0x100000; g.Edi += g.Ecx; g.Ecx = g.Eax - 0x1e0; g.Edx = g.Ebx - 0xa0; g.Ebp = 0x90; g.Esi = U32(w.Ds, 0x1922); w.Call(0x6fcc, g);
+        g.Ecx = ecx0; g.Edx = edx0; g.Eax = eax0; w.Call(0xac23, g); g.Esi = esi0;
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {

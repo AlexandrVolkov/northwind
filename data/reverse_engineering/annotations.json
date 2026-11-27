@@ -10048,6 +10048,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the fixture keeps the quotient of the division within a byte (the original would fault otherwise)"
+    },
+    {
+      "id": "le1-minimap-picture-b3b6",
+      "module": "LE:1",
+      "start": 46006,
+      "end": 46071,
+      "name": "Picture on the minimap area with its figure (B3B6)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "3EEA, 6FCC and AC23 are recorded stubs; EBP (90h for 6FCC) is not in the recorded registers, so the fixture does not tell it"
     }
   ]
 }
