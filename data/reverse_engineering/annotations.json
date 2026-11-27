@@ -10353,6 +10353,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "124D8, A758, 103EC and 98CC are recorded stubs"
+    },
+    {
+      "id": "le1-call-scroll-120e2",
+      "module": "LE:1",
+      "start": 73954,
+      "end": 74110,
+      "name": "Handler of the scroll of the call (120E2)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "124D8, EDD5, 1ECA0, 10AD2, A758 and 43E5 are recorded stubs"
     }
   ]
 }
