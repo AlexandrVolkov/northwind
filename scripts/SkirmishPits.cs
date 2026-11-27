@@ -87,15 +87,7 @@ public sealed partial class Skirmish
         {
             switch (address)
             {
-                case 0x21a00:   // clip the rectangle (CL, CH, DL, DH = left, top, width, height) to the map
-                {
-                    byte w = Ds[0x18de], h = Ds[0x18e2], cl = g.Cl, ch = g.Ch, dl = g.Dl, dh = g.Dh;
-                    if (cl >= w) { dl += cl; cl = 0; }
-                    if (ch >= h) { dh += ch; ch = 0; }
-                    dl += cl; if (dl > w) dl = w; dl -= cl;
-                    dh += ch; if (dh > h) dh = h; dh -= ch;
-                    g.Cl = cl; g.Ch = ch; g.Dl = dl; g.Dh = dh; break;
-                }
+                case 0x21a00: OriginalUnitActions.F21A00(this, g); break;   // clip the rectangle (CL, CH, DL, DH = left, top, width, height) to the map
                 case 0xd7b1:    // the list of the unique occupants of the rectangle at DS:1F45, ended by 0
                 {
                     var list = OriginalTargetRules.Collect(new SearchWorld(battle, 0), g.Cl, g.Ch, g.Dl, g.Dh);
@@ -104,17 +96,8 @@ public sealed partial class Skirmish
                 }
                 case 0x68bd:    // the template of the object EDI
                     g.Edx = g.Edi == SelfPointer ? SelfTemplatePointer : TemplateBase + g.Edi; break;
-                case 0xc344:    // Chebyshev distance of the positions ESI and EDI
-                {
-                    var a = ObjectAt(g.Esi); var b = ObjectAt(g.Edi);
-                    long dx = Math.Abs((long)BitConverter.ToUInt32(a, 4) - BitConverter.ToUInt32(b, 4)), dy = Math.Abs((long)BitConverter.ToUInt32(a, 8) - BitConverter.ToUInt32(b, 8));
-                    g.Eax = (uint)Math.Max(dx, dy); break;
-                }
-                case 0xd157:    // the terrain class under the object EDI
-                {
-                    var o = ObjectAt(g.Edi); int cell = (int)(BitConverter.ToUInt32(o, 8) >> 5) * battle.Map.Width + (int)(BitConverter.ToUInt32(o, 4) >> 5);
-                    g.Eax = cell >= 0 && cell < battle.Map.Cells.Length ? (uint)(battle._properties[(int)(battle.Map.Cells[cell] & 0xffff) * 8] & 7) : 0; break;
-                }
+                case 0xc344: OriginalUnitActions.FC344(this, g, ObjectAt(g.Esi)); break;   // Chebyshev distance of the positions ESI and EDI
+                case 0xd157: OriginalUnitActions.FD157(this, g); break;   // the terrain class under the object EDI
                 default: throw new InvalidOperationException($"call {address:X}");
             }
         }
@@ -126,7 +109,7 @@ public sealed partial class Skirmish
         public byte TableByte(uint address) => 0xff;
         public byte Fs13D { get; set; } public byte Fs10 { get; set; } public byte G525 => 0; public byte G526 => 0; public byte G1C61 { get; set; } public uint G2730 => 0;
         public byte[] Route => throw new NotSupportedException();
-        public uint TileDescriptor(uint tile) => 0;
+        public uint TileDescriptor(uint cell) => cell < battle.Map.Cells.Length ? battle._properties[(int)(battle.Map.Cells[cell] & 0xffff) * 8] : 0u;
         public uint TileProperty(uint cell, int offset) => 0;
         public uint Fs17F { get; set; }
         public byte[] L3 { get; } = new byte[0x4000];

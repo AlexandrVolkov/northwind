@@ -10067,6 +10067,406 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "3EEA, 6FCC and AC23 are recorded stubs; EBP (90h for 6FCC) is not in the recorded registers, so the fixture does not tell it"
+    },
+    {
+      "id": "le1-nearest-hostile-11d34",
+      "module": "LE:1",
+      "start": 73012,
+      "end": 73182,
+      "name": "Nearest hostile of an object in its neighbourhood (11D34)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "219C3, D7B1 and C344 are recorded stubs; the fixture world (shared with FS:14B) does not tell the template bit 8000h from 8020h, the health test JLE from JC and JA from JAE"
+    },
+    {
+      "id": "le1-area-objects-11c1a",
+      "module": "LE:1",
+      "start": 72730,
+      "end": 72905,
+      "name": "Objects of the participant's area, round a point, and the hand-over of the owner's (11C1A, 11C3D, 11C73)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1EAD8, D7B1, 219C3, 8197, A320 and D1BA are recorded stubs; the statistics record is the flat test region"
+    },
+    {
+      "id": "le1-clip-rectangles-21a00",
+      "module": "LE:1",
+      "start": 137728,
+      "end": 137853,
+      "name": "Clip a cell rectangle to the map and a pixel rectangle to the view (21A00, 21A3D)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs",
+        "scripts/SkirmishPits.cs"
+      ],
+      "limitations": "the map size is 32 x 32 in the fixture; the difference JBE against JB at equal sums is not observable (the value is the same)"
+    },
+    {
+      "id": "le1-widget-draw-e08b",
+      "module": "LE:1",
+      "start": 57483,
+      "end": 58713,
+      "name": "Draw the widgets of the queue and track the mouse over them (E08B)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the drawing services 1E133, 1DF08, 1DF3C, 1E098, 1E0DE, 1DF7B, 1E153, 6D4A, 6DEF, B3B6, 7069, 7012, 6CD6, 1D7AF, 3EEA, 3F32 and 21A3D are recorded stubs that keep EDI; the widget records are in the flat queue window, the strings in the text test region"
+    },
+    {
+      "id": "le1-command-panel-58ca",
+      "module": "LE:1",
+      "start": 22730,
+      "end": 22880,
+      "name": "Panel of the commands of the selected object (58CA)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "D182, A5F4, DEE4 and A4A9 are recorded stubs; DF7E is the ported code over the flat queue window"
+    },
+    {
+      "id": "le1-object-panel-5787",
+      "module": "LE:1",
+      "start": 22407,
+      "end": 22730,
+      "name": "Panel of the selected object with its six slots (5787)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "B6F1, B9EB, BA2E, 66DF, 6EC1, E03C, 4938, DFE5, DF2A, 6EB2, 66E9 and 674F are recorded stubs that keep EDI; DF7E is the ported code over the flat queue window"
+    },
+    {
+      "id": "le1-object-rows-5716",
+      "module": "LE:1",
+      "start": 22294,
+      "end": 22407,
+      "name": "Picture rows of the selected object for the widget (5716)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "63CB is a recorded stub; only the widget bytes 7F2h..872h are compared (the queue window of the test world overlaps the participant table)"
+    },
+    {
+      "id": "le1-shop-menu-54b4",
+      "module": "LE:1",
+      "start": 21684,
+      "end": 21875,
+      "name": "Menu of the command «build» of the selected object (54B4)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "D182, 14E51, E055, F781 and DEE4 are recorded stubs; DF7E and 6885 are the ported code; the table, the block and its copy lie in the flat text test region"
+    },
+    {
+      "id": "le1-blit-screen-6fcc",
+      "module": "LE:1",
+      "start": 28620,
+      "end": 28690,
+      "name": "Copy a picture to the screen row by row (6FCC)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the screen and the source are flat test regions in the video window; widths above FFFh are not exercised"
+    },
+    {
+      "id": "le1-saved-game-screen-9d87",
+      "module": "LE:1",
+      "start": 40327,
+      "end": 40513,
+      "name": "Screen of the saved game: open, read the areas, reset the selection (9D87)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the file services 10CA0, F8E1, FA88, F9B7, F967, FEC6, 199B9, DEC8, 6EB2, 4938, 14D5C and DEE4 are recorded stubs; the stub cannot set the carry flag, so the fixture only exercises the branch where F8E1 opens the file (CF = 0)"
+    },
+    {
+      "id": "le1-world-frames-11087",
+      "module": "LE:1",
+      "start": 69767,
+      "end": 69832,
+      "name": "Advance the world by EAX frames at once (11087)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "42BB, 96CD, D3E5, 1E7EA and 9BF9 are recorded stubs (the ported frame services are not chained here)"
+    },
+    {
+      "id": "le1-hero-select-10b75",
+      "module": "LE:1",
+      "start": 68469,
+      "end": 68564,
+      "name": "Select the hero of the player and centre the view on it (10B75)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "A320 is a recorded stub; the objects of the participant are the chain of the test world"
+    },
+    {
+      "id": "le1-darkness-scroll-12198",
+      "module": "LE:1",
+      "start": 74136,
+      "end": 74213,
+      "name": "Handler of the scroll of the darkness: clear a bit of the fog table (12198)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "124D8 is a recorded stub; the fog table is the flat text test region (32 x 32 cells); a shift count of 16 and above gives the same byte in both the port and the fixture check"
+    },
+    {
+      "id": "le1-inventory-take-124a5",
+      "module": "LE:1",
+      "start": 74917,
+      "end": 74968,
+      "name": "Take an item out of the inventory of a participant (124A5)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the participant is limited to 0..7 in the fixture"
+    },
+    {
+      "id": "le1-summon-scroll-121ff",
+      "module": "LE:1",
+      "start": 74239,
+      "end": 74326,
+      "name": "Handler of the scroll of the summoning (121FF)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "124D8, A758, 103EC and 98CC are recorded stubs"
+    },
+    {
+      "id": "le1-call-scroll-120e2",
+      "module": "LE:1",
+      "start": 73954,
+      "end": 74110,
+      "name": "Handler of the scroll of the call (120E2)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "124D8, EDD5, 1ECA0, 10AD2, A758 and 43E5 are recorded stubs"
+    },
+    {
+      "id": "le1-alliance-offer-f09c",
+      "module": "LE:1",
+      "start": 61596,
+      "end": 61683,
+      "name": "Dialog handler of the alliance offer (F09C)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "EEFA, 21490, 23A6E, 23B8E and EF3F are recorded stubs that keep BH; EBP (E6Bh for EF3F) is not in the recorded registers, so the fixture does not tell it"
+    },
+    {
+      "id": "le1-inventory-items-11eff",
+      "module": "LE:1",
+      "start": 73471,
+      "end": 73563,
+      "name": "Inventory handler of the crystal (11EFF)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5E6 and DEE4 are recorded stubs; the participant is limited to 5..7 in the fixture"
+    },
+    {
+      "id": "le1-inventory-timed-1205c",
+      "module": "LE:1",
+      "start": 73820,
+      "end": 73901,
+      "name": "Inventory handler of the timed item (1205C)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "219C3 and 8197 are recorded stubs; the participant is limited to 5..7 in the fixture"
+    },
+    {
+      "id": "le1-find-nth-object-11be0",
+      "module": "LE:1",
+      "start": 72672,
+      "end": 72730,
+      "name": "Find the n-th object of a participant by army and template (11BE0)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the test world gives every participant the same object range, so the owner selecting the record (BL) is not told from another owner"
+    },
+    {
+      "id": "le1-message-menu-e717",
+      "module": "LE:1",
+      "start": 59159,
+      "end": 59418,
+      "name": "Menu of the messages of a settlement (E717)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "F781, EAD8, 9E69, 7012 and 704F are recorded stubs that keep EDX and EDI; DF7E is the ported code over the flat queue window; the message tables lie in the L3 area (owners 1..3 only in the fixture because the test world overlaps the participant table)"
     }
   ]
 }

@@ -1166,7 +1166,7 @@ public static class OriginalUnitActions
 
     private static void CellClass(IUnitActionWorld w, ActionRegs g, byte[] o)
     {
-        g.Eax = U32(o, 8) >> 5; Mul8(g, g.Al, 32); g.Ebx = U32(o, 4) >> 5; g.Ebx += g.Eax; g.Ecx = 0xf00000;
+        g.Eax = U32(o, 8) >> 5; Mul8(g, g.Al, w.Ds[0x18de]); g.Ebx = U32(o, 4) >> 5; g.Ebx += g.Eax; g.Ecx = 0xf00000;
         g.Eax = g.Ebx & 0xffff; g.Al = (byte)w.TileDescriptor(g.Eax); g.Eax &= 7; g.Logic(g.Eax, 32);
     }
 
@@ -3465,7 +3465,7 @@ public static class OriginalUnitActions
             g.Al = g.Bh; g.Ebx -= U32(d, 0x1f31); g.Cmp(g.Al, g.Bh, 8); g.Al = (byte)(g.Al - g.Bh);
             g.Cmp(g.Ch, g.Al, 8); g.Ch = (byte)(g.Ch - g.Al);
             if (g.Cf || g.Zf) return;
-            Mul8(g, g.Al, d[0x1f0b]); g.Esi += g.Eax; g.Ch = Dec8(g, g.Ch);
+            Mul8(g, g.Al, d[0x1f0b]); g.Add(g.Esi, g.Eax); g.Esi += g.Eax; g.Ch = Dec8(g, g.Ch);
             if (g.Zf) return;
         }
     }
@@ -3490,6 +3490,541 @@ public static class OriginalUnitActions
         g.Eax = g.Ecx; g.Ecx = g.Ebx; g.Ebx = g.Edx; g.Edx = 0x10; w.Call(0x3eea, g);
         g.Edi = 0x100000; g.Edi += g.Ecx; g.Ecx = g.Eax - 0x1e0; g.Edx = g.Ebx - 0xa0; g.Ebp = 0x90; g.Esi = U32(w.Ds, 0x1922); w.Call(0x6fcc, g);
         g.Ecx = ecx0; g.Edx = edx0; g.Eax = eax0; w.Call(0xac23, g); g.Esi = esi0;
+    }
+
+    /// <summary>11D34: the nearest hostile of the object ESI (the record r) in its neighbourhood: 219C3 gives the rectangle round the cell (+4/+8 &gt;&gt; 5), D7B1 lists the objects in it at DS:1F45; a candidate is not the object itself, its template has no bits 8020h of +40, its +20 mask has the bit of the owner +3, its health +19 is above the template's +46, its layer +0D is allowed by [1CA6] (the template +74); the nearest by C344 goes to [1F31] with the distance in [1F35]. EDI = the nearest (ZF = 1 when none).</summary>
+    public static void F11D34(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; uint esi = g.Esi; g.Ecx = U32(r, 4); g.Eax = U32(r, 8); g.Ecx >>= 5; g.Eax >>= 5; g.Ch = g.Al; w.Call(0x219c3, g);
+        g.Edx -= g.Ecx; g.Edx += 0x101; w.Call(0xd7b1, g); g.Esi = esi;
+        g.Edi = U32(d, 0x1c49); d[0x1ca6] = w.ObjectAt(g.Edi)[0x74]; g.Eax = 0; Put(d, 0x1f31, 0); g.Eax--; Put(d, 0x1f35, g.Eax); g.Ebp = 0x1f45;
+        for (; ; )
+        {
+            g.Edi = U32(d, (int)g.Ebp); g.Test(g.Edi, g.Edi, 32); if (g.Zf) break;
+            Candidate();
+            g.Ebp += 4;
+        }
+        g.Edi = U32(d, 0x1f31); g.Test(g.Edi, g.Edi, 32); g.Esi = esi;
+
+        void Candidate()
+        {
+            g.Cmp(g.Edi, g.Esi, 32); if (g.Zf) return;
+            w.Call(0x68bd, g); var t = w.ObjectAt(g.Edx); var o = w.ObjectAt(g.Edi);
+            g.Test(U32(t, 0x40), 0x8020, 32); if (!g.Zf) return;
+            g.Eax = o[0x20]; g.Ebx = r[3]; g.Cf = ((g.Eax >> (int)(g.Ebx & 31)) & 1) != 0; if (!g.Cf) return;
+            g.Al = t[0x46]; g.Cmp(o[0x19], g.Al, 8); if (g.Jle) return;
+            g.Al = o[0xd]; g.Eax &= 3; g.Cf = ((d[0x1ca6] >> (int)g.Eax) & 1) != 0; if (!g.Cf) return;
+            w.Call(0xc344, g); g.Cmp(g.Eax, U32(d, 0x1f35), 32); if (!g.Cf && !g.Zf) return;
+            Put(d, 0x1f31, g.Edi); Put(d, 0x1f35, g.Eax);
+        }
+    }
+
+    /// <summary>11C1A: the objects of the area of the participant of the object ESI (the record r, owner +3): 1EAD8 gives the statistics record of the participant, its corners [+63]/[+65] (EDX = the size + 101h), D7B1 lists the objects at DS:1F45 (EDI = 1F45).</summary>
+    public static void F11C1A(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        uint esi = g.Esi; g.Al = r[3]; w.Call(0x1ead8, g); int so = 0x1a35 * r[3]; g.Ecx = U32(w.Stats, so + 0x63); g.Edx = U32(w.Stats, so + 0x65); g.Cmp(g.Edx, g.Ecx, 32); g.Edx -= g.Ecx; g.Add(g.Edx, 0x101); g.Edx += 0x101;
+        w.Call(0xd7b1, g); g.Edi = 0x1f45; g.Esi = esi;
+    }
+
+    /// <summary>11C3D: the objects round the point (EAX, EBX in pixels): the cell (&gt;&gt; 5) goes to 219C3, EDX - ECX + 101h is the size (ECX), the owner [1972] to 8197 (AL, BL = the cell); then A320 for the cell of the point.</summary>
+    public static void F11C3D(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint eax = g.Eax, ebx = g.Ebx; g.Eax >>= 5; g.Ebx >>= 5; g.Cl = g.Al; g.Ch = g.Bl; w.Call(0x219c3, g);
+        g.Al = g.Cl; g.Bl = g.Ch; g.Edx -= g.Ecx; g.Ecx = g.Edx + 0x101; g.Dl = d[0x1972]; w.Call(0x8197, g);
+        g.Ebx = ebx; g.Eax = eax; g.Eax = g.Shr(g.Eax, 5, 32); g.Ebx = g.Shr(g.Ebx, 5, 32); w.Call(0xa320, g);
+    }
+
+    /// <summary>11C73: the objects of the owner of the object ESI (the record r) in the area of its participant (1EAD8, D7B1 as in 11C1A) whose template has the bit 8 of +40 are handed over (D1BA with AL = the participants - 1).</summary>
+    public static void F11C73(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; uint esi0 = g.Esi; g.Ah = r[3]; uint eax0 = g.Eax; g.Al = g.Ah; w.Call(0x1ead8, g);
+        int so = 0x1a35 * r[3]; g.Ecx = U32(w.Stats, so + 0x63); g.Edx = U32(w.Stats, so + 0x65); g.Edx -= g.Ecx; g.Add(g.Edx, 0x101); g.Edx += 0x101; w.Call(0xd7b1, g); g.Ebp = 0x1f45; g.Ecx = eax0;
+        for (; ; )
+        {
+            g.Esi = U32(d, (int)g.Ebp); g.Test(g.Esi, g.Esi, 32); if (g.Zf) break;
+            var o = w.ObjectAt(g.Esi); g.Cmp(o[3], g.Cl, 8);
+            if (g.Zf)
+            {
+                F6885(w, g, o); g.Test(U32(w.ObjectAt(g.Edi), 0x40), 8, 32);
+                if (!g.Zf) { uint ecx = g.Ecx, ebp = g.Ebp; g.Al = Dec8(g, d[0x6c6]); w.Call(0xd1ba, g); g.Ebp = ebp; g.Ecx = ecx; }
+            }
+            g.Add(g.Ebp, 4); g.Ebp += 4;
+        }
+        g.Esi = esi0;
+    }
+
+    /// <summary>21A00: clip the rectangle (CL, CH = the corner, DL, DH = the size) to the map [18DE] x [18E2]: a corner outside is moved to 0 and its excess is added to the size, the far edge is cut to the map; the size becomes the difference.</summary>
+    public static void F21A00(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; byte mw = d[0x18de], mh = d[0x18e2];
+        g.Cmp(g.Cl, mw, 8); if (!g.Cf) { g.Dl = Add8(g, g.Dl, g.Cl); g.Cl = 0; g.Logic(0, 8); }
+        g.Cmp(g.Ch, mh, 8); if (!g.Cf) { g.Dh = Add8(g, g.Dh, g.Ch); g.Ch = 0; g.Logic(0, 8); }
+        g.Dl = Add8(g, g.Dl, g.Cl); g.Cmp(g.Dl, mw, 8); if (!(g.Cf || g.Zf)) g.Dl = mw; g.Dl = Sub8(g, g.Dl, g.Cl);
+        g.Dh = Add8(g, g.Dh, g.Ch); g.Cmp(g.Dh, mh, 8); if (!(g.Cf || g.Zf)) g.Dh = mh; g.Dh = Sub8(g, g.Dh, g.Ch);
+    }
+
+    /// <summary>21A3D: clip the pixel rectangle (EAX, EBX = the corner, signed; ECX, EDX = the size) to the 1C0h x 1C0h view: a negative corner is moved to 0 and cuts the size, the far edge is cut; nothing left: AL = 0 and ZF = 1; otherwise the flags of ECX.</summary>
+    public static void F21A3D(IUnitActionWorld w, ActionRegs g)
+    {
+        if ((int)g.Eax < 0)
+        {
+            g.Eax = (uint)-(int)g.Eax; g.Cmp(g.Ecx, g.Eax, 32); g.Ecx -= g.Eax; if (g.Cf || g.Zf) goto none; g.Eax = 0;
+        }
+        else
+        {
+            g.Ebp = g.Eax + g.Ecx; g.Cmp(g.Ebp, 0x1c0, 32); g.Ebp -= 0x1c0;
+            if (!(g.Cf || g.Zf)) { g.Cmp(g.Ecx, g.Ebp, 32); g.Ecx -= g.Ebp; if (g.Cf || g.Zf) goto none; }
+        }
+        if ((int)g.Ebx < 0)
+        {
+            g.Ebx = (uint)-(int)g.Ebx; g.Cmp(g.Edx, g.Ebx, 32); g.Edx -= g.Ebx; if (g.Cf || g.Zf) goto none; g.Ebx = 0;
+        }
+        else
+        {
+            g.Ebp = g.Ebx + g.Edx; g.Cmp(g.Ebp, 0x1c0, 32); g.Ebp -= 0x1c0;
+            if (!(g.Cf || g.Zf)) { g.Cmp(g.Edx, g.Ebp, 32); g.Edx -= g.Ebp; if (g.Cf || g.Zf) goto none; }
+        }
+        g.Test(g.Ecx, g.Ecx, 32); return;
+    none:
+        g.Al = 0; g.Logic(0, 8);
+    }
+
+    /// <summary>E08B: the widgets of the queue (records of 1Eh bytes from 7F2h to [DCE], the byte +0 the type (bit 40h hidden, bit 80h redraw), +3 the state of the mouse, +4/+8 the point): the mouse state of every widget is [DD2] ((the bit 1 of [194B] * 4 | [193A]) * 2) first; a widget of the type 0..5, 7..9, 0Ch redraws what it shows (pictures through 1E133 and the blits 1DF08/1DF3C/1E098/1E0DE/1DF7B/1E153, the text 7069/7012/6CD6, the bar 1D7AF, the figure B3B6, the frames 6D4A/6DEF) and the dirty cells (3EEA, 3F32) are marked; the rectangle of the widget is tested against the mouse [194D]/[1951] (+3 bit 1 = the mouse is over it); the widgets of the mode [0] other than their key +1 lose the mouse. The drawing services are recorded stubs.</summary>
+    public static void FE08B(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        byte B(uint o) => l[g.Edi + o];
+        ushort B16(uint o) => (ushort)(l[g.Edi + o] | l[g.Edi + o + 1] << 8);
+        uint B32(uint o) => BitConverter.ToUInt32(l, (int)(g.Edi + o));
+        g.Al = d[0x194b]; g.Al = (byte)(g.Al << 2); g.Al |= d[0x193a]; g.Al = (byte)(g.Al << 1); l[0xdd2] = g.Al; g.Edi = 0x7f2;
+        for (; ; )
+        {
+            g.Cmp(g.Edi, U32(l, 0xdce), 32); if (!g.Cf) return;
+            l[g.Edi + 3] = l[0xdd2]; g.Al = B(0); g.Test(g.Al, 0x40, 8); if (!g.Zf) goto hide;
+            g.Al &= 0x3f; g.Cmp(g.Al, 0xa, 8); if (g.Zf) goto next;
+            g.Cmp(g.Al, 0xb, 8); if (g.Zf) { g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B16(0x12); g.Edx = B16(0x14); goto t50f; }
+            g.Cmp(B32(4), 0x1d0, 32); if (g.Cf) l[g.Edi] |= 0x80;
+            byte type = g.Al;
+            switch (type)
+            {
+                case 0: case 4:
+                    {
+                        g.Esi = U32(d, 0x191a); if (B(0x16) != 0xff) { g.Eax = 0x56; Mul8(g, g.Al, B(0x16)); g.Esi = U32(d, (int)(g.Eax + 0x6ca)); }
+                        g.Eax = B16(0x17); w.Call(0x1e133, g); g.Eax = 0; g.Ah = B(0x10);
+                        if (type == 0)
+                        {
+                            g.Ebp = U32(d, 0x19f6) + g.Eax; g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B16(0x12); g.Edx = B16(0x14); g.Test(B(0), 0x80, 8);
+                            if (!g.Zf) { uint e = g.Edi, a = g.Eax, b = g.Ebx, c = g.Ecx, x = g.Edx; g.Cmp(B(0x10), 8, 8); w.Call(g.Zf ? 0x1df08u : 0x1df3cu, g); g.Edi = e; g.Eax = a; g.Ebx = b; g.Ecx = c; g.Edx = x; }
+                            goto t4f4;
+                        }
+                        g.Ecx = U32(d, 0x19f6) + g.Eax; g.Eax = B32(4); g.Ebx = B32(8); g.Dl = B(0x12); g.Dh = B(0x14);
+                        { uint e = g.Edi; w.Call(0x1df7b, g); g.Edi = e; }
+                        g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B16(0x12); g.Edx = B16(0x14); w.Call(0x21a3d, g); if (g.Zf) goto t537;
+                        g.Eax += 0x10; g.Ebx += 0x10; w.Call(0x3eea, g); goto t50f;
+                    }
+                case 1: case 5:
+                    {
+                        g.Esi = U32(d, 0x191a); if (B(0x14) != 0xff) { g.Eax = 0x56; Mul8(g, g.Al, B(0x14)); g.Esi = U32(d, (int)(g.Eax + 0x6ca)); }
+                        g.Eax = B16(0x15); w.Call(0x1e133, g); g.Eax = 0; g.Ah = B(0x10);
+                        if (type == 1)
+                        {
+                            g.Ebp = U32(d, 0x19f6) + g.Eax; g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B(0x12); g.Edx = B(0x13); g.Test(B(0), 0x80, 8);
+                            if (!g.Zf) { uint e = g.Edi, a = g.Eax, b = g.Ebx, c = g.Ecx, x = g.Edx; g.Cmp(B(0x10), 8, 8); w.Call(g.Zf ? 0x1e098u : 0x1e0deu, g); g.Edi = e; g.Eax = a; g.Ebx = b; g.Ecx = c; g.Edx = x; }
+                            goto t4f4;
+                        }
+                        g.Ecx = U32(d, 0x19f6) + g.Eax; g.Eax = B32(4); g.Ebx = B32(8); g.Dl = B(0x12); g.Dh = B(0x13);
+                        { uint e = g.Edi; w.Call(0x1e153, g); g.Edi = e; }
+                        g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B(0x12); g.Edx = B(0x13); w.Call(0x21a3d, g); if (g.Zf) goto t537;
+                        g.Eax += 0x10; g.Ebx += 0x10; w.Call(0x3eea, g); goto t50f;
+                    }
+                case 7: case 8:
+                    {
+                        g.Test(B(0), 0x80, 8);
+                        if (!g.Zf)
+                        {
+                            uint e = g.Edi; g.Eax = B32(4); g.Ebx = B32(8); g.Cl = B(0x14); g.Ch = B(0x15); g.Dl = B(0x12); g.Dh = B(0x13); g.Edi = B(0x16);
+                            w.Call(type == 7 ? 0x6d4au : 0x6defu, g); g.Edi = e;
+                        }
+                        g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B(0x12); g.Edx = B(0x13); goto t4f4;
+                    }
+                case 3:
+                    {
+                        g.Test(B(0), 0x80, 8);
+                        if (!g.Zf)
+                        {
+                            g.Ebx = B32(0x15); g.Eax = w.Peek(g.Ebx); g.Cmp(B(0x14), 1, 8);
+                            if (!g.Zf) { g.Eax = (uint)(w.Peek(g.Ebx) | w.Peek(g.Ebx + 1) << 8 | w.Peek(g.Ebx + 2) << 16 | w.Peek(g.Ebx + 3) << 24) & 0xffffff; }
+                            g.Ecx = B32(4); g.Edx = B32(8); g.Ebx = B(0x12); uint e = g.Edi; w.Call(0xb3b6, g); g.Edi = e;
+                        }
+                        g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B(0x12); g.Edx = B(0x13); goto t4f4;
+                    }
+                case 2:
+                    {
+                        uint e = g.Edi; g.Esi = B32(0x12); g.Eax = B(0x17); g.Ebx = B(0x18); g.Ecx = B(0x19); g.Edi = U32(d, 0x696); w.Call(0x7069, g); g.Edi = e;
+                        g.Test(B(0), 0x80, 8);
+                        if (g.Zf) { w.Call(0x7012, g); g.Edi = e; g.Ecx = g.Ebx; g.Edx = 0x10; g.Eax = B32(4); g.Ebx = B32(8); goto t4f4; }
+                        g.Ecx = B32(4); g.Edx = B32(8); g.Eax = 0; g.Ah = B(0x10); g.Ebp = U32(d, 0x19f6) + g.Eax; w.Call(0x6cd6, g); g.Edi = e; goto t4f4;
+                    }
+                case 9:
+                    {
+                        uint e = g.Edi; g.Esi = B32(0x12); g.Eax = B(0x17); g.Ebx = B(0x18); g.Ecx = B(0x19); g.Edi = U32(d, 0x696); w.Call(0x7069, g); g.Edi = e;
+                        g.Edx = 0x1f45; g.Ch = 0xff;
+                        do { g.Al = w.Peek(g.Esi); d[g.Edx] = g.Al; g.Ch++; g.Esi++; g.Edx++; g.Cmp(g.Al, 0xff, 8); } while (!g.Zf);
+                        g.Ebx = B(0x16); g.Cmp(g.Bl, g.Ch, 8);
+                        if (!g.Zf)
+                        {
+                            g.Test(d[0x19e7], 2, 8);
+                            if (!g.Zf) { g.Bl = (byte)(g.Bl + 2); g.Cmp(g.Bl, g.Ch, 8); if (!(g.Cf || g.Zf)) g.Bl = g.Ch; }
+                            g.Test(g.Bl, g.Bl, 8);
+                            if (!g.Zf) { g.Cmp(d[g.Ebx + 0x1f44], 0x7e, 8); if (g.Zf) g.Bl--; }
+                            d[g.Ebx + 0x1f45] = 0xff; l[g.Edi + 0x16] = g.Bl; l[g.Edi] |= 0x80;
+                        }
+                        g.Esi = 0x1f45; g.Test(B(0), 0x80, 8);
+                        if (g.Zf) { w.Call(0x7012, g); g.Edi = e; g.Ecx = g.Ebx; g.Edx = 0x10; g.Eax = B32(4); g.Ebx = B32(8); goto t4f4; }
+                        g.Ecx = B32(4); g.Edx = B32(8); g.Eax = 0; g.Ah = B(0x10); g.Ebp = U32(d, 0x19f6) + g.Eax; w.Call(0x6cd6, g); g.Edi = e; goto t4f4;
+                    }
+                case 0xc:
+                    {
+                        g.Test(B(0), 0x80, 8);
+                        if (!g.Zf)
+                        {
+                            g.Eax = B(0x12); Mul8(g, g.Al, B(0x14)); Div8(g, B(0x15)); g.Ah = 0; uint pushed = g.Eax; g.Ecx = g.Eax; g.Eax = B32(4); g.Ebx = B32(8); g.Ecx += g.Eax; g.Edx = g.Ebx;
+                            uint e = g.Edi; g.Edi = B(0x16); w.Call(0x1d7af, g); g.Edi = e; g.Eax = pushed;
+                            g.Ecx = B(0x12); g.Ecx -= g.Eax; g.Eax += B32(4); g.Ebx = B32(8); g.Ecx += g.Eax; g.Edx = g.Ebx;
+                            g.Edi = 0; w.Call(0x1d7af, g); g.Edi = e;
+                            g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B(0x12); g.Edx = 1; w.Call(0x3eea, g); goto t4f4;
+                        }
+                        g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B(0x12); g.Edx = 1; goto t4f4;
+                    }
+                default: goto next;
+            }
+        t4f4:
+            l[g.Edi] &= 0x7f; g.Cmp(g.Eax, 0x1d0, 32);
+            if (g.Cf) { g.Eax -= 0x10; g.Ebx -= 0x10; w.Call(0x3f32, g); g.Eax += 0x10; g.Ebx += 0x10; }
+        t50f:
+            g.Add(g.Ecx, g.Eax); g.Ecx += g.Eax; g.Add(g.Edx, g.Ebx); g.Edx += g.Ebx;
+            g.Cmp(U32(d, 0x194d), g.Eax, 32); if (g.Cf) goto t537;
+            g.Cmp(U32(d, 0x1951), g.Ebx, 32); if (g.Cf) goto t537;
+            g.Cmp(U32(d, 0x194d), g.Ecx, 32); if (!g.Cf) goto t537;
+            g.Cmp(U32(d, 0x1951), g.Edx, 32); if (!g.Cf) goto t537;
+            l[g.Edi + 3] |= 1;
+        t537:
+            g.Al = l[0]; g.Test(g.Al, g.Al, 8); if (g.Zf) goto next;
+            g.Cmp(g.Al, B(1), 8); if (g.Zf) goto next;
+        hide:
+            l[g.Edi + 3] = 0;
+        next:
+            g.Edi += 0x1e;
+        }
+    }
+
+    /// <summary>58CA: the panel of the commands of the selected object [1969] (the widget EDI): D182 (AH = 6) gives the table of the object, A5F4 lists the commands (AL = the owner +22, AH = the byte +6 of the table): their number is +1C of the widget, the rows are laid from 0E0h - 1Bh * number (+1A of the widget and [1F31]); for every entry of the list at DS:1F45 (to FFh) DF7E queues the widget 1F8h whose +2 = the first byte, +15 = the word +1, +14 = the object's byte [1F41], +8 = the row ([1F31] += 32h); at last the panel 297h (DEE4) and A4A9 with EAX = 0.</summary>
+    public static void F58CA(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; uint widget = g.Edi; g.Esi = U32(d, 0x1969); g.Ah = 6; w.Call(0xd182, g);
+        var o = w.ObjectAt(g.Esi); g.Al = o[0x22]; g.Ah = w.Peek(g.Edx + 6); g.Edx += 7; w.Call(0xa5f4, g); g.Edi = widget;
+        l[widget + 0x1c] = g.Al; g.Cl = g.Al; g.Eax = 0x1b; Mul8(g, g.Al, g.Cl); g.Eax = (uint)-(int)g.Eax; g.Eax += 0xe0; Put(d, 0x1f31, g.Eax);
+        l[widget + 0x1a] = (byte)g.Eax; l[widget + 0x1b] = (byte)(g.Eax >> 8); g.Al = o[0]; d[0x1f41] = g.Al; g.Esi = 0x1f45;
+        for (; ; )
+        {
+            g.Cmp(d[g.Esi], 0xff, 8); if (g.Zf) break;
+            uint entry = g.Esi; g.Esi = 0x1f8; g.Al = 1; FDF7E(w, g); g.Esi = entry;
+            g.Al = d[entry]; l[g.Edi + 2] = g.Al; l[g.Edi + 0x15] = d[entry + 1]; l[g.Edi + 0x16] = d[entry + 2]; l[g.Edi + 0x14] = d[0x1f41];
+            g.Eax = U32(d, 0x1f31); Put(l, (int)g.Edi + 8, g.Eax); Put(d, 0x1f31, g.Eax + 0x32); g.Esi = entry + 4;
+        }
+        g.Esi = 0x297; w.Call(0xdee4, g); g.Eax = 0; w.Call(0xa4a9, g);
+    }
+
+    /// <summary>5787: the panel of the selected object [1969]: when [1C89] is set B6F1/B9EB look up the object of the key [1C87] of the owner [1972] (CL = +1A of the widget EDI; EAX = 1: BA2E gives the object, [1969] = ESI, [1C89] = 0); an object of the owner with health and without the bit 80h of +17 gives 66DF (+1A) and 6EC1, otherwise the panel is cleared (DF2A with 2Bh, 6EB2, 66E9, 674F, 4938). The six slots of the list DS:1978 (12 bytes each): E03C finds the widget 2Bh of the slot: found - the redraw bit, a slot without +2 is removed (DFE5), a slot with another number +6 than the widget's +1C is redrawn (4938 when +1A is set); not found - a slot with +2 gets the widget 16Eh (DF7E); the widget takes the slot number +2, the word +0, +0B, the point (1E5h or 22Ch by the parity, 139h + 2Bh * slot) and the number +1C.</summary>
+    public static void F5787(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Cmp(d[0x1c89], 0, 8);
+        if (!g.Zf)
+        {
+            uint e = g.Edi; w.Call(0xb6f1, g); g.Al = d[0x1972]; g.Bl = d[0x1c87]; w.Call(0xb9eb, g); g.Edi = e; l[g.Edi + 0x1a] = g.Cl; g.Cmp(g.Eax, 1, 32);
+            if (!g.Zf) goto slots;
+            g.Al = d[0x1972]; g.Bl = d[0x1c87]; w.Call(0xba2e, g); g.Edi = e; Put(d, 0x1969, g.Esi); d[0x1c89] = 0;
+        }
+        g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); g.Al = o[3]; g.Cmp(g.Al, d[0x1972], 8); if (!g.Zf) goto clear;
+        g.Cmp(o[0x19], 0, 8); if (g.Jle) goto clear;
+        g.Test(U16(o, 0x17), 0x80, 16); if (!g.Zf) goto clear;
+        w.Call(0x66df, g); l[g.Edi + 0x1a] = g.Al; w.Call(0x6ec1, g);
+    slots:
+        g.Esi = 0x1978; g.Cl = 0;
+        do
+        {
+            uint pe = g.Esi, pc = g.Ecx; g.Al = 0x2b; g.Ah = g.Cl; w.Call(0xe03c, g);
+            if (g.Zf) { g.Cmp(U32(d, (int)pe + 2), 0, 32); if (g.Zf) goto next; uint s2 = pe, c2 = g.Ecx; g.Esi = 0x16e; g.Al = 1; FDF7E(w, g); g.Ecx = c2; g.Esi = s2; goto fill; }
+            l[g.Edi] |= 0x80; g.Cmp(U32(d, (int)pe + 2), 0, 32);
+            if (g.Zf)
+            {
+                g.Cmp(l[g.Edi + 0x1a], 0, 8); if (!g.Zf) w.Call(0x4938, g);
+                g.Al = 0x2b; g.Ah = g.Cl; w.Call(0xdfe5, g); goto next;
+            }
+            g.Al = d[pe + 6]; g.Cmp(g.Al, l[g.Edi + 0x1c], 8); if (g.Zf) goto next;
+            g.Cmp(l[g.Edi + 0x1a], 0, 8); if (!g.Zf) { w.Call(0x4938, g); }
+        fill:
+            g.Esi = pe; l[g.Edi + 2] = g.Cl; l[g.Edi + 0x15] = d[pe]; l[g.Edi + 0x16] = d[pe + 1]; l[g.Edi + 0x14] = d[pe + 0xb];
+            g.Eax = g.Cl; Put(l, (int)g.Edi + 4, 0x1e5); bool odd = (g.Al & 1) != 0; g.Al = (byte)(g.Al >> 1); if (odd) Put(l, (int)g.Edi + 4, 0x22c);
+            g.Ah = 0x2b; Mul8(g, g.Al, g.Ah); g.Eax += 0x139; Put(l, (int)g.Edi + 8, g.Eax); g.Al = d[pe + 6]; l[g.Edi + 0x1c] = g.Al;
+        next:
+            g.Esi = pe + 0xc; g.Ecx = pc; g.Cl = (byte)(g.Cl + 1); g.Cmp(g.Cl, 6, 8);
+        } while (g.Cf);
+        return;
+    clear:
+        g.Al = 0x2b; w.Call(0xdf2a, g); w.Call(0x6eb2, g); w.Call(0x66e9, g); w.Call(0x674f, g); w.Call(0x4938, g);
+    }
+
+    /// <summary>5716: the picture rows of the selected object [1969] for the widget EDI: +1A of the widget = the template number +0E, the next widget (+1Eh): +12 = the template pointer + 7 + the dword +7 (the strings), +33 = the word +5, +32 = the army +0 of the object; a template with the nibble F in +41 shows the participant instead (+12 = the participant record + 0A4h, +33 = the byte +0B8 + 0C3h, +32 = FFh, +30 = 40h, +31 = 46h); 3C bytes on, +15 = the byte +45 of the template; 63CB draws; ECX + 1Eh.</summary>
+    public static void F5716(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); g.Al = o[0xe]; l[g.Edi + 0x1a] = g.Al; g.Edi += 0x1e; uint widget = g.Edi;
+        F6877(w, g, o); g.Ebx = g.Ecx; g.Ecx = widget; var t = w.ObjectAt(g.Edi);
+        g.Eax = g.Edi + 7; g.Add(g.Eax, U32(t, 7)); g.Eax += U32(t, 7); Put(l, (int)g.Ecx + 0x12, g.Eax); g.Eax = (g.Eax & 0xffff0000) | U16(t, 5); l[g.Ecx + 0x33] = t[5]; l[g.Ecx + 0x34] = t[6]; g.Al = o[0]; l[g.Ecx + 0x32] = g.Al;
+        g.Edx = U32(t, 0x40); g.Dh &= 0xf; g.Cmp(g.Dh, 0xf, 8);
+        if (g.Zf)
+        {
+            g.Eax = g.Ebx + 0xa4; Put(l, (int)g.Ecx + 0x12, g.Eax); g.Eax = w.PartOf(o[3])[0xb8]; ushort ax = (ushort)(g.Eax + 0xc3); g.Eax = (g.Eax & 0xffff0000) | ax;
+            l[g.Ecx + 0x33] = (byte)ax; l[g.Ecx + 0x34] = (byte)(ax >> 8); l[g.Ecx + 0x32] = 0xff; l[g.Ecx + 0x30] = 0x40; l[g.Ecx + 0x31] = 0x46;
+        }
+        g.Add(g.Ecx, 0x3c); g.Ecx += 0x3c; g.Al = t[0x45]; l[g.Ecx + 0x15] = g.Al; g.Esi = g.Ecx; w.Call(0x63cb, g); g.Add(g.Ecx, 0x1e); g.Ecx += 0x1e;
+    }
+
+    /// <summary>54B4: the panel of the command «build» of the selected object [1969] (the menu of a shop): D182 (AH = 6) gives the table EDX, 6885 the army entry (its byte +8 + 30h is the digit at DS:207, its dword +9 the offset EBP); 14E51 and E055 (2Dh) prepare the screen, F781, L3[0] = 32h; the block of the table ([EDX + 2] + EBP: the size dword + 9 bytes) is copied to [696], in it +4 and the dwords +0C of every 1Eh bytes (from +9 to the size) grow by EBP and the army +0 of the object goes to the byte +16; the widget 35Dh (DF7E), the block [696] (DEE4), [19C2] = 0, L3[2] = 9, L3[12h] = 7.</summary>
+    public static void F54B4(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; uint esi0 = g.Esi; g.Esi = U32(d, 0x1969); g.Ah = 6; w.Call(0xd182, g); uint table = g.Edx;
+        var o = w.ObjectAt(g.Esi); F6885(w, g, o); uint entry = g.Ebx; uint ebp = U32(d, (int)entry + 9); g.Al = d[entry + 8]; g.Al = (byte)(g.Al + 0x30); g.Ebx = 0x200; d[0x207] = g.Al;
+        g.Eax = U16(d, (int)table); g.Ecx = 0x10; g.Edx = 0x10; w.Call(0x14e51, g); g.Al = 0x2d; w.Call(0xe055, g); w.Call(0xf781, g); l[0] = 0x32; l[1] = 0;
+        g.Ebp = ebp; g.Edx = table; g.Esi = Peek32(w, table + 2) + g.Ebp; g.Edi = U32(d, 0x696);
+        g.Ecx = Peek32(w, g.Esi); g.Ecx += 9; g.Eax = g.Ecx; g.Ecx >>= 2;
+        for (uint k = 0; k < g.Ecx * 4; k++) w.Poke(g.Edi + k, w.Peek(g.Esi + k));
+        g.Esi += g.Ecx * 4; g.Edi += g.Ecx * 4; g.Ecx = 0; g.Eax &= 3; g.Ecx = g.Eax;
+        for (uint k = 0; k < g.Ecx; k++) w.Poke(g.Edi + k, w.Peek(g.Esi + k));
+        g.Esi += g.Ecx; g.Edi += g.Ecx; g.Ecx = 0;
+        void Add32(uint a, uint v) { uint r = Peek32(w, a) + v; for (uint k = 0; k < 4; k++) w.Poke(a + k, (byte)(r >> (8 * (int)k))); }
+        g.Edi = U32(d, 0x696); g.Esi = U32(d, 0x1969); g.Al = w.ObjectAt(g.Esi)[0]; Add32(g.Edi + 4, g.Ebp);
+        g.Ecx = Peek32(w, g.Edi); g.Edi += 9; g.Ecx += g.Edi;
+        do { Add32(g.Edi + 0xc, g.Ebp); w.Poke(g.Edi + 0x16, g.Al); g.Edi += 0x1e; g.Cmp(g.Edi, g.Ecx, 32); } while (g.Cf);
+        g.Al = 1; g.Esi = 0x35d; FDF7E(w, g); g.Esi = U32(d, 0x696); w.Call(0xdee4, g); d[0x19c2] = 0; l[2] = 9; l[0x12] = 7; g.Esi = esi0;
+    }
+
+    /// <summary>6FCC: a picture to the screen: the point (EAX, EBX) on the screen [68E] (640 bytes a row), the source ESI + EDX * EBP + ECX (EBP = the source row), EDI = the width (low word) and the height (high word): every row is copied by dwords and bytes, the source goes on by EBP - the width and the screen by 280h - the width.</summary>
+    public static void F6FCC(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint param = g.Edi; g.Edi = g.Ebx; g.Edi <<= 9; g.Ebx <<= 7; g.Edi += g.Eax; g.Edi += g.Ebx; g.Edi += U32(d, 0x68e);
+        g.Eax = g.Edx; { ulong pr = (ulong)g.Eax * g.Ebp; g.Eax = (uint)pr; g.Edx = (uint)(pr >> 32); g.Cf = g.Of = g.Edx != 0; }
+        g.Add(g.Eax, g.Ecx); g.Eax += g.Ecx; g.Add(g.Esi, g.Eax); g.Esi += g.Eax; g.Eax = param; g.Ebx = g.Eax; g.Ebx &= 0xffff; g.Eax >>= 16;
+        g.Ebp -= g.Ebx; g.Edx = 0x280; g.Edx -= g.Ebx;
+        do
+        {
+            g.Ecx = g.Ebx; g.Ecx >>= 2;
+            for (uint k = 0; k < g.Ecx * 4; k++) w.Poke(g.Edi + k, w.Peek(g.Esi + k));
+            g.Esi += g.Ecx * 4; g.Edi += g.Ecx * 4; g.Ecx = g.Ebx; g.Ecx &= 3;
+            for (uint k = 0; k < g.Ecx; k++) w.Poke(g.Edi + k, w.Peek(g.Esi + k));
+            g.Esi += g.Ecx; g.Edi += g.Ecx; g.Ecx = 0; g.Add(g.Esi, g.Ebp); g.Esi += g.Ebp; g.Add(g.Edi, g.Edx); g.Edi += g.Edx; g.Eax--; g.Zf = g.Eax == 0; g.Sf = (g.Eax & 0x80000000) != 0;
+        } while (!g.Zf);
+    }
+
+    /// <summary>9D87: the screen of the saved game: with the mode L3[0] other than 0 nothing; otherwise 10CA0 prepares, F8E1 (EDX = 99h) opens the file: opened - FA88 (EDX = 219h), the areas ([6C9] records of 841h bytes at [3E87]) are read (F9B7) and F967 closes it; not opened - FEC6; then 199B9, DEC8, 6EB2, 4938, the selection is dropped ([1A1B], [1969], [1C87] = 0, L3[0] = 0), [1C6A], [1C62], [1C66] - 1, 14D5C, the dirty table [64C] (4B0h bytes) and DS:33C (310h bytes) are filled with FFh, DEE4 with 18Ch. The file services are recorded stubs.</summary>
+    public static void F9D87(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; g.Cmp(l[0], 0, 8); if (!g.Zf) return;
+        w.Call(0x10ca0, g); g.Edx = 0x99; w.Call(0xf8e1, g);
+        if (g.Cf) w.Call(0xfec6, g);
+        else
+        {
+            g.Edx = 0x219; w.Call(0xfa88, g); g.Eax = d[0x6c9]; g.Ebx = 0x841; { ulong pr = (ulong)g.Eax * g.Ebx; g.Eax = (uint)pr; g.Edx = (uint)(pr >> 32); g.Cf = g.Of = g.Edx != 0; }
+            g.Ecx = g.Eax; g.Edx = U32(d, 0x3e87); w.Call(0xf9b7, g); w.Call(0xf967, g);
+        }
+        w.Call(0x199b9, g); w.Call(0xdec8, g); w.Call(0x6eb2, g); w.Call(0x4938, g);
+        g.Eax = 0; d[0x1a1b] = 0; Put(d, 0x1969, 0); d[0x1c87] = 0; l[0] = 0; l[1] = 0;
+        foreach (int a in new[] { 0x1c6a, 0x1c62, 0x1c66 }) { uint v = U32(d, a); g.Zf = v - 1 == 0; g.Sf = ((v - 1) & 0x80000000) != 0; g.Of = v == 0x80000000; Put(d, a, v - 1); }
+        w.Call(0x14d5c, g); g.Edi = U32(d, 0x64c); g.Eax = 0xffffffff; g.Ecx = 0x4b0;
+        for (uint k = 0; k < 0x4b0; k++) w.Poke(g.Edi + k, 0xff);
+        g.Edi += 0x4b0; g.Ecx = 0; g.Edi = 0x33c; g.Ecx = 0x310; for (int k = 0; k < 0x310; k++) d[0x33c + k] = 0xff; g.Edi += 0x310; g.Ecx = 0;
+        g.Esi = 0x18c; w.Call(0xdee4, g);
+    }
+
+    /// <summary>11087: the world is advanced by EAX frames at once (the dialog of the scroll): [1EC6] = 0, [1C4E] = 1, the key [9091] is held at 0 (saved in the loop); every frame runs 42BB, 96CD, D3E5, 1E7EA and 9BF9; at last [9091] = its old value. The frame services are recorded stubs.</summary>
+    public static void F11087(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; d[0x1ec6] = 0; d[0x1c4e] = 1; g.Bl = d[0x9091]; uint saved = g.Ebx; d[0x9091] = 0;
+        do
+        {
+            uint count = g.Eax; w.Call(0x42bb, g); w.Call(0x96cd, g); w.Call(0xd3e5, g); w.Call(0x1e7ea, g); w.Call(0x9bf9, g); g.Eax = count; g.Eax = Dec32(g, g.Eax);
+        } while (!g.Zf);
+        g.Eax = saved; d[0x9091] = g.Al;
+    }
+
+    /// <summary>10B75: the hero of the player [1972]: the objects of its participant (from [+0E] to [+09] of the record in the pool) are walked, the first with the nibble F in the byte +41 of its template (6885) is the selection [1974] = ESI and A320 centres the view on its cell (+4/+8 &gt;&gt; 5); none: [1974] = 0.</summary>
+    public static void F10B75(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Eax = 0xf5; Mul8(g, g.Al, d[0x1972]); uint pool = w.PoolBase; var part = w.PartOf((byte)(g.Eax / 0xf5)); g.Ebp = U32(part, 9) + pool; g.Esi = U32(part, 0xe) + pool;
+        while (true)
+        {
+            g.Cmp(g.Esi, g.Ebp, 32); if (g.Zf) { Put(d, 0x1974, 0); return; }
+            var o = w.ObjectAt(g.Esi); F6885(w, g, o); var t = w.ObjectAt(g.Edi); g.Eax = U32(t, 0x40); g.Ah &= 0xf; g.Cmp(g.Ah, 0xf, 8);
+            if (g.Zf) break;
+            g.Add(g.Esi, U32(o, 0x10)); g.Esi += U32(o, 0x10);
+        }
+        Put(d, 0x1974, g.Esi); var f = w.ObjectAt(g.Esi); g.Eax = U32(f, 4); g.Ebx = U32(f, 8); g.Eax = g.Shr(g.Eax, 5, 32); g.Ebx = g.Shr(g.Ebx, 5, 32); w.Call(0xa320, g);
+    }
+
+    /// <summary>12198: the dialog handler of the scroll of the darkness (AH = the call: 1 = the scroll is read, 2 = the check): the call 1 puts [1EC5] and BH into +15/+16 of the record ESI; 124D8 (AL = 6, DL = BH) answers: no - nothing; yes - the bit BH of every byte of the fog table [18DA] ([18E2] * [18DE] bytes) is cleared (AND FEh rotated left by BH); the call 2 gives AL = FFh (ZF = 0 is not guaranteed: OR sets the flags).</summary>
+    public static void F12198(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Cmp(g.Ah, 1, 8);
+        if (!g.Zf) { g.Cmp(g.Ah, 2, 8); if (g.Zf) { g.Al |= 0xff; g.Logic(g.Al, 8); } return; }
+        g.Al = d[0x1ec5]; r[0x15] = g.Al; r[0x16] = g.Bh; g.Test(d[0x19ea], 0x3f, 8);
+        g.Dl = g.Bh; g.Al = 6; w.Call(0x124d8, g); if (g.Zf) return;
+        g.Cl = g.Dl; g.Dl = 0xfe; g.Dl = (byte)((g.Cl & 31) >= 8 ? 0 : g.Dl << (g.Cl & 31)); g.Eax = U32(d, 0x18e2); Mul8(g, g.Al, d[0x18de]); g.Edi = U32(d, 0x18da); g.Ecx = g.Eax; g.Al = g.Dl;
+        do { byte res = (byte)(w.Peek(g.Edi) & g.Al); w.Poke(g.Edi, res); g.Logic(res, 8); g.Edi++; g.Ecx = Dec32(g, g.Ecx); } while (!g.Zf);
+    }
+
+    /// <summary>124A5: the item BL is taken from the inventory (20 slots at +0CD of the participant record BH = the owner): the first slot with it is cleared (AL = 0), none: AL = FFh.</summary>
+    public static void F124A5(IUnitActionWorld w, ActionRegs g)
+    {
+        uint e = g.Eax; g.Ebx = e; g.Eax = 0xf5; Mul8(g, g.Al, g.Bh); g.Ecx = (g.Eax & 0xffff) + 0x97a; var part = w.PartOf(g.Bh); g.Edx = 0;
+        for (; ; )
+        {
+            g.Cmp(part[0xcd + g.Edx], g.Bl, 8); if (g.Zf) { part[0xcd + g.Edx] = 0; g.Al = 0; g.Logic(0, 8); return; }
+            g.Edx++; g.Cmp(g.Edx, 0x14, 32); if (!g.Cf) break;
+        }
+        g.Al |= 0xff; g.Logic(g.Al, 8);
+    }
+
+    /// <summary>121FF: the dialog handler of the scroll of the summoning (AH = the call: 1 = the scroll is read, 2 = the check - AL = FFh): the record ESI has the use flag +17; 124D8 (AL = 7, then 0Dh, DL = BH) must allow it; the flag is cleared and A758 creates the object of the template 17h of the army 0 (kind 4); 103EC and 98CC show it (ECX = 2).</summary>
+    public static void F121FF(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Cmp(g.Ah, 1, 8);
+        if (!g.Zf) { g.Cmp(g.Ah, 2, 8); if (g.Zf) { g.Al |= 0xff; g.Logic(g.Al, 8); } return; }
+        g.Cmp(r[0x17], 0, 8); if (g.Zf) return;
+        g.Dl = g.Bh; g.Al = 7; w.Call(0x124d8, g);
+        if (g.Zf) { g.Al = 0xd; w.Call(0x124d8, g); if (g.Zf) return; }
+        r[0x17] = 0; g.Al = 0; g.Logic(0, 8); g.Ah = 4; g.Bl = 0x17; g.Bh = 0; g.Ecx = 0; g.Edx = 0; w.Call(0xa758, g);
+        if (!g.Zf) return;
+        uint esi = g.Esi; g.Esi = g.Edi; g.Eax = 0; g.Ebx = 0; g.Ecx = 2; w.Call(0x103ec, g); w.Call(0x98cc, g); g.Esi = esi;
+    }
+
+    /// <summary>120E2: the dialog handler of the scroll of the call (AH = the call: 1 = read, 2 = the check - AL = FFh): the record ESI gets [1EC5] and BH in +15/+16; with the use flag +17 and the answer of 124D8 (AL = 15h, or 8) the flag is cleared, the message 91h is queued (EDD5) and 1ECA0 (ECX = F08h, EDX = F00h) lists ten objects: for each 10AD2 (AL = 1Bh, AH = 2, BL = 1) finds a place at its point (+4/+8) and A758 (kind 4) creates an object there; 43E5 follows with the offset of the created one.</summary>
+    public static void F120E2(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Cmp(g.Ah, 1, 8);
+        if (!g.Zf) { g.Cmp(g.Ah, 2, 8); if (g.Zf) { g.Al |= 0xff; g.Logic(g.Al, 8); } return; }
+        g.Al = d[0x1ec5]; r[0x15] = g.Al; r[0x16] = g.Bh; g.Cmp(r[0x17], 0, 8); if (g.Zf) return;
+        g.Dl = g.Bh; g.Al = 0x15; w.Call(0x124d8, g);
+        if (g.Zf) { g.Al = 8; w.Call(0x124d8, g); if (g.Zf) return; }
+        r[0x17] = 0; g.Al = 0x91; g.Ah = g.Dl; g.Bl = g.Dl; uint pushed = g.Edx; w.Call(0xedd5, g); g.Eax = pushed;
+        g.Ecx = 0xf08; g.Edx = 0xf00; w.Call(0x1eca0, g); if (g.Zf) return;
+        g.Ecx = 0xa;
+        do
+        {
+            uint ecx = g.Ecx, edi = g.Edi; var o = w.ObjectAt(g.Edi); g.Ecx = U32(o, 4); g.Edx = U32(o, 8); g.Al = 0x1b; g.Ah = 2; g.Bl = 1; w.Call(0x10ad2, g); g.Edi = edi;
+            if (g.Zf)
+            {
+                g.Bh = g.Bl; g.Bl = g.Al; g.Al = g.Ah; g.Ah = w.ObjectAt(edi)[3]; w.Call(0xa758, g); g.Eax = 4;
+                if (g.Zf) { g.Esi = g.Edi; g.Eax = g.Esi; g.Eax -= w.PoolBase; w.Call(0x43e5, g); }
+            }
+            g.Edi = edi; g.Ecx = ecx - 1;
+        } while (g.Ecx != 0);
+    }
+
+    /// <summary>F09C: the dialog handler of the alliance offer: the participant BH = +9 of the record EDI; EEFA drops the messages between the two (ECX = the record of the offer); its dwords +20, +18 and +1C go to +1A28, +1A2C and +1A30 of the statistics record of BH; 21490 prepares, 23A6E (CL = BH, CH = 4, DL = BL, DH = 5) and 23B8E make the message, EF3F (EBP = E6Bh) reacts.</summary>
+    public static void FF09C(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Bh = w.ObjectAt(g.Edi)[9]; w.Call(0xeefa, g);
+        g.Eax = 0x1a35; g.Edx = g.Bh; { ulong pr = (ulong)g.Eax * g.Edx; g.Eax = (uint)pr; g.Edx = (uint)(pr >> 32); g.Cf = g.Of = g.Edx != 0; }
+        g.Edx = U32(d, 0x6ba); g.Add(g.Edx, g.Eax); g.Edx += g.Eax; int so = (int)(g.Edx - 0x40a000);
+        g.Eax = Peek32(w, g.Ecx + 0x20); Put(w.Stats, so + 0x1a28, g.Eax); g.Eax = Peek32(w, g.Ecx + 0x18); Put(w.Stats, so + 0x1a2c, g.Eax); g.Eax = Peek32(w, g.Ecx + 0x1c); Put(w.Stats, so + 0x1a30, g.Eax);
+        w.Call(0x21490, g); g.Cl = g.Bh; g.Ch = 4; g.Dl = g.Bl; g.Dh = 5; w.Call(0x23a6e, g); w.Call(0x23b8e, g); g.Ebp = 0xe6b; w.Call(0xef3f, g);
+    }
+
+    /// <summary>11EFF: the handler of the crystal in the inventory (ECX = the participant record, AH = the call): 2 = the use: the first slot (+0CD) with a value 18h..1Eh takes the bits BL - 17h (slot - 17h | BL - 17h, + 17h), AL = 0, none: AL = FFh; 3 = the picture: E5E6, AL = +15, DEE4 with ESI = 475Bh.</summary>
+    public static void F11EFF(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Cmp(g.Ah, 2, 8);
+        if (!g.Zf)
+        {
+            g.Cmp(g.Ah, 3, 8); if (!g.Zf) return;
+            uint esi = g.Esi; w.Call(0xe5e6, g); g.Esi = esi; g.Al = r[0x15]; g.Esi = 0x475b; w.Call(0xdee4, g); return;
+        }
+        var part = w.PartOf((byte)((g.Ecx - 0x97a) / 0xf5)); g.Edx = 0;
+        for (; ; )
+        {
+            g.Cmp(part[0xcd + g.Edx], 0x18, 8);
+            if (!g.Cf)
+            {
+                g.Cmp(part[0xcd + g.Edx], 0x1e, 8);
+                if (g.Cf || g.Zf)
+                {
+                    part[0xcd + g.Edx] = (byte)(part[0xcd + g.Edx] - 0x17); g.Bl = (byte)(g.Bl - 0x17); part[0xcd + g.Edx] |= g.Bl; part[0xcd + g.Edx] = Add8(g, part[0xcd + g.Edx], 0x17);
+                    g.Al = 0; g.Logic(0, 8); return;
+                }
+            }
+            g.Edx++; g.Cmp(g.Edx, 0x14, 32); if (!g.Cf) break;
+        }
+        g.Al |= 0xff; g.Logic(g.Al, 8);
+    }
+
+    /// <summary>1205C: the handler of the timed item (ECX = the participant record, EDX = the slot, AH = the call): 3 = the tick: 219C3 (CL, CH = +0F/+10 of the record ESI, EDX = F0Fh) and 8197 (AL, BL = the cell, ECX = size + 101h, DL = DH of the saved EBX); the counter +0E (9 when 0) is decremented and at 0 the slot [ECX + EDX + 0CD] is cleared; 2 = AL = FFh.</summary>
+    public static void F1205C(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Cmp(g.Ah, 3, 8);
+        if (!g.Zf) { g.Cmp(g.Ah, 2, 8); if (g.Zf) { g.Al |= 0xff; g.Logic(g.Al, 8); } return; }
+        uint ecx0 = g.Ecx, edx0 = g.Edx, esi0 = g.Esi, ebx0 = g.Ebx;
+        g.Cl = r[0xf]; g.Ch = r[0x10]; g.Edx = 0xf0f; w.Call(0x219c3, g); g.Al = g.Cl; g.Bl = g.Ch; g.Edx -= g.Ecx; g.Ecx = g.Edx + 0x101; g.Edx = ebx0; g.Dl = g.Dh; w.Call(0x8197, g);
+        g.Esi = esi0; g.Edx = edx0; g.Ecx = ecx0;
+        g.Cmp(r[0xe], 0, 8); if (g.Zf) r[0xe] = 9;
+        r[0xe] = Dec8(g, r[0xe]); if (!g.Zf) return;
+        w.PartOf((byte)((g.Ecx - 0x97a) / 0xf5))[0xcd + g.Edx] = 0;
+    }
+
+    /// <summary>11BE0: the (BH + 1)-th object of the participant BL (from [+0E] to [+09] of its record) with the template number +0E = AL and the army +0 = AH: EDI = it (the walk ends at the end of the list); SF = the counter has run out.</summary>
+    public static void F11BE0(IUnitActionWorld w, ActionRegs g)
+    {
+        uint eax0 = g.Eax; g.Eax = 0xf5; Mul8(g, g.Al, g.Bl); var part = w.PartOf(g.Bl); g.Ebp = U32(part, 9) + w.PoolBase; g.Edi = U32(part, 0xe) + w.PoolBase; g.Al = g.Bh; g.Ebx = eax0;
+        for (; ; )
+        {
+            g.Cmp(g.Edi, g.Ebp, 32); if (g.Zf) return;
+            var o = w.ObjectAt(g.Edi); g.Cmp(o[0xe], g.Bl, 8);
+            if (g.Zf) { g.Cmp(o[0], g.Bh, 8); if (g.Zf) { g.Al = Dec8(g, g.Al); if (g.Sf) return; } }
+            g.Add(g.Edi, U32(o, 0x10)); g.Edi += U32(o, 0x10);
+        }
+    }
+
+    /// <summary>E717: the menu of the messages of a settlement (mode L3[0] = 2): F781 prepares, EAD8 (EAX = [DD4], BL = 2, EBP = EC82h, ECX = 28h, EDX = 3Ch) makes the title, [1F31] = DCh; for every of the 8 records of 0Eh bytes from [1F35] + 34h (the index +0, FFh = none) whose message (the table L3[EFB + 13h * index]: the flag +10 without the bit 40h) is of the player [1972] (+9): DF7E queues the widget 3C5Bh (+0C = ED01h when +12 = +11 of the table); the text is the string (9E69 picks it) of the list [table] (the first byte is the count, every string ends with FFh): +12 = its pointer, +1A = the index, +17 = [1972], +18 and +1B = [DD4]; 7012 measures it (centred at 0F0h - width / 2 = +4), +8 = [1F31], 704F gives the height (+0Fh) that moves [1F31]. The services are recorded stubs that keep EDX and EDI.</summary>
+    public static void FE717(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; w.Call(0xf781, g); l[0] = 2; l[1] = 0; g.Eax = l[0xdd4]; g.Bl = 2; g.Ebp = 0xec82; g.Ecx = 0x28; g.Edx = 0x3c; w.Call(0xead8, g);
+        Put(d, 0x1f31, 0xdc); g.Edi = U32(d, 0x1f35); g.Edi += 0x34; g.Ecx = 8;
+        do
+        {
+            g.Cmp(w.Peek(g.Edi), 0xff, 8);
+            if (!g.Zf)
+            {
+                g.Eax = 0x13; Mul8(g, g.Al, w.Peek(g.Edi)); g.Al = l[g.Eax + 0xf00 + 0xb]; g.Test(g.Al, 0x40, 8);
+                if (g.Zf)
+                {
+                    g.Al = w.Peek(g.Edi + 9); g.Cmp(g.Al, d[0x1972], 8);
+                    if (g.Zf)
+                    {
+                        uint ecx = g.Ecx; g.Esi = 0x3c5b; uint edi = g.Edi; g.Al = 1; FDF7E(w, g); g.Edx = g.Edi; g.Edi = edi;
+                        g.Eax = 0x13; Mul8(g, g.Al, w.Peek(g.Edi)); g.Ebx = (g.Eax & 0xffff) + 0xefb;
+                        g.Al = l[g.Ebx + 0x12]; g.Cmp(g.Al, l[g.Ebx + 0x11], 8); if (g.Zf) Put(l, (int)g.Edx + 0xc, 0xed01);
+                        g.Ebx = U32(l, (int)g.Ebx); w.Call(0x9e69, g); Mul8(g, g.Al, w.Peek(g.Ebx));
+                        goto skip;
+                    again: g.Ebx++; g.Cmp(w.Peek(g.Ebx), 0xff, 8); if (!g.Zf) goto again;
+                    skip: g.Ebx++; g.Ah = Dec8(g, g.Ah); if (!g.Sf) goto again;
+                        Put(l, (int)g.Edx + 0x12, g.Ebx); l[g.Edx + 0x1a] = w.Peek(g.Edi); l[g.Edx + 0x17] = d[0x1972]; g.Al = l[0xdd4]; l[g.Edx + 0x18] = g.Al; l[g.Edx + 0x1b] = g.Al;
+                        g.Esi = g.Ebx; w.Call(0x7012, g); g.Eax = 0xf0; g.Ebx >>= 1; g.Eax -= g.Ebx; Put(l, (int)g.Edx + 4, g.Eax); g.Eax = U32(d, 0x1f31); Put(l, (int)g.Edx + 8, g.Eax);
+                        w.Call(0x704f, g); g.Eax += 0xf; Put(d, 0x1f31, U32(d, 0x1f31) + g.Eax); g.Ecx = ecx;
+                    }
+                }
+            }
+            g.Edi += 0xe; g.Ecx = Dec32(g, g.Ecx);
+        } while (!g.Zf);
     }
 
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
