@@ -10010,6 +10010,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the owner's table and the list lie in the flat text test region; the owner of the object is limited to 0..7 in the fixture"
+    },
+    {
+      "id": "le1-blit-trapezoid-6f18",
+      "module": "LE:1",
+      "start": 28440,
+      "end": 28620,
+      "name": "Scaled trapezoid blit through the shade table (6F18)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the screen, the shade table and the source are flat test regions in the video window; the first 4000h bytes of the screen are compared"
     }
   ]
 }

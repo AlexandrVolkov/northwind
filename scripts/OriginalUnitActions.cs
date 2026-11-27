@@ -3440,6 +3440,36 @@ public static class OriginalUnitActions
         d[g.Edi] = 0xff; g.Al = g.Ah; g.Ah = d[0x1f42]; g.Esi = esi0;
     }
 
+    /// <summary>6F18: the picture ESI scaled into a trapezoid on the screen (EAX, EBX = the point, CL = the width of the first row, DL = the width of the last, CH = the number of rows): every row narrows by the fixed-point step (CL - DL) / (CH - 1) from 7Fh of the fraction and the pixels are taken from the source by the 8.8 step (the width of the source row / the width of the row) through the shade table [19F6] + 700h (the row of the table by the top five bits of the step fraction); the screen row is centred; ZF/CF are those of the last SUB/MUL/DEC.</summary>
+    public static void F6F18(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds;
+        g.Edi = g.Ebx; g.Edi <<= 9; g.Ebx <<= 7; g.Edi += g.Eax; g.Edi += g.Ebx; g.Edi += U32(d, 0x68e);
+        g.Eax = 0x280; bool borrow = g.Al < g.Cl; g.Al = (byte)(g.Al - g.Cl); g.Ah = (byte)(g.Ah - (borrow ? 1 : 0)); Put(d, 0x1f35, g.Eax);
+        g.Ah = g.Cl; g.Ah = (byte)(g.Ah - g.Dl); g.Bl = g.Ch; g.Bl = (byte)(g.Bl - 1); g.Bh = 0; g.Al = 0; g.Edx = 0;
+        { uint ax = g.Eax & 0xffff, bx = g.Ebx & 0xffff; uint q = ax / bx, r = ax % bx; g.Eax = (g.Eax & 0xffff0000) | q; g.Edx = r; }
+        Put(d, 0x1f31, g.Eax); g.Bh = g.Cl; g.Bl = 0x7f; d[0x1f0b] = g.Cl;
+        for (; ; )
+        {
+            uint pushedEbx = g.Ebx; g.Edx = 0; g.Ah = d[0x1f0b]; g.Al = g.Dl; g.Bl = g.Bh; g.Bh = g.Al;
+            { uint ax = g.Eax & 0xffff, bx = g.Ebx & 0xffff; uint q = ax / bx, r = ax % bx; g.Eax = (g.Eax & 0xffff0000) | q; g.Edx = (g.Edx & 0xffff0000) | r; }
+            g.Dh = g.Al; g.Dl = g.Bl; g.Ebp = g.Ah; g.Ah = 0; g.Al &= 0xf8; g.Eax <<= 5;
+            g.Ebx = U32(d, 0x19f6); g.Ebx += 0x700; g.Ebx += g.Eax; g.Eax = 0; g.Al = d[0x1f0b]; g.Al = (byte)(g.Al - g.Dl);
+            bool cf = (g.Al & 1) != 0; g.Al = (byte)(g.Al >> 1); g.Edi += g.Eax + (cf ? 1u : 0u); uint pushedEax = g.Eax; g.Cl = 0x7f;
+            do
+            {
+                g.Al = w.Peek(g.Esi); bool c2 = g.Cl + g.Dh > 0xff; g.Cl = (byte)(g.Cl + g.Dh); g.Esi += g.Ebp + (c2 ? 1u : 0u);
+                g.Al = w.Peek(g.Ebx + g.Eax); w.Poke(g.Edi, g.Al); g.Edi++; g.Dl = Dec8(g, g.Dl);
+            } while (!g.Zf);
+            g.Eax = pushedEax; g.Edi += g.Eax; g.Edi += U32(d, 0x1f35); g.Ebx = pushedEbx;
+            g.Al = g.Bh; g.Ebx -= U32(d, 0x1f31); g.Cmp(g.Al, g.Bh, 8); g.Al = (byte)(g.Al - g.Bh);
+            g.Cmp(g.Ch, g.Al, 8); g.Ch = (byte)(g.Ch - g.Al);
+            if (g.Cf || g.Zf) return;
+            Mul8(g, g.Al, d[0x1f0b]); g.Esi += g.Eax; g.Ch = Dec8(g, g.Ch);
+            if (g.Zf) return;
+        }
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
