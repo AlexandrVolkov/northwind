@@ -3519,6 +3519,40 @@ public static class OriginalUnitActions
         }
     }
 
+    /// <summary>11C1A: the objects of the area of the participant of the object ESI (the record r, owner +3): 1EAD8 gives the statistics record of the participant, its corners [+63]/[+65] (EDX = the size + 101h), D7B1 lists the objects at DS:1F45 (EDI = 1F45).</summary>
+    public static void F11C1A(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        uint esi = g.Esi; g.Al = r[3]; w.Call(0x1ead8, g); int so = 0x1a35 * r[3]; g.Ecx = U32(w.Stats, so + 0x63); g.Edx = U32(w.Stats, so + 0x65); g.Cmp(g.Edx, g.Ecx, 32); g.Edx -= g.Ecx; g.Add(g.Edx, 0x101); g.Edx += 0x101;
+        w.Call(0xd7b1, g); g.Edi = 0x1f45; g.Esi = esi;
+    }
+
+    /// <summary>11C3D: the objects round the point (EAX, EBX in pixels): the cell (&gt;&gt; 5) goes to 219C3, EDX - ECX + 101h is the size (ECX), the owner [1972] to 8197 (AL, BL = the cell); then A320 for the cell of the point.</summary>
+    public static void F11C3D(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint eax = g.Eax, ebx = g.Ebx; g.Eax >>= 5; g.Ebx >>= 5; g.Cl = g.Al; g.Ch = g.Bl; w.Call(0x219c3, g);
+        g.Al = g.Cl; g.Bl = g.Ch; g.Edx -= g.Ecx; g.Ecx = g.Edx + 0x101; g.Dl = d[0x1972]; w.Call(0x8197, g);
+        g.Ebx = ebx; g.Eax = eax; g.Eax = g.Shr(g.Eax, 5, 32); g.Ebx = g.Shr(g.Ebx, 5, 32); w.Call(0xa320, g);
+    }
+
+    /// <summary>11C73: the objects of the owner of the object ESI (the record r) in the area of its participant (1EAD8, D7B1 as in 11C1A) whose template has the bit 8 of +40 are handed over (D1BA with AL = the participants - 1).</summary>
+    public static void F11C73(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; uint esi0 = g.Esi; g.Ah = r[3]; uint eax0 = g.Eax; g.Al = g.Ah; w.Call(0x1ead8, g);
+        int so = 0x1a35 * r[3]; g.Ecx = U32(w.Stats, so + 0x63); g.Edx = U32(w.Stats, so + 0x65); g.Edx -= g.Ecx; g.Add(g.Edx, 0x101); g.Edx += 0x101; w.Call(0xd7b1, g); g.Ebp = 0x1f45; g.Ecx = eax0;
+        for (; ; )
+        {
+            g.Esi = U32(d, (int)g.Ebp); g.Test(g.Esi, g.Esi, 32); if (g.Zf) break;
+            var o = w.ObjectAt(g.Esi); g.Cmp(o[3], g.Cl, 8);
+            if (g.Zf)
+            {
+                F6885(w, g, o); g.Test(U32(w.ObjectAt(g.Edi), 0x40), 8, 32);
+                if (!g.Zf) { uint ecx = g.Ecx, ebp = g.Ebp; g.Al = Dec8(g, d[0x6c6]); w.Call(0xd1ba, g); g.Ebp = ebp; g.Ecx = ecx; }
+            }
+            g.Add(g.Ebp, 4); g.Ebp += 4;
+        }
+        g.Esi = esi0;
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
