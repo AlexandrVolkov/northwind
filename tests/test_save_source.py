@@ -39,12 +39,17 @@ class SaveSourceChecks(unittest.TestCase):
 
     def test_campaign99_cabinet_name_records_keep_raw_tail_bytes(self):
         body = bytearray(25 + 512 + 0x841)
+        struct.pack_into('<II', body, 1, 61440, 61440)
+        body[9:12] = bytes((0, 1, 0xff))
         body[25 + 6:25 + 6 + 20] = 'Олег'.encode('cp866') + bytes([0xff] * 16)
         body[25 + 6 + 20:25 + 6 + 22] = b'\x02\x03'
         result = parse_session99(body)
         self.assertEqual((result['cabinet_participants'][0]['name'],
                           result['cabinet_participants'][0]['trailing_bytes']), ('Олег', [2, 3]))
         self.assertEqual(len(result['cabinet_participants']), 16)
+        self.assertEqual((result['remaining_turn_ticks'], result['turn_duration_ticks']), (61440, 61440))
+        self.assertEqual(result['scheduled_participants'], [0, 1])
+        self.assertEqual(result['field_1cb5'][:3], [0, 1, 255])
 
 
     def test_area22_descriptor_and_bucket_bounds(self):

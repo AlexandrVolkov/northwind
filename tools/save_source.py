@@ -142,8 +142,11 @@ def parse_session99(payload):
         row = cabinet[index * 22:(index + 1) * 22]
         name = row[:20].split(b'\xff', 1)[0].split(b'\0', 1)[0].decode('cp866')
         names.append(dict(index=index, name=name, trailing_bytes=list(row[20:22])))
+    schedule_end = field_1cb5.index(0xff) if 0xff in field_1cb5 else len(field_1cb5)
     return dict(current_participant=current_participant, field_1cad=field_1cad,
                 field_1cb1=field_1cb1, field_1cb5=field_1cb5,
+                remaining_turn_ticks=field_1cad, turn_duration_ticks=field_1cb1,
+                scheduled_participants=field_1cb5[:schedule_end],
                 world_width=table[0], world_height=table[1],
                 current_area_x=table[2], current_area_y=table[3],
                 table_length=512, table_sha256=hashlib.sha256(table).hexdigest(),
