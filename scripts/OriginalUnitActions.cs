@@ -3553,6 +3553,42 @@ public static class OriginalUnitActions
         g.Esi = esi0;
     }
 
+    /// <summary>21A00: clip the rectangle (CL, CH = the corner, DL, DH = the size) to the map [18DE] x [18E2]: a corner outside is moved to 0 and its excess is added to the size, the far edge is cut to the map; the size becomes the difference.</summary>
+    public static void F21A00(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; byte mw = d[0x18de], mh = d[0x18e2];
+        g.Cmp(g.Cl, mw, 8); if (!g.Cf) { g.Dl = Add8(g, g.Dl, g.Cl); g.Cl = 0; g.Logic(0, 8); }
+        g.Cmp(g.Ch, mh, 8); if (!g.Cf) { g.Dh = Add8(g, g.Dh, g.Ch); g.Ch = 0; g.Logic(0, 8); }
+        g.Dl = Add8(g, g.Dl, g.Cl); g.Cmp(g.Dl, mw, 8); if (!(g.Cf || g.Zf)) g.Dl = mw; g.Dl = Sub8(g, g.Dl, g.Cl);
+        g.Dh = Add8(g, g.Dh, g.Ch); g.Cmp(g.Dh, mh, 8); if (!(g.Cf || g.Zf)) g.Dh = mh; g.Dh = Sub8(g, g.Dh, g.Ch);
+    }
+
+    /// <summary>21A3D: clip the pixel rectangle (EAX, EBX = the corner, signed; ECX, EDX = the size) to the 1C0h x 1C0h view: a negative corner is moved to 0 and cuts the size, the far edge is cut; nothing left: AL = 0 and ZF = 1; otherwise the flags of ECX.</summary>
+    public static void F21A3D(IUnitActionWorld w, ActionRegs g)
+    {
+        if ((int)g.Eax < 0)
+        {
+            g.Eax = (uint)-(int)g.Eax; g.Cmp(g.Ecx, g.Eax, 32); g.Ecx -= g.Eax; if (g.Cf || g.Zf) goto none; g.Eax = 0;
+        }
+        else
+        {
+            g.Ebp = g.Eax + g.Ecx; g.Cmp(g.Ebp, 0x1c0, 32); g.Ebp -= 0x1c0;
+            if (!(g.Cf || g.Zf)) { g.Cmp(g.Ecx, g.Ebp, 32); g.Ecx -= g.Ebp; if (g.Cf || g.Zf) goto none; }
+        }
+        if ((int)g.Ebx < 0)
+        {
+            g.Ebx = (uint)-(int)g.Ebx; g.Cmp(g.Edx, g.Ebx, 32); g.Edx -= g.Ebx; if (g.Cf || g.Zf) goto none; g.Ebx = 0;
+        }
+        else
+        {
+            g.Ebp = g.Ebx + g.Edx; g.Cmp(g.Ebp, 0x1c0, 32); g.Ebp -= 0x1c0;
+            if (!(g.Cf || g.Zf)) { g.Cmp(g.Edx, g.Ebp, 32); g.Edx -= g.Ebp; if (g.Cf || g.Zf) goto none; }
+        }
+        g.Test(g.Ecx, g.Ecx, 32); return;
+    none:
+        g.Al = 0; g.Logic(0, 8);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {

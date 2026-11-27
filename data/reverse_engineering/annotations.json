@@ -10105,6 +10105,26 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "1EAD8, D7B1, 219C3, 8197, A320 and D1BA are recorded stubs; the statistics record is the flat test region"
+    },
+    {
+      "id": "le1-clip-rectangles-21a00",
+      "module": "LE:1",
+      "start": 137728,
+      "end": 137853,
+      "name": "Clip a cell rectangle to the map and a pixel rectangle to the view (21A00, 21A3D)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs",
+        "scripts/SkirmishPits.cs"
+      ],
+      "limitations": "the map size is 32 x 32 in the fixture; the difference JBE against JB at equal sums is not observable (the value is the same)"
     }
   ]
 }

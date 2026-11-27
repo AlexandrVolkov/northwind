@@ -87,15 +87,7 @@ public sealed partial class Skirmish
         {
             switch (address)
             {
-                case 0x21a00:   // clip the rectangle (CL, CH, DL, DH = left, top, width, height) to the map
-                {
-                    byte w = Ds[0x18de], h = Ds[0x18e2], cl = g.Cl, ch = g.Ch, dl = g.Dl, dh = g.Dh;
-                    if (cl >= w) { dl += cl; cl = 0; }
-                    if (ch >= h) { dh += ch; ch = 0; }
-                    dl += cl; if (dl > w) dl = w; dl -= cl;
-                    dh += ch; if (dh > h) dh = h; dh -= ch;
-                    g.Cl = cl; g.Ch = ch; g.Dl = dl; g.Dh = dh; break;
-                }
+                case 0x21a00: OriginalUnitActions.F21A00(this, g); break;   // clip the rectangle (CL, CH, DL, DH = left, top, width, height) to the map
                 case 0xd7b1:    // the list of the unique occupants of the rectangle at DS:1F45, ended by 0
                 {
                     var list = OriginalTargetRules.Collect(new SearchWorld(battle, 0), g.Cl, g.Ch, g.Dl, g.Dh);
