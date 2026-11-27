@@ -3324,6 +3324,88 @@ public static class OriginalUnitActions
         }
     }
 
+    /// <summary>CF77: stamp the tile found by CF41 (AL = the class, AH = the byte 1) on a rectangle (CL x CH cells from the point EDX = x + 256 y): CD72 for every cell with EBX = the tile, the point in EAX; no such tile: nothing happens.</summary>
+    public static void FCF77(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint esi = g.Esi, edx0 = g.Edx, ecx0 = g.Ecx;
+        FCF41(w, g); g.Ecx = ecx0; g.Ebx = g.Eax; g.Eax = edx0;
+        if (g.Zf) { g.Esi = esi; return; }
+        d[0x7e9] = g.Al; g.Dl = g.Cl;
+        do
+        {
+            g.Al = d[0x7e9];
+            do
+            {
+                uint eax = g.Eax, ebx = g.Ebx, ecx = g.Ecx, edx = g.Edx; FCD72(w, g); g.Eax = eax; g.Ebx = ebx; g.Ecx = ecx; g.Edx = edx;
+                g.Al = Inc8(g, g.Al); g.Dl = Dec8(g, g.Dl);
+            } while (!g.Zf);
+            g.Ah = Inc8(g, g.Ah); g.Ch = Dec8(g, g.Ch);
+        } while (!g.Zf);
+        g.Esi = esi;
+    }
+
+    /// <summary>CFAC: stamp tiles over a rectangle (CL x CH cells from the point EDX = x + 256 y; AL = the way, AH = the parameter): every cell inside the map reads its tile descriptor; way 0: the bytes 2 and 3 are equal after the turn by 4 bits - CE9D finds the tile of the same class (AH = the byte 1, AL = the descriptor &amp; 7); another way: the nibbles of the bytes 2 and 3 choose the colours (BL, BH) and CF07 lists the tiles (AH, mask F00h), of which the first two that CE9D finds for the colours form the tile; CD72 stamps it at the cell.</summary>
+    public static void FCFAC(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint esi0 = g.Esi, eax0 = g.Eax;
+        d[0x1f0a] = g.Cl; g.Dl = (byte)(g.Dl + g.Cl); g.Cl = d[0x1f0a];
+        do
+        {
+            g.Cl = d[0x1f0a]; g.Dl = (byte)(g.Dl - g.Cl);
+            do
+            {
+                uint ecx = g.Ecx, edx = g.Edx; uint saved = eax0;
+                g.Cmp(g.Dl, d[0x18de], 8);
+                if (g.Cf)
+                {
+                    g.Cmp(g.Dh, d[0x18e2], 8);
+                    if (g.Cf)
+                    {
+                        g.Edi = U32(d, 0x18ee); g.Eax = U32(d, 0x18de); Mul8(g, g.Al, g.Dh); g.Edi += g.Eax * 4; g.Eax = g.Dl; g.Eax = w.PlaneRead(g.Edi + g.Eax * 4) & 0xffff;
+                        g.Edx = U32(d, 0x18fe); g.Ebx = Desc(w, g.Eax, 2); g.Eax = Desc(w, g.Eax, 0);
+                        g.Cmp((byte)saved, 0, 8);
+                        if (g.Zf)
+                        {
+                            g.Cmp(g.Bl, g.Bh, 8);
+                            if (g.Zf)
+                            {
+                                g.Bl = (byte)((g.Bl << 4) | (g.Bl >> 4)); g.Cmp(g.Bl, g.Bh, 8);
+                                if (g.Zf)
+                                {
+                                    g.Ah = (byte)(saved >> 8); g.Al &= 7; FCE9D(w, g);
+                                    if (!g.Zf) { g.Ebx = g.Eax; g.Eax = edx; FCD72(w, g); }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            g.Cl = g.Bh; g.Bh = g.Bl; g.Bl &= 0xf; g.Bh >>= 4; g.Ch = g.Cl; g.Cl &= 0xf; g.Ch >>= 4;
+                            g.Cmp(g.Bl, g.Bh, 8);
+                            if (g.Zf) { g.Bh = g.Cl; g.Cmp(g.Bl, g.Bh, 8); if (g.Zf) g.Bh = g.Ch; }
+                            g.Al = g.Bl; g.Al = (byte)(g.Al << 4); g.Bl |= g.Al; g.Al = g.Bh; g.Al = (byte)(g.Al << 4); g.Bh |= g.Al;
+                            g.Ah = (byte)(saved >> 8); uint ebx = g.Ebx; g.Ebx = 0xf00; FCF07(w, g); g.Ebx = ebx;
+                            if (!g.Zf)
+                            {
+                                g.Esi = 0x1f45;
+                                for (; ; )
+                                {
+                                    g.Eax = U16(d, (int)g.Esi); g.Cmp(g.Eax, 0xffff, 32); if (g.Zf) break;
+                                    g.Esi += 2; g.Ecx = U32(d, 0x18fe); g.Ecx = Desc(w, g.Eax, 0); g.Ecx &= 0xff000000; g.Al = g.Bl; g.Eax <<= 16; g.Eax |= g.Ecx;
+                                    uint pc = g.Ecx, pb = g.Ebx; FCE9D(w, g); g.Ebx = pb; g.Ecx = pc; if (g.Zf) continue;
+                                    g.Eax = g.Bh; g.Eax <<= 16; g.Eax |= g.Ecx; pb = g.Ebx; FCE9D(w, g); g.Ebx = pb; if (g.Zf) continue;
+                                    g.Eax = U16(d, (int)g.Esi - 2); g.Ebx = g.Eax; g.Eax = edx; FCD72(w, g); break;
+                                }
+                            }
+                        }
+                    }
+                }
+                g.Ecx = ecx; g.Edx = edx; g.Dl = (byte)(g.Dl + 1); g.Cl = Dec8(g, g.Cl);
+            } while (!g.Zf);
+            g.Dh = (byte)(g.Dh + 1); g.Ch = Dec8(g, g.Ch);
+        } while (!g.Zf);
+        g.Eax = eax0; g.Esi = esi0;
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
