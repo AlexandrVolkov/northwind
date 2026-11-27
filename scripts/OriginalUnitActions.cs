@@ -3277,6 +3277,53 @@ public static class OriginalUnitActions
         } while (!g.Zf);
     }
 
+    /// <summary>CD72: stamp a tile on the map layer [18EE] (EAX = the point x + 256 y, EBX = the tile): the 3 x 3 cells round the point (the mask dwords DS:7C0, 0 = take the cell) whose tile descriptor, merged by the mask into the descriptor of EBX (DS:7B8), differs get a tile found by CE9D (none: the function ends) - the cells are noted at DS:2045 (point, address, tile), then written as words and the cells in the 14 x 14 view [1906]/[190A] are marked in the dirty cache DS:33C (FFFFh, the rows 38h bytes, the second row +1Ch).</summary>
+    public static void FCD72(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Ecx = g.Eax; g.Eax = U32(d, 0x18de); g.Ebp = (g.Eax << 2) + 4; Mul8(g, g.Al, g.Ch);
+        g.Edi = g.Cl; g.Edi += g.Eax; g.Edi <<= 2; g.Edi += U32(d, 0x18ee); g.Ch--; g.Cl--; g.Edi -= g.Ebp; g.Ebp -= 0x10;
+        Put(d, 0x7ea, g.Ebp); Put(d, 0x7bc, g.Ebx); g.Eax = Desc(w, g.Ebx, 0); Put(d, 0x7b8, g.Eax); d[0x7e8] = g.Cl;
+        g.Esi = 0x2045; g.Ebx = 0x7c0; g.Dh = 3;
+        do
+        {
+            g.Dl = 3; g.Cl = d[0x7e8];
+            do
+            {
+                g.Cmp(g.Cl, d[0x18de], 8);
+                if (!g.Cf) goto skip;
+                g.Cmp(g.Ch, d[0x18e2], 8);
+                if (!g.Cf) goto skip;
+                Put(d, (int)g.Esi, g.Ecx); g.Ebp = U32(d, (int)g.Ebx); g.Eax = U32(d, 0x7bc); g.Test(g.Ebp, g.Ebp, 32);
+                if (!g.Zf)
+                {
+                    g.Eax = Desc(w, w.PlaneRead(g.Edi) & 0xffff, 0);
+                    uint pushed = g.Eax; g.Eax &= g.Ebp; g.Ebp = ~g.Ebp; g.Ebp &= U32(d, 0x7b8); g.Eax |= g.Ebp; g.Ebp = pushed;
+                    g.Cmp(g.Eax, g.Ebp, 32); if (g.Zf) goto skip;
+                    FCE9D(w, g); if (g.Zf) return;
+                }
+                Put(d, (int)g.Esi + 2, g.Edi); d[g.Esi + 6] = g.Al; d[g.Esi + 7] = g.Ah; g.Esi += 8;
+            skip:
+                g.Ebx += 4; g.Edi += 4; g.Cl++; g.Dl = Dec8(g, g.Dl);
+            } while (!g.Zf);
+            g.Edi += U32(d, 0x7ea); g.Ch++; g.Dh = Dec8(g, g.Dh);
+        } while (!g.Zf);
+        g.Eax = 0; Put(d, (int)g.Esi + 2, 0); g.Esi = 0x2045; g.Edx = (g.Edx & 0xffff0000) | 0xffff;
+        for (; ; )
+        {
+            g.Edi = U32(d, (int)g.Esi + 2); g.Test(g.Edi, g.Edi, 32); if (g.Zf) return;
+            g.Eax = U32(d, (int)g.Esi + 6); w.PlaneWrite(g.Edi, (w.PlaneRead(g.Edi) & 0xffff0000) | (g.Eax & 0xffff));
+            g.Eax = U32(d, (int)g.Esi); g.Cmp(g.Al, d[0x1906], 8); g.Al = (byte)(g.Al - d[0x1906]);
+            if (g.Cf) goto next;
+            g.Cmp(g.Al, 0xe, 8); if (!g.Cf) goto next;
+            g.Cmp(g.Ah, d[0x190a], 8); g.Ah = (byte)(g.Ah - d[0x190a]); if (g.Cf) goto next;
+            g.Cmp(g.Ah, 0xe, 8); if (!g.Cf) goto next;
+            g.Ebx = 0; g.Bl = g.Ah; g.Eax &= 0xff; g.Ecx = g.Ebx * 8; g.Ebx <<= 6; g.Ebx -= g.Ecx; g.Ebx = g.Ebx + g.Eax * 2 + 0x33c;
+            d[g.Ebx] = (byte)g.Edx; d[g.Ebx + 1] = (byte)(g.Edx >> 8); d[g.Ebx + 0x1c] = (byte)g.Edx; d[g.Ebx + 0x1d] = (byte)(g.Edx >> 8);
+        next:
+            g.Esi += 8;
+        }
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
