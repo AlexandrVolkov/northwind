@@ -10600,6 +10600,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "none: the real code of EE69 runs in the check; the queues of the participants 0..7 are set in the fixture (the records 0..4 overlap the L3 area only in the flat memory of the Python check and are zeroed before each case); the restore of EDX in EE92 is indistinguishable (EE69 keeps EDX)"
+    },
+    {
+      "id": "le1-message-queue-expire-eebb",
+      "module": "LE:1",
+      "start": 61115,
+      "end": 61247,
+      "name": "Expire and mark the messages in the queues (EEBB, EEFA)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none: the real code runs in the check; the queues of the participants 0..7 are set in the fixture; the game-side callers (F09C) still call EEFA as a recorded stub"
     }
   ]
 }

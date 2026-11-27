@@ -4178,6 +4178,35 @@ public static class OriginalUnitActions
         }
     }
 
+    /// <summary>EEBB: every 20h-th tick ([19E9] + 0Fh divisible by 20h) the queues of the participants 0..[6C6]-1 are cleaned: a record (0Eh bytes from +34) whose time +5 is not above [1CA9] gets the number FFh; EBX = FFh, EDI = behind the last participant, ECX = 0.</summary>
+    public static void FEEBB(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Al = Add8(g, d[0x19e9], 0xf); g.Logic((byte)(g.Al & 0x1f), 8); if (!g.Zf) return;
+        g.Edi = 0x9ae; g.Ch = d[0x6c6]; g.Bl = 0xff; byte p = 0;
+        while (true)
+        {
+            var part = w.PartOf(p); g.Cl = 8;
+            for (int k = 0; ; k++)
+            {
+                g.Cmp(part[0x34 + 0xe * k], g.Bl, 8);
+                if (!g.Zf) { g.Eax = U32(part, 0x34 + 0xe * k + 5); g.Cmp(g.Eax, U32(d, 0x1ca9), 32); if (!g.Cf && !g.Zf) { } else part[0x34 + 0xe * k] = g.Bl; }
+                g.Add(g.Edi, 0xe); g.Edi += 0xe; g.Cl = Dec8(g, g.Cl); if (g.Zf) break;
+            }
+            g.Edi -= 0xe * 8; g.Add(g.Edi, 0xf5); g.Edi += 0xf5; g.Ch = Dec8(g, g.Ch); p++; if (g.Zf) return;
+        }
+    }
+
+    /// <summary>EEFA: the messages of the participant BL that are about BH (+9) get the number FFh in its queue, then the same for BH about BL; EAX, ECX and EDX are kept, the flags come from the last ADD.</summary>
+    public static void FEEFA(IUnitActionWorld w, ActionRegs g)
+    {
+        byte a = g.Bl, b = g.Bh;
+        for (int pass = 0; pass < 2; pass++)
+        {
+            byte own = pass == 0 ? a : b, about = pass == 0 ? b : a; var part = w.PartOf(own); uint edx = 0x9ae + 0xf5u * own;
+            for (int k = 0; k < 8; k++) { g.Cmp(part[0x34 + 0xe * k + 9], about, 8); if (g.Zf) part[0x34 + 0xe * k] = 0xff; g.Add(edx, 0xe); edx += 0xe; }
+        }
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
@@ -5385,8 +5414,8 @@ public static class OriginalUnitActions
         g.Ebx = y; g.Eax = x; g.Eax += U32(d, 0x1906); g.Ebx += U32(d, 0x190a);
         g.Edi = g.Ebx << 9; g.Ebx <<= 7; g.Edi += g.Ebx; g.Edi += g.Eax; g.Edi += U32(d, 0x68e); g.Eax = 0x1010101;
         for (uint k = 0; k < 14; k++) w.Poke(g.Edi + k, k < 12 ? (byte)1 : (byte)1);
-        g.Edi += 0x280; g.Cl = 0xc;
-        do { w.Poke(g.Edi, g.Al); w.Poke(g.Edi + 0xd, g.Al); g.Edi += 0x280; g.Cl = Dec8(g, g.Cl); } while (!g.Zf);
+        g.Add(g.Edi, 0x280); g.Edi += 0x280; g.Cl = 0xc;
+        do { w.Poke(g.Edi, g.Al); w.Poke(g.Edi + 0xd, g.Al); g.Add(g.Edi, 0x280); g.Edi += 0x280; g.Cl = Dec8(g, g.Cl); } while (!g.Zf);
         for (uint k = 0; k < 14; k++) w.Poke(g.Edi + k, 1);
     }
 
