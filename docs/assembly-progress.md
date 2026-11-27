@@ -4,7 +4,7 @@
 
 | Модуль | Байт | Не разобрано | Частично | Проверено | Перенесено | Неразрешённые косвенные переходы |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| LE:1 | 146882 | 80673 | 6265 | 97 | 59847 | 44 |
+| LE:1 | 146882 | 80540 | 6265 | 97 | 59980 | 44 |
 | LE:2 | 15872 | 15872 | 0 | 0 | 0 | 0 |
 | LE:3 | 61833 | 61086 | 0 | 0 | 747 | 0 |
 | ARMY__00.WRK | 5403 | 0 | 100 | 0 | 5303 | 0 |
@@ -192,6 +192,7 @@
 | LE:1 `0x3D67..0x3DB5` | Save, draw and redraw the cursor (3D67) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 1DECF, 1E133 and 1E098 are recorded stubs |
 | LE:1 `0x3DB5..0x3DF2` | Advance cursor frame on a four-tick byte timer interval | ported | [interface.md](../docs/interface.md); [cursor-animation.json](../tests/fixtures/cursor-animation.json) | Числовой шаг проверен на 35840 входах. Выбор семейства, DOS-мышь, фоновый буфер и полный цикл отрисовки курсора не включены; HUD использует только диапазон обычной стрелки. |
 | LE:1 `0x3DB5..0x3DF2` | Frame of the cursor animation (3DB5) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | the upper bound jbe boundary is not distinguished by the check |
+| LE:1 `0x3DF2..0x3E77` | Cut the dirty table into rectangles and copy them (3DF2) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | 3E77 (the screen copy with the bank switching of the video card) is a recorded stub; the table [64C] is a flat test region; the value written back for the cells of a partly marked row (FFh) is not observable, since the cells are cleared later |
 | LE:1 `0x3EEA..0x3F32` | Mark the 16 x 16 cells of a rectangle in the dirty table (3EEA) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | the table [64C] is a flat test region; the boundary of the row step (width exactly 10h) is not distinguished by the check; the many earlier checks that record 3EEA as a stub still do |
 | LE:1 `0x3F32..0x3F79` | Mark the cells of a rectangle in the dirty cache DS:33C (3F32) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | only the first 100h bytes of the cache are compared |
 | LE:1 `0x3F79..0x3FA1` | OR the dirty-cell cache into the table [64C] (3F79) | ported | [unit-actions.md](../docs/unit-actions.md); [unit-actions.json](../tests/fixtures/unit-actions.json); [verify_unit_actions.py](../tools/verify_unit_actions.py); [OriginalUnitActionChecks.cs](../tests/OriginalUnitActionChecks.cs) | none stubbed; the table is a flat test region |

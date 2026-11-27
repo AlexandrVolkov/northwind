@@ -9782,6 +9782,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "only the first 100h bytes of the cache are compared"
+    },
+    {
+      "id": "le1-dirty-rects-3df2",
+      "module": "LE:1",
+      "start": 15858,
+      "end": 15991,
+      "name": "Cut the dirty table into rectangles and copy them (3DF2)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "3E77 (the screen copy with the bank switching of the video card) is a recorded stub; the table [64C] is a flat test region; the value written back for the cells of a partly marked row (FFh) is not observable, since the cells are cleared later"
     }
   ]
 }
