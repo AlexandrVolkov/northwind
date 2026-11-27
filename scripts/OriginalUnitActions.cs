@@ -4494,6 +4494,72 @@ public static class OriginalUnitActions
         } while (!g.Zf);
     }
 
+    /// <summary>9F38: the fog of war on the picture: the fog bytes of the 16 x 16 cells around the view [1906], [190A] (the table [18DA], one bit per owner [1972]) are copied to DS:1F45 (the map borders are marked FFh); for the 14 x 14 visible cells (32 x 32 pixels each, from [68E] + 2810h) a cell hidden from the owner is blended through the table [19F6] + 700h with the fog tile (1E133 chooses it from the hidden neighbours: the mask of four bits, the checkerboard [1F41]) or, with all four neighbours hidden, blacked out; the touched cells go to the dirty cache DS:33C.</summary>
+    public static void F9F38(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Eax = U32(d, 0x68e); g.Eax += 0x2810; Put(d, 0x1f31, g.Eax);
+        g.Eax = 0; g.Al = d[0x190a]; g.Ah = d[0x1906]; g.Edx = g.Eax; g.Ah = (byte)(g.Ah + g.Al); g.Ah &= 1; d[0x1f41] = g.Ah;
+        Mul8(g, g.Al, d[0x18de]); g.Eax += U32(d, 0x1906); g.Esi = g.Eax; g.Esi += U32(d, 0x18da);
+        g.Cl = d[0x1972]; g.Al = 1; g.Al = (byte)((g.Cl & 31) >= 8 ? 0 : g.Al << (g.Cl & 31)); d[0x1f42] = g.Al;
+        g.Edi = 0x1f45; g.Ebp = U32(d, 0x18de); g.Bl = d[0x18e2]; g.Bh = d[0x18de]; g.Ebx -= 0xe0e;
+        g.Esi--; g.Esi -= g.Ebp; g.Eax = 0x10; g.Ebp -= g.Eax;
+        do
+        {
+            for (uint k = 0; k < 16; k++) d[g.Edi + k] = w.Peek(g.Esi + k);
+            g.Edi += 16; g.Esi += 16; g.Ecx = 0; g.Esi += g.Ebp; g.Al = Dec8(g, g.Al);
+        } while (!g.Zf);
+        g.Eax = 0xffffffff; g.Edi -= 0x10; g.Cmp(g.Dl, g.Bl, 8);
+        bool fillRow = g.Zf;
+        if (!fillRow) { g.Edi = 0x1f45; g.Test(g.Dl, g.Dl, 8); fillRow = g.Zf; }
+        if (fillRow) { for (uint k = 0; k < 16; k++) d[g.Edi + k] = 0xff; g.Edi += 16; g.Ecx = 0; }
+        g.Edi = 0x1f45; g.Test(g.Dh, g.Dh, 8); bool fillColumn = g.Zf;
+        if (!fillColumn) { g.Edi += 0xf; g.Cmp(g.Dh, g.Bh, 8); fillColumn = g.Zf; }
+        if (fillColumn) { g.Cl = 0x10; do { d[g.Edi] = g.Al; g.Edi += 0x10; g.Cl = Dec8(g, g.Cl); } while (!g.Zf); }
+        g.Esi = 0x1f56; g.Edi = 0x33c; g.Ch = 0xe; g.Cl = 0xe;
+        for (; ; )
+        {
+            for (; ; )
+            {
+                uint ecx = g.Ecx, esi = g.Esi, edi = g.Edi; g.Ah = d[0x1f42]; g.Test(d[g.Esi], g.Ah, 8);
+                if (!g.Zf)
+                {
+                    g.Eax = 0xffff; d[g.Edi] = 0xff; d[g.Edi + 1] = 0xff; d[g.Edi + 0x1c] = 0xff; d[g.Edi + 0x1d] = 0xff;
+                    g.Eax = Peek32(w, g.Esi - 0x10) | (g.Eax & 0); g.Eax = U32(d, (int)g.Esi - 0x10); g.Dl = d[g.Esi - 0x11]; g.Bl = d[g.Esi - 1]; g.Bh = d[g.Esi + 1]; g.Dh = d[g.Esi + 0xf]; g.Ecx = U32(d, (int)g.Esi + 0x10);
+                    g.Dl &= g.Al; g.Dl &= g.Bl; g.Ah &= g.Al; g.Ah &= g.Bh; g.Dh &= g.Cl; g.Dh &= g.Bl; g.Ch &= g.Cl; g.Ch &= g.Bh;
+                    g.Al = 0xf; g.Cl = d[0x1f42];
+                    g.Test(g.Cl, g.Ah, 8); if (g.Zf) g.Al &= 0xe; g.Test(g.Cl, g.Dl, 8); if (g.Zf) g.Al &= 0xd; g.Test(g.Cl, g.Ch, 8); if (g.Zf) g.Al &= 7; g.Test(g.Cl, g.Dh, 8); if (g.Zf) g.Al &= 0xb;
+                    g.Test(g.Al, g.Al, 8);
+                    if (!g.Zf)
+                    {
+                        g.Cmp(g.Al, 0xf, 8);
+                        if (g.Zf)
+                        {
+                            g.Edi = U32(d, 0x1f31); g.Eax = 0; g.Bl = 0x20;
+                            do { for (uint k = 0; k < 32; k++) w.Poke(g.Edi + k, 0); g.Edi += 32; g.Ecx = 0; g.Edi += 0x260; g.Bl = Dec8(g, g.Bl); } while (!g.Zf);
+                        }
+                        else
+                        {
+                            g.Al = (byte)(g.Al + g.Al); g.Al = (byte)(g.Al + d[0x1f41]); g.Eax &= 0xff; g.Eax += 0xa4; g.Esi = U32(d, 0x191a); w.Call(0x1e133, g);
+                            g.Edi = U32(d, 0x1f31); g.Ebx = U32(d, 0x19f6); g.Ebx += 0x700; g.Eax = 0; g.Ch = 0x20;
+                            do
+                            {
+                                g.Cl = 0x20;
+                                do { g.Ah = w.Peek(g.Esi); g.Esi++; g.Al = w.Peek(g.Edi); g.Al = w.Peek(g.Ebx + g.Eax); w.Poke(g.Edi, g.Al); g.Edi++; g.Cl = Dec8(g, g.Cl); } while (!g.Zf);
+                                g.Edi += 0x260; g.Ch = Dec8(g, g.Ch);
+                            } while (!g.Zf);
+                        }
+                    }
+                }
+                Put(d, 0x1f31, U32(d, 0x1f31) + 0x20); d[0x1f41] ^= 1;
+                g.Ecx = ecx; g.Esi = esi; g.Edi = edi; g.Edi += 2; g.Esi++; g.Cl = Dec8(g, g.Cl);
+                if (g.Zf) break;
+            }
+            g.Edi += 0x1c; Put(d, 0x1f31, U32(d, 0x1f31) + 0x4e40); d[0x1f41] ^= 1; g.Esi += 2; g.Ch = Dec8(g, g.Ch);
+            if (g.Zf) break;
+            g.Cl = 0xe;
+        }
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
