@@ -9744,6 +9744,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "none stubbed; the table is a flat test region"
+    },
+    {
+      "id": "le1-dirty-mark-3eea",
+      "module": "LE:1",
+      "start": 16106,
+      "end": 16178,
+      "name": "Mark the 16 x 16 cells of a rectangle in the dirty table (3EEA)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the table [64C] is a flat test region; the boundary of the row step (width exactly 10h) is not distinguished by the check; the many earlier checks that record 3EEA as a stub still do"
     }
   ]
 }
