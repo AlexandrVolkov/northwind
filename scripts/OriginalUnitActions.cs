@@ -3908,6 +3908,29 @@ public static class OriginalUnitActions
         uint esi = g.Esi; g.Esi = g.Edi; g.Eax = 0; g.Ebx = 0; g.Ecx = 2; w.Call(0x103ec, g); w.Call(0x98cc, g); g.Esi = esi;
     }
 
+    /// <summary>120E2: the dialog handler of the scroll of the call (AH = the call: 1 = read, 2 = the check - AL = FFh): the record ESI gets [1EC5] and BH in +15/+16; with the use flag +17 and the answer of 124D8 (AL = 15h, or 8) the flag is cleared, the message 91h is queued (EDD5) and 1ECA0 (ECX = F08h, EDX = F00h) lists ten objects: for each 10AD2 (AL = 1Bh, AH = 2, BL = 1) finds a place at its point (+4/+8) and A758 (kind 4) creates an object there; 43E5 follows with the offset of the created one.</summary>
+    public static void F120E2(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Cmp(g.Ah, 1, 8);
+        if (!g.Zf) { g.Cmp(g.Ah, 2, 8); if (g.Zf) { g.Al |= 0xff; g.Logic(g.Al, 8); } return; }
+        g.Al = d[0x1ec5]; r[0x15] = g.Al; r[0x16] = g.Bh; g.Cmp(r[0x17], 0, 8); if (g.Zf) return;
+        g.Dl = g.Bh; g.Al = 0x15; w.Call(0x124d8, g);
+        if (g.Zf) { g.Al = 8; w.Call(0x124d8, g); if (g.Zf) return; }
+        r[0x17] = 0; g.Al = 0x91; g.Ah = g.Dl; g.Bl = g.Dl; uint pushed = g.Edx; w.Call(0xedd5, g); g.Eax = pushed;
+        g.Ecx = 0xf08; g.Edx = 0xf00; w.Call(0x1eca0, g); if (g.Zf) return;
+        g.Ecx = 0xa;
+        do
+        {
+            uint ecx = g.Ecx, edi = g.Edi; var o = w.ObjectAt(g.Edi); g.Ecx = U32(o, 4); g.Edx = U32(o, 8); g.Al = 0x1b; g.Ah = 2; g.Bl = 1; w.Call(0x10ad2, g); g.Edi = edi;
+            if (g.Zf)
+            {
+                g.Bh = g.Bl; g.Bl = g.Al; g.Al = g.Ah; g.Ah = w.ObjectAt(edi)[3]; w.Call(0xa758, g); g.Eax = 4;
+                if (g.Zf) { g.Esi = g.Edi; g.Eax = g.Esi; g.Eax -= w.PoolBase; w.Call(0x43e5, g); }
+            }
+            g.Edi = edi; g.Ecx = ecx - 1;
+        } while (g.Ecx != 0);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
