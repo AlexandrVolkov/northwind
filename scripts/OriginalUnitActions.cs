@@ -4276,7 +4276,7 @@ public static class OriginalUnitActions
         var d = w.Ds; d[0x1c60] = 0; g.Eax = 2; g.Ebx = 0x23c; g.Ecx = 0x1d0; g.Edx = 0; w.Call(0x14e51, g);
         g.Cmp(U32(d, 0x1cad), 0xffffffff, 32);
         if (g.Zf) { g.Al = 0x2f; g.Bl = 0x14; g.Bh = 0x16; w.Call(0xe02a, g); }
-        d[0] = 0x2f; d[1] = 0;
+        w.L3[0] = 0x2f; w.L3[1] = 0;
     }
 
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
