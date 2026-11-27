@@ -10543,6 +10543,44 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "1EAD8, E5E6, F781, 9E69, 7012 and 704F are recorded stubs that keep EDX, ECX and EDI; DF7E is the ported code; the message tables lie in the L3 area (records of the owners 6 and 7 only in the fixture)"
+    },
+    {
+      "id": "le1-message-buttons-ecd8",
+      "module": "LE:1",
+      "start": 60632,
+      "end": 60885,
+      "name": "Message button handlers (ECD8, ED01, ED32, ED64, ED93)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5AB, E5E6, DEE4, EDD5 and F791 are recorded stubs (the stubs set only ZF); the queue records of the owners 6 and 7 only in the fixture"
+    },
+    {
+      "id": "le1-message-queue-find-ee49",
+      "module": "LE:1",
+      "start": 61001,
+      "end": 61033,
+      "name": "Find a message in the queue of a participant (EE49)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "none: the real code runs in the check; the flags after the loop come from ADD EDI; owners 6 and 7 only in the fixture"
     }
   ]
 }
