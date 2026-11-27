@@ -3847,6 +3847,31 @@ public static class OriginalUnitActions
         g.Esi = 0x18c; w.Call(0xdee4, g);
     }
 
+    /// <summary>11087: the world is advanced by EAX frames at once (the dialog of the scroll): [1EC6] = 0, [1C4E] = 1, the key [9091] is held at 0 (saved in the loop); every frame runs 42BB, 96CD, D3E5, 1E7EA and 9BF9; at last [9091] = its old value. The frame services are recorded stubs.</summary>
+    public static void F11087(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; d[0x1ec6] = 0; d[0x1c4e] = 1; g.Bl = d[0x9091]; uint saved = g.Ebx; d[0x9091] = 0;
+        do
+        {
+            uint count = g.Eax; w.Call(0x42bb, g); w.Call(0x96cd, g); w.Call(0xd3e5, g); w.Call(0x1e7ea, g); w.Call(0x9bf9, g); g.Eax = count; g.Eax = Dec32(g, g.Eax);
+        } while (!g.Zf);
+        g.Eax = saved; d[0x9091] = g.Al;
+    }
+
+    /// <summary>10B75: the hero of the player [1972]: the objects of its participant (from [+0E] to [+09] of the record in the pool) are walked, the first with the nibble F in the byte +41 of its template (6885) is the selection [1974] = ESI and A320 centres the view on its cell (+4/+8 &gt;&gt; 5); none: [1974] = 0.</summary>
+    public static void F10B75(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Eax = 0xf5; Mul8(g, g.Al, d[0x1972]); uint pool = w.PoolBase; var part = w.PartOf((byte)(g.Eax / 0xf5)); g.Ebp = U32(part, 9) + pool; g.Esi = U32(part, 0xe) + pool;
+        while (true)
+        {
+            g.Cmp(g.Esi, g.Ebp, 32); if (g.Zf) { Put(d, 0x1974, 0); return; }
+            var o = w.ObjectAt(g.Esi); F6885(w, g, o); var t = w.ObjectAt(g.Edi); g.Eax = U32(t, 0x40); g.Ah &= 0xf; g.Cmp(g.Ah, 0xf, 8);
+            if (g.Zf) break;
+            g.Add(g.Esi, U32(o, 0x10)); g.Esi += U32(o, 0x10);
+        }
+        Put(d, 0x1974, g.Esi); var f = w.ObjectAt(g.Esi); g.Eax = U32(f, 4); g.Ebx = U32(f, 8); g.Eax = g.Shr(g.Eax, 5, 32); g.Ebx = g.Shr(g.Ebx, 5, 32); w.Call(0xa320, g);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
