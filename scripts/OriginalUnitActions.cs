@@ -5414,8 +5414,8 @@ public static class OriginalUnitActions
         g.Ebx = y; g.Eax = x; g.Eax += U32(d, 0x1906); g.Ebx += U32(d, 0x190a);
         g.Edi = g.Ebx << 9; g.Ebx <<= 7; g.Edi += g.Ebx; g.Edi += g.Eax; g.Edi += U32(d, 0x68e); g.Eax = 0x1010101;
         for (uint k = 0; k < 14; k++) w.Poke(g.Edi + k, k < 12 ? (byte)1 : (byte)1);
-        g.Edi += 0x280; g.Cl = 0xc;
-        do { w.Poke(g.Edi, g.Al); w.Poke(g.Edi + 0xd, g.Al); g.Edi += 0x280; g.Cl = Dec8(g, g.Cl); } while (!g.Zf);
+        g.Add(g.Edi, 0x280); g.Edi += 0x280; g.Cl = 0xc;
+        do { w.Poke(g.Edi, g.Al); w.Poke(g.Edi + 0xd, g.Al); g.Add(g.Edi, 0x280); g.Edi += 0x280; g.Cl = Dec8(g, g.Cl); } while (!g.Zf);
         for (uint k = 0; k < 14; k++) w.Poke(g.Edi + k, 1);
     }
 
