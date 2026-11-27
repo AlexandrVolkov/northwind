@@ -4207,6 +4207,24 @@ public static class OriginalUnitActions
         }
     }
 
+    /// <summary>EDD5: send the message AL (about the object AH) to the participant BL: if it is already in its queue (EE69) AL = FFh (ZF = 0); else the first free record (number FFh, 0Eh bytes from +34; none: AL = FFh) gets DL (the number), DH (+9), EBP (+0A), the time [1CA9] (+1) and the end time (+5, FFFFFFFFh on a carry) with the duration of the table entry DL (13h bytes from EFBh, +0C); the handler of the entry (+08) is called with EDI = the record, EDX = the message; AL = 0 (ZF = 1).</summary>
+    public static void FEDD5(IUnitActionWorld w, ActionRegs g)
+    {
+        FEE69(w, g); if (!g.Zf) { g.Al |= 0xff; g.Logic(g.Al, 8); return; }
+        g.Edx = g.Eax; g.Eax = 0xf5; Mul8(g, g.Al, g.Bl); g.Edi = (g.Eax & 0xffff) + 0x9ae; g.Ecx = 8; var part = w.PartOf(g.Bl); int k = 0;
+        while (true)
+        {
+            g.Cmp(part[0x34 + 0xe * k], 0xff, 8); if (g.Zf) break;
+            g.Add(g.Edi, 0xe); g.Edi += 0xe; g.Ecx--; k++; if (g.Ecx == 0) { g.Al |= 0xff; g.Logic(g.Al, 8); return; }
+        }
+        uint esi = g.Esi, entry = g.Edi, edx = g.Edx; var l = w.L3; int o = 0x34 + 0xe * k;
+        g.Eax = 0x13; Mul8(g, g.Al, g.Dl); g.Esi = (g.Eax & 0xffff) + 0xefb; int t = (int)g.Esi;
+        part[o] = g.Dl; part[o + 9] = g.Dh; BitConverter.GetBytes(g.Ebp).CopyTo(part, o + 0xa);
+        g.Eax = U32(w.Ds, 0x1ca9); BitConverter.GetBytes(g.Eax).CopyTo(part, o + 1); g.Add(g.Eax, U32(l, t + 0xc)); g.Eax += U32(l, t + 0xc); if (g.Cf) g.Eax = 0xffffffff;
+        BitConverter.GetBytes(g.Eax).CopyTo(part, o + 5); w.Call(U32(l, t + 8), g);
+        g.Edx = edx; g.Edi = entry; g.Esi = esi; part[o] = g.Dl; part[o + 9] = g.Dh; g.Al = 0; g.Logic(g.Al, 8);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
