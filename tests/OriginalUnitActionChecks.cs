@@ -524,7 +524,7 @@ public partial class TestRunner
                 case "f11150":
                 case "f11187":
                     {
-                        rbs = Convert.FromHexString(c.GetProperty("rb").GetString()!); BitConverter.GetBytes((ushort)c.GetProperty("k1c35").GetInt32()).CopyTo(w.Ds, 0x1c35); BitConverter.GetBytes((uint)c.GetProperty("k1cad").GetInt64()).CopyTo(w.Ds, 0x1cad); g.Esi = 0x402300;
+                        foreach (var (ad, n) in new[] { (0x1946, 4), (0x1965, 4), (0x1969, 4), (0x1a1b, 1), (0x1c60, 1), (0x1c87, 1), (0x1ec6, 1), (0x908e, 2), (0, 2) }) Array.Clear(w.Ds, ad, n); rbs = Convert.FromHexString(c.GetProperty("rb").GetString()!); BitConverter.GetBytes((ushort)c.GetProperty("k1c35").GetInt32()).CopyTo(w.Ds, 0x1c35); BitConverter.GetBytes((uint)c.GetProperty("k1cad").GetInt64()).CopyTo(w.Ds, 0x1cad); g.Esi = 0x402300;
                         switch (fn)
                         {
                             case "f111c5": OriginalUnitActions.F111C5(w, g, rbs); break;
