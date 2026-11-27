@@ -10676,6 +10676,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "E5E6, DEE4, 14E51, DEC8, 6EB2, 4938 and E02A are recorded stubs (the stubs set only ZF); the button record lies in the pool in the fixture"
+    },
+    {
+      "id": "le1-menu-sliders-1131e",
+      "module": "LE:1",
+      "start": 70430,
+      "end": 70752,
+      "name": "Menu slider handlers (1131E, 1132F, 11351, 11364, 11386, 11397, 113CC, 11410, 11441)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the handler [69E9] called by 11397 (an indirect call) is a recorded stub in the check (the pointer is a code address: the world gets it as it is); 111F8 and 111C5 run as ported code; the button record lies in the pool in the fixture"
     }
   ]
 }

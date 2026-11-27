@@ -4279,6 +4279,59 @@ public static class OriginalUnitActions
         w.L3[0] = 0x2f; w.L3[1] = 0;
     }
 
+    private static void Mark80(byte[] r, ActionRegs g) { r[0] |= 0x80; g.Logic(r[0], 8); }
+
+    /// <summary>1131E / 11351 / 11386: the slider position into the record: +14 = [908F] ([908E] - 0EFh, [9093]) and the record is marked.</summary>
+    public static void F1131E(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Al = w.Ds[0x908f]; g.Cmp(r[0x14], g.Al, 8); if (g.Zf) return; r[0x14] = g.Al; Mark80(r, g); }
+    public static void F11351(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Al = Sub8(g, w.Ds[0x908e], 0xef); g.Cmp(r[0x14], g.Al, 8); if (g.Zf) return; r[0x14] = g.Al; Mark80(r, g); }
+    public static void F11386(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Al = w.Ds[0x9093]; g.Cmp(r[0x14], g.Al, 8); if (g.Zf) return; r[0x14] = g.Al; Mark80(r, g); }
+
+    /// <summary>1132F: the button +1A (111F8) answering ZF moves the scroll step [908F] by +1C of the record within 1..10h.</summary>
+    public static void F1132F(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = U16(r, 0x1a); F111F8(w, g, r); if (!g.Zf) return;
+        g.Al = Add8(g, r[0x1c], w.Ds[0x908f]); g.Cmp(g.Al, 0x10, 8); if (!g.Cf && !g.Zf) return; g.Cmp(g.Al, 1, 8); if (g.Cf) return; w.Ds[0x908f] = g.Al;
+    }
+
+    /// <summary>11364: as 1132F for [908E] within 0F0h..0FEh.</summary>
+    public static void F11364(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = U16(r, 0x1a); F111F8(w, g, r); if (!g.Zf) return;
+        g.Al = Add8(g, r[0x1c], w.Ds[0x908e]); g.Cmp(g.Al, 0xfe, 8); if (!g.Cf && !g.Zf) return; g.Cmp(g.Al, 0xf0, 8); if (g.Cf) return; w.Ds[0x908e] = g.Al;
+    }
+
+    /// <summary>11397: the button +1A (111F8) with +3 = 3 and bit 2 of [19E7]: [9093] moves by +1C within 1..0Fh, then the handler [69E9] is called.</summary>
+    public static void F11397(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Eax = U16(r, 0x1a); F111F8(w, g, r); g.Cmp(r[3], 3, 8); if (!g.Zf) return; g.Test(d[0x19e7], 2, 8); if (g.Zf) return;
+        g.Al = Add8(g, r[0x1c], d[0x9093]); g.Cmp(g.Al, 0xf, 8); if (!g.Cf && !g.Zf) return; g.Cmp(g.Al, 1, 8); if (g.Cf) return; d[0x9093] = g.Al; w.Call(U32(d, 0x69e9), g);
+    }
+
+    /// <summary>113CC: the toggle button: a record with bit 1 of +3 sets the cursor, +3 = 9 flips [9098]; the picture is 146h (145h with [9098] set).</summary>
+    public static void F113CC(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds;
+        if ((r[3] & 1) != 0) { Put(d, 0x1946, 0xa5009c); Put(d, 0x1965, 0); if (r[3] == 9) d[0x9098] ^= 1; }
+        g.Eax = 0x146; g.Cmp(d[0x9098], 0, 8); if (!g.Zf) g.Eax--;
+        g.Cmp(U16(r, 0x17), g.Eax & 0xffff, 16); if (g.Zf) return; r[0x17] = g.Al; r[0x18] = g.Ah; Mark80(r, g);
+    }
+
+    /// <summary>11410: the spin button: +1A = 0 waits for the button 148h (111C5, +1A = 1); with bit 1 of [19E7] the word +17 grows (the record is marked) and +1A goes back at 15Ah.</summary>
+    public static void F11410(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Cmp(r[0x1a], 0, 8);
+        if (g.Zf) { g.Eax = 0x148; F111C5(w, g, r); if (!g.Zf) return; r[0x1a] = Inc8(g, r[0x1a]); }
+        g.Test(d[0x19e7], 1, 8); if (g.Zf) return;
+        ushort v0 = U16(r, 0x17), v = (ushort)(v0 + 1); g.Zf = v == 0; g.Sf = (v & 0x8000) != 0; g.Of = v0 == 0x7fff; BitConverter.GetBytes(v).CopyTo(r, 0x17);
+        r[0] |= 0x80; g.Cmp(v, 0x15a, 16); if (g.Cf) return; r[0x1a] = Dec8(g, r[0x1a]);
+    }
+
+    /// <summary>11441: the colour bytes: +15 = [1CB1] >> 8, +14 = [1CAD] >> 8 (a changed +14 marks the record).</summary>
+    public static void F11441(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Eax = U32(d, 0x1cb1) >> 8; r[0x15] = g.Al; g.Eax = U32(d, 0x1cad) >> 8; g.Cmp(r[0x14], g.Al, 8); if (g.Zf) return; r[0x14] = g.Al; Mark80(r, g);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
