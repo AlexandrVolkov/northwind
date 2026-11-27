@@ -3895,6 +3895,19 @@ public static class OriginalUnitActions
         g.Al |= 0xff; g.Logic(g.Al, 8);
     }
 
+    /// <summary>121FF: the dialog handler of the scroll of the summoning (AH = the call: 1 = the scroll is read, 2 = the check - AL = FFh): the record ESI has the use flag +17; 124D8 (AL = 7, then 0Dh, DL = BH) must allow it; the flag is cleared and A758 creates the object of the template 17h of the army 0 (kind 4); 103EC and 98CC show it (ECX = 2).</summary>
+    public static void F121FF(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Cmp(g.Ah, 1, 8);
+        if (!g.Zf) { g.Cmp(g.Ah, 2, 8); if (g.Zf) { g.Al |= 0xff; g.Logic(g.Al, 8); } return; }
+        g.Cmp(r[0x17], 0, 8); if (g.Zf) return;
+        g.Dl = g.Bh; g.Al = 7; w.Call(0x124d8, g);
+        if (g.Zf) { g.Al = 0xd; w.Call(0x124d8, g); if (g.Zf) return; }
+        r[0x17] = 0; g.Al = 0; g.Logic(0, 8); g.Ah = 4; g.Bl = 0x17; g.Bh = 0; g.Ecx = 0; g.Edx = 0; w.Call(0xa758, g);
+        if (!g.Zf) return;
+        uint esi = g.Esi; g.Esi = g.Edi; g.Eax = 0; g.Ebx = 0; g.Ecx = 2; w.Call(0x103ec, g); w.Call(0x98cc, g); g.Esi = esi;
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {

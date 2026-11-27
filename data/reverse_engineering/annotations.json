@@ -10334,6 +10334,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the participant is limited to 0..7 in the fixture"
+    },
+    {
+      "id": "le1-summon-scroll-121ff",
+      "module": "LE:1",
+      "start": 74239,
+      "end": 74326,
+      "name": "Handler of the scroll of the summoning (121FF)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "124D8, A758, 103EC and 98CC are recorded stubs"
     }
   ]
 }
