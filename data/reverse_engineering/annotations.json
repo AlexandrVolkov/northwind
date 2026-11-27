@@ -10144,6 +10144,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the drawing services 1E133, 1DF08, 1DF3C, 1E098, 1E0DE, 1DF7B, 1E153, 6D4A, 6DEF, B3B6, 7069, 7012, 6CD6, 1D7AF, 3EEA, 3F32 and 21A3D are recorded stubs that keep EDI; the widget records are in the flat queue window, the strings in the text test region"
+    },
+    {
+      "id": "le1-command-panel-58ca",
+      "module": "LE:1",
+      "start": 22730,
+      "end": 22880,
+      "name": "Panel of the commands of the selected object (58CA)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "D182, A5F4, DEE4 and A4A9 are recorded stubs; DF7E is the ported code over the flat queue window"
     }
   ]
 }

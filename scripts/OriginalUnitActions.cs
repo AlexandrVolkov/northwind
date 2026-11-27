@@ -3718,6 +3718,23 @@ public static class OriginalUnitActions
         }
     }
 
+    /// <summary>58CA: the panel of the commands of the selected object [1969] (the widget EDI): D182 (AH = 6) gives the table of the object, A5F4 lists the commands (AL = the owner +22, AH = the byte +6 of the table): their number is +1C of the widget, the rows are laid from 0E0h - 1Bh * number (+1A of the widget and [1F31]); for every entry of the list at DS:1F45 (to FFh) DF7E queues the widget 1F8h whose +2 = the first byte, +15 = the word +1, +14 = the object's byte [1F41], +8 = the row ([1F31] += 32h); at last the panel 297h (DEE4) and A4A9 with EAX = 0.</summary>
+    public static void F58CA(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; uint widget = g.Edi; g.Esi = U32(d, 0x1969); g.Ah = 6; w.Call(0xd182, g);
+        var o = w.ObjectAt(g.Esi); g.Al = o[0x22]; g.Ah = w.Peek(g.Edx + 6); g.Edx += 7; w.Call(0xa5f4, g); g.Edi = widget;
+        l[widget + 0x1c] = g.Al; g.Cl = g.Al; g.Eax = 0x1b; Mul8(g, g.Al, g.Cl); g.Eax = (uint)-(int)g.Eax; g.Eax += 0xe0; Put(d, 0x1f31, g.Eax);
+        l[widget + 0x1a] = (byte)g.Eax; l[widget + 0x1b] = (byte)(g.Eax >> 8); g.Al = o[0]; d[0x1f41] = g.Al; g.Esi = 0x1f45;
+        for (; ; )
+        {
+            g.Cmp(d[g.Esi], 0xff, 8); if (g.Zf) break;
+            uint entry = g.Esi; g.Esi = 0x1f8; g.Al = 1; FDF7E(w, g); g.Esi = entry;
+            g.Al = d[entry]; l[g.Edi + 2] = g.Al; l[g.Edi + 0x15] = d[entry + 1]; l[g.Edi + 0x16] = d[entry + 2]; l[g.Edi + 0x14] = d[0x1f41];
+            g.Eax = U32(d, 0x1f31); Put(l, (int)g.Edi + 8, g.Eax); Put(d, 0x1f31, g.Eax + 0x32); g.Esi = entry + 4;
+        }
+        g.Esi = 0x297; w.Call(0xdee4, g); g.Eax = 0; w.Call(0xa4a9, g);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
