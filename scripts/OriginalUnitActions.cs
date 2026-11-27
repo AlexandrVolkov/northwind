@@ -4149,6 +4149,35 @@ public static class OriginalUnitActions
         g.Al = r[0x1a]; g.Ah = r[0x1b]; g.Bl = w.Ds[0x1972]; uint e = g.Esi; w.Call(0xedd5, g); g.Esi = e; w.Call(0xe5e6, g); w.Call(0xf791, g); g.Esi = 0x7d4;
     }
 
+    /// <summary>EE69: the message AL/AH (the number and +9) in the queue of the participant BL (8 records of 0Eh bytes from +34): found: EDI = the record, BH |= FFh (ZF = 0), none: EDI behind the last (ZF = 1, CF from the last ADD); EAX and EBX are kept (pushed).</summary>
+    public static void FEE69(IUnitActionWorld w, ActionRegs g)
+    {
+        uint ebx = g.Ebx, eax = g.Eax; byte bl = g.Bl; g.Eax = 0xf5; Mul8(g, g.Al, bl); g.Edi = (g.Eax & 0xffff) + 0x9ae; g.Eax = eax; var part = w.PartOf(bl); g.Bh = 8;
+        for (int k = 0; ; k++)
+        {
+            g.Cmp(part[0x34 + 0xe * k], g.Al, 8);
+            if (g.Zf) { g.Cmp(part[0x34 + 0xe * k + 9], g.Ah, 8); if (g.Zf) { g.Bh |= 0xff; g.Logic(g.Bh, 8); g.Ebx = ebx; return; } }
+            g.Add(g.Edi, 0xe); g.Edi += 0xe; g.Bh = Dec8(g, g.Bh); if (g.Zf) { g.Ebx = ebx; return; }
+        }
+    }
+
+    /// <summary>EE92: as EE69 for the message AL / [ESI+3] of the participant DL (ESI, ECX and EDX are kept).</summary>
+    public static void FEE92(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        uint esi = g.Esi, ecx = g.Ecx, edx = g.Edx; g.Bl = g.Dl; g.Ah = r[3]; FEE69(w, g); g.Esi = esi; g.Ecx = ecx; g.Edx = edx;
+    }
+
+    /// <summary>EEA3: the first participant BL = 0.. (up to [6C6]) with the message AL/AH in its queue (EE69): ZF = 0 and EDI = the record; none: ZF = 1.</summary>
+    public static void FEEA3(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Bl = 0;
+        while (true)
+        {
+            uint ebx = g.Ebx, eax = g.Eax; FEE69(w, g); g.Eax = eax; g.Ebx = ebx; if (!g.Zf) return;
+            g.Bl = Inc8(g, g.Bl); g.Cmp(g.Bl, w.Ds[0x6c6], 8); if (g.Zf) return;
+        }
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
