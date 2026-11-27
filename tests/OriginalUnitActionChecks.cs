@@ -559,7 +559,7 @@ public partial class TestRunner
                     }
                 case "f116ba":
                     {
-                        w.Ds[0x6c8] = (byte)c.GetProperty("n6c8").GetInt32(); w.Ds[0x18de] = (byte)c.GetProperty("m18de").GetInt32(); w.Ds[0x18e2] = (byte)c.GetProperty("m18e2").GetInt32(); Array.Clear(w.Ds, 0xed20, 4); Array.Clear(w.Ds, 0xed2d, 4);
+                        w.Ds[0x6c8] = (byte)c.GetProperty("n6c8").GetInt32(); w.Ds[0x18de] = (byte)c.GetProperty("m18de").GetInt32(); w.Ds[0x18e2] = (byte)c.GetProperty("m18e2").GetInt32(); Array.Clear(w.Ds, 0xed20, 4); Array.Clear(w.Ds, 0xed2d, 4); for (int k = 3; k < 8; k++) Array.Clear(w.PartOf((byte)k), 0x18, 0x10);
                         for (int k = 0; k < 8; k++) BitConverter.GetBytes((uint)c.GetProperty("dv")[k].GetInt64()).CopyTo(w.Stats, k * 0x1a35 + 0x19f1);
                         OriginalUnitActions.F116BA(w, g); break;
                     }
