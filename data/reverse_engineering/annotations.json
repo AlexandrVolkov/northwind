@@ -10029,6 +10029,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the screen, the shade table and the source are flat test regions in the video window; the first 4000h bytes of the screen are compared"
+    },
+    {
+      "id": "le1-health-frame-ca49",
+      "module": "LE:1",
+      "start": 51785,
+      "end": 51836,
+      "name": "Picture frame by the health of the object (CA49)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the fixture keeps the quotient of the division within a byte (the original would fault otherwise)"
     }
   ]
 }
