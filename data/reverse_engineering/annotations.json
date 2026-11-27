@@ -10201,6 +10201,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "63CB is a recorded stub; only the widget bytes 7F2h..872h are compared (the queue window of the test world overlaps the participant table)"
+    },
+    {
+      "id": "le1-shop-menu-54b4",
+      "module": "LE:1",
+      "start": 21684,
+      "end": 21875,
+      "name": "Menu of the command «build» of the selected object (54B4)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "D182, 14E51, E055, F781 and DEE4 are recorded stubs; DF7E and 6885 are the ported code; the table, the block and its copy lie in the flat text test region"
     }
   ]
 }

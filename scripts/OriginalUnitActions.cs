@@ -3791,6 +3791,25 @@ public static class OriginalUnitActions
         g.Add(g.Ecx, 0x3c); g.Ecx += 0x3c; g.Al = t[0x45]; l[g.Ecx + 0x15] = g.Al; g.Esi = g.Ecx; w.Call(0x63cb, g); g.Add(g.Ecx, 0x1e); g.Ecx += 0x1e;
     }
 
+    /// <summary>54B4: the panel of the command «build» of the selected object [1969] (the menu of a shop): D182 (AH = 6) gives the table EDX, 6885 the army entry (its byte +8 + 30h is the digit at DS:207, its dword +9 the offset EBP); 14E51 and E055 (2Dh) prepare the screen, F781, L3[0] = 32h; the block of the table ([EDX + 2] + EBP: the size dword + 9 bytes) is copied to [696], in it +4 and the dwords +0C of every 1Eh bytes (from +9 to the size) grow by EBP and the army +0 of the object goes to the byte +16; the widget 35Dh (DF7E), the block [696] (DEE4), [19C2] = 0, L3[2] = 9, L3[12h] = 7.</summary>
+    public static void F54B4(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; uint esi0 = g.Esi; g.Esi = U32(d, 0x1969); g.Ah = 6; w.Call(0xd182, g); uint table = g.Edx;
+        var o = w.ObjectAt(g.Esi); F6885(w, g, o); uint entry = g.Ebx; uint ebp = U32(d, (int)entry + 9); g.Al = d[entry + 8]; g.Al = (byte)(g.Al + 0x30); g.Ebx = 0x200; d[0x207] = g.Al;
+        g.Eax = U16(d, (int)table); g.Ecx = 0x10; g.Edx = 0x10; w.Call(0x14e51, g); g.Al = 0x2d; w.Call(0xe055, g); w.Call(0xf781, g); l[0] = 0x32; l[1] = 0;
+        g.Ebp = ebp; g.Edx = table; g.Esi = Peek32(w, table + 2) + g.Ebp; g.Edi = U32(d, 0x696);
+        g.Ecx = Peek32(w, g.Esi); g.Ecx += 9; g.Eax = g.Ecx; g.Ecx >>= 2;
+        for (uint k = 0; k < g.Ecx * 4; k++) w.Poke(g.Edi + k, w.Peek(g.Esi + k));
+        g.Esi += g.Ecx * 4; g.Edi += g.Ecx * 4; g.Ecx = 0; g.Eax &= 3; g.Ecx = g.Eax;
+        for (uint k = 0; k < g.Ecx; k++) w.Poke(g.Edi + k, w.Peek(g.Esi + k));
+        g.Esi += g.Ecx; g.Edi += g.Ecx; g.Ecx = 0;
+        void Add32(uint a, uint v) { uint r = Peek32(w, a) + v; for (uint k = 0; k < 4; k++) w.Poke(a + k, (byte)(r >> (8 * (int)k))); }
+        g.Edi = U32(d, 0x696); g.Esi = U32(d, 0x1969); g.Al = w.ObjectAt(g.Esi)[0]; Add32(g.Edi + 4, g.Ebp);
+        g.Ecx = Peek32(w, g.Edi); g.Edi += 9; g.Ecx += g.Edi;
+        do { Add32(g.Edi + 0xc, g.Ebp); w.Poke(g.Edi + 0x16, g.Al); g.Edi += 0x1e; g.Cmp(g.Edi, g.Ecx, 32); } while (g.Cf);
+        g.Al = 1; g.Esi = 0x35d; FDF7E(w, g); g.Esi = U32(d, 0x696); w.Call(0xdee4, g); d[0x19c2] = 0; l[2] = 9; l[0x12] = 7; g.Esi = esi0;
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
