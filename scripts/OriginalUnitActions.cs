@@ -3810,6 +3810,23 @@ public static class OriginalUnitActions
         g.Al = 1; g.Esi = 0x35d; FDF7E(w, g); g.Esi = U32(d, 0x696); w.Call(0xdee4, g); d[0x19c2] = 0; l[2] = 9; l[0x12] = 7; g.Esi = esi0;
     }
 
+    /// <summary>6FCC: a picture to the screen: the point (EAX, EBX) on the screen [68E] (640 bytes a row), the source ESI + EDX * EBP + ECX (EBP = the source row), EDI = the width (low word) and the height (high word): every row is copied by dwords and bytes, the source goes on by EBP - the width and the screen by 280h - the width.</summary>
+    public static void F6FCC(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint param = g.Edi; g.Edi = g.Ebx; g.Edi <<= 9; g.Ebx <<= 7; g.Edi += g.Eax; g.Edi += g.Ebx; g.Edi += U32(d, 0x68e);
+        g.Eax = g.Edx; { ulong pr = (ulong)g.Eax * g.Ebp; g.Eax = (uint)pr; g.Edx = (uint)(pr >> 32); g.Cf = g.Of = g.Edx != 0; }
+        g.Add(g.Eax, g.Ecx); g.Eax += g.Ecx; g.Add(g.Esi, g.Eax); g.Esi += g.Eax; g.Eax = param; g.Ebx = g.Eax; g.Ebx &= 0xffff; g.Eax >>= 16;
+        g.Ebp -= g.Ebx; g.Edx = 0x280; g.Edx -= g.Ebx;
+        do
+        {
+            g.Ecx = g.Ebx; g.Ecx >>= 2;
+            for (uint k = 0; k < g.Ecx * 4; k++) w.Poke(g.Edi + k, w.Peek(g.Esi + k));
+            g.Esi += g.Ecx * 4; g.Edi += g.Ecx * 4; g.Ecx = g.Ebx; g.Ecx &= 3;
+            for (uint k = 0; k < g.Ecx; k++) w.Poke(g.Edi + k, w.Peek(g.Esi + k));
+            g.Esi += g.Ecx; g.Edi += g.Ecx; g.Ecx = 0; g.Add(g.Esi, g.Ebp); g.Esi += g.Ebp; g.Add(g.Edi, g.Edx); g.Edi += g.Edx; g.Eax--; g.Zf = g.Eax == 0; g.Sf = (g.Eax & 0x80000000) != 0;
+        } while (!g.Zf);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {

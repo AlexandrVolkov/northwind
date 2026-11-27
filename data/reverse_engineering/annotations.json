@@ -10220,6 +10220,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "D182, 14E51, E055, F781 and DEE4 are recorded stubs; DF7E and 6885 are the ported code; the table, the block and its copy lie in the flat text test region"
+    },
+    {
+      "id": "le1-blit-screen-6fcc",
+      "module": "LE:1",
+      "start": 28620,
+      "end": 28690,
+      "name": "Copy a picture to the screen row by row (6FCC)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the screen and the source are flat test regions in the video window; widths above FFFh are not exercised"
     }
   ]
 }
