@@ -4437,6 +4437,20 @@ public static class OriginalUnitActions
         g.Eax = eax; g.Ebx = ebx; g.Ecx = ecx; g.Edx = edx; g.Edi = edi;
     }
 
+    /// <summary>3F32: as 3EEA, but into the cache DS:33C (28 bytes a row): the cells that the rectangle (EAX, EBX) of ECX x EDX pixels touches get FFh; the registers are kept, the flags are those of the last row step.</summary>
+    public static void F3F32(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint eax = g.Eax, ebx = g.Ebx, ecx = g.Ecx, edx = g.Edx, edi = g.Edi;
+        uint width = ecx + (eax & 0xf), height = edx + (ebx & 0xf); uint row = ebx >> 4; uint at = (row << 5) - row * 4 + (eax >> 4) + 0x33c;
+        for (; ; )
+        {
+            uint left = width, cell = at; bool above;
+            do { d[cell] = 0xff; cell++; g.Cmp(left, 0x10, 32); above = !g.Cf && !g.Zf; left -= 0x10; } while (above);
+            at += 0x1c; g.Cmp(height, 0x10, 32); above = !g.Cf && !g.Zf; height -= 0x10; if (!above) break;
+        }
+        g.Eax = eax; g.Ebx = ebx; g.Ecx = ecx; g.Edx = edx; g.Edi = edi;
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)

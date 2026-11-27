@@ -9763,6 +9763,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the table [64C] is a flat test region; the boundary of the row step (width exactly 10h) is not distinguished by the check; the many earlier checks that record 3EEA as a stub still do"
+    },
+    {
+      "id": "le1-dirty-cache-mark-3f32",
+      "module": "LE:1",
+      "start": 16178,
+      "end": 16249,
+      "name": "Mark the cells of a rectangle in the dirty cache DS:33C (3F32)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "only the first 100h bytes of the cache are compared"
     }
   ]
 }
