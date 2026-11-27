@@ -62,7 +62,7 @@ public sealed class OriginalRouteSearch
         return Math.Max(Abs(unchecked((byte)(_targetX - (byte)pair))), Abs(unchecked((byte)(_targetY - (byte)(pair >> 8)))));
     }
     public OriginalRouteSearchResult Find(byte width, byte height, byte footprintWidth, byte footprintHeight,
-        RouteCell start, RouteCell target, Func<byte, byte, byte, bool> admit)
+        RouteCell start, RouteCell target, Func<byte, byte, byte, bool> admit, bool windowed = true)
     {
         if (width is 0 or > 128 || height is 0 or > 128 || footprintWidth == 0 || footprintHeight == 0 ||
             footprintWidth > width || footprintHeight > height || start.X > width - footprintWidth || start.Y > height - footprintHeight ||
@@ -73,6 +73,7 @@ public sealed class OriginalRouteSearch
         _x = start.X; _y = start.Y; _targetX = target.X; _targetY = target.Y;
         _minX = unchecked((byte)(_x - 16)); _maxX = unchecked((byte)(_x + 16));
         _minY = unchecked((byte)(_y - 16)); _maxY = unchecked((byte)(_y + 16));
+        if (!windowed) _minX = _maxX = _minY = _maxY = 255;   // 72FE sets the four bounds [274A..274D] to FFh
         _loops = true; _operations = 0;
         byte mask = 0, chosenMask = 0, length = 0, closestLength = 0, closestDistance = 255, closestMask = 0;
         byte a = 0, ch = 0, cl = 0, distance = 0, least = 0;
@@ -206,5 +207,24 @@ public sealed class OriginalRouteSearch
         q = output; while (q < _work.Length && (_work[q] & 8) == 0) q++;
         if (q == _work.Length) throw new InvalidDataException("Native route has no terminator");
         return new(true, _work.AsSpan(output, q - output).ToArray(), new(_x, _y));
+    }
+
+    /// <summary>72FE: the planner with explicit parameters (AL = [2741], BL = the plane, BH = the square footprint, (CL, CH) = the centre of the start, (DL, DH) = the centre of the goal, both shifted by half the size to the top-left cell): up to four contour searches without the +-16 window (the bounds are FFh); after every search the route is followed from the start; the goal reached - found; otherwise the pass counter [1F41] falls and the search starts again from the point reached. Left = the counter after the last pass; the route and SearchEnd are those of the last search.</summary>
+    public (bool Found, byte[] Route, RouteCell End, byte Left) Plan72FE(byte width, byte height, byte size, RouteCell center, RouteCell goalCenter, Func<byte, byte, byte, bool> admit)
+    {
+        byte half = (byte)(size >> 1);
+        var start = new RouteCell(unchecked((byte)(center.X - half)), unchecked((byte)(center.Y - half)));
+        var target = new RouteCell(unchecked((byte)(goalCenter.X - half)), unchecked((byte)(goalCenter.Y - half)));
+        byte left = 4;
+        for (; ; )
+        {
+            var r = Find(width, height, size, size, start, target, admit, windowed: false);
+            if (!r.Found) return (false, [], r.SearchEnd, left);
+            byte x = start.X, y = start.Y;
+            foreach (byte d in r.Directions) { x = unchecked((byte)(x + Deltas[d].X)); y = unchecked((byte)(y + Deltas[d].Y)); }
+            if (x == target.X && y == target.Y) return (true, r.Directions, r.SearchEnd, left);
+            left--; if (left == 0) return (false, r.Directions, r.SearchEnd, left);
+            start = new RouteCell(x, y);
+        }
     }
 }

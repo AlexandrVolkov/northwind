@@ -626,43 +626,41 @@ public sealed partial class Skirmish : IDisposable
         actor.ReplanTimer = UnreachableDelay;
         return false;
     }
+    private SkirmishWalkWorld? _walkWorld; private OriginalUnitWalk? _walkStep;
+    /// <summary>The walk of a unit: the ported step 70B0 (<see cref="OriginalUnitWalk"/>) over the route in the original route pool; the destination cell is reserved when the step is granted (an adapter for the movement admission of the original) and released when the step is over.</summary>
     private void MoveTick(SkirmishActor actor)
     {
         if (!actor.Stepping)
         {
             if (actor.Route.Count == 0) { if ((actor.Record[0x2d] & 15) == 2) actor.Record[0x2d] = 0; return; }
-            var next = actor.Route.Peek();
-            if (!CanStand(actor, next)) { actor.Route.Clear(); actor.ReplanTimer = 0; actor.Record[0x2d] = 0; return; }
-            var direction = next - actor.Cell;
-            if (Math.Max(Math.Abs(direction.X), Math.Abs(direction.Y)) != 1) { actor.Route.Clear(); actor.Record[0x2d] = 0; return; }
-            byte heading = OriginalMotionPreparation.DirectionToward((uint)actor.Cell.X, (uint)actor.Cell.Y, (uint)next.X, (uint)next.Y);
-            actor.Record[0x25] = (byte)((actor.Record[0x25] & 7) | (heading << 3));
-            actor.Record[0x24] = 3; actor.Record[0x2c] = 32;
-            actor.StepGoal = next; actor.Route.Dequeue(); actor.Stepping = actor.Turning = true; actor.StalledTicks = 0;
-            ReserveStep(actor, next); actor.Record[0x2d] = 0x22; // movement state 2 for every unit (90E9 skips idle-only rules)
+            actor.Stepping = true; actor.StalledTicks = 0; actor.Record[0x2d] = 0x22; actor.Record[0x24] = 1;   // the route exists: the walk waits for its next step (state 1; state 0 would reset the route cursor +28)   // movement state 2 for every unit (90E9 skips idle-only rules)
         }
-        OriginalMotionStep result;
-        if (actor.Turning)
+        if (_walkWorld == null)
         {
-            var prepared = OriginalMotionPreparation.TurnAndAdvance(Occupancy, Map.Cells, _properties, actor.Record, actor.Parameters, actor.Id, 0);
-            actor.Turning = !prepared.EnteredMotion; result = prepared.Step;
+            _walkWorld = new SkirmishWalkWorld(Occupancy, Map.Cells, _properties); _walkStep = new OriginalUnitWalk(_walkWorld);
         }
-        else
-        {
-            result = OriginalSpatialRules.AdvanceMotion(Occupancy, actor.Record, actor.Id, actor.Parameters[3], actor.Parameters[4], 0);
-            OriginalUnitWalk.Stride(actor.Record, actor.Parameters, null);   // 725C: the stride counter of the walking frames (the dust effect DAT[A2] is not drawn yet)
-        }
-        OriginalUnitWalk.WriteFrame(actor.Record, actor.Parameters);        // 72D8: the frame of the walk
-        if (!actor.Turning && result.Distance == 0) actor.StalledTicks++; else actor.StalledTicks = 0;
+        var world = _walkWorld; world.Record = actor.Record; world.Template = actor.Parameters; world.Reference = actor.Id;
+        world.RouteCount = () => actor.Route.Count; world.RoutePeek = actor.Route.Peek; world.RouteDequeue = () => actor.Route.Dequeue();
+        world.CanEnter = cell => CanStand(actor, cell); world.Granted = cell => { ReserveStep(actor, cell); actor.StepGoal = cell; };
+        uint x = System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(4)), y = System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(8));
+        byte flags = _walkStep!.Step(actor.Record, actor.Parameters, 2, 2, 0);
+        // Adapter: the original ends the walk one update after the last step (7FA7 answers «none» on the next update); the tuned engagement timing of the port ends it at once, as the previous adapter did (docs/unit-motion.md).
+        if (flags == 0 && actor.Record[0x2c] == 0 && (actor.Record[0x24] & 7) == 1 && actor.Route.Count == 0) flags = _walkStep.Step(actor.Record, actor.Parameters, 2, 2, 0);
+        bool moved = x != System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(4)) || y != System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(actor.Record.AsSpan(8));
+        if ((actor.Record[0x24] & 7) >= 3 && !moved && actor.Record[0x2c] != 0) actor.StalledTicks++; else actor.StalledTicks = 0;
         if (actor.StalledTicks > 120)
         {
             actor.Route.Clear(); actor.Goal = null; actor.Target = 0;
             Log($"{actor.Source.TemplateName}: движение остановлено свойствами местности.");
         }
-        if (actor.Record[0x2c] == 0 || actor.StalledTicks > 120)
+        if (actor.Record[0x2c] == 0 || actor.StalledTicks > 120 || (flags & 0xc0) != 0) ReleaseStep(actor.Id);
+        if ((flags & 0x80) != 0) { actor.Route.Clear(); actor.ReplanTimer = 0; actor.Record[0x2d] = 0; }   // 7FA7 refused the step (the cell is not free any more): the route is dropped, the goal is kept
+        bool stepOver = flags == 0 && actor.Record[0x2c] == 0 && (actor.Record[0x24] & 7) == 1;   // 71F5: the step ended; the next one is taken on the next update
+        if (stepOver) actor.Stepping = false;
+        if ((flags & 0xc0) != 0 || actor.StalledTicks > 120)
         {
-            ReleaseStep(actor.Id); actor.Stepping = false;
-            if (actor.Route.Count == 0) { actor.Record[0x2d] = 0; actor.Record[0x27] = 0; OriginalUnitWalk.WriteFrame(actor.Record, actor.Parameters); }   // 72CF + 92CA: the standing frame of the heading
+            actor.Stepping = false; actor.Record[0x24] = 0;
+            if ((flags & 0x80) == 0 && actor.Route.Count == 0) actor.Record[0x2d] = 0;   // 92CA: the walk ends in rest; the standing frame was written by the finish of 70B0
         }
     }
     /// <summary>Phase-1 attack loop of 843E/8EC7: reach 8B5E, swing delay 8AF4, turn, swing request 8C7C and the
