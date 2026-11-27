@@ -9839,6 +9839,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "checked inside 9F38 (the sprite file is a flat test region, the offsets are below 400h); FA1D1 and FA320 still call it as a recorded stub"
+    },
+    {
+      "id": "le1-tool-ready-cursor-51ac",
+      "module": "LE:1",
+      "start": 20908,
+      "end": 21003,
+      "name": "Tool state 5: cursor of the selected object (51AC)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "D182, 68A0 and AE57 are recorded stubs; the template table read through EDX is limited to the DS window in the fixture"
     }
   ]
 }

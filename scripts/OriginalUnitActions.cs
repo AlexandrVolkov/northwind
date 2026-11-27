@@ -2905,6 +2905,15 @@ public static class OriginalUnitActions
     /// <summary>50E5: the tool state 4.</summary>
     public static void F50E5(IUnitActionWorld w, ActionRegs g) { w.L3[2] = 4; w.L3[0x12] = 0; }
 
+    /// <summary>51AC: the tool «ready the cursor» (state 5): D182 gives the template table of the selected object ESI = [1969] (AH = 6), the byte at [EDX + 7 + 4 · (((cursor [19C0] >> 3) & 7) - 4)] and the first byte of the object go to DS:284D/284E, 68A0 gives the pointer for [2849], the counter [4F0] is cleared, AE57 draws, L3[2] = 5, L3[12] = 0.</summary>
+    public static void F51AC(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Esi = U32(d, 0x1969); g.Ah = 6; w.Call(0xd182, g);
+        g.Eax = 4; g.Ah = d[0x19c0]; g.Ah = (byte)(g.Ah >> 3); g.Ah &= 7; g.Ah = (byte)(g.Ah - 4); Mul8(g, g.Al, g.Ah);
+        g.Edx = g.Edx + g.Eax + 7; g.Al = d[g.Edx]; g.Ah = w.ObjectAt(g.Esi)[0]; d[0x284d] = g.Al; d[0x284e] = g.Ah;
+        w.Call(0x68a0, g); Put(d, 0x2849, g.Edi); Put(d, 0x4f0, 0); w.Call(0xae57, g); w.L3[2] = 5; w.L3[0x12] = 0;
+    }
+
     /// <summary>50F4: the tool «go and do» (cursor 9B0094h): the left button over the map: effect 4, the point [1955]/[1959] as +32/+33 of the selected object with the order [19C0] (a group: 20232, 1F62B); then 4938.</summary>
     public static void F50F4(IUnitActionWorld w, ActionRegs g)
     {
