@@ -9801,6 +9801,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "3E77 (the screen copy with the bank switching of the video card) is a recorded stub; the table [64C] is a flat test region; the value written back for the cells of a partly marked row (FFh) is not observable, since the cells are cleared later"
+    },
+    {
+      "id": "le1-fog-draw-9f38",
+      "module": "LE:1",
+      "start": 40760,
+      "end": 41227,
+      "name": "Draw the fog of war over the 14 x 14 visible cells (9F38)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1E133 (choice of the fog tile) is a recorded stub; the blend table (64 KB) and the tile data are flat test regions in the video window; the map width is fixed at 32 in the fixture"
     }
   ]
 }
