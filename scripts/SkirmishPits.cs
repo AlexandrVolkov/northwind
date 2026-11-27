@@ -82,6 +82,7 @@ public sealed partial class Skirmish
             if (battle.Find(pointer) is { } actor) { Touched.Add(actor); return actor.Record; }
             return new SearchWorld(battle, 0).Resolve(pointer).Record;
         }
+        public void Out(ushort port, byte value) { }
         public void Call(uint address, ActionRegs g)
         {
             switch (address)
