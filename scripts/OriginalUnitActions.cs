@@ -3941,6 +3941,46 @@ public static class OriginalUnitActions
         w.Call(0x21490, g); g.Cl = g.Bh; g.Ch = 4; g.Dl = g.Bl; g.Dh = 5; w.Call(0x23a6e, g); w.Call(0x23b8e, g); g.Ebp = 0xe6b; w.Call(0xef3f, g);
     }
 
+    /// <summary>11EFF: the handler of the crystal in the inventory (ECX = the participant record, AH = the call): 2 = the use: the first slot (+0CD) with a value 18h..1Eh takes the bits BL - 17h (slot - 17h | BL - 17h, + 17h), AL = 0, none: AL = FFh; 3 = the picture: E5E6, AL = +15, DEE4 with ESI = 475Bh.</summary>
+    public static void F11EFF(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Cmp(g.Ah, 2, 8);
+        if (!g.Zf)
+        {
+            g.Cmp(g.Ah, 3, 8); if (!g.Zf) return;
+            uint esi = g.Esi; w.Call(0xe5e6, g); g.Esi = esi; g.Al = r[0x15]; g.Esi = 0x475b; w.Call(0xdee4, g); return;
+        }
+        var part = w.PartOf((byte)((g.Ecx - 0x97a) / 0xf5)); g.Edx = 0;
+        for (; ; )
+        {
+            g.Cmp(part[0xcd + g.Edx], 0x18, 8);
+            if (!g.Cf)
+            {
+                g.Cmp(part[0xcd + g.Edx], 0x1e, 8);
+                if (g.Cf || g.Zf)
+                {
+                    part[0xcd + g.Edx] = (byte)(part[0xcd + g.Edx] - 0x17); g.Bl = (byte)(g.Bl - 0x17); part[0xcd + g.Edx] |= g.Bl; part[0xcd + g.Edx] = Add8(g, part[0xcd + g.Edx], 0x17);
+                    g.Al = 0; g.Logic(0, 8); return;
+                }
+            }
+            g.Edx++; g.Cmp(g.Edx, 0x14, 32); if (!g.Cf) break;
+        }
+        g.Al |= 0xff; g.Logic(g.Al, 8);
+    }
+
+    /// <summary>1205C: the handler of the timed item (ECX = the participant record, EDX = the slot, AH = the call): 3 = the tick: 219C3 (CL, CH = +0F/+10 of the record ESI, EDX = F0Fh) and 8197 (AL, BL = the cell, ECX = size + 101h, DL = DH of the saved EBX); the counter +0E (9 when 0) is decremented and at 0 the slot [ECX + EDX + 0CD] is cleared; 2 = AL = FFh.</summary>
+    public static void F1205C(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Cmp(g.Ah, 3, 8);
+        if (!g.Zf) { g.Cmp(g.Ah, 2, 8); if (g.Zf) { g.Al |= 0xff; g.Logic(g.Al, 8); } return; }
+        uint ecx0 = g.Ecx, edx0 = g.Edx, esi0 = g.Esi, ebx0 = g.Ebx;
+        g.Cl = r[0xf]; g.Ch = r[0x10]; g.Edx = 0xf0f; w.Call(0x219c3, g); g.Al = g.Cl; g.Bl = g.Ch; g.Edx -= g.Ecx; g.Ecx = g.Edx + 0x101; g.Edx = ebx0; g.Dl = g.Dh; w.Call(0x8197, g);
+        g.Esi = esi0; g.Edx = edx0; g.Ecx = ecx0;
+        g.Cmp(r[0xe], 0, 8); if (g.Zf) r[0xe] = 9;
+        r[0xe] = Dec8(g, r[0xe]); if (!g.Zf) return;
+        w.PartOf((byte)((g.Ecx - 0x97a) / 0xf5))[0xcd + g.Edx] = 0;
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
