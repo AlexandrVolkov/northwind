@@ -4345,8 +4345,8 @@ public static class OriginalUnitActions
         Put(d, 0xed2d, g.Ecx); Put(d, 0xed20, g.Esi); int st = (int)(g.Esi - sbase);
         g.Al = w.Stats[st]; g.Ecx = 0xf08; g.Edx = 0x508; w.Call(0x22e46, g);
         if (g.Zf) { Fail116BA(g, saved); return; }
-        g.Bl = (byte)(w.Template[0x77] & 3); g.Logic(g.Bl, 8); g.Ecx = w.Stats[st + 0x61]; g.Edx = w.Stats[st + 0x62]; g.Test(g.Ecx, g.Ecx, 32);
-        w.Call(0x9e41, g); Mul8(g, g.Al, d[0x18de]); g.Ecx = g.Ah; w.Call(0x9e55, g); Mul8(g, g.Al, d[0x18e2]); g.Edx = g.Ah; g.Eax = saved;
+        g.Bl = (byte)(w.Template[0x77] & 3); g.Logic(g.Bl, 8); g.Ecx = w.Stats[st + 0x61]; g.Edx = w.Stats[st + 0x62]; g.Test(g.Ecx, g.Ecx, 32); uint pushed = g.Eax;
+        w.Call(0x9e41, g); Mul8(g, g.Al, d[0x18de]); g.Ecx = g.Ah; w.Call(0x9e55, g); Mul8(g, g.Al, d[0x18e2]); g.Edx = g.Ah; g.Eax = pushed;
         g.Ecx <<= 5; g.Edx <<= 5; w.Call(0x10ad2, g); if (!g.Zf) { Fail116BA(g, saved); return; }
         g.Esi = U32(d, 0xed20); g.Bh = g.Bl; g.Bl = g.Al; g.Al = g.Ah; g.Ah = w.Stats[st]; w.Call(0xa758, g); if (!g.Zf) { Fail116BA(g, saved); return; }
         var o = w.ObjectAt(g.Edi); o[0x14] = 0x81; o[0x1a] = 1; g.Esi = g.Edi; g.Eax = g.Esi - w.PoolBase; w.Call(0x43e5, g);
