@@ -9934,6 +9934,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "1DB64, AF07 and 1D970 are recorded stubs"
+    },
+    {
+      "id": "le1-map-tile-stamp-cd72",
+      "module": "LE:1",
+      "start": 52594,
+      "end": 52893,
+      "name": "Stamp a tile on the map layer with a 3 x 3 mask (CD72)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "9E41 (the random byte of CE9D) is a recorded stub; the map layer and the tile table are flat test regions (32 x 32 cells, 1024 tiles)"
     }
   ]
 }
