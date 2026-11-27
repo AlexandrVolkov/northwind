@@ -3827,6 +3827,26 @@ public static class OriginalUnitActions
         } while (!g.Zf);
     }
 
+    /// <summary>9D87: the screen of the saved game: with the mode L3[0] other than 0 nothing; otherwise 10CA0 prepares, F8E1 (EDX = 99h) opens the file: opened - FA88 (EDX = 219h), the areas ([6C9] records of 841h bytes at [3E87]) are read (F9B7) and F967 closes it; not opened - FEC6; then 199B9, DEC8, 6EB2, 4938, the selection is dropped ([1A1B], [1969], [1C87] = 0, L3[0] = 0), [1C6A], [1C62], [1C66] - 1, 14D5C, the dirty table [64C] (4B0h bytes) and DS:33C (310h bytes) are filled with FFh, DEE4 with 18Ch. The file services are recorded stubs.</summary>
+    public static void F9D87(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; g.Cmp(l[0], 0, 8); if (!g.Zf) return;
+        w.Call(0x10ca0, g); g.Edx = 0x99; w.Call(0xf8e1, g);
+        if (g.Cf) w.Call(0xfec6, g);
+        else
+        {
+            g.Edx = 0x219; w.Call(0xfa88, g); g.Eax = d[0x6c9]; g.Ebx = 0x841; { ulong pr = (ulong)g.Eax * g.Ebx; g.Eax = (uint)pr; g.Edx = (uint)(pr >> 32); g.Cf = g.Of = g.Edx != 0; }
+            g.Ecx = g.Eax; g.Edx = U32(d, 0x3e87); w.Call(0xf9b7, g); w.Call(0xf967, g);
+        }
+        w.Call(0x199b9, g); w.Call(0xdec8, g); w.Call(0x6eb2, g); w.Call(0x4938, g);
+        g.Eax = 0; d[0x1a1b] = 0; Put(d, 0x1969, 0); d[0x1c87] = 0; l[0] = 0; l[1] = 0;
+        foreach (int a in new[] { 0x1c6a, 0x1c62, 0x1c66 }) { uint v = U32(d, a); g.Zf = v - 1 == 0; g.Sf = ((v - 1) & 0x80000000) != 0; g.Of = v == 0x80000000; Put(d, a, v - 1); }
+        w.Call(0x14d5c, g); g.Edi = U32(d, 0x64c); g.Eax = 0xffffffff; g.Ecx = 0x4b0;
+        for (uint k = 0; k < 0x4b0; k++) w.Poke(g.Edi + k, 0xff);
+        g.Edi += 0x4b0; g.Ecx = 0; g.Edi = 0x33c; g.Ecx = 0x310; for (int k = 0; k < 0x310; k++) d[0x33c + k] = 0xff; g.Edi += 0x310; g.Ecx = 0;
+        g.Esi = 0x18c; w.Call(0xdee4, g);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {

@@ -10239,6 +10239,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the screen and the source are flat test regions in the video window; widths above FFFh are not exercised"
+    },
+    {
+      "id": "le1-saved-game-screen-9d87",
+      "module": "LE:1",
+      "start": 40327,
+      "end": 40513,
+      "name": "Screen of the saved game: open, read the areas, reset the selection (9D87)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the file services 10CA0, F8E1, FA88, F9B7, F967, FEC6, 199B9, DEC8, 6EB2, 4938, 14D5C and DEE4 are recorded stubs; the stub cannot set the carry flag, so the fixture only exercises the branch where F8E1 opens the file (CF = 0)"
     }
   ]
 }
