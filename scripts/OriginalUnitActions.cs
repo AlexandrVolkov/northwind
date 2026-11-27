@@ -4358,6 +4358,33 @@ public static class OriginalUnitActions
 
     private static void Fail116BA(ActionRegs g, uint saved) { g.Al |= 0xff; g.Logic(g.Al, 8); g.Eax = saved; }
 
+    /// <summary>117C5: the tribute of the participant AL: 116BA (AL = 5) finds the recipient (ZF = 1, ECX = its record); the four sums +18, +20, +1C, +24 of the donor are halved and added to those of the recipient; the objects of the donor (the list [+0E] .. [+09] of its record, 6885) without bit 8 of the template flags +40 and with the high nibble of +41 not 0Fh pay with the cost +76 of the template from the half of the statistics +19E9 (while it lasts) and go to the recipient (D1BA); then EDD5 sends the message 0Fh about the donor to the recipient; AL = 0 (ZF = 1) or the flags of 116BA; EAX is kept.</summary>
+    public static void F117C5(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint saved = g.Eax, sbase = U32(d, 0x6ba); g.Al = 5; F116BA(w, g); if (!g.Zf) { g.Eax = saved; return; }
+        byte who = (byte)saved; g.Eax = 0xf5; Mul8(g, g.Al, who); g.Edx = (g.Eax & 0xffff) + 0x97a;
+        var donor = w.PartOf(who); var recip = w.PartOf((byte)((g.Ecx - 0x97a) / 0xf5));
+        foreach (int off in new[] { 0x18, 0x20, 0x1c, 0x24 }) { uint v = U32(donor, off) >> 1; Put(donor, off, v); g.Eax = v; Put(recip, off, U32(recip, off) + v); }
+        g.Eax = 0x1a35; g.Ebx = who; g.Eax *= g.Ebx; g.Edx = 0; uint budget = U32(w.Stats, who * 0x1a35 + 0x19e9) >> 1; g.Eax = budget;
+        g.Eax = 0xf5; Mul8(g, g.Al, g.Bl); g.Ecx = (g.Eax & 0xffff) + 0x97a; g.Esi = U32(donor, 0xe) + w.PoolBase; g.Ebp = U32(donor, 9) + w.PoolBase;
+        while (g.Esi != g.Ebp)
+        {
+            F6885(w, g, w.ObjectAt(g.Esi)); int t = (int)(g.Edi - 0x400c00); uint tflags = U32(w.Template, t + 0x40);
+            if ((tflags & 8) == 0)
+            {
+                g.Eax = tflags; g.Ah &= 0xf;
+                if (g.Ah != 0xf)
+                {
+                    g.Eax = w.Template[t + 0x76]; uint b0 = budget; budget -= g.Eax; if (b0 < g.Eax) break;
+                    uint esi = g.Esi, ebp = g.Ebp; g.Eax = U32(d, 0xed20); g.Al = w.Stats[(int)(g.Eax - sbase)]; w.Call(0xd1ba, g); g.Esi = esi; g.Ebp = ebp;
+                }
+            }
+            g.Esi += U32(w.ObjectAt(g.Esi), 0x10);
+        }
+        g.Eax = budget; g.Eax = U32(d, 0xed20); g.Bl = w.Stats[(int)(g.Eax - sbase)]; g.Al = 0xf; g.Ah = who; w.Call(0xedd5, g);
+        g.Al = 0; g.Logic(g.Al, 8); g.Eax = saved;
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
