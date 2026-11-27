@@ -10163,6 +10163,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "D182, A5F4, DEE4 and A4A9 are recorded stubs; DF7E is the ported code over the flat queue window"
+    },
+    {
+      "id": "le1-object-panel-5787",
+      "module": "LE:1",
+      "start": 22407,
+      "end": 22730,
+      "name": "Panel of the selected object with its six slots (5787)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "B6F1, B9EB, BA2E, 66DF, 6EC1, E03C, 4938, DFE5, DF2A, 6EB2, 66E9 and 674F are recorded stubs that keep EDI; DF7E is the ported code over the flat queue window"
     }
   ]
 }
