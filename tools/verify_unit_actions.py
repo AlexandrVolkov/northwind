@@ -734,10 +734,17 @@ def cases(names):
             wv = rng.choice([w0, w0 - 1, w0 + 1, w0 + 2, rng.randrange(0x10000)]) if c['fn'] in ('f111c5', 'f111f8') else rng.choice([0x13c, 0x13b, 0x13e, 0x13d, 0x140, 0x13f, 0x142, 0x141, 0x15e, 0x15d, 0xe6, 0xe5, rng.randrange(0x10000)])
             rb = bytearray(rng.randrange(256) for _ in range(0x20)); rb[3] = rng.choice([0, 1, 3, 9, 0x10, 0x11, 0x13, 5, rng.randrange(256)]); rb[0x17] = wv & 255; rb[0x18] = (wv >> 8) & 255
             c['rb'] = bytes(rb).hex(); c['k1c35'] = rng.choice([0, 1, 1, 0x3a, rng.randrange(1 << 16)]); c['k1cad'] = rng.choice([0xffffffff, 0xffffffff, 0, rng.randrange(1 << 32)])
+            d90 = bytearray(rng.choice([0, 1, 0xd, 0xfd, 0xff, 0x10, 0xf, rng.randrange(256)]) for _ in range(12)); k19 = rng.choice([0, 1, 2, 3, rng.randrange(256)])
             if c['fn'] in ('f1131e', 'f1132f', 'f11351', 'f11364', 'f11386', 'f11397', 'f113cc', 'f11410', 'f11441'):
                 rb[0x1a] = rng.choice([0, 1, 2, rng.randrange(256)]); rb[0x1b] = 0; rb[0x1c] = rng.choice([0, 1, 2, 0xff, 0xfe, 0xf0, 0xef, 0x10, rng.randrange(256)])
+                if c['fn'] == 'f1132f' and rng.random() < 0.8: rb[3] = rng.choice([9, 9, 9, 1, 3]); rb[0x1c] = (rng.choice([1, 0x10, 0x11, 0, 2, 0xf]) - d90[1]) & 255
+                if c['fn'] == 'f11364' and rng.random() < 0.8: rb[3] = rng.choice([9, 9, 9, 1, 3]); rb[0x1c] = (rng.choice([0xf0, 0xfe, 0xff, 0xef, 0xf1, 0xfd]) - d90[0]) & 255
+                if c['fn'] == 'f11397' and rng.random() < 0.8: rb[3] = rng.choice([3, 3, 3, 9, 1]); k19 |= 2; rb[0x1c] = (rng.choice([1, 0xf, 0x10, 0, 2, 0xe]) - d90[5]) & 255
+                if c['fn'] == 'f113cc': rb[3] = rng.choice([9, 9, 1, 3, 5, 0x11]); d90[10] = rng.choice([0, 1, rng.randrange(256)])
+                if c['fn'] == 'f11410' and rng.random() < 0.8:
+                    rb[3] = rng.choice([9, 9, 9, 1, 3]); rb[0x1a] = rng.choice([0, 0, 1]); k19 |= 1; wv = rng.choice([0x158, 0x159, 0x15a, 0x15b, rng.randrange(0x10000)]); rb[0x17] = wv & 255; rb[0x18] = wv >> 8
                 c['rb'] = bytes(rb).hex()
-            c['d90'] = bytes(rng.choice([0, 1, 0xd, 0xfd, 0xff, 0x10, 0xf, rng.randrange(256)]) for _ in range(12)).hex(); c['k19e7'] = rng.choice([0, 1, 2, 3, rng.randrange(256)]); c['k1cb1'] = rng.randrange(1 << 32)
+            c['d90'] = bytes(d90).hex(); c['k19e7'] = k19; c['k1cb1'] = rng.randrange(1 << 32)
             for call in c['calls']: call[0] = rng.choice([0, 1])
         if c['fn'] == 'febd8':
             c['rel'] = [rng.choice([0, 0, 0, 1, 5]) for _ in range(8)] + [0] * 8; c['dv'] = [rng.choice([0x7cf, 0x7d0, 0x7ce, 0x1000, 0]) for _ in range(8)]; c['m0'] = rng.choice([0, 0, 1]); c['k1c35'] = rng.choice([0x3a, 0x3a, 0, 5]); c['k1972'] = c['f3']
