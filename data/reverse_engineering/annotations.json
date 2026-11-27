@@ -10505,6 +10505,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "E5AB, E5E6 and DEE4 are recorded stubs; the record owner is 5..7 in the fixture (the bit 10h of +3 in ECA3 is never set)"
+    },
+    {
+      "id": "le1-message-call-ebd8",
+      "module": "LE:1",
+      "start": 60376,
+      "end": 60472,
+      "name": "Call of the message menu by a participant that knows the player (EBD8)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1EAD8, 111C5 and DEE4 are recorded stubs (1EAD8 keeps EBX in the fixture); only the relation slots 0..7 are non-zero in the fixture"
     }
   ]
 }

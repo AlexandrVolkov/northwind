@@ -4059,6 +4059,25 @@ public static class OriginalUnitActions
     /// <summary>ECC8: the flags of the record: +21 and +3F get +3 | +21 | +3F.</summary>
     public static void FECC8(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Al = r[3]; g.Al |= r[0x21]; g.Al |= r[0x3f]; g.Logic(g.Al, 8); r[0x21] = g.Al; r[0x3f] = g.Al; }
 
+    /// <summary>EBD8: the call to the message menu when a participant that knows the player (the relation table +0B9 of the participant of [1972], 16 entries, from the last) has a value above 7CFh at +19F1 of its statistics: with the mode L3[0] = 0 and the key [1C35] = 3Ah it shows the menu 3B27h (DEE4), otherwise E4h goes to 111C5 first (it must agree).</summary>
+    public static void FEBD8(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; g.Eax = 0xf5; Mul8(g, g.Al, d[0x1972]); g.Ebx = (g.Eax & 0xffff) + 0x97a; var part = w.PartOf(d[0x1972]); g.Eax = 0x10;
+        for (; ; )
+        {
+            g.Eax = Dec32(g, g.Eax); if (g.Sf) return;
+            g.Cmp(part[0xb9 + g.Eax], 0, 8); if (g.Zf) continue;
+            uint eax = g.Eax; w.Call(0x1ead8, g); g.Eax = eax;
+            g.Cmp(U32(w.Stats, (int)(g.Edx - 0x40a000) + 0x19f1), 0x7cf, 32); if (g.Cf || g.Zf) continue;
+            break;
+        }
+        g.Cmp(l[0], 0, 8);
+        if (g.Zf) { g.Cmp(U16(d, 0x1c35), 0x3a, 16); if (g.Zf) goto show; }
+        g.Eax = 0xe4; w.Call(0x111c5, g); if (!g.Zf) return;
+    show:
+        g.Esi = 0x3b27; w.Call(0xdee4, g);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
