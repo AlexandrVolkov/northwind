@@ -96,17 +96,8 @@ public sealed partial class Skirmish
                 }
                 case 0x68bd:    // the template of the object EDI
                     g.Edx = g.Edi == SelfPointer ? SelfTemplatePointer : TemplateBase + g.Edi; break;
-                case 0xc344:    // Chebyshev distance of the positions ESI and EDI
-                {
-                    var a = ObjectAt(g.Esi); var b = ObjectAt(g.Edi);
-                    long dx = Math.Abs((long)BitConverter.ToUInt32(a, 4) - BitConverter.ToUInt32(b, 4)), dy = Math.Abs((long)BitConverter.ToUInt32(a, 8) - BitConverter.ToUInt32(b, 8));
-                    g.Eax = (uint)Math.Max(dx, dy); break;
-                }
-                case 0xd157:    // the terrain class under the object EDI
-                {
-                    var o = ObjectAt(g.Edi); int cell = (int)(BitConverter.ToUInt32(o, 8) >> 5) * battle.Map.Width + (int)(BitConverter.ToUInt32(o, 4) >> 5);
-                    g.Eax = cell >= 0 && cell < battle.Map.Cells.Length ? (uint)(battle._properties[(int)(battle.Map.Cells[cell] & 0xffff) * 8] & 7) : 0; break;
-                }
+                case 0xc344: OriginalUnitActions.FC344(this, g, ObjectAt(g.Esi)); break;   // Chebyshev distance of the positions ESI and EDI
+                case 0xd157: OriginalUnitActions.FD157(this, g); break;   // the terrain class under the object EDI
                 default: throw new InvalidOperationException($"call {address:X}");
             }
         }
@@ -118,7 +109,7 @@ public sealed partial class Skirmish
         public byte TableByte(uint address) => 0xff;
         public byte Fs13D { get; set; } public byte Fs10 { get; set; } public byte G525 => 0; public byte G526 => 0; public byte G1C61 { get; set; } public uint G2730 => 0;
         public byte[] Route => throw new NotSupportedException();
-        public uint TileDescriptor(uint tile) => 0;
+        public uint TileDescriptor(uint cell) => cell < battle.Map.Cells.Length ? battle._properties[(int)(battle.Map.Cells[cell] & 0xffff) * 8] : 0u;
         public uint TileProperty(uint cell, int offset) => 0;
         public uint Fs17F { get; set; }
         public byte[] L3 { get; } = new byte[0x4000];
