@@ -10125,6 +10125,25 @@
         "scripts/SkirmishPits.cs"
       ],
       "limitations": "the map size is 32 x 32 in the fixture; the difference JBE against JB at equal sums is not observable (the value is the same)"
+    },
+    {
+      "id": "le1-widget-draw-e08b",
+      "module": "LE:1",
+      "start": 57483,
+      "end": 58713,
+      "name": "Draw the widgets of the queue and track the mouse over them (E08B)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the drawing services 1E133, 1DF08, 1DF3C, 1E098, 1E0DE, 1DF7B, 1E153, 6D4A, 6DEF, B3B6, 7069, 7012, 6CD6, 1D7AF, 3EEA, 3F32 and 21A3D are recorded stubs that keep EDI; the widget records are in the flat queue window, the strings in the text test region"
     }
   ]
 }
