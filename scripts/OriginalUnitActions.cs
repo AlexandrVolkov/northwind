@@ -3589,6 +3589,135 @@ public static class OriginalUnitActions
         g.Al = 0; g.Logic(0, 8);
     }
 
+    /// <summary>E08B: the widgets of the queue (records of 1Eh bytes from 7F2h to [DCE], the byte +0 the type (bit 40h hidden, bit 80h redraw), +3 the state of the mouse, +4/+8 the point): the mouse state of every widget is [DD2] ((the bit 1 of [194B] * 4 | [193A]) * 2) first; a widget of the type 0..5, 7..9, 0Ch redraws what it shows (pictures through 1E133 and the blits 1DF08/1DF3C/1E098/1E0DE/1DF7B/1E153, the text 7069/7012/6CD6, the bar 1D7AF, the figure B3B6, the frames 6D4A/6DEF) and the dirty cells (3EEA, 3F32) are marked; the rectangle of the widget is tested against the mouse [194D]/[1951] (+3 bit 1 = the mouse is over it); the widgets of the mode [0] other than their key +1 lose the mouse. The drawing services are recorded stubs.</summary>
+    public static void FE08B(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        byte B(uint o) => l[g.Edi + o];
+        ushort B16(uint o) => (ushort)(l[g.Edi + o] | l[g.Edi + o + 1] << 8);
+        uint B32(uint o) => BitConverter.ToUInt32(l, (int)(g.Edi + o));
+        g.Al = d[0x194b]; g.Al = (byte)(g.Al << 2); g.Al |= d[0x193a]; g.Al = (byte)(g.Al << 1); l[0xdd2] = g.Al; g.Edi = 0x7f2;
+        for (; ; )
+        {
+            g.Cmp(g.Edi, U32(l, 0xdce), 32); if (!g.Cf) return;
+            l[g.Edi + 3] = l[0xdd2]; g.Al = B(0); g.Test(g.Al, 0x40, 8); if (!g.Zf) goto hide;
+            g.Al &= 0x3f; g.Cmp(g.Al, 0xa, 8); if (g.Zf) goto next;
+            g.Cmp(g.Al, 0xb, 8); if (g.Zf) { g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B16(0x12); g.Edx = B16(0x14); goto t50f; }
+            g.Cmp(B32(4), 0x1d0, 32); if (g.Cf) l[g.Edi] |= 0x80;
+            byte type = g.Al;
+            switch (type)
+            {
+                case 0: case 4:
+                    {
+                        g.Esi = U32(d, 0x191a); if (B(0x16) != 0xff) { g.Eax = 0x56; Mul8(g, g.Al, B(0x16)); g.Esi = U32(d, (int)(g.Eax + 0x6ca)); }
+                        g.Eax = B16(0x17); w.Call(0x1e133, g); g.Eax = 0; g.Ah = B(0x10);
+                        if (type == 0)
+                        {
+                            g.Ebp = U32(d, 0x19f6) + g.Eax; g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B16(0x12); g.Edx = B16(0x14); g.Test(B(0), 0x80, 8);
+                            if (!g.Zf) { uint e = g.Edi, a = g.Eax, b = g.Ebx, c = g.Ecx, x = g.Edx; g.Cmp(B(0x10), 8, 8); w.Call(g.Zf ? 0x1df08u : 0x1df3cu, g); g.Edi = e; g.Eax = a; g.Ebx = b; g.Ecx = c; g.Edx = x; }
+                            goto t4f4;
+                        }
+                        g.Ecx = U32(d, 0x19f6) + g.Eax; g.Eax = B32(4); g.Ebx = B32(8); g.Dl = B(0x12); g.Dh = B(0x14);
+                        { uint e = g.Edi; w.Call(0x1df7b, g); g.Edi = e; }
+                        g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B16(0x12); g.Edx = B16(0x14); w.Call(0x21a3d, g); if (g.Zf) goto t537;
+                        g.Eax += 0x10; g.Ebx += 0x10; w.Call(0x3eea, g); goto t50f;
+                    }
+                case 1: case 5:
+                    {
+                        g.Esi = U32(d, 0x191a); if (B(0x14) != 0xff) { g.Eax = 0x56; Mul8(g, g.Al, B(0x14)); g.Esi = U32(d, (int)(g.Eax + 0x6ca)); }
+                        g.Eax = B16(0x15); w.Call(0x1e133, g); g.Eax = 0; g.Ah = B(0x10);
+                        if (type == 1)
+                        {
+                            g.Ebp = U32(d, 0x19f6) + g.Eax; g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B(0x12); g.Edx = B(0x13); g.Test(B(0), 0x80, 8);
+                            if (!g.Zf) { uint e = g.Edi, a = g.Eax, b = g.Ebx, c = g.Ecx, x = g.Edx; g.Cmp(B(0x10), 8, 8); w.Call(g.Zf ? 0x1e098u : 0x1e0deu, g); g.Edi = e; g.Eax = a; g.Ebx = b; g.Ecx = c; g.Edx = x; }
+                            goto t4f4;
+                        }
+                        g.Ecx = U32(d, 0x19f6) + g.Eax; g.Eax = B32(4); g.Ebx = B32(8); g.Dl = B(0x12); g.Dh = B(0x13);
+                        { uint e = g.Edi; w.Call(0x1e153, g); g.Edi = e; }
+                        g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B(0x12); g.Edx = B(0x13); w.Call(0x21a3d, g); if (g.Zf) goto t537;
+                        g.Eax += 0x10; g.Ebx += 0x10; w.Call(0x3eea, g); goto t50f;
+                    }
+                case 7: case 8:
+                    {
+                        g.Test(B(0), 0x80, 8);
+                        if (!g.Zf)
+                        {
+                            uint e = g.Edi; g.Eax = B32(4); g.Ebx = B32(8); g.Cl = B(0x14); g.Ch = B(0x15); g.Dl = B(0x12); g.Dh = B(0x13); g.Edi = B(0x16);
+                            w.Call(type == 7 ? 0x6d4au : 0x6defu, g); g.Edi = e;
+                        }
+                        g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B(0x12); g.Edx = B(0x13); goto t4f4;
+                    }
+                case 3:
+                    {
+                        g.Test(B(0), 0x80, 8);
+                        if (!g.Zf)
+                        {
+                            g.Ebx = B32(0x15); g.Eax = w.Peek(g.Ebx); g.Cmp(B(0x14), 1, 8);
+                            if (!g.Zf) { g.Eax = (uint)(w.Peek(g.Ebx) | w.Peek(g.Ebx + 1) << 8 | w.Peek(g.Ebx + 2) << 16 | w.Peek(g.Ebx + 3) << 24) & 0xffffff; }
+                            g.Ecx = B32(4); g.Edx = B32(8); g.Ebx = B(0x12); uint e = g.Edi; w.Call(0xb3b6, g); g.Edi = e;
+                        }
+                        g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B(0x12); g.Edx = B(0x13); goto t4f4;
+                    }
+                case 2:
+                    {
+                        uint e = g.Edi; g.Esi = B32(0x12); g.Eax = B(0x17); g.Ebx = B(0x18); g.Ecx = B(0x19); g.Edi = U32(d, 0x696); w.Call(0x7069, g); g.Edi = e;
+                        g.Test(B(0), 0x80, 8);
+                        if (g.Zf) { w.Call(0x7012, g); g.Edi = e; g.Ecx = g.Ebx; g.Edx = 0x10; g.Eax = B32(4); g.Ebx = B32(8); goto t4f4; }
+                        g.Ecx = B32(4); g.Edx = B32(8); g.Eax = 0; g.Ah = B(0x10); g.Ebp = U32(d, 0x19f6) + g.Eax; w.Call(0x6cd6, g); g.Edi = e; goto t4f4;
+                    }
+                case 9:
+                    {
+                        uint e = g.Edi; g.Esi = B32(0x12); g.Eax = B(0x17); g.Ebx = B(0x18); g.Ecx = B(0x19); g.Edi = U32(d, 0x696); w.Call(0x7069, g); g.Edi = e;
+                        g.Edx = 0x1f45; g.Ch = 0xff;
+                        do { g.Al = w.Peek(g.Esi); d[g.Edx] = g.Al; g.Ch++; g.Esi++; g.Edx++; g.Cmp(g.Al, 0xff, 8); } while (!g.Zf);
+                        g.Ebx = B(0x16); g.Cmp(g.Bl, g.Ch, 8);
+                        if (!g.Zf)
+                        {
+                            g.Test(d[0x19e7], 2, 8);
+                            if (!g.Zf) { g.Bl = (byte)(g.Bl + 2); g.Cmp(g.Bl, g.Ch, 8); if (!(g.Cf || g.Zf)) g.Bl = g.Ch; }
+                            g.Test(g.Bl, g.Bl, 8);
+                            if (!g.Zf) { g.Cmp(d[g.Ebx + 0x1f44], 0x7e, 8); if (g.Zf) g.Bl--; }
+                            d[g.Ebx + 0x1f45] = 0xff; l[g.Edi + 0x16] = g.Bl; l[g.Edi] |= 0x80;
+                        }
+                        g.Esi = 0x1f45; g.Test(B(0), 0x80, 8);
+                        if (g.Zf) { w.Call(0x7012, g); g.Edi = e; g.Ecx = g.Ebx; g.Edx = 0x10; g.Eax = B32(4); g.Ebx = B32(8); goto t4f4; }
+                        g.Ecx = B32(4); g.Edx = B32(8); g.Eax = 0; g.Ah = B(0x10); g.Ebp = U32(d, 0x19f6) + g.Eax; w.Call(0x6cd6, g); g.Edi = e; goto t4f4;
+                    }
+                case 0xc:
+                    {
+                        g.Test(B(0), 0x80, 8);
+                        if (!g.Zf)
+                        {
+                            g.Eax = B(0x12); Mul8(g, g.Al, B(0x14)); Div8(g, B(0x15)); g.Ah = 0; uint pushed = g.Eax; g.Ecx = g.Eax; g.Eax = B32(4); g.Ebx = B32(8); g.Ecx += g.Eax; g.Edx = g.Ebx;
+                            uint e = g.Edi; g.Edi = B(0x16); w.Call(0x1d7af, g); g.Edi = e; g.Eax = pushed;
+                            g.Ecx = B(0x12); g.Ecx -= g.Eax; g.Eax += B32(4); g.Ebx = B32(8); g.Ecx += g.Eax; g.Edx = g.Ebx;
+                            g.Edi = 0; w.Call(0x1d7af, g); g.Edi = e;
+                            g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B(0x12); g.Edx = 1; w.Call(0x3eea, g); goto t4f4;
+                        }
+                        g.Eax = B32(4); g.Ebx = B32(8); g.Ecx = B(0x12); g.Edx = 1; goto t4f4;
+                    }
+                default: goto next;
+            }
+        t4f4:
+            l[g.Edi] &= 0x7f; g.Cmp(g.Eax, 0x1d0, 32);
+            if (g.Cf) { g.Eax -= 0x10; g.Ebx -= 0x10; w.Call(0x3f32, g); g.Eax += 0x10; g.Ebx += 0x10; }
+        t50f:
+            g.Add(g.Ecx, g.Eax); g.Ecx += g.Eax; g.Add(g.Edx, g.Ebx); g.Edx += g.Ebx;
+            g.Cmp(U32(d, 0x194d), g.Eax, 32); if (g.Cf) goto t537;
+            g.Cmp(U32(d, 0x1951), g.Ebx, 32); if (g.Cf) goto t537;
+            g.Cmp(U32(d, 0x194d), g.Ecx, 32); if (!g.Cf) goto t537;
+            g.Cmp(U32(d, 0x1951), g.Edx, 32); if (!g.Cf) goto t537;
+            l[g.Edi + 3] |= 1;
+        t537:
+            g.Al = l[0]; g.Test(g.Al, g.Al, 8); if (g.Zf) goto next;
+            g.Cmp(g.Al, B(1), 8); if (g.Zf) goto next;
+        hide:
+            l[g.Edi + 3] = 0;
+        next:
+            g.Edi += 0x1e;
+        }
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
