@@ -10448,6 +10448,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the test world gives every participant the same object range, so the owner selecting the record (BL) is not told from another owner"
+    },
+    {
+      "id": "le1-message-menu-e717",
+      "module": "LE:1",
+      "start": 59159,
+      "end": 59418,
+      "name": "Menu of the messages of a settlement (E717)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "F781, EAD8, 9E69, 7012 and 704F are recorded stubs that keep EDX and EDI; DF7E is the ported code over the flat queue window; the message tables lie in the L3 area (owners 1..3 only in the fixture because the test world overlaps the participant table)"
     }
   ]
 }
