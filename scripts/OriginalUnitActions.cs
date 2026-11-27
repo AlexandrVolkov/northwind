@@ -4078,6 +4078,31 @@ public static class OriginalUnitActions
         g.Esi = 0x3b27; w.Call(0xdee4, g);
     }
 
+    /// <summary>E9F0: the answer window of a message (AH = the participant -> [DD4], AL = the message -> [DD5]): a participant whose statistics +19F1 is not above 7CFh only gets E5E6 (nothing to say); otherwise the mode L3[0] = 5, F781, DF7E queues two widgets 3CB3h for the two answers of the table of the message (L3[F0C + 13h * message], the bytes +11, +12 are the messages of the answers): the text of each (9E69 picks the string from the list, the first byte is the count), +12 = its pointer, +1A = the answer, +18 = [1972], +17 and +1B = [DD4]; 7012 centres it (0F0h - width / 2 = +4), +8 = [1F31] (starts at DCh), 704F gives the height (+0Fh) that moves [1F31].</summary>
+    public static void FE9F0(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; l[0xdd4] = g.Ah; l[0xdd5] = g.Al; g.Al = g.Ah; w.Call(0x1ead8, g);
+        g.Cmp(U32(w.Stats, (int)(g.Edx - 0x40a000) + 0x19f1), 0x7cf, 32);
+        if (g.Cf || g.Zf) { w.Call(0xe5e6, g); return; }
+        l[0] = 5; l[1] = 0; w.Call(0xf781, g); g.Eax = 0x13; Mul8(g, g.Al, l[0xdd5]); g.Ebx = U32(l, (int)(g.Eax + 0xefb)); g.Eax += 0xf0c; uint pushed = g.Eax;
+        w.Call(0x9e69, g); Mul8(g, g.Al, w.Peek(g.Ebx));
+        goto s1;
+    a1: g.Ebx++; g.Cmp(w.Peek(g.Ebx), 0xff, 8); if (!g.Zf) goto a1;
+    s1: g.Ebx++; g.Ah = Dec8(g, g.Ah); if (!g.Sf) goto a1;
+        Put(d, 0x1f31, 0xdc); g.Edi = pushed; g.Cl = 2;
+        do
+        {
+            g.Esi = 0x3cb3; uint edi = g.Edi, ecx = g.Ecx; g.Al = 1; FDF7E(w, g); g.Edx = g.Edi; g.Ecx = ecx; g.Edi = edi;
+            g.Eax = 0x13; Mul8(g, g.Al, l[g.Edi]); g.Ebx = U32(l, (int)(g.Eax + 0xefb)); w.Call(0x9e69, g); Mul8(g, g.Al, w.Peek(g.Ebx));
+            goto s2;
+        a2: g.Ebx++; g.Cmp(w.Peek(g.Ebx), 0xff, 8); if (!g.Zf) goto a2;
+        s2: g.Ebx++; g.Ah = Dec8(g, g.Ah); if (!g.Sf) goto a2;
+            Put(l, (int)g.Edx + 0x12, g.Ebx); g.Al = l[g.Edi]; l[g.Edx + 0x1a] = g.Al; g.Al = d[0x1972]; l[g.Edx + 0x18] = g.Al; g.Al = l[0xdd4]; l[g.Edx + 0x17] = g.Al; l[g.Edx + 0x1b] = g.Al;
+            g.Esi = g.Ebx; w.Call(0x7012, g); g.Eax = 0xf0; g.Ebx >>= 1; g.Eax -= g.Ebx; Put(l, (int)g.Edx + 4, g.Eax); g.Eax = U32(d, 0x1f31); Put(l, (int)g.Edx + 8, g.Eax);
+            w.Call(0x704f, g); g.Eax += 0xf; Put(d, 0x1f31, U32(d, 0x1f31) + g.Eax); g.Edi++; g.Cl = Dec8(g, g.Cl);
+        } while (!g.Zf);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
