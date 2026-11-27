@@ -691,9 +691,9 @@ def cases(names):
             c['k1c35'] = rng.choice([1, 1, 0, 0x3a, rng.randrange(1 << 16)]); c['kdd4'] = rng.randrange(256)
             for call in c['calls']: call[0] = rng.choice([0, 1, 1])
         if c['fn'] in ('fee49', 'fecd8', 'fed01', 'fed32', 'fed64', 'fed93'):
-            c['b1a'] = rng.randrange(4); c['b1b'] = 5 + rng.randrange(3); c['k1972'] = 5 + rng.randrange(3); c['kdd4'] = 5 + rng.randrange(3); c['kdd5'] = rng.randrange(4)
-            c['regs'][0] = (c['regs'][0] & ~0xff) | rng.randrange(4); c['regs'][1] = (c['regs'][1] & ~0xff) | 5 + rng.randrange(3)
-            c['qq'] = bytes((rng.choice([0, 1, 2, 3, 0xff]) if k % 0xe == 0 else rng.randrange(256)) for k in range(0x70 * 3)).hex()
+            c['b1a'] = rng.randrange(4); c['b1b'] = 6 + rng.randrange(2); c['k1972'] = 6 + rng.randrange(2); c['kdd4'] = 6 + rng.randrange(2); c['kdd5'] = rng.randrange(4)
+            c['regs'][0] = (c['regs'][0] & ~0xff) | rng.randrange(4); c['regs'][1] = (c['regs'][1] & ~0xff) | 6 + rng.randrange(2)
+            c['qq'] = bytes((rng.choice([0, 1, 2, 3, 0xff]) if k % 0xe == 0 else rng.randrange(256)) for k in range(0x70 * 2)).hex()
             c['calls'] = [list(x) for x in c['calls'] * 3]
             for call in c['calls']: call[0] = rng.choice([1, 1, 1, 0])
         if c['fn'] == 'febd8':
@@ -1201,7 +1201,7 @@ def generate(game, names):
         if case['fn'] in ('fec38', 'fec61', 'fec82', 'feca3', 'fecc8'): o.cpu.mem_write(0x1c35, struct.pack('<H', case['k1c35'])); o.cpu.mem_write(0xdd4, bytes([case['kdd4']]))
         if case['fn'] in ('fee49', 'fecd8', 'fed01', 'fed32', 'fed64', 'fed93'):
             o.cpu.mem_write(0x1972, bytes([case['k1972']])); o.cpu.mem_write(0xdd4, bytes([case['kdd4'], case['kdd5']])); o.cpu.mem_write(o.POOL + POOLREC + 0x1a, bytes([case['b1a'], case['b1b']]))
-            for k in range(3): o.cpu.mem_write(0x97a + 0xf5 * (5 + k) + 0x34, bytes.fromhex(case['qq'])[0x70 * k:0x70 * k + 0x70])
+            for k in range(2): o.cpu.mem_write(0x97a + 0xf5 * (6 + k) + 0x34, bytes.fromhex(case['qq'])[0x70 * k:0x70 * k + 0x70])
         if case['fn'] == 'febd8':
             o.cpu.mem_write(0x1972, bytes([case['k1972']])); o.cpu.mem_write(0x97a + 0xf5 * case['f3'] + 0xb9, bytes(case['rel'])); o.cpu.mem_write(0x1c35, struct.pack('<H', case['k1c35'])); o.cpu.mem_write(0, bytes([case['m0']]))
             for k in range(8): o.cpu.mem_write(o.POOL + 0xa000 + k * 0x1a35 + 0x19f1, struct.pack('<I', case['dv'][k]))
@@ -1252,7 +1252,7 @@ def generate(game, names):
         if case['fn'] == 'fe717': extraC = bytes(o.cpu.mem_read(0x7f2, 0x40)) + bytes(o.cpu.mem_read(0xdce, 4)) + bytes(o.cpu.mem_read(0x1f31, 4))
         if case['fn'] == 'fead8': extraC = bytes(o.cpu.mem_read(0x7f2, 0x80)) + bytes(o.cpu.mem_read(0xdce, 4)) + bytes(o.cpu.mem_read(0x1f31, 0x14))
         if case['fn'] in ('fec38', 'fec61', 'fec82', 'feca3', 'fecc8'): extraC = bytes(o.cpu.mem_read(0xdd4, 1)) + bytes(o.cpu.mem_read(0x1c35, 2))
-        if case['fn'] in ('fee49', 'fecd8', 'fed01', 'fed32', 'fed64', 'fed93'): extraC = bytes(o.cpu.mem_read(0xdd4, 2)) + b''.join(bytes(o.cpu.mem_read(0x97a + 0xf5 * (5 + k) + 0x34, 0x70)) for k in range(3))
+        if case['fn'] in ('fee49', 'fecd8', 'fed01', 'fed32', 'fed64', 'fed93'): extraC = bytes(o.cpu.mem_read(0xdd4, 2)) + b''.join(bytes(o.cpu.mem_read(0x97a + 0xf5 * (6 + k) + 0x34, 0x70)) for k in range(2))
         if case['fn'] == 'fe9f0': extraC = bytes(o.cpu.mem_read(0x7f2, 0x80)) + bytes(o.cpu.mem_read(0xdce, 4)) + bytes(o.cpu.mem_read(0xdd4, 2)) + bytes(o.cpu.mem_read(0x1f31, 4))
         if case['fn'] == 'f9f38': extraC = bytes(o.cpu.mem_read(0xc00000, 0x49000)) + bytes(o.cpu.mem_read(0x43c, 0x204)) + bytes(o.cpu.mem_read(0x1f31, 0x114))
         extraB = bytes(o.cpu.mem_read(0x193e, 4)) if case['fn'] == 'f3db5' else b''
