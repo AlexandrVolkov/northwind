@@ -3931,6 +3931,16 @@ public static class OriginalUnitActions
         } while (g.Ecx != 0);
     }
 
+    /// <summary>F09C: the dialog handler of the alliance offer: the participant BH = +9 of the record EDI; EEFA drops the messages between the two (ECX = the record of the offer); its dwords +20, +18 and +1C go to +1A28, +1A2C and +1A30 of the statistics record of BH; 21490 prepares, 23A6E (CL = BH, CH = 4, DL = BL, DH = 5) and 23B8E make the message, EF3F (EBP = E6Bh) reacts.</summary>
+    public static void FF09C(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Bh = w.ObjectAt(g.Edi)[9]; w.Call(0xeefa, g);
+        g.Eax = 0x1a35; g.Edx = g.Bh; { ulong pr = (ulong)g.Eax * g.Edx; g.Eax = (uint)pr; g.Edx = (uint)(pr >> 32); g.Cf = g.Of = g.Edx != 0; }
+        g.Edx = U32(d, 0x6ba); g.Add(g.Edx, g.Eax); g.Edx += g.Eax; int so = (int)(g.Edx - 0x40a000);
+        g.Eax = Peek32(w, g.Ecx + 0x20); Put(w.Stats, so + 0x1a28, g.Eax); g.Eax = Peek32(w, g.Ecx + 0x18); Put(w.Stats, so + 0x1a2c, g.Eax); g.Eax = Peek32(w, g.Ecx + 0x1c); Put(w.Stats, so + 0x1a30, g.Eax);
+        w.Call(0x21490, g); g.Cl = g.Bh; g.Ch = 4; g.Dl = g.Bl; g.Dh = 5; w.Call(0x23a6e, g); w.Call(0x23b8e, g); g.Ebp = 0xe6b; w.Call(0xef3f, g);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {

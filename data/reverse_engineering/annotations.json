@@ -10372,6 +10372,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "124D8, EDD5, 1ECA0, 10AD2, A758 and 43E5 are recorded stubs"
+    },
+    {
+      "id": "le1-alliance-offer-f09c",
+      "module": "LE:1",
+      "start": 61596,
+      "end": 61683,
+      "name": "Dialog handler of the alliance offer (F09C)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "EEFA, 21490, 23A6E, 23B8E and EF3F are recorded stubs that keep BH; EBP (E6Bh for EF3F) is not in the recorded registers, so the fixture does not tell it"
     }
   ]
 }
