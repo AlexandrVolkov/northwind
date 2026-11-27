@@ -3883,6 +3883,18 @@ public static class OriginalUnitActions
         do { byte res = (byte)(w.Peek(g.Edi) & g.Al); w.Poke(g.Edi, res); g.Logic(res, 8); g.Edi++; g.Ecx = Dec32(g, g.Ecx); } while (!g.Zf);
     }
 
+    /// <summary>124A5: the item BL is taken from the inventory (20 slots at +0CD of the participant record BH = the owner): the first slot with it is cleared (AL = 0), none: AL = FFh.</summary>
+    public static void F124A5(IUnitActionWorld w, ActionRegs g)
+    {
+        uint e = g.Eax; g.Ebx = e; g.Eax = 0xf5; Mul8(g, g.Al, g.Bh); g.Ecx = (g.Eax & 0xffff) + 0x97a; var part = w.PartOf(g.Bh); g.Edx = 0;
+        for (; ; )
+        {
+            g.Cmp(part[0xcd + g.Edx], g.Bl, 8); if (g.Zf) { part[0xcd + g.Edx] = 0; g.Al = 0; g.Logic(0, 8); return; }
+            g.Edx++; g.Cmp(g.Edx, 0x14, 32); if (!g.Cf) break;
+        }
+        g.Al |= 0xff; g.Logic(g.Al, 8);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {

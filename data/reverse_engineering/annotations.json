@@ -10315,6 +10315,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "124D8 is a recorded stub; the fog table is the flat text test region (32 x 32 cells); a shift count of 16 and above gives the same byte in both the port and the fixture check"
+    },
+    {
+      "id": "le1-inventory-take-124a5",
+      "module": "LE:1",
+      "start": 74917,
+      "end": 74968,
+      "name": "Take an item out of the inventory of a participant (124A5)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the participant is limited to 0..7 in the fixture"
     }
   ]
 }

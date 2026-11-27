@@ -478,6 +478,7 @@ public partial class TestRunner
                 case "f12198":
                     Array.Copy(Convert.FromHexString(c.GetProperty("fogd").GetString()!), 0, w.Text, 0xc00, 0x400); BitConverter.GetBytes(0x402e00u).CopyTo(w.Ds, 0x18da); w.Ds[0x1ec5] = (byte)c.GetProperty("k1ec5").GetInt32(); w.Ds[0x19ea] = (byte)c.GetProperty("k19ea").GetInt32();
                     OriginalUnitActions.F12198(w, g, r); break;
+                case "f124a5": OriginalUnitActions.F124A5(w, g); break;
                 case "f9f38":
                     {
                         Array.Fill(w.Video, (byte)0x5a, 0, 0x49000); Array.Copy(ActionPrng(c.GetProperty("seed").GetUInt32(), 0x10000), 0, w.Video, 0x50000, 0x10000); Array.Copy(Convert.FromHexString(c.GetProperty("tile").GetString()!), 0, w.Video, 0x60000, 0x1800);
@@ -738,7 +739,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 272, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 273, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }
