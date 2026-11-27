@@ -3186,6 +3186,37 @@ public static class OriginalUnitActions
         } while (!g.Zf);
     }
 
+    /// <summary>5CD9: the panel picture of the record ESI: when the wanted number +1A differs from the shown +1B it is shown (674F clears, +1B = +1A); a number other than FFh asks 68A0 for the template EDI (AH = the kind +1C), 6C66 draws its name (ECX = 14h, EDX = 1D0h, ESI = the string +7 of the template) and, with the flag +1D, the four prices (+7C, +84, +80, +88 of the template; pictures 138h, 137h, 139h, 13Ah) go through 5D68 one below the other from ECX = AAh; at the end +1A = FFh.</summary>
+    public static void F5CD9(IUnitActionWorld w, ActionRegs g)
+    {
+        uint e = g.Esi; g.Al = w.Peek(e + 0x1a); g.Cmp(g.Al, w.Peek(e + 0x1b), 8);
+        if (!g.Zf)
+        {
+            w.Poke(e + 0x1b, g.Al); w.Call(0x674f, g); g.Esi = e; g.Al = w.Peek(e + 0x1a); w.Poke(e + 0x1b, g.Al); g.Cmp(g.Al, 0xff, 8);
+            if (!g.Zf)
+            {
+                g.Ah = w.Peek(e + 0x1c); w.Call(0x68a0, g); uint edi = g.Edi;
+                g.Esi = edi + 7; g.Add(g.Esi, Peek32(w, g.Esi)); g.Esi += Peek32(w, g.Esi); g.Ecx = 0x14; g.Edx = 0x1d0; w.Call(0x6c66, g);
+                g.Edi = edi; g.Esi = e; g.Ecx = 0xaa; g.Cmp(w.Peek(e + 0x1d), 0, 8);
+                if (!g.Zf)
+                {
+                    foreach (var (off, pic) in new[] { (0x7cu, 0x138u), (0x84u, 0x137u), (0x80u, 0x139u), (0x88u, 0x13au) }) { g.Ebx = Peek32(w, g.Edi + off); g.Eax = pic; F5D68(w, g); }
+                    g.Esi = e;
+                }
+            }
+        }
+        w.Poke(e + 0x1a, 0xff);
+    }
+
+    /// <summary>5D68: one price: EBX = the picture of the template (0 - nothing), EAX = its number (ECX = the row): the picture [191A] (1E133), the blit 1E098 (EBX = 1D0h, ECX = 20h, EDX = 10h), the figure AC23 (ECX + 28h, EDX = 1D0h); the next row ECX = EAX + 1Eh.</summary>
+    public static void F5D68(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Test(g.Ebx, g.Ebx, 32); if (g.Zf) return;
+        uint edi = g.Edi, ebx = g.Ebx, ecx = g.Ecx; g.Esi = U32(w.Ds, 0x191a); w.Call(0x1e133, g);
+        g.Eax = ecx; g.Ebx = 0x1d0; g.Ecx = 0x20; g.Edx = 0x10; w.Call(0x1e098, g);
+        g.Ecx = ecx; g.Eax = ebx; g.Add(g.Ecx, 0x28); g.Ecx += 0x28; g.Edx = 0x1d0; w.Call(0xac23, g); g.Ecx = g.Eax + 0x1e; g.Edi = edi;
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {

@@ -9877,6 +9877,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the records lie in the flat text test region; the jump into 5CC2 (the state is not 7) is not exercised by the fixture (5CC2 has its own)"
+    },
+    {
+      "id": "le1-panel-picture-5cd9",
+      "module": "LE:1",
+      "start": 23769,
+      "end": 23973,
+      "name": "Panel picture of a record with the four prices (5CD9, 5D68)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "674F, 68A0, 6C66, 1E133, 1E098 and AC23 are recorded stubs; the template and the record lie in the flat text test region"
     }
   ]
 }
