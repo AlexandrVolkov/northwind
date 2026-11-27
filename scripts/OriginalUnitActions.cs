@@ -3465,7 +3465,7 @@ public static class OriginalUnitActions
             g.Al = g.Bh; g.Ebx -= U32(d, 0x1f31); g.Cmp(g.Al, g.Bh, 8); g.Al = (byte)(g.Al - g.Bh);
             g.Cmp(g.Ch, g.Al, 8); g.Ch = (byte)(g.Ch - g.Al);
             if (g.Cf || g.Zf) return;
-            Mul8(g, g.Al, d[0x1f0b]); g.Esi += g.Eax; g.Ch = Dec8(g, g.Ch);
+            Mul8(g, g.Al, d[0x1f0b]); g.Add(g.Esi, g.Eax); g.Esi += g.Eax; g.Ch = Dec8(g, g.Ch);
             if (g.Zf) return;
         }
     }
@@ -3490,6 +3490,33 @@ public static class OriginalUnitActions
         g.Eax = g.Ecx; g.Ecx = g.Ebx; g.Ebx = g.Edx; g.Edx = 0x10; w.Call(0x3eea, g);
         g.Edi = 0x100000; g.Edi += g.Ecx; g.Ecx = g.Eax - 0x1e0; g.Edx = g.Ebx - 0xa0; g.Ebp = 0x90; g.Esi = U32(w.Ds, 0x1922); w.Call(0x6fcc, g);
         g.Ecx = ecx0; g.Edx = edx0; g.Eax = eax0; w.Call(0xac23, g); g.Esi = esi0;
+    }
+
+    /// <summary>11D34: the nearest hostile of the object ESI (the record r) in its neighbourhood: 219C3 gives the rectangle round the cell (+4/+8 &gt;&gt; 5), D7B1 lists the objects in it at DS:1F45; a candidate is not the object itself, its template has no bits 8020h of +40, its +20 mask has the bit of the owner +3, its health +19 is above the template's +46, its layer +0D is allowed by [1CA6] (the template +74); the nearest by C344 goes to [1F31] with the distance in [1F35]. EDI = the nearest (ZF = 1 when none).</summary>
+    public static void F11D34(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; uint esi = g.Esi; g.Ecx = U32(r, 4); g.Eax = U32(r, 8); g.Ecx >>= 5; g.Eax >>= 5; g.Ch = g.Al; w.Call(0x219c3, g);
+        g.Edx -= g.Ecx; g.Edx += 0x101; w.Call(0xd7b1, g); g.Esi = esi;
+        g.Edi = U32(d, 0x1c49); d[0x1ca6] = w.ObjectAt(g.Edi)[0x74]; g.Eax = 0; Put(d, 0x1f31, 0); g.Eax--; Put(d, 0x1f35, g.Eax); g.Ebp = 0x1f45;
+        for (; ; )
+        {
+            g.Edi = U32(d, (int)g.Ebp); g.Test(g.Edi, g.Edi, 32); if (g.Zf) break;
+            Candidate();
+            g.Ebp += 4;
+        }
+        g.Edi = U32(d, 0x1f31); g.Test(g.Edi, g.Edi, 32); g.Esi = esi;
+
+        void Candidate()
+        {
+            g.Cmp(g.Edi, g.Esi, 32); if (g.Zf) return;
+            w.Call(0x68bd, g); var t = w.ObjectAt(g.Edx); var o = w.ObjectAt(g.Edi);
+            g.Test(U32(t, 0x40), 0x8020, 32); if (!g.Zf) return;
+            g.Eax = o[0x20]; g.Ebx = r[3]; g.Cf = ((g.Eax >> (int)(g.Ebx & 31)) & 1) != 0; if (!g.Cf) return;
+            g.Al = t[0x46]; g.Cmp(o[0x19], g.Al, 8); if (g.Jle) return;
+            g.Al = o[0xd]; g.Eax &= 3; g.Cf = ((d[0x1ca6] >> (int)g.Eax) & 1) != 0; if (!g.Cf) return;
+            w.Call(0xc344, g); g.Cmp(g.Eax, U32(d, 0x1f35), 32); if (!g.Cf && !g.Zf) return;
+            Put(d, 0x1f31, g.Edi); Put(d, 0x1f35, g.Eax);
+        }
     }
 
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
