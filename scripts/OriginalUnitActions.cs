@@ -3330,10 +3330,10 @@ public static class OriginalUnitActions
         var d = w.Ds; uint esi = g.Esi, edx0 = g.Edx, ecx0 = g.Ecx;
         FCF41(w, g); g.Ecx = ecx0; g.Ebx = g.Eax; g.Eax = edx0;
         if (g.Zf) { g.Esi = esi; return; }
-        d[0x7e9] = g.Al; g.Dl = g.Cl;
+        d[0x7e9] = g.Al;
         do
         {
-            g.Al = d[0x7e9];
+            g.Dl = g.Cl; g.Al = d[0x7e9];
             do
             {
                 uint eax = g.Eax, ebx = g.Ebx, ecx = g.Ecx, edx = g.Edx; FCD72(w, g); g.Eax = eax; g.Ebx = ebx; g.Ecx = ecx; g.Edx = edx;
@@ -3404,6 +3404,14 @@ public static class OriginalUnitActions
             g.Dh = (byte)(g.Dh + 1); g.Ch = Dec8(g, g.Ch);
         } while (!g.Zf);
         g.Eax = eax0; g.Esi = esi0;
+    }
+
+    /// <summary>D0D5: stamp the tile class 6 under a building: the rectangle of the template [1C49] (the width and the height +3/+4) round the object ESI (the point +4/+8 in cells, the corner at half the size back) goes to CF77 (EAX = 6).</summary>
+    public static void FD0D5(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Edi = U32(d, 0x1c49); var t = w.ObjectAt(g.Edi); var o = w.ObjectAt(g.Esi);
+        g.Ecx = U32(t, 3); g.Eax = g.Ecx; g.Edx = U32(o, 4) >> 5; g.Al = (byte)(g.Al >> 1); g.Dl = (byte)(g.Dl - g.Al);
+        g.Ebx = U32(o, 8) >> 5; g.Ah = (byte)(g.Ah >> 1); g.Bl = (byte)(g.Bl - g.Ah); g.Dh = g.Bl; g.Eax = 6; FCF77(w, g);
     }
 
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
