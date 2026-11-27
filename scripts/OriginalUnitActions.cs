@@ -4103,6 +4103,52 @@ public static class OriginalUnitActions
         } while (!g.Zf);
     }
 
+    /// <summary>EE49: the message AL in the queue of the participant BL (8 records of 0Eh bytes from +34 of its record, EDI = the address): the first record with the number AL (BH): AL |= FFh (ZF = 0), none: EDI behind the last (ZF = 1).</summary>
+    public static void FEE49(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Bh = g.Al; g.Eax = 0xf5; Mul8(g, g.Al, g.Bl); var part = w.PartOf(g.Bl); g.Edi = (g.Eax & 0xffff) + 0x9ae; g.Cl = 8;
+        for (int k = 0; ; k++)
+        {
+            g.Cmp(part[0x34 + 0xe * k], g.Bh, 8); if (g.Zf) { g.Al |= 0xff; g.Logic(g.Al, 8); return; }
+            g.Edi += 0xe; g.Cl = Dec8(g, g.Cl); if (g.Zf) return;
+        }
+    }
+
+    private static void QueueMark(IUnitActionWorld w, ActionRegs g, byte owner) { w.PartOf(owner)[g.Edi - 0x97a - 0xf5u * owner] = 0xff; }
+
+    /// <summary>ECD8: the handler of the cancel button: E5AB (EAX = E04h) must agree, E5E6 and DEE4 with the menu 3BCCh, ESI = 7D4h (AX = +1A/+1B of the record is kept for it).</summary>
+    public static void FECD8(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = 0xe04; w.Call(0xe5ab, g); if (!g.Zf) return; g.Al = r[0x1a]; g.Ah = r[0x1b]; uint e = g.Eax; w.Call(0xe5e6, g); g.Eax = e; g.Esi = 0x3bcc; w.Call(0xdee4, g); g.Esi = 0x7d4;
+    }
+
+    /// <summary>ED01: the answer is taken: the message +1A of the owner +1B is cleared in its queue (EE49, 0FFh), E5E6, the menu 3B5Dh.</summary>
+    public static void FED01(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = 0xe04; w.Call(0xe5ab, g); if (!g.Zf) return; g.Bl = r[0x1b]; g.Al = r[0x1a]; FEE49(w, g); if (!g.Zf) QueueMark(w, g, g.Bl);
+        w.Call(0xe5e6, g); g.Esi = 0x3b5d; w.Call(0xdee4, g); g.Esi = 0x7d4;
+    }
+
+    /// <summary>ED32: as ED01 for the own player [1972] (the record behind the last is also marked), the menu 3B94h.</summary>
+    public static void FED32(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = 0xe04; w.Call(0xe5ab, g); if (!g.Zf) return; g.Bl = w.Ds[0x1972]; g.Al = r[0x1a]; FEE49(w, g); QueueMark(w, g, g.Bl);
+        w.Call(0xe5e6, g); g.Esi = 0x3b94; w.Call(0xdee4, g); g.Esi = 0x7d4;
+    }
+
+    /// <summary>ED64: the answer is sent: EDD5 (AL, AH = +1A/+1B, BL = [1972]), E5E6, F791.</summary>
+    public static void FED64(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = 0xe04; w.Call(0xe5ab, g); if (!g.Zf) return; g.Al = r[0x1a]; g.Ah = r[0x1b]; g.Bl = w.Ds[0x1972]; uint e = g.Esi; w.Call(0xedd5, g); g.Esi = e; w.Call(0xe5e6, g); w.Call(0xf791, g); g.Esi = 0x7d4;
+    }
+
+    /// <summary>ED93: the answer to a message: the message [DD5] of the participant [DD4] is cleared (EE49), then as ED64.</summary>
+    public static void FED93(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = 0xe04; w.Call(0xe5ab, g); if (!g.Zf) return; g.Bl = w.L3[0xdd4]; g.Al = w.L3[0xdd5]; FEE49(w, g); QueueMark(w, g, g.Bl);
+        g.Al = r[0x1a]; g.Ah = r[0x1b]; g.Bl = w.Ds[0x1972]; uint e = g.Esi; w.Call(0xedd5, g); g.Esi = e; w.Call(0xe5e6, g); w.Call(0xf791, g); g.Esi = 0x7d4;
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
