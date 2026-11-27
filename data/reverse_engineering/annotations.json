@@ -10429,6 +10429,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "219C3 and 8197 are recorded stubs; the participant is limited to 5..7 in the fixture"
+    },
+    {
+      "id": "le1-find-nth-object-11be0",
+      "module": "LE:1",
+      "start": 72672,
+      "end": 72730,
+      "name": "Find the n-th object of a participant by army and template (11BE0)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the test world gives every participant the same object range, so the owner selecting the record (BL) is not told from another owner"
     }
   ]
 }
