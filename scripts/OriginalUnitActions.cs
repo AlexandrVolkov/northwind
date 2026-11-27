@@ -3735,6 +3735,47 @@ public static class OriginalUnitActions
         g.Esi = 0x297; w.Call(0xdee4, g); g.Eax = 0; w.Call(0xa4a9, g);
     }
 
+    /// <summary>5787: the panel of the selected object [1969]: when [1C89] is set B6F1/B9EB look up the object of the key [1C87] of the owner [1972] (CL = +1A of the widget EDI; EAX = 1: BA2E gives the object, [1969] = ESI, [1C89] = 0); an object of the owner with health and without the bit 80h of +17 gives 66DF (+1A) and 6EC1, otherwise the panel is cleared (DF2A with 2Bh, 6EB2, 66E9, 674F, 4938). The six slots of the list DS:1978 (12 bytes each): E03C finds the widget 2Bh of the slot: found - the redraw bit, a slot without +2 is removed (DFE5), a slot with another number +6 than the widget's +1C is redrawn (4938 when +1A is set); not found - a slot with +2 gets the widget 16Eh (DF7E); the widget takes the slot number +2, the word +0, +0B, the point (1E5h or 22Ch by the parity, 139h + 2Bh * slot) and the number +1C.</summary>
+    public static void F5787(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3;
+        g.Cmp(d[0x1c89], 0, 8);
+        if (!g.Zf)
+        {
+            uint e = g.Edi; w.Call(0xb6f1, g); g.Al = d[0x1972]; g.Bl = d[0x1c87]; w.Call(0xb9eb, g); g.Edi = e; l[g.Edi + 0x1a] = g.Cl; g.Cmp(g.Eax, 1, 32);
+            if (!g.Zf) goto slots;
+            g.Al = d[0x1972]; g.Bl = d[0x1c87]; w.Call(0xba2e, g); g.Edi = e; Put(d, 0x1969, g.Esi); d[0x1c89] = 0;
+        }
+        g.Esi = U32(d, 0x1969); var o = w.ObjectAt(g.Esi); g.Al = o[3]; g.Cmp(g.Al, d[0x1972], 8); if (!g.Zf) goto clear;
+        g.Cmp(o[0x19], 0, 8); if (g.Jle) goto clear;
+        g.Test(U16(o, 0x17), 0x80, 16); if (!g.Zf) goto clear;
+        w.Call(0x66df, g); l[g.Edi + 0x1a] = g.Al; w.Call(0x6ec1, g);
+    slots:
+        g.Esi = 0x1978; g.Cl = 0;
+        do
+        {
+            uint pe = g.Esi, pc = g.Ecx; g.Al = 0x2b; g.Ah = g.Cl; w.Call(0xe03c, g);
+            if (g.Zf) { g.Cmp(U32(d, (int)pe + 2), 0, 32); if (g.Zf) goto next; uint s2 = pe, c2 = g.Ecx; g.Esi = 0x16e; g.Al = 1; FDF7E(w, g); g.Ecx = c2; g.Esi = s2; goto fill; }
+            l[g.Edi] |= 0x80; g.Cmp(U32(d, (int)pe + 2), 0, 32);
+            if (g.Zf)
+            {
+                g.Cmp(l[g.Edi + 0x1a], 0, 8); if (!g.Zf) w.Call(0x4938, g);
+                g.Al = 0x2b; g.Ah = g.Cl; w.Call(0xdfe5, g); goto next;
+            }
+            g.Al = d[pe + 6]; g.Cmp(g.Al, l[g.Edi + 0x1c], 8); if (g.Zf) goto next;
+            g.Cmp(l[g.Edi + 0x1a], 0, 8); if (!g.Zf) { w.Call(0x4938, g); }
+        fill:
+            g.Esi = pe; l[g.Edi + 2] = g.Cl; l[g.Edi + 0x15] = d[pe]; l[g.Edi + 0x16] = d[pe + 1]; l[g.Edi + 0x14] = d[pe + 0xb];
+            g.Eax = g.Cl; Put(l, (int)g.Edi + 4, 0x1e5); bool odd = (g.Al & 1) != 0; g.Al = (byte)(g.Al >> 1); if (odd) Put(l, (int)g.Edi + 4, 0x22c);
+            g.Ah = 0x2b; Mul8(g, g.Al, g.Ah); g.Eax += 0x139; Put(l, (int)g.Edi + 8, g.Eax); g.Al = d[pe + 6]; l[g.Edi + 0x1c] = g.Al;
+        next:
+            g.Esi = pe + 0xc; g.Ecx = pc; g.Cl = (byte)(g.Cl + 1); g.Cmp(g.Cl, 6, 8);
+        } while (g.Cf);
+        return;
+    clear:
+        g.Al = 0x2b; w.Call(0xdf2a, g); w.Call(0x6eb2, g); w.Call(0x66e9, g); w.Call(0x674f, g); w.Call(0x4938, g);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
