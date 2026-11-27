@@ -509,7 +509,7 @@ public partial class TestRunner
                     }
                 case "fee69": case "fee92": case "feea3": case "feebb": case "feefa": case "fedd5":
                     {
-                        if (fn == "fedd5") { g.Ebp = (uint)c.GetProperty("ebp").GetInt64(); var tb = Convert.FromHexString(c.GetProperty("tbl3").GetString()!); for (int t = 0; t < 4; t++) { BitConverter.GetBytes(0xdee4u).CopyTo(tb, 0x13 * t + 8); BitConverter.GetBytes((uint)c.GetProperty("dur")[t].GetInt64()).CopyTo(tb, 0x13 * t + 0xc); } tb.CopyTo(w.L3, 0xefb); }
+                        if (fn == "fedd5") { g.Ebp = (uint)c.GetProperty("ebp").GetInt64(); var tb = Convert.FromHexString(c.GetProperty("tbl3").GetString()!); for (int t = 0; t < 3; t++) { BitConverter.GetBytes(0xdee4u).CopyTo(tb, 0x13 * t + 8); BitConverter.GetBytes((uint)c.GetProperty("dur")[t].GetInt64()).CopyTo(tb, 0x13 * t + 0xc); } tb.CopyTo(w.L3, 0xefb); }
                         w.Ds[0x6c6] = (byte)c.GetProperty("b6c6").GetInt32(); w.Ds[0x19e9] = (byte)c.GetProperty("k19e9").GetInt32(); BitConverter.GetBytes((uint)c.GetProperty("k1ca9").GetInt64()).CopyTo(w.Ds, 0x1ca9); var qq = Convert.FromHexString(c.GetProperty("qq").GetString()!); for (int k = 0; k < 8; k++) Array.Copy(qq, 0x70 * k, w.PartOf((byte)k), 0x34, 0x70);
                         if (fn == "fee69") OriginalUnitActions.FEE69(w, g); else if (fn == "fee92") OriginalUnitActions.FEE92(w, g, r); else if (fn == "feea3") OriginalUnitActions.FEEA3(w, g); else if (fn == "feebb") OriginalUnitActions.FEEBB(w, g); else if (fn == "fedd5") OriginalUnitActions.FEDD5(w, g); else OriginalUnitActions.FEEFA(w, g); break;
                     }

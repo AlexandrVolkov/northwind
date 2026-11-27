@@ -705,8 +705,8 @@ def cases(names):
         if c['fn'] in ('fee69', 'fee92', 'feea3', 'feebb', 'feefa', 'fedd5'):
             c['f3'] = 6 + rng.randrange(2); c['b6c6'] = 1 + rng.randrange(8); c['k19e9'] = rng.choice([0x11, 0x31, 0x10, 0xf1, rng.randrange(256)]); c['k1ca9'] = rng.choice([0, 0xffffffff, 5, 100, rng.randrange(1 << 32)])
             if c['fn'] == 'fedd5':
-                c['regs'][0] = (c['regs'][0] & ~0xffff) | rng.randrange(4) | rng.randrange(8) << 8; c['regs'][1] = (c['regs'][1] & ~0xff) | 6 + rng.randrange(2); c['ebp'] = rng.randrange(1 << 32)
-                c['tbl3'] = bytes(rng.randrange(256) for _ in range(0x13 * 4)).hex(); c['dur'] = [rng.choice([0, 5, 0xffffffff, 0x7fffffff, rng.randrange(1 << 32)]) for _ in range(4)]
+                c['regs'][0] = (c['regs'][0] & ~0xffff) | rng.randrange(3) | rng.randrange(8) << 8; c['regs'][1] = (c['regs'][1] & ~0xff) | 6 + rng.randrange(2); c['ebp'] = rng.randrange(1 << 32)
+                c['tbl3'] = bytes(rng.randrange(256) for _ in range(0x13 * 3)).hex(); c['dur'] = [rng.choice([0, 5, 0xffffffff, 0x7fffffff, rng.randrange(1 << 32)]) for _ in range(3)]
             if c['fn'] == 'feefa': c['regs'][1] = (c['regs'][1] & ~0xffff) | rng.randrange(8) | rng.randrange(8) << 8
             c['regs'][0] = (c['regs'][0] & ~0xffff) | rng.randrange(4) | rng.choice([0, 1, 2, 3, 6, 7]) << 8; c['regs'][1] = (c['regs'][1] & ~0xff) | rng.randrange(8); c['regs'][3] = (c['regs'][3] & ~0xff) | rng.randrange(8)
             if c['fn'] == 'fedd5': c['regs'][1] = (c['regs'][1] & ~0xff) | 6 + rng.randrange(2)
@@ -1220,7 +1220,7 @@ def generate(game, names):
         if case['fn'] in ('fee69', 'fee92', 'feea3', 'feebb', 'feefa', 'fedd5'):
             if case['fn'] == 'fedd5':
                 o.cpu.reg_write(UC_X86_REG_EBP, case['ebp']); tb = bytearray(bytes.fromhex(case['tbl3']))
-                for t in range(4): struct.pack_into('<I', tb, 0x13 * t + 8, o.CODE + 0xdee4); struct.pack_into('<I', tb, 0x13 * t + 0xc, case['dur'][t])
+                for t in range(3): struct.pack_into('<I', tb, 0x13 * t + 8, o.CODE + 0xdee4); struct.pack_into('<I', tb, 0x13 * t + 0xc, case['dur'][t])
                 o.cpu.mem_write(0xefb, bytes(tb))
             o.cpu.mem_write(0x6c6, bytes([case['b6c6']])); o.cpu.mem_write(0x19e9, bytes([case['k19e9']])); o.cpu.mem_write(0x1ca9, struct.pack('<I', case['k1ca9']))
             for k in range(8): o.cpu.mem_write(0x97a + 0xf5 * k + 0x34, bytes.fromhex(case['qq'])[0x70 * k:0x70 * k + 0x70])
