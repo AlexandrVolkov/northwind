@@ -3872,6 +3872,17 @@ public static class OriginalUnitActions
         Put(d, 0x1974, g.Esi); var f = w.ObjectAt(g.Esi); g.Eax = U32(f, 4); g.Ebx = U32(f, 8); g.Eax = g.Shr(g.Eax, 5, 32); g.Ebx = g.Shr(g.Ebx, 5, 32); w.Call(0xa320, g);
     }
 
+    /// <summary>12198: the dialog handler of the scroll of the darkness (AH = the call: 1 = the scroll is read, 2 = the check): the call 1 puts [1EC5] and BH into +15/+16 of the record ESI; 124D8 (AL = 6, DL = BH) answers: no - nothing; yes - the bit BH of every byte of the fog table [18DA] ([18E2] * [18DE] bytes) is cleared (AND FEh rotated left by BH); the call 2 gives AL = FFh (ZF = 0 is not guaranteed: OR sets the flags).</summary>
+    public static void F12198(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        var d = w.Ds; g.Cmp(g.Ah, 1, 8);
+        if (!g.Zf) { g.Cmp(g.Ah, 2, 8); if (g.Zf) { g.Al |= 0xff; g.Logic(g.Al, 8); } return; }
+        g.Al = d[0x1ec5]; r[0x15] = g.Al; r[0x16] = g.Bh; g.Test(d[0x19ea], 0x3f, 8);
+        g.Dl = g.Bh; g.Al = 6; w.Call(0x124d8, g); if (g.Zf) return;
+        g.Cl = g.Dl; g.Dl = 0xfe; g.Dl = (byte)((g.Cl & 31) >= 8 ? 0 : g.Dl << (g.Cl & 31)); g.Eax = U32(d, 0x18e2); Mul8(g, g.Al, d[0x18de]); g.Edi = U32(d, 0x18da); g.Ecx = g.Eax; g.Al = g.Dl;
+        do { byte res = (byte)(w.Peek(g.Edi) & g.Al); w.Poke(g.Edi, res); g.Logic(res, 8); g.Edi++; g.Ecx = Dec32(g, g.Ecx); } while (!g.Zf);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
