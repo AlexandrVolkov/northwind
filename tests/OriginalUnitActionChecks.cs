@@ -473,6 +473,8 @@ public partial class TestRunner
                 case "f9d87":
                     w.L3[0] = (byte)c.GetProperty("m0").GetInt32(); w.Ds[0x6c9] = (byte)c.GetProperty("k6c9").GetInt32(); var ddb = Convert.FromHexString(c.GetProperty("d").GetString()!); for (int k = 0; k < 40; k++) Array.Copy(ddb, 0, w.Text, 0x800 + 0x20 * k, 0x20);
                     BitConverter.GetBytes(0x402a00u).CopyTo(w.Ds, 0x64c); Array.Clear(w.Ds, 0x33c, 0x310); Array.Clear(w.Ds, 0x1c62, 12); w.Ds[0x1a1b] = 0x55; w.Ds[0x1c87] = 0x66; BitConverter.GetBytes(0x12345678u).CopyTo(w.Ds, 0x1969); w.L3[1] = 0x77; BitConverter.GetBytes(0x4400u).CopyTo(w.Ds, 0x3e87); BitConverter.GetBytes(0x99u).CopyTo(w.Ds, 0x3e8b); OriginalUnitActions.F9D87(w, g); break;
+                case "f11087": w.Ds[0x9091] = (byte)c.GetProperty("k9091").GetInt32(); OriginalUnitActions.F11087(w, g); break;
+                case "f10b75": w.Ds[0x1972] = (byte)c.GetProperty("f3").GetInt32(); w.Template[0x41] = (byte)c.GetProperty("k41").GetInt32(); BitConverter.GetBytes(0x77u).CopyTo(w.Ds, 0x1974); OriginalUnitActions.F10B75(w, g); break;
                 case "f9f38":
                     {
                         Array.Fill(w.Video, (byte)0x5a, 0, 0x49000); Array.Copy(ActionPrng(c.GetProperty("seed").GetUInt32(), 0x10000), 0, w.Video, 0x50000, 0x10000); Array.Copy(Convert.FromHexString(c.GetProperty("tile").GetString()!), 0, w.Video, 0x60000, 0x1800);
@@ -733,7 +735,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 269, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 271, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }

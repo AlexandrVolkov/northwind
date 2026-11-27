@@ -10258,6 +10258,44 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the file services 10CA0, F8E1, FA88, F9B7, F967, FEC6, 199B9, DEC8, 6EB2, 4938, 14D5C and DEE4 are recorded stubs; the stub cannot set the carry flag, so the fixture only exercises the branch where F8E1 opens the file (CF = 0)"
+    },
+    {
+      "id": "le1-world-frames-11087",
+      "module": "LE:1",
+      "start": 69767,
+      "end": 69832,
+      "name": "Advance the world by EAX frames at once (11087)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "42BB, 96CD, D3E5, 1E7EA and 9BF9 are recorded stubs (the ported frame services are not chained here)"
+    },
+    {
+      "id": "le1-hero-select-10b75",
+      "module": "LE:1",
+      "start": 68469,
+      "end": 68564,
+      "name": "Select the hero of the player and centre the view on it (10B75)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "A320 is a recorded stub; the objects of the participant are the chain of the test world"
     }
   ]
 }
