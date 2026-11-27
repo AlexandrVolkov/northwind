@@ -10391,6 +10391,44 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "EEFA, 21490, 23A6E, 23B8E and EF3F are recorded stubs that keep BH; EBP (E6Bh for EF3F) is not in the recorded registers, so the fixture does not tell it"
+    },
+    {
+      "id": "le1-inventory-items-11eff",
+      "module": "LE:1",
+      "start": 73471,
+      "end": 73563,
+      "name": "Inventory handler of the crystal (11EFF)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "E5E6 and DEE4 are recorded stubs; the participant is limited to 5..7 in the fixture"
+    },
+    {
+      "id": "le1-inventory-timed-1205c",
+      "module": "LE:1",
+      "start": 73820,
+      "end": 73901,
+      "name": "Inventory handler of the timed item (1205C)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "219C3 and 8197 are recorded stubs; the participant is limited to 5..7 in the fixture"
     }
   ]
 }
