@@ -4451,6 +4451,49 @@ public static class OriginalUnitActions
         g.Eax = eax; g.Ebx = ebx; g.Ecx = ecx; g.Edx = edx; g.Edi = edi;
     }
 
+    /// <summary>3DF2: the dirty table [64C] (30 rows of 40 cells) is cut into rectangles: every marked cell starts a run along its row (the cells are cleared), the rows below with the whole run marked extend it (cleared too; a partly marked row gives its cleared cells back), and 3E77 copies the rectangle (EAX = x pixels + the running offset, ECX = width, EDX = height in pixels) to the screen; EDI keeps the running offset (16 per cell, 2580h per row).</summary>
+    public static void F3DF2(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Esi = U32(d, 0x64c); g.Eax = 0; g.Edi = 0; g.Ch = 0x1e;
+        do
+        {
+            g.Cl = 0x28;
+            for (; ; )
+            {
+                g.Cmp(w.Peek(g.Esi), g.Al, 8);
+                if (g.Zf) { g.Esi++; g.Edi += 0x10; g.Cl = Dec8(g, g.Cl); }
+                else
+                {
+                    g.Edx = g.Ecx; g.Ebx = g.Esi;
+                    do
+                    {
+                        g.Cmp(w.Peek(g.Esi), g.Al, 8); if (g.Zf) break;
+                        w.Poke(g.Esi, g.Al); g.Esi++; g.Dl = Dec8(g, g.Dl);
+                    } while (!g.Zf);
+                    uint pushedEsi = g.Esi; g.Dl = Sub8(g, g.Dl, g.Cl); g.Dl = (byte)(0 - g.Dl);
+                    for (; ; )
+                    {
+                        g.Ebx += 0x28; g.Ah = g.Dl; g.Dh = Dec8(g, g.Dh); if (g.Zf) break;
+                        g.Esi = g.Ebx; bool stop = false;
+                        for (; ; )
+                        {
+                            g.Cmp(w.Peek(g.Esi), g.Al, 8); if (g.Zf) { stop = true; break; }
+                            w.Poke(g.Esi, g.Al); g.Esi++; g.Ah = Dec8(g, g.Ah); if (g.Zf) break;
+                        }
+                        if (stop) break;
+                    }
+                    g.Ah = Sub8(g, g.Ah, g.Dl);
+                    if (!g.Zf) { g.Ah = (byte)(0 - g.Ah); do { g.Esi--; w.Poke(g.Esi, 0xff); g.Ah = Dec8(g, g.Ah); } while (!g.Zf); }
+                    g.Cl = Sub8(g, g.Cl, g.Dl); uint ecxPushed = g.Ecx; g.Eax = 0; g.Al = g.Dl; g.Ch = Sub8(g, g.Ch, g.Dh); g.Edx = 0; g.Dl = g.Ch;
+                    g.Edx <<= 4; g.Eax <<= 4; g.Ecx = g.Eax; g.Eax += g.Edi; uint pushedEax = g.Eax; w.Call(0x3e77, g);
+                    g.Edi = pushedEax; g.Ecx = ecxPushed; g.Esi = pushedEsi; g.Eax = 0; g.Test(g.Cl, g.Cl, 8);
+                }
+                if (g.Zf) break;
+            }
+            g.Edi += 0x2580; g.Ch = Dec8(g, g.Ch);
+        } while (!g.Zf);
+    }
+
     /// <summary>10AD2 = FS:187: looks for a free spot (AC63) for the template AL of the army AH around the point (ECX, EDX): the point is snapped to 32 and shifted by the half size of the template (+3, +4); then the rings 1, 2, 3, ... are
     /// tried, ring k with k * k random spots (9E41, 9E55) of the 32-cells square of side k. ZF = a spot was found (ECX, EDX = it); EAX and EBX are kept.</summary>
     public static void FS187(IUnitActionWorld w, ActionRegs g)
