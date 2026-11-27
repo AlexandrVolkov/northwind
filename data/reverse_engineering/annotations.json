@@ -10086,6 +10086,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "219C3, D7B1 and C344 are recorded stubs; the fixture world (shared with FS:14B) does not tell the template bit 8000h from 8020h, the health test JLE from JC and JA from JAE"
+    },
+    {
+      "id": "le1-area-objects-11c1a",
+      "module": "LE:1",
+      "start": 72730,
+      "end": 72905,
+      "name": "Objects of the participant's area, round a point, and the hand-over of the owner's (11C1A, 11C3D, 11C73)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1EAD8, D7B1, 219C3, 8197, A320 and D1BA are recorded stubs; the statistics record is the flat test region"
     }
   ]
 }

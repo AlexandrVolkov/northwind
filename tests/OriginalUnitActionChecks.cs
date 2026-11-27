@@ -434,6 +434,8 @@ public partial class TestRunner
                         w.Record[0x19] = (byte)ob[0].GetInt32(); w.Record[0x1a] = (byte)ob[1].GetInt32(); w.Record[0xf] = (byte)ob[2].GetInt32(); OriginalUnitActions.FCA49(w, g); break;
                     }
                 case "fb3b6": BitConverter.GetBytes((uint)c.GetProperty("v1922").GetInt64()).CopyTo(w.Ds, 0x1922); OriginalUnitActions.FB3B6(w, g); break;
+                case "f11c1a": Array.Copy(Convert.FromHexString(c.GetProperty("p63").GetString()!), 0, w.Stats, 0x1a35 * w.Record[3] + 0x63, 8); OriginalUnitActions.F11C1A(w, g, r); break;
+                case "f11c3d": OriginalUnitActions.F11C3D(w, g); break;
                 case "f9f38":
                     {
                         Array.Fill(w.Video, (byte)0x5a, 0, 0x49000); Array.Copy(ActionPrng(c.GetProperty("seed").GetUInt32(), 0x10000), 0, w.Video, 0x50000, 0x10000); Array.Copy(Convert.FromHexString(c.GetProperty("tile").GetString()!), 0, w.Video, 0x60000, 0x1800);
@@ -625,7 +627,7 @@ public partial class TestRunner
                         g.Eax = new[] { 0x900u, 0xa00u, 0u, 0x900u }[sel]; g.Ebx = new[] { 0xa00u, 0x900u, r3, 0u }[(sel + r2) & 3]; g.Ecx = r2; g.Edx = r3;
                         OriginalUnitActions.FD2D1(w, g, r); break;
                     }
-                case "fs14b": case "f11d34": if (c.GetProperty("sel").GetInt32() != 0) { w.Obj1[0x20] = 0xff; w.Obj1[0x19] = 0x7f; w.Obj1[3] %= 8; w.Obj2[0x20] = 0xff; w.Obj2[0x19] = 0x7f; w.Obj2[3] %= 8; w.Template[0x46] = 5; w.Template[0x74] = 0xf; w.Template[0x40] &= 0xdf; w.Template[0x41] &= 0x7f; } if (fn == "f11d34") OriginalUnitActions.F11D34(w, g, r); else OriginalUnitActions.FS14B(w, g, r); break;
+                case "fs14b": case "f11d34": case "f11c73": if (c.GetProperty("sel").GetInt32() != 0) { w.Obj1[0x20] = 0xff; w.Obj1[0x19] = 0x7f; w.Obj1[3] %= 8; w.Obj2[0x20] = 0xff; w.Obj2[0x19] = 0x7f; w.Obj2[3] %= 8; w.Template[0x46] = 5; w.Template[0x74] = 0xf; w.Template[0x40] &= 0xdf; w.Template[0x41] &= 0x7f; } if (fn == "f11c73") { Array.Copy(Convert.FromHexString(c.GetProperty("p63").GetString()!), 0, w.Stats, 0x1a35 * w.Record[3] + 0x63, 8); OriginalUnitActions.F11C73(w, g, r); } else if (fn == "f11d34") OriginalUnitActions.F11D34(w, g, r); else OriginalUnitActions.FS14B(w, g, r); break;
                 case "fs187": g.Eax = (regs[0] & 0xffff0000u) | ((((regs[0] >> 8) & 0xffu) % 3) << 8); OriginalUnitActions.FS187(w, g); break;
                 case "fs16b": g.Eax = (regs[0] & 0xffff0000u) | ((((regs[0] >> 8) & 0xffu) % 3) << 8); OriginalUnitActions.FS16B(w, g, r); break;
                 case "fs18b":
@@ -694,7 +696,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 257, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 260, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }
