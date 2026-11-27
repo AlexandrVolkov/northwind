@@ -10695,6 +10695,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the handler [69E9] called by 11397 (an indirect call) is a recorded stub in the check (the pointer is a code address: the world gets it as it is); 111F8 and 111C5 run as ported code; the button record lies in the pool in the fixture"
+    },
+    {
+      "id": "le1-tribute-settlement-116ba",
+      "module": "LE:1",
+      "start": 71354,
+      "end": 71621,
+      "name": "Participant for the tribute settlement and its unit (116BA)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "22E46, 9E41, 9E55, 10AD2, A758, 43E5 and 1E740 are recorded stubs (the stubs set only ZF; 9E41 and 9E55 change only EAX); the check runs the participants 3..7 with the participant records of 3 and 4 only as a hash of the written bytes (their records overlap the L3 area in the flat memory of the Python check)"
     }
   ]
 }

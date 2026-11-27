@@ -4332,6 +4332,32 @@ public static class OriginalUnitActions
         var d = w.Ds; g.Eax = U32(d, 0x1cb1) >> 8; r[0x15] = g.Al; g.Eax = U32(d, 0x1cad) >> 8; g.Cmp(r[0x14], g.Al, 8); if (g.Zf) return; r[0x14] = g.Al; Mark80(r, g);
     }
 
+    /// <summary>116BA: a participant for a tribute settlement: from the participant 3 on (BL = 2 .. [6C8]) the first whose statistics +19F1 is at most 7CFh (the participant record ECX, the statistics ESI are kept in [ED2D], [ED20]); 22E46 gives the template (ECX = F08h, EDX = 508h), the unit is placed at the cell given by the two random cells (9E41, 9E55, 10AD2) by A758, the object gets +14 = 81h, +1A = 1, 43E5 and 1E740 run; the statistics +19F1 = 7D0h and the four sums +18, +1C, +20, +24 of the record = 3E8h, 3E8h, 3E8h, 32h; AL = 0 (ZF = 1) or AL = FFh (ZF = 0); EAX is kept.</summary>
+    public static void F116BA(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint saved = g.Eax, sbase = U32(d, 0x6ba); g.Esi = sbase + 0x4e9f; g.Ecx = 0xc59; g.Ebx = 2;
+        while (true)
+        {
+            g.Cmp(g.Bl, d[0x6c8], 8); if (!g.Cf) { g.Al |= 0xff; g.Logic(g.Al, 8); g.Eax = saved; return; }
+            int idx = (int)(g.Esi - sbase); g.Cmp(U32(w.Stats, idx + 0x19f1), 0x7cf, 32); if (g.Cf || g.Zf) break;
+            g.Esi += 0x1a35; g.Ecx += 0xf5; g.Bl = Inc8(g, g.Bl);
+        }
+        Put(d, 0xed2d, g.Ecx); Put(d, 0xed20, g.Esi); int st = (int)(g.Esi - sbase);
+        g.Al = w.Stats[st]; g.Ecx = 0xf08; g.Edx = 0x508; w.Call(0x22e46, g);
+        if (g.Zf) { Fail116BA(g, saved); return; }
+        g.Bl = (byte)(w.Template[0x77] & 3); g.Logic(g.Bl, 8); g.Ecx = w.Stats[st + 0x61]; g.Edx = w.Stats[st + 0x62]; g.Test(g.Ecx, g.Ecx, 32); uint pushed = g.Eax;
+        w.Call(0x9e41, g); Mul8(g, g.Al, d[0x18de]); g.Ecx = g.Ah; w.Call(0x9e55, g); Mul8(g, g.Al, d[0x18e2]); g.Edx = g.Ah; g.Eax = pushed;
+        g.Ecx <<= 5; g.Edx <<= 5; w.Call(0x10ad2, g); if (!g.Zf) { Fail116BA(g, saved); return; }
+        g.Esi = U32(d, 0xed20); g.Bh = g.Bl; g.Bl = g.Al; g.Al = g.Ah; g.Ah = w.Stats[st]; w.Call(0xa758, g); if (!g.Zf) { Fail116BA(g, saved); return; }
+        var o = w.ObjectAt(g.Edi); o[0x14] = 0x81; o[0x1a] = 1; g.Esi = g.Edi; g.Eax = g.Esi - w.PoolBase; w.Call(0x43e5, g);
+        g.Esi = U32(d, 0xed20); g.Al = w.Stats[st]; g.Ah = (byte)saved; w.Call(0x1e740, g);
+        g.Ecx = U32(d, 0xed2d); g.Esi = U32(d, 0xed20); Put(w.Stats, st + 0x19f1, 0x7d0);
+        var part = w.PartOf((byte)((g.Ecx - 0x97a) / 0xf5)); Put(part, 0x18, 0x3e8); Put(part, 0x20, 0x3e8); Put(part, 0x1c, 0x3e8); Put(part, 0x24, 0x32);
+        g.Al = 0; g.Logic(g.Al, 8); g.Eax = saved;
+    }
+
+    private static void Fail116BA(ActionRegs g, uint saved) { g.Al |= 0xff; g.Logic(g.Al, 8); g.Eax = saved; }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
