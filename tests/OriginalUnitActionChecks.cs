@@ -404,7 +404,7 @@ public partial class TestRunner
                 case "f3d40": case "f3d67": w.Ds[0x194c] = (byte)c.GetProperty("k194c").GetInt32(); if (fn == "f3d40") OriginalUnitActions.F3D40(w, g); else OriginalUnitActions.F3D67(w, g); break;
                 case "f9f38":
                     {
-                        Array.Fill(w.Video, (byte)0x5a, 0, 0x49000); Array.Copy(ActionPrng(c.GetProperty("seed").GetUInt32(), 0x10000), 0, w.Video, 0x50000, 0x10000); Array.Copy(ActionPrng(c.GetProperty("seed").GetUInt32() + 1, 0x400), 0, w.Video, 0x60000, 0x400);
+                        Array.Fill(w.Video, (byte)0x5a, 0, 0x49000); Array.Copy(ActionPrng(c.GetProperty("seed").GetUInt32(), 0x10000), 0, w.Video, 0x50000, 0x10000); Array.Copy(Convert.FromHexString(c.GetProperty("tile").GetString()!), 0, w.Video, 0x60000, 0x1800);
                         BitConverter.GetBytes(0xc00000u).CopyTo(w.Ds, 0x68e); BitConverter.GetBytes(0xc50000u - 0x700).CopyTo(w.Ds, 0x19f6); BitConverter.GetBytes(0xc60000u).CopyTo(w.Ds, 0x191a);
                         BitConverter.GetBytes((uint)c.GetProperty("v06").GetInt32()).CopyTo(w.Ds, 0x1906); BitConverter.GetBytes((uint)c.GetProperty("v0a").GetInt32()).CopyTo(w.Ds, 0x190a); w.Ds[0x1972] = (byte)c.GetProperty("own").GetInt32();
                         Array.Copy(Convert.FromHexString(c.GetProperty("fog").GetString()!), 0, w.Text, 0x440, 0x480); BitConverter.GetBytes(0x402640u).CopyTo(w.Ds, 0x18da);

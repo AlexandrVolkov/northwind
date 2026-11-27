@@ -9819,7 +9819,26 @@
       "implementation": [
         "scripts/OriginalUnitActions.cs"
       ],
-      "limitations": "1E133 (choice of the fog tile) is a recorded stub; the blend table (64 KB) and the tile data are flat test regions in the video window; the map width is fixed at 32 in the fixture"
+      "limitations": "the blend table (64 KB) and the tile data are flat test regions in the video window; the map width is fixed at 32 in the fixture"
+    },
+    {
+      "id": "le1-sprite-address-1e133",
+      "module": "LE:1",
+      "start": 123187,
+      "end": 123219,
+      "name": "Address of picture number EAX in a sprite file (1E133)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "checked inside 9F38 (the sprite file is a flat test region, the offsets are below 400h); FA1D1 and FA320 still call it as a recorded stub"
     }
   ]
 }

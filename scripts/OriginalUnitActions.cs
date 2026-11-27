@@ -4494,6 +4494,14 @@ public static class OriginalUnitActions
         } while (!g.Zf);
     }
 
+    /// <summary>1E133: the address of the picture in the sprite file at ESI (the table of 24-bit offsets, three bytes per number EAX, after the word of the number of pictures): ESI += 2 + 3 * (the count word) + the offset of the number EAX; EBX, ECX and EAX are consumed.</summary>
+    public static void F1E133(IUnitActionWorld w, ActionRegs g)
+    {
+        g.Ebx = g.Eax; g.Eax += g.Eax; g.Ebx += g.Eax;
+        g.Eax = (uint)(w.Peek(g.Esi) | w.Peek(g.Esi + 1) << 8); g.Esi += 2; g.Ecx = g.Eax; g.Eax += g.Eax; g.Ecx += g.Eax;
+        g.Ebx = Peek32(w, g.Esi + g.Ebx) & 0xffffff; g.Esi += g.Ebx; g.Esi += g.Ecx;
+    }
+
     /// <summary>9F38: the fog of war on the picture: the fog bytes of the 16 x 16 cells around the view [1906], [190A] (the table [18DA], one bit per owner [1972]) are copied to DS:1F45 (the map borders are marked FFh); for the 14 x 14 visible cells (32 x 32 pixels each, from [68E] + 2810h) a cell hidden from the owner is blended through the table [19F6] + 700h with the fog tile (1E133 chooses it from the hidden neighbours: the mask of four bits, the checkerboard [1F41]) or, with all four neighbours hidden, blacked out; the touched cells go to the dirty cache DS:33C.</summary>
     public static void F9F38(IUnitActionWorld w, ActionRegs g)
     {
@@ -4539,7 +4547,7 @@ public static class OriginalUnitActions
                         }
                         else
                         {
-                            g.Al = (byte)(g.Al + g.Al); g.Al = (byte)(g.Al + d[0x1f41]); g.Eax &= 0xff; g.Eax += 0xa4; g.Esi = U32(d, 0x191a); w.Call(0x1e133, g);
+                            g.Al = (byte)(g.Al + g.Al); g.Al = (byte)(g.Al + d[0x1f41]); g.Eax &= 0xff; g.Eax += 0xa4; g.Esi = U32(d, 0x191a); F1E133(w, g);
                             g.Edi = U32(d, 0x1f31); g.Ebx = U32(d, 0x19f6); g.Ebx += 0x700; g.Eax = 0; g.Ch = 0x20;
                             do
                             {
@@ -4554,7 +4562,7 @@ public static class OriginalUnitActions
                 g.Ecx = ecx; g.Esi = esi; g.Edi = edi; g.Edi += 2; g.Esi++; g.Cl = Dec8(g, g.Cl);
                 if (g.Zf) break;
             }
-            g.Edi += 0x1c; Put(d, 0x1f31, U32(d, 0x1f31) + 0x4e40); d[0x1f41] ^= 1; g.Esi += 2; g.Ch = Dec8(g, g.Ch);
+            g.Edi += 0x1c; Put(d, 0x1f31, U32(d, 0x1f31) + 0x4e40); d[0x1f41] ^= 1; g.Add(g.Esi, 2); g.Esi += 2; g.Ch = Dec8(g, g.Ch);
             if (g.Zf) break;
             g.Cl = 0xe;
         }
