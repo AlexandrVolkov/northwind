@@ -9896,6 +9896,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "674F, 68A0, 6C66, 1E133, 1E098 and AC23 are recorded stubs; the template and the record lie in the flat text test region"
+    },
+    {
+      "id": "le1-palette-animation-c010",
+      "module": "LE:1",
+      "start": 49168,
+      "end": 49398,
+      "name": "Palette fade step and palette cycling (C010, C06E, C0A4)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the writes to the VGA palette ports 3C8h/3C9h go to IUnitActionWorld.Out (the game world ignores them until the palette is drawn by the engine); the records lie in the flat test regions"
     }
   ]
 }

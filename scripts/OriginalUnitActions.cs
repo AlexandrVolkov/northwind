@@ -46,6 +46,8 @@ public interface IUnitActionWorld
 {
     /// <summary>A callee outside the checked function: the world records the call and sets the registers and the flags (68BD only sets EDX, the template).</summary>
     void Call(uint address, ActionRegs g);
+    /// <summary>OUT to a port (the palette registers 3C8h/3C9h): the world records the byte.</summary>
+    void Out(ushort port, byte value);
     /// <summary>The object behind an absolute pointer (the pool base is <see cref="PoolBase"/>).</summary>
     byte[] ObjectAt(uint pointer);
     byte[] Template { get; }
@@ -3215,6 +3217,43 @@ public static class OriginalUnitActions
         uint edi = g.Edi, ebx = g.Ebx, ecx = g.Ecx; g.Esi = U32(w.Ds, 0x191a); w.Call(0x1e133, g);
         g.Eax = ecx; g.Ebx = 0x1d0; g.Ecx = 0x20; g.Edx = 0x10; w.Call(0x1e098, g);
         g.Ecx = ecx; g.Eax = ebx; g.Add(g.Ecx, 0x28); g.Ecx += 0x28; g.Edx = 0x1d0; w.Call(0xac23, g); g.Ecx = g.Eax + 0x1e; g.Edi = edi;
+    }
+
+    /// <summary>C010: one step of the palette fade of the record ESI (the colour number +0, the start +1..3, the end +4..6, the length +7, the step +8, the position +9): the quotient position / length / 2 (BL) blends every component: out 3C8h = the number, then 3C9h three times start + ((end - start) * BL * 2 >> 8); the position moves by the step and the step is reversed at the end (+8 negated when position + step is not below the length).</summary>
+    public static void FC010(IUnitActionWorld w, ActionRegs g)
+    {
+        uint e = g.Esi; byte B(uint o) => w.Peek(e + o);
+        g.Eax = 0; g.Ah = B(9); uint ax = g.Eax & 0xffff, dv = B(7); g.Al = (byte)(ax / dv); g.Ah = (byte)(ax % dv); g.Al = (byte)(g.Al >> 1); g.Bl = g.Al;
+        w.Out(0x3c8, B(0)); g.Edx = (g.Edx & 0xffff0000) | 0x3c9;
+        for (uint k = 0; k < 3; k++)
+        {
+            g.Al = (byte)(B(4 + k) - B(1 + k)); int r = (sbyte)g.Al * (sbyte)g.Bl; g.Eax = (g.Eax & 0xffff0000) | (ushort)r; g.Eax += g.Eax;
+            g.Al = B(1 + k); g.Al = (byte)(g.Al + g.Ah); w.Out(0x3c9, g.Al);
+        }
+        g.Al = B(8); g.Al = Add8(g, g.Al, B(9)); g.Cmp(g.Al, B(7), 8);
+        if (!g.Cf) w.Poke(e + 8, (byte)-B(8));
+        g.Al = B(8); w.Poke(e + 9, Add8(g, B(9), g.Al));
+    }
+
+    /// <summary>C06E: every second tick of the timer [19E4] (against [52D]) the three palette records DS:52E, 538 and 542 take a fade step (C010).</summary>
+    public static void FC06E(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Al = d[0x19e4]; g.Ah = g.Al; g.Al = Sub8(g, g.Al, d[0x52d]); g.Cmp(g.Al, 2, 8); if (g.Cf) return;
+        d[0x52d] = g.Ah; foreach (uint a in new uint[] { 0x52e, 0x538, 0x542 }) { g.Esi = a; FC010(w, g); }
+    }
+
+    /// <summary>C0A4: the palette cycling of the record ESI (the count +0, the interval +1, the phase +2, the last time +3, then the blocks: the colour number and 3 * count bytes of the colours): after the interval of the timer [19E4] the phase advances (round the count) and every block (to the zero number) sends its colour of the phase.</summary>
+    public static void FC0A4(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint e = g.Esi; byte B(uint o) => w.Peek(e + o);
+        g.Al = d[0x19e4]; g.Ah = g.Al; g.Al = Sub8(g, g.Al, B(3)); g.Cmp(g.Al, B(1), 8); if (g.Cf) return;
+        w.Poke(e + 3, g.Ah); g.Eax = B(2); g.Ecx = B(0); g.Al = Inc8(g, g.Al); g.Cmp(g.Al, g.Cl, 8); if (!g.Cf) { g.Al = 0; g.Logic(0, 8); }
+        w.Poke(e + 2, g.Al); g.Ebx = g.Eax + g.Eax * 2 + 1; g.Ecx = g.Ecx + g.Ecx * 2 + 1; g.Esi = e + 4; g.Edx = (g.Edx & 0xffff0000) | 0x3c9;
+        do
+        {
+            g.Al = w.Peek(g.Esi); w.Out(0x3c8, g.Al); for (uint k = 0; k < 3; k++) { g.Al = w.Peek(g.Esi + g.Ebx + k); w.Out(0x3c9, g.Al); }
+            g.Add(g.Esi, g.Ecx); g.Esi += g.Ecx; g.Cmp(w.Peek(g.Esi), 0, 8);
+        } while (!g.Zf);
     }
 
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
