@@ -9915,6 +9915,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "the writes to the VGA palette ports 3C8h/3C9h go to IUnitActionWorld.Out (the game world ignores them until the palette is drawn by the engine); the records lie in the flat test regions"
+    },
+    {
+      "id": "le1-cursor-frames-ae57",
+      "module": "LE:1",
+      "start": 44631,
+      "end": 44807,
+      "name": "Cursor frames of the template and of the selected object (AE57, AEA8)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "1DB64, AF07 and 1D970 are recorded stubs"
     }
   ]
 }

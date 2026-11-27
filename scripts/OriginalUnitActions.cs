@@ -2916,6 +2916,27 @@ public static class OriginalUnitActions
         w.Call(0x68a0, g); Put(d, 0x2849, g.Edi); Put(d, 0x4f0, 0); w.Call(0xae57, g); w.L3[2] = 5; w.L3[0x12] = 0;
     }
 
+    /// <summary>AE57: the cursor frame of the template [2849]: the bits 0 of the bytes +3 and +4 (shifted to 10h) go to [27EC] and [27F0], the bytes themselves halved (EBX, ECX) draw the two frames 1DB64 (ESI = 27F5 to EDI = 279C and ESI = 281B to EDI = 27C4).</summary>
+    public static void FAE57(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Edi = U32(d, 0x2849); var o = w.ObjectAt(g.Edi); g.Ebx = 0; g.Ecx = 0; g.Eax = 0;
+        g.Bh = o[3]; g.Ch = o[4]; g.Al = g.Bh; g.Al = (byte)(g.Al << 4); g.Al &= 0x10; Put(d, 0x27ec, g.Eax);
+        g.Al = g.Ch; g.Al = (byte)(g.Al << 4); g.Al &= 0x10; Put(d, 0x27f0, g.Eax);
+        g.Ebx = g.Shr(g.Ebx, 1, 32); g.Ecx = g.Shr(g.Ecx, 1, 32); g.Esi = 0x27f5; g.Edi = 0x279c;
+        uint ebx = g.Ebx, ecx = g.Ecx; w.Call(0x1db64, g); g.Ecx = ecx; g.Ebx = ebx;
+        g.Esi = 0x281b; g.Edi = 0x27c4; w.Call(0x1db64, g);
+    }
+
+    /// <summary>AEA8: the cursor of the selected object: AF07 chooses the frame (AL/AH = [284D]/[284E], BL = the owner +3, ECX/EDX = [2841]/[2845]); with a failure the second frame 27C4 (EDI = FEh) and the bit 0 of [27F4] cleared, otherwise 279C (EDI = FDh); 1D970 draws at the point minus the view [190E]/[1912].</summary>
+    public static void FAEA8(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Esi = U32(d, 0x1969); g.Al = d[0x284d]; g.Ah = d[0x284e]; g.Bl = w.ObjectAt(g.Esi)[3]; g.Ecx = U32(d, 0x2841); g.Edx = U32(d, 0x2845);
+        w.Call(0xaf07, g); g.Esi = 0x279c; g.Edi = 0xfd;
+        if (!g.Zf) { d[0x27f4] &= 0xfe; g.Esi = 0x27c4; g.Edi = 0xfe; }
+        g.Eax = U32(d, 0x2841); g.Ebx = U32(d, 0x2845); g.Cmp(g.Eax, U32(d, 0x190e), 32); g.Eax -= U32(d, 0x190e); g.Cmp(g.Ebx, U32(d, 0x1912), 32); g.Ebx -= U32(d, 0x1912);
+        w.Call(0x1d970, g);
+    }
+
     /// <summary>50F4: the tool «go and do» (cursor 9B0094h): the left button over the map: effect 4, the point [1955]/[1959] as +32/+33 of the selected object with the order [19C0] (a group: 20232, 1F62B); then 4938.</summary>
     public static void F50F4(IUnitActionWorld w, ActionRegs g)
     {
