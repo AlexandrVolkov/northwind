@@ -755,6 +755,8 @@ def cases(names):
             c['m18de'] = rng.randrange(1, 9); c['m18e2'] = rng.randrange(1, 9)
             if c['fn'] == 'f117c5':
                 c['regs'][0] = (c['regs'][0] & ~0xff) | 6 + rng.randrange(2); c['who'] = c['regs'][0] & 0xff; c['lst'] = rng.choice([0x800, 0x900, 0xa00, 0x800]); c['army1'] = rng.randrange(3); c['army2'] = rng.randrange(3)
+                cost = prng(c['tm'], 0x100)[0x76]; c['dsb'] = rng.choice([2 * cost, 2 * cost + 1, 4 * cost, 4 * cost + 1, 2 * cost - 1, 0, rng.randrange(1 << 20)]) & 0xffffffff
+                c['sums'] = bytes(rng.randrange(256) if k % 4 < 2 else 0 for k in range(80)).hex()
         if c['fn'] == 'febd8':
             c['rel'] = [rng.choice([0, 0, 0, 1, 5]) for _ in range(8)] + [0] * 8; c['dv'] = [rng.choice([0x7cf, 0x7d0, 0x7ce, 0x1000, 0]) for _ in range(8)]; c['m0'] = rng.choice([0, 0, 1]); c['k1c35'] = rng.choice([0x3a, 0x3a, 0, 5]); c['k1972'] = c['f3']
             for call in c['calls']: call[0] = rng.choice([0, 1, 1]); call[1] = call[1] % 256; call[2] = 0x97a + 0xf5 * c['f3']
@@ -1277,6 +1279,8 @@ def generate(game, names):
             for k in range(8): o.cpu.mem_write(o.POOL + 0xa000 + k * 0x1a35 + 0x19f1, struct.pack('<I', case['dv'][k]))
             for k in range(3, 8): o.cpu.mem_write(0x97a + 0xf5 * k + 0x18, bytes(0x10))
             if case['fn'] == 'f117c5':
+                for k in range(3, 8): o.cpu.mem_write(0x97a + 0xf5 * k + 0x18, bytes.fromhex(case['sums'])[16 * (k - 3):16 * (k - 3) + 16])
+                o.cpu.mem_write(o.POOL + 0xa000 + case['who'] * 0x1a35 + 0x19e9, struct.pack('<I', case['dsb']))
                 pa = 0x97a + 0xf5 * case['who']; o.cpu.mem_write(pa + 0xe, struct.pack('<I', case['lst'])); o.cpu.mem_write(pa + 9, struct.pack('<I', 0xa00))
                 for ofs, ar in ((POOLREC, case['army1']), (OBJ1, case['army2'])): o.cpu.mem_write(o.POOL + ofs, bytes([ar])); o.cpu.mem_write(o.POOL + ofs + 0xe, b'\x00'); o.cpu.mem_write(o.POOL + ofs + 0x10, struct.pack('<I', 0x100))
         if case['fn'] == 'febd8':

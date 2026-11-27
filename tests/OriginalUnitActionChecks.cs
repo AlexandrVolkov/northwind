@@ -563,7 +563,7 @@ public partial class TestRunner
                         for (int k = 0; k < 8; k++) BitConverter.GetBytes((uint)c.GetProperty("dv")[k].GetInt64()).CopyTo(w.Stats, k * 0x1a35 + 0x19f1);
                         if (fn == "f117c5")
                         {
-                            int who = c.GetProperty("who").GetInt32(); var pa = w.PartOf((byte)who); Put32(pa, 0xe, (uint)c.GetProperty("lst").GetInt32()); Put32(pa, 9, 0xa00);
+                            int who = c.GetProperty("who").GetInt32(); var sums = Convert.FromHexString(c.GetProperty("sums").GetString()!); for (int k = 3; k < 8; k++) Array.Copy(sums, 16 * (k - 3), w.PartOf((byte)k), 0x18, 16); Put32(w.Stats, who * 0x1a35 + 0x19e9, (uint)c.GetProperty("dsb").GetInt64()); var pa = w.PartOf((byte)who); Put32(pa, 0xe, (uint)c.GetProperty("lst").GetInt32()); Put32(pa, 9, 0xa00);
                             r[0] = (byte)c.GetProperty("army1").GetInt32(); r[0xe] = 0; Put32(r, 0x10, 0x100); w.Obj1[0] = (byte)c.GetProperty("army2").GetInt32(); w.Obj1[0xe] = 0; Put32(w.Obj1, 0x10, 0x100);
                             OriginalUnitActions.F117C5(w, g);
                         }
