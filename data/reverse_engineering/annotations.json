@@ -10067,6 +10067,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "3EEA, 6FCC and AC23 are recorded stubs; EBP (90h for 6FCC) is not in the recorded registers, so the fixture does not tell it"
+    },
+    {
+      "id": "le1-nearest-hostile-11d34",
+      "module": "LE:1",
+      "start": 73012,
+      "end": 73182,
+      "name": "Nearest hostile of an object in its neighbourhood (11D34)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "219C3, D7B1 and C344 are recorded stubs; the fixture world (shared with FS:14B) does not tell the template bit 8000h from 8020h, the health test JLE from JC and JA from JAE"
     }
   ]
 }
