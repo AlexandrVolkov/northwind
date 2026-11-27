@@ -709,7 +709,7 @@ def cases(names):
                 c['tbl3'] = bytes(rng.randrange(256) for _ in range(0x13 * 3)).hex(); c['dur'] = [rng.choice([0, 5, 0xffffffff, 0x7fffffff, rng.randrange(1 << 32)]) for _ in range(3)]
             if c['fn'] == 'feefa': c['regs'][1] = (c['regs'][1] & ~0xffff) | rng.randrange(8) | rng.randrange(8) << 8
             c['regs'][0] = (c['regs'][0] & ~0xffff) | rng.randrange(4) | rng.choice([0, 1, 2, 3, 6, 7]) << 8; c['regs'][1] = (c['regs'][1] & ~0xff) | rng.randrange(8); c['regs'][3] = (c['regs'][3] & ~0xff) | rng.randrange(8)
-            if c['fn'] == 'fedd5': c['regs'][1] = (c['regs'][1] & ~0xff) | 6 + rng.randrange(2)
+            if c['fn'] == 'fedd5': c['regs'][1] = (c['regs'][1] & ~0xff) | 6 + rng.randrange(2); c['regs'][0] = (c['regs'][0] & ~0xff) | rng.randrange(3)
             c['qq'] = bytes(((rng.choice([0, 1, 2, 3, 0xff, 0xff]) if c['fn'] == 'fedd5' else rng.randrange(4)) if k % 0xe == 0 else rng.choice([0, 1, 2, 3, 6, 7]) if k % 0xe == 9 else (0 if rng.random() < 0.7 else rng.randrange(256)) if k % 0xe in (6, 7, 8) else rng.randrange(256)) for k in range(0x70 * 8)).hex()
         if c['fn'] == 'febd8':
             c['rel'] = [rng.choice([0, 0, 0, 1, 5]) for _ in range(8)] + [0] * 8; c['dv'] = [rng.choice([0x7cf, 0x7d0, 0x7ce, 0x1000, 0]) for _ in range(8)]; c['m0'] = rng.choice([0, 0, 1]); c['k1c35'] = rng.choice([0x3a, 0x3a, 0, 5]); c['k1972'] = c['f3']
