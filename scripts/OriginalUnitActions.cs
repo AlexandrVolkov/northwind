@@ -1166,7 +1166,7 @@ public static class OriginalUnitActions
 
     private static void CellClass(IUnitActionWorld w, ActionRegs g, byte[] o)
     {
-        g.Eax = U32(o, 8) >> 5; Mul8(g, g.Al, 32); g.Ebx = U32(o, 4) >> 5; g.Ebx += g.Eax; g.Ecx = 0xf00000;
+        g.Eax = U32(o, 8) >> 5; Mul8(g, g.Al, w.Ds[0x18de]); g.Ebx = U32(o, 4) >> 5; g.Ebx += g.Eax; g.Ecx = 0xf00000;
         g.Eax = g.Ebx & 0xffff; g.Al = (byte)w.TileDescriptor(g.Eax); g.Eax &= 7; g.Logic(g.Eax, 32);
     }
 
