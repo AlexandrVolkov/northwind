@@ -3414,6 +3414,32 @@ public static class OriginalUnitActions
         g.Ebx = U32(o, 8) >> 5; g.Ah = (byte)(g.Ah >> 1); g.Bl = (byte)(g.Bl - g.Ah); g.Dh = g.Bl; g.Eax = 6; FCF77(w, g);
     }
 
+    /// <summary>A5F4: the list of the cursor-command entries (the list EDX of four-byte entries ended by FFh; the first byte is the key) for the object ESI that the table of its owner accepts (6885 gives the army entry, [entry + owner * 4 + 15h] the table of records: +0 the way, +1 the key, +2 the flag, +0F the number of the 2-byte extras, size 10h + 2 * number; FFh at +1 ends it): AL = the key of the way [1F41], AH = the way [1F0A]; the accepted entries go to DS:1F45 (ended by FFh); AL = their number, AH = the index of the first with the key AL ([1F42] = FFh when none).</summary>
+    public static void FA5F4(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; uint esi0 = g.Esi, edx0 = g.Edx; d[0x1f41] = g.Al; d[0x1f0a] = g.Ah; d[0x1f42] = 0xff;
+        var obj = w.ObjectAt(g.Esi); F6885(w, g, obj); g.Eax = obj[3]; g.Ebp = Peek32(w, g.Ebx + g.Eax * 4 + 0x15); g.Esi = edx0;
+        g.Edx = 0; g.Ah = 0; g.Edi = 0x1f45;
+        do
+        {
+            g.Ebx = g.Ebp;
+            for (; ; )
+            {
+                g.Al = w.Peek(g.Ebx + 1); g.Cmp(g.Al, 0xff, 8); if (g.Zf) goto next;
+                g.Cmp(g.Al, w.Peek(g.Esi), 8); if (g.Zf) break;
+                g.Dl = w.Peek(g.Ebx + 0xf); g.Ebx = g.Ebx + g.Edx * 2 + 0x10;
+            }
+            g.Cmp(w.Peek(g.Ebx + 2), g.Dh, 8); if (!g.Zf) goto next;
+            g.Cl = d[0x1f0a]; g.Cmp(g.Cl, w.Peek(g.Ebx), 8); if (!g.Zf) goto next;
+            g.Cmp(g.Al, d[0x1f41], 8); if (g.Zf) d[0x1f42] = g.Ah;
+            g.Ah = Inc8(g, g.Ah); g.Ecx = 4;
+            for (int k = 0; k < 4; k++) w.Poke(g.Edi + (uint)k, w.Peek(g.Esi + (uint)k)); g.Edi += 4; g.Esi += 4; g.Ecx = 0; g.Esi -= 4;
+        next:
+            g.Esi += 4; g.Cmp(w.Peek(g.Esi), 0xff, 8);
+        } while (!g.Zf);
+        d[g.Edi] = 0xff; g.Al = g.Ah; g.Ah = d[0x1f42]; g.Esi = esi0;
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
