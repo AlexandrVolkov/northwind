@@ -4027,6 +4027,38 @@ public static class OriginalUnitActions
         } while (!g.Zf);
     }
 
+    /// <summary>EAD8: the title of the message window (AL = the participant, BL = the key, ECX/EDX = the corner, EBP = the handler): DS:1F0A, 1F35 (the record of the participant), 1F39, 1F3D, 1F41 keep the arguments; DF7E queues 3C1Fh (+15 = the byte +0B8 of the participant + 0C3h, +1 = key, +4/+8 = the corner + 23h), 3C01h (+15 = the relation +0B9 + [1972] + 166h with the carry of the compare, +0C = EBP, +4 + 10h) and 3C3Dh (+12 = the name +0A4 of the participant, centred by 7012: +4 = corner + 30h - width / 2, +8 = corner + 74h); +1 = key and +1A = AL in each.</summary>
+    public static void FEAD8(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; var l = w.L3; d[0x1f0a] = g.Al; byte owner = g.Al; g.Ah = 0xf5; Mul8(g, g.Al, g.Ah); g.Eax += 0x97a; Put(d, 0x1f35, g.Eax); Put(d, 0x1f39, g.Ecx); Put(d, 0x1f3d, g.Edx); d[0x1f41] = g.Bl;
+        var part = w.PartOf(owner);
+        g.Esi = 0x3c1f; g.Al = 1; FDF7E(w, g); g.Eax = part[0xb8]; ushort ax = (ushort)(g.Eax + 0xc3); g.Eax = (g.Eax & 0xffff0000) | ax; l[g.Edi + 0x15] = (byte)ax; l[g.Edi + 0x16] = (byte)(ax >> 8);
+        g.Al = d[0x1f41]; l[g.Edi + 1] = g.Al; g.Eax = U32(d, 0x1f39); Put(l, (int)g.Edi + 4, g.Eax); g.Eax = U32(d, 0x1f3d); g.Eax += 0x23; Put(l, (int)g.Edi + 8, g.Eax);
+        g.Esi = 0x3c01; g.Al = 1; FDF7E(w, g); g.Eax = d[0x1972]; g.Ecx = U32(d, 0x1f35); g.Al = part[0xb9 + d[0x1972]]; g.Cmp(g.Al, 1, 8);
+        { uint r = (g.Eax & 0xffff) + 0x166 + (g.Cf ? 1u : 0u); g.Eax = (g.Eax & 0xffff0000) | (r & 0xffff); l[g.Edi + 0x15] = (byte)r; l[g.Edi + 0x16] = (byte)(r >> 8); }
+        Put(l, (int)g.Edi + 0xc, g.Ebp); g.Al = d[0x1f41]; l[g.Edi + 1] = g.Al; g.Eax = U32(d, 0x1f39); g.Eax += 0x10; Put(l, (int)g.Edi + 4, g.Eax); g.Eax = U32(d, 0x1f3d); Put(l, (int)g.Edi + 8, g.Eax); g.Al = d[0x1f0a]; l[g.Edi + 0x1a] = g.Al;
+        g.Esi = 0x3c3d; g.Al = 1; FDF7E(w, g); g.Eax = U32(d, 0x1f35); g.Esi = g.Eax + 0xa4; Put(l, (int)g.Edi + 0x12, g.Esi);
+        uint e = g.Edi; w.Call(0x7012, g); g.Edi = e; g.Ebx >>= 1; g.Eax = U32(d, 0x1f39); g.Eax += 0x30; g.Eax -= g.Ebx; Put(l, (int)g.Edi + 4, g.Eax); g.Eax = U32(d, 0x1f3d); g.Add(g.Eax, 0x74); g.Eax += 0x74; Put(l, (int)g.Edi + 8, g.Eax);
+        Put(l, (int)g.Edi + 0xc, g.Ebp); g.Al = d[0x1f41]; l[g.Edi + 1] = g.Al; g.Al = d[0x1f0a]; l[g.Edi + 0x1a] = g.Al;
+    }
+
+    /// <summary>EC61 / EC82 / EC38 / ECA3: the closing handlers of the message menus: E5AB (EAX = E04h) must agree, then E5E6, DEE4 with the menu 3B5Dh (3B94h for EC82, 3B5Dh after the key +1A to [DD4] for EC38), ESI = 7D4h; ECA3 closes on the mouse click [1C35] = 1 or the bit 10h of +3 of the record.</summary>
+    public static void FEC61(IUnitActionWorld w, ActionRegs g) { g.Eax = 0xe04; w.Call(0xe5ab, g); if (!g.Zf) return; w.Call(0xe5e6, g); g.Esi = 0x3b5d; w.Call(0xdee4, g); g.Esi = 0x7d4; }
+    public static void FEC82(IUnitActionWorld w, ActionRegs g) { g.Eax = 0xe04; w.Call(0xe5ab, g); if (!g.Zf) return; w.Call(0xe5e6, g); g.Esi = 0x3b94; w.Call(0xdee4, g); g.Esi = 0x7d4; }
+    public static void FEC38(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Eax = 0xe04; w.Call(0xe5ab, g); if (!g.Zf) return; g.Al = r[0x1a]; w.L3[0xdd4] = g.Al; w.Call(0xe5e6, g); g.Esi = 0x3b5d; w.Call(0xdee4, g); g.Esi = 0x7d4;
+    }
+    public static void FECA3(IUnitActionWorld w, ActionRegs g, byte[] r)
+    {
+        g.Cmp(U16(w.Ds, 0x1c35), 1, 16);
+        if (!g.Zf) { g.Test(r[3], 0x10, 8); if (g.Zf) return; }
+        w.Call(0xe5e6, g); g.Esi = 0x3b5d; w.Call(0xdee4, g); g.Esi = 0x7d4;
+    }
+
+    /// <summary>ECC8: the flags of the record: +21 and +3F get +3 | +21 | +3F.</summary>
+    public static void FECC8(IUnitActionWorld w, ActionRegs g, byte[] r) { g.Al = r[3]; g.Al |= r[0x21]; g.Al |= r[0x3f]; g.Logic(g.Al, 8); r[0x21] = g.Al; r[0x3f] = g.Al; }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
