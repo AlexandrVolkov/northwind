@@ -9858,6 +9858,25 @@
         "scripts/OriginalUnitActions.cs"
       ],
       "limitations": "D182, 68A0 and AE57 are recorded stubs; the template table read through EDX is limited to the DS window in the fixture"
+    },
+    {
+      "id": "le1-panel-slope-5c2e",
+      "module": "LE:1",
+      "start": 23598,
+      "end": 23746,
+      "name": "Slope speed of the panel records in state 7 (5C2E)",
+      "classification": "code",
+      "status": "ported",
+      "evidence": [
+        "docs/unit-actions.md",
+        "tests/fixtures/unit-actions.json",
+        "tools/verify_unit_actions.py",
+        "tests/OriginalUnitActionChecks.cs"
+      ],
+      "implementation": [
+        "scripts/OriginalUnitActions.cs"
+      ],
+      "limitations": "the records lie in the flat text test region; the jump into 5CC2 (the state is not 7) is not exercised by the fixture (5CC2 has its own)"
     }
   ]
 }
