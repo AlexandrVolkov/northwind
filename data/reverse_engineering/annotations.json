@@ -10637,7 +10637,7 @@
       "implementation": [
         "scripts/OriginalUnitActions.cs"
       ],
-      "limitations": "the handler of the table entry (+08, an indirect call) is a recorded stub in the check (the pointer is a code address: the world gets it as it is); the check has three table entries and the queues of the participants 6 and 7 (the records 0..5 overlap the L3 area in the flat memory of the Python check)"
+      "limitations": "the handler of the table entry (+08, an indirect call) is a recorded stub in the check (the pointer is a code address: the world gets it as it is); the check has three table entries and the queues of the participants 6 and 7 (the records 0..5 overlap the L3 area in the flat memory of the Python check); the first write of +9 before the handler call is indistinguishable (DH is written again after it, the stub does not read it)"
     }
   ]
 }
