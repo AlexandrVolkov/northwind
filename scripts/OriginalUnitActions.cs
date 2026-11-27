@@ -4110,7 +4110,7 @@ public static class OriginalUnitActions
         for (int k = 0; ; k++)
         {
             g.Cmp(part[0x34 + 0xe * k], g.Bh, 8); if (g.Zf) { g.Al |= 0xff; g.Logic(g.Al, 8); return; }
-            g.Edi += 0xe; g.Cl = Dec8(g, g.Cl); if (g.Zf) return;
+            g.Add(g.Edi, 0xe); g.Edi += 0xe; g.Cl = Dec8(g, g.Cl); if (g.Zf) return;
         }
     }
 
