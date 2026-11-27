@@ -501,6 +501,11 @@ public partial class TestRunner
                 case "fec38": case "fec61": case "fec82": case "feca3": case "fecc8":
                     BitConverter.GetBytes((ushort)c.GetProperty("k1c35").GetInt32()).CopyTo(w.Ds, 0x1c35); w.L3[0xdd4] = (byte)c.GetProperty("kdd4").GetInt32();
                     if (fn == "fec38") OriginalUnitActions.FEC38(w, g, r); else if (fn == "fec61") OriginalUnitActions.FEC61(w, g); else if (fn == "fec82") OriginalUnitActions.FEC82(w, g); else if (fn == "feca3") OriginalUnitActions.FECA3(w, g, r); else OriginalUnitActions.FECC8(w, g, r); break;
+                case "febd8":
+                    {
+                        int f3 = c.GetProperty("f3").GetInt32(); w.Ds[0x1972] = (byte)c.GetProperty("k1972").GetInt32(); for (int k = 0; k < 16; k++) w.PartOf((byte)f3)[0xb9 + k] = (byte)c.GetProperty("rel")[k].GetInt32(); BitConverter.GetBytes((ushort)c.GetProperty("k1c35").GetInt32()).CopyTo(w.Ds, 0x1c35); w.L3[0] = (byte)c.GetProperty("m0").GetInt32();
+                        for (int k = 0; k < 8; k++) BitConverter.GetBytes((uint)c.GetProperty("dv")[k].GetInt32()).CopyTo(w.Stats, k * 0x1a35 + 0x19f1); OriginalUnitActions.FEBD8(w, g); break;
+                    }
                 case "f9f38":
                     {
                         Array.Fill(w.Video, (byte)0x5a, 0, 0x49000); Array.Copy(ActionPrng(c.GetProperty("seed").GetUInt32(), 0x10000), 0, w.Video, 0x50000, 0x10000); Array.Copy(Convert.FromHexString(c.GetProperty("tile").GetString()!), 0, w.Video, 0x60000, 0x1800);
@@ -761,7 +766,7 @@ public partial class TestRunner
         }
         GD.Print($"Unit actions: first mismatch {firstMismatch}");
         var summary = root.GetProperty("results").GetProperty("actions");
-        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 286, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
+        Check(count == summary.GetProperty("case_count").GetInt32() && seen.Count == 287, $"Unit action reference coverage ({count} cases, {seen.Count} functions)");
         Check(Convert.ToHexStringLower(digest.GetHashAndReset()) == summary.GetProperty("sha256").GetString(), "Unit action handlers match original x86");
     }
 }
