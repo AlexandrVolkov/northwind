@@ -3147,6 +3147,45 @@ public static class OriginalUnitActions
     private static void Rebuild(IUnitActionWorld w, ActionRegs g) { g.Edi = g.Esi; w.Call(0x5787, g); w.Call(0x66e9, g); }
     private static void Clear5B55(IUnitActionWorld w, ActionRegs g) { w.Call(0x66e9, g); w.Call(0x674f, g); w.Call(0x6eb2, g); w.Call(0x4938, g); g.Al = 0x2b; FDF2A(w, g); }
 
+    /// <summary>5C2E: the slope of the panel in the state 7 (L3[2]): the height EBX = the word +1A of the record ESI and the length 36h · (the count +1C) + EBX decide, with the flags [19E7] and the distance [1951], the step of the speed +1D of the record (to +/-7 or +/-F9h, otherwise it comes back to 0); with the bit 2 of [19E7] the speed moves EBX and the dword +8 of every following record (+1E each); in any other state it goes on into 5CC2 (the panel is closed).</summary>
+    public static void F5C2E(IUnitActionWorld w, ActionRegs g)
+    {
+        var d = w.Ds; g.Cmp(w.L3[2], 7, 8); if (!g.Zf) { F5CC2(w, g); return; }
+        uint e = g.Esi; byte B(uint o) => w.Peek(e + o);
+        g.Ebx = (uint)(int)(short)(B(0x1a) | B(0x1b) << 8); g.Eax = 0x36; g.Cl = B(0x1c); Mul8(g, g.Al, g.Cl); g.Add(g.Eax, g.Ebx); g.Eax += g.Ebx;
+        g.Test(B(3), 1, 8);
+        if (g.Zf) goto L91;
+        g.Test(d[0x19e7], 1, 8); if (g.Zf) goto La0;
+        g.Cmp(g.Eax, 0x1a2, 32);
+        if (g.Sf == g.Of)
+        {
+            g.Cmp(U32(d, 0x1951), 0x19a, 32);
+            if (!g.Cf)
+            {
+                g.Cmp(B(0x1d), 0xf9, 8); if (g.Zf || g.Sf != g.Of) goto La0;
+                w.Poke(e + 0x1d, Dec8(g, B(0x1d))); goto La0;
+            }
+        }
+        g.Cmp(g.Ebx, 0x1e, 32); if (!(g.Zf || g.Sf != g.Of)) goto L91;
+        g.Cmp(U32(d, 0x1951), 0x46, 32); if (!g.Cf && !g.Zf) goto L91;
+        g.Cmp(B(0x1d), 7, 8); if (g.Sf == g.Of) goto La0;
+        w.Poke(e + 0x1d, Inc8(g, B(0x1d))); goto La0;
+    L91:
+        g.Cmp(B(0x1d), 0, 8); if (g.Zf) goto La0;
+        if (!g.Sf) w.Poke(e + 0x1d, Sub8(g, B(0x1d), 2));
+        w.Poke(e + 0x1d, Inc8(g, B(0x1d)));
+    La0:
+        g.Test(d[0x19e7], 2, 8); if (g.Zf) return;
+        g.Edx = (uint)(int)(sbyte)B(0x1d); g.Test(g.Edx, g.Edx, 32); if (g.Zf) return;
+        g.Add(g.Ebx, g.Edx); g.Ebx += g.Edx; w.Poke(e + 0x1a, (byte)g.Ebx); w.Poke(e + 0x1b, (byte)(g.Ebx >> 8));
+        do
+        {
+            g.Add(e, 0x1e); e += 0x1e; g.Esi = e; uint v = (uint)(w.Peek(e + 8) | w.Peek(e + 9) << 8 | w.Peek(e + 10) << 16 | w.Peek(e + 11) << 24); g.Add(v, g.Edx); v += g.Edx;
+            for (uint k = 0; k < 4; k++) w.Poke(e + 8 + k, (byte)(v >> (8 * (int)k)));
+            g.Cl = Dec8(g, g.Cl);
+        } while (!g.Zf);
+    }
+
     /// <summary>5CC2: the panel is closed: 674F, DF2A with 2Ch, the effect 2 (A4A9).</summary>
     public static void F5CC2(IUnitActionWorld w, ActionRegs g)
     {
